@@ -1,1 +1,1 @@
-export * from "@/components/fights/Fights"
+export { default as Fights } from "@/components/fights/Fights"

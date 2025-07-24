@@ -1,6 +1,6 @@
 import { Container, Typography, Box } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
-import Fights from "@/components/fights/Fights" // Adjust path based on your project structure
+import { Fights } from "@/components/fights" // Adjust path based on your project structure
 
 export const metadata = {
   title: "Chi War"
