@@ -1,14 +1,12 @@
 import ThemeRegistry from "@/components/ThemeRegistry"
+import Navbar from "@/components/Navbar"
 
-type RootLayoutProps = {
-  children: React.ReactNode
-}
-
-export default function RootLayout({ children }: RootLayoutProps) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
         <ThemeRegistry>
+          <Navbar />
           {children}
         </ThemeRegistry>
       </body>
