@@ -7,11 +7,12 @@ import { useClient } from "@/contexts"
 import { logoutAction } from "@/lib/actions" // Import the server action
 
 export default function Navbar() {
-  const { jwt, user } = useClient()
+  const { jwt, user, dispatchCurrentUser } = useClient()
   const router = useRouter()
 
   const handleLogout = async () => {
     await logoutAction(jwt) // Call the server action
+    dispatchCurrentUser({ type: "RESET" })
     router.push("/login")
   }
 
