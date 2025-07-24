@@ -34,7 +34,7 @@ async function logoutAction() {
   const cookieStore = await cookies()
   const token = cookieStore.get("jwtToken")?.value
   if (token) {
-    await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/logout`, {
+    await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/sign_out`, {
       method: "DELETE",
       headers: { "Authorization": `Bearer ${token}` }
     })
