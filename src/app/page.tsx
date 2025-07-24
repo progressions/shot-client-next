@@ -27,29 +27,9 @@ export default async function HomePage() {
   return (
     <Container sx={{ mt: 4 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-        <Typography variant="h4" sx={{ color: "#ffffff" }}>
-          Welcome, {user.name}
+        <Typography variant="h4" component="h1" sx={{ color: "#ffffff" }}>
+          Fights
         </Typography>
-      </Box>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <Avatar src={user.image_url ?? undefined} alt={user.name} sx={{ width: 56, height: 56, mr: 2 }} />
-        <Box>
-          <Typography variant="body1" sx={{ color: "#ffffff" }}>
-            Email: {user.email}
-          </Typography>
-          <Typography variant="body1" sx={{ color: "#ffffff" }}>
-            Name: {user.first_name} {user.last_name}
-          </Typography>
-          <Typography variant="body1" sx={{ color: "#ffffff" }}>
-            ID: {user.id}
-          </Typography>
-          <Typography variant="body1" sx={{ color: "#ffffff" }}>
-            Admin: {user.admin ? "Yes" : "No"}
-          </Typography>
-          <Typography variant="body1" sx={{ color: "#ffffff" }}>
-            Gamemaster: {user.gamemaster ? "Yes" : "No"}
-          </Typography>
-        </Box>
       </Box>
     </Container>
   )
