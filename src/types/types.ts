@@ -1,6 +1,4 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { Session, User as NextAuthUser } from "next-auth"
-import { AlertColor } from "@mui/material"
 
 export type BackendErrorResponse = {
   name?: string[]
@@ -40,7 +38,7 @@ export interface CharacterJson {
 
 export interface PopupProps {
   id: string
-  data?: any
+  data?: object
 }
 
 export interface VehicleArchetype {
@@ -181,21 +179,9 @@ export interface ErrorMessages {
   [key: string]: string
 }
 
-export interface AuthUser extends NextAuthUser {
-  authorization: string | null
-  admin: boolean
-}
-
 export interface SessionData {
-  authorization: {}
-  user?: User | AuthUser
-}
-
-export interface AuthSession extends Session {
-  authorization: {} | null
-  id: {}
-  status: "loading" | "unauthenticated" | "authenticated"
-  data: SessionData | null
+  authorization: object
+  user?: User
 }
 
 export interface OptionType {
@@ -523,7 +509,7 @@ export interface FightEvent {
   fight_id?: string
   event_type: string
   description: string
-  details?: any
+  details?: object
   created_at?: string
 }
 

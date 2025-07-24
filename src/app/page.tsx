@@ -2,11 +2,22 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Container, Typography, Box, Alert, Button } from "@mui/material"
+import { Container, Typography, Box, Alert, Button, Avatar } from "@mui/material"
 import Cookies from "js-cookie"
 
+interface User {
+  id: string
+  email: string
+  name: string
+  first_name: string
+  last_name: string
+  admin: boolean
+  gamemaster: boolean
+  image_url: string
+}
+
 export default function HomePage() {
-  const [user, setUser] = useState<{ id: number, email: string, name?: string } | null>(null)
+  const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
@@ -22,8 +33,7 @@ export default function HomePage() {
       }
       try {
         console.log("token", token)
-
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/users/current`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/users/current`, {
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
@@ -32,9 +42,9 @@ export default function HomePage() {
         if (!response.ok) {
           throw new Error("Failed to fetch user data")
         }
-        const user = await response.json()
-        console.log("user", user)
-        setUser(user)
+        const { data } = await response.json()
+        console.log("user", data)
+        setUser(data)
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred")
       } finally {
@@ -56,13 +66,31 @@ export default function HomePage() {
     <Container sx={{ mt: 4 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
         <Typography variant="h4" sx={{ color: "#ffffff" }}>
-          Welcome{user?.name ? `, ${user.name}` : ""}
+          Welcome, {user?.name}
         </Typography>
         <Button variant="outlined" color="error" onClick={handleLogout}>
           Logout
         </Button>
       </Box>
-      <Box>
+      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+        <Avatar src={user?.image_url} alt={user?.name} sx={{ width: 56, height: 56, mr: 2 }} />
+        <Box>
+          <Typography variant="body1" sx={{ color: "#ffffff" }}>
+            Email: {user?.email}
+          </Typography>
+          <Typography variant="body1" sx={{ color: "#ffffff" }}>
+            Name: {user?.first_name} {user?.last_name}
+          </Typography>
+          <Typography variant="body1" sx={{ color: "#ffffff" }}>
+            ID: {user?.id}
+          </Typography>
+          <Typography variant="body1" sx={{ color: "#ffffff" }}>
+            Admin: {user?.admin ? "Yes" : "No"}
+          </Typography>
+          <Typography variant="body1" sx={{ color: "#ffffff" }}>
+            Gamemaster: {user?.gamemaster ? "Yes" : "No"}
+          </Typography>
+        </Box>
       </Box>
     </Container>
   )

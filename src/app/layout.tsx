@@ -1,6 +1,10 @@
 import ThemeRegistry from "@/components/ThemeRegistry"
 
-export default function RootLayout({ children }) {
+type RootLayoutProps = {
+  children: React.ReactNode
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <body>
