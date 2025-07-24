@@ -13,8 +13,6 @@ export default function FightName({ fight }: FightNameProps) {
   const { campaignData } = useCampaign()
   const [displayName, setDisplayName] = useState(fight.name)
 
-  console.log("campaignData", campaignData)
-
   useEffect(() => {
     if (campaignData) {
       const updatedFight = campaignData?.fight
