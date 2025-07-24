@@ -1,0 +1,106 @@
+"use client"
+
+import { useEffect, useState, createContext, useContext, useCallback } from "react"
+import { Subscription } from "@rails/actioncable"
+
+import type { CampaignCableData, Campaign } from "@/types/types"
+import { defaultCampaign } from "@/types/types"
+import { useClient, useLocalStorage } from "@/contexts"
+
+export interface CampaignContextType {
+  campaign: Campaign | null
+  setCurrentCampaign: (camp: Campaign | null) => Promise<Campaign | null>
+  getCurrentCampaign: () => Promise<Campaign | null>
+  subscription: Subscription | null
+  campaignData: CampaignCableData | null
+}
+
+interface CampaignProviderProps {
+  children: React.ReactNode
+}
+
+const defaultContext: CampaignContextType = {
+  campaign: null,
+  setCurrentCampaign: async (camp: Campaign | null) => (camp || defaultCampaign),
+  getCurrentCampaign: async () => defaultCampaign,
+  subscription: null,
+  campaignData: null
+}
+
+const CampaignContext = createContext<CampaignContextType>(defaultContext)
+
+export function CampaignProvider({ children }: CampaignProviderProps) {
+  const { user, client } = useClient()
+  const { saveLocally, getLocally } = useLocalStorage()
+  const consumer = client.consumer()
+
+  const [campaign, setCampaign] = useState<Campaign | null>(defaultCampaign)
+  const [subscription, setSubscription] = useState<Subscription | null>(null)
+  const [campaignData, setCampaignData] = useState<CampaignCableData | null>(null)
+
+  const setCurrentCampaign = async (camp: Campaign | null): Promise<Campaign | null> => {
+    try {
+      const data = await client.setCurrentCampaign(camp)
+      setCampaign(data)
+      saveLocally(`currentCampaign-${user?.id}`, data)
+      return data
+    } catch (err) {
+      console.error(err)
+    }
+    return null
+  }
+
+  const getCurrentCampaign = useCallback(async (): Promise<Campaign | null> => {
+    try {
+      const cachedCampaign = getLocally(`currentCampaign-${user?.id}`) as Campaign | null
+      if (cachedCampaign) {
+        setCampaign(cachedCampaign)
+        return cachedCampaign
+      }
+      const data = await client.getCurrentCampaign()
+      setCampaign(data)
+      return data
+    } catch (err) {
+      console.error(err)
+    }
+    return null
+  }, [client, user, setCampaign, getLocally])
+
+  useEffect(() => {
+    if (!user) return
+
+    getCurrentCampaign()
+  }, [user, getCurrentCampaign])
+
+  useEffect(() => {
+    if (!user || !campaign?.id) return
+
+    const sub = consumer.subscriptions.create(
+      { channel: "CampaignChannel", id: campaign.id },
+      {
+        connected: () => console.log("Connected to CampaignChannel"),
+        disconnected: () => console.log("Disconnected from CampaignChannel"),
+        received: (data: CampaignCableData) => {
+          console.log("CampaignChannel data", data)
+          setCampaignData(data)
+        }
+      }
+    )
+
+    setSubscription(sub)
+
+    return () => {
+      sub.unsubscribe()
+    }
+  }, [user, campaign, consumer])
+
+  return (
+    <CampaignContext.Provider value={{ campaign, setCurrentCampaign, getCurrentCampaign, subscription, campaignData }}>
+      {children}
+    </CampaignContext.Provider>
+  )
+}
+
+export function useCampaign() {
+  return useContext(CampaignContext)
+}

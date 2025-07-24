@@ -6,6 +6,10 @@ export type BackendErrorResponse = {
   errors?: Record<string, string[]>
 }
 
+export interface CampaignCableData {
+  character: Character | null
+}
+
 export interface CableData {
   status: 'preview_ready' | 'error'
   json?: CharacterJson

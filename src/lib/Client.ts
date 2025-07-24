@@ -1,9 +1,8 @@
-import axios, { AxiosResponse } from "axios"
+import axios, { AxiosResponse, AxiosRequestConfig } from "axios"
 import Api from "@/lib/Api"
 import type {
   Location,
   CharacterJson,
-  Shot,
   Faction,
   FactionsResponse,
   SuggestionsResponse,
@@ -35,7 +34,7 @@ import type {
   User,
   VehicleArchetype
 } from "@/types/types"
-import { createConsumer } from "@rails/actioncable"
+import { createConsumer, Consumer } from "@rails/actioncable"
 
 interface ClientParams {
   jwt?: string
@@ -46,10 +45,12 @@ interface CacheOptions {
   revalidate?: number
 }
 
+type Params = Record<string, unknown>
+
 class Client {
   jwt?: string
   api: Api
-  consumerInstance?: any
+  consumerInstance?: Consumer
 
   constructor(params: ClientParams = {}) {
     if (params.jwt) {
@@ -68,26 +69,25 @@ class Client {
   }
 
   async generateAiCharacter(params: { description: string } = { description: "" }): Promise<CharacterJson> {
-    const query = this.queryParams(params)
     return this.post(this.api.ai(), { ai: params })
   }
 
-  async getSuggestions(params = {}, cacheOptions: CacheOptions = {}): Promise<SuggestionsResponse> {
+  async getSuggestions(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<SuggestionsResponse> {
     const query = this.queryParams(params)
     return this.get(`${this.api.suggestions()}?${query}`, {}, cacheOptions)
   }
 
-  async getNotionCharacters(params = {}, cacheOptions: CacheOptions = {}) {
+  async getNotionCharacters(params: Params = {}, cacheOptions: CacheOptions = {}) {
     const query = this.queryParams(params)
     return this.get(`${this.api.notionCharacters()}?${query}`, {}, cacheOptions)
   }
 
   async getLocationForCharacter(character: Character, cacheOptions: CacheOptions = {}): Promise<Location> {
-    return this.get(this.api.locations(), { "shot_id": character.shot_id } as Character, cacheOptions)
+    return this.get(this.api.locations(), { "shot_id": character.shot_id } as Params, cacheOptions)
   }
 
   async getLocationForVehicle(vehicle: Vehicle, cacheOptions: CacheOptions = {}): Promise<Location> {
-    return this.get(this.api.locations(), { "shot_id": vehicle.shot_id } as Vehicle, cacheOptions)
+    return this.get(this.api.locations(), { "shot_id": vehicle.shot_id } as Params, cacheOptions)
   }
 
   async setCharacterLocation(character: Character, location: Location | ID): Promise<Location> {
@@ -114,7 +114,7 @@ class Client {
     return this.delete(`${this.api.memberships(party, vehicle)}/vehicle`)
   }
 
-  async getParties(params = {}, cacheOptions: CacheOptions = {}): Promise<PartiesResponse> {
+  async getParties(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<PartiesResponse> {
     const query = this.queryParams(params)
     return this.get(`${this.api.parties()}?${query}`, {}, cacheOptions)
   }
@@ -143,7 +143,7 @@ class Client {
     return this.post(this.api.addPartyToFight(party, fight))
   }
 
-  async getFights(params = {}, cacheOptions: CacheOptions = {}): Promise<FightsResponse> {
+  async getFights(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<FightsResponse> {
     const query = this.queryParams(params)
     return this.get(`${this.api.fights()}?${query}`, {}, cacheOptions)
   }
@@ -176,17 +176,17 @@ class Client {
     return this.post(this.api.fightEvents(fight), { "fight_event": fightEvent })
   }
 
-  async getCharactersInFight(fight: Fight | ID, params = {}, cacheOptions: CacheOptions = {}): Promise<Person[]> {
+  async getCharactersInFight(fight: Fight | ID, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<Person[]> {
     const query = this.queryParams(params)
     return this.get(`${this.api.charactersAndVehicles(fight)}/characters?${query}`, {}, cacheOptions)
   }
 
-  async getVehiclesInFight(fight: Fight | ID, params = {}, cacheOptions: CacheOptions = {}): Promise<Vehicle[]> {
+  async getVehiclesInFight(fight: Fight | ID, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<Vehicle[]> {
     const query = this.queryParams(params)
     return this.get(`${this.api.charactersAndVehicles(fight)}/vehicles?${query}`, {}, cacheOptions)
   }
 
-  async getCharactersAndVehicles(params = {}, cacheOptions: CacheOptions = {}): Promise<CharactersAndVehiclesResponse> {
+  async getCharactersAndVehicles(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<CharactersAndVehiclesResponse> {
     const query = this.queryParams(params)
     return this.get(`${this.api.charactersAndVehicles()}?${query}`, {}, cacheOptions)
   }
@@ -306,7 +306,7 @@ class Client {
     return this.delete(this.api.advancements(character, advancement))
   }
 
-  async getJunctures(params = {}, cacheOptions: CacheOptions = {}): Promise<JuncturesResponse> {
+  async getJunctures(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<JuncturesResponse> {
     const query = this.queryParams(params)
     return this.get(`${this.api.junctures()}?${query}`, {}, cacheOptions)
   }
@@ -331,7 +331,7 @@ class Client {
     return this.delete(`${this.api.junctures(juncture)}/image`)
   }
 
-  async getSites(params = {}, cacheOptions: CacheOptions = {}): Promise<SitesResponse> {
+  async getSites(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<SitesResponse> {
     const query = this.queryParams(params)
     return this.get(`${this.api.allSites()}?${query}`, {}, cacheOptions)
   }
@@ -504,7 +504,7 @@ class Client {
     return this.get(this.api.factions(faction), {}, cacheOptions)
   }
 
-  async getFactions(params = {}, cacheOptions: CacheOptions = {}): Promise<FactionsResponse> {
+  async getFactions(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<FactionsResponse> {
     const query = this.queryParams(params)
     return this.get(`${this.api.factions()}?${query}`, {}, cacheOptions)
   }
@@ -521,7 +521,7 @@ class Client {
     return this.delete(`${this.api.factions(faction)}/image`)
   }
 
-  async getSchticks(params = {}, cacheOptions: CacheOptions = {}): Promise<SchticksResponse> {
+  async getSchticks(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<SchticksResponse> {
     const query = this.queryParams(params)
     return this.get(`${this.api.schticks()}?${query}`, {}, cacheOptions)
   }
@@ -542,7 +542,7 @@ class Client {
     return this.delete(this.api.schticks(schtick))
   }
 
-  async getCharacterSchticks(character: Character | ID, params = {}, cacheOptions: CacheOptions = {}): Promise<SchticksResponse> {
+  async getCharacterSchticks(character: Character | ID, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<SchticksResponse> {
     const query = this.queryParams(params)
     return this.get(`${this.api.characterSchticks(character)}?${query}`, {}, cacheOptions)
   }
@@ -563,12 +563,12 @@ class Client {
     return this.delete(this.api.characterSchticks(character, schtick))
   }
 
-  async getCharacterWeapons(character: Character | ID, params = {}, cacheOptions: CacheOptions = {}): Promise<WeaponsResponse> {
+  async getCharacterWeapons(character: Character | ID, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<WeaponsResponse> {
     const query = this.queryParams(params)
     return this.get(`${this.api.characterWeapons(character)}?${query}`, {}, cacheOptions)
   }
 
-  async getWeapons(params = {}, cacheOptions: CacheOptions = {}): Promise<WeaponsResponse> {
+  async getWeapons(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<WeaponsResponse> {
     const query = this.queryParams(params)
     return this.get(`${this.api.weapons()}?${query}`, {}, cacheOptions)
   }
@@ -605,28 +605,30 @@ class Client {
     return this.delete(this.api.characterWeapons(character, weapon))
   }
 
-  async patch<T>(url: string, params = {}, cacheOptions: CacheOptions = {}): Promise<T> {
+  async patch<T>(url: string, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<T> {
     return await this.request("PATCH", url, params, cacheOptions)
   }
 
-  async post<T>(url: string, params = {}, cacheOptions: CacheOptions = {}): Promise<T> {
+  async post<T>(url: string, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<T> {
     return await this.request("POST", url, params, cacheOptions)
   }
 
-  async request<T>(method: string, url: string, params = {}, cacheOptions: CacheOptions = {}): Promise<T> {
-    const config: any = {
-      url: url,
-      method: method,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${this.jwt}`
-      }
+  async request<T>(method: string, url: string, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<T> {
+    const headers: { [key: string]: string } = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${this.jwt}`
     }
 
     if (cacheOptions.cache === "no-store") {
-      config.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, proxy-revalidate"
+      headers["Cache-Control"] = "no-store, no-cache, must-revalidate, proxy-revalidate"
     } else if (cacheOptions.cache === "force-cache") {
-      config.headers["Cache-Control"] = `max-age=${cacheOptions.revalidate || 3600}`
+      headers["Cache-Control"] = `max-age=${cacheOptions.revalidate || 3600}`
+    }
+
+    const config: AxiosRequestConfig = {
+      url: url,
+      method: method,
+      headers: headers
     }
 
     if (method === "GET") {
@@ -638,25 +640,28 @@ class Client {
     return await axios(config).then(response => response.data)
   }
 
-  async get<T>(url: string, params = {}, cacheOptions: CacheOptions = {}): Promise<T> {
+  async get<T>(url: string, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<T> {
     if (!this.jwt) {
       console.log("No JWT provided, cannot make GET request", url)
       return Promise.reject(new Error("No JWT provided"))
     }
-    const config: any = {
-      url: url,
-      method: "GET",
-      params: params,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${this.jwt}`
-      }
+
+    const headers: { [key: string]: string } = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${this.jwt}`
     }
 
     if (cacheOptions.cache === "no-store") {
-      config.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, proxy-revalidate"
+      headers["Cache-Control"] = "no-store, no-cache, must-revalidate, proxy-revalidate"
     } else if (cacheOptions.cache === "force-cache") {
-      config.headers["Cache-Control"] = `max-age=${cacheOptions.revalidate || 3600}`
+      headers["Cache-Control"] = `max-age=${cacheOptions.revalidate || 3600}`
+    }
+
+    const config: AxiosRequestConfig = {
+      url: url,
+      method: "GET",
+      params: params,
+      headers: headers
     }
 
     return await axios(config).then(response => response.data)
@@ -689,7 +694,7 @@ class Client {
       })
   }
 
-  queryParams(params = {}) {
+  queryParams(params: Params = {}) {
     return Object.entries(params).map(([key, value]) => `${key}=${value || ""}`).join("&")
   }
 }

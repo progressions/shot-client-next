@@ -1,13 +1,12 @@
 "use client"
 
-import { useReducer, useEffect, useMemo, createContext, useContext } from "react"
+import { type ActionDispatch, useReducer, useEffect, useMemo, createContext, useContext } from "react"
 import Cookies from "js-cookie"
 import Client from "@/lib/Client"
-import Api from "@/lib/Api"
 
 import { defaultUser } from "@/types/types"
 import type { User } from "@/types/types"
-import { UserActions, userReducer, initialUserState } from "@/reducers/userState"
+import { UserStateAction, UserActions, userReducer, initialUserState } from "@/reducers/userState"
 import type { UserStateType } from "@/reducers/userState"
 
 interface ClientContextType {
@@ -15,7 +14,7 @@ interface ClientContextType {
   jwt: string
   user: User
   currentUserState: UserStateType
-  dispatchCurrentUser: React.Dispatch<any>
+  dispatchCurrentUser: ActionDispatch<[action: UserStateAction]>
 }
 
 interface ClientProviderProps {

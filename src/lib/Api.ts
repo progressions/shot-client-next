@@ -1,6 +1,5 @@
 import type {
   Location,
-  Shot,
   Party,
   Weapon,
   Site,
@@ -13,10 +12,8 @@ import type {
   Effect,
   Faction,
   Fight,
-  FightEvent,
   Character,
   User,
-  Person,
   Juncture,
   ID
 } from "@/types/types"

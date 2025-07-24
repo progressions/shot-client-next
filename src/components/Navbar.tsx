@@ -1,43 +1,19 @@
-import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
+"use client"
+
+import { useRouter } from "next/navigation"
 import { Box, AppBar, Toolbar, Typography, Button, Avatar } from "@mui/material"
 import Link from "next/link"
-import { User } from "@/types/types"
-import Client from "@/lib/Client"
+import { useClient } from "@/contexts"
+import { logoutAction } from "@/lib/actions" // Import the server action
 
-async function getUser() {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("jwtToken")?.value
-  if (!token) {
-    return null
-  }
-  const client = new Client({ jwt: token })
-  try {
-    const data = await client.getCurrentUser()
-    console.log("data", data)
-    if (!data) {
-      return null
-    }
-    return data as User
-  } catch (err) {
-    console.error(err)
-    return null
-  }
-}
+export default function Navbar() {
+  const { jwt, user } = useClient()
+  const router = useRouter()
 
-async function logoutAction() {
-  "use server"
-  const cookieStore = await cookies()
-  const token = cookieStore.get("jwtToken")?.value
-  if (!token) {
-    return null
+  const handleLogout = async () => {
+    await logoutAction(jwt) // Call the server action
+    router.push("/login")
   }
-  cookieStore.delete("jwtToken")
-  redirect("/login")
-}
-
-export default async function Navbar() {
-  const user = await getUser()
 
   return (
     <AppBar position="static" sx={{ bgcolor: "#1d1d1d" }}>
@@ -51,14 +27,12 @@ export default async function Navbar() {
           Chi War
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          {user ? (
+          {user.id ? (
             <>
               <Avatar src={user.image_url ?? undefined} alt={user.name} sx={{ width: 32, height: 32 }} />
-              <form action={logoutAction}>
-                <Button type="submit" variant="outlined" color="error">
-                  Logout
-                </Button>
-              </form>
+              <Button variant="outlined" color="error" onClick={handleLogout}>
+                Logout
+              </Button>
             </>
           ) : (
             <Button

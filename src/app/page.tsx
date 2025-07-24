@@ -1,26 +1,15 @@
-import { redirect } from "next/navigation"
-import { cookies } from "next/headers"
-import { Container, Typography, Box, Button, Avatar } from "@mui/material"
-import { User } from "types/types"
+import { Container, Typography, Box } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 
 export const metadata = {
   title: "Chi War"
 }
 
-async function logoutAction() {
-  "use server"
-  const client = await getServerClient()
-  if (client) {
-    await client.delete("/users/sign_out")
-  }
-  cookies().delete("jwtToken")
-  redirect("/login")
-}
-
 export default async function HomePage() {
   const client = await getServerClient()
   const user = await getUser()
+  if (!client || !user) return
+
   const data = await client.getFights()
   console.log("fights", data.fights)
 

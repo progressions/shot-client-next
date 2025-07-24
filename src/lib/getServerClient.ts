@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import Client from "@/lib/Client"
+import type { User } from "@/types/types"
 
-export async function getServerClient() {
+export async function getServerClient(): Promise<Client | null> {
   const cookieStore = await cookies()
   const token = cookieStore.get("jwtToken")?.value
 
