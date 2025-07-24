@@ -1,21 +1,23 @@
-"use client" // Client component to enable future interactivity
+"use client"
 
 import { useState, useEffect } from "react"
-import { Typography, Box } from "@mui/material"
+import { Box } from "@mui/material"
 import { useClient } from "@/contexts"
-import type { Fight } from "@/types/types"
+import { FightName } from "@/components/fights" // Import the new FightName component
 
-type FightsProps = {
-  initialFights: Fight[]
+// Define Fight type based on your API (adjust as needed)
+type Fight = {
+  id: string
+  name: string // Or whatever properties your fights have
+  // Add more fields like date, participants, etc.
 }
 
-export default function Fights({ initialFights }: FightsProps) {
+export default function Fights({ initialFights }: { initialFights: Fight[] }) {
   const [fights, setFights] = useState<Fight[]>(initialFights)
   const { client } = useClient() // For future refetches
 
   // Future: Add sorting/filtering state and refetch logic here
-  // e.g., useEffect to refetch when filters change:
-  // useEffect(() => {
+  // e.g., useEffect(() => {
   //   async function refetch() {
   //     const { data } = await client.getFights({ sort: sortBy, filter: filter });
   //     setFights(data.fights);
@@ -31,9 +33,7 @@ export default function Fights({ initialFights }: FightsProps) {
         </Typography>
       ) : (
         fights.map((fight) => (
-          <Typography key={fight.id} variant="body1" sx={{ color: "#ffffff", mb: 1 }}>
-            {fight.name} {/* Adjust to display relevant fight details */}
-          </Typography>
+          <FightName key={fight.id} fight={fight} />
         ))
       )}
     </Box>

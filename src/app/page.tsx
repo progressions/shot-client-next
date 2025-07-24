@@ -20,7 +20,7 @@ export default async function HomePage() {
           Fights
         </Typography>
       </Box>
-      <Fights initialFights={data.fights} /> {/* Pass resolved fights array as prop */}
+      <Fights initialFights={data.fights} />
     </Container>
   )
 }

@@ -24,7 +24,7 @@ class Api {
   api():string { return `${this.base()}/api/v1` }
 
   cable(jwt?: string):string {
-    return `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/cable?token=${jwt || ""}`
+    return `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/cable?token=Bearer ${jwt || ""}`
   }
 
   ai(): string {

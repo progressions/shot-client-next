@@ -75,6 +75,7 @@ export function CampaignProvider({ children }: CampaignProviderProps) {
   useEffect(() => {
     if (!user || !campaign?.id) return
 
+    console.log("about to subscribe to CampaignChannel", campaign.id)
     const sub = consumer.subscriptions.create(
       { channel: "CampaignChannel", id: campaign.id },
       {

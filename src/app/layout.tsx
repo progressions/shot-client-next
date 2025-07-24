@@ -1,6 +1,6 @@
 import ThemeRegistry from "@/components/ThemeRegistry"
 import Navbar from "@/components/Navbar"
-import { ClientProvider, LocalStorageProvider } from "@/contexts"
+import { CampaignProvider, ClientProvider, LocalStorageProvider } from "@/contexts"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -9,8 +9,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeRegistry>
           <LocalStorageProvider>
             <ClientProvider>
-              <Navbar />
-              {children}
+              <CampaignProvider>
+                <Navbar />
+                {children}
+              </CampaignProvider>
             </ClientProvider>
           </LocalStorageProvider>
         </ThemeRegistry>
