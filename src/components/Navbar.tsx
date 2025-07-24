@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { Box, AppBar, Toolbar, Typography, Button, Avatar } from "@mui/material"
 import Link from "next/link"
 import { User } from "@/types/types"
+import Client from "@/lib/Client"
 
 async function getUser() {
   const cookieStore = await cookies()
@@ -10,18 +11,13 @@ async function getUser() {
   if (!token) {
     return null
   }
+  const client = new Client({ jwt: token })
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/users/current`, {
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      cache: "no-store"
-    })
-    if (!response.ok) {
+    const data = await client.getCurrentUser()
+    console.log("data", data)
+    if (!data) {
       return null
     }
-    const data = await response.json()
     return data as User
   } catch (err) {
     console.error(err)
@@ -33,11 +29,8 @@ async function logoutAction() {
   "use server"
   const cookieStore = await cookies()
   const token = cookieStore.get("jwtToken")?.value
-  if (token) {
-    await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/sign_out`, {
-      method: "DELETE",
-      headers: { "Authorization": `Bearer ${token}` }
-    })
+  if (!token) {
+    return null
   }
   cookieStore.delete("jwtToken")
   redirect("/login")
@@ -55,7 +48,7 @@ export default async function Navbar() {
           href="/"
           sx={{ color: "#ffffff", textDecoration: "none" }}
         >
-          Shot Counter
+          Chi War
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           {user ? (

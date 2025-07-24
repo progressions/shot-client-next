@@ -54,11 +54,6 @@ export default async function HomePage() {
         <Typography variant="h4" sx={{ color: "#ffffff" }}>
           Welcome, {user.name}
         </Typography>
-        <form action={logoutAction}>
-          <Button type="submit" variant="outlined" color="error">
-            Logout
-          </Button>
-        </form>
       </Box>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <Avatar src={user.image_url ?? undefined} alt={user.name} sx={{ width: 56, height: 56, mr: 2 }} />
