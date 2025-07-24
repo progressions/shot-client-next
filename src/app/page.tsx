@@ -63,12 +63,6 @@ export default function HomePage() {
         </Button>
       </Box>
       <Box>
-        <Typography variant="body1" sx={{ color: "#ffffff" }}>
-          Email: {user?.email}
-        </Typography>
-        <Typography variant="body1" sx={{ color: "#ffffff" }}>
-          ID: {user?.id}
-        </Typography>
       </Box>
     </Container>
   )
