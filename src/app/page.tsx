@@ -2,28 +2,10 @@ import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import { Container, Typography, Box, Button, Avatar } from "@mui/material"
 import { User } from "types/types"
-import { getServerClient } from "@/lib/getServerClient"
+import { getUser, getServerClient } from "@/lib/getServerClient"
 
 export const metadata = {
   title: "Chi War"
-}
-
-async function getUser() {
-  "use server"
-  const client = await getServerClient()
-  if (!client) {
-    redirect("/login")
-  }
-  try {
-    const data = await client.getCurrentUser()
-    if (!data) {
-      throw new Error("Failed to fetch user data")
-    }
-    return data as User
-  } catch (err) {
-    console.error(err)
-    redirect("/login") // Or handle error differently, e.g., show error page
-  }
 }
 
 async function logoutAction() {
@@ -37,7 +19,10 @@ async function logoutAction() {
 }
 
 export default async function HomePage() {
+  const client = await getServerClient()
   const user = await getUser()
+  const data = await client.getFights()
+  console.log("fights", data.fights)
 
   return (
     <Container sx={{ mt: 4 }}>

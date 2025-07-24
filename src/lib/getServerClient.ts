@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import Client from "@/lib/Client"
 
@@ -11,4 +12,22 @@ export async function getServerClient() {
 
   const client = new Client({ jwt: token })
   return client
+}
+
+export async function getUser() {
+  "use server"
+  const client = await getServerClient()
+  if (!client) {
+    redirect("/login")
+  }
+  try {
+    const data = await client.getCurrentUser()
+    if (!data) {
+      throw new Error("Failed to fetch user data")
+    }
+    return data as User
+  } catch (err) {
+    console.error(err)
+    redirect("/login") // Or handle error differently, e.g., show error page
+  }
 }
