@@ -2,29 +2,23 @@ import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import { Container, Typography, Box, Button, Avatar } from "@mui/material"
 import { User } from "types/types"
+import { getServerClient } from "@/lib/getServerClient"
 
 export const metadata = {
   title: "Chi War"
 }
 
 async function getUser() {
-  const cookie = await cookies()
-  const token = cookie.get("jwtToken")?.value
-  if (!token) {
+  "use server"
+  const client = await getServerClient()
+  if (!client) {
     redirect("/login")
   }
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/users/current`, {
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      cache: "no-store" // Ensure fresh data on each request
-    })
-    if (!response.ok) {
+    const data = await client.getCurrentUser()
+    if (!data) {
       throw new Error("Failed to fetch user data")
     }
-    const data = await response.json()
     return data as User
   } catch (err) {
     console.error(err)
@@ -34,12 +28,9 @@ async function getUser() {
 
 async function logoutAction() {
   "use server"
-  const token = cookies().get("jwtToken")?.value
-  if (token) {
-    await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/logout`, {
-      method: "DELETE",
-      headers: { "Authorization": `Bearer ${token}` }
-    })
+  const client = await getServerClient()
+  if (client) {
+    await client.delete("/users/sign_out")
   }
   cookies().delete("jwtToken")
   redirect("/login")
