@@ -639,7 +639,7 @@ class Client {
       config.data = params
     }
 
-    return await axios(config).then(response => response.data)
+    return await axios(config)
   }
 
   async get<T>(url: string, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<T> {
@@ -667,7 +667,7 @@ class Client {
       proxy: false
     }
 
-    return await axios(config).then(response => response.data)
+    return await axios(config)
   }
 
   async delete<T>(url: string): Promise<T> {
@@ -679,7 +679,7 @@ class Client {
         "Authorization": `Bearer ${this.jwt}`
       },
       proxy: false
-    }).then(response => response.data)
+    })
   }
 
   async requestFormData<T>(method: string, url: string, formData: FormData): Promise<T> {
@@ -692,11 +692,10 @@ class Client {
         "Authorization": `Bearer ${this.jwt}`
       },
       proxy: false
-    }).then((response: AxiosResponse<T>) => response.data)
-      .catch((error) => {
-        console.error("Error in requestFormData:", error)
-        return Promise.reject(error)
-      })
+    }).catch((error) => {
+      console.error("Error in requestFormData:", error)
+      return Promise.reject(error)
+    })
   }
 
   queryParams(params: Params = {}) {

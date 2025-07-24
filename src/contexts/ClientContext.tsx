@@ -8,6 +8,7 @@ import { defaultUser } from "@/types/types"
 import type { User } from "@/types/types"
 import { UserStateAction, UserActions, userReducer, initialUserState } from "@/reducers/userState"
 import type { UserStateType } from "@/reducers/userState"
+import { getUser } from "@/lib/getServerClient"
 
 interface ClientContextType {
   client: Client
@@ -30,20 +31,16 @@ export function ClientProvider({ children }: ClientProviderProps) {
   const client = useMemo(() => new Client({ jwt }), [jwt])
 
   useEffect(() => {
-    async function fetchUser() {
-      if (!jwt) return
-
-      try {
-        const user = await client.getCurrentUser()
+    getUser().then(user => {
+      if (user) {
         dispatch({ type: UserActions.USER, payload: user })
-      } catch (err) {
-        console.error("Failed to fetch user", err)
+      } else {
         Cookies.remove("jwtToken")
       }
-    }
+    })
+  }, [jwt, client, state.user.id])
 
-    fetchUser()
-  }, [jwt, client])
+  console.log("user", state.user)
 
   return (
     <ClientContext.Provider value={{ client, jwt, user: state.user, currentUserState: state, dispatchCurrentUser: dispatch }}>

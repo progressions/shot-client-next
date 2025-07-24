@@ -1,3 +1,5 @@
+"use server"
+
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import Client from "@/lib/Client"
@@ -22,7 +24,7 @@ export async function getUser() {
     redirect("/login")
   }
   try {
-    const data = await client.getCurrentUser()
+    const { data } = await client.getCurrentUser()
     if (!data) {
       throw new Error("Failed to fetch user data")
     }

@@ -10,7 +10,7 @@ export default async function HomePage() {
   const user = await getUser()
   if (!client || !user) return
 
-  const data = await client.getFights()
+  const { data } = await client.getFights()
   console.log("fights", data.fights)
 
   return (

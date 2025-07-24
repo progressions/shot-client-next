@@ -4,12 +4,16 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Box, TextField, Button, Typography, Alert, Container } from "@mui/material"
 import Cookies from "js-cookie"
+import { useClient } from "@/contexts" // For dispatch
+import Client from "@/lib/Client" // For temp client instance
+import { UserActions } from "@/reducers/userState" // Add this import for the action type
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const { dispatchCurrentUser } = useClient()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,9 +29,17 @@ export default function LoginPage() {
 
       const token = response.headers.get("Authorization")?.split(" ")?.[1] || ""
       Cookies.set("jwtToken", token, { expires: 1, secure: true, sameSite: "Strict" })
+
+      // Create temp Client with fresh token, fetch user, and dispatch to update context
+      const tempClient = new Client({ jwt: token })
+      const user = await tempClient.getCurrentUser()
+      dispatchCurrentUser({ type: UserActions.USER, payload: user })
+      console.log("Dispatched user after login:", user) // Debug log
+
       router.push("/")
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
+      console.error("Login error:", err) // Debug log
     }
   }
 
