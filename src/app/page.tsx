@@ -1,5 +1,6 @@
 import { Container, Typography, Box } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
+import Fights from "@/components/fights/Fights" // Adjust path based on your project structure
 
 export const metadata = {
   title: "Chi War"
@@ -8,10 +9,9 @@ export const metadata = {
 export default async function HomePage() {
   const client = await getServerClient()
   const user = await getUser()
-  if (!client || !user) return
+  if (!client || !user) return // Consider adding a fallback like <Typography>Not logged in</Typography>
 
-  const { data } = await client.getFights()
-  console.log("fights", data.fights)
+  const { data } = await client.getFights() // Resolve on server for initial load
 
   return (
     <Container sx={{ mt: 4 }}>
@@ -20,6 +20,7 @@ export default async function HomePage() {
           Fights
         </Typography>
       </Box>
+      <Fights initialFights={data.fights} /> {/* Pass resolved fights array as prop */}
     </Container>
   )
 }
