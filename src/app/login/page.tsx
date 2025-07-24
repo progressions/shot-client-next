@@ -22,10 +22,8 @@ export default function LoginPage() {
       if (!response.ok) {
         throw new Error("Login failed")
       }
-      console.log("response.headers", response.headers.get("Authorization"))
 
       const token = response.headers.get("Authorization")?.split(" ")?.[1] || ""
-      console.log("token", token)
       Cookies.set("jwtToken", token, { expires: 1, secure: true, sameSite: "Strict" })
       router.push("/")
     } catch (err) {

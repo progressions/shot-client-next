@@ -205,7 +205,8 @@ class Client {
       headers: {
         "Content-Type": "application/json",
         "Authorization": this.jwt
-      }
+      },
+      proxy: false
     }).then(response => response.data)
   }
 
@@ -628,7 +629,8 @@ class Client {
     const config: AxiosRequestConfig = {
       url: url,
       method: method,
-      headers: headers
+      headers: headers,
+      proxy: false
     }
 
     if (method === "GET") {
@@ -661,7 +663,8 @@ class Client {
       url: url,
       method: "GET",
       params: params,
-      headers: headers
+      headers: headers,
+      proxy: false
     }
 
     return await axios(config).then(response => response.data)
@@ -674,7 +677,8 @@ class Client {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${this.jwt}`
-      }
+      },
+      proxy: false
     }).then(response => response.data)
   }
 
@@ -686,7 +690,8 @@ class Client {
       headers: {
         "Content-Type": "multipart/form-data",
         "Authorization": `Bearer ${this.jwt}`
-      }
+      },
+      proxy: false
     }).then((response: AxiosResponse<T>) => response.data)
       .catch((error) => {
         console.error("Error in requestFormData:", error)
