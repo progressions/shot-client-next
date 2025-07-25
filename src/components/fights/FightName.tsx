@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Typography } from "@mui/material"
+import { Typography, Box } from "@mui/material"
 import { useCampaign } from "@/contexts"
 import type { Fight } from "@/types/types"
+import { RichTextRenderer } from "@/components/editor"
 
 interface FightNameProps {
   fight: Fight
@@ -12,19 +13,28 @@ interface FightNameProps {
 export default function FightName({ fight }: FightNameProps) {
   const { campaignData } = useCampaign()
   const [displayName, setDisplayName] = useState(fight.name)
+  const [displayDescription, setDisplayDescription] = useState(fight.description || "") // Assuming Fight type has description; add to types if needed
 
   useEffect(() => {
     if (campaignData) {
       const updatedFight = campaignData?.fight
       if (updatedFight && updatedFight.id === fight.id) {
-        setDisplayName(updatedFight.name)
+        if (updatedFight.name) {
+          setDisplayName(updatedFight.name)
+        }
+        if (updatedFight.description) {
+          setDisplayDescription(updatedFight.description)
+        }
       }
     }
   }, [campaignData])
 
   return (
-    <Typography variant="body1" sx={{ color: "#ffffff", mb: 1 }}>
-      {displayName}
-    </Typography>
+    <Box sx={{ mb: 2 }}>
+      <Typography variant="h6" sx={{ color: "#ffffff" }}>
+        {displayName}
+      </Typography>
+      <RichTextRenderer html={displayDescription} />
+    </Box>
   )
 }
