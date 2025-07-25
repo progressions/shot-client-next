@@ -25,7 +25,7 @@ interface SubmitAction {
 interface UpdateAction {
   type: FormActions.UPDATE
   name: string
-  value: any
+  value: unknown
 }
 
 interface OpenAction {

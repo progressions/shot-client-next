@@ -30,7 +30,7 @@ const defaultContext: CampaignContextType = {
 const CampaignContext = createContext<CampaignContextType>(defaultContext)
 
 export function CampaignProvider({ children }: CampaignProviderProps) {
-  const { user, jwt, client } = useClient()
+  const { user, client } = useClient()
   const { saveLocally, getLocally } = useLocalStorage()
   const consumer = useMemo(() => client.consumer(), [client])
 

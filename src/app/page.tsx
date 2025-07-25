@@ -1,6 +1,6 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
-import { CircularProgress, Container, Typography, Box } from "@mui/material"
+import { CircularProgress, Container, Box } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Fights } from "@/components/fights"
 import type { FightsResponse } from "@/types/types"

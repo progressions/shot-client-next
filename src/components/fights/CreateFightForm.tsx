@@ -1,12 +1,9 @@
 "use client"
 
-import { useState } from "react"
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Drawer, Box, Typography, Alert } from "@mui/material"
 import { TextField, SaveButton, CancelButton } from "@/components/ui"
-import Cookies from "js-cookie"
-import Client from "@/lib/Client"
 import type { Fight } from "@/types/types"
 import { useClient } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
@@ -41,7 +38,7 @@ export default function CreateFightForm({ open, onClose, onSave }: CreateFightFo
     }
 
     try {
-      const response = await client.createFight({ name, description })
+      const response = await client.createFight({ name, description } as Fight)
       const newFight = response.data
       onSave(newFight)
       handleClose()

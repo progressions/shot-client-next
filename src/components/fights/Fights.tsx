@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Box, Button, Typography, Container } from "@mui/material"
 import { FightDetail, CreateFightForm } from "@/components/fights"
@@ -17,7 +16,7 @@ type FormData = {
 }
 
 export default function Fights({ initialFights }: FightsProps) {
-  const { formState, dispatchForm, initialFormState } = useForm<FormData>({
+  const { formState, dispatchForm } = useForm<FormData>({
     fights: initialFights,
     drawerOpen: false
   })
