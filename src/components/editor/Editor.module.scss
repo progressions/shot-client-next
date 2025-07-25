@@ -1,0 +1,189 @@
+.editorContainer {
+  border: 1px solid var(--grey-800);
+  border-radius: 4px;
+  min-height: 100px;
+  font-family: 'Roboto', sans-serif;
+  width: 100%;
+
+  .controlGroup {
+    margin-bottom: 8px;
+    padding: 8px;
+    background: var(--blue-grey-100);
+    border-radius: 4px;
+    display: block;
+    visibility: visible;
+
+    .buttonGroup {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+
+      button {
+        padding: 6px 12px;
+        border: 1px solid var(--grey-800);
+        background: var(--blue-grey-200);
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-family: 'Roboto', sans-serif;
+        color: var(--black);
+
+        &:hover {
+          border-color: var(--yellow);
+          background: var(--blue-grey-300);
+        }
+
+        &.isActive {
+          background: var(--blue-700);
+          color: var(--white);
+          border-color: var(--blue-700);
+        }
+
+        &:disabled {
+          border-color: var(--green);
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+
+  :global(.tiptap),
+  :global(.ProseMirror) {
+    min-height: 100px;
+    padding: 8px;
+    outline: none;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--white);
+    border: 0.5px solid #b0bec5;
+    border-radius: 4px;
+
+    &:focus {
+      border: 1px solid #90caf9;
+      opacity: 1;
+    }
+
+    :first-child {
+      margin-top: 0;
+    }
+
+    ul,
+    ol {
+      padding: 0 1rem;
+      margin: 1.25rem 1rem 1.25rem 0.4rem;
+
+      li p {
+        margin-top: 0.25em;
+        margin-bottom: 0.25em;
+      }
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      line-height: 1.1;
+      margin-top: 2.5rem;
+      text-wrap: pretty;
+      color: var(--black);
+    }
+
+    h1,
+    h2 {
+      margin-top: 3.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+    }
+
+    h4,
+    h5,
+    h6 {
+      font-size: 1rem;
+    }
+  }
+}
+
+.mentionSuggestions {
+  background: var(--black);
+  color: var(--white);
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-height: 600px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.mentionCategoryLabel, .mentionItem {
+  color: var(--white);
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: block;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  text-align: left;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+
+  &.focused {
+    background: #b0bec5;
+  }
+}
+.mentionCategoryLabel {
+  font-weight: bold;
+}
+
+.selectedMentionItem {
+  background: #3a3a3a;
+}
+
+
+.richText {
+  a {
+    color: var(--white);
+    font-weight: bold;
+
+    &:visited {
+      color: var(--white);
+    }
+  }
+  a.mention {
+    font-weight: bold;
+    background: none;
+    border-radius: 3px;
+    padding: 0.1em 0.2em;
+    color: var(--white);
+
+    &:hover {
+      background: #1e40af;
+      color: var(--white);
+    }
+  }
+
+  a.inlineMention {
+    border-radius: 4px;
+    padding: 2px 4px;
+    color: var(--white);
+    font-weight: bold;
+
+    &:hover {
+      background: #1e40af;
+      color: var(--white);
+    }
+  }
+}
+

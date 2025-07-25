@@ -24,7 +24,7 @@ export default function FightPageClient({ fight }: FightPageClientProps) {
       <FightName
         fight={fight}
         sx={{
-          fontSize: { xs: "1.25rem", md: "1.5rem" } as SystemStyleObject<Theme>,
+          fontSize: { xs: "1.5rem", md: "1.5rem" } as SystemStyleObject<Theme>,
           mb: { xs: 1, md: 2 },
         }}
       />

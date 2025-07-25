@@ -54,7 +54,7 @@ const theme = createTheme({
           borderRadius: "0.5rem",
           textTransform: "none",
           fontWeight: 600,
-          padding: "0.5rem 1rem" // Consistent padding
+          padding: "0.5rem 1rem"
         }
       },
       variants: [
@@ -62,7 +62,7 @@ const theme = createTheme({
           props: { variant: "contained", color: "primary" },
           style: {
             "&:hover": {
-              backgroundColor: "#64b5f6" // Slightly darker primary for hover
+              backgroundColor: "#64b5f6"
             }
           }
         },
@@ -72,8 +72,31 @@ const theme = createTheme({
             borderColor: "#f48fb1",
             color: "#f48fb1",
             "&:hover": {
-              borderColor: "#f06292", // Slightly darker secondary
-              backgroundColor: "rgba(244, 143, 177, 0.08)" // Subtle background on hover
+              borderColor: "#f06292",
+              backgroundColor: "rgba(244, 143, 177, 0.08)"
+            }
+          }
+        }
+      ]
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          color: "#ffffff",
+          borderRadius: "0.5rem",
+          padding: "0.5rem",
+          "&:hover": {
+            backgroundColor: "rgba(255, 255, 255, 0.08)"
+          }
+        }
+      },
+      variants: [
+        {
+          props: { color: "error" },
+          style: {
+            color: "#f44336",
+            "&:hover": {
+              backgroundColor: "rgba(244, 67, 54, 0.08)"
             }
           }
         }

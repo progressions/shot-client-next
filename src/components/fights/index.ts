@@ -4,3 +4,4 @@ export { default as FightDescription } from "@/components/fights/FightDescriptio
 export { default as FightDetail } from "@/components/fights/FightDetail"
 export { default as FightPageClient } from "@/components/fights/FightPageClient"
 export { default as CreateFightForm } from "@/components/fights/CreateFightForm"
+export { default as EditFightForm } from "@/components/fights/EditFightForm"

@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Drawer, Box, Typography, Alert } from "@mui/material"
@@ -9,10 +10,11 @@ import { useClient } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 
-interface CreateFightFormProps {
+interface EditFightFormProps {
   open: boolean
   onClose: () => void
-  onSave: (newFight: Fight) => void
+  onSave: (updatedFight: Fight) => void
+  fight: Fight
 }
 
 type FormData = {
@@ -20,11 +22,11 @@ type FormData = {
   description: string
 }
 
-export default function CreateFightForm({ open, onClose, onSave }: CreateFightFormProps) {
+export default function EditFightForm({ open, onClose, onSave, fight }: EditFightFormProps) {
   const { client } = useClient()
   const { formState, dispatchForm, initialFormState } = useForm<FormData>({
-    name: "",
-    description: ""
+    name: fight.name || "",
+    description: fight.description || ""
   })
   const { disabled, error, formData } = formState
   const { name, description } = formData
@@ -33,7 +35,7 @@ export default function CreateFightForm({ open, onClose, onSave }: CreateFightFo
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
   const handleSave = async (e?: React.FormEvent) => {
-    e?.preventDefault() // Prevent default form submission behavior
+    e?.preventDefault()
     if (disabled) return
     if (!name.trim()) {
       dispatchForm({ type: FormActions.ERROR, payload: "Name is required" })
@@ -42,19 +44,22 @@ export default function CreateFightForm({ open, onClose, onSave }: CreateFightFo
 
     dispatchForm({ type: FormActions.SUBMIT })
     try {
-      const response = await client.createFight({ name, description } as Fight)
-      const newFight = response.data
-      onSave(newFight)
-    } catch (err) {
-      dispatchForm({ type: FormActions.ERROR, payload: err instanceof Error ? err.message : "An error occurred" })
-      console.error("Create fight error:", err)
+      const response = await client.updateFight({ id: fight.id, name, description } as Fight)
+      console.log("Update response:", response.data)
+      const updatedFight = response.data
+      onSave(updatedFight)
+    } catch (err: unknown) {
+      dispatchForm({
+        type: FormActions.ERROR,
+        payload: err instanceof Error ? err.message : "An error occurred"
+      })
+      console.error("Update fight error:", err)
     } finally {
       handleClose()
     }
   }
 
   const handleClose = () => {
-    dispatchForm({ type: FormActions.RESET, payload: initialFormState })
     onClose()
   }
 
@@ -66,7 +71,7 @@ export default function CreateFightForm({ open, onClose, onSave }: CreateFightFo
         sx={{ width: isMobile ? "100%" : "30rem", height: isMobile ? "auto" : "100%", p: isMobile ? "1rem" : "2rem" }}
       >
         <Typography variant="h5" sx={{ mb: 2, color: "#ffffff" }}>
-          New Fight
+          Edit Fight
         </Typography>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -81,7 +86,14 @@ export default function CreateFightForm({ open, onClose, onSave }: CreateFightFo
           required
           autoFocus
         />
-        <Editor name="description" value={description} onChange={(e: EditorChangeEvent) => dispatchForm({ type: FormActions.UPDATE, name: "description", value: e.target.value })} />
+        <Editor
+          name="description"
+          value={description}
+          onChange={(e: EditorChangeEvent) => {
+            console.log("Editor onChange:", e.target.value)
+            dispatchForm({ type: FormActions.UPDATE, name: "description", value: e.target.value })
+          }}
+        />
         <Box sx={{ display: "flex", gap: "1rem", mt: 3 }}>
           <SaveButton type="submit" disabled={disabled}>
             Save

@@ -4,6 +4,7 @@ import { Box } from "@mui/material"
 import type { SystemStyleObject, Theme } from "@mui/system"
 import { useState, useEffect } from "react"
 import DOMPurify from "dompurify"
+import styles from "@/components/editor/Editor.module.scss"
 
 interface RichTextRendererProps {
   html: string
@@ -24,6 +25,7 @@ export default function RichTextRenderer({ html, sx }: RichTextRendererProps) {
 
   return (
     <Box
+      className={styles.richText}
       style={{ color: "#b0bec5" }}
       sx={{ color: "#b0bec5", ...sx }}
       dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
