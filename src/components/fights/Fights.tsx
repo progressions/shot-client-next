@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react"
 import { Box } from "@mui/material"
+import Link from "next/link"
 import { useClient } from "@/contexts"
-import { FightName } from "@/components/fights" // Import the new FightName component
+import { FightName } from "@/components/fights"
 
 // Define Fight type based on your API (adjust as needed)
 type Fight = {
   id: string
-  name: string // Or whatever properties your fights have
+  name: string
+  description?: string // Optional description
   // Add more fields like date, participants, etc.
 }
 

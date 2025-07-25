@@ -5,6 +5,7 @@ import { Typography, Box } from "@mui/material"
 import { useCampaign } from "@/contexts"
 import type { Fight } from "@/types/types"
 import { RichTextRenderer } from "@/components/editor"
+import Link from "next/link"
 
 interface FightNameProps {
   fight: Fight
@@ -32,7 +33,9 @@ export default function FightName({ fight }: FightNameProps) {
   return (
     <Box sx={{ mb: 2 }}>
       <Typography variant="h6" sx={{ color: "#ffffff" }}>
-        {displayName}
+        <Link href={`/fights/${fight.id}`} key={fight.id} sx={{color: "#fff"}}>
+          {displayName}
+        </Link>
       </Typography>
       <RichTextRenderer html={displayDescription} />
     </Box>
