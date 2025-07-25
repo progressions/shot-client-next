@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, createContext, useContext, useCallback } from "react"
+import { useMemo, useEffect, useState, createContext, useContext, useCallback } from "react"
 import { Subscription } from "@rails/actioncable"
 
 import type { CampaignCableData, Campaign } from "@/types/types"
@@ -32,7 +32,7 @@ const CampaignContext = createContext<CampaignContextType>(defaultContext)
 export function CampaignProvider({ children }: CampaignProviderProps) {
   const { user, client } = useClient()
   const { saveLocally, getLocally } = useLocalStorage()
-  const consumer = client.consumer()
+  const consumer = useMemo(() => client.consumer(), [client])
 
   const [campaign, setCampaign] = useState<Campaign | null>(defaultCampaign)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
