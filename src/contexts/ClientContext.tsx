@@ -4,8 +4,8 @@ import { type ActionDispatch, useReducer, useEffect, useMemo, createContext, use
 import Cookies from "js-cookie"
 import Client from "@/lib/Client"
 import { defaultUser, type User } from "@/types/types"
-import { UserStateAction, UserActions, userReducer, initialUserState } from "@/reducers/userState"
-import type { UserStateType } from "@/reducers/userState"
+import { UserStateAction, UserActions, userReducer, initialUserState } from "@/reducers"
+import type { UserStateType } from "@/reducers"
 
 interface ClientContextType {
   client: Client

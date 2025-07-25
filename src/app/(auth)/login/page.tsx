@@ -7,7 +7,7 @@ import { Button, TextField } from "@/components/ui"
 import Cookies from "js-cookie"
 import { useClient } from "@/contexts"
 import Client from "@/lib/Client"
-import { UserActions } from "@/reducers/userState"
+import { UserActions } from "@/reducers"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")

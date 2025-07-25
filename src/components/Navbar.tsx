@@ -5,7 +5,7 @@ import { Box, AppBar, Toolbar, Typography, Avatar } from "@mui/material"
 import Link from "next/link"
 import { useClient } from "@/contexts"
 import { logoutAction } from "@/lib/actions"
-import { UserActions } from "@/reducers/userState"
+import { UserActions } from "@/reducers"
 import { Button } from "@/components/ui"
 
 export default function Navbar() {

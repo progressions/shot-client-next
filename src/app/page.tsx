@@ -21,14 +21,11 @@ export default async function HomePage() {
 
   return (
     <Container sx={{ mt: 4 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-        <Typography variant="h4" component="h1" sx={{ color: "#ffffff" }}>
-          Fights
-        </Typography>
+      <Box sx={{ justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+        <Suspense fallback={<CircularProgress />}>
+          <Fights initialFights={fights} />
+        </Suspense>
       </Box>
-      <Suspense fallback={<CircularProgress />}>
-        <Fights initialFights={fights} />
-      </Suspense>
     </Container>
   )
 }

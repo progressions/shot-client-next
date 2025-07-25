@@ -1,33 +1,60 @@
 "use client"
 
 import { useState } from "react"
-import { Box, Typography } from "@mui/material"
-import { FightDetail } from "@/components/fights"
+import { useRouter } from "next/navigation"
+import { Box, Button, Typography, Container } from "@mui/material"
+import { FightDetail, CreateFightForm } from "@/components/fights"
 import type { Fight } from "@/types/types"
 
-export default function Fights({ initialFights }: { initialFights: Fight[] }) {
-  const [fights, setFights] = useState<Fight[]>(initialFights)
+interface FightsProps {
+  initialFights: Fight[]
+}
 
-  // Future: Add sorting/filtering state and refetch logic here
-  // e.g., useEffect(() => {
-  //   async function refetch() {
-  //     const { data } = await client.getFights({ sort: sortBy, filter: filter });
-  //     setFights(data.fights);
-  //   }
-  //   refetch();
-  // }, [sortBy, filter, client]);
+export default function Fights({ initialFights }: FightsProps) {
+  const [fights, setFights] = useState<Fight[]>(initialFights)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const router = useRouter()
+
+  const handleOpenDrawer = () => {
+    setDrawerOpen(true)
+  }
+
+  const handleCloseDrawer = () => {
+    setDrawerOpen(false)
+  }
+
+  const handleSaveFight = (newFight: Fight) => {
+    setFights([newFight, ...fights])
+    setDrawerOpen(false)
+    router.refresh() // Optional: Refresh server data if using SSR
+  }
 
   return (
-    <Box>
-      {fights.length === 0 ? (
-        <Typography variant="body1" sx={{ color: "#ffffff" }}>
-          No fights available
+    <Container maxWidth="md">
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
+        <Typography variant="h4" sx={{ color: "#ffffff" }}>
+          Fights
         </Typography>
-      ) : (
-        fights.map((fight) => (
-          <FightDetail key={fight.id} fight={fight} />
-        ))
-      )}
-    </Box>
+        <Button variant="contained" color="primary" onClick={handleOpenDrawer}>
+          Create Fight
+        </Button>
+      </Box>
+      <Box>
+        {fights.length === 0 ? (
+          <Typography variant="body1" sx={{ color: "#ffffff" }}>
+            No fights available
+          </Typography>
+        ) : (
+          fights.map((fight) => (
+            <FightDetail key={fight.id} fight={fight} />
+          ))
+        )}
+      </Box>
+      <CreateFightForm
+        open={drawerOpen}
+        onClose={handleCloseDrawer}
+        onSave={handleSaveFight}
+      />
+    </Container>
   )
 }
