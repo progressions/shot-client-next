@@ -21,7 +21,7 @@ export async function getUser() {
   "use server"
   const client = await getServerClient()
   if (!client) {
-    redirect("/login")
+    return null
   }
   try {
     const { data } = await client.getCurrentUser()
@@ -31,6 +31,6 @@ export async function getUser() {
     return data as User
   } catch (err) {
     console.error(err)
-    redirect("/login") // Or handle error differently, e.g., show error page
+    return null
   }
 }
