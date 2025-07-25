@@ -40,8 +40,6 @@ export function ClientProvider({ children }: ClientProviderProps) {
     })
   }, [jwt, client, state.user.id])
 
-  console.log("user", state.user)
-
   return (
     <ClientContext.Provider value={{ client, jwt, user: state.user, currentUserState: state, dispatchCurrentUser: dispatch }}>
       {children}

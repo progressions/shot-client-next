@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Box } from "@mui/material"
 import Link from "next/link"
 import { useClient } from "@/contexts"
-import { FightName } from "@/components/fights"
+import { FightDetail } from "@/components/fights"
 
 // Define Fight type based on your API (adjust as needed)
 type Fight = {
@@ -35,7 +35,7 @@ export default function Fights({ initialFights }: { initialFights: Fight[] }) {
         </Typography>
       ) : (
         fights.map((fight) => (
-          <FightName key={fight.id} fight={fight} />
+          <FightDetail key={fight.id} fight={fight} />
         ))
       )}
     </Box>

@@ -7,30 +7,27 @@ import type { Fight } from "@/types/types"
 import { RichTextRenderer } from "@/components/editor"
 import Link from "next/link"
 
-interface FightNameProps {
+interface FightDescriptionProps {
   fight: Fight
   sx?: React.CSSProperties
 }
 
-export default function FightName({ fight, sx = {} }: FightNameProps) {
+export default function FightDescription({ fight, sx = {} }: FightDescriptionProps) {
   const { campaignData } = useCampaign()
-  const [displayName, setDisplayName] = useState(fight.name)
   const [displayDescription, setDisplayDescription] = useState(fight.description || "") // Assuming Fight type has description; add to types if needed
 
   useEffect(() => {
     if (campaignData) {
       const updatedFight = campaignData?.fight
       if (updatedFight && updatedFight.id === fight.id) {
-        if (updatedFight.name) {
-          setDisplayName(updatedFight.name)
+        if (updatedFight.description) {
+          setDisplayDescription(updatedFight.description)
         }
       }
     }
   }, [campaignData])
 
   return (
-    <Typography variant="h6" sx={{ color: "#ffffff", ...sx }}>
-      {displayName}
-    </Typography>
+    <RichTextRenderer html={displayDescription} />
   )
 }

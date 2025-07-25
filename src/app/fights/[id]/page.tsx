@@ -1,13 +1,10 @@
 import { Box, Container, Typography } from "@mui/material"
-import { FightName } from "@/components/fights"
-import type { Fight } from "@/types/types"
-import { RichTextRenderer } from "@/components/editor"
 import { getServerClient, getUser } from "@/lib/getServerClient"
+import type { Fight } from "@/types/types"
+import { FightPageClient } from "@/components/fights"
 
 type FightPageProps = {
-  params: Promise<{
-    id: string
-  }>
+  params: Promise<{ id: string }>
 }
 
 export default async function FightPage({ params }: FightPageProps) {
@@ -17,6 +14,7 @@ export default async function FightPage({ params }: FightPageProps) {
   if (!client || !user) return <Typography>Not logged in</Typography>
 
   const response = await client.getFight({ id })
+  console.log("Fight response:", response)
   const fight: Fight = response.data
 
   if (!fight?.id) {
@@ -27,27 +25,11 @@ export default async function FightPage({ params }: FightPageProps) {
     <Container
       maxWidth="lg"
       sx={{
-        mt: { xs: 2, md: 4 }, // Smaller margin top on mobile
-        px: { xs: 2, md: 3 }, // Adjust padding for mobile
+        mt: { xs: 2, md: 4 },
+        px: { xs: 2, md: 3 },
       }}
     >
-      <Box
-        sx={{
-          mb: { xs: 1, md: 2 }, // Smaller margin bottom on mobile
-        }}
-      >
-        <Typography
-          variant="h6"
-          sx={{
-            color: "#ffffff",
-            fontSize: { xs: "1.25rem", md: "1.5rem" }, // Smaller font on mobile
-            mb: { xs: 1, md: 2 },
-          }}
-        >
-          {fight.name}
-        </Typography>
-        <RichTextRenderer html={fight.description} />
-      </Box>
+      <FightPageClient fight={fight} />
     </Container>
   )
 }

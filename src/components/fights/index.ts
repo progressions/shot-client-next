@@ -1,2 +1,5 @@
-export { default as Fights } from "./Fights"
-export { default as FightName } from "./FightName" // Add this export
+export { default as Fights } from "@/components/fights/Fights"
+export { default as FightName } from "@/components/fights/FightName"
+export { default as FightDescription } from "@/components/fights/FightDescription"
+export { default as FightDetail } from "@/components/fights/FightDetail"
+export { default as FightPageClient } from "@/components/fights/FightPageClient"
