@@ -31,12 +31,15 @@ export default function CreateFightForm({ open, onClose, onSave }: CreateFightFo
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
-  const handleSave = async () => {
+  const handleSave = async (e?: React.FormEvent) => {
+    e?.preventDefault() // Prevent default form submission behavior
+    if (disabled) return
     if (!name.trim()) {
       dispatchForm({ type: FormActions.ERROR, payload: "Name is required" })
       return
     }
 
+    dispatchForm({ type: FormActions.SET_DISABLED, payload: true })
     try {
       const response = await client.createFight({ name, description } as Fight)
       const newFight = response.data
@@ -45,6 +48,8 @@ export default function CreateFightForm({ open, onClose, onSave }: CreateFightFo
     } catch (err) {
       dispatchForm({ type: FormActions.ERROR, payload: err instanceof Error ? err.message : "An error occurred" })
       console.error("Create fight error:", err)
+    } finally {
+      dispatchForm({ type: FormActions.SET_DISABLED, payload: false })
     }
   }
 
@@ -55,7 +60,11 @@ export default function CreateFightForm({ open, onClose, onSave }: CreateFightFo
 
   return (
     <Drawer anchor={isMobile ? "bottom" : "right"} open={open} onClose={handleClose}>
-      <Box sx={{ width: isMobile ? "100%" : "30rem", height: isMobile ? "auto" : "100%", p: isMobile ? "1rem" : "2rem" }}>
+      <Box
+        component="form"
+        onSubmit={handleSave}
+        sx={{ width: isMobile ? "100%" : "30rem", height: isMobile ? "auto" : "100%", p: isMobile ? "1rem" : "2rem" }}
+      >
         <Typography variant="h5" sx={{ mb: 2, color: "#ffffff" }}>
           New Fight
         </Typography>
@@ -81,7 +90,7 @@ export default function CreateFightForm({ open, onClose, onSave }: CreateFightFo
           rows={4}
         />
         <Box sx={{ display: "flex", gap: "1rem", mt: 3 }}>
-          <SaveButton disabled={disabled} onClick={handleSave}>
+          <SaveButton type="submit" disabled={disabled}>
             Save
           </SaveButton>
           <CancelButton onClick={handleClose}>
