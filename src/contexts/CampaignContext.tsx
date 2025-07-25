@@ -30,7 +30,7 @@ const defaultContext: CampaignContextType = {
 const CampaignContext = createContext<CampaignContextType>(defaultContext)
 
 export function CampaignProvider({ children }: CampaignProviderProps) {
-  const { user, client } = useClient()
+  const { user, jwt, client } = useClient()
   const { saveLocally, getLocally } = useLocalStorage()
   const consumer = useMemo(() => client.consumer(), [client])
 
@@ -77,13 +77,13 @@ export function CampaignProvider({ children }: CampaignProviderProps) {
   }, [client, user, setCampaign, getLocally])
 
   useEffect(() => {
-    if (!user) return
+    if (!user?.id) return
 
     getCurrentCampaign()
   }, [user, getCurrentCampaign])
 
   useEffect(() => {
-    if (!user || !campaign?.id) return
+    if (!user?.id || !campaign?.id) return
 
     console.log("about to subscribe to CampaignChannel", campaign.id)
     const sub = consumer.subscriptions.create(
