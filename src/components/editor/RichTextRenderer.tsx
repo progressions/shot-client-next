@@ -1,6 +1,7 @@
 "use client"
 
 import { Box } from "@mui/material"
+import type { SystemStyleObject, Theme } from "@mui/system"
 import { useState, useEffect } from "react"
 import DOMPurify from "dompurify"
 

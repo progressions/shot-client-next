@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Box, Typography } from "@mui/material"
+import { useEffect } from "react"
+import { Box } from "@mui/material"
 import { useCampaign } from "@/contexts"
 import { FightName, FightDescription } from "@/components/fights"
 import type { Fight } from "@/types/types"
@@ -12,22 +12,6 @@ interface FightPageClientProps {
 }
 
 export default function FightPageClient({ fight }: FightPageClientProps) {
-  const { campaignData } = useCampaign()
-  const [displayName, setDisplayName] = useState(fight.name)
-
-  // Update document title and displayName on WebSocket updates
-  useEffect(() => {
-    if (!campaignData) return
-
-    if (campaignData.fight?.id === fight.id) {
-      if (campaignData.fight?.name) {
-        setDisplayName(campaignData.fight.name)
-        document.title = campaignData.fight.name
-      }
-    }
-  }, [campaignData, fight.id])
-
-  // Set initial title on mount
   useEffect(() => {
     document.title = fight.name || "Chi War"
   }, [fight.name])

@@ -1,12 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Typography, Box } from "@mui/material"
+import { Typography } from "@mui/material"
 import { useCampaign } from "@/contexts"
-import type { Fight, CampaignCableData } from "@/types/types"
+import type { Fight } from "@/types/types"
 import type { SystemStyleObject, Theme } from "@mui/system"
-import { RichTextRenderer } from "@/components/editor"
-import Link from "next/link"
 
 interface FightNameProps {
   fight: Fight
@@ -26,7 +24,7 @@ export default function FightName({ fight, sx = {} }: FightNameProps) {
         }
       }
     }
-  }, [campaignData])
+  }, [campaignData, fight.id])
 
   return (
     <Typography variant="h6" sx={{ color: "#ffffff", ...sx }}>

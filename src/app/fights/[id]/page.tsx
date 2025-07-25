@@ -1,4 +1,4 @@
-import { Box, Container, Typography } from "@mui/material"
+import { Container, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Fight } from "@/types/types"
 import { FightPageClient } from "@/components/fights"

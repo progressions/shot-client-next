@@ -1,6 +1,5 @@
 "use server"
 
-import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import Client from "@/lib/Client"
 import type { User } from "@/types/types"

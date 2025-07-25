@@ -1,14 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Typography, Box } from "@mui/material"
 import { useCampaign } from "@/contexts"
 import type { Fight } from "@/types/types"
 import { RichTextRenderer } from "@/components/editor"
+import type { SystemStyleObject, Theme } from "@mui/system"
 
 interface FightDescriptionProps {
   fight: Fight
-  sx?: React.CSSProperties
+  sx?: SystemStyleObject<Theme>
 }
 
 export default function FightDescription({ fight, sx = {} }: FightDescriptionProps) {
@@ -24,7 +24,7 @@ export default function FightDescription({ fight, sx = {} }: FightDescriptionPro
         }
       }
     }
-  }, [campaignData])
+  }, [campaignData, fight.id])
 
   return (
     <RichTextRenderer html={displayDescription} sx={sx} />

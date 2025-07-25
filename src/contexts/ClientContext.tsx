@@ -17,7 +17,7 @@ interface ClientContextType {
 
 interface ClientProviderProps {
   children: React.ReactNode
-  initialUser?: User // Add optional initialUser prop
+  initialUser?: User | null
 }
 
 const ClientContext = createContext<ClientContextType>({

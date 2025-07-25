@@ -1,15 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Box, Typography } from "@mui/material"
-import Link from "next/link"
-import { useClient } from "@/contexts"
 import { FightDetail } from "@/components/fights"
 import type { Fight } from "@/types/types"
 
 export default function Fights({ initialFights }: { initialFights: Fight[] }) {
   const [fights, setFights] = useState<Fight[]>(initialFights)
-  const { client } = useClient() // For future refetches
 
   // Future: Add sorting/filtering state and refetch logic here
   // e.g., useEffect(() => {

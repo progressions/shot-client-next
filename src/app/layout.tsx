@@ -1,11 +1,9 @@
 import ThemeRegistry from "@/components/ThemeRegistry"
 import Navbar from "@/components/Navbar"
 import { CampaignProvider, ClientProvider, LocalStorageProvider } from "@/contexts"
-import { getServerClient, getUser } from "@/lib/getServerClient"
-import type { User } from "@/types/types"
+import { getUser } from "@/lib/getServerClient"
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const client = await getServerClient()
   const user = await getUser()
 
   return (

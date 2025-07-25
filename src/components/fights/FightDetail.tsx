@@ -1,9 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Typography, Box } from "@mui/material"
+import { Box } from "@mui/material"
 import type { Fight } from "@/types/types"
-import { RichTextRenderer } from "@/components/editor"
 import Link from "next/link"
 import { FightName, FightDescription } from "@/components/fights"
 
