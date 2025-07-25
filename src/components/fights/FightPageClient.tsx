@@ -2,7 +2,6 @@
 
 import { useEffect } from "react"
 import { Box } from "@mui/material"
-import { useCampaign } from "@/contexts"
 import { FightName, FightDescription } from "@/components/fights"
 import type { Fight } from "@/types/types"
 import type { SystemStyleObject, Theme } from "@mui/system"
