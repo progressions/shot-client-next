@@ -2,11 +2,12 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Box, TextField, Button, Typography, Alert, Container } from "@mui/material"
+import { Box, Typography, Alert, Container } from "@mui/material"
+import { Button, TextField } from "@/components/ui"
 import Cookies from "js-cookie"
-import { useClient } from "@/contexts" // For dispatch
-import Client from "@/lib/Client" // For temp client instance
-import { UserActions } from "@/reducers/userState" // Add this import for the action type
+import { useClient } from "@/contexts"
+import Client from "@/lib/Client"
+import { UserActions } from "@/reducers/userState"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -30,7 +31,6 @@ export default function LoginPage() {
       const token = response.headers.get("Authorization")?.split(" ")?.[1] || ""
       Cookies.set("jwtToken", token, { expires: 1, secure: true, sameSite: "Strict" })
 
-      // Create temp Client with fresh token, fetch user, and dispatch to update context
       const tempClient = new Client({ jwt: token })
       const tempResponse = await tempClient.getCurrentUser()
       dispatchCurrentUser({ type: UserActions.USER, payload: tempResponse.data })
@@ -38,7 +38,7 @@ export default function LoginPage() {
       router.push("/")
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
-      console.error("Login error:", err) // Debug log
+      console.error("Login error:", err)
     }
   }
 
@@ -52,29 +52,21 @@ export default function LoginPage() {
           <TextField
             margin="normal"
             required
-            fullWidth
             label="Email Address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             autoFocus
-            InputLabelProps={{ style: { color: "#b0bec5" } }}
-            InputProps={{ style: { color: "#ffffff" } }}
           />
           <TextField
             margin="normal"
             required
-            fullWidth
             label="Password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            InputLabelProps={{ style: { color: "#b0bec5" } }}
-            InputProps={{ style: { color: "#ffffff" } }}
           />
           <Button
             type="submit"
-            fullWidth
-            variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
             Sign In
