@@ -9,7 +9,7 @@ interface RichTextRendererProps {
   sx?: SystemStyleObject<Theme>
 }
 
-export default function RichTextRenderer({ html }: RichTextRendererProps) {
+export default function RichTextRenderer({ html, sx }: RichTextRendererProps) {
   const [sanitizedHTML, setSanitizedHTML] = useState("")
 
   useEffect(() => {
