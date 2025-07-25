@@ -5,27 +5,38 @@ import { useRouter } from "next/navigation"
 import { Box, Button, Typography, Container } from "@mui/material"
 import { FightDetail, CreateFightForm } from "@/components/fights"
 import type { Fight } from "@/types/types"
+import { FormActions, useForm } from "@/reducers"
 
 interface FightsProps {
   initialFights: Fight[]
 }
 
+type FormData = {
+  fights: Fight[]
+  drawerOpen: boolean
+}
+
 export default function Fights({ initialFights }: FightsProps) {
-  const [fights, setFights] = useState<Fight[]>(initialFights)
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const { formState, dispatchForm, initialFormState } = useForm<FormData>({
+    fights: initialFights,
+    drawerOpen: false
+  })
+  const { formData } = formState
+  const { fights, drawerOpen } = formData
+
   const router = useRouter()
 
   const handleOpenDrawer = () => {
-    setDrawerOpen(true)
+    dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
   }
 
   const handleCloseDrawer = () => {
-    setDrawerOpen(false)
+    dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: false })
   }
 
   const handleSaveFight = (newFight: Fight) => {
-    setFights([newFight, ...fights])
-    setDrawerOpen(false)
+    dispatchForm({ type: FormActions.UPDATE, name: "fights", value: [newFight, ...fights] })
+    dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: false })
     router.refresh() // Optional: Refresh server data if using SSR
   }
 

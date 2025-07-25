@@ -9,6 +9,7 @@ import Cookies from "js-cookie"
 import Client from "@/lib/Client"
 import type { Fight } from "@/types/types"
 import { useClient } from "@/contexts"
+import { FormActions, useForm } from "@/reducers"
 
 interface CreateFightFormProps {
   open: boolean
@@ -16,38 +17,42 @@ interface CreateFightFormProps {
   onSave: (newFight: Fight) => void
 }
 
+type FormData = {
+  name: string
+  description: string
+}
+
 export default function CreateFightForm({ open, onClose, onSave }: CreateFightFormProps) {
   const { client } = useClient()
-  const [name, setName] = useState("")
-  const [description, setDescription] = useState("")
-  const [error, setError] = useState<string | null>(null)
+  const { formState, dispatchForm, initialFormState } = useForm<FormData>({
+    name: "",
+    description: ""
+  })
+  const { disabled, error, formData } = formState
+  const { name, description } = formData
+
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
   const handleSave = async () => {
     if (!name.trim()) {
-      setError("Name is required")
+      dispatchForm({ type: FormActions.ERROR, payload: "Name is required" })
       return
     }
 
     try {
       const response = await client.createFight({ name, description })
-      console.log("response.data", response.data)
       const newFight = response.data
       onSave(newFight)
-      setName("")
-      setDescription("")
-      setError(null)
+      handleClose()
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
+      dispatchForm({ type: FormActions.ERROR, payload: err instanceof Error ? err.message : "An error occurred" })
       console.error("Create fight error:", err)
     }
   }
 
   const handleClose = () => {
-    setName("")
-    setDescription("")
-    setError(null)
+    dispatchForm({ type: FormActions.RESET, payload: initialFormState })
     onClose()
   }
 
@@ -65,7 +70,7 @@ export default function CreateFightForm({ open, onClose, onSave }: CreateFightFo
         <TextField
           label="Name"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => dispatchForm({ type: FormActions.UPDATE, name: "name", value: e.target.value })}
           margin="normal"
           required
           autoFocus
@@ -73,13 +78,13 @@ export default function CreateFightForm({ open, onClose, onSave }: CreateFightFo
         <TextField
           label="Description"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={(e) => dispatchForm({ type: FormActions.UPDATE, name: "description", value: e.target.value })}
           margin="normal"
           multiline
           rows={4}
         />
         <Box sx={{ display: "flex", gap: "1rem", mt: 3 }}>
-          <SaveButton onClick={handleSave}>
+          <SaveButton disabled={disabled} onClick={handleSave}>
             Save
           </SaveButton>
           <CancelButton onClick={handleClose}>
