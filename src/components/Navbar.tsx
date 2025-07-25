@@ -4,15 +4,16 @@ import { useRouter } from "next/navigation"
 import { Box, AppBar, Toolbar, Typography, Button, Avatar } from "@mui/material"
 import Link from "next/link"
 import { useClient } from "@/contexts"
-import { logoutAction } from "@/lib/actions" // Import the server action
+import { logoutAction } from "@/lib/actions"
+import { UserActions } from "@/reducers/userState"
 
 export default function Navbar() {
   const { jwt, user, dispatchCurrentUser } = useClient()
   const router = useRouter()
 
   const handleLogout = async () => {
-    await logoutAction(jwt) // Call the server action
-    dispatchCurrentUser({ type: "RESET" })
+    await logoutAction(jwt)
+    dispatchCurrentUser({ type: UserActions.RESET })
     router.push("/login")
   }
 

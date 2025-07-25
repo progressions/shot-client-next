@@ -14,7 +14,6 @@ export default async function FightPage({ params }: FightPageProps) {
   if (!client || !user) return <Typography>Not logged in</Typography>
 
   const response = await client.getFight({ id })
-  console.log("Fight response:", response)
   const fight: Fight = response.data
 
   if (!fight?.id) {

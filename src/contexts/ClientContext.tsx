@@ -45,8 +45,14 @@ export function ClientProvider({ children, initialUser }: ClientProviderProps) {
 
       hasFetchedRef.current = true
       try {
-        const user = await client.getCurrentUser()
-        dispatch({ type: UserActions.USER, payload: user })
+        const response = await client.getCurrentUser()
+        const { data } = response || {}
+        if (!data) {
+          console.error("Failed to fetch user data")
+          Cookies.remove("jwtToken")
+          return
+        }
+        dispatch({ type: UserActions.USER, payload: data })
       } catch (err) {
         console.error("Failed to fetch user", err)
         Cookies.remove("jwtToken")

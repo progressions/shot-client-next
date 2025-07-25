@@ -32,9 +32,8 @@ export default function LoginPage() {
 
       // Create temp Client with fresh token, fetch user, and dispatch to update context
       const tempClient = new Client({ jwt: token })
-      const user = await tempClient.getCurrentUser()
-      dispatchCurrentUser({ type: UserActions.USER, payload: user })
-      console.log("Dispatched user after login:", user) // Debug log
+      const tempResponse = await tempClient.getCurrentUser()
+      dispatchCurrentUser({ type: UserActions.USER, payload: tempResponse.data })
 
       router.push("/")
     } catch (err) {

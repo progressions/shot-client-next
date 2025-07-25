@@ -40,7 +40,12 @@ export function CampaignProvider({ children }: CampaignProviderProps) {
 
   const setCurrentCampaign = async (camp: Campaign | null): Promise<Campaign | null> => {
     try {
-      const data = await client.setCurrentCampaign(camp)
+      const response = await client.setCurrentCampaign(camp)
+      const { data } = response || {}
+      if (!data) {
+        console.error("Failed to set current campaign")
+        return null
+      }
       setCampaign(data)
       saveLocally(`currentCampaign-${user?.id}`, data)
       return data
@@ -57,7 +62,12 @@ export function CampaignProvider({ children }: CampaignProviderProps) {
         setCampaign(cachedCampaign)
         return cachedCampaign
       }
-      const data = await client.getCurrentCampaign()
+      const response = await client.getCurrentCampaign()
+      const { data } = response || {}
+      if (!data) {
+        console.error("Failed to get current campaign")
+        return null
+      }
       setCampaign(data)
       return data
     } catch (err) {

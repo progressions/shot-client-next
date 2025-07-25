@@ -1,18 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Box } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import Link from "next/link"
 import { useClient } from "@/contexts"
 import { FightDetail } from "@/components/fights"
-
-// Define Fight type based on your API (adjust as needed)
-type Fight = {
-  id: string
-  name: string
-  description?: string // Optional description
-  // Add more fields like date, participants, etc.
-}
+import type { Fight } from "@/types/types"
 
 export default function Fights({ initialFights }: { initialFights: Fight[] }) {
   const [fights, setFights] = useState<Fight[]>(initialFights)

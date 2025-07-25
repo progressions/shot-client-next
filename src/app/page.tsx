@@ -1,6 +1,7 @@
 import { Container, Typography, Box } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Fights } from "@/components/fights"
+import type { FightsResponse } from "@/types/types"
 
 export const metadata = {
   title: "Chi War"
@@ -11,7 +12,8 @@ export default async function HomePage() {
   const user = await getUser()
   if (!client || !user) return // Consider adding a fallback like <Typography>Not logged in</Typography>
 
-  const { data } = await client.getFights() // Resolve on server for initial load
+  const response = await client.getFights() // Resolve on server for initial load
+  const { fights }: FightsResponse = response.data
 
   return (
     <Container sx={{ mt: 4 }}>
@@ -20,7 +22,7 @@ export default async function HomePage() {
           Fights
         </Typography>
       </Box>
-      <Fights initialFights={data.fights} />
+      <Fights initialFights={fights} />
     </Container>
   )
 }

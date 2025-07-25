@@ -6,6 +6,7 @@ import { useCampaign } from "@/contexts"
 import { FightName } from "@/components/fights"
 import { RichTextRenderer } from "@/components/editor"
 import type { Fight } from "@/types/types"
+import type { SystemStyleObject, Theme } from "@mui/system"
 
 interface FightPageClientProps {
   fight: Fight
@@ -17,8 +18,10 @@ export default function FightPageClient({ fight }: FightPageClientProps) {
 
   // Update document title and displayName on WebSocket updates
   useEffect(() => {
-    if (campaignData?.fight?.id === fight.id) {
-      if (campaignData.fight.name) {
+    if (!campaignData) return
+
+    if (campaignData.fight?.id === fight.id) {
+      if (campaignData.fight?.name) {
         setDisplayName(campaignData.fight.name)
         document.title = campaignData.fight.name
       }
@@ -27,7 +30,7 @@ export default function FightPageClient({ fight }: FightPageClientProps) {
 
   // Set initial title on mount
   useEffect(() => {
-    document.title = fight.name
+    document.title = fight.name || "Chi War"
   }, [fight.name])
 
   return (
@@ -39,7 +42,7 @@ export default function FightPageClient({ fight }: FightPageClientProps) {
       <FightName
         fight={fight}
         sx={{
-          fontSize: { xs: "1.25rem", md: "1.5rem" },
+          fontSize: { xs: "1.25rem", md: "1.5rem" } as SystemStyleObject<Theme>,
           mb: { xs: 1, md: 2 },
         }}
       />

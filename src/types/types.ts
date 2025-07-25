@@ -1,5 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
+export type NotionPage = {
+  id: string
+}
+
 export type BackendErrorResponse = {
   name?: string[]
   error?: string
@@ -7,6 +11,7 @@ export type BackendErrorResponse = {
 }
 
 export interface CampaignCableData {
+  fight: Fight | null
   character: Character | null
 }
 
