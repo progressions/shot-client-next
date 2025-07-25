@@ -1,10 +1,12 @@
 "use client"
 
+import { Box } from "@mui/material"
 import { useState, useEffect } from "react"
 import DOMPurify from "dompurify"
 
 interface RichTextRendererProps {
   html: string
+  sx?: SystemStyleObject<Theme>
 }
 
 export default function RichTextRenderer({ html }: RichTextRendererProps) {
@@ -20,8 +22,9 @@ export default function RichTextRenderer({ html }: RichTextRendererProps) {
   }, [html])
 
   return (
-    <div
+    <Box
       style={{ color: "#b0bec5" }}
+      sx={{ color: "#b0bec5", ...sx }}
       dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
     />
   )

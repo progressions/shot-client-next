@@ -16,7 +16,6 @@ interface FightNameProps {
 export default function FightName({ fight, sx = {} }: FightNameProps) {
   const { campaignData } = useCampaign()
   const [displayName, setDisplayName] = useState(fight.name)
-  const [displayDescription, setDisplayDescription] = useState(fight.description || "")
 
   useEffect(() => {
     if (campaignData && "fight" in campaignData) {
