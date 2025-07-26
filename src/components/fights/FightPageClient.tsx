@@ -1,10 +1,9 @@
 "use client"
 
 import { useEffect } from "react"
-import { Box } from "@mui/material"
+import { Typography, Box } from "@mui/material"
 import { FightName, FightDescription } from "@/components/fights"
 import type { Fight } from "@/types/types"
-import type { SystemStyleObject, Theme } from "@mui/system"
 
 interface FightPageClientProps {
   fight: Fight
@@ -21,13 +20,9 @@ export default function FightPageClient({ fight }: FightPageClientProps) {
         mb: { xs: 1, md: 2 },
       }}
     >
-      <FightName
-        fight={fight}
-        sx={{
-          fontSize: { xs: "1.5rem", md: "1.5rem" } as SystemStyleObject<Theme>,
-          mb: { xs: 1, md: 2 },
-        }}
-      />
+      <Typography variant="h6" sx={{ mb: 2 }}>
+        <FightName fight={fight} />
+      </Typography>
       <FightDescription fight={fight} sx={{ mb: { xs: 1, md: 2 } }} />
     </Box>
   )

@@ -1,17 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Typography } from "@mui/material"
+import { useEffect, useState } from "react"
 import { useCampaign } from "@/contexts"
 import type { Fight } from "@/types/types"
-import type { SystemStyleObject, Theme } from "@mui/system"
 
 interface FightNameProps {
   fight: Fight
-  sx?: SystemStyleObject<Theme>
 }
 
-export default function FightName({ fight, sx = {} }: FightNameProps) {
+export default function FightName({ fight }: FightNameProps) {
   const { campaignData } = useCampaign()
   const [displayName, setDisplayName] = useState(fight.name)
 
@@ -26,9 +23,7 @@ export default function FightName({ fight, sx = {} }: FightNameProps) {
     }
   }, [campaignData, fight.id])
 
-  return (
-    <Typography variant="h6" sx={{ color: "#ffffff", ...sx }}>
-      {displayName}
-    </Typography>
-  )
+  return (<>
+    {displayName}
+  </>)
 }

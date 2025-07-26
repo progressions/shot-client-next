@@ -3,7 +3,7 @@ import tippy from 'tippy.js'
 
 import MentionList from './MentionList.jsx'
 
-export default (user, client) => ({
+const suggestion = (user, client) => ({
   items: async ({ query }) => {
     if (user?.id) {
       const response = await client.getSuggestions({ query })
@@ -81,3 +81,5 @@ export default (user, client) => ({
     }
   },
 })
+
+export default suggestion

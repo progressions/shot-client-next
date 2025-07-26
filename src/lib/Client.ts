@@ -5,6 +5,8 @@ import type {
   Location,
   CharacterJson,
   Faction,
+  CharactersResponse,
+  VehiclesResponse,
   FactionsResponse,
   SuggestionsResponse,
   PartiesResponse,
@@ -177,12 +179,22 @@ class Client {
     return this.post(this.api.fightEvents(fight), { "fight_event": fightEvent })
   }
 
+  async getCharacters(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<CharactersResponse>> {
+    const query = this.queryParams(params)
+    return this.get(`${this.api.characters()}?${query}`, {}, cacheOptions)
+  }
+
   async getCharactersInFight(fight: Fight | ID, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Person[]>> {
     const query = this.queryParams(params)
     return this.get(`${this.api.charactersAndVehicles(fight)}/characters?${query}`, {}, cacheOptions)
   }
 
-  async getVehiclesInFight(fight: Fight | ID, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Vehicle[]>> {
+  async getVehicles(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Person[]>> {
+    const query = this.queryParams(params)
+    return this.get(`${this.api.vehicles()}?${query}`, {}, cacheOptions)
+  }
+
+  async getVehiclesInFight(fight: Fight | ID, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<VehiclesResponse>> {
     const query = this.queryParams(params)
     return this.get(`${this.api.charactersAndVehicles(fight)}/vehicles?${query}`, {}, cacheOptions)
   }

@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect } from "react"
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Drawer, Box, Typography, Alert } from "@mui/material"
@@ -24,7 +23,7 @@ type FormData = {
 
 export default function EditFightForm({ open, onClose, onSave, fight }: EditFightFormProps) {
   const { client } = useClient()
-  const { formState, dispatchForm, initialFormState } = useForm<FormData>({
+  const { formState, dispatchForm } = useForm<FormData>({
     name: fight.name || "",
     description: fight.description || ""
   })
@@ -45,7 +44,6 @@ export default function EditFightForm({ open, onClose, onSave, fight }: EditFigh
     dispatchForm({ type: FormActions.SUBMIT })
     try {
       const response = await client.updateFight({ id: fight.id, name, description } as Fight)
-      console.log("Update response:", response.data)
       const updatedFight = response.data
       onSave(updatedFight)
     } catch (err: unknown) {

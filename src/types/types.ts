@@ -186,6 +186,11 @@ export interface CharactersResponse {
   archetypes: Archetype[]
 }
 
+export interface VehiclesResponse {
+  vehicles: Vehicle[]
+  meta: PaginationMeta
+}
+
 export interface CharactersAndVehiclesResponse {
   characters: Character[]
   meta: PaginationMeta
@@ -545,7 +550,7 @@ export interface Fight {
   vehicle_effects: CharacterEffects
   created_at?: string
   updated_at?: string
-  actors?: Character[]
+  actors: Character[]
   fight_events?: FightEvent[]
 }
 
@@ -730,6 +735,7 @@ export const defaultFight:Fight = {
   active: true,
   sequence: 0,
   effects: [],
+  actors: [],
   characters: [],
   shot_order: [],
   character_effects: {},
