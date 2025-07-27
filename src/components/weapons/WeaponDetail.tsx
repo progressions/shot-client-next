@@ -8,7 +8,6 @@ import type { Weapon } from "@/types/types"
 import Link from "next/link"
 import { WeaponName, WeaponDescription } from "@/components/weapons"
 import { useCampaign, useClient } from "@/contexts"
-import { CharacterName } from "@/components/characters"
 
 interface WeaponDetailProps {
   weapon: Weapon
@@ -105,18 +104,6 @@ export default function WeaponDetail({ weapon: initialWeapon, onDelete, onEdit }
           </Box>
         </Box>
         <WeaponDescription weapon={weapon} />
-        <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
-          {weapon.characters && weapon.characters.length > 0 ? (
-            weapon.characters.map((actor, index) => (
-              <span key={`${actor.id}-${index}`}>
-                <Link href={`/characters/${actor.id}`} style={{ color: "#ffffff", textDecoration: "underline" }}>
-                  <CharacterName character={actor} />
-                </Link>
-                {index < weapon.characters.length - 1 && ", "}
-              </span>
-            ))
-          ) : null }
-        </Typography>
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
           Created: {formattedCreatedAt}
         </Typography>

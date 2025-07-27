@@ -27,6 +27,8 @@ export const defaultFaction:Faction = {
   vehicles: [],
   active: true,
   image_url: null,
+  created_at: "",
+  updated_at: ""
 }
 
 export const defaultCharacter:Person = {
@@ -221,7 +223,10 @@ export const defaultSite:Site = {
   description: "",
   faction: null,
   secret: false,
-  image_url: null
+  image_url: null,
+  characters: [],
+  created_at: "",
+  updated_at: ""
 }
 
 export const defaultParty:Party = {
@@ -231,7 +236,9 @@ export const defaultParty:Party = {
   characters: [],
   vehicles: [],
   secret: false,
-  image_url: null
+  image_url: null,
+  created_at: "",
+  updated_at: ""
 }
 
 export const defaultWeapon:Weapon = {
@@ -244,7 +251,9 @@ export const defaultWeapon:Weapon = {
   category: "",
   mook_bonus: 0,
   kachunk: false,
-  image_url: ""
+  image_url: "",
+  created_at: "",
+  updated_at: "",
 }
 
 export const defaultPaginationMeta:PaginationMeta = {

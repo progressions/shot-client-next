@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useState } from "react"
+import { useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Pagination, Box, Typography, Container, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, useMediaQuery, Card, CardContent, Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material"
 import Link from "next/link"
@@ -22,7 +22,6 @@ interface CharactersProps {
 type ValidSort = "name" | "type" | "created_at" | "updated_at"
 const validSorts: readonly ValidSort[] = ["name", "type", "created_at", "updated_at"]
 type ValidOrder = "asc" | "desc"
-const validOrders: readonly ValidOrder[] = ["asc", "desc"]
 
 // Mobile-specific component
 function CharactersMobile({
@@ -123,7 +122,7 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
   const router = useRouter()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
-  const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
+  const { formState, dispatchForm } = useForm<FormStateData>({
     characters: initialCharacters,
     meta: initialMeta,
     sort: initialSort,
@@ -139,7 +138,7 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
     } catch (err) {
       console.error("Fetch characters error:", err)
     }
-  }, [client])
+  }, [client, dispatchForm])
 
   const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
     if (page <= 0 || page > meta.total_pages) {

@@ -1,4 +1,4 @@
-import { Container, Typography } from "@mui/material"
+import { Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Site } from "@/types/types"
 import { SitePageClient } from "@/components/sites"

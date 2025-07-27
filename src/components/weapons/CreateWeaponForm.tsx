@@ -25,7 +25,7 @@ export default function CreateWeaponForm({ open, onClose, onSave }: CreateWeapon
       open={open}
       onClose={onClose}
       onSave={handleSave}
-      initialFormData={{ name: "", description: "", image: null }}
+      initialFormData={{ ...defaultWeapon, image: null }}
       title="New Weapon"
     />
   )
