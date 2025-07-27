@@ -129,7 +129,7 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
     sort: initialSort,
     order: initialOrder
   })
-  const { characters, meta, sort, order } = formState.formData
+  const { characters, meta, sort, order } = formState.data
 
   // Debug mobile detection and table widths
   useEffect(() => {
