@@ -121,23 +121,23 @@ class Client {
 
   async getParties(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<PartiesResponse>> {
     const query = this.queryParams(params)
-    return this.get(`${this.api.parties()}?${query}`, {}, cacheOptions)
+    return this.get(`${this.apiV2.parties()}?${query}`, {}, cacheOptions)
   }
 
   async getParty(party: Party | ID, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Party>> {
-    return this.get(this.api.parties(party), {}, cacheOptions)
+    return this.get(this.apiV2.parties(party), {}, cacheOptions)
   }
 
   async deleteParty(party: Party | ID): Promise<AxiosResponse<void>> {
-    return this.delete(this.api.parties(party))
+    return this.delete(this.apiV2.parties(party))
   }
 
-  async createParty(party: Party): Promise<AxiosResponse<Party>> {
-    return this.post(this.api.parties(), { "party": party })
+  async createParty(formData: FormData): Promise<AxiosResponse<Party>> {
+    return this.requestFormData("POST", `${this.apiV2.parties()}`, formData)
   }
 
-  async updateParty(party: Party): Promise<AxiosResponse<Party>> {
-    return this.patch(this.api.parties(party), { "party": party })
+  async updateParty(id: string, formData: FormData): Promise<AxiosResponse<Party>> {
+    return this.requestFormData("PATCH", `${this.apiV2.parties({ id })}`, formData)
   }
 
   async deletePartyImage(party: Party): Promise<AxiosResponse<void>> {
@@ -586,27 +586,27 @@ class Client {
 
   async getWeapons(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<WeaponsResponse>> {
     const query = this.queryParams(params)
-    return this.get(`${this.api.weapons()}?${query}`, {}, cacheOptions)
+    return this.get(`${this.apiV2.weapons()}?${query}`, {}, cacheOptions)
   }
 
   async getWeapon(weapon: Weapon | ID, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Weapon>> {
-    return this.get(this.api.weapons(weapon), {}, cacheOptions)
+    return this.get(this.apiV2.weapons(weapon), {}, cacheOptions)
   }
 
-  async createWeapon(weapon: Weapon): Promise<AxiosResponse<Weapon>> {
-    return this.post(this.api.weapons(), { "weapon": weapon })
+  async createWeapon(formData: FormData): Promise<AxiosResponse<Weapon>> {
+    return this.requestFormData("POST", `${this.apiV2.weapons()}`, formData)
   }
 
-  async updateWeapon(weapon: Weapon): Promise<AxiosResponse<Weapon>> {
-    return this.patch(this.api.weapons(weapon), { "weapon": weapon })
+  async updateWeapon(id: string, formData: FormData): Promise<AxiosResponse<Weapon>> {
+    return this.requestFormData("PATCH", `${this.apiV2.weapons({ id })}`, formData)
   }
 
   async deleteWeapon(weapon: Weapon): Promise<AxiosResponse<void>> {
-    return this.delete(this.api.weapons(weapon))
+    return this.delete(this.apiV2.weapons(weapon))
   }
 
   async deleteWeaponImage(weapon: Weapon): Promise<AxiosResponse<void>> {
-    return this.delete(`${this.api.weapons(weapon)}/image`)
+    return this.delete(`${this.apiV2.weapons(weapon)}/image`)
   }
 
   async addWeapon(character: Character | ID, weapon: Weapon): Promise<AxiosResponse<Character>> {

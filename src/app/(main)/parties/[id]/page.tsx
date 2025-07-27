@@ -1,0 +1,26 @@
+import { Container, Typography } from "@mui/material"
+import { getServerClient, getUser } from "@/lib/getServerClient"
+import type { Site } from "@/types/types"
+import { SitePageClient } from "@/components/sites"
+
+type SitePageProps = {
+  params: Promise<{ id: string }>
+}
+
+export default async function SitePage({ params }: SitePageProps) {
+  const { id } = await params
+  const client = await getServerClient()
+  const user = await getUser()
+  if (!client || !user) return <Typography>Not logged in</Typography>
+
+  const response = await client.getSite({ id })
+  const site: Site = response.data
+
+  if (!site?.id) {
+    return <Typography>Site not found</Typography>
+  }
+
+  return (
+    <SitePageClient site={site} />
+  )
+}

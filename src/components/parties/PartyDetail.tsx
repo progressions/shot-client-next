@@ -1,0 +1,131 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { Card, CardContent, CardMedia, Box, Alert, IconButton, Tooltip, Typography } from "@mui/material"
+import DeleteIcon from "@mui/icons-material/Delete"
+import EditIcon from "@mui/icons-material/Edit"
+import type { Party } from "@/types/types"
+import Link from "next/link"
+import { PartyName, PartyDescription } from "@/components/parties"
+import { useCampaign, useClient } from "@/contexts"
+import { CharacterName } from "@/components/characters"
+
+interface PartyDetailProps {
+  party: Party
+  onDelete: (partyId: string) => void
+  onEdit: (party: Party) => void
+}
+
+export default function PartyDetail({ party: initialParty, onDelete, onEdit }: PartyDetailProps) {
+  const { client } = useClient()
+  const { campaignData } = useCampaign()
+  const [error, setError] = useState<string | null>(null)
+  const [party, setParty] = useState<Party>(initialParty)
+
+  useEffect(() => {
+    if (campaignData?.party && campaignData.party.id === initialParty.id) {
+      setParty({
+        ...initialParty,
+        name: campaignData.party.name || initialParty.name,
+        description: campaignData.party.description || initialParty.description,
+        image_url: campaignData.party.image_url || initialParty.image_url,
+      })
+    }
+  }, [campaignData, initialParty])
+
+  const handleDelete = async () => {
+    if (!party?.id) return
+    if (!confirm(`Are you sure you want to delete the party: ${party.name}?`)) return
+
+    try {
+      await client.deleteParty(party)
+      onDelete(party.id)
+      setError(null)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete party")
+      console.error("Delete party error:", err)
+    }
+  }
+
+  const handleEdit = () => {
+    onEdit(party)
+  }
+
+  // Format created_at timestamp for display
+  const formattedCreatedAt = party.created_at
+    ? new Date(party.created_at).toLocaleString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true
+      })
+    : "Unknown"
+
+  return (
+    <Card sx={{ mb: 2, bgcolor: "#424242" }}>
+      {party.image_url && (
+        <CardMedia
+          component="img"
+          height="140"
+          image={party.image_url}
+          alt={party.name}
+          sx={{ objectFit: "cover" }}
+        />
+      )}
+      <CardContent sx={{ p: "1rem" }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Typography variant="h6" sx={{ color: "#ffffff" }}>
+            <Link href={`/parties/${party.id}`} style={{ color: "#fff" }}>
+              <PartyName party={party} />
+            </Link>
+          </Typography>
+          <Box sx={{ display: "flex", gap: "0.5rem" }}>
+            <Tooltip title="Edit Party">
+              <IconButton
+                color="inherit"
+                onClick={handleEdit}
+                size="small"
+                aria-label="edit party"
+              >
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete Party">
+              <IconButton
+                color="inherit"
+                onClick={handleDelete}
+                size="small"
+                aria-label="delete party"
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Box>
+        <PartyDescription party={party} />
+        <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
+          {party.characters && party.characters.length > 0 ? (
+            party.characters.map((actor, index) => (
+              <span key={`${actor.id}-${index}`}>
+                <Link href={`/characters/${actor.id}`} style={{ color: "#ffffff", textDecoration: "underline" }}>
+                  <CharacterName character={actor} />
+                </Link>
+                {index < party.characters.length - 1 && ", "}
+              </span>
+            ))
+          ) : null }
+        </Typography>
+        <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
+          Created: {formattedCreatedAt}
+        </Typography>
+        {error && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {error}
+          </Alert>
+        )}
+      </CardContent>
+    </Card>
+  )
+}

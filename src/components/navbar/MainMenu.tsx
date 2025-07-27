@@ -70,6 +70,11 @@ export default function HamburgerMenu() {
           </Link>
         </MenuItem>
         <MenuItem onClick={handleMenuClose}>
+          <Link href="/parties" style={{ color: "#ffffff", textDecoration: "none", width: "100%" }}>
+            Parties
+          </Link>
+        </MenuItem>
+        <MenuItem onClick={handleMenuClose}>
           <Link href="/schticks" style={{ color: "#ffffff", textDecoration: "none", width: "100%" }}>
             Schticks
           </Link>

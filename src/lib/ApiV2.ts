@@ -40,6 +40,22 @@ class ApiV2 {
     }
   }
 
+  parties(party?: Party | ID): string {
+    if (party?.id) {
+      return `${this.api()}/parties/${party.id}`
+    } else {
+      return `${this.api()}/parties`
+    }
+  }
+
+  weapons(weapon?: Weapon | ID): string {
+    if (weapon?.id) {
+      return `${this.api()}/weapons/${weapon.id}`
+    } else {
+      return `${this.api()}/weapons`
+    }
+  }
+
 }
 
 export default ApiV2
