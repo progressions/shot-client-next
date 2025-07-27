@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useState, useEffect } from "react"
+import { useCallback, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Pagination, Box, Typography, Container, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, useMediaQuery, Card, CardContent, Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material"
 import Link from "next/link"
@@ -123,13 +123,13 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
   const router = useRouter()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
-  const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
+  const { formState, dispatchForm } = useForm<FormStateData>({
     characters: initialCharacters,
     meta: initialMeta,
     sort: initialSort,
     order: initialOrder
   })
-  const { characters, meta, sort, order } = formState.formData
+  const { characters, meta, sort, order } = formState.data
 
   // Debug mobile detection and table widths
   useEffect(() => {
@@ -155,7 +155,7 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
     } catch (err) {
       console.error("Fetch characters error:", err)
     }
-  }, [client])
+  }, [client, dispatchForm])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -169,7 +169,7 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
     if (page !== meta.current_page || currentSort !== sort || currentOrder !== order) {
       fetchCharacters(page, currentSort, currentOrder)
     }
-  }, [client, meta.current_page, fetchCharacters, order, sort])
+  }, [client, meta.current_page, fetchCharacters, order, sort, dispatchForm])
 
   const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
     if (page <= 0 || page > meta.total_pages) {
