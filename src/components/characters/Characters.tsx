@@ -11,6 +11,7 @@ import type { SelectChangeEvent } from "@mui/material"
 import { CharacterName } from "@/components/characters"
 import { CS } from "@/services"
 import { FormActions, useForm } from "@/reducers"
+import { CharactersMobile } from "@/components/characters"
 
 interface CharactersProps {
   initialCharacters: Character[]
@@ -24,92 +25,6 @@ const validSorts: readonly ValidSort[] = ["name", "type", "created_at", "updated
 type ValidOrder = "asc" | "desc"
 const validOrders: readonly ValidOrder[] = ["asc", "desc"]
 
-// Mobile-specific component
-function CharactersMobile({
-  characters,
-  meta,
-  sort,
-  order,
-  onPageChange,
-  onSortChange,
-  onOrderChange
-}: {
-  characters: Character[]
-  meta: PaginationMeta
-  sort: string
-  order: string
-  onPageChange: (_event: React.ChangeEvent<unknown>, page: number) => void
-  onSortChange: (event: SelectChangeEvent<string>) => void
-  onOrderChange: () => void
-}) {
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
-
-  const formatDate = (date: string) => {
-    const d = new Date(date)
-    return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear().toString().slice(-2)}`
-  }
-
-  return (
-    <Stack spacing={2}>
-      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-        <FormControl sx={{ minWidth: 120 }}>
-          <InputLabel id="sort-label" sx={{ color: "#ffffff" }}>Sort By</InputLabel>
-          <Select
-            labelId="sort-label"
-            value={sort}
-            label="Sort By"
-            onChange={onSortChange}
-            sx={{ color: "#ffffff", "& .MuiSvgIcon-root": { color: "#ffffff" } }}
-          >
-            <MenuItem value="name">Name</MenuItem>
-            <MenuItem value="created_at">Created</MenuItem>
-            <MenuItem value="updated_at">Updated</MenuItem>
-          </Select>
-        </FormControl>
-        <Typography
-          onClick={onOrderChange}
-          sx={{
-            color: "#ffffff",
-            cursor: "pointer",
-            fontSize: "0.875rem",
-            textDecoration: "underline"
-          }}
-        >
-          {order === "asc" ? "↑ Asc" : "↓ Desc"}
-        </Typography>
-      </Box>
-      {characters.length === 0 ? (
-        <Typography sx={{ color: "#ffffff" }}>No characters available</Typography>
-      ) : (
-        characters.map((character) => (
-          <Card key={character.id} sx={{ bgcolor: "#424242", color: "#ffffff" }}>
-            <CardContent sx={{ p: 2 }}>
-              <Typography variant="body1">
-                <Link href={`/characters/${character.id}`} style={{ color: "#ffffff", textDecoration: "underline" }}>
-                  <CharacterName character={character} />
-                </Link>
-              </Typography>
-              <Typography variant="body2">Type: {CS.type(character)}</Typography>
-              <Typography variant="body2">Created: {formatDate(character.created_at || "")}</Typography>
-              <Typography variant="body2">Active: {character.active ? "Yes" : "No"}</Typography>
-            </CardContent>
-          </Card>
-        ))
-      )}
-      <Pagination
-        count={meta.total_pages}
-        page={meta.current_page}
-        onChange={onPageChange}
-        variant="outlined"
-        color="primary"
-        shape="rounded"
-        size={isMobile ? "small" : "large"}
-        sx={{ mt: 2 }}
-      />
-    </Stack>
-  )
-}
 
 type FormStateData = {
   characters: Character[]
