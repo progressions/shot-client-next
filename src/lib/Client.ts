@@ -631,6 +631,7 @@ class Client {
 
   async request<T>(method: string, url: string, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<T>> {
     const headers: { [key: string]: string } = {
+      "Accept": "application/json",
       "Content-Type": "application/json",
       "Authorization": `Bearer ${this.jwt}`
     }
@@ -664,6 +665,7 @@ class Client {
     }
 
     const headers: { [key: string]: string } = {
+      "Accept": "application/json",
       "Content-Type": "application/json",
       "Authorization": `Bearer ${this.jwt}`
     }
@@ -690,6 +692,7 @@ class Client {
       url: url,
       method: "DELETE",
       headers: {
+        "Accept": "application/json",
         "Content-Type": "application/json",
         "Authorization": `Bearer ${this.jwt}`
       },
@@ -703,6 +706,7 @@ class Client {
       method: method,
       data: formData,
       headers: {
+        "Accept": "application/json",
         "Content-Type": "multipart/form-data",
         "Authorization": `Bearer ${this.jwt}`
       },
