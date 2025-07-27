@@ -47,6 +47,7 @@ export function useCollection<T extends DataShape>({
     const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
+    console.log("handleSortChange", newSort, newOrder)
     router.push(`${url}?page=1&sort=${newSort}&order=${newOrder}`, { scroll: false })
     fetchCollection(1, newSort, newOrder)
   }

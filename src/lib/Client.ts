@@ -1,5 +1,5 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios"
-import Api from "@/lib/Api"
+import { Api, ApiV2 } from "@/lib"
 import type {
   NotionPage,
   Location,
@@ -53,6 +53,7 @@ type Params = Record<string, unknown>
 class Client {
   jwt?: string
   api: Api
+  apiV2: ApiV2
   consumerInstance?: Consumer
 
   constructor(params: ClientParams = {}) {
@@ -60,6 +61,7 @@ class Client {
       this.jwt = params.jwt
     }
     this.api = new Api()
+    this.apiV2 = new ApiV2()
   }
 
   consumer() {
@@ -181,7 +183,7 @@ class Client {
 
   async getCharacters(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<CharactersResponse>> {
     const query = this.queryParams(params)
-    return this.get(`${this.api.characters()}?${query}`, {}, cacheOptions)
+    return this.get(`${this.apiV2.characters()}?${query}`, {}, cacheOptions)
   }
 
   async getCharactersInFight(fight: Fight | ID, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Person[]>> {
