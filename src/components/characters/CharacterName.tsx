@@ -24,6 +24,6 @@ export default function CharacterName({ character }: CharacterNameProps) {
   }, [campaignData, character.id])
 
   return (<>
-      {displayName}
-    </>)
+    {displayName}
+  </>)
 }

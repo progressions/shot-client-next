@@ -4,28 +4,27 @@ import { useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Pagination, Box, Typography, Container, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, useMediaQuery, Card, CardContent, Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material"
 import Link from "next/link"
-import type { Character, PaginationMeta } from "@/types/types"
+import type { Vehicle, PaginationMeta } from "@/types/types"
 import { useClient } from "@/contexts"
 import { useTheme } from "@mui/material/styles"
 import type { SelectChangeEvent } from "@mui/material"
-import { CharacterName } from "@/components/characters"
-import { CS } from "@/services"
+import { VehicleName } from "@/components/vehicles"
 
-interface CharactersProps {
-  initialCharacters: Character[]
+interface VehiclesProps {
+  initialVehicles: Vehicle[]
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
 }
 
-type ValidSort = "name" | "type" | "created_at" | "updated_at"
-const validSorts: readonly ValidSort[] = ["name", "type", "created_at", "updated_at"]
+type ValidSort = "name" | "created_at" | "updated_at"
+const validSorts: readonly ValidSort[] = ["name", "created_at", "updated_at"]
 type ValidOrder = "asc" | "desc"
 const validOrders: readonly ValidOrder[] = ["asc", "desc"]
 
 // Mobile-specific component
-function CharactersMobile({
-  characters,
+function VehiclesMobile({
+  vehicles,
   meta,
   sort,
   order,
@@ -33,7 +32,7 @@ function CharactersMobile({
   onSortChange,
   onOrderChange
 }: {
-  characters: Character[]
+  vehicles: Vehicle[]
   meta: PaginationMeta
   sort: string
   order: string
@@ -78,20 +77,20 @@ function CharactersMobile({
           {order === "asc" ? "↑ Asc" : "↓ Desc"}
         </Typography>
       </Box>
-      {characters.length === 0 ? (
-        <Typography sx={{ color: "#ffffff" }}>No characters available</Typography>
+      {vehicles.length === 0 ? (
+        <Typography sx={{ color: "#ffffff" }}>No vehicles available</Typography>
       ) : (
-        characters.map((character) => (
-          <Card key={character.id} sx={{ bgcolor: "#424242", color: "#ffffff" }}>
+        vehicles.map((vehicle) => (
+          <Card key={vehicle.id} sx={{ bgcolor: "#424242", color: "#ffffff" }}>
             <CardContent sx={{ p: 2 }}>
               <Typography variant="body1">
-                <Link href={`/characters/${character.id}`} style={{ color: "#ffffff", textDecoration: "underline" }}>
-                  <CharacterName character={character} />
+                <Link href={`/vehicles/${vehicle.id}`} style={{ color: "#ffffff", textDecoration: "underline" }}>
+                  <VehicleName vehicle={vehicle} />
                 </Link>
               </Typography>
-              <Typography variant="body2">Type: {CS.type(character)}</Typography>
-              <Typography variant="body2">Created: {formatDate(character.created_at || "")}</Typography>
-              <Typography variant="body2">Active: {character.active ? "Yes" : "No"}</Typography>
+              <Typography variant="body2">Created: {formatDate(vehicle.created_at || "")}</Typography>
+              <Typography variant="body2">Updated: {formatDate(vehicle.updated_at || "")}</Typography>
+              <Typography variant="body2">Active: {vehicle.active ? "Yes" : "No"}</Typography>
             </CardContent>
           </Card>
         ))
@@ -110,12 +109,12 @@ function CharactersMobile({
   )
 }
 
-export default function Characters({ initialCharacters, initialMeta, initialSort, initialOrder }: CharactersProps) {
+export default function Vehicles({ initialVehicles, initialMeta, initialSort, initialOrder }: VehiclesProps) {
   const { client } = useClient()
   const router = useRouter()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
-  const [characters, setCharacters] = useState<Character[]>(initialCharacters)
+  const [vehicles, setVehicles] = useState<Vehicle[]>(initialVehicles)
   const [meta, setMeta] = useState<PaginationMeta>(initialMeta)
   const [sort, setSort] = useState<string>(initialSort)
   const [order, setOrder] = useState<string>(initialOrder)
@@ -123,7 +122,7 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
   // Debug mobile detection and table widths
   useEffect(() => {
     console.log("isMobile:", isMobile, "Screen width:", window.innerWidth)
-    console.log("Rendering:", isMobile ? "CharactersMobile" : "Table")
+    console.log("Rendering:", isMobile ? "VehiclesMobile" : "Table")
     console.log("Table styles:", {
       maxWidth: isMobile ? "400px" : "100%",
       tableLayout: "fixed",
@@ -136,13 +135,13 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
     })
   }, [isMobile])
 
-  const fetchCharacters = useCallback(async (page: number = 1, sort: string = "name", order: string = "asc") => {
+  const fetchVehicles = useCallback(async (page: number = 1, sort: string = "name", order: string = "asc") => {
     try {
-      const response = await client.getCharacters({ page, sort, order })
-      setCharacters(response.data.characters)
+      const response = await client.getVehicles({ page, sort, order })
+      setVehicles(response.data.vehicles)
       setMeta(response.data.meta)
     } catch (err) {
-      console.error("Fetch characters error:", err)
+      console.error("Fetch vehicles error:", err)
     }
   }, [client])
 
@@ -156,17 +155,17 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
     setSort(currentSort)
     setOrder(currentOrder)
     if (page !== meta.current_page || currentSort !== sort || currentOrder !== order) {
-      fetchCharacters(page, currentSort, currentOrder)
+      fetchVehicles(page, currentSort, currentOrder)
     }
-  }, [client, meta.current_page, fetchCharacters, order, sort])
+  }, [client, meta.current_page, fetchVehicles, order, sort])
 
   const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
     if (page <= 0 || page > meta.total_pages) {
-      router.push(`/characters?page=1&sort=${sort}&order=${order}`, { scroll: false })
-      fetchCharacters(1, sort, order)
+      router.push(`/vehicles?page=1&sort=${sort}&order=${order}`, { scroll: false })
+      fetchVehicles(1, sort, order)
     } else {
-      router.push(`/characters?page=${page}&sort=${sort}&order=${order}`, { scroll: false })
-      fetchCharacters(page, sort, order)
+      router.push(`/vehicles?page=${page}&sort=${sort}&order=${order}`, { scroll: false })
+      fetchVehicles(page, sort, order)
     }
   }
 
@@ -174,8 +173,8 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
     const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
     setSort(newSort)
     setOrder(newOrder)
-    router.push(`/characters?page=1&sort=${newSort}&order=${newOrder}`, { scroll: false })
-    fetchCharacters(1, newSort, newOrder)
+    router.push(`/vehicles?page=1&sort=${newSort}&order=${newOrder}`, { scroll: false })
+    fetchVehicles(1, newSort, newOrder)
   }
 
   const handleSortChangeMobile = (event: SelectChangeEvent<string>) => {
@@ -183,16 +182,16 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
     if (validSorts.includes(newSort)) {
       setSort(newSort)
       setOrder("asc")
-      router.push(`/characters?page=1&sort=${newSort}&order=asc`, { scroll: false })
-      fetchCharacters(1, newSort, "asc")
+      router.push(`/vehicles?page=1&sort=${newSort}&order=asc`, { scroll: false })
+      fetchVehicles(1, newSort, "asc")
     }
   }
 
   const handleOrderChangeMobile = () => {
     const newOrder = order === "asc" ? "desc" : "asc"
     setOrder(newOrder)
-    router.push(`/characters?page=1&sort=${sort}&order=${newOrder}`, { scroll: false })
-    fetchCharacters(1, sort, newOrder)
+    router.push(`/vehicles?page=1&sort=${sort}&order=${newOrder}`, { scroll: false })
+    fetchVehicles(1, sort, newOrder)
   }
 
   const formatDate = (date: string) => {
@@ -214,10 +213,10 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
           variant="h4"
           sx={{ color: "#ffffff", fontSize: { xs: "1.5rem", sm: "2.125rem" }, mb: 2 }}
         >
-          Characters
+          Vehicles
         </Typography>
-        <CharactersMobile
-          characters={characters}
+        <VehiclesMobile
+          vehicles={vehicles}
           meta={meta}
           sort={sort}
           order={order}
@@ -235,7 +234,7 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
         variant="h4"
         sx={{ color: "#ffffff", fontSize: { xs: "1.5rem", sm: "2.125rem" }, mb: 2 }}
       >
-        Characters
+        Vehicles
       </Typography>
       <Box sx={{ bgcolor: "#424242", borderRadius: 1, overflowX: "auto" }}>
         <Table
@@ -262,20 +261,6 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
               </TableCell>
               <TableCell sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}>
                 <TableSortLabel
-                  active={sort === "type"}
-                  direction={sort === "type" ? order as ValidOrder : "asc"}
-                  onClick={() => handleSortChange("type")}
-                  sx={{
-                    color: "#ffffff",
-                    "&.Mui-active": { color: "#ffffff" },
-                    "& .MuiTableSortLabel-icon": { color: "#ffffff !important" }
-                  }}
-                >
-                  Type
-                </TableSortLabel>
-              </TableCell>
-              <TableCell sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}>
-                <TableSortLabel
                   active={sort === "created_at"}
                   direction={sort === "created_at" ? order as ValidOrder : "asc"}
                   onClick={() => handleSortChange("created_at")}
@@ -286,6 +271,20 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
                   }}
                 >
                   Created
+                </TableSortLabel>
+              </TableCell>
+              <TableCell sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}>
+                <TableSortLabel
+                  active={sort === "updated_at"}
+                  direction={sort === "updated_at" ? order as ValidOrder : "asc"}
+                  onClick={() => handleSortChange("updated_at")}
+                  sx={{
+                    color: "#ffffff",
+                    "&.Mui-active": { color: "#ffffff" },
+                    "& .MuiTableSortLabel-icon": { color: "#ffffff !important" }
+                  }}
+                >
+                  Updated
                 </TableSortLabel>
               </TableCell>
               <TableCell
@@ -301,15 +300,15 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
             </TableRow>
           </TableHead>
           <TableBody>
-            {characters.length === 0 ? (
+            {vehicles.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} sx={{ color: "#ffffff" }}>
-                  No characters available
+                  No vehicles available
                 </TableCell>
               </TableRow>
             ) : (
-              characters.map((character) => (
-                <TableRow key={character.id} sx={{ "&:hover": { bgcolor: "#616161" } }}>
+              vehicles.map((vehicle) => (
+                <TableRow key={vehicle.id} sx={{ "&:hover": { bgcolor: "#616161" } }}>
                   <TableCell
                     sx={{
                       color: "#ffffff",
@@ -318,15 +317,15 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
                       whiteSpace: "nowrap"
                     }}
                   >
-                    <Link href={`/characters/${character.id}`} style={{ color: "#ffffff", textDecoration: "underline" }}>
-                      <CharacterName character={character} />
+                    <Link href={`/vehicles/${vehicle.id}`} style={{ color: "#ffffff", textDecoration: "underline" }}>
+                      {vehicle.name}
                     </Link>
                   </TableCell>
                   <TableCell sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}>
-                    {CS.type(character)}
+                    {formatDate(vehicle.created_at || "")}
                   </TableCell>
                   <TableCell sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}>
-                    {formatDate(character.created_at || "")}
+                    {formatDate(vehicle.updated_at || "")}
                   </TableCell>
                   <TableCell
                     sx={{
@@ -336,7 +335,7 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
                       padding: { xs: "8px 4px", sm: "16px 8px" }
                     }}
                   >
-                    {character.active ? "Yes" : "No"}
+                    {vehicle.active ? "Yes" : "No"}
                   </TableCell>
                 </TableRow>
               ))
@@ -357,3 +356,4 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
   </>
   )
 }
+

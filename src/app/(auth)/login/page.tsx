@@ -46,7 +46,7 @@ export default function LoginPage() {
     <Container maxWidth="sm">
       <Box sx={{ mt: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
         <Typography variant="h4" component="h1" gutterBottom sx={{ color: "#ffffff" }}>
-          Login
+          Login to Chi War
         </Typography>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: "100%" }}>
           <TextField

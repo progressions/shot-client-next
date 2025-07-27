@@ -20,7 +20,25 @@ export type BackendErrorResponse = {
 export interface CampaignCableData {
   fight: Fight | null
   character: Character | null
-  fights?: Fight[] | string | null
+  campaign: Campaign | null
+  user: User | null
+  vehicle: Vehicle | null
+  faction: Faction | null
+  juncture: Juncture | null
+  party: Party | null
+  site: Site | null
+  weapon: Weapon | null
+  schtick: Schtick | null
+
+  fights: Fight[] | string | null
+  junctures: Juncture[] | string | null
+  factions: Faction[] | string | null
+  characters: Character[] | string | null
+  vehicles: Vehicle[] | string | null
+  parties: Party[] | string | null
+  sites: Site[] | string | null
+  schticks: Schtick[] | string | null
+  weapons: Weapon[] | string | null
 }
 
 export interface CableData {
@@ -252,8 +270,8 @@ export interface Toast {
 export interface Campaign {
   id?: string
   name: string
-  description?: string
-  gamemaster?: User
+  description: string
+  gamemaster: User
   new?: boolean
   players: User[]
   invitations: Invitation[]
@@ -492,9 +510,11 @@ export interface Juncture {
   name: string
   description?: string
   faction?: Faction | null
-  characters?: Character[]
+  characters: Character[]
   active: boolean
   image_url: string | null
+  created_at: string
+  updated_at: string
 }
 
 export interface Effect {
@@ -552,6 +572,7 @@ export interface Fight {
   updated_at?: string
   actors: Character[]
   fight_events?: FightEvent[]
+  image_url: string | null
 }
 
 export interface User {
@@ -611,249 +632,3 @@ export interface FightChannelMessage {
   fight?: "updated" | Fight
   users?: Viewer[]
 }
-
-export const defaultFaction:Faction = {
-  id: "",
-  name: "",
-  description: "",
-  characters: [],
-  vehicles: [],
-  active: true,
-  image_url: null,
-}
-
-export const defaultCharacter:Person = {
-  name: '',
-  category: "character",
-  active: true,
-  current_shot: 0,
-  impairments: 0,
-  color: '',
-  faction_id: null,
-  faction: defaultFaction,
-  action_values: {
-    Archetype: "",
-    Guns: 0,
-    "Martial Arts": 0,
-    Sorcery: 0,
-    Scroungetech: 0,
-    Genome: 0,
-    Creature: 0,
-    Defense: 0,
-    Toughness: 0,
-    Speed: 0,
-    Fortune: 0,
-    "Max Fortune": 0,
-    FortuneType: "Fortune",
-    MainAttack: "Guns",
-    SecondaryAttack: null,
-    Wounds: 0,
-    Type: "Featured Foe",
-    Vehicle: false,
-    "Marks of Death": 0,
-    Damage: 0,
-  },
-  description: {
-    "Nicknames": "",
-    "Age": "",
-    "Height": "",
-    "Weight": "",
-    "Hair Color": "",
-    "Eye Color": "",
-    "Style of Dress": "",
-    "Appearance": "",
-    "Background": "",
-    "Melodramatic Hook": ""
-  },
-  schticks: [],
-  skills: {},
-  advancements: [],
-  sites: [],
-  weapons: [],
-  count: 0,
-  shot_id: "",
-  image_url: "",
-  task: false,
-  notion_page_id: null,
-  wealth: "Poor",
-  juncture_id: null,
-  juncture: null
-}
-
-export const defaultVehicle:Vehicle = {
-  name: '',
-  active: true,
-  category: "vehicle",
-  current_shot: '',
-  impairments: 0,
-  color: '',
-  faction_id: null,
-  faction: defaultFaction,
-  action_values: {
-    Acceleration: 0,
-    Handling: 0,
-    Squeal: 0,
-    Frame: 0,
-    Crunch: 0,
-    "Chase Points": 0,
-    "Condition Points": 0,
-    Pursuer: "true",
-    Position: "far",
-    Type: "Featured Foe",
-  },
-  description: {
-    "Nicknames": "",
-    "Age": "",
-    "Height": "",
-    "Weight": "",
-    "Hair Color": "",
-    "Eye Color": "",
-    "Style of Dress": "",
-    "Appearance": "",
-    "Background": "",
-    "Melodramatic Hook": ""
-  },
-  schticks: [],
-  skills: {},
-  advancements: [],
-  sites: [],
-  weapons: [],
-  count: 0,
-  shot_id: "",
-  driver: defaultCharacter,
-  image_url: "",
-  task: false,
-  notion_page_id: null,
-  wealth: "",
-  juncture_id: null,
-  juncture: null
-}
-
-export const defaultFight:Fight = {
-  name: "",
-  description: "",
-  active: true,
-  sequence: 0,
-  effects: [],
-  actors: [],
-  characters: [],
-  shot_order: [],
-  character_effects: {},
-  vehicle_effects: {}
-}
-
-export const defaultUser:User = {
-  email: '',
-  name: '',
-}
-
-export const defaultEffect:Effect = {
-  name: "",
-  description: "",
-  severity: "error",
-  start_sequence: 1,
-  end_sequence: 2,
-  start_shot: 15,
-  end_shot: 15,
-}
-
-export const defaultToast:Toast = {
-  open: false,
-  message: "",
-  severity: "success"
-}
-
-export const defaultCampaign:Campaign = {
-  name: "",
-  description: "",
-  gamemaster: defaultUser,
-  players: [],
-  invitations: []
-}
-
-export const defaultCharacterEffect:CharacterEffect = {
-  name: "",
-  description: "",
-  severity: "info",
-  character_id: "",
-  shot_id: ""
-}
-
-export const defaultSchtick:Schtick = {
-  name: "",
-  description: "",
-  campaign_id: "",
-  category: "",
-  path: "",
-  schtick_id: "",
-  prerequisite: {
-    id: "",
-    name: ""
-  },
-  color: ""
-}
-
-export const defaultAdvancement:Advancement = {
-  description: ""
-}
-
-export const defaultJuncture:Juncture = {
-  name: "",
-  description: "",
-  faction: null,
-  active: true,
-  image_url: null
-}
-
-export const defaultSite:Site = {
-  name: "",
-  description: "",
-  faction: null,
-  secret: false,
-  image_url: null
-}
-
-export const defaultParty:Party = {
-  name: "",
-  description: "",
-  faction: null,
-  characters: [],
-  vehicles: [],
-  secret: false,
-  image_url: null
-}
-
-export const defaultWeapon:Weapon = {
-  name: "",
-  description: "",
-  damage: 7,
-  concealment: 0,
-  reload_value: 0,
-  juncture: "",
-  category: "",
-  mook_bonus: 0,
-  kachunk: false,
-  image_url: ""
-}
-
-export const defaultPaginationMeta:PaginationMeta = {
-  current_page: 1,
-  next_page: null,
-  prev_page: null,
-  total_pages: 1,
-  total_count: 1
-}
-
-export const defaultLocation:Location = {
-  name: ""
-}
-
-export const defaultSwerve:Swerve = {
-  result: 0,
-  positiveRolls: [],
-  negativeRolls: [],
-  positive: 0,
-  negative: 0,
-  boxcars: false,
-}
-

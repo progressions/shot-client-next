@@ -7,6 +7,7 @@ import { useClient } from "@/contexts"
 import { logoutAction } from "@/lib/actions"
 import { UserActions } from "@/reducers"
 import { Button } from "@/components/ui"
+import { MainMenu } from "@/components/navbar"
 
 export default function Navbar() {
   const { jwt, user, dispatchCurrentUser } = useClient()
@@ -20,16 +21,23 @@ export default function Navbar() {
 
   return (
     <AppBar position="static" sx={{ bgcolor: "#1d1d1d" }}>
-      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Typography
-          variant="h6"
-          component={Link}
-          href="/"
-          sx={{ color: "#ffffff", textDecoration: "none" }}
-        >
-          Chi War
-        </Typography>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+      <Toolbar sx={{ display: "flex", justifyContent: "space-between", px: { xs: 1, sm: 2 } }}>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <MainMenu />
+          <Typography
+            variant="h6"
+            component={Link}
+            href="/"
+            sx={{
+              color: "#ffffff",
+              textDecoration: "none",
+              fontSize: { xs: "1.25rem", sm: "1.5rem" }
+            }}
+          >
+            Chi War
+          </Typography>
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1, sm: 2 } }}>
           {user.id ? (
             <>
               <Avatar src={user.image_url ?? undefined} alt={user.name} sx={{ width: 32, height: 32 }} />

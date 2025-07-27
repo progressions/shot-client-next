@@ -1,0 +1,33 @@
+"use client"
+
+import { defaultJuncture, type Juncture } from "@/types"
+import { useClient } from "@/contexts"
+import JunctureForm from "./JunctureForm"
+
+interface CreateJunctureFormProps {
+  open: boolean
+  onClose: () => void
+  onSave: (newJuncture: Juncture) => void
+}
+
+export default function CreateJunctureForm({ open, onClose, onSave }: CreateJunctureFormProps) {
+  const { client } = useClient()
+
+  const handleSave = async (formData: FormData, junctureData: Juncture) => {
+    const juncture = { ...defaultJuncture, ...junctureData } as Juncture
+    formData.set("juncture", JSON.stringify(juncture))
+    const response = await client.createJuncture(formData)
+    onSave(response.data)
+  }
+
+  return (
+    <JunctureForm
+      open={open}
+      onClose={onClose}
+      onSave={handleSave}
+      initialFormData={{ name: "", description: "", image: null }}
+      title="New Juncture"
+    />
+  )
+}
+

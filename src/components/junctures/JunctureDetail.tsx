@@ -1,60 +1,59 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { CardMedia, Card, CardContent, Box, Alert, IconButton, Tooltip, Typography } from "@mui/material"
+import { Card, CardContent, CardMedia, Box, Alert, IconButton, Tooltip, Typography } from "@mui/material"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
-import type { Fight } from "@/types/types"
+import type { Juncture } from "@/types/types"
 import Link from "next/link"
-import { FightName, FightDescription } from "@/components/fights"
+import { JunctureName, JunctureDescription } from "@/components/junctures"
 import { useCampaign, useClient } from "@/contexts"
 import { CharacterName } from "@/components/characters"
 
-interface FightDetailProps {
-  fight: Fight
-  onDelete: (fightId: string) => void
-  onEdit: (fight: Fight) => void
+interface JunctureDetailProps {
+  juncture: Juncture
+  onDelete: (junctureId: string) => void
+  onEdit: (juncture: Juncture) => void
 }
 
-export default function FightDetail({ fight: initialFight, onDelete, onEdit }: FightDetailProps) {
+export default function JunctureDetail({ juncture: initialJuncture, onDelete, onEdit }: JunctureDetailProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
-  const [fight, setFight] = useState<Fight>(initialFight)
+  const [juncture, setJuncture] = useState<Juncture>(initialJuncture)
 
   useEffect(() => {
-    if (campaignData?.fight && campaignData.fight.id === initialFight.id) {
-      console.log("Updating fight from campaign data:", campaignData.fight)
-      setFight({
-        ...initialFight,
-        name: campaignData.fight.name || initialFight.name,
-        description: campaignData.fight.description || initialFight.description,
-        image_url: campaignData.fight.image_url || initialFight.image_url,
+    if (campaignData?.juncture && campaignData.juncture.id === initialJuncture.id) {
+      setJuncture({
+        ...initialJuncture,
+        name: campaignData.juncture.name || initialJuncture.name,
+        description: campaignData.juncture.description || initialJuncture.description,
+        image_url: campaignData.juncture.image_url || initialJuncture.image_url,
       })
     }
-  }, [campaignData, initialFight])
+  }, [campaignData, initialJuncture])
 
   const handleDelete = async () => {
-    if (!fight?.id) return
-    if (!confirm(`Are you sure you want to delete the fight: ${fight.name}?`)) return
+    if (!juncture?.id) return
+    if (!confirm(`Are you sure you want to delete the juncture: ${juncture.name}?`)) return
 
     try {
-      await client.deleteFight(fight)
-      onDelete(fight.id)
+      await client.deleteJuncture(juncture)
+      onDelete(juncture.id)
       setError(null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete fight")
-      console.error("Delete fight error:", err)
+      setError(err instanceof Error ? err.message : "Failed to delete juncture")
+      console.error("Delete juncture error:", err)
     }
   }
 
   const handleEdit = () => {
-    onEdit(fight)
+    onEdit(juncture)
   }
 
   // Format created_at timestamp for display
-  const formattedCreatedAt = fight.created_at
-    ? new Date(fight.created_at).toLocaleString("en-US", {
+  const formattedCreatedAt = juncture.created_at
+    ? new Date(juncture.created_at).toLocaleString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -66,54 +65,54 @@ export default function FightDetail({ fight: initialFight, onDelete, onEdit }: F
 
   return (
     <Card sx={{ mb: 2, bgcolor: "#424242" }}>
-      {fight.image_url && (
+      {juncture.image_url && (
         <CardMedia
           component="img"
           height="140"
-          image={fight.image_url}
-          alt={fight.name}
+          image={juncture.image_url}
+          alt={juncture.name}
           sx={{ objectFit: "cover" }}
         />
       )}
       <CardContent sx={{ p: "1rem" }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Typography variant="h6" sx={{ color: "#ffffff" }}>
-            <Link href={`/fights/${fight.id}`} style={{ color: "#fff" }}>
-              <FightName fight={fight} />
+            <Link href={`/junctures/${juncture.id}`} style={{ color: "#fff" }}>
+              <JunctureName juncture={juncture} />
             </Link>
           </Typography>
           <Box sx={{ display: "flex", gap: "0.5rem" }}>
-            <Tooltip title="Edit Fight">
+            <Tooltip title="Edit Juncture">
               <IconButton
                 color="inherit"
                 onClick={handleEdit}
                 size="small"
-                aria-label="edit fight"
+                aria-label="edit juncture"
               >
                 <EditIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Delete Fight">
+            <Tooltip title="Delete Juncture">
               <IconButton
                 color="inherit"
                 onClick={handleDelete}
                 size="small"
-                aria-label="delete fight"
+                aria-label="delete juncture"
               >
                 <DeleteIcon />
               </IconButton>
             </Tooltip>
           </Box>
         </Box>
-        <FightDescription fight={fight} />
+        <JunctureDescription juncture={juncture} />
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
-          {fight.actors && fight.actors.length > 0 ? (
-            fight.actors.map((actor, index) => (
+          {juncture.characters && juncture.characters.length > 0 ? (
+            juncture.characters.map((actor, index) => (
               <span key={`${actor.id}-${index}`}>
                 <Link href={`/characters/${actor.id}`} style={{ color: "#ffffff", textDecoration: "underline" }}>
                   <CharacterName character={actor} />
                 </Link>
-                {index < fight.actors.length - 1 && ", "}
+                {index < juncture.characters.length - 1 && ", "}
               </span>
             ))
           ) : null }

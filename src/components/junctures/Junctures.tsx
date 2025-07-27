@@ -5,38 +5,38 @@ import { useRouter } from "next/navigation"
 import { Pagination, Box, Button, Typography, Alert, FormControl, InputLabel, Select, MenuItem, Stack, IconButton, Tooltip } from "@mui/material"
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
-import { FightDetail, CreateFightForm, EditFightForm } from "@/components/fights"
-import type { Fight, PaginationMeta } from "@/types/types"
+import { JunctureDetail, CreateJunctureForm, EditJunctureForm } from "@/components/junctures"
+import type { Juncture, PaginationMeta } from "@/types/types"
 import { FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
 import type { SelectChangeEvent } from "@mui/material"
 
-interface FightsProps {
-  initialFights: Fight[]
+interface JuncturesProps {
+  initialJunctures: Juncture[]
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
 }
 
 type FormData = {
-  fights: Fight[]
+  junctures: Juncture[]
   meta: PaginationMeta
   drawerOpen: boolean
   error: string | null
 }
 
-export default function Fights({ initialFights, initialMeta, initialSort, initialOrder }: FightsProps) {
+export default function Junctures({ initialJunctures, initialMeta, initialSort, initialOrder }: JuncturesProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormData>({
-    fights: initialFights,
+    junctures: initialJunctures,
     meta: initialMeta,
     drawerOpen: false,
     error: null
   })
   const { formData } = formState
-  const { meta, fights, drawerOpen, error } = formData
-  const [selectedFight, setSelectedFight] = useState<Fight | null>(null)
+  const { meta, junctures, drawerOpen, error } = formData
+  const [selectedJuncture, setSelectedJuncture] = useState<Juncture | null>(null)
   const [sort, setSort] = useState<string>(initialSort)
   const [order, setOrder] = useState<string>(initialOrder)
   const router = useRouter()
@@ -46,26 +46,26 @@ export default function Fights({ initialFights, initialMeta, initialSort, initia
   type ValidOrder = "asc" | "desc"
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
-  const fetchFights = useCallback(async (page: number = 1, sort: string = "created_at", order: string = "desc") => {
+  const fetchJunctures = useCallback(async (page: number = 1, sort: string = "created_at", order: string = "desc") => {
     try {
-      const response = await client.getFights({ page, sort, order })
-      console.log("Fetched fights:", response.data.fights)
-      dispatchForm({ type: FormActions.UPDATE, name: "fights", value: response.data.fights })
+      const response = await client.getJunctures({ page, sort, order })
+      console.log("Fetched junctures:", response.data.junctures)
+      dispatchForm({ type: FormActions.UPDATE, name: "junctures", value: response.data.junctures })
       dispatchForm({ type: FormActions.UPDATE, name: "meta", value: response.data.meta })
       dispatchForm({ type: FormActions.ERROR, payload: null })
     } catch (err: unknown) {
       dispatchForm({
         type: FormActions.ERROR,
-        payload: err instanceof Error ? err.message : "Failed to fetch fights"
+        payload: err instanceof Error ? err.message : "Failed to fetch junctures"
       })
-      console.error("Fetch fights error:", err)
+      console.error("Fetch junctures error:", err)
     }
   }, [client, dispatchForm])
 
   useEffect(() => {
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
-    if (campaignData.fights === "reload") {
+    if (campaignData.junctures === "reload") {
       const params = new URLSearchParams(window.location.search)
       const page = params.get("page") ? parseInt(params.get("page")!, 10) : 1
       const sortParam = params.get("sort")
@@ -74,9 +74,9 @@ export default function Fights({ initialFights, initialMeta, initialSort, initia
       const currentOrder = orderParam && validOrders.includes(orderParam as ValidOrder) ? orderParam : "desc"
       setSort(currentSort)
       setOrder(currentOrder)
-      fetchFights(page, currentSort, currentOrder)
+      fetchJunctures(page, currentSort, currentOrder)
     }
-  }, [client, campaignData, dispatchForm, fetchFights, validSorts, validOrders])
+  }, [client, campaignData, dispatchForm, fetchJunctures, validSorts, validOrders])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -86,40 +86,40 @@ export default function Fights({ initialFights, initialMeta, initialSort, initia
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: false })
   }
 
-  const handleSaveFight = async (newFight: Fight) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "fights", value: [newFight, ...fights] })
+  const handleSaveJuncture = async (newJuncture: Juncture) => {
+    dispatchForm({ type: FormActions.UPDATE, name: "junctures", value: [newJuncture, ...junctures] })
   }
 
-  const handleDeleteFight = (fightId: string) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "fights", value: fights.filter((fight) => fight.id !== fightId) })
-    if (selectedFight?.id === fightId) setSelectedFight(null)
+  const handleDeleteJuncture = (junctureId: string) => {
+    dispatchForm({ type: FormActions.UPDATE, name: "junctures", value: junctures.filter((juncture) => juncture.id !== junctureId) })
+    if (selectedJuncture?.id === junctureId) setSelectedJuncture(null)
     router.refresh()
   }
 
-  const handleEditFight = (fight: Fight) => {
-    setSelectedFight(fight)
+  const handleEditJuncture = (juncture: Juncture) => {
+    setSelectedJuncture(juncture)
   }
 
-  const handleCloseEditFight = () => {
-    setSelectedFight(null)
+  const handleCloseEditJuncture = () => {
+    setSelectedJuncture(null)
   }
 
-  const handleSaveEditFight = (updatedFight: Fight) => {
+  const handleSaveEditJuncture = (updatedJuncture: Juncture) => {
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "fights",
-      value: fights.map((f) => (f.id === updatedFight.id ? updatedFight : f))
+      name: "junctures",
+      value: junctures.map((f) => (f.id === updatedJuncture.id ? updatedJuncture : f))
     })
-    setSelectedFight(null)
+    setSelectedJuncture(null)
   }
 
   const handlePageChange = async (_event: React.ChangeEvent<unknown>, page: number) => {
     if (page <= 0 || page > meta.total_pages) {
-      router.push(`/fights?page=1&sort=${sort}&order=${order}`, { scroll: false })
-      await fetchFights(1, sort, order)
+      router.push(`/junctures?page=1&sort=${sort}&order=${order}`, { scroll: false })
+      await fetchJunctures(1, sort, order)
     } else {
-      router.push(`/fights?page=${page}&sort=${sort}&order=${order}`, { scroll: false })
-      await fetchFights(page, sort, order)
+      router.push(`/junctures?page=${page}&sort=${sort}&order=${order}`, { scroll: false })
+      await fetchJunctures(page, sort, order)
     }
   }
 
@@ -128,16 +128,16 @@ export default function Fights({ initialFights, initialMeta, initialSort, initia
     if (validSorts.includes(newSort)) {
       setSort(newSort)
       // Perform async operations
-      router.push(`/fights?page=1&sort=${newSort}&order=${order}`, { scroll: false })
-      fetchFights(1, newSort, order)
+      router.push(`/junctures?page=1&sort=${newSort}&order=${order}`, { scroll: false })
+      fetchJunctures(1, newSort, order)
     }
   }
 
   const handleOrderChange = async () => {
     const newOrder = order === "asc" ? "desc" : "asc"
     setOrder(newOrder)
-    router.push(`/fights?page=1&sort=${sort}&order=${newOrder}`, { scroll: false })
-    await fetchFights(1, sort, newOrder)
+    router.push(`/junctures?page=1&sort=${sort}&order=${newOrder}`, { scroll: false })
+    await fetchJunctures(1, sort, newOrder)
   }
 
   return (
@@ -150,7 +150,7 @@ export default function Fights({ initialFights, initialMeta, initialSort, initia
             fontSize: { xs: "1.5rem", sm: "2.125rem" }
           }}
         >
-          Fights
+          Junctures
         </Typography>
         <Box
           sx={{
@@ -198,7 +198,7 @@ export default function Fights({ initialFights, initialMeta, initialSort, initia
             color="primary"
             onClick={handleOpenCreateDrawer}
             sx={{ px: 2 }}
-            aria-label="create new fight"
+            aria-label="create new juncture"
           >
             New
           </Button>
@@ -211,35 +211,36 @@ export default function Fights({ initialFights, initialMeta, initialSort, initia
       )}
       <Pagination count={meta.total_pages} page={meta.current_page} onChange={handlePageChange} variant="outlined" color="primary" shape="rounded" size="large" />
       <Box my={2}>
-        {fights.length === 0 ? (
+        {junctures.length === 0 ? (
           <Typography variant="body1" sx={{ color: "#ffffff" }}>
-            No fights available
+            No junctures available
           </Typography>
         ) : (
-          fights.map((fight) => (
-            <FightDetail
-              key={fight.id}
-              fight={fight}
-              onDelete={handleDeleteFight}
-              onEdit={handleEditFight}
+          junctures.map((juncture) => (
+            <JunctureDetail
+              key={juncture.id}
+              juncture={juncture}
+              onDelete={handleDeleteJuncture}
+              onEdit={handleEditJuncture}
             />
           ))
         )}
       </Box>
       <Pagination count={meta.total_pages} page={meta.current_page} onChange={handlePageChange} variant="outlined" color="primary" shape="rounded" size="large" />
-      <CreateFightForm
+      <CreateJunctureForm
         open={drawerOpen}
         onClose={handleCloseCreateDrawer}
-        onSave={handleSaveFight}
+        onSave={handleSaveJuncture}
       />
-      {selectedFight && (
-        <EditFightForm
-          open={!!selectedFight}
-          onClose={handleCloseEditFight}
-          onSave={handleSaveEditFight}
-          fight={selectedFight}
+      {selectedJuncture && (
+        <EditJunctureForm
+          open={!!selectedJuncture}
+          onClose={handleCloseEditJuncture}
+          onSave={handleSaveEditJuncture}
+          juncture={selectedJuncture}
         />
       )}
     </Box>
   )
 }
+

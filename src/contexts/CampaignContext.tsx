@@ -3,8 +3,8 @@
 import { useMemo, useEffect, useState, createContext, useContext, useCallback } from "react"
 import { Subscription } from "@rails/actioncable"
 
-import type { CampaignCableData, Campaign } from "@/types/types"
-import { defaultCampaign } from "@/types/types"
+import type { CampaignCableData, Campaign } from "@/types"
+import { defaultCampaign } from "@/types"
 import { useClient, useLocalStorage } from "@/contexts"
 
 export interface CampaignContextType {

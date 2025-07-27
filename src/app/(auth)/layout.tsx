@@ -1,10 +1,24 @@
-import { ReactNode } from "react"
-import { Box } from "@mui/material"
+import ThemeRegistry from "@/components/ThemeRegistry"
+import { CampaignProvider, ClientProvider, LocalStorageProvider } from "@/contexts"
+import { getUser } from "@/lib/getServerClient"
+import "@/styles/global.scss"
 
-export default function AuthLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const user = await getUser()
+
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      {children}
-    </Box>
+    <html lang="en">
+      <body>
+        <ThemeRegistry>
+          <LocalStorageProvider>
+            <ClientProvider initialUser={user}>
+              <CampaignProvider>
+                {children}
+              </CampaignProvider>
+            </ClientProvider>
+          </LocalStorageProvider>
+        </ThemeRegistry>
+      </body>
+    </html>
   )
 }

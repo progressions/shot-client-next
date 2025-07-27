@@ -1,13 +1,8 @@
 "use client"
 
-import { useTheme } from "@mui/material/styles"
-import useMediaQuery from "@mui/material/useMediaQuery"
-import { Drawer, Box, Typography, Alert } from "@mui/material"
-import { TextField, SaveButton, CancelButton } from "@/components/ui"
-import type { EditorChangeEvent, Fight } from "@/types/types"
+import { defaultFight, type Fight } from "@/types"
 import { useClient } from "@/contexts"
-import { FormActions, useForm } from "@/reducers"
-import { Editor } from "@/components/editor"
+import FightForm from "./FightForm"
 
 interface CreateFightFormProps {
   open: boolean
@@ -15,82 +10,23 @@ interface CreateFightFormProps {
   onSave: (newFight: Fight) => void
 }
 
-type FormData = {
-  name: string
-  description: string
-}
-
 export default function CreateFightForm({ open, onClose, onSave }: CreateFightFormProps) {
   const { client } = useClient()
-  const { formState, dispatchForm, initialFormState } = useForm<FormData>({
-    name: "",
-    description: ""
-  })
-  const { disabled, error, formData } = formState
-  const { name, description } = formData
 
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
-
-  const handleSave = async (e?: React.FormEvent) => {
-    e?.preventDefault() // Prevent default form submission behavior
-    if (disabled) return
-    if (!name.trim()) {
-      dispatchForm({ type: FormActions.ERROR, payload: "Name is required" })
-      return
-    }
-
-    dispatchForm({ type: FormActions.SUBMIT })
-    try {
-      const response = await client.createFight({ name, description } as Fight)
-      const newFight = response.data
-      onSave(newFight)
-    } catch (err) {
-      dispatchForm({ type: FormActions.ERROR, payload: err instanceof Error ? err.message : "An error occurred" })
-      console.error("Create fight error:", err)
-    } finally {
-      handleClose()
-    }
-  }
-
-  const handleClose = () => {
-    dispatchForm({ type: FormActions.RESET, payload: initialFormState })
-    onClose()
+  const handleSave = async (formData: FormData, fightData: Fight) => {
+    const fight = { ...defaultFight, ...fightData } as Fight
+    formData.set("fight", JSON.stringify(fight))
+    const response = await client.createFight(formData)
+    onSave(response.data)
   }
 
   return (
-    <Drawer anchor={isMobile ? "bottom" : "right"} open={open} onClose={handleClose}>
-      <Box
-        component="form"
-        onSubmit={handleSave}
-        sx={{ width: isMobile ? "100%" : "30rem", height: isMobile ? "auto" : "100%", p: isMobile ? "1rem" : "2rem" }}
-      >
-        <Typography variant="h5" sx={{ mb: 2, color: "#ffffff" }}>
-          New Fight
-        </Typography>
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-        <TextField
-          label="Name"
-          value={name}
-          onChange={(e) => dispatchForm({ type: FormActions.UPDATE, name: "name", value: e.target.value })}
-          margin="normal"
-          required
-          autoFocus
-        />
-        <Editor name="description" value={description} onChange={(e: EditorChangeEvent) => dispatchForm({ type: FormActions.UPDATE, name: "description", value: e.target.value })} />
-        <Box sx={{ display: "flex", gap: "1rem", mt: 3 }}>
-          <SaveButton type="submit" disabled={disabled}>
-            Save
-          </SaveButton>
-          <CancelButton onClick={handleClose}>
-            Cancel
-          </CancelButton>
-        </Box>
-      </Box>
-    </Drawer>
+    <FightForm
+      open={open}
+      onClose={onClose}
+      onSave={handleSave}
+      initialFormData={{ name: "", description: "", image: null }}
+      title="New Fight"
+    />
   )
 }

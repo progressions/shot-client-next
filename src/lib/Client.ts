@@ -159,12 +159,12 @@ class Client {
     return this.patch(`${this.api.fights(fight)}/touch`)
   }
 
-  async updateFight(fight: Fight): Promise<AxiosResponse<Fight>> {
-    return this.patch(this.api.fights(fight), { "fight": fight })
+  async createFight(formData: FormData): Promise<AxiosResponse<Fight>> {
+    return this.requestFormData("POST", `${this.api.fights()}`, formData)
   }
 
-  async createFight(fight: Fight): Promise<AxiosResponse<Fight>> {
-    return this.post(this.api.fights(), { "fight": fight })
+  async updateFight(id: string, formData: FormData): Promise<AxiosResponse<Fight>> {
+    return this.requestFormData("PATCH", `${this.api.fights({ id })}`, formData)
   }
 
   async deleteFight(fight: Fight): Promise<AxiosResponse<void>> {
@@ -189,7 +189,7 @@ class Client {
     return this.get(`${this.api.charactersAndVehicles(fight)}/characters?${query}`, {}, cacheOptions)
   }
 
-  async getVehicles(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Person[]>> {
+  async getVehicles(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<VehiclesResponse>> {
     const query = this.queryParams(params)
     return this.get(`${this.api.vehicles()}?${query}`, {}, cacheOptions)
   }
@@ -325,8 +325,12 @@ class Client {
     return this.get(`${this.api.junctures()}?${query}`, {}, cacheOptions)
   }
 
-  async createJuncture(juncture: Juncture): Promise<AxiosResponse<Juncture>> {
-    return this.post(this.api.junctures(), { "juncture": juncture })
+  async createJuncture(formData: FormData): Promise<AxiosResponse<Juncture>> {
+    return this.requestFormData("POST", `${this.api.junctures()}`, formData)
+  }
+
+  async updateJuncture(id: string, formData: FormData): Promise<AxiosResponse<Juncture>> {
+    return this.requestFormData("PATCH", `${this.api.junctures({ id })}`, formData)
   }
 
   async getJuncture(juncture: Juncture | ID, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Juncture>> {
@@ -335,10 +339,6 @@ class Client {
 
   async deleteJuncture(juncture: Juncture): Promise<AxiosResponse<void>> {
     return this.delete(this.api.junctures(juncture))
-  }
-
-  async updateJuncture(juncture: Juncture): Promise<AxiosResponse<Juncture>> {
-    return this.patch(this.api.junctures(juncture), { "juncture": juncture })
   }
 
   async deleteJunctureImage(juncture: Juncture): Promise<AxiosResponse<void>> {

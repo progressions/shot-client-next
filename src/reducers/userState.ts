@@ -1,5 +1,4 @@
-import type { User } from "@/types/types"
-import { defaultUser } from "@/types/types"
+import { defaultUser, type User } from "@/types"
 
 export enum UserActions {
   EDITED = "edited",

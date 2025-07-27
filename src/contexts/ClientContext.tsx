@@ -3,7 +3,7 @@
 import { type ActionDispatch, useReducer, useEffect, useMemo, createContext, useContext, useRef } from "react"
 import Cookies from "js-cookie"
 import Client from "@/lib/Client"
-import { defaultUser, type User } from "@/types/types"
+import { defaultUser, type User } from "@/types"
 import { UserStateAction, UserActions, userReducer, initialUserState } from "@/reducers"
 import type { UserStateType } from "@/reducers"
 
