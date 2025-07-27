@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useState, useEffect } from "react"
+import { useCallback, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Pagination, Box, Typography, Container, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, useMediaQuery, Card, CardContent, Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material"
 import Link from "next/link"
@@ -131,22 +131,6 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
   })
   const { characters, meta, sort, order } = formState.data
 
-  // Debug mobile detection and table widths
-  useEffect(() => {
-    console.log("isMobile:", isMobile, "Screen width:", window.innerWidth)
-    console.log("Rendering:", isMobile ? "CharactersMobile" : "Table")
-    console.log("Table styles:", {
-      maxWidth: isMobile ? "400px" : "100%",
-      tableLayout: "fixed",
-      columnWidths: {
-        name: "remaining",
-        created: isMobile ? "65px" : "150px",
-        updated: isMobile ? "65px" : "150px",
-        active: isMobile ? "60px" : "100px"
-      }
-    })
-  }, [isMobile])
-
   const fetchCharacters = useCallback(async (page: number = 1, sort: string = "name", order: string = "asc") => {
     try {
       const response = await client.getCharacters({ page, sort, order })
@@ -156,20 +140,6 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
       console.error("Fetch characters error:", err)
     }
   }, [client])
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const page = params.get("page") ? parseInt(params.get("page")!, 10) : 1
-    const sortParam = params.get("sort")
-    const orderParam = params.get("order")
-    const currentSort = sortParam && validSorts.includes(sortParam as ValidSort) ? sortParam : "name"
-    const currentOrder = orderParam && validOrders.includes(orderParam as ValidOrder) ? orderParam : "asc"
-    dispatchForm({ type: FormActions.UPDATE, name: "sort", value: currentSort })
-    dispatchForm({ type: FormActions.UPDATE, name: "order", value: currentOrder })
-    if (page !== meta.current_page || currentSort !== sort || currentOrder !== order) {
-      fetchCharacters(page, currentSort, currentOrder)
-    }
-  }, [client, meta.current_page, fetchCharacters, order, sort])
 
   const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
     if (page <= 0 || page > meta.total_pages) {

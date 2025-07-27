@@ -193,7 +193,7 @@ class Client {
 
   async getVehicles(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<VehiclesResponse>> {
     const query = this.queryParams(params)
-    return this.get(`${this.api.vehicles()}?${query}`, {}, cacheOptions)
+    return this.get(`${this.apiV2.vehicles()}?${query}`, {}, cacheOptions)
   }
 
   async getVehiclesInFight(fight: Fight | ID, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<VehiclesResponse>> {

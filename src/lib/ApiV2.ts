@@ -15,6 +15,15 @@ class ApiV2 {
       return `${this.api()}/characters`
     }
   }
+
+  vehicles(vehicle?: Vehicle | ID): string {
+    if (vehicle?.id) {
+      return `${this.api()}/vehicles/${vehicle.id}`
+    } else {
+      return `${this.api()}/vehicles`
+    }
+  }
+
 }
 
 export default ApiV2
