@@ -9,7 +9,11 @@ export const metadata = {
   title: "Characters - Chi War"
 }
 
-export default async function CharactersPage({ searchParams }: { searchParams: Promise<{ page?: string, sort?: string, order?: string }> }) {
+type CharactersPageProps = {
+  searchParams: Promise<{ page?: string, sort?: string, order?: string }>
+}
+
+export default async function CharactersPage({ searchParams }: CharactersPageProps) {
   const client = await getServerClient()
   const user = await getUser()
   if (!client || !user) {

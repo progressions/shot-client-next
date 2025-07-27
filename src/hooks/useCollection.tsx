@@ -1,24 +1,35 @@
-import { FormActions } from "@/reducers"
+import { FormStateAction, FormActions } from "@/reducers"
 import { SelectChangeEvent } from "@mui/material"
 
-// Define the generic type for the hook
-type UseCollectionProps<T> = {
-  url: string
-  fetch: (page: number, sort: string, order: string) => Promise<void>
-  dispatchForm: React.Dispatch<any>
-  data: T
-  router: any // You might want to type this more specifically, e.g., NextRouter from 'next/router'
+// Define the minimum required shape for the data prop
+interface DataShape {
+  sort: string
+  order: string
+  meta: {
+    total_pages: number
+    current_page: number
+  }
 }
 
-// Assuming ValidSort is defined elsewhere, e.g.:
-// type ValidSort = "name" | "date" | string
+// Define the generic type for the hook
+type UseCollectionProps<T extends DataShape> = {
+  url: string
+  fetch: (page: number, sort: string, order: string) => Promise<void>
+  dispatchForm: React.Dispatch<FormStateAction<T>>
+  data: T
+  router: ReturnType<typeof import("next/navigation").useRouter>
+  validSorts?: readonly string[]
+}
 
-export function useCollection<T>({
+type ValidSort = "name" | "created_at" | "updated_at" | string
+
+export function useCollection<T extends DataShape>({
   url,
   fetch: fetchCollection,
   dispatchForm,
   data,
   router,
+  validSorts = ["name", "created_at", "updated_at"] as const,
 }: UseCollectionProps<T>) {
   const { sort, order, meta } = data
 
@@ -27,7 +38,7 @@ export function useCollection<T>({
       router.push(`${url}?page=1&sort=${sort}&order=${order}`, { scroll: false })
       fetchCollection(1, sort, order)
     } else {
-      router.push(`/${url}?page=${page}&sort=${sort}&order=${order}`, { scroll: false })
+      router.push(`${url}?page=${page}&sort=${sort}&order=${order}`, { scroll: false })
       fetchCollection(page, sort, order)
     }
   }

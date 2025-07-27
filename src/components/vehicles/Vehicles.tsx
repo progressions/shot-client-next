@@ -1,14 +1,12 @@
 "use client"
 
-import { useCallback, useState, useEffect } from "react"
+import { useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Pagination, Box, Typography, Container, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, useMediaQuery, Card, CardContent, Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material"
+import { Pagination, Box, Typography, Container, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, useMediaQuery } from "@mui/material"
 import Link from "next/link"
 import type { Vehicle, PaginationMeta } from "@/types/types"
 import { useClient } from "@/contexts"
 import { useTheme } from "@mui/material/styles"
-import type { SelectChangeEvent } from "@mui/material"
-import { VehicleName } from "@/components/vehicles"
 import { FormActions, useForm } from "@/reducers"
 import { useCollection } from "@/hooks"
 import { VehiclesMobile } from "@/components/vehicles"
@@ -23,8 +21,6 @@ interface VehiclesProps {
 type ValidSort = "name" | "created_at" | "updated_at"
 const validSorts: readonly ValidSort[] = ["name", "created_at", "updated_at"]
 type ValidOrder = "asc" | "desc"
-const validOrders: readonly ValidOrder[] = ["asc", "desc"]
-
 
 type FormStateData = {
   vehicles: Vehicle[]
@@ -53,13 +49,14 @@ export default function Vehicles({ initialVehicles, initialMeta, initialSort, in
     } catch (err) {
       console.error("Fetch vehicles error:", err)
     }
-  }, [client])
-  const { handlePageChange, handleSortChange, handleSortChangeMobile, handleOrderChangeMobile } = useCollection({
+  }, [client, dispatchForm])
+  const { handlePageChange, handleSortChange, handleSortChangeMobile, handleOrderChangeMobile } = useCollection<FormStateData>({
     url: "vehicles",
     fetch: fetchVehicles,
     data: formState.data,
     dispatchForm,
-    router
+    router,
+    validSorts,
   })
 
   const formatDate = (date: string) => {

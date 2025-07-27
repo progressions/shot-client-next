@@ -5,6 +5,7 @@ import { useMediaQuery, Stack, Box, Typography, Card, CardContent, Pagination, F
 import { useTheme } from "@mui/material/styles"
 import type { SelectChangeEvent } from "@mui/material"
 import { VehicleName } from "@/components/vehicles"
+import type { Vehicle, PaginationMeta } from "@/types/types"
 
 export default function VehiclesMobile({
   vehicles,

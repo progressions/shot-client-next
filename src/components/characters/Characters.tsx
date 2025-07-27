@@ -1,13 +1,12 @@
 "use client"
 
-import { useCallback, useEffect } from "react"
+import { useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Pagination, Box, Typography, Container, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, useMediaQuery, Card, CardContent, Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material"
+import { useMediaQuery, Pagination, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography, Box } from "@mui/material"
 import Link from "next/link"
 import type { Character, PaginationMeta } from "@/types/types"
 import { useClient } from "@/contexts"
 import { useTheme } from "@mui/material/styles"
-import type { SelectChangeEvent } from "@mui/material"
 import { CharacterName } from "@/components/characters"
 import { CS } from "@/services"
 import { FormActions, useForm } from "@/reducers"
@@ -24,7 +23,6 @@ interface CharactersProps {
 type ValidSort = "name" | "type" | "created_at" | "updated_at"
 const validSorts: readonly ValidSort[] = ["name", "type", "created_at", "updated_at"]
 type ValidOrder = "asc" | "desc"
-const validOrders: readonly ValidOrder[] = ["asc", "desc"]
 
 type FormStateData = {
   characters: Character[]
@@ -54,11 +52,11 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
       console.error("Fetch characters error:", err)
     }
   }, [client, dispatchForm])
-  const { handlePageChange, handleSortChange, handleOrderChange, handleOrderChangeMobile, handleSortChangeMobile } = useCollection({
+  const { handlePageChange, handleSortChange, handleOrderChangeMobile, handleSortChangeMobile } = useCollection<FormStateData>({
     url: "characters",
     fetch: fetchCharacters,
     data: formState.data,
-    router, dispatchForm, validSorts, validOrders,
+    router, dispatchForm, validSorts,
   })
 
   const formatDate = (date: string) => {
