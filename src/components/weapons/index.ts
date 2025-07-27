@@ -1,1 +1,8 @@
 export { default as WeaponName } from "@/components/weapons/WeaponName"
+export { default as WeaponDescription } from "@/components/weapons/WeaponDescription"
+export { default as Weapons } from "@/components/weapons/Weapons"
+export { default as WeaponDetail } from "@/components/weapons/WeaponDetail"
+export { default as CreateWeaponForm } from "@/components/weapons/CreateWeaponForm"
+export { default as EditWeaponForm } from "@/components/weapons/EditWeaponForm"
+export { default as WeaponForm } from "@/components/weapons/WeaponForm"
+export { default as WeaponPageClient } from "@/components/weapons/WeaponPageClient"

@@ -28,8 +28,8 @@ interface FightFormProps {
 
 export default function FightForm({ open, onClose, onSave, initialFormData, title, existingImageUrl }: FightFormProps) {
   const { formState, dispatchForm, initialFormState } = useForm<FormStateData>(initialFormData)
-  const { disabled, error, formData } = formState
-  const { name, description, image } = formData
+  const { disabled, error, data } = formState
+  const { name, description, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
 
   const theme = useTheme()
@@ -141,6 +141,8 @@ export default function FightForm({ open, onClose, onSave, initialFormData, titl
             <Image
               src={imagePreview || existingImageUrl || ""}
               alt="Fight image preview"
+              width={isMobile ? 150 : 200}
+              height={isMobile ? 150 : 200}
               style={{
                 width: "100%",
                 maxHeight: isMobile ? "150px" : "200px",

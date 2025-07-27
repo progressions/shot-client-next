@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useState, useEffect } from "react"
+import { useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Pagination, Box, Typography, Container, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, useMediaQuery, Card, CardContent, Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material"
 import Link from "next/link"
@@ -10,6 +10,7 @@ import { useTheme } from "@mui/material/styles"
 import type { SelectChangeEvent } from "@mui/material"
 import { CharacterName } from "@/components/characters"
 import { CS } from "@/services"
+import { FormActions, useForm } from "@/reducers"
 
 interface CharactersProps {
   initialCharacters: Character[]
@@ -21,7 +22,6 @@ interface CharactersProps {
 type ValidSort = "name" | "type" | "created_at" | "updated_at"
 const validSorts: readonly ValidSort[] = ["name", "type", "created_at", "updated_at"]
 type ValidOrder = "asc" | "desc"
-const validOrders: readonly ValidOrder[] = ["asc", "desc"]
 
 // Mobile-specific component
 function CharactersMobile({
@@ -110,55 +110,35 @@ function CharactersMobile({
   )
 }
 
+type FormStateData = {
+  characters: Character[]
+  meta: PaginationMeta
+  sort: string
+  order: string
+}
+
 export default function Characters({ initialCharacters, initialMeta, initialSort, initialOrder }: CharactersProps) {
   const { client } = useClient()
   const router = useRouter()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
-  const [characters, setCharacters] = useState<Character[]>(initialCharacters)
-  const [meta, setMeta] = useState<PaginationMeta>(initialMeta)
-  const [sort, setSort] = useState<string>(initialSort)
-  const [order, setOrder] = useState<string>(initialOrder)
-
-  // Debug mobile detection and table widths
-  useEffect(() => {
-    console.log("isMobile:", isMobile, "Screen width:", window.innerWidth)
-    console.log("Rendering:", isMobile ? "CharactersMobile" : "Table")
-    console.log("Table styles:", {
-      maxWidth: isMobile ? "400px" : "100%",
-      tableLayout: "fixed",
-      columnWidths: {
-        name: "remaining",
-        created: isMobile ? "65px" : "150px",
-        updated: isMobile ? "65px" : "150px",
-        active: isMobile ? "60px" : "100px"
-      }
-    })
-  }, [isMobile])
+  const { formState, dispatchForm } = useForm<FormStateData>({
+    characters: initialCharacters,
+    meta: initialMeta,
+    sort: initialSort,
+    order: initialOrder
+  })
+  const { characters, meta, sort, order } = formState.data
 
   const fetchCharacters = useCallback(async (page: number = 1, sort: string = "name", order: string = "asc") => {
     try {
       const response = await client.getCharacters({ page, sort, order })
-      setCharacters(response.data.characters)
-      setMeta(response.data.meta)
+      dispatchForm({ type: FormActions.UPDATE, name: "characters", value: response.data.characters })
+      dispatchForm({ type: FormActions.UPDATE, name: "meta", value: response.data.meta })
     } catch (err) {
       console.error("Fetch characters error:", err)
     }
-  }, [client])
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const page = params.get("page") ? parseInt(params.get("page")!, 10) : 1
-    const sortParam = params.get("sort")
-    const orderParam = params.get("order")
-    const currentSort = sortParam && validSorts.includes(sortParam as ValidSort) ? sortParam : "name"
-    const currentOrder = orderParam && validOrders.includes(orderParam as ValidOrder) ? orderParam : "asc"
-    setSort(currentSort)
-    setOrder(currentOrder)
-    if (page !== meta.current_page || currentSort !== sort || currentOrder !== order) {
-      fetchCharacters(page, currentSort, currentOrder)
-    }
-  }, [client, meta.current_page, fetchCharacters, order, sort])
+  }, [client, dispatchForm])
 
   const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
     if (page <= 0 || page > meta.total_pages) {
@@ -172,8 +152,8 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
 
   const handleSortChange = (newSort: ValidSort) => {
     const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
-    setSort(newSort)
-    setOrder(newOrder)
+    dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
+    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
     router.push(`/characters?page=1&sort=${newSort}&order=${newOrder}`, { scroll: false })
     fetchCharacters(1, newSort, newOrder)
   }
@@ -181,8 +161,8 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
   const handleSortChangeMobile = (event: SelectChangeEvent<string>) => {
     const newSort = event.target.value as ValidSort
     if (validSorts.includes(newSort)) {
-      setSort(newSort)
-      setOrder("asc")
+      dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
+      dispatchForm({ type: FormActions.UPDATE, name: "order", value: "asc" })
       router.push(`/characters?page=1&sort=${newSort}&order=asc`, { scroll: false })
       fetchCharacters(1, newSort, "asc")
     }
@@ -190,7 +170,7 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
 
   const handleOrderChangeMobile = () => {
     const newOrder = order === "asc" ? "desc" : "asc"
-    setOrder(newOrder)
+    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
     router.push(`/characters?page=1&sort=${sort}&order=${newOrder}`, { scroll: false })
     fetchCharacters(1, sort, newOrder)
   }

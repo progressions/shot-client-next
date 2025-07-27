@@ -18,7 +18,7 @@ interface FightsProps {
   initialOrder: string
 }
 
-type FormData = {
+type FormStateData = {
   fights: Fight[]
   meta: PaginationMeta
   drawerOpen: boolean
@@ -28,14 +28,13 @@ type FormData = {
 export default function Fights({ initialFights, initialMeta, initialSort, initialOrder }: FightsProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
-  const { formState, dispatchForm } = useForm<FormData>({
+  const { formState, dispatchForm } = useForm<FormStateData>({
     fights: initialFights,
     meta: initialMeta,
     drawerOpen: false,
     error: null
   })
-  const { formData } = formState
-  const { meta, fights, drawerOpen, error } = formData
+  const { meta, fights, drawerOpen, error } = formState.data
   const [selectedFight, setSelectedFight] = useState<Fight | null>(null)
   const [sort, setSort] = useState<string>(initialSort)
   const [order, setOrder] = useState<string>(initialOrder)

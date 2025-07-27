@@ -28,8 +28,8 @@ interface JunctureFormProps {
 
 export default function JunctureForm({ open, onClose, onSave, initialFormData, title, existingImageUrl }: JunctureFormProps) {
   const { formState, dispatchForm, initialFormState } = useForm<FormStateData>(initialFormData)
-  const { disabled, error, formData } = formState
-  const { name, description, image } = formData
+  const { disabled, error, data } = formState
+  const { name, description, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
 
   const theme = useTheme()
@@ -141,6 +141,8 @@ export default function JunctureForm({ open, onClose, onSave, initialFormData, t
             <Image
               src={imagePreview || existingImageUrl || ""}
               alt="Juncture image preview"
+              width={isMobile ? 150 : 200}
+              height={isMobile ? 150 : 200}
               style={{
                 width: "100%",
                 maxHeight: isMobile ? "150px" : "200px",

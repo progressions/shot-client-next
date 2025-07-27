@@ -1,5 +1,5 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios"
-import Api from "@/lib/Api"
+import { Api, ApiV2 } from "@/lib"
 import type {
   NotionPage,
   Location,
@@ -53,6 +53,7 @@ type Params = Record<string, unknown>
 class Client {
   jwt?: string
   api: Api
+  apiV2: ApiV2
   consumerInstance?: Consumer
 
   constructor(params: ClientParams = {}) {
@@ -60,6 +61,7 @@ class Client {
       this.jwt = params.jwt
     }
     this.api = new Api()
+    this.apiV2 = new ApiV2()
   }
 
   consumer() {
@@ -119,23 +121,23 @@ class Client {
 
   async getParties(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<PartiesResponse>> {
     const query = this.queryParams(params)
-    return this.get(`${this.api.parties()}?${query}`, {}, cacheOptions)
+    return this.get(`${this.apiV2.parties()}?${query}`, {}, cacheOptions)
   }
 
   async getParty(party: Party | ID, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Party>> {
-    return this.get(this.api.parties(party), {}, cacheOptions)
+    return this.get(this.apiV2.parties(party), {}, cacheOptions)
   }
 
   async deleteParty(party: Party | ID): Promise<AxiosResponse<void>> {
-    return this.delete(this.api.parties(party))
+    return this.delete(this.apiV2.parties(party))
   }
 
-  async createParty(party: Party): Promise<AxiosResponse<Party>> {
-    return this.post(this.api.parties(), { "party": party })
+  async createParty(formData: FormData): Promise<AxiosResponse<Party>> {
+    return this.requestFormData("POST", `${this.apiV2.parties()}`, formData)
   }
 
-  async updateParty(party: Party): Promise<AxiosResponse<Party>> {
-    return this.patch(this.api.parties(party), { "party": party })
+  async updateParty(id: string, formData: FormData): Promise<AxiosResponse<Party>> {
+    return this.requestFormData("PATCH", `${this.apiV2.parties({ id })}`, formData)
   }
 
   async deletePartyImage(party: Party): Promise<AxiosResponse<void>> {
@@ -181,7 +183,7 @@ class Client {
 
   async getCharacters(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<CharactersResponse>> {
     const query = this.queryParams(params)
-    return this.get(`${this.api.characters()}?${query}`, {}, cacheOptions)
+    return this.get(`${this.apiV2.characters()}?${query}`, {}, cacheOptions)
   }
 
   async getCharactersInFight(fight: Fight | ID, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Person[]>> {
@@ -191,7 +193,7 @@ class Client {
 
   async getVehicles(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<VehiclesResponse>> {
     const query = this.queryParams(params)
-    return this.get(`${this.api.vehicles()}?${query}`, {}, cacheOptions)
+    return this.get(`${this.apiV2.vehicles()}?${query}`, {}, cacheOptions)
   }
 
   async getVehiclesInFight(fight: Fight | ID, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<VehiclesResponse>> {
@@ -322,52 +324,52 @@ class Client {
 
   async getJunctures(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<JuncturesResponse>> {
     const query = this.queryParams(params)
-    return this.get(`${this.api.junctures()}?${query}`, {}, cacheOptions)
+    return this.get(`${this.apiV2.junctures()}?${query}`, {}, cacheOptions)
   }
 
   async createJuncture(formData: FormData): Promise<AxiosResponse<Juncture>> {
-    return this.requestFormData("POST", `${this.api.junctures()}`, formData)
+    return this.requestFormData("POST", `${this.apiV2.junctures()}`, formData)
   }
 
   async updateJuncture(id: string, formData: FormData): Promise<AxiosResponse<Juncture>> {
-    return this.requestFormData("PATCH", `${this.api.junctures({ id })}`, formData)
+    return this.requestFormData("PATCH", `${this.apiV2.junctures({ id })}`, formData)
   }
 
   async getJuncture(juncture: Juncture | ID, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Juncture>> {
-    return this.get(this.api.junctures(juncture), {}, cacheOptions)
+    return this.get(this.apiV2.junctures(juncture), {}, cacheOptions)
   }
 
   async deleteJuncture(juncture: Juncture): Promise<AxiosResponse<void>> {
-    return this.delete(this.api.junctures(juncture))
+    return this.delete(this.apiV2.junctures(juncture))
   }
 
   async deleteJunctureImage(juncture: Juncture): Promise<AxiosResponse<void>> {
-    return this.delete(`${this.api.junctures(juncture)}/image`)
+    return this.delete(`${this.apiV2.junctures(juncture)}/image`)
   }
 
   async getSites(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<SitesResponse>> {
     const query = this.queryParams(params)
-    return this.get(`${this.api.allSites()}?${query}`, {}, cacheOptions)
+    return this.get(`${this.apiV2.sites()}?${query}`, {}, cacheOptions)
   }
 
-  async createSite(site: Site): Promise<AxiosResponse<Site>> {
-    return this.post(this.api.allSites(), { "site": site })
+  async createSite(formData: FormData): Promise<AxiosResponse<Site>> {
+    return this.requestFormData("POST", `${this.apiV2.sites()}`, formData)
+  }
+
+  async updateSite(id: string, formData: FormData): Promise<AxiosResponse<Site>> {
+    return this.requestFormData("PATCH", `${this.apiV2.sites({ id })}`, formData)
   }
 
   async getSite(site: Site | ID, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Site>> {
-    return this.get(this.api.allSites(site), {}, cacheOptions)
+    return this.get(this.apiV2.sites(site), {}, cacheOptions)
   }
 
   async deleteSite(site: Site): Promise<AxiosResponse<void>> {
-    return this.delete(this.api.allSites(site))
-  }
-
-  async updateSite(site: Site): Promise<AxiosResponse<Site>> {
-    return this.patch(this.api.allSites(site), { "site": site })
+    return this.delete(this.apiV2.sites(site))
   }
 
   async deleteSiteImage(site: Site): Promise<AxiosResponse<void>> {
-    return this.delete(`${this.api.allSites(site)}/image`)
+    return this.delete(`${this.apiV2.sites(site)}/image`)
   }
 
   async addCharacterToSite(site: Site, character: Character): Promise<AxiosResponse<Site>> {
@@ -584,27 +586,27 @@ class Client {
 
   async getWeapons(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<WeaponsResponse>> {
     const query = this.queryParams(params)
-    return this.get(`${this.api.weapons()}?${query}`, {}, cacheOptions)
+    return this.get(`${this.apiV2.weapons()}?${query}`, {}, cacheOptions)
   }
 
   async getWeapon(weapon: Weapon | ID, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Weapon>> {
-    return this.get(this.api.weapons(weapon), {}, cacheOptions)
+    return this.get(this.apiV2.weapons(weapon), {}, cacheOptions)
   }
 
-  async createWeapon(weapon: Weapon): Promise<AxiosResponse<Weapon>> {
-    return this.post(this.api.weapons(), { "weapon": weapon })
+  async createWeapon(formData: FormData): Promise<AxiosResponse<Weapon>> {
+    return this.requestFormData("POST", `${this.apiV2.weapons()}`, formData)
   }
 
-  async updateWeapon(weapon: Weapon): Promise<AxiosResponse<Weapon>> {
-    return this.patch(this.api.weapons(weapon), { "weapon": weapon })
+  async updateWeapon(id: string, formData: FormData): Promise<AxiosResponse<Weapon>> {
+    return this.requestFormData("PATCH", `${this.apiV2.weapons({ id })}`, formData)
   }
 
   async deleteWeapon(weapon: Weapon): Promise<AxiosResponse<void>> {
-    return this.delete(this.api.weapons(weapon))
+    return this.delete(this.apiV2.weapons(weapon))
   }
 
   async deleteWeaponImage(weapon: Weapon): Promise<AxiosResponse<void>> {
-    return this.delete(`${this.api.weapons(weapon)}/image`)
+    return this.delete(`${this.apiV2.weapons(weapon)}/image`)
   }
 
   async addWeapon(character: Character | ID, weapon: Weapon): Promise<AxiosResponse<Character>> {
@@ -629,6 +631,7 @@ class Client {
 
   async request<T>(method: string, url: string, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<T>> {
     const headers: { [key: string]: string } = {
+      "Accept": "application/json",
       "Content-Type": "application/json",
       "Authorization": `Bearer ${this.jwt}`
     }
@@ -662,6 +665,7 @@ class Client {
     }
 
     const headers: { [key: string]: string } = {
+      "Accept": "application/json",
       "Content-Type": "application/json",
       "Authorization": `Bearer ${this.jwt}`
     }
@@ -688,6 +692,7 @@ class Client {
       url: url,
       method: "DELETE",
       headers: {
+        "Accept": "application/json",
         "Content-Type": "application/json",
         "Authorization": `Bearer ${this.jwt}`
       },
@@ -701,6 +706,7 @@ class Client {
       method: method,
       data: formData,
       headers: {
+        "Accept": "application/json",
         "Content-Type": "multipart/form-data",
         "Authorization": `Bearer ${this.jwt}`
       },

@@ -132,6 +132,8 @@ export interface Party {
   vehicles: Vehicle[]
   secret: boolean
   image_url: string | null
+  created_at: string
+  updated_at: string
 }
 
 export interface Faction {
@@ -142,6 +144,8 @@ export interface Faction {
   vehicles: Vehicle[]
   active: boolean
   image_url: string | null
+  created_at: string
+  updated_at: string
 }
 
 export interface SuggestionsResponse {
@@ -291,6 +295,8 @@ export interface Weapon {
   mook_bonus: number
   kachunk: boolean
   image_url: string | null
+  created_at: string
+  updated_at: string
 }
 
 // Enum definition for description keys
@@ -500,9 +506,11 @@ export interface Site {
   name: string
   description?: string
   faction?: Faction | null
-  characters?: Character[]
+  characters: Character[]
   secret: boolean
   image_url: string | null
+  created_at: string
+  updated_at: string
 }
 
 export interface Juncture {

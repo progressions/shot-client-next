@@ -18,7 +18,7 @@ interface JuncturesProps {
   initialOrder: string
 }
 
-type FormData = {
+type FormStateData = {
   junctures: Juncture[]
   meta: PaginationMeta
   drawerOpen: boolean
@@ -28,14 +28,13 @@ type FormData = {
 export default function Junctures({ initialJunctures, initialMeta, initialSort, initialOrder }: JuncturesProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
-  const { formState, dispatchForm } = useForm<FormData>({
+  const { formState, dispatchForm } = useForm<FormStateData>({
     junctures: initialJunctures,
     meta: initialMeta,
     drawerOpen: false,
     error: null
   })
-  const { formData } = formState
-  const { meta, junctures, drawerOpen, error } = formData
+  const { meta, junctures, drawerOpen, error } = formState.data
   const [selectedJuncture, setSelectedJuncture] = useState<Juncture | null>(null)
   const [sort, setSort] = useState<string>(initialSort)
   const [order, setOrder] = useState<string>(initialOrder)

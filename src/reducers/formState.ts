@@ -66,7 +66,7 @@ export interface FormStateType<T> {
   open: boolean
   error: string | null
   success: string | null
-  formData: T
+  data: T
 }
 
 export type FormStateAction<T> =
@@ -81,7 +81,7 @@ export type FormStateAction<T> =
   | ResetAction<T>
 
 export function initializeFormState<T extends Record<string, unknown>>(
-  formData: T | null = null
+  data: T | null = null
 ): FormStateType<T> {
   return {
     edited: false,
@@ -91,7 +91,7 @@ export function initializeFormState<T extends Record<string, unknown>>(
     open: false,
     error: null,
     success: null,
-    formData: formData ?? ({} as T),
+    data: data ?? ({} as T),
   }
 }
 
@@ -106,8 +106,8 @@ export function formReducer<T extends Record<string, unknown>>(
           ...state,
           edited: true,
           loading: false,
-          formData: {
-            ...state.formData,
+          data: {
+            ...state.data,
           } as T,
           [action.name]: action.value,
         }
@@ -117,14 +117,15 @@ export function formReducer<T extends Record<string, unknown>>(
         edited: true,
       }
     case FormActions.UPDATE:
+      console.log("Updating form state:", action.name, action.value)
       return {
         ...state,
         edited: true,
         disabled: false,
         loading: false,
         saving: false,
-        formData: {
-          ...state.formData,
+        data: {
+          ...state.data,
           [action.name]: action.value,
         } as T,
       }
