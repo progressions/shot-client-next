@@ -1,20 +1,25 @@
 import { FormActions } from "@/reducers"
+import { SelectChangeEvent } from "@mui/material"
 
-type useCollectionProps = {
+// Define the generic type for the hook
+type UseCollectionProps<T> = {
   url: string
   fetch: (page: number, sort: string, order: string) => Promise<void>
   dispatchForm: React.Dispatch<any>
-  data: {
-    sort: string
-    order: string
-    meta: {
-      total_pages: number
-      current_page: number
-    }
-  }
+  data: T
+  router: any // You might want to type this more specifically, e.g., NextRouter from 'next/router'
 }
 
-export function useCollection({ url, fetch: fetchCollection, dispatchForm, data, router }) {
+// Assuming ValidSort is defined elsewhere, e.g.:
+// type ValidSort = "name" | "date" | string
+
+export function useCollection<T>({
+  url,
+  fetch: fetchCollection,
+  dispatchForm,
+  data,
+  router,
+}: UseCollectionProps<T>) {
   const { sort, order, meta } = data
 
   const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
@@ -53,6 +58,9 @@ export function useCollection({ url, fetch: fetchCollection, dispatchForm, data,
   }
 
   return {
-    handlePageChange, handleSortChange, handleSortChangeMobile, handleOrderChangeMobile
+    handlePageChange,
+    handleSortChange,
+    handleSortChangeMobile,
+    handleOrderChangeMobile,
   }
 }

@@ -57,7 +57,8 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
   const { handlePageChange, handleSortChange, handleOrderChange, handleOrderChangeMobile, handleSortChangeMobile } = useCollection({
     url: "characters",
     fetch: fetchCharacters,
-    sort, order, meta, dispatchForm, router, validSorts, validOrders
+    data: formState.data,
+    router, dispatchForm, validSorts, validOrders,
   })
 
   const formatDate = (date: string) => {
