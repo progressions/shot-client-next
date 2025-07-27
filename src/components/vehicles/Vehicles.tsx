@@ -9,6 +9,8 @@ import { useClient } from "@/contexts"
 import { useTheme } from "@mui/material/styles"
 import type { SelectChangeEvent } from "@mui/material"
 import { VehicleName } from "@/components/vehicles"
+import { FormActions, useForm } from "@/reducers"
+import { useCollection } from "@/hooks"
 
 interface VehiclesProps {
   initialVehicles: Vehicle[]
@@ -109,90 +111,41 @@ function VehiclesMobile({
   )
 }
 
+type FormStateData = {
+  vehicles: Vehicle[]
+  meta: PaginationMeta
+  sort: string
+  order: string
+}
+
 export default function Vehicles({ initialVehicles, initialMeta, initialSort, initialOrder }: VehiclesProps) {
   const { client } = useClient()
   const router = useRouter()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
-  const [vehicles, setVehicles] = useState<Vehicle[]>(initialVehicles)
-  const [meta, setMeta] = useState<PaginationMeta>(initialMeta)
-  const [sort, setSort] = useState<string>(initialSort)
-  const [order, setOrder] = useState<string>(initialOrder)
-
-  // Debug mobile detection and table widths
-  useEffect(() => {
-    console.log("isMobile:", isMobile, "Screen width:", window.innerWidth)
-    console.log("Rendering:", isMobile ? "VehiclesMobile" : "Table")
-    console.log("Table styles:", {
-      maxWidth: isMobile ? "400px" : "100%",
-      tableLayout: "fixed",
-      columnWidths: {
-        name: "remaining",
-        created: isMobile ? "65px" : "150px",
-        updated: isMobile ? "65px" : "150px",
-        active: isMobile ? "60px" : "100px"
-      }
-    })
-  }, [isMobile])
-
+  const { formState, dispatchForm } = useForm<FormStateData>({
+    vehicles: initialVehicles,
+    meta: initialMeta,
+    sort: initialSort,
+    order: initialOrder
+  })
+  const { vehicles, meta, sort, order } = formState.data
   const fetchVehicles = useCallback(async (page: number = 1, sort: string = "name", order: string = "asc") => {
     try {
       const response = await client.getVehicles({ page, sort, order })
-      setVehicles(response.data.vehicles)
-      setMeta(response.data.meta)
+      dispatchForm({ type: FormActions.UPDATE, name: "vehicles", value: response.data.vehicles })
+      dispatchForm({ type: FormActions.UPDATE, name: "meta", value: response.data.meta })
     } catch (err) {
       console.error("Fetch vehicles error:", err)
     }
   }, [client])
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const page = params.get("page") ? parseInt(params.get("page")!, 10) : 1
-    const sortParam = params.get("sort")
-    const orderParam = params.get("order")
-    const currentSort = sortParam && validSorts.includes(sortParam as ValidSort) ? sortParam : "name"
-    const currentOrder = orderParam && validOrders.includes(orderParam as ValidOrder) ? orderParam : "asc"
-    setSort(currentSort)
-    setOrder(currentOrder)
-    if (page !== meta.current_page || currentSort !== sort || currentOrder !== order) {
-      fetchVehicles(page, currentSort, currentOrder)
-    }
-  }, [client, meta.current_page, fetchVehicles, order, sort])
-
-  const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
-    if (page <= 0 || page > meta.total_pages) {
-      router.push(`/vehicles?page=1&sort=${sort}&order=${order}`, { scroll: false })
-      fetchVehicles(1, sort, order)
-    } else {
-      router.push(`/vehicles?page=${page}&sort=${sort}&order=${order}`, { scroll: false })
-      fetchVehicles(page, sort, order)
-    }
-  }
-
-  const handleSortChange = (newSort: ValidSort) => {
-    const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
-    setSort(newSort)
-    setOrder(newOrder)
-    router.push(`/vehicles?page=1&sort=${newSort}&order=${newOrder}`, { scroll: false })
-    fetchVehicles(1, newSort, newOrder)
-  }
-
-  const handleSortChangeMobile = (event: SelectChangeEvent<string>) => {
-    const newSort = event.target.value as ValidSort
-    if (validSorts.includes(newSort)) {
-      setSort(newSort)
-      setOrder("asc")
-      router.push(`/vehicles?page=1&sort=${newSort}&order=asc`, { scroll: false })
-      fetchVehicles(1, newSort, "asc")
-    }
-  }
-
-  const handleOrderChangeMobile = () => {
-    const newOrder = order === "asc" ? "desc" : "asc"
-    setOrder(newOrder)
-    router.push(`/vehicles?page=1&sort=${sort}&order=${newOrder}`, { scroll: false })
-    fetchVehicles(1, sort, newOrder)
-  }
+  const { handlePageChange, handleSortChange, handleSortChangeMobile, handleOrderChangeMobile } = useCollection({
+    url: "vehicles",
+    fetch: fetchVehicles,
+    data: formState.data,
+    dispatchForm,
+    router
+  })
 
   const formatDate = (date: string) => {
     if (isMobile) {

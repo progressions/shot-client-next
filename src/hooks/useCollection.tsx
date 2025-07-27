@@ -1,6 +1,22 @@
 import { FormActions } from "@/reducers"
 
-export function useCollection({ url, fetch: fetchCollection, sort, order, meta, dispatchForm, router, validSorts, validOrders }) {
+type useCollectionProps = {
+  url: string
+  fetch: (page: number, sort: string, order: string) => Promise<void>
+  dispatchForm: React.Dispatch<any>
+  data: {
+    sort: string
+    order: string
+    meta: {
+      total_pages: number
+      current_page: number
+    }
+  }
+}
+
+export function useCollection({ url, fetch: fetchCollection, dispatchForm, data, router }) {
+  const { sort, order, meta } = data
+
   const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
     if (page <= 0 || page > meta.total_pages) {
       router.push(`${url}?page=1&sort=${sort}&order=${order}`, { scroll: false })
@@ -15,7 +31,7 @@ export function useCollection({ url, fetch: fetchCollection, sort, order, meta, 
     const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/characters?page=1&sort=${newSort}&order=${newOrder}`, { scroll: false })
+    router.push(`${url}?page=1&sort=${newSort}&order=${newOrder}`, { scroll: false })
     fetchCollection(1, newSort, newOrder)
   }
 
@@ -24,7 +40,7 @@ export function useCollection({ url, fetch: fetchCollection, sort, order, meta, 
     if (validSorts.includes(newSort)) {
       dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
       dispatchForm({ type: FormActions.UPDATE, name: "order", value: "asc" })
-      router.push(`/characters?page=1&sort=${newSort}&order=asc`, { scroll: false })
+      router.push(`${url}?page=1&sort=${newSort}&order=asc`, { scroll: false })
       fetchCollection(1, newSort, "asc")
     }
   }
@@ -32,7 +48,7 @@ export function useCollection({ url, fetch: fetchCollection, sort, order, meta, 
   const handleOrderChangeMobile = () => {
     const newOrder = order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/characters?page=1&sort=${sort}&order=${newOrder}`, { scroll: false })
+    router.push(`${url}?page=1&sort=${sort}&order=${newOrder}`, { scroll: false })
     fetchCollection(1, sort, newOrder)
   }
 
