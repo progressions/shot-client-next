@@ -117,6 +117,7 @@ export function formReducer<T extends Record<string, unknown>>(
         edited: true,
       }
     case FormActions.UPDATE:
+      console.log("Updating form state:", action.name, action.value)
       return {
         ...state,
         edited: true,

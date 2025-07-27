@@ -27,6 +27,9 @@ export default function WeaponDetail({ weapon: initialWeapon, onDelete, onEdit }
         ...initialWeapon,
         name: campaignData.weapon.name || initialWeapon.name,
         description: campaignData.weapon.description || initialWeapon.description,
+        damage: campaignData.weapon.damage || initialWeapon.damage,
+        concealment: campaignData.weapon.concealment || initialWeapon.concealment,
+        reload_value: campaignData.weapon.reload_value || initialWeapon.reload_value,
         image_url: campaignData.weapon.image_url || initialWeapon.image_url,
       })
     }
@@ -79,6 +82,7 @@ export default function WeaponDetail({ weapon: initialWeapon, onDelete, onEdit }
             <Link href={`/weapons/${weapon.id}`} style={{ color: "#fff" }}>
               <WeaponName weapon={weapon} />
             </Link>
+            {' '}({weapon.damage}/{weapon.concealment || "-"}/{weapon.reload_value || "-"})
           </Typography>
           <Box sx={{ display: "flex", gap: "0.5rem" }}>
             <Tooltip title="Edit Weapon">
@@ -103,10 +107,18 @@ export default function WeaponDetail({ weapon: initialWeapon, onDelete, onEdit }
             </Tooltip>
           </Box>
         </Box>
+        <Box sx={{ mt: 1, mb: 2 }}>
+          <Typography variant="body2">
+            Damage: {weapon.damage || "Unknown"}
+          </Typography>
+          <Typography variant="body2">
+            Concealment: {weapon.concealment || "-"}
+          </Typography>
+          <Typography variant="body2">
+            Reload: {weapon.reload_value || "-"}
+          </Typography>
+        </Box>
         <WeaponDescription weapon={weapon} />
-        <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
-          Created: {formattedCreatedAt}
-        </Typography>
         {error && (
           <Alert severity="error" sx={{ mt: 2 }}>
             {error}

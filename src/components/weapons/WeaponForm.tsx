@@ -75,7 +75,7 @@ export default function WeaponForm({ open, onClose, onSave, initialFormData, tit
     dispatchForm({ type: FormActions.SUBMIT })
     try {
       const formData = new FormData()
-      const weaponData = { name, description } as Weapon
+      const weaponData = { name, description, damage, concealment, reload_value } as Weapon
       formData.append("weapon", JSON.stringify(weaponData))
       if (image) {
         formData.append("image", image)
@@ -129,16 +129,16 @@ export default function WeaponForm({ open, onClose, onSave, initialFormData, tit
         <Stack direction="row" spacing={2} my={2}>
           <TextField
             label="Damage"
-            value={damage}
+            value={damage || ""}
             type="number"
-            onChange={(e) => dispatchForm({ type: FormActions.UPDATE, name: "damage", value: e.target.value })}
+            onChange={(e) => dispatchForm({ type: FormActions.UPDATE, name: "damage", value: parseInt(e.target.value as string, 10)})}
             margin="normal"
             required
             sx={{width: 80}}
           />
           <TextField
             label="Concealment"
-            value={concealment}
+            value={concealment || ""}
             type="number"
             onChange={(e) => dispatchForm({ type: FormActions.UPDATE, name: "concealment", value: e.target.value || "" })}
             margin="normal"
@@ -146,7 +146,7 @@ export default function WeaponForm({ open, onClose, onSave, initialFormData, tit
           />
           <TextField
             label="Reload"
-            value={reload_value}
+            value={reload_value || ""}
             type="number"
             onChange={(e) => dispatchForm({ type: FormActions.UPDATE, name: "reload_value", value: e.target.value || "" })}
             margin="normal"
