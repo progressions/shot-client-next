@@ -24,6 +24,22 @@ class ApiV2 {
     }
   }
 
+  sites(site?: Site | ID): string {
+    if (site?.id) {
+      return `${this.api()}/sites/${site.id}`
+    } else {
+      return `${this.api()}/sites`
+    }
+  }
+
+  junctures(juncture?: Juncture | ID): string {
+    if (juncture?.id) {
+      return `${this.api()}/junctures/${juncture.id}`
+    } else {
+      return `${this.api()}/junctures`
+    }
+  }
+
 }
 
 export default ApiV2

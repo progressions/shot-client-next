@@ -324,52 +324,52 @@ class Client {
 
   async getJunctures(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<JuncturesResponse>> {
     const query = this.queryParams(params)
-    return this.get(`${this.api.junctures()}?${query}`, {}, cacheOptions)
+    return this.get(`${this.apiV2.junctures()}?${query}`, {}, cacheOptions)
   }
 
   async createJuncture(formData: FormData): Promise<AxiosResponse<Juncture>> {
-    return this.requestFormData("POST", `${this.api.junctures()}`, formData)
+    return this.requestFormData("POST", `${this.apiV2.junctures()}`, formData)
   }
 
   async updateJuncture(id: string, formData: FormData): Promise<AxiosResponse<Juncture>> {
-    return this.requestFormData("PATCH", `${this.api.junctures({ id })}`, formData)
+    return this.requestFormData("PATCH", `${this.apiV2.junctures({ id })}`, formData)
   }
 
   async getJuncture(juncture: Juncture | ID, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Juncture>> {
-    return this.get(this.api.junctures(juncture), {}, cacheOptions)
+    return this.get(this.apiV2.junctures(juncture), {}, cacheOptions)
   }
 
   async deleteJuncture(juncture: Juncture): Promise<AxiosResponse<void>> {
-    return this.delete(this.api.junctures(juncture))
+    return this.delete(this.apiV2.junctures(juncture))
   }
 
   async deleteJunctureImage(juncture: Juncture): Promise<AxiosResponse<void>> {
-    return this.delete(`${this.api.junctures(juncture)}/image`)
+    return this.delete(`${this.apiV2.junctures(juncture)}/image`)
   }
 
   async getSites(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<SitesResponse>> {
     const query = this.queryParams(params)
-    return this.get(`${this.api.allSites()}?${query}`, {}, cacheOptions)
+    return this.get(`${this.apiV2.sites()}?${query}`, {}, cacheOptions)
   }
 
-  async createSite(site: Site): Promise<AxiosResponse<Site>> {
-    return this.post(this.api.allSites(), { "site": site })
+  async createSite(formData: FormData): Promise<AxiosResponse<Site>> {
+    return this.requestFormData("POST", `${this.apiV2.sites()}`, formData)
+  }
+
+  async updateSite(id: string, formData: FormData): Promise<AxiosResponse<Site>> {
+    return this.requestFormData("PATCH", `${this.apiV2.sites({ id })}`, formData)
   }
 
   async getSite(site: Site | ID, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Site>> {
-    return this.get(this.api.allSites(site), {}, cacheOptions)
+    return this.get(this.apiV2.sites(site), {}, cacheOptions)
   }
 
   async deleteSite(site: Site): Promise<AxiosResponse<void>> {
-    return this.delete(this.api.allSites(site))
-  }
-
-  async updateSite(site: Site): Promise<AxiosResponse<Site>> {
-    return this.patch(this.api.allSites(site), { "site": site })
+    return this.delete(this.apiV2.sites(site))
   }
 
   async deleteSiteImage(site: Site): Promise<AxiosResponse<void>> {
-    return this.delete(`${this.api.allSites(site)}/image`)
+    return this.delete(`${this.apiV2.sites(site)}/image`)
   }
 
   async addCharacterToSite(site: Site, character: Character): Promise<AxiosResponse<Site>> {
