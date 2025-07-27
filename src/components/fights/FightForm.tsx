@@ -141,6 +141,8 @@ export default function FightForm({ open, onClose, onSave, initialFormData, titl
             <Image
               src={imagePreview || existingImageUrl || ""}
               alt="Fight image preview"
+              width={isMobile ? 150 : 200}
+              height={isMobile ? 150 : 200}
               style={{
                 width: "100%",
                 maxHeight: isMobile ? "150px" : "200px",
