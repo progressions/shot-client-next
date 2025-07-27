@@ -1,5 +1,5 @@
 import Link from "next/link"
-import type { Site } from "@/types/types"
+import type { Site } from "@/types"
 import { SiteName } from "@/components/sites"
 
 type SiteLinkProps = {
@@ -13,7 +13,7 @@ export default function SiteLink({ site, data }: SiteLinkProps) {
       href={`/sites/${site.id}`}
       data-mention-id={site.id}
       data-mention-class-name="Site"
-      data-mention-data-={data ? JSON.stringify(data) : undefined}
+      data-mention-data={data ? JSON.stringify(data) : undefined}
       style={{textDecoration: "underline", color: "#fff"}}
     >
       <SiteName site={site} />

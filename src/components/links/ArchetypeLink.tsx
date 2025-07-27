@@ -10,7 +10,7 @@ export default function ArchetypeLink({ archetype, data }: ArchetypeLinkProps) {
     <Link
       data-mention-id={archetype}
       data-mention-class-name="Archetype"
-      data-mention-data-={data ? JSON.stringify(data) : undefined}
+      data-mention-data={data ? JSON.stringify(data) : undefined}
       style={{ cursor: "pointer", textDecoration: "underline", color: "#ffffff" }}
     >
       { archetype }

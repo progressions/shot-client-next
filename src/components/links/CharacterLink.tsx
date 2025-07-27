@@ -13,7 +13,7 @@ export default function CharacterLink({ character, data }: CharacterLinkProps) {
       href={`/characters/${character.id}`}
       data-mention-id={character.id}
       data-mention-class-name="Character"
-      data-mention-data-={data ? JSON.stringify(data) : undefined}
+      data-mention-data={data ? JSON.stringify(data) : undefined}
       style={{textDecoration: "underline", color: "#fff"}}
     >
       <CharacterName character={character} />

@@ -10,7 +10,7 @@ export default function ActionValueLink({ name, data }: ActionValueLinkProps) {
     <Link
       data-mention-id={name}
       data-mention-class-name="ActionValue"
-      data-mention-data-={data ? JSON.stringify(data) : undefined}
+      data-mention-data={data ? JSON.stringify(data) : undefined}
       style={{ cursor: "pointer", textDecoration: "underline", color: "#ffffff" }}
     >
       { name }

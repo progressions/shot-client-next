@@ -10,7 +10,7 @@ export default function InfoLink({ info, data }: InfoLinkProps) {
     <Link
       data-mention-id={info}
       data-mention-class-name="Info"
-      data-mention-data-={data ? JSON.stringify(data) : undefined}
+      data-mention-data={data ? JSON.stringify(data) : undefined}
       style={{ cursor: "pointer", textDecoration: "underline", color: "#ffffff" }}
     >
       { info }

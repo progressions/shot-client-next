@@ -10,6 +10,7 @@ import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
+import { InfoLink } from "@/components/links"
 
 type FormStateData = {
   name: string
@@ -152,7 +153,7 @@ export default function WeaponForm({ open, onClose, onSave, initialFormData, tit
             sx={{width: 80}}
           />
         </Stack>
-        <Typography>Typical weapon <strong>Damage</strong> is 9, only extreme weapons are 12 or higher. For <strong>Concealment</strong> and <strong>Reload</strong>, lower is better.</Typography>
+        <Typography>Typical weapon <InfoLink info={(<strong>Damage</strong>)} /> is 9, only extreme weapons are 12 or higher. For <strong>Concealment</strong> and <strong>Reload</strong>, lower is better.</Typography>
         <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: "1rem" }}>
           <IconButton component="label">
             <AddPhotoAlternateIcon sx={{ color: "#ffffff" }} />
