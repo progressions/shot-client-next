@@ -141,6 +141,8 @@ export default function JunctureForm({ open, onClose, onSave, initialFormData, t
             <Image
               src={imagePreview || existingImageUrl || ""}
               alt="Juncture image preview"
+              width={isMobile ? 150 : 200}
+              height={isMobile ? 150 : 200}
               style={{
                 width: "100%",
                 maxHeight: isMobile ? "150px" : "200px",
