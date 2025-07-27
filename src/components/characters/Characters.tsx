@@ -12,6 +12,7 @@ import { CharacterName } from "@/components/characters"
 import { CS } from "@/services"
 import { FormActions, useForm } from "@/reducers"
 import { CharactersMobile } from "@/components/characters"
+import { useCollection } from "@/hooks/useCollection"
 
 interface CharactersProps {
   initialCharacters: Character[]
@@ -24,7 +25,6 @@ type ValidSort = "name" | "type" | "created_at" | "updated_at"
 const validSorts: readonly ValidSort[] = ["name", "type", "created_at", "updated_at"]
 type ValidOrder = "asc" | "desc"
 const validOrders: readonly ValidOrder[] = ["asc", "desc"]
-
 
 type FormStateData = {
   characters: Character[]
@@ -45,23 +45,6 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
     order: initialOrder
   })
   const { characters, meta, sort, order } = formState.data
-
-  // Debug mobile detection and table widths
-  useEffect(() => {
-    console.log("isMobile:", isMobile, "Screen width:", window.innerWidth)
-    console.log("Rendering:", isMobile ? "CharactersMobile" : "Table")
-    console.log("Table styles:", {
-      maxWidth: isMobile ? "400px" : "100%",
-      tableLayout: "fixed",
-      columnWidths: {
-        name: "remaining",
-        created: isMobile ? "65px" : "150px",
-        updated: isMobile ? "65px" : "150px",
-        active: isMobile ? "60px" : "100px"
-      }
-    })
-  }, [isMobile])
-
   const fetchCharacters = useCallback(async (page: number = 1, sort: string = "name", order: string = "asc") => {
     try {
       const response = await client.getCharacters({ page, sort, order })
@@ -71,55 +54,11 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
       console.error("Fetch characters error:", err)
     }
   }, [client, dispatchForm])
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const page = params.get("page") ? parseInt(params.get("page")!, 10) : 1
-    const sortParam = params.get("sort")
-    const orderParam = params.get("order")
-    const currentSort = sortParam && validSorts.includes(sortParam as ValidSort) ? sortParam : "name"
-    const currentOrder = orderParam && validOrders.includes(orderParam as ValidOrder) ? orderParam : "asc"
-    dispatchForm({ type: FormActions.UPDATE, name: "sort", value: currentSort })
-    dispatchForm({ type: FormActions.UPDATE, name: "order", value: currentOrder })
-    if (page !== meta.current_page || currentSort !== sort || currentOrder !== order) {
-      fetchCharacters(page, currentSort, currentOrder)
-    }
-  }, [client, meta.current_page, fetchCharacters, order, sort, dispatchForm])
-
-  const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
-    if (page <= 0 || page > meta.total_pages) {
-      router.push(`/characters?page=1&sort=${sort}&order=${order}`, { scroll: false })
-      fetchCharacters(1, sort, order)
-    } else {
-      router.push(`/characters?page=${page}&sort=${sort}&order=${order}`, { scroll: false })
-      fetchCharacters(page, sort, order)
-    }
-  }
-
-  const handleSortChange = (newSort: ValidSort) => {
-    const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
-    dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
-    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/characters?page=1&sort=${newSort}&order=${newOrder}`, { scroll: false })
-    fetchCharacters(1, newSort, newOrder)
-  }
-
-  const handleSortChangeMobile = (event: SelectChangeEvent<string>) => {
-    const newSort = event.target.value as ValidSort
-    if (validSorts.includes(newSort)) {
-      dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
-      dispatchForm({ type: FormActions.UPDATE, name: "order", value: "asc" })
-      router.push(`/characters?page=1&sort=${newSort}&order=asc`, { scroll: false })
-      fetchCharacters(1, newSort, "asc")
-    }
-  }
-
-  const handleOrderChangeMobile = () => {
-    const newOrder = order === "asc" ? "desc" : "asc"
-    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/characters?page=1&sort=${sort}&order=${newOrder}`, { scroll: false })
-    fetchCharacters(1, sort, newOrder)
-  }
+  const { handlePageChange, handleSortChange, handleOrderChange, handleOrderChangeMobile, handleSortChangeMobile } = useCollection({
+    url: "characters",
+    fetch: fetchCharacters,
+    sort, order, meta, dispatchForm, router, validSorts, validOrders
+  })
 
   const formatDate = (date: string) => {
     if (isMobile) {
@@ -135,7 +74,7 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
 
   if (isMobile) {
     return (
-      <Container maxWidth="md">
+      <>
         <Typography
           variant="h4"
           sx={{ color: "#ffffff", fontSize: { xs: "1.5rem", sm: "2.125rem" }, mb: 2 }}
@@ -151,7 +90,7 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
           onSortChange={handleSortChangeMobile}
           onOrderChange={handleOrderChangeMobile}
         />
-      </Container>
+    </>
     )
   }
 
