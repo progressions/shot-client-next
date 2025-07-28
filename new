@@ -1,0 +1,13 @@
+
+  const labelMap: { [key: string]: string } = useMemo(() => ({
+    characters: "Characters",
+    vehicles: "Vehicles",
+    fights: "Fights",
+    campaigns: "Campaigns",
+    users: "Users",
+    home: "Home",
+    factions: "Factions",
+    weapons: "Weapons",
+    schticks: "Schticks",
+    parties: "Parties",
+  }), [])

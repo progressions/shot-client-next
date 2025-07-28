@@ -11,7 +11,7 @@ export default function FightsModule({ fights }: FightsModuleProps) {
   return (
     <Box sx={{ flexGrow: 1, width: { xs: "100%", sm: "auto" }, p: 2, borderRadius: 2, backgroundColor: "#1d1d1d" }}>
       <Typography variant="h6" gutterBottom>
-        Fights
+        Your Fights
       </Typography>
       {fights.map(fight => (
         <Box key={fight.id} sx={{ mb: 1, p: 1, borderRadius: 1, backgroundColor: "#2d2d2d" }}>

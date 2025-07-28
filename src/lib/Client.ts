@@ -150,27 +150,27 @@ class Client {
 
   async getFights(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<FightsResponse>> {
     const query = this.queryParams(params)
-    return this.get(`${this.api.fights()}?${query}`, {}, cacheOptions)
+    return this.get(`${this.apiV2.fights()}?${query}`, {}, cacheOptions)
   }
 
   async getFight(fight: Fight | ID, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Fight>> {
-    return this.get(this.api.fights(fight), {}, cacheOptions)
-  }
-
-  async touchFight(fight: Fight | ID): Promise<AxiosResponse<Fight>> {
-    return this.patch(`${this.api.fights(fight)}/touch`)
+    return this.get(this.apiV2.fights(fight), {}, cacheOptions)
   }
 
   async createFight(formData: FormData): Promise<AxiosResponse<Fight>> {
-    return this.requestFormData("POST", `${this.api.fights()}`, formData)
+    return this.requestFormData("POST", `${this.apiV2.fights()}`, formData)
   }
 
   async updateFight(id: string, formData: FormData): Promise<AxiosResponse<Fight>> {
-    return this.requestFormData("PATCH", `${this.api.fights({ id })}`, formData)
+    return this.requestFormData("PATCH", `${this.apiV2.fights({ id })}`, formData)
+  }
+
+  async touchFight(fight: Fight | ID): Promise<AxiosResponse<Fight>> {
+    return this.patch(`${this.apiV2.fights(fight)}/touch`)
   }
 
   async deleteFight(fight: Fight): Promise<AxiosResponse<void>> {
-    return this.delete(this.api.fights(fight))
+    return this.delete(this.apiV2.fights(fight))
   }
 
   async getFightEvents(fight: Fight | ID, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<FightEvent[]>> {
@@ -512,50 +512,50 @@ class Client {
     return this.get(this.api.adminUsers(), {}, cacheOptions)
   }
 
-  async deleteFaction(faction: Faction | ID): Promise<AxiosResponse<void>> {
-    return this.delete(this.api.factions(faction))
-  }
-
   async getFaction(faction: Faction | ID, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Faction>> {
-    return this.get(this.api.factions(faction), {}, cacheOptions)
+    return this.get(this.apiV2.factions(faction), {}, cacheOptions)
   }
 
   async getFactions(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<FactionsResponse>> {
     const query = this.queryParams(params)
-    return this.get(`${this.api.factions()}?${query}`, {}, cacheOptions)
+    return this.get(`${this.apiV2.factions()}?${query}`, {}, cacheOptions)
   }
 
-  async createFaction(faction: Faction): Promise<AxiosResponse<Faction>> {
-    return this.post(this.api.factions(), { "faction": faction })
+  async createFaction(formData: FormData): Promise<AxiosResponse<Faction>> {
+    return this.requestFormData("POST", `${this.apiV2.factions()}`, formData)
   }
 
-  async updateFaction(faction: Faction): Promise<AxiosResponse<Faction>> {
-    return this.patch(this.api.factions(faction), { "faction": faction })
+  async updateFaction(id: string, formData: FormData): Promise<AxiosResponse<Faction>> {
+    return this.requestFormData("PATCH", `${this.apiV2.factions({ id })}`, formData)
   }
 
   async deleteFactionImage(faction: Faction): Promise<AxiosResponse<void>> {
-    return this.delete(`${this.api.factions(faction)}/image`)
+    return this.delete(`${this.apiV2.factions(faction)}/image`)
+  }
+
+  async deleteFaction(faction: Faction | ID): Promise<AxiosResponse<void>> {
+    return this.delete(this.apiV2.factions(faction))
   }
 
   async getSchticks(params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<SchticksResponse>> {
     const query = this.queryParams(params)
-    return this.get(`${this.api.schticks()}?${query}`, {}, cacheOptions)
+    return this.get(`${this.apiV2.schticks()}?${query}`, {}, cacheOptions)
   }
 
   async getSchtick(schtick: Schtick | ID, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Schtick>> {
-    return this.get(this.api.schticks(schtick), {}, cacheOptions)
+    return this.get(this.apiV2.schticks(schtick), {}, cacheOptions)
   }
 
-  async createSchtick(schtick: Schtick): Promise<AxiosResponse<Schtick>> {
-    return this.post(this.api.schticks(), { "schtick": schtick })
+  async createSchtick(formData: FormData): Promise<AxiosResponse<Schtick>> {
+    return this.requestFormData("POST", `${this.apiV2.schticks()}`, formData)
   }
 
-  async updateSchtick(schtick: Schtick): Promise<AxiosResponse<Schtick>> {
-    return this.patch(this.api.schticks(schtick), { "schtick": schtick })
+  async updateSchtick(id: string, formData: FormData): Promise<AxiosResponse<Schtick>> {
+    return this.requestFormData("PATCH", `${this.apiV2.schticks({ id })}`, formData)
   }
 
   async deleteSchtick(schtick: Schtick): Promise<AxiosResponse<void>> {
-    return this.delete(this.api.schticks(schtick))
+    return this.delete(this.apiV2.schticks(schtick))
   }
 
   async getCharacterSchticks(character: Character | ID, params: Params = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<SchticksResponse>> {

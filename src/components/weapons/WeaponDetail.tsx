@@ -53,18 +53,6 @@ export default function WeaponDetail({ weapon: initialWeapon, onDelete, onEdit }
     onEdit(weapon)
   }
 
-  // Format created_at timestamp for display
-  const formattedCreatedAt = weapon.created_at
-    ? new Date(weapon.created_at).toLocaleString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true
-      })
-    : "Unknown"
-
   return (
     <Card sx={{ mb: 2, bgcolor: "#424242" }}>
       {weapon.image_url && (

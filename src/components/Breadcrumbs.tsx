@@ -15,7 +15,7 @@ interface BreadcrumbItem {
 export default function Breadcrumbs() {
   const { client } = useClient()
   const pathname = usePathname()
-  const pathnames = useMemo(() => (pathname ? pathname.split("/").filter((x) => x) : []), [pathname])
+  const pathnames = useMemo(() => pathname ? pathname.split("/").filter((x) => x) : [], [pathname])
   const [crumbName, setCrumbName] = useState<string | null>(null)
 
   const labelMap: { [key: string]: string } = useMemo(() => ({
@@ -24,13 +24,78 @@ export default function Breadcrumbs() {
     fights: "Fights",
     campaigns: "Campaigns",
     users: "Users",
-    home: "Home"
+    home: "Home",
+    factions: "Factions",
+    weapons: "Weapons",
+    schticks: "Schticks",
+    parties: "Parties",
   }), [])
 
   useEffect(() => {
-    const fetchCharacterName = async () => {
+    const fetchName = async () => {
+      setCrumbName(null)
+
       const id = pathnames[pathnames.length - 1]
-      if (labelMap[id]) return
+
+      if (pathnames[0] === "weapons" && id) {
+        if (id == "weapons") return
+        try {
+          const response = await client.getWeapon({ id })
+          const { data } = response
+          setCrumbName(data.name || id)
+        } catch (error) {
+          console.error("Error fetching weapon name:", error)
+          setCrumbName(id)
+        }
+      }
+
+      if (pathnames[0] === "parties" && id) {
+        if (id == "parties") return
+        try {
+          const response = await client.getParty({ id })
+          const { data } = response
+          setCrumbName(data.name || id)
+        } catch (error) {
+          console.error("Error fetching party name:", error)
+          setCrumbName(id)
+        }
+      }
+
+      if (pathnames[0] === "junctures" && id) {
+        if (id == "junctures") return
+        try {
+          const response = await client.getJuncture({ id })
+          const { data } = response
+          setCrumbName(data.name || id)
+        } catch (error) {
+          console.error("Error fetching juncture name:", error)
+          setCrumbName(id)
+        }
+      }
+
+      if (pathnames[0] === "schticks" && id) {
+        if (id == "schticks") return
+        try {
+          const response = await client.getSchtick({ id })
+          const { data } = response
+          setCrumbName(data.name || id)
+        } catch (error) {
+          console.error("Error fetching schtick name:", error)
+          setCrumbName(id)
+        }
+      }
+
+      if (pathnames[0] === "factions" && id) {
+        if (id == "factions") return
+        try {
+          const response = await client.getFaction({ id })
+          const { data } = response
+          setCrumbName(data.name || id)
+        } catch (error) {
+          console.error("Error fetching faction name:", error)
+          setCrumbName(id)
+        }
+      }
 
       if (pathnames[0] === "vehicles" && id) {
         if (id == "vehicles") return
@@ -68,7 +133,7 @@ export default function Breadcrumbs() {
         }
       }
     }
-    fetchCharacterName()
+    fetchName()
   }, [pathnames, client, labelMap])
 
   const getBreadcrumbs = (): BreadcrumbItem[] => {

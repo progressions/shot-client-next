@@ -1,11 +1,14 @@
 import {
   ID,
+  Fight,
   Character,
   Vehicle,
   Site,
   Juncture,
   Party,
-  Weapon
+  Weapon,
+  Schtick,
+  Faction,
 } from "@/types"
 
 class ApiV2 {
@@ -58,6 +61,30 @@ class ApiV2 {
       return `${this.api()}/weapons/${weapon.id}`
     } else {
       return `${this.api()}/weapons`
+    }
+  }
+
+  schticks(schtick?: Schtick | ID): string {
+    if (schtick?.id) {
+      return `${this.api()}/schticks/${schtick.id}`
+    } else {
+      return `${this.api()}/schticks`
+    }
+  }
+
+  factions(faction?: Faction | ID): string {
+    if (faction?.id) {
+      return `${this.api()}/factions/${faction.id}`
+    } else {
+      return `${this.api()}/factions`
+    }
+  }
+
+  fights(fight?: Fight | ID | undefined): string {
+    if (fight?.id) {
+      return `${this.api()}/fights/${fight.id}`
+    } else {
+      return `${this.api()}/fights`
     }
   }
 

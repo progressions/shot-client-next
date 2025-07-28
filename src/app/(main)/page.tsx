@@ -19,18 +19,23 @@ export default async function HomePage() {
   const campaignResponse = await client.getCurrentCampaign()
   const campaign = campaignResponse.data as Campaign
 
-  const fightsResponse = await client.getFights({ per_page: 5 })
+  const searchUserId = (campaign && campaign.gamemaster?.id === user.id) ? null: user.id
+
+  const fightsResponse = await client.getFights({ user_id: searchUserId, per_page: 5, sort: "created_at", order: "desc"})
   const fights = fightsResponse.data?.fights || []
 
-  const charactersResponse = await client.getCharacters({ user_id: user.id, per_page: 5, sort: "created_at", sort_direction: "desc" })
+  const charactersResponse = await client.getCharacters({ user_id: searchUserId, per_page: 5, sort: "created_at", order: "desc" })
   const characters = charactersResponse.data?.characters || []
 
   const campaignMembershipsResponse = await client.getCampaigns()
   const campaignMemberships = campaignMembershipsResponse.data || { gamemaster: [], player: [] }
 
+  const partiesResponse = await client.getParties({ user_id: searchUserId, per_page: 5 })
+  const parties = partiesResponse.data?.parties || []
+
   return (
     <Suspense fallback={<CircularProgress />}>
-      <Dashboard user={user} campaign={campaign} fights={fights} characters={characters} campaignMemberships={campaignMemberships} />
+      <Dashboard user={user} campaign={campaign} fights={fights} characters={characters} campaignMemberships={campaignMemberships} parties={parties} />
     </Suspense>
   )
 }

@@ -200,7 +200,10 @@ export const defaultSchtick:Schtick = {
     id: "",
     name: ""
   },
-  color: ""
+  color: "",
+  image_url: "",
+  created_at: "",
+  updated_at: "",
 }
 
 export const defaultAdvancement:Advancement = {

@@ -1,1 +1,8 @@
 export { default as SchtickName } from "@/components/schticks/SchtickName"
+export { default as SchtickDescription } from "@/components/schticks/SchtickDescription"
+export { default as Schticks } from "@/components/schticks/Schticks"
+export { default as SchtickDetail } from "@/components/schticks/SchtickDetail"
+export { default as CreateSchtickForm } from "@/components/schticks/CreateSchtickForm"
+export { default as EditSchtickForm } from "@/components/schticks/EditSchtickForm"
+export { default as SchtickForm } from "@/components/schticks/SchtickForm"
+export { default as SchtickPageClient } from "@/components/schticks/SchtickPageClient"

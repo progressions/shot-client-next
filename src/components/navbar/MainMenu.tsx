@@ -80,6 +80,11 @@ export default function HamburgerMenu() {
           </Link>
         </MenuItem>
         <MenuItem onClick={handleMenuClose}>
+          <Link href="/factions" style={{ color: "#ffffff", textDecoration: "none", width: "100%" }}>
+            Factions
+          </Link>
+        </MenuItem>
+        <MenuItem onClick={handleMenuClose}>
           <Link href="/weapons" style={{ color: "#ffffff", textDecoration: "none", width: "100%" }}>
             Weapons
           </Link>
