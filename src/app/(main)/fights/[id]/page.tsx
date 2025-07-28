@@ -1,4 +1,4 @@
-import { Container, Typography } from "@mui/material"
+import { Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Fight } from "@/types/types"
 import { FightPageClient } from "@/components/fights"
@@ -21,14 +21,6 @@ export default async function FightPage({ params }: FightPageProps) {
   }
 
   return (
-    <Container
-      maxWidth="lg"
-      sx={{
-        mt: { xs: 2, md: 4 },
-        px: { xs: 2, md: 3 },
-      }}
-    >
-      <FightPageClient fight={fight} />
-    </Container>
+    <FightPageClient fight={fight} />
   )
 }

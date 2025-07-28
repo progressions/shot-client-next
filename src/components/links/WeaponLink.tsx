@@ -14,7 +14,7 @@ export default function WeaponLink({ weapon, data }: WeaponLinkProps) {
       data-mention-id={weapon.id}
       data-mention-class-name="Weapon"
       data-mention-data={data ? JSON.stringify(data) : undefined}
-      style={{textDecoration: "underline", color: "#fff"}}
+      style={{fontWeight: "bold", textDecoration: "underline", color: "#fff"}}
     >
       <WeaponName weapon={weapon} />
     </Link>

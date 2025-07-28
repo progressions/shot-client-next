@@ -11,7 +11,7 @@ export default function WealthLink({ wealth, data }: WealthLinkProps) {
       data-mention-id={wealth}
       data-mention-class-name="Wealth"
       data-mention-data={data ? JSON.stringify(data) : undefined}
-      style={{ cursor: "pointer", textDecoration: "underline", color: "#ffffff" }}
+      style={{ fontWeight: "bold", cursor: "pointer", textDecoration: "underline", color: "#ffffff" }}
     >
       { wealth }
     </Link>

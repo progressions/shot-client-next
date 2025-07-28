@@ -8,7 +8,7 @@ import type { Fight } from "@/types/types"
 import Link from "next/link"
 import { FightName, FightDescription } from "@/components/fights"
 import { useCampaign, useClient } from "@/contexts"
-import { CharacterName } from "@/components/characters"
+import { CharacterLink } from "@/components/links"
 
 interface FightDetailProps {
   fight: Fight
@@ -110,9 +110,7 @@ export default function FightDetail({ fight: initialFight, onDelete, onEdit }: F
           {fight.actors && fight.actors.length > 0 ? (
             fight.actors.map((actor, index) => (
               <span key={`${actor.id}-${index}`}>
-                <Link href={`/characters/${actor.id}`} style={{ color: "#ffffff", textDecoration: "underline" }}>
-                  <CharacterName character={actor} />
-                </Link>
+                <CharacterLink character={actor} />
                 {index < fight.actors.length - 1 && ", "}
               </span>
             ))

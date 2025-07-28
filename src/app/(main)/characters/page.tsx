@@ -3,7 +3,6 @@ import { redirect } from "next/navigation"
 import { CircularProgress, Box } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Characters } from "@/components/characters"
-import type { CharactersResponse } from "@/types/types"
 
 export const metadata = {
   title: "Characters - Chi War"
@@ -36,7 +35,7 @@ export default async function CharactersPage({ searchParams }: CharactersPagePro
   const order = params.order && validOrders.includes(params.order as ValidOrder) ? params.order : "asc"
 
   const response = await client.getCharacters({ page, sort, order })
-  const { characters, meta }: CharactersResponse = response.data
+  const { characters, meta } = response.data
 
   if (page > meta.total_pages) {
     redirect("/characters?page=1&sort=name&order=asc")

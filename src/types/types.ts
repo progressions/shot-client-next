@@ -128,6 +128,7 @@ export interface Party {
   name: string
   description?: string
   faction?: Faction | null
+  faction_id?: string | null
   characters: Character[]
   vehicles: Vehicle[]
   secret: boolean
@@ -509,6 +510,7 @@ export interface Site {
   name: string
   description?: string
   faction?: Faction | null
+  faction_id: string | null
   characters: Character[]
   secret: boolean
   image_url: string | null
@@ -521,6 +523,7 @@ export interface Juncture {
   name: string
   description?: string
   faction?: Faction | null
+  faction_id: string | null
   characters: Character[]
   active: boolean
   image_url: string | null

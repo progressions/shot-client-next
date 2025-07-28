@@ -6,13 +6,16 @@ import { Pagination, Box, Button, Typography, Alert, FormControl, InputLabel, Se
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
 import { JunctureDetail, CreateJunctureForm, EditJunctureForm } from "@/components/junctures"
-import type { Juncture, PaginationMeta } from "@/types/types"
+import type { Juncture, Faction, PaginationMeta } from "@/types/types"
 import { FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
 import type { SelectChangeEvent } from "@mui/material"
+import { InfoLink } from "@/components/links"
+import { FactionsAutocomplete } from "@/components/autocomplete"
 
 interface JuncturesProps {
   initialJunctures: Juncture[]
+  initialFactions: Faction[]
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
@@ -20,21 +23,25 @@ interface JuncturesProps {
 
 type FormStateData = {
   junctures: Juncture[]
+  factions: Faction[]
   meta: PaginationMeta
+  faction_id: string | null
   drawerOpen: boolean
   error: string | null
 }
 
-export default function Junctures({ initialJunctures, initialMeta, initialSort, initialOrder }: JuncturesProps) {
+export default function Junctures({ initialJunctures, initialFactions, initialMeta, initialSort, initialOrder }: JuncturesProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
     junctures: initialJunctures,
+    factions: initialFactions,
     meta: initialMeta,
+    faction_id: null,
     drawerOpen: false,
     error: null
   })
-  const { meta, junctures, drawerOpen, error } = formState.data
+  const { meta, junctures, factions, faction_id, drawerOpen, error } = formState.data
   const [selectedJuncture, setSelectedJuncture] = useState<Juncture | null>(null)
   const [sort, setSort] = useState<string>(initialSort)
   const [order, setOrder] = useState<string>(initialOrder)
@@ -45,11 +52,11 @@ export default function Junctures({ initialJunctures, initialMeta, initialSort, 
   type ValidOrder = "asc" | "desc"
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
-  const fetchJunctures = useCallback(async (page: number = 1, sort: string = "created_at", order: string = "desc") => {
+  const fetchJunctures = useCallback(async (page: number = 1, sort: string = "created_at", order: string = "desc", faction_id: string | null) => {
     try {
-      const response = await client.getJunctures({ page, sort, order })
-      console.log("Fetched junctures:", response.data.junctures)
+      const response = await client.getJunctures({ page, sort, order, faction_id })
       dispatchForm({ type: FormActions.UPDATE, name: "junctures", value: response.data.junctures })
+      dispatchForm({ type: FormActions.UPDATE, name: "factions", value: response.data.factions })
       dispatchForm({ type: FormActions.UPDATE, name: "meta", value: response.data.meta })
       dispatchForm({ type: FormActions.ERROR, payload: null })
     } catch (err: unknown) {
@@ -63,7 +70,6 @@ export default function Junctures({ initialJunctures, initialMeta, initialSort, 
 
   useEffect(() => {
     if (!campaignData) return
-    console.log("Campaign data:", campaignData)
     if (campaignData.junctures === "reload") {
       const params = new URLSearchParams(window.location.search)
       const page = params.get("page") ? parseInt(params.get("page")!, 10) : 1
@@ -73,9 +79,9 @@ export default function Junctures({ initialJunctures, initialMeta, initialSort, 
       const currentOrder = orderParam && validOrders.includes(orderParam as ValidOrder) ? orderParam : "desc"
       setSort(currentSort)
       setOrder(currentOrder)
-      fetchJunctures(page, currentSort, currentOrder)
+      fetchJunctures(page, currentSort, currentOrder, faction_id)
     }
-  }, [client, campaignData, dispatchForm, fetchJunctures, validSorts, validOrders])
+  }, [client, campaignData, dispatchForm, fetchJunctures, validSorts, validOrders, faction_id])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -115,10 +121,10 @@ export default function Junctures({ initialJunctures, initialMeta, initialSort, 
   const handlePageChange = async (_event: React.ChangeEvent<unknown>, page: number) => {
     if (page <= 0 || page > meta.total_pages) {
       router.push(`/junctures?page=1&sort=${sort}&order=${order}`, { scroll: false })
-      await fetchJunctures(1, sort, order)
+      await fetchJunctures(1, sort, order, faction_id)
     } else {
-      router.push(`/junctures?page=${page}&sort=${sort}&order=${order}`, { scroll: false })
-      await fetchJunctures(page, sort, order)
+      router.push(`/junctures?page=${page}&sort=${sort}&order=${order}&faction_id=${faction_id}`, { scroll: false })
+      await fetchJunctures(page, sort, order, faction_id)
     }
   }
 
@@ -127,17 +133,31 @@ export default function Junctures({ initialJunctures, initialMeta, initialSort, 
     if (validSorts.includes(newSort)) {
       setSort(newSort)
       // Perform async operations
-      router.push(`/junctures?page=1&sort=${newSort}&order=${order}`, { scroll: false })
-      fetchJunctures(1, newSort, order)
+      router.push(`/junctures?page=1&sort=${newSort}&order=${order}&faction_id=${faction_id}`, { scroll: false })
+      fetchJunctures(1, newSort, order, faction_id)
     }
   }
 
   const handleOrderChange = async () => {
     const newOrder = order === "asc" ? "desc" : "asc"
     setOrder(newOrder)
-    router.push(`/junctures?page=1&sort=${sort}&order=${newOrder}`, { scroll: false })
-    await fetchJunctures(1, sort, newOrder)
+    router.push(`/junctures?page=1&sort=${sort}&order=${newOrder}&faction_id=${faction_id}`, { scroll: false })
+    await fetchJunctures(1, sort, newOrder, faction_id)
   }
+
+  const handleFactionChange = async (value: string | null) => {
+    const newFactionId = value
+    dispatchForm({ type: FormActions.UPDATE, name: "faction_id", value: newFactionId })
+    router.push(`/junctures?page=1&sort=${sort}&order=${order}&faction_id=${newFactionId}`, { scroll: false })
+    await fetchJunctures(1, sort, order, newFactionId)
+  }
+
+  const factionOptions = useMemo(() => {
+    return factions.map((faction) => ({
+      label: faction.name || "",
+      value: faction.id || ""
+    }))
+  }, [factions])
 
   return (
     <Box>
@@ -151,6 +171,9 @@ export default function Junctures({ initialJunctures, initialMeta, initialSort, 
         >
           Junctures
         </Typography>
+        <Box sx={{ pb: 2 }}>
+          <Typography>A <InfoLink href="/junctures" info="Juncture" /> is a period in time which has <InfoLink info="Portals" /> opening to the <InfoLink info="Netherworld" />. A Juncture is controlled by the <InfoLink href="/factions" info="Faction" /> which controlls the most powerful <InfoLink href="/sites" info="Feng Shui Sites" />.</Typography>
+        </Box>
         <Box
           sx={{
             display: "flex",
@@ -191,6 +214,13 @@ export default function Junctures({ initialJunctures, initialMeta, initialSort, 
                 {order === "asc" ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
               </IconButton>
             </Tooltip>
+            <FormControl sx={{ minWidth: { xs: 120, sm: 140 } }}>
+              <FactionsAutocomplete
+                options={factionOptions}
+                value={faction_id || ""}
+                onChange={handleFactionChange}
+              />
+            </FormControl>
           </Box>
           <Button
             variant="contained"

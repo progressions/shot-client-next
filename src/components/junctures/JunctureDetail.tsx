@@ -8,7 +8,7 @@ import type { Juncture } from "@/types/types"
 import Link from "next/link"
 import { JunctureName, JunctureDescription } from "@/components/junctures"
 import { useCampaign, useClient } from "@/contexts"
-import { CharacterName } from "@/components/characters"
+import { CharacterLink, FactionLink } from "@/components/links"
 
 interface JunctureDetailProps {
   juncture: Juncture
@@ -104,14 +104,16 @@ export default function JunctureDetail({ juncture: initialJuncture, onDelete, on
             </Tooltip>
           </Box>
         </Box>
+        { juncture.faction && <Typography variant="body1" sx={{ textTransform: "lowercase", fontVariant: "small-caps", mb: 2, color: "#ffffff" }}>
+          Controlled by{' '}
+          <FactionLink faction={juncture.faction} />
+        </Typography> }
         <JunctureDescription juncture={juncture} />
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
           {juncture.characters && juncture.characters.length > 0 ? (
             juncture.characters.map((actor, index) => (
               <span key={`${actor.id}-${index}`}>
-                <Link href={`/characters/${actor.id}`} style={{ color: "#ffffff", textDecoration: "underline" }}>
-                  <CharacterName character={actor} />
-                </Link>
+                <CharacterLink character={actor} />
                 {index < juncture.characters.length - 1 && ", "}
               </span>
             ))

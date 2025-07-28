@@ -5,15 +5,17 @@ import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
 import { TextField, SaveButton, CancelButton } from "@/components/ui"
-import type { EditorChangeEvent, Party } from "@/types/types"
+import type { EditorChangeEvent, Party } from "@/types"
+import { defaultParty } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
+import { FactionsAutocomplete } from "@/components/autocomplete"
+import { InfoLink } from "@/components/links"
 
-type FormStateData = {
-  name: string
-  description: string
+type FormStateData = Party & {
+  [key: string]: unknown
   image?: File | null
 }
 
@@ -29,7 +31,7 @@ interface PartyFormProps {
 export default function PartyForm({ open, onClose, onSave, initialFormData, title, existingImageUrl }: PartyFormProps) {
   const { formState, dispatchForm, initialFormState } = useForm<FormStateData>(initialFormData)
   const { disabled, error, data } = formState
-  const { name, description, image } = data
+  const { name, description, faction_id, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
 
   const theme = useTheme()
@@ -71,7 +73,7 @@ export default function PartyForm({ open, onClose, onSave, initialFormData, titl
     dispatchForm({ type: FormActions.SUBMIT })
     try {
       const formData = new FormData()
-      const partyData = { name, description } as Party
+      const partyData = { ...defaultParty, name, description, faction_id } as Party
       formData.append("party", JSON.stringify(partyData))
       if (image) {
         formData.append("image", image)
@@ -92,6 +94,10 @@ export default function PartyForm({ open, onClose, onSave, initialFormData, titl
     onClose()
   }
 
+  const handleFactionChange = async (value: string | null) => {
+    dispatchForm({ type: FormActions.UPDATE, name: "faction_id", value })
+  }
+
   return (
     <Drawer anchor={isMobile ? "bottom" : "right"} open={open} onClose={handleClose}>
       <Box
@@ -107,6 +113,7 @@ export default function PartyForm({ open, onClose, onSave, initialFormData, titl
             {error}
           </Alert>
         )}
+        <Typography>A <InfoLink href="/parties" info="Party" /> is a group of <InfoLink href="/characters" info="Characters" /> that work together in the Chi War. They can be part of a <InfoLink href="/factions" info="Faction" /> and have unique abilities and characteristics.</Typography>
         <TextField
           label="Name"
           value={name}
@@ -122,6 +129,13 @@ export default function PartyForm({ open, onClose, onSave, initialFormData, titl
             dispatchForm({ type: FormActions.UPDATE, name: "description", value: e.target.value })
           }}
         />
+        <Box sx={{ mt: 2 }}>
+          <Typography sx={{mb: 2}}>A <InfoLink href="/parties" info="Party" /> belongs to a certain <InfoLink href="/factions" info="Faction" />, which influences how they engage in the Chi War.</Typography>
+          <FactionsAutocomplete
+            value={faction_id || ""}
+            onChange={handleFactionChange}
+          />
+        </Box>
         <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: "1rem" }}>
           <IconButton component="label">
             <AddPhotoAlternateIcon sx={{ color: "#ffffff" }} />

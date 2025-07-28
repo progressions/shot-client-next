@@ -14,7 +14,7 @@ export default function JunctureLink({ juncture, data }: JunctureLinkProps) {
       data-mention-id={juncture.id}
       data-mention-class-name="Juncture"
       data-mention-data={data ? JSON.stringify(data) : undefined}
-      style={{textDecoration: "underline", color: "#fff"}}
+      style={{fontWeight: "bold", textDecoration: "underline", color: "#fff"}}
     >
       <JunctureName juncture={juncture} />
     </Link>

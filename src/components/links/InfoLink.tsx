@@ -3,15 +3,18 @@ import { Link } from "@mui/material"
 type InfoLinkProps = {
   info: string
   data?: string | object
+  href?: string
 }
 
-export default function InfoLink({ info, data }: InfoLinkProps) {
+export default function InfoLink({ info, data, href }: InfoLinkProps) {
   return (
     <Link
+      href={href}
+      target="_blank"
       data-mention-id={info}
       data-mention-class-name="Info"
       data-mention-data={data ? JSON.stringify(data) : undefined}
-      style={{ cursor: "pointer", textDecoration: "underline", color: "#ffffff" }}
+      style={{ fontWeight: "bold", cursor: "pointer", textDecoration: "underline", color: "#ffffff" }}
     >
       { info }
     </Link>

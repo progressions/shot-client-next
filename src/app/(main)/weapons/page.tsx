@@ -6,7 +6,7 @@ import { Weapons } from "@/components/weapons"
 import type { WeaponsResponse } from "@/types/types"
 
 export const metadata = {
-  title: "Chi War"
+  title: "Weapons - Chi War"
 }
 
 export default async function WeaponsPage({ searchParams }: { searchParams: Promise<{ page?: string, sort?: string, order?: string }> }) {

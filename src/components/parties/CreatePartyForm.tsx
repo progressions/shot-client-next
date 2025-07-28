@@ -25,7 +25,7 @@ export default function CreatePartyForm({ open, onClose, onSave }: CreatePartyFo
       open={open}
       onClose={onClose}
       onSave={handleSave}
-      initialFormData={{ name: "", description: "", image: null }}
+      initialFormData={{ ...defaultParty, image: null }}
       title="New Party"
     />
   )

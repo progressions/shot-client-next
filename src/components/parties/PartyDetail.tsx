@@ -1,14 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardContent, CardMedia, Box, Alert, IconButton, Tooltip, Typography } from "@mui/material"
+import { Alert, Card, CardContent, CardMedia, Box, IconButton, Tooltip, Typography } from "@mui/material"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
 import type { Party } from "@/types/types"
 import Link from "next/link"
 import { PartyName, PartyDescription } from "@/components/parties"
 import { useCampaign, useClient } from "@/contexts"
-import { CharacterName } from "@/components/characters"
+import { CharacterLink, FactionLink } from "@/components/links"
 
 interface PartyDetailProps {
   party: Party
@@ -24,12 +24,7 @@ export default function PartyDetail({ party: initialParty, onDelete, onEdit }: P
 
   useEffect(() => {
     if (campaignData?.party && campaignData.party.id === initialParty.id) {
-      setParty({
-        ...initialParty,
-        name: campaignData.party.name || initialParty.name,
-        description: campaignData.party.description || initialParty.description,
-        image_url: campaignData.party.image_url || initialParty.image_url,
-      })
+      setParty(campaignData.party)
     }
   }, [campaignData, initialParty])
 
@@ -57,9 +52,6 @@ export default function PartyDetail({ party: initialParty, onDelete, onEdit }: P
         year: "numeric",
         month: "long",
         day: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true
       })
     : "Unknown"
 
@@ -104,20 +96,22 @@ export default function PartyDetail({ party: initialParty, onDelete, onEdit }: P
             </Tooltip>
           </Box>
         </Box>
+        { party.faction && <Typography variant="body1" sx={{ textTransform: "lowercase", fontVariant: "small-caps", mb: 2, color: "#ffffff" }}>
+          Belongs to{' '}
+          <FactionLink faction={party.faction} />
+        </Typography> }
         <PartyDescription party={party} />
-        <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
+        <Typography variant="body2" sx={{ mt: 2 }}>
           {party.characters && party.characters.length > 0 ? (
             party.characters.map((actor, index) => (
               <span key={`${actor.id}-${index}`}>
-                <Link href={`/characters/${actor.id}`} style={{ color: "#ffffff", textDecoration: "underline" }}>
-                  <CharacterName character={actor} />
-                </Link>
+                <CharacterLink character={actor} />
                 {index < party.characters.length - 1 && ", "}
               </span>
             ))
           ) : null }
         </Typography>
-        <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
+        <Typography variant="body2" sx={{ mt: 2, color: "#ffffff" }}>
           Created: {formattedCreatedAt}
         </Typography>
         {error && (

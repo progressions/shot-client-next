@@ -6,10 +6,10 @@ import { Sites } from "@/components/sites"
 import type { SitesResponse } from "@/types/types"
 
 export const metadata = {
-  title: "Chi War"
+  title: "Feng Shui Sites - Chi War"
 }
 
-export default async function SitesPage({ searchParams }: { searchParams: Promise<{ page?: string, sort?: string, order?: string }> }) {
+export default async function SitesPage({ searchParams }: { searchParams: Promise<{ page?: string, sort?: string, order?: string, faction_id?: string }> }) {
   const client = await getServerClient()
   const user = await getUser()
   if (!client || !user) {
@@ -36,9 +36,11 @@ export default async function SitesPage({ searchParams }: { searchParams: Promis
   const validOrders: readonly ValidOrder[] = ["asc", "desc"]
   const order = params.order && validOrders.includes(params.order as ValidOrder) ? params.order : "desc"
 
+  const faction_id = params.faction_id
+
   // Fetch sites for the requested page, sort, and order
-  const response = await client.getSites({ page, sort, order })
-  const { sites, meta }: SitesResponse = response.data
+  const response = await client.getSites({ page, sort, order, faction_id })
+  const { sites, factions, meta }: SitesResponse = response.data
 
   // Check if page exceeds total_pages
   if (page > meta.total_pages) {
@@ -48,7 +50,7 @@ export default async function SitesPage({ searchParams }: { searchParams: Promis
   return (
     <Box sx={{ justifyContent: "space-between", alignItems: "center", mb: 2 }}>
       <Suspense fallback={<CircularProgress />}>
-        <Sites initialSites={sites} initialMeta={meta} initialSort={sort} initialOrder={order} />
+        <Sites initialSites={sites} initialFactions={factions} initialMeta={meta} initialSort={sort} initialOrder={order} />
       </Suspense>
     </Box>
   )

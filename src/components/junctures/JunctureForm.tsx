@@ -5,15 +5,17 @@ import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
 import { TextField, SaveButton, CancelButton } from "@/components/ui"
-import type { EditorChangeEvent, Juncture } from "@/types/types"
+import type { EditorChangeEvent, Juncture } from "@/types"
+import { defaultJuncture } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
+import { FactionsAutocomplete } from "@/components/autocomplete"
+import { InfoLink } from "@/components/links"
 
-type FormStateData = {
-  name: string
-  description: string
+type FormStateData = Juncture & {
+  [key: string]: unknown
   image?: File | null
 }
 
@@ -29,7 +31,7 @@ interface JunctureFormProps {
 export default function JunctureForm({ open, onClose, onSave, initialFormData, title, existingImageUrl }: JunctureFormProps) {
   const { formState, dispatchForm, initialFormState } = useForm<FormStateData>(initialFormData)
   const { disabled, error, data } = formState
-  const { name, description, image } = data
+  const { name, description, faction_id, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
 
   const theme = useTheme()
@@ -71,7 +73,7 @@ export default function JunctureForm({ open, onClose, onSave, initialFormData, t
     dispatchForm({ type: FormActions.SUBMIT })
     try {
       const formData = new FormData()
-      const junctureData = { name, description } as Juncture
+      const junctureData = { ...defaultJuncture, name, description, faction_id } as Juncture
       formData.append("juncture", JSON.stringify(junctureData))
       if (image) {
         formData.append("image", image)
@@ -92,6 +94,10 @@ export default function JunctureForm({ open, onClose, onSave, initialFormData, t
     onClose()
   }
 
+  const handleFactionChange = async (value: string | null): Promise<void> => {
+    dispatchForm({ type: FormActions.UPDATE, name: "faction_id", value })
+  }
+
   return (
     <Drawer anchor={isMobile ? "bottom" : "right"} open={open} onClose={handleClose}>
       <Box
@@ -107,6 +113,7 @@ export default function JunctureForm({ open, onClose, onSave, initialFormData, t
             {error}
           </Alert>
         )}
+        <Typography>A <InfoLink href="/junctures" info="Juncture" /> is a period in time which has <InfoLink info="Portals" /> opening to the <InfoLink info="Netherworld" />. A Juncture is controlled by the <InfoLink href="/factions" info="Faction" /> which controlls the most powerful <InfoLink href="/sites" info="Feng Shui Sites" />.</Typography>
         <TextField
           label="Name"
           value={name}
@@ -122,6 +129,13 @@ export default function JunctureForm({ open, onClose, onSave, initialFormData, t
             dispatchForm({ type: FormActions.UPDATE, name: "description", value: e.target.value })
           }}
         />
+        <Box sx={{ mt: 2 }}>
+          <Typography sx={{mb: 2}}>A <InfoLink href="/juncture" info="Juncture" /> belongs to a certain <InfoLink href="/factions" info="Faction" /> that controls the most powerful <InfoLink href="/sites" info="Feng Shuite Sites" />.</Typography>
+          <FactionsAutocomplete
+            value={faction_id || ""}
+            onChange={handleFactionChange}
+          />
+        </Box>
         <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: "1rem" }}>
           <IconButton component="label">
             <AddPhotoAlternateIcon sx={{ color: "#ffffff" }} />

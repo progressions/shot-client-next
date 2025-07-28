@@ -17,10 +17,9 @@ export default function EditFactionForm({ open, onClose, onSave, faction }: Edit
   const handleSave = async (formData: FormData, factionData: Faction) => {
     const updatedFactionData = {
       ...faction,
-      id: faction.id,
-      name: factionData.name,
-      description: factionData.description,
+      ...factionData
     } as Faction
+
     formData.set("faction", JSON.stringify(updatedFactionData))
     const response = await client.updateFaction(faction.id as string, formData)
     onSave(response.data)

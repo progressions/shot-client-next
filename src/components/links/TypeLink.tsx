@@ -11,7 +11,7 @@ export default function TypeLink({ characterType, data }: TypeLinkProps) {
       data-mention-id={characterType}
       data-mention-class-name="Type"
       data-mention-data={data ? JSON.stringify(data) : undefined}
-      style={{ cursor: "pointer", textDecoration: "underline", color: "#ffffff" }}
+      style={{ fontWeight: "bold", cursor: "pointer", textDecoration: "underline", color: "#ffffff" }}
     >
       { characterType }
     </Link>

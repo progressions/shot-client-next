@@ -8,7 +8,7 @@ import type { Site } from "@/types/types"
 import Link from "next/link"
 import { SiteName, SiteDescription } from "@/components/sites"
 import { useCampaign, useClient } from "@/contexts"
-import { CharacterName } from "@/components/characters"
+import { FactionLink, InfoLink, CharacterLink } from "@/components/links"
 
 interface SiteDetailProps {
   site: Site
@@ -104,14 +104,16 @@ export default function SiteDetail({ site: initialSite, onDelete, onEdit }: Site
             </Tooltip>
           </Box>
         </Box>
+        { site.faction && <Typography variant="body1" sx={{ textTransform: "lowercase", fontVariant: "small-caps", mb: 2, color: "#ffffff" }}>
+          Controlled by{' '}
+          <FactionLink faction={site.faction} />
+        </Typography> }
         <SiteDescription site={site} />
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
           {site.characters && site.characters.length > 0 ? (
             site.characters.map((actor, index) => (
               <span key={`${actor.id}-${index}`}>
-                <Link href={`/characters/${actor.id}`} style={{ color: "#ffffff", textDecoration: "underline" }}>
-                  <CharacterName character={actor} />
-                </Link>
+                <CharacterLink character={actor} />
                 {index < site.characters.length - 1 && ", "}
               </span>
             ))

@@ -2,8 +2,7 @@
 
 import { Box } from "@mui/material"
 import type { SystemStyleObject, Theme } from "@mui/system"
-import { useState, useEffect } from "react"
-import DOMPurify from "dompurify"
+import DOMPurify from "isomorphic-dompurify"
 import styles from "@/components/editor/Editor.module.scss"
 
 interface RichTextRendererProps {
@@ -12,21 +11,14 @@ interface RichTextRendererProps {
 }
 
 export default function RichTextRenderer({ html, sx }: RichTextRendererProps) {
-  const [sanitizedHTML, setSanitizedHTML] = useState("")
-
-  useEffect(() => {
-    const clean = DOMPurify.sanitize(html || '', {
-      USE_PROFILES: { html: true },
-      ADD_ATTR: ['target', 'rel', 'data-mention-id', 'data-mention-class-name'],
-    })
-
-    setSanitizedHTML(clean)
-  }, [html])
+  const sanitizedHTML = DOMPurify.sanitize(html || "", {
+    USE_PROFILES: { html: true },
+    ADD_ATTR: ["target", "rel", "data-mention-id", "data-mention-class-name", "data-mention-data"],
+  })
 
   return (
     <Box
       className={styles.richText}
-      style={{ color: "#b0bec5" }}
       sx={{ color: "#b0bec5", ...sx }}
       dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
     />

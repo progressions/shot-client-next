@@ -6,7 +6,7 @@ import { Factions } from "@/components/factions"
 import type { FactionsResponse } from "@/types/types"
 
 export const metadata = {
-  title: "Chi War"
+  title: "Factions - Chi War"
 }
 
 export default async function FactionsPage({ searchParams }: { searchParams: Promise<{ page?: string, sort?: string, order?: string }> }) {

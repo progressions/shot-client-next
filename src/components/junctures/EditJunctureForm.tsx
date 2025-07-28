@@ -17,9 +17,7 @@ export default function EditJunctureForm({ open, onClose, onSave, juncture }: Ed
   const handleSave = async (formData: FormData, junctureData: Juncture) => {
     const updatedJunctureData = {
       ...juncture,
-      id: juncture.id,
-      name: junctureData.name,
-      description: junctureData.description,
+      ...junctureData,
     } as Juncture
     formData.set("juncture", JSON.stringify(updatedJunctureData))
     const response = await client.updateJuncture(juncture.id as string, formData)
@@ -31,7 +29,7 @@ export default function EditJunctureForm({ open, onClose, onSave, juncture }: Ed
       open={open}
       onClose={onClose}
       onSave={handleSave}
-      initialFormData={{ name: juncture.name || "", description: juncture.description || "", image: null }}
+      initialFormData={{ ...juncture, image: null }}
       title="Edit Juncture"
       existingImageUrl={juncture.image_url}
     />

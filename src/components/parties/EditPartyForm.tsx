@@ -17,10 +17,9 @@ export default function EditPartyForm({ open, onClose, onSave, party }: EditPart
   const handleSave = async (formData: FormData, partyData: Party) => {
     const updatedPartyData = {
       ...party,
-      id: party.id,
-      name: partyData.name,
-      description: partyData.description,
+      ...partyData,
     } as Party
+
     formData.set("party", JSON.stringify(updatedPartyData))
     const response = await client.updateParty(party.id as string, formData)
     onSave(response.data)
@@ -31,7 +30,7 @@ export default function EditPartyForm({ open, onClose, onSave, party }: EditPart
       open={open}
       onClose={onClose}
       onSave={handleSave}
-      initialFormData={{ name: party.name || "", description: party.description || "", image: null }}
+      initialFormData={{ ...party, image: null }}
       title="Edit Party"
       existingImageUrl={party.image_url}
     />

@@ -19,11 +19,6 @@ function Editor({ name, value, onChange }) {
   const contentRef = useRef(value || "")
   const updateRef = useRef(false)
 
-  // Log re-renders
-  useEffect(() => {
-    console.log("Editor re-rendered")
-  })
-
   // Sync editor content with value prop
   useEffect(() => {
     console.log("Editor value prop:", value)
@@ -178,13 +173,11 @@ function Editor({ name, value, onChange }) {
                 value: html
               }
             }
-            console.log("onUpdate syntheticEvent:", syntheticEvent)
             onChangeContent(syntheticEvent)
           }
           updateRef.current = false
           // Ensure focus is preserved
           if (editor.isFocused) {
-            console.log("Preserving editor focus after onUpdate")
             editor.commands.focus()
           }
         }}
@@ -193,4 +186,4 @@ function Editor({ name, value, onChange }) {
   )
 }
 
-export default dynamic(() => Promise.resolve(Editor), { ssr: false })
+export default Editor

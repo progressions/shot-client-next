@@ -14,7 +14,7 @@ export default function SiteLink({ site, data }: SiteLinkProps) {
       data-mention-id={site.id}
       data-mention-class-name="Site"
       data-mention-data={data ? JSON.stringify(data) : undefined}
-      style={{textDecoration: "underline", color: "#fff"}}
+      style={{fontWeight: "bold", textDecoration: "underline", color: "#fff"}}
     >
       <SiteName site={site} />
     </Link>

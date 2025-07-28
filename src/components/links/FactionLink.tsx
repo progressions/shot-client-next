@@ -14,7 +14,7 @@ export default function FactionLink({ faction, data }: FactionLinkProps) {
       data-mention-id={faction.id}
       data-mention-class-name="Faction"
       data-mention-data={data ? JSON.stringify(data) : undefined}
-      style={{textDecoration: "underline", color: "#fff"}}
+      style={{fontWeight: "bold", textDecoration: "underline", color: "#fff"}}
     >
       <FactionName faction={faction} />
     </Link>

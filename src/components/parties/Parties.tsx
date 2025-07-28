@@ -6,13 +6,16 @@ import { Pagination, Box, Button, Typography, Alert, FormControl, InputLabel, Se
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
 import { PartyDetail, CreatePartyForm, EditPartyForm } from "@/components/parties"
-import type { Party, PaginationMeta } from "@/types/types"
+import type { Party, Faction, PaginationMeta } from "@/types/types"
 import { FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
 import type { SelectChangeEvent } from "@mui/material"
+import { InfoLink } from "@/components/links"
+import { FactionsAutocomplete } from "@/components/autocomplete"
 
 interface PartiesProps {
   initialParties: Party[]
+  initialFactions: Faction[]
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
@@ -20,21 +23,25 @@ interface PartiesProps {
 
 type FormStateData = {
   parties: Party[]
+  factions: Faction[]
   meta: PaginationMeta
+  faction_id: string | null
   drawerOpen: boolean
   error: string | null
 }
 
-export default function Parties({ initialParties, initialMeta, initialSort, initialOrder }: PartiesProps) {
+export default function Parties({ initialParties, initialFactions, initialMeta, initialSort, initialOrder }: PartiesProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
     parties: initialParties,
+    factions: initialFactions,
     meta: initialMeta,
+    faction_id: null,
     drawerOpen: false,
     error: null
   })
-  const { meta, parties, drawerOpen, error } = formState.data
+  const { meta, parties, factions, faction_id, drawerOpen, error } = formState.data
   const [selectedParty, setSelectedParty] = useState<Party | null>(null)
   const [sort, setSort] = useState<string>(initialSort)
   const [order, setOrder] = useState<string>(initialOrder)
@@ -45,11 +52,11 @@ export default function Parties({ initialParties, initialMeta, initialSort, init
   type ValidOrder = "asc" | "desc"
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
-  const fetchParties = useCallback(async (page: number = 1, sort: string = "created_at", order: string = "desc") => {
+  const fetchParties = useCallback(async (page: number = 1, sort: string = "created_at", order: string = "desc", faction_id: string | null) => {
     try {
-      const response = await client.getParties({ page, sort, order })
-      console.log("Fetched parties:", response.data.parties)
+      const response = await client.getParties({ page, sort, order, faction_id })
       dispatchForm({ type: FormActions.UPDATE, name: "parties", value: response.data.parties })
+      dispatchForm({ type: FormActions.UPDATE, name: "factions", value: response.data.factions })
       dispatchForm({ type: FormActions.UPDATE, name: "meta", value: response.data.meta })
       dispatchForm({ type: FormActions.ERROR, payload: null })
     } catch (err: unknown) {
@@ -63,7 +70,6 @@ export default function Parties({ initialParties, initialMeta, initialSort, init
 
   useEffect(() => {
     if (!campaignData) return
-    console.log("Campaign data:", campaignData)
     if (campaignData.parties === "reload") {
       const params = new URLSearchParams(window.location.search)
       const page = params.get("page") ? parseInt(params.get("page")!, 10) : 1
@@ -73,9 +79,9 @@ export default function Parties({ initialParties, initialMeta, initialSort, init
       const currentOrder = orderParam && validOrders.includes(orderParam as ValidOrder) ? orderParam : "desc"
       setSort(currentSort)
       setOrder(currentOrder)
-      fetchParties(page, currentSort, currentOrder)
+      fetchParties(page, currentSort, currentOrder, faction_id)
     }
-  }, [client, campaignData, dispatchForm, fetchParties, validSorts, validOrders])
+  }, [client, campaignData, dispatchForm, fetchParties, validSorts, validOrders, faction_id])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -115,10 +121,10 @@ export default function Parties({ initialParties, initialMeta, initialSort, init
   const handlePageChange = async (_event: React.ChangeEvent<unknown>, page: number) => {
     if (page <= 0 || page > meta.total_pages) {
       router.push(`/parties?page=1&sort=${sort}&order=${order}`, { scroll: false })
-      await fetchParties(1, sort, order)
+      await fetchParties(1, sort, order, faction_id)
     } else {
       router.push(`/parties?page=${page}&sort=${sort}&order=${order}`, { scroll: false })
-      await fetchParties(page, sort, order)
+      await fetchParties(page, sort, order, faction_id)
     }
   }
 
@@ -128,7 +134,7 @@ export default function Parties({ initialParties, initialMeta, initialSort, init
       setSort(newSort)
       // Perform async operations
       router.push(`/parties?page=1&sort=${newSort}&order=${order}`, { scroll: false })
-      fetchParties(1, newSort, order)
+      fetchParties(1, newSort, order, faction_id)
     }
   }
 
@@ -136,8 +142,22 @@ export default function Parties({ initialParties, initialMeta, initialSort, init
     const newOrder = order === "asc" ? "desc" : "asc"
     setOrder(newOrder)
     router.push(`/parties?page=1&sort=${sort}&order=${newOrder}`, { scroll: false })
-    await fetchParties(1, sort, newOrder)
+    await fetchParties(1, sort, newOrder, faction_id)
   }
+
+  const handleFactionChange = async (value: string | null) => {
+    const newFactionId = value
+    dispatchForm({ type: FormActions.UPDATE, name: "faction_id", value: newFactionId })
+    router.push(`/parties?page=1&sort=${sort}&order=${order}&faction_id=${newFactionId}`, { scroll: false })
+    await fetchParties(1, sort, order, newFactionId)
+  }
+
+  const factionOptions = useMemo(() => {
+    return factions.map((faction) => ({
+      label: faction.name || "",
+      value: faction.id || ""
+    }))
+  }, [factions])
 
   return (
     <Box>
@@ -151,6 +171,9 @@ export default function Parties({ initialParties, initialMeta, initialSort, init
         >
           Parties
         </Typography>
+        <Box sx={{ pb: 2 }}>
+          <Typography>A <InfoLink href="/parties" info="Party" /> is a group of <InfoLink href="/characters" info="Characters" /> that work together. A Party belongs to a <InfoLink href="/factions" info="Faction" />, and can be added to a <InfoLink href="/fights" info="Fight" />.</Typography>
+        </Box>
         <Box
           sx={{
             display: "flex",
@@ -191,6 +214,13 @@ export default function Parties({ initialParties, initialMeta, initialSort, init
                 {order === "asc" ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
               </IconButton>
             </Tooltip>
+            <FormControl sx={{ minWidth: { xs: 120, sm: 140 } }}>
+              <FactionsAutocomplete
+                options={factionOptions}
+                value={faction_id || ""}
+                onChange={handleFactionChange}
+              />
+            </FormControl>
           </Box>
           <Button
             variant="contained"

@@ -6,10 +6,10 @@ import { Junctures } from "@/components/junctures"
 import type { JuncturesResponse } from "@/types/types"
 
 export const metadata = {
-  title: "Chi War"
+  title: "Junctures - Chi War"
 }
 
-export default async function JuncturesPage({ searchParams }: { searchParams: Promise<{ page?: string, sort?: string, order?: string }> }) {
+export default async function JuncturesPage({ searchParams }: { searchParams: Promise<{ page?: string, sort?: string, order?: string, faction_id?: string }> }) {
   const client = await getServerClient()
   const user = await getUser()
   if (!client || !user) {
@@ -36,9 +36,11 @@ export default async function JuncturesPage({ searchParams }: { searchParams: Pr
   const validOrders: readonly ValidOrder[] = ["asc", "desc"]
   const order = params.order && validOrders.includes(params.order as ValidOrder) ? params.order : "desc"
 
+  const faction_id = params.faction_id
+
   // Fetch junctures for the requested page, sort, and order
-  const response = await client.getJunctures({ page, sort, order })
-  const { junctures, meta }: JuncturesResponse = response.data
+  const response = await client.getJunctures({ page, sort, order, faction_id })
+  const { junctures, factions, meta }: JuncturesResponse = response.data
 
   // Check if page exceeds total_pages
   if (page > meta.total_pages) {
@@ -48,7 +50,7 @@ export default async function JuncturesPage({ searchParams }: { searchParams: Pr
   return (
     <Box sx={{ justifyContent: "space-between", alignItems: "center", mb: 2 }}>
       <Suspense fallback={<CircularProgress />}>
-        <Junctures initialJunctures={junctures} initialMeta={meta} initialSort={sort} initialOrder={order} />
+        <Junctures initialJunctures={junctures} initialFactions={factions} initialMeta={meta} initialSort={sort} initialOrder={order} />
       </Suspense>
     </Box>
   )

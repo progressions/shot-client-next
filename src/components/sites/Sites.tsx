@@ -6,13 +6,16 @@ import { Pagination, Box, Button, Typography, Alert, FormControl, InputLabel, Se
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
 import { SiteDetail, CreateSiteForm, EditSiteForm } from "@/components/sites"
-import type { Site, PaginationMeta } from "@/types/types"
+import type { Site, Faction, PaginationMeta } from "@/types/types"
 import { FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
 import type { SelectChangeEvent } from "@mui/material"
+import { InfoLink } from "@/components/links"
+import { FactionsAutocomplete } from "@/components/autocomplete"
 
 interface SitesProps {
   initialSites: Site[]
+  initialFactions: Faction[]
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
@@ -20,21 +23,24 @@ interface SitesProps {
 
 type FormStateData = {
   sites: Site[]
+  factions: Faction[]
   meta: PaginationMeta
+  faction_id: string | null
   drawerOpen: boolean
   error: string | null
 }
 
-export default function Sites({ initialSites, initialMeta, initialSort, initialOrder }: SitesProps) {
+export default function Sites({ initialSites, initialFactions, initialMeta, initialSort, initialOrder }: SitesProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
     sites: initialSites,
+    factions: initialFactions,
     meta: initialMeta,
     drawerOpen: false,
     error: null
   })
-  const { meta, sites, drawerOpen, error } = formState.data
+  const { meta, sites, factions, faction_id, drawerOpen, error } = formState.data
   const [selectedSite, setSelectedSite] = useState<Site | null>(null)
   const [sort, setSort] = useState<string>(initialSort)
   const [order, setOrder] = useState<string>(initialOrder)
@@ -45,9 +51,9 @@ export default function Sites({ initialSites, initialMeta, initialSort, initialO
   type ValidOrder = "asc" | "desc"
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
-  const fetchSites = useCallback(async (page: number = 1, sort: string = "created_at", order: string = "desc") => {
+  const fetchSites = useCallback(async (page: number = 1, sort: string = "created_at", order: string = "desc", faction_id: string | null) => {
     try {
-      const response = await client.getSites({ page, sort, order })
+      const response = await client.getSites({ page, sort, order, faction_id })
       console.log("Fetched sites:", response.data.sites)
       dispatchForm({ type: FormActions.UPDATE, name: "sites", value: response.data.sites })
       dispatchForm({ type: FormActions.UPDATE, name: "meta", value: response.data.meta })
@@ -73,9 +79,9 @@ export default function Sites({ initialSites, initialMeta, initialSort, initialO
       const currentOrder = orderParam && validOrders.includes(orderParam as ValidOrder) ? orderParam : "desc"
       setSort(currentSort)
       setOrder(currentOrder)
-      fetchSites(page, currentSort, currentOrder)
+      fetchSites(page, currentSort, currentOrder, faction_id)
     }
-  }, [client, campaignData, dispatchForm, fetchSites, validSorts, validOrders])
+  }, [client, campaignData, dispatchForm, fetchSites, validSorts, validOrders, faction_id])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -115,10 +121,10 @@ export default function Sites({ initialSites, initialMeta, initialSort, initialO
   const handlePageChange = async (_event: React.ChangeEvent<unknown>, page: number) => {
     if (page <= 0 || page > meta.total_pages) {
       router.push(`/sites?page=1&sort=${sort}&order=${order}`, { scroll: false })
-      await fetchSites(1, sort, order)
+      await fetchSites(1, sort, order, faction_id)
     } else {
       router.push(`/sites?page=${page}&sort=${sort}&order=${order}`, { scroll: false })
-      await fetchSites(page, sort, order)
+      await fetchSites(page, sort, order, faction_id)
     }
   }
 
@@ -128,7 +134,7 @@ export default function Sites({ initialSites, initialMeta, initialSort, initialO
       setSort(newSort)
       // Perform async operations
       router.push(`/sites?page=1&sort=${newSort}&order=${order}`, { scroll: false })
-      fetchSites(1, newSort, order)
+      fetchSites(1, newSort, order, faction_id)
     }
   }
 
@@ -136,8 +142,22 @@ export default function Sites({ initialSites, initialMeta, initialSort, initialO
     const newOrder = order === "asc" ? "desc" : "asc"
     setOrder(newOrder)
     router.push(`/sites?page=1&sort=${sort}&order=${newOrder}`, { scroll: false })
-    await fetchSites(1, sort, newOrder)
+    await fetchSites(1, sort, newOrder, faction_id)
   }
+
+  const handleFactionChange = async (value: string | null) => {
+    const newFactionId = value
+    dispatchForm({ type: FormActions.UPDATE, name: "faction_id", value: newFactionId })
+    router.push(`/sites?page=1&sort=${sort}&order=${order}&faction_id=${newFactionId}`, { scroll: false })
+    await fetchSites(1, sort, order, newFactionId)
+  }
+
+  const factionOptions = useMemo(() => {
+    return factions.map((faction) => ({
+      label: faction.name || "",
+      value: faction.id || ""
+    }))
+  }, [factions])
 
   return (
     <Box>
@@ -149,8 +169,11 @@ export default function Sites({ initialSites, initialMeta, initialSort, initialO
             fontSize: { xs: "1.5rem", sm: "2.125rem" }
           }}
         >
-          Sites
+          Feng Shui Sites
         </Typography>
+        <Box sx={{ pb: 2 }}>
+          <Typography>A <InfoLink href="/sites" info="Feng Shui Site" /> is a location whose flow of energy produces powerful <InfoLink info="Chi" /> for those who are attuned to it. A Feng Shui Site belongs to a <InfoLink href="/factions" info="Faction" />.</Typography>
+        </Box>
         <Box
           sx={{
             display: "flex",
@@ -191,6 +214,13 @@ export default function Sites({ initialSites, initialMeta, initialSort, initialO
                 {order === "asc" ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
               </IconButton>
             </Tooltip>
+            <FormControl sx={{ minWidth: { xs: 120, sm: 140 } }}>
+              <FactionsAutocomplete
+                options={factionOptions}
+                value={faction_id || ""}
+                onChange={handleFactionChange}
+              />
+            </FormControl>
           </Box>
           <Button
             variant="contained"

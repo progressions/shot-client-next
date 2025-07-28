@@ -6,7 +6,7 @@ import { Schticks } from "@/components/schticks"
 import type { SchticksResponse } from "@/types/types"
 
 export const metadata = {
-  title: "Chi War"
+  title: "Schticks - Chi War"
 }
 
 export default async function SchticksPage({ searchParams }: { searchParams: Promise<{ page?: string, sort?: string, order?: string }> }) {

@@ -6,10 +6,10 @@ import { Parties } from "@/components/parties"
 import type { PartiesResponse } from "@/types/types"
 
 export const metadata = {
-  title: "Chi War"
+  title: "Parties - Chi War"
 }
 
-export default async function PartiesPage({ searchParams }: { searchParams: Promise<{ page?: string, sort?: string, order?: string }> }) {
+export default async function PartiesPage({ searchParams }: { searchParams: Promise<{ page?: string, sort?: string, order?: string, faction_id?: string }> }) {
   const client = await getServerClient()
   const user = await getUser()
   if (!client || !user) {
@@ -36,9 +36,11 @@ export default async function PartiesPage({ searchParams }: { searchParams: Prom
   const validOrders: readonly ValidOrder[] = ["asc", "desc"]
   const order = params.order && validOrders.includes(params.order as ValidOrder) ? params.order : "desc"
 
+  const faction_id = params.faction_id
+
   // Fetch parties for the requested page, sort, and order
-  const response = await client.getParties({ page, sort, order })
-  const { parties, meta }: PartiesResponse = response.data
+  const response = await client.getParties({ page, sort, order, faction_id })
+  const { parties, factions, meta }: PartiesResponse = response.data
 
   // Check if page exceeds total_pages
   if (page > meta.total_pages) {
@@ -48,7 +50,7 @@ export default async function PartiesPage({ searchParams }: { searchParams: Prom
   return (
     <Box sx={{ justifyContent: "space-between", alignItems: "center", mb: 2 }}>
       <Suspense fallback={<CircularProgress />}>
-        <Parties initialParties={parties} initialMeta={meta} initialSort={sort} initialOrder={order} />
+        <Parties initialParties={parties} initialFactions={factions} initialMeta={meta} initialSort={sort} initialOrder={order} />
       </Suspense>
     </Box>
   )

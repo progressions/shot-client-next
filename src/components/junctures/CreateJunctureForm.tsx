@@ -25,7 +25,7 @@ export default function CreateJunctureForm({ open, onClose, onSave }: CreateJunc
       open={open}
       onClose={onClose}
       onSave={handleSave}
-      initialFormData={{ name: "", description: "", image: null }}
+      initialFormData={{ ...defaultJuncture, image: null }}
       title="New Juncture"
     />
   )
