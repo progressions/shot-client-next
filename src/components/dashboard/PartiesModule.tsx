@@ -1,7 +1,7 @@
-import { Box, Typography } from "@mui/material"
+import { Stack, Box, Typography } from "@mui/material"
 import Link from "next/link"
-import { PartyName } from "@/components/parties"
-import type { Party } from "@/types/types"
+import { PartyBadge } from "@/components/badges"
+import type { Party } from "@/types"
 
 type PartiesModuleProps = {
   parties: Party[]
@@ -9,21 +9,28 @@ type PartiesModuleProps = {
 
 export default function PartiesModule({ parties }: PartiesModuleProps) {
   return (
-    <Box sx={{ flexGrow: 1, width: { xs: "100%", sm: "auto" }, p: 2, borderRadius: 2, backgroundColor: "#1d1d1d" }}>
+    <Box
+      sx={{
+        flexGrow: 1,
+        width: { xs: "100%", sm: "auto" },
+        p: 2,
+        borderRadius: 2,
+        backgroundColor: "#2d2d2d",
+      }}
+    >
       <Typography variant="h6" gutterBottom>
         Your Parties
       </Typography>
-      {parties.map(party => (
-        <Box key={party.id} sx={{ mb: 1, p: 1, borderRadius: 1, backgroundColor: "#2d2d2d" }}>
-          <Typography variant="body1">
-            <Link href={`/parties/${party.id}`} style={{ color: "#fff", textDecoration: "none" }}>
-              <PartyName party={party} />
-            </Link>
-          </Typography>
-        </Box>
-      ))}
+      <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
+        {parties.map(party => (
+          <PartyBadge key={party.id} party={party} size="sm" />
+        ))}
+      </Stack>
       <Typography variant="body2">
-        <Link href="/parties" style={{ color: "#fff", textDecoration: "underline" }}>
+        <Link
+          href="/parties"
+          style={{ color: "#fff", textDecoration: "underline" }}
+        >
           All parties
         </Link>
       </Typography>

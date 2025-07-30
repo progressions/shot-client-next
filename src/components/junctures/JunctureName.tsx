@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useCampaign } from "@/contexts"
-import type { Juncture } from "@/types/types"
+import type { Juncture } from "@/types"
 
 interface JunctureNameProps {
   juncture: Juncture
@@ -15,15 +15,11 @@ export default function JunctureName({ juncture }: JunctureNameProps) {
   useEffect(() => {
     if (campaignData && "juncture" in campaignData) {
       const updatedJuncture = campaignData.juncture
-      if (updatedJuncture && updatedJuncture.id === juncture.id) {
-        if (updatedJuncture.name) {
+      if (updatedJuncture && updatedJuncture.id === juncture.id && updatedJuncture.name) {
           setDisplayName(updatedJuncture.name)
         }
-      }
     }
   }, [campaignData, juncture.id])
 
-  return (<>
-    {displayName}
-  </>)
+  return <>{displayName}</>
 }

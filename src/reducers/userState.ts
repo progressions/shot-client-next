@@ -5,11 +5,14 @@ export enum UserActions {
   UPDATE = "update",
   SUBMIT = "submit",
   USER = "user",
-  RESET = "reset"
+  RESET = "reset",
 }
 
 interface ActionNoPayload {
-  type: Extract<UserActions, UserActions.EDITED | UserActions.SUBMIT | UserActions.RESET>
+  type: Extract<
+    UserActions,
+    UserActions.EDITED | UserActions.SUBMIT | UserActions.RESET
+  >
 }
 
 interface UpdateAction {
@@ -31,47 +34,56 @@ export interface UserStateType {
 
 export type UserStateAction = ActionNoPayload | UpdateAction | PayloadAction
 
-export const initialUserState:UserStateType = {
+export const initialUserState: UserStateType = {
   edited: false,
   saving: false,
-  user: defaultUser
+  user: defaultUser,
 }
 
-export function userReducer(state: UserStateType, action: UserStateAction): UserStateType {
-  switch(action.type) {
-    case UserActions.EDITED:
+export function userReducer(
+  state: UserStateType,
+  action: UserStateAction
+): UserStateType {
+  switch (action.type) {
+    case UserActions.EDITED: {
       return {
         ...state,
-        edited: true
+        edited: true,
       }
-    case UserActions.UPDATE:
+    }
+    case UserActions.UPDATE: {
       return {
         ...state,
         edited: true,
         user: {
           ...state.user,
-          [action.name as string]: action.value
-        } as User
+          [action.name]: action.value,
+        } as User,
       }
-    case UserActions.SUBMIT:
+    }
+    case UserActions.SUBMIT: {
       return {
         ...state,
         edited: false,
         saving: true,
       }
-    case UserActions.USER:
+    }
+    case UserActions.USER: {
       return {
         ...state,
         saving: false,
         edited: false,
-        user: action.payload as User
+        user: action.payload,
       }
-    case UserActions.RESET:
+    }
+    case UserActions.RESET: {
       return {
         ...state,
-        saving: false
+        saving: false,
       }
-    default:
+    }
+    default: {
       return initialUserState
+    }
   }
 }

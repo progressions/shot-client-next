@@ -1,10 +1,19 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { CardMedia, Card, CardContent, Box, Alert, IconButton, Tooltip, Typography } from "@mui/material"
+import {
+  CardMedia,
+  Card,
+  CardContent,
+  Box,
+  Alert,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
-import type { Fight } from "@/types/types"
+import type { Fight } from "@/types"
 import Link from "next/link"
 import { FightName, FightDescription } from "@/components/fights"
 import { useCampaign, useClient } from "@/contexts"
@@ -16,7 +25,11 @@ interface FightDetailProps {
   onEdit: (fight: Fight) => void
 }
 
-export default function FightDetail({ fight: initialFight, onDelete, onEdit }: FightDetailProps) {
+export default function FightDetail({
+  fight: initialFight,
+  onDelete,
+  onEdit,
+}: FightDetailProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
@@ -25,26 +38,22 @@ export default function FightDetail({ fight: initialFight, onDelete, onEdit }: F
   useEffect(() => {
     if (campaignData?.fight && campaignData.fight.id === initialFight.id) {
       console.log("Updating fight from campaign data:", campaignData.fight)
-      setFight({
-        ...initialFight,
-        name: campaignData.fight.name || initialFight.name,
-        description: campaignData.fight.description || initialFight.description,
-        image_url: campaignData.fight.image_url || initialFight.image_url,
-      })
+      setFight(campaignData.fight)
     }
   }, [campaignData, initialFight])
 
   const handleDelete = async () => {
     if (!fight?.id) return
-    if (!confirm(`Are you sure you want to delete the fight: ${fight.name}?`)) return
+    if (!confirm(`Are you sure you want to delete the fight: ${fight.name}?`))
+      return
 
     try {
       await client.deleteFight(fight)
       onDelete(fight.id)
       setError(null)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete fight")
-      console.error("Delete fight error:", err)
+    } catch (error_) {
+      setError(error_ instanceof Error ? error_.message : "Failed to delete fight")
+      console.error("Delete fight error:", error_)
     }
   }
 
@@ -60,7 +69,7 @@ export default function FightDetail({ fight: initialFight, onDelete, onEdit }: F
         day: "numeric",
         hour: "numeric",
         minute: "numeric",
-        hour12: true
+        hour12: true,
       })
     : "Unknown"
 
@@ -76,7 +85,13 @@ export default function FightDetail({ fight: initialFight, onDelete, onEdit }: F
         />
       )}
       <CardContent sx={{ p: "1rem" }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Typography variant="h6" sx={{ color: "#ffffff" }}>
             <Link href={`/fights/${fight.id}`} style={{ color: "#fff" }}>
               <FightName fight={fight} />
@@ -107,14 +122,14 @@ export default function FightDetail({ fight: initialFight, onDelete, onEdit }: F
         </Box>
         <FightDescription fight={fight} />
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
-          {fight.actors && fight.actors.length > 0 ? (
-            fight.actors.map((actor, index) => (
-              <span key={`${actor.id}-${index}`}>
-                <CharacterLink character={actor} />
-                {index < fight.actors.length - 1 && ", "}
-              </span>
-            ))
-          ) : null }
+          {fight.actors && fight.actors.length > 0
+            ? fight.actors.map((actor, index) => (
+                <span key={`${actor.id}-${index}`}>
+                  <CharacterLink character={actor} />
+                  {index < fight.actors.length - 1 && ", "}
+                </span>
+              ))
+            : null}
         </Typography>
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
           Created: {formattedCreatedAt}

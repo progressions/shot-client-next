@@ -1,6 +1,13 @@
 "use client"
 
-import { useMemo, useEffect, useState, createContext, useContext, useCallback } from "react"
+import {
+  useMemo,
+  useEffect,
+  useState,
+  createContext,
+  useContext,
+  useCallback,
+} from "react"
 import { Subscription } from "@rails/actioncable"
 
 import type { CampaignCableData, Campaign } from "@/types"
@@ -21,10 +28,10 @@ interface CampaignProviderProps {
 
 const defaultContext: CampaignContextType = {
   campaign: null,
-  setCurrentCampaign: async (camp: Campaign | null) => (camp || defaultCampaign),
+  setCurrentCampaign: async (camp: Campaign | null) => camp || defaultCampaign,
   getCurrentCampaign: async () => defaultCampaign,
   subscription: null,
-  campaignData: null
+  campaignData: null,
 }
 
 const CampaignContext = createContext<CampaignContextType>(defaultContext)
@@ -36,9 +43,13 @@ export function CampaignProvider({ children }: CampaignProviderProps) {
 
   const [campaign, setCampaign] = useState<Campaign | null>(defaultCampaign)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
-  const [campaignData, setCampaignData] = useState<CampaignCableData | null>(null)
+  const [campaignData, setCampaignData] = useState<CampaignCableData | null>(
+    null
+  )
 
-  const setCurrentCampaign = async (camp: Campaign | null): Promise<Campaign | null> => {
+  const setCurrentCampaign = async (
+    camp: Campaign | null
+  ): Promise<Campaign | null> => {
     try {
       const response = await client.setCurrentCampaign(camp)
       const { data } = response || {}
@@ -49,15 +60,15 @@ export function CampaignProvider({ children }: CampaignProviderProps) {
       setCampaign(data)
       saveLocally(`currentCampaign-${user?.id}`, data)
       return data
-    } catch (err) {
-      console.error(err)
+    } catch (error) {
+      console.error(error)
     }
     return null
   }
 
   const getCurrentCampaign = useCallback(async (): Promise<Campaign | null> => {
     try {
-      const cachedCampaign = getLocally(`currentCampaign-${user?.id}`) as Campaign | null
+      const cachedCampaign = getLocally(`currentCampaign-${user?.id}`)
       if (cachedCampaign) {
         setCampaign(cachedCampaign)
         return cachedCampaign
@@ -70,8 +81,8 @@ export function CampaignProvider({ children }: CampaignProviderProps) {
       }
       setCampaign(data)
       return data
-    } catch (err) {
-      console.error(err)
+    } catch (error) {
+      console.error(error)
     }
     return null
   }, [client, user, setCampaign, getLocally])
@@ -94,7 +105,7 @@ export function CampaignProvider({ children }: CampaignProviderProps) {
         received: (data: CampaignCableData) => {
           console.log("CampaignChannel data", data)
           setCampaignData(data)
-        }
+        },
       }
     )
 
@@ -106,7 +117,15 @@ export function CampaignProvider({ children }: CampaignProviderProps) {
   }, [user, campaign, consumer])
 
   return (
-    <CampaignContext.Provider value={{ campaign, setCurrentCampaign, getCurrentCampaign, subscription, campaignData }}>
+    <CampaignContext.Provider
+      value={{
+        campaign,
+        setCurrentCampaign,
+        getCurrentCampaign,
+        subscription,
+        campaignData,
+      }}
+    >
       {children}
     </CampaignContext.Provider>
   )

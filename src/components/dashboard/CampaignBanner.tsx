@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material"
-import type { Campaign } from "@/types/types"
+import type { Campaign } from "@/types"
 import { CampaignName } from "@/components/campaigns"
 import { UserName } from "@/components/users"
 import { RichTextRenderer } from "@/components/editor"
@@ -10,17 +10,67 @@ type CampaignProps = {
 
 export default function CampaignBanner({ campaign }: CampaignProps) {
   return (
-    <Box sx={{ p: 2, mb: 2, borderRadius: 2, backgroundColor: "#1d1d1d", alignItems: "center", textAlign: "center" }}>
-      <Typography variant="body2" textAlign="center">
-        Current Campaign
-      </Typography>
-      <Typography variant="h5" textAlign="center" gutterBottom>
-        <CampaignName campaign={campaign} />
-      </Typography>
-      <RichTextRenderer html={campaign.description} />
-      <Typography>
-        GM: <UserName user={campaign.gamemaster} />
-      </Typography>
+    <Box
+      sx={{
+        p: 2,
+        mb: 2,
+        borderRadius: 2,
+        backgroundColor: "#1d1d1d",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Background image container */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "100%",
+          backgroundImage: `url(${campaign.image_url || "/default-campaign-banner.jpg"})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          zIndex: 1,
+        }}
+      />
+      {/* Overlay to ensure text readability */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "100%",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          zIndex: 2,
+        }}
+      />
+      {/* Content container with semi-transparent background */}
+      <Box
+        sx={{
+          position: "relative",
+          zIndex: 3,
+          textAlign: "center",
+          backgroundColor: "rgba(0, 0, 0, 0.4)",
+          borderRadius: 1,
+          p: 2,
+          mt: 10,
+          mx: "auto",
+          maxWidth: "80%",
+        }}
+      >
+        <Typography variant="body2" color="white" textAlign="center">
+          Current Campaign
+        </Typography>
+        <Typography variant="h5" color="white" textAlign="center" gutterBottom>
+          <CampaignName campaign={campaign} />
+        </Typography>
+        <RichTextRenderer html={campaign.description} />
+        <Typography color="white">
+          GM: <UserName user={campaign.gamemaster} />
+        </Typography>
+      </Box>
     </Box>
   )
 }

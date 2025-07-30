@@ -1,7 +1,7 @@
-import { ReactRenderer } from '@tiptap/react'
-import tippy from 'tippy.js'
+import { ReactRenderer } from "@tiptap/react"
+import tippy from "tippy.js"
 
-import MentionList from './MentionList.jsx'
+import MentionList from "./MentionList.jsx"
 
 const suggestion = (user, client) => ({
   items: async ({ query }) => {
@@ -15,15 +15,15 @@ const suggestion = (user, client) => ({
       .chain()
       .focus()
       .insertContentAt(range, {
-        type: 'mention',
+        type: "mention",
         attrs: {
           id: props.id,
           label: props.label,
           className: props.className,
-          mentionSuggestionChar: '@',
+          mentionSuggestionChar: "@",
         },
       })
-      .run();
+      .run()
   },
   render: () => {
     let component
@@ -40,14 +40,14 @@ const suggestion = (user, client) => ({
           return
         }
 
-        popup = tippy('body', {
+        popup = tippy("body", {
           getReferenceClientRect: props.clientRect,
           appendTo: () => document.body,
           content: component.element,
           showOnCreate: true,
           interactive: true,
-          trigger: 'manual',
-          placement: 'bottom-start',
+          trigger: "manual",
+          placement: "bottom-start",
         })
       },
 
@@ -65,7 +65,7 @@ const suggestion = (user, client) => ({
 
       onKeyDown(props) {
         console.log("suggestion keydown props", props)
-        if (props.event.key === 'Escape') {
+        if (props.event.key === "Escape") {
           popup[0].hide()
 
           return true

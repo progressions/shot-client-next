@@ -1,0 +1,8 @@
+export { default as CharacterAvatar } from "@/components/avatars/CharacterAvatar"
+export { default as VehicleAvatar } from "@/components/avatars/VehicleAvatar"
+export { default as WeaponAvatar } from "@/components/avatars/WeaponAvatar"
+export { default as JunctureAvatar } from "@/components/avatars/JunctureAvatar"
+export { default as SiteAvatar } from "@/components/avatars/SiteAvatar"
+export { default as PartyAvatar } from "@/components/avatars/PartyAvatar"
+export { default as FactionAvatar } from "@/components/avatars/FactionAvatar"
+export { default as UserAvatar } from "@/components/avatars/UserAvatar"

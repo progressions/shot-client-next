@@ -2,7 +2,10 @@ import { useEffect, useImperativeHandle, useState, forwardRef } from "react"
 import styles from "@/components/editor/Editor.module.scss"
 
 const MentionList = forwardRef((props, ref) => {
-  const [selectedIndex, setSelectedIndex] = useState({ category: null, index: 0 })
+  const [selectedIndex, setSelectedIndex] = useState({
+    category: null,
+    index: 0,
+  })
 
   const selectItem = (key, index) => {
     const item = props.items[key]?.[index]
@@ -11,12 +14,26 @@ const MentionList = forwardRef((props, ref) => {
     }
   }
 
-  const itemKeys = ["Character", "Vehicle", "Party", "Site", "Faction", "Weapon", "Schtick", "Juncture"]
-  const validCategories = itemKeys.filter((key) => Array.isArray(props.items?.[key]) && props.items[key].length > 0)
-  const totalItems = validCategories.reduce((sum, key) => sum + props.items[key].length, 0)
+  const itemKeys = [
+    "Character",
+    "Vehicle",
+    "Party",
+    "Site",
+    "Faction",
+    "Weapon",
+    "Schtick",
+    "Juncture",
+  ]
+  const validCategories = itemKeys.filter(
+    key => Array.isArray(props.items?.[key]) && props.items[key].length > 0
+  )
+  const totalItems = validCategories.reduce(
+    (sum, key) => sum + props.items[key].length,
+    0
+  )
 
   const getNextCategory = (currentKey, direction) => {
-    if (!validCategories.length) return null
+    if (validCategories.length === 0) return null
     const currentIdx = validCategories.indexOf(currentKey)
     if (currentIdx === -1) return validCategories[0]
     const nextIdx =
@@ -28,23 +45,29 @@ const MentionList = forwardRef((props, ref) => {
 
   const upHandler = () => {
     setSelectedIndex(({ category, index }) => {
-      if (!validCategories.length) return { category: null, index: 0 }
-      const currentCategory = category && props.items[category]?.length ? category : validCategories[0]
+      if (validCategories.length === 0) return { category: null, index: 0 }
+      const currentCategory =
+        category && props.items[category]?.length
+          ? category
+          : validCategories[0]
       if (index > 0) {
         return { category: currentCategory, index: index - 1 }
       }
       const prevKey = getNextCategory(currentCategory, "prev")
       return {
         category: prevKey,
-        index: props.items[prevKey]?.length - 1 || 0
+        index: props.items[prevKey]?.length - 1 || 0,
       }
     })
   }
 
   const downHandler = () => {
     setSelectedIndex(({ category, index }) => {
-      if (!validCategories.length) return { category: null, index: 0 }
-      const currentCategory = category && props.items[category]?.length ? category : validCategories[0]
+      if (validCategories.length === 0) return { category: null, index: 0 }
+      const currentCategory =
+        category && props.items[category]?.length
+          ? category
+          : validCategories[0]
       if (index < props.items[currentCategory].length - 1) {
         return { category: currentCategory, index: index + 1 }
       }
@@ -54,14 +77,17 @@ const MentionList = forwardRef((props, ref) => {
   }
 
   const enterHandler = () => {
-    if (selectedIndex.category && props.items[selectedIndex.category]?.[selectedIndex.index]) {
+    if (
+      selectedIndex.category &&
+      props.items[selectedIndex.category]?.[selectedIndex.index]
+    ) {
       selectItem(selectedIndex.category, selectedIndex.index)
     }
   }
 
   useEffect(() => {
     const firstKey = validCategories[0] || null
-    setSelectedIndex((prev) => {
+    setSelectedIndex(prev => {
       if (prev.category === firstKey && prev.index === 0) return prev
       return { category: firstKey, index: 0 }
     })
@@ -82,7 +108,7 @@ const MentionList = forwardRef((props, ref) => {
         return true
       }
       return false
-    }
+    },
   }))
 
   if (!props.items || !totalItems) {
@@ -95,9 +121,9 @@ const MentionList = forwardRef((props, ref) => {
 
   return (
     <div className={styles.mentionSuggestions}>
-      {itemKeys.map((key) => {
+      {itemKeys.map(key => {
         const items = Array.isArray(props.items[key]) ? props.items[key] : []
-        if (!items.length) return null
+        if (items.length === 0) return null
         return (
           <div key={key} className={styles.mentionCategory}>
             <div className={styles.mentionCategoryLabel}>{key}</div>
@@ -110,7 +136,9 @@ const MentionList = forwardRef((props, ref) => {
                 }`}
                 key={idx}
                 onClick={() => selectItem(key, idx)}
-                onMouseEnter={() => setSelectedIndex({ category: key, index: idx })}
+                onMouseEnter={() =>
+                  setSelectedIndex({ category: key, index: idx })
+                }
               >
                 {item.label}
               </button>

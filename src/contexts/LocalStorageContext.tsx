@@ -13,27 +13,27 @@ interface LocalStorageProviderProps {
 
 const LocalStorageContext = createContext<LocalStorageContextType>({
   saveLocally: () => {},
-  getLocally: () => null
+  getLocally: () => null,
 })
 
 export function LocalStorageProvider({ children }: LocalStorageProviderProps) {
   function saveLocally(key: string, value: unknown) {
-    if (typeof window !== "undefined") {
+    if (globalThis.window !== undefined) {
       try {
         localStorage.setItem(key, JSON.stringify(value))
-      } catch (err) {
-        console.error("Failed to save to localStorage", err)
+      } catch (error) {
+        console.error("Failed to save to localStorage", error)
       }
     }
   }
 
   function getLocally(key: string): unknown | null {
-    if (typeof window !== "undefined") {
+    if (globalThis.window !== undefined) {
       try {
         const item = localStorage.getItem(key)
         return item ? JSON.parse(item) : null
-      } catch (err) {
-        console.error("Failed to parse localStorage item", err)
+      } catch (error) {
+        console.error("Failed to parse localStorage item", error)
         return null
       }
     }

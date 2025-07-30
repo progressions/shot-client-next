@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
-import type { Fight } from "@/types/types"
+import type { Fight } from "@/types"
 import { FightPageClient } from "@/components/fights"
 
 type FightPageProps = {
@@ -20,7 +20,5 @@ export default async function FightPage({ params }: FightPageProps) {
     return <Typography>Fight not found</Typography>
   }
 
-  return (
-    <FightPageClient fight={fight} />
-  )
+  return <FightPageClient fight={fight} />
 }

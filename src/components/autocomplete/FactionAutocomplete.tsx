@@ -4,22 +4,36 @@ import type { Faction } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
 
-type FactionsAutocompleteProps = {
+type FactionAutocompleteProps = {
   value: string
-  onChange: (value: string | null) => Promise<void>
+  onChange: (value: string | null) => void
   options?: Option[]
+  exclude?: string[]
+  allowNone?: boolean
 }
 
-export default function FactionsAutocomplete({ value, onChange, options }: FactionsAutocompleteProps) {
+export default function FactionAutocomplete({
+  value,
+  onChange,
+  options,
+  exclude = [],
+  allowNone = true,
+}: FactionAutocompleteProps) {
   const { client } = useClient()
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
-    if (options) return Promise.resolve(options)
+    if (options) {
+      const filteredOptions = options.filter(option =>
+        option.label.toLowerCase().includes(inputValue.toLowerCase())
+      )
+
+      return filteredOptions;
+    }
     try {
       const response = await client.getFactions({ search: inputValue })
       return response.data.factions.map((faction: Faction) => ({
         label: faction.name || "",
-        value: faction.id || ""
+        value: faction.id || "",
       }))
     } catch (error) {
       console.error("Error fetching options:", error)
@@ -33,7 +47,8 @@ export default function FactionsAutocomplete({ value, onChange, options }: Facti
       value={value}
       fetchOptions={fetchOptions}
       onChange={onChange}
+      exclude={exclude}
+      allowNone={allowNone}
     />
   )
-
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useCampaign } from "@/contexts"
-import type { Fight } from "@/types/types"
+import type { Fight } from "@/types"
 
 interface FightNameProps {
   fight: Fight
@@ -15,15 +15,11 @@ export default function FightName({ fight }: FightNameProps) {
   useEffect(() => {
     if (campaignData && "fight" in campaignData) {
       const updatedFight = campaignData.fight
-      if (updatedFight && updatedFight.id === fight.id) {
-        if (updatedFight.name) {
+      if (updatedFight && updatedFight.id === fight.id && updatedFight.name) {
           setDisplayName(updatedFight.name)
         }
-      }
     }
   }, [campaignData, fight.id])
 
-  return (<>
-    {displayName}
-  </>)
+  return <>{displayName}</>
 }

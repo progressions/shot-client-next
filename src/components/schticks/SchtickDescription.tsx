@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useCampaign } from "@/contexts"
-import type { Schtick } from "@/types/types"
+import type { Schtick } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import type { SystemStyleObject, Theme } from "@mui/system"
 
@@ -11,22 +11,23 @@ interface SchtickDescriptionProps {
   sx?: SystemStyleObject<Theme>
 }
 
-export default function SchtickDescription({ schtick, sx = {} }: SchtickDescriptionProps) {
+export default function SchtickDescription({
+  schtick,
+  sx = {},
+}: SchtickDescriptionProps) {
   const { campaignData } = useCampaign()
-  const [displayDescription, setDisplayDescription] = useState(schtick.description || "")
+  const [displayDescription, setDisplayDescription] = useState(
+    schtick.description || ""
+  )
 
   useEffect(() => {
     if (campaignData) {
       const updatedSchtick = campaignData?.schtick
-      if (updatedSchtick && updatedSchtick.id === schtick.id) {
-        if (updatedSchtick.description) {
+      if (updatedSchtick && updatedSchtick.id === schtick.id && updatedSchtick.description) {
           setDisplayDescription(updatedSchtick.description)
         }
-      }
     }
   }, [campaignData, schtick.id])
 
-  return (
-    <RichTextRenderer html={displayDescription} sx={sx} />
-  )
+  return <RichTextRenderer html={displayDescription} sx={sx} />
 }

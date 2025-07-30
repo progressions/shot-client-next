@@ -3,7 +3,7 @@ import { Box } from "@mui/material"
 
 export const metadata = {
   title: "Login - Chi War",
-  description: "Log in to Chi War to access your account"
+  description: "Log in to Chi War to access your account",
 }
 
 export default function AuthLayout({ children }: { children: ReactNode }) {

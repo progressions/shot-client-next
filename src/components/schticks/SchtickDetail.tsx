@@ -1,10 +1,19 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardContent, CardMedia, Box, Alert, IconButton, Tooltip, Typography } from "@mui/material"
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Box,
+  Alert,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
-import type { Schtick } from "@/types/types"
+import type { Schtick } from "@/types"
 import Link from "next/link"
 import { SchtickName, SchtickDescription } from "@/components/schticks"
 import { useCampaign, useClient } from "@/contexts"
@@ -15,18 +24,26 @@ interface SchtickDetailProps {
   onEdit: (schtick: Schtick) => void
 }
 
-export default function SchtickDetail({ schtick: initialSchtick, onDelete, onEdit }: SchtickDetailProps) {
+export default function SchtickDetail({
+  schtick: initialSchtick,
+  onDelete,
+  onEdit,
+}: SchtickDetailProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
   const [schtick, setSchtick] = useState<Schtick>(initialSchtick)
 
   useEffect(() => {
-    if (campaignData?.schtick && campaignData.schtick.id === initialSchtick.id) {
+    if (
+      campaignData?.schtick &&
+      campaignData.schtick.id === initialSchtick.id
+    ) {
       setSchtick({
         ...initialSchtick,
         name: campaignData.schtick.name || initialSchtick.name,
-        description: campaignData.schtick.description || initialSchtick.description,
+        description:
+          campaignData.schtick.description || initialSchtick.description,
         image_url: campaignData.schtick.image_url || initialSchtick.image_url,
       })
     }
@@ -34,15 +51,18 @@ export default function SchtickDetail({ schtick: initialSchtick, onDelete, onEdi
 
   const handleDelete = async () => {
     if (!schtick?.id) return
-    if (!confirm(`Are you sure you want to delete the schtick: ${schtick.name}?`)) return
+    if (
+      !confirm(`Are you sure you want to delete the schtick: ${schtick.name}?`)
+    )
+      return
 
     try {
       await client.deleteSchtick(schtick)
       onDelete(schtick.id)
       setError(null)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete schtick")
-      console.error("Delete schtick error:", err)
+    } catch (error_) {
+      setError(error_ instanceof Error ? error_.message : "Failed to delete schtick")
+      console.error("Delete schtick error:", error_)
     }
   }
 
@@ -58,7 +78,7 @@ export default function SchtickDetail({ schtick: initialSchtick, onDelete, onEdi
         day: "numeric",
         hour: "numeric",
         minute: "numeric",
-        hour12: true
+        hour12: true,
       })
     : "Unknown"
 
@@ -74,7 +94,13 @@ export default function SchtickDetail({ schtick: initialSchtick, onDelete, onEdi
         />
       )}
       <CardContent sx={{ p: "1rem" }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Typography variant="h6" sx={{ color: "#ffffff" }}>
             <Link href={`/schticks/${schtick.id}`} style={{ color: "#fff" }}>
               <SchtickName schtick={schtick} />

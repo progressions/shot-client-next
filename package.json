@@ -6,7 +6,8 @@
     "dev": "next dev -p 3001 --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx}\"",
+    "lint": "eslint --fix \"src/**/*.{ts,tsx,js,jsx}\""
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -21,23 +22,37 @@
     "@tiptap/starter-kit": "^3.0.7",
     "axios": "^1.11.0",
     "dompurify": "^3.2.6",
+    "html-react-parser": "^5.2.6",
     "isomorphic-dompurify": "^2.26.0",
     "js-cookie": "^3.0.5",
     "next": "15.4.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-icons": "^5.5.0",
     "sass": "^1.89.2",
-    "tippy.js": "^6.3.7"
+    "tippy.js": "^6.3.7",
+    "typescript-eslint": "^8.38.0"
   },
   "devDependencies": {
+    "eslint-plugin-next": "^0.0.0",
     "@eslint/eslintrc": "^3",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/rails__actioncable": "^6.1.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "eslint": "^9.32.0",
     "eslint-config-next": "15.4.3",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-drizzle": "^0.2.3",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^5.5.3",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "prettier": "^3.6.2",
     "typescript": "^5"
   }
 }

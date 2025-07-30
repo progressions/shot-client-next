@@ -9,54 +9,70 @@ const MenuBar = () => {
   const { editor } = useCurrentEditor()
 
   if (!editor) {
-    console.log('MenuBar: No editor instance')
+    console.log("MenuBar: No editor instance")
     return null
   }
 
   return (
     <div className={styles.controlGroup}>
-      <ButtonGroup className={styles.buttonGroup} variant="outlined" size="small">
+      <ButtonGroup
+        className={styles.buttonGroup}
+        variant="outlined"
+        size="small"
+      >
         <Button
           onClick={() => editor.chain().focus().toggleBold().run()}
           disabled={!editor.can().chain().focus().toggleBold().run()}
-          className={editor.isActive('bold') ? styles.isActive : ''}
+          className={editor.isActive("bold") ? styles.isActive : ""}
         >
           <FormatBoldIcon />
         </Button>
         <Button
           onClick={() => editor.chain().focus().toggleItalic().run()}
           disabled={!editor.can().chain().focus().toggleItalic().run()}
-          className={editor.isActive('italic') ? styles.isActive : ''}
+          className={editor.isActive("italic") ? styles.isActive : ""}
         >
           <FormatItalicIcon />
         </Button>
         <Button
           onClick={() => editor.chain().focus().setParagraph().run()}
-          className={editor.isActive('paragraph') ? styles.isActive : ''}
+          className={editor.isActive("paragraph") ? styles.isActive : ""}
         >
           P
         </Button>
         <Button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          className={editor.isActive('heading', { level: 1 }) ? styles.isActive : ''}
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 1 }).run()
+          }
+          className={
+            editor.isActive("heading", { level: 1 }) ? styles.isActive : ""
+          }
         >
           H1
         </Button>
         <Button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={editor.isActive('heading', { level: 2 }) ? styles.isActive : ''}
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 2 }).run()
+          }
+          className={
+            editor.isActive("heading", { level: 2 }) ? styles.isActive : ""
+          }
         >
           H2
         </Button>
         <Button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-          className={editor.isActive('heading', { level: 3 }) ? styles.isActive : ''}
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 3 }).run()
+          }
+          className={
+            editor.isActive("heading", { level: 3 }) ? styles.isActive : ""
+          }
         >
           H3
         </Button>
         <Button
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={editor.isActive('bulletList') ? styles.isActive : ''}
+          className={editor.isActive("bulletList") ? styles.isActive : ""}
         >
           <FormatListBulletedIcon />
         </Button>

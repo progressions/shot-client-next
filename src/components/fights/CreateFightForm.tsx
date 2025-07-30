@@ -10,7 +10,11 @@ interface CreateFightFormProps {
   onSave: (newFight: Fight) => void
 }
 
-export default function CreateFightForm({ open, onClose, onSave }: CreateFightFormProps) {
+export default function CreateFightForm({
+  open,
+  onClose,
+  onSave,
+}: CreateFightFormProps) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, fightData: Fight) => {

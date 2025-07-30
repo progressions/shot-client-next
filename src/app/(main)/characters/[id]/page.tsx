@@ -1,13 +1,21 @@
 import { redirect } from "next/navigation"
 import { Stack, Container, Typography, Box, Avatar } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
-import type { Faction, Character } from "@/types/types"
+import type { Weapon, Faction, Character } from "@/types"
 import type { Metadata } from "next"
 import { CharacterName } from "@/components/characters"
 import { UserName } from "@/components/users"
 import { CS } from "@/services"
 import Link from "next/link"
-import { WeaponLink, ActionValueLink, WealthLink, JunctureLink, ArchetypeLink, TypeLink, FactionLink } from "@/components/links"
+import {
+  WeaponLink,
+  ActionValueLink,
+  WealthLink,
+  JunctureLink,
+  ArchetypeLink,
+  TypeLink,
+  FactionLink,
+} from "@/components/links"
 
 // Component for character not found
 function CharacterNotFound() {
@@ -26,7 +34,11 @@ function CharacterNotFound() {
 }
 
 // Dynamically generate metadata for the page title
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
   const client = await getServerClient()
   const user = await getUser()
   if (!client || !user) {
@@ -42,13 +54,17 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       return { title: "Character Not Found - Chi War" }
     }
     return { title: `${character.name} - Chi War` }
-  } catch (err) {
-    console.error("Fetch character error for metadata:", err)
+  } catch (error) {
+    console.error("Fetch character error for metadata:", error)
     return { title: "Character Not Found - Chi War" }
   }
 }
 
-export default async function CharacterPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function CharacterPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
   const client = await getServerClient()
   const user = await getUser()
   if (!client || !user) {
@@ -62,8 +78,8 @@ export default async function CharacterPage({ params }: { params: Promise<{ id: 
     const response = await client.getCharacter({ id })
     character = response.data
     console.log("character data:", character)
-  } catch (err) {
-    console.error("Fetch character error:", err)
+  } catch (error) {
+    console.error("Fetch character error:", error)
   }
 
   if (!character?.id) {
@@ -77,14 +93,17 @@ export default async function CharacterPage({ params }: { params: Promise<{ id: 
     totalBoxes: CS.secondaryAttack(character) ? 6 : 5,
     rowGap: { xs: "32px", sm: "24px" },
     columnGap: { xs: "16px", sm: "32px" },
-    avatarSrc: character.image_url ?? "none"
+    avatarSrc: character.image_url ?? "none",
   })
 
   const skillValues = CS.knownSkills(character)
 
   return (
     <Box sx={{ bgcolor: "#424242", p: { xs: 2, sm: 3 }, borderRadius: 1 }}>
-      <Stack direction="row" sx={{ alignItems: "center", mb: 2, gap: { xs: 1, sm: 2 } }}>
+      <Stack
+        direction="row"
+        sx={{ alignItems: "center", mb: 2, gap: { xs: 1, sm: 2 } }}
+      >
         <Avatar
           src={character.image_url ?? undefined}
           alt={character.name}
@@ -95,7 +114,7 @@ export default async function CharacterPage({ params }: { params: Promise<{ id: 
             variant="h3"
             sx={{
               color: "#ffffff",
-              fontSize: { xs: "1.75rem", sm: "2.5rem" }
+              fontSize: { xs: "1.75rem", sm: "2.5rem" },
             }}
           >
             <CharacterName character={character} />
@@ -105,19 +124,30 @@ export default async function CharacterPage({ params }: { params: Promise<{ id: 
             variant="h6"
             sx={{
               color: "#ffffff",
-              fontSize: { xs: "1rem", sm: "1.25rem" }
+              fontSize: { xs: "1rem", sm: "1.25rem" },
             }}
           >
-            { <TypeLink characterType={CS.type(character)} /> }
-            { CS.faction(character) ? <>{' - '}<FactionLink faction={CS.faction(character) as Faction} /></> : null }
+            {<TypeLink characterType={CS.type(character)} />}
+            {CS.faction(character) ? (
+              <>
+                {" - "}
+                <FactionLink faction={CS.faction(character) as Faction} />
+              </>
+            ) : null}
           </Typography>
         </Stack>
       </Stack>
-      {character.user?.name && <Box sx={{mb: 2, fontSize: "0.8rem", textTransform: "uppercase"}}>
-        <Link href={`/users/${character.user.id}`} passHref style={{ color: "#ffffff" }}>
-          <UserName user={character.user} />
-        </Link>
-      </Box> }
+      {character.user?.name && (
+        <Box sx={{ mb: 2, fontSize: "0.8rem", textTransform: "uppercase" }}>
+          <Link
+            href={`/users/${character.user.id}`}
+            passHref
+            style={{ color: "#ffffff" }}
+          >
+            <UserName user={character.user} />
+          </Link>
+        </Box>
+      )}
       <Stack
         direction="row"
         sx={{
@@ -139,7 +169,7 @@ export default async function CharacterPage({ params }: { params: Promise<{ id: 
               border: "1px solid #ffffff",
               borderRadius: 1,
               p: 1,
-              px: 2
+              px: 2,
             }}
           >
             {CS.mainAttackValue(character)}
@@ -158,7 +188,7 @@ export default async function CharacterPage({ params }: { params: Promise<{ id: 
                 border: "1px solid #ffffff",
                 borderRadius: 1,
                 p: 1,
-                px: 2
+                px: 2,
               }}
             >
               {CS.secondaryAttackValue(character)}
@@ -177,7 +207,7 @@ export default async function CharacterPage({ params }: { params: Promise<{ id: 
               border: "1px solid #ffffff",
               borderRadius: 1,
               p: 1,
-              px: 2
+              px: 2,
             }}
           >
             {CS.defense(character)}
@@ -195,7 +225,7 @@ export default async function CharacterPage({ params }: { params: Promise<{ id: 
               border: "1px solid #ffffff",
               borderRadius: 1,
               p: 1,
-              px: 2
+              px: 2,
             }}
           >
             {CS.toughness(character)}
@@ -213,13 +243,13 @@ export default async function CharacterPage({ params }: { params: Promise<{ id: 
               border: "1px solid #ffffff",
               borderRadius: 1,
               p: 1,
-              px: 2
+              px: 2,
             }}
           >
             {CS.speed(character)}
           </Box>
         </Stack>
-        { CS.isPC(character) && (
+        {CS.isPC(character) && (
           <Stack direction="column">
             <Typography variant="body2" sx={{ color: "#ffffff" }}>
               <ActionValueLink name={CS.fortuneType(character)} />
@@ -232,14 +262,14 @@ export default async function CharacterPage({ params }: { params: Promise<{ id: 
                 border: "1px solid #ffffff",
                 borderRadius: 1,
                 p: 1,
-                px: 2
+                px: 2,
               }}
             >
               {CS.fortune(character)}
             </Box>
           </Stack>
         )}
-        { !CS.isPC(character) && (
+        {!CS.isPC(character) && (
           <Stack direction="column">
             <Typography variant="body2" sx={{ color: "#ffffff" }}>
               <ActionValueLink name="Damage" />
@@ -252,7 +282,7 @@ export default async function CharacterPage({ params }: { params: Promise<{ id: 
                 border: "1px solid #ffffff",
                 borderRadius: 1,
                 p: 1,
-                px: 2
+                px: 2,
               }}
             >
               {CS.damage(character)}
@@ -277,7 +307,12 @@ export default async function CharacterPage({ params }: { params: Promise<{ id: 
             boxSizing: "border-box",
           }}
         >
-          <strong>Archetype</strong> {CS.archetype(character) ? <ArchetypeLink archetype={CS.archetype(character)} /> : "None"}
+          <strong>Archetype</strong>{" "}
+          {CS.archetype(character) ? (
+            <ArchetypeLink archetype={CS.archetype(character)} />
+          ) : (
+            "None"
+          )}
         </Typography>
         <Typography
           variant="body1"
@@ -287,7 +322,12 @@ export default async function CharacterPage({ params }: { params: Promise<{ id: 
             boxSizing: "border-box",
           }}
         >
-          <strong>Juncture</strong> {character.juncture?.id ? <JunctureLink juncture={character.juncture} /> : "None"}
+          <strong>Juncture</strong>{" "}
+          {character.juncture?.id ? (
+            <JunctureLink juncture={character.juncture} />
+          ) : (
+            "None"
+          )}
         </Typography>
         <Typography
           variant="body1"
@@ -297,15 +337,16 @@ export default async function CharacterPage({ params }: { params: Promise<{ id: 
             boxSizing: "border-box",
           }}
         >
-          <strong>Wealth</strong> {character.wealth ? <WealthLink wealth={character.wealth} /> : "Unknown"}
+          <strong>Wealth</strong>{" "}
+          {character.wealth ? (
+            <WealthLink wealth={character.wealth} />
+          ) : (
+            "Unknown"
+          )}
         </Typography>
       </Stack>
       <Stack direction="column">
-        {skillValues.length > 0 && (
-          <Typography variant="h6">
-            Skills
-          </Typography>
-        )}
+        {skillValues.length > 0 && <Typography variant="h6">Skills</Typography>}
         <Stack direction="column">
           {skillValues.map((skill, index) => (
             <Typography key={index} variant="body1" sx={{ color: "#ffffff" }}>
@@ -313,16 +354,18 @@ export default async function CharacterPage({ params }: { params: Promise<{ id: 
             </Typography>
           ))}
         </Stack>
-        {character.weapons.length > 0 && (<>
-          <Typography variant="h6" mt={2}>
-            Weapons
-          </Typography>
-          <Typography variant="body2" sx={{fontSize: "0.8rem"}}>
-            (Damage/Concealment/Reload)
-          </Typography>
-        </>)}
+        {character.weapons.length > 0 && (
+          <>
+            <Typography variant="h6" mt={2}>
+              Weapons
+            </Typography>
+            <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
+              (Damage/Concealment/Reload)
+            </Typography>
+          </>
+        )}
         <Stack direction="column" mt={2}>
-          {character.weapons.map((weapon, index) => (
+          {character.weapons.map((weapon: Weapon, index: number) => (
             <Typography key={index} variant="body1" sx={{ color: "#ffffff" }}>
               <WeaponLink weapon={weapon} />
             </Typography>

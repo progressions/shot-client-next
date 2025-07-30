@@ -100,7 +100,7 @@ export function formReducer<T extends Record<string, unknown>>(
   action: FormStateAction<T>
 ): FormStateType<T> {
   switch (action.type) {
-    case FormActions.EDIT:
+    case FormActions.EDIT: {
       if (action.name && action.value !== undefined) {
         return {
           ...state,
@@ -108,7 +108,7 @@ export function formReducer<T extends Record<string, unknown>>(
           loading: false,
           data: {
             ...state.data,
-          } as T,
+          },
           [action.name]: action.value,
         }
       }
@@ -116,7 +116,8 @@ export function formReducer<T extends Record<string, unknown>>(
         ...state,
         edited: true,
       }
-    case FormActions.UPDATE:
+    }
+    case FormActions.UPDATE: {
       return {
         ...state,
         edited: true,
@@ -128,22 +129,26 @@ export function formReducer<T extends Record<string, unknown>>(
           [action.name]: action.value,
         } as T,
       }
-    case FormActions.OPEN:
+    }
+    case FormActions.OPEN: {
       return {
         ...state,
         open: action.payload,
       }
-    case FormActions.DISABLE:
+    }
+    case FormActions.DISABLE: {
       return {
         ...state,
         disabled: action.payload,
       }
-    case FormActions.LOADING:
+    }
+    case FormActions.LOADING: {
       return {
         ...state,
         loading: action.payload,
       }
-    case FormActions.ERROR:
+    }
+    case FormActions.ERROR: {
       return {
         ...state,
         disabled: true,
@@ -152,7 +157,8 @@ export function formReducer<T extends Record<string, unknown>>(
         error: action.payload,
         success: null,
       }
-    case FormActions.SUCCESS:
+    }
+    case FormActions.SUCCESS: {
       return {
         ...state,
         disabled: false,
@@ -161,7 +167,8 @@ export function formReducer<T extends Record<string, unknown>>(
         error: null,
         success: action.payload,
       }
-    case FormActions.SUBMIT:
+    }
+    case FormActions.SUBMIT: {
       return {
         ...state,
         error: null,
@@ -169,10 +176,13 @@ export function formReducer<T extends Record<string, unknown>>(
         edited: false,
         saving: true,
       }
-    case FormActions.RESET:
+    }
+    case FormActions.RESET: {
       return action.payload
-    default:
+    }
+    default: {
       return state
+    }
   }
 }
 

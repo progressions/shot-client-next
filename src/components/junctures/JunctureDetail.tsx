@@ -1,10 +1,19 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardContent, CardMedia, Box, Alert, IconButton, Tooltip, Typography } from "@mui/material"
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Box,
+  Alert,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
-import type { Juncture } from "@/types/types"
+import type { Juncture } from "@/types"
 import Link from "next/link"
 import { JunctureName, JunctureDescription } from "@/components/junctures"
 import { useCampaign, useClient } from "@/contexts"
@@ -16,18 +25,26 @@ interface JunctureDetailProps {
   onEdit: (juncture: Juncture) => void
 }
 
-export default function JunctureDetail({ juncture: initialJuncture, onDelete, onEdit }: JunctureDetailProps) {
+export default function JunctureDetail({
+  juncture: initialJuncture,
+  onDelete,
+  onEdit,
+}: JunctureDetailProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
   const [juncture, setJuncture] = useState<Juncture>(initialJuncture)
 
   useEffect(() => {
-    if (campaignData?.juncture && campaignData.juncture.id === initialJuncture.id) {
+    if (
+      campaignData?.juncture &&
+      campaignData.juncture.id === initialJuncture.id
+    ) {
       setJuncture({
         ...initialJuncture,
         name: campaignData.juncture.name || initialJuncture.name,
-        description: campaignData.juncture.description || initialJuncture.description,
+        description:
+          campaignData.juncture.description || initialJuncture.description,
         image_url: campaignData.juncture.image_url || initialJuncture.image_url,
       })
     }
@@ -35,15 +52,20 @@ export default function JunctureDetail({ juncture: initialJuncture, onDelete, on
 
   const handleDelete = async () => {
     if (!juncture?.id) return
-    if (!confirm(`Are you sure you want to delete the juncture: ${juncture.name}?`)) return
+    if (
+      !confirm(
+        `Are you sure you want to delete the juncture: ${juncture.name}?`
+      )
+    )
+      return
 
     try {
       await client.deleteJuncture(juncture)
       onDelete(juncture.id)
       setError(null)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete juncture")
-      console.error("Delete juncture error:", err)
+    } catch (error_) {
+      setError(error_ instanceof Error ? error_.message : "Failed to delete juncture")
+      console.error("Delete juncture error:", error_)
     }
   }
 
@@ -59,7 +81,7 @@ export default function JunctureDetail({ juncture: initialJuncture, onDelete, on
         day: "numeric",
         hour: "numeric",
         minute: "numeric",
-        hour12: true
+        hour12: true,
       })
     : "Unknown"
 
@@ -75,7 +97,13 @@ export default function JunctureDetail({ juncture: initialJuncture, onDelete, on
         />
       )}
       <CardContent sx={{ p: "1rem" }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Typography variant="h6" sx={{ color: "#ffffff" }}>
             <Link href={`/junctures/${juncture.id}`} style={{ color: "#fff" }}>
               <JunctureName juncture={juncture} />
@@ -104,20 +132,29 @@ export default function JunctureDetail({ juncture: initialJuncture, onDelete, on
             </Tooltip>
           </Box>
         </Box>
-        { juncture.faction && <Typography variant="body1" sx={{ textTransform: "lowercase", fontVariant: "small-caps", mb: 2, color: "#ffffff" }}>
-          Controlled by{' '}
-          <FactionLink faction={juncture.faction} />
-        </Typography> }
+        {juncture.faction && (
+          <Typography
+            variant="body1"
+            sx={{
+              textTransform: "lowercase",
+              fontVariant: "small-caps",
+              mb: 2,
+              color: "#ffffff",
+            }}
+          >
+            Controlled by <FactionLink faction={juncture.faction} />
+          </Typography>
+        )}
         <JunctureDescription juncture={juncture} />
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
-          {juncture.characters && juncture.characters.length > 0 ? (
-            juncture.characters.map((actor, index) => (
-              <span key={`${actor.id}-${index}`}>
-                <CharacterLink character={actor} />
-                {index < juncture.characters.length - 1 && ", "}
-              </span>
-            ))
-          ) : null }
+          {juncture.characters && juncture.characters.length > 0
+            ? juncture.characters.map((actor, index) => (
+                <span key={`${actor.id}-${index}`}>
+                  <CharacterLink character={actor} />
+                  {index < juncture.characters.length - 1 && ", "}
+                </span>
+              ))
+            : null}
         </Typography>
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
           Created: {formattedCreatedAt}

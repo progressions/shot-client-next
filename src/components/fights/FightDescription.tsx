@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useCampaign } from "@/contexts"
-import type { Fight } from "@/types/types"
+import type { Fight } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import type { SystemStyleObject, Theme } from "@mui/system"
 
@@ -11,22 +11,23 @@ interface FightDescriptionProps {
   sx?: SystemStyleObject<Theme>
 }
 
-export default function FightDescription({ fight, sx = {} }: FightDescriptionProps) {
+export default function FightDescription({
+  fight,
+  sx = {},
+}: FightDescriptionProps) {
   const { campaignData } = useCampaign()
-  const [displayDescription, setDisplayDescription] = useState(fight.description || "")
+  const [displayDescription, setDisplayDescription] = useState(
+    fight.description || ""
+  )
 
   useEffect(() => {
     if (campaignData) {
       const updatedFight = campaignData?.fight
-      if (updatedFight && updatedFight.id === fight.id) {
-        if (updatedFight.description) {
+      if (updatedFight && updatedFight.id === fight.id && updatedFight.description) {
           setDisplayDescription(updatedFight.description)
         }
-      }
     }
   }, [campaignData, fight.id])
 
-  return (
-    <RichTextRenderer html={displayDescription} sx={sx} />
-  )
+  return <RichTextRenderer html={displayDescription || ""} sx={sx} />
 }

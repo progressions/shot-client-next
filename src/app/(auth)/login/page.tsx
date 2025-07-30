@@ -19,42 +19,68 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/sign_in`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user: { email, password } })
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/sign_in`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user: { email, password } }),
+        }
+      )
       if (!response.ok) {
         throw new Error("Login failed")
       }
 
       const token = response.headers.get("Authorization")?.split(" ")?.[1] || ""
-      Cookies.set("jwtToken", token, { expires: 1, secure: true, sameSite: "Strict" })
+      Cookies.set("jwtToken", token, {
+        expires: 1,
+        secure: true,
+        sameSite: "Strict",
+      })
 
       const tempClient = new Client({ jwt: token })
       const tempResponse = await tempClient.getCurrentUser()
-      dispatchCurrentUser({ type: UserActions.USER, payload: tempResponse.data })
+      dispatchCurrentUser({
+        type: UserActions.USER,
+        payload: tempResponse.data,
+      })
 
       router.push("/")
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      console.error("Login error:", err)
+    } catch (error_) {
+      setError(error_ instanceof Error ? error_.message : "An error occurred")
+      console.error("Login error:", error_)
     }
   }
 
   return (
     <Container maxWidth="sm">
-      <Box sx={{ mt: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ color: "#ffffff" }}>
+      <Box
+        sx={{
+          mt: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          sx={{ color: "#ffffff" }}
+        >
           Login to Chi War
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: "100%" }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ mt: 1, width: "100%" }}
+        >
           <TextField
             margin="normal"
             required
             label="Email Address"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={e => setEmail(e.target.value)}
             autoFocus
           />
           <TextField
@@ -63,12 +89,9 @@ export default function LoginPage() {
             label="Password"
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
           />
-          <Button
-            type="submit"
-            sx={{ mt: 3, mb: 2 }}
-          >
+          <Button type="submit" sx={{ mt: 3, mb: 2 }}>
             Sign In
           </Button>
           {error && (

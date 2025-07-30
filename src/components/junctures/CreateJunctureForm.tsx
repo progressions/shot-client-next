@@ -10,7 +10,11 @@ interface CreateJunctureFormProps {
   onSave: (newJuncture: Juncture) => void
 }
 
-export default function CreateJunctureForm({ open, onClose, onSave }: CreateJunctureFormProps) {
+export default function CreateJunctureForm({
+  open,
+  onClose,
+  onSave,
+}: CreateJunctureFormProps) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, junctureData: Juncture) => {
@@ -30,4 +34,3 @@ export default function CreateJunctureForm({ open, onClose, onSave }: CreateJunc
     />
   )
 }
-

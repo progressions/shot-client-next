@@ -2,16 +2,33 @@
 
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Pagination, Box, Button, Typography, Alert, FormControl, InputLabel, Select, MenuItem, Stack, IconButton, Tooltip } from "@mui/material"
+import {
+  Pagination,
+  Box,
+  Button,
+  Typography,
+  Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Stack,
+  IconButton,
+  Tooltip,
+} from "@mui/material"
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
-import { JunctureDetail, CreateJunctureForm, EditJunctureForm } from "@/components/junctures"
-import type { Juncture, Faction, PaginationMeta } from "@/types/types"
+import {
+  JunctureDetail,
+  CreateJunctureForm,
+  EditJunctureForm,
+} from "@/components/junctures"
+import type { Juncture, Faction, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
 import type { SelectChangeEvent } from "@mui/material"
 import { InfoLink } from "@/components/links"
-import { FactionsAutocomplete } from "@/components/autocomplete"
+import { FactionAutocomplete } from "@/components/autocomplete"
 
 interface JuncturesProps {
   initialJunctures: Juncture[]
@@ -30,7 +47,13 @@ type FormStateData = {
   error: string | null
 }
 
-export default function Junctures({ initialJunctures, initialFactions, initialMeta, initialSort, initialOrder }: JuncturesProps) {
+export default function Junctures({
+  initialJunctures,
+  initialFactions,
+  initialMeta,
+  initialSort,
+  initialOrder,
+}: JuncturesProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
@@ -39,49 +62,95 @@ export default function Junctures({ initialJunctures, initialFactions, initialMe
     meta: initialMeta,
     faction_id: null,
     drawerOpen: false,
-    error: null
+    error: null,
   })
-  const { meta, junctures, factions, faction_id, drawerOpen, error } = formState.data
-  const [selectedJuncture, setSelectedJuncture] = useState<Juncture | null>(null)
+  const { meta, junctures, factions, faction_id, drawerOpen, error } =
+    formState.data
+  const [selectedJuncture, setSelectedJuncture] = useState<Juncture | null>(
+    null
+  )
   const [sort, setSort] = useState<string>(initialSort)
   const [order, setOrder] = useState<string>(initialOrder)
   const router = useRouter()
 
   type ValidSort = "created_at" | "updated_at" | "name"
-  const validSorts: readonly ValidSort[] = useMemo(() => ["created_at", "updated_at", "name"], [])
+  const validSorts: readonly ValidSort[] = useMemo(
+    () => ["created_at", "updated_at", "name"],
+    []
+  )
   type ValidOrder = "asc" | "desc"
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
-  const fetchJunctures = useCallback(async (page: number = 1, sort: string = "created_at", order: string = "desc", faction_id: string | null) => {
-    try {
-      const response = await client.getJunctures({ page, sort, order, faction_id })
-      dispatchForm({ type: FormActions.UPDATE, name: "junctures", value: response.data.junctures })
-      dispatchForm({ type: FormActions.UPDATE, name: "factions", value: response.data.factions })
-      dispatchForm({ type: FormActions.UPDATE, name: "meta", value: response.data.meta })
-      dispatchForm({ type: FormActions.ERROR, payload: null })
-    } catch (err: unknown) {
-      dispatchForm({
-        type: FormActions.ERROR,
-        payload: err instanceof Error ? err.message : "Failed to fetch junctures"
-      })
-      console.error("Fetch junctures error:", err)
-    }
-  }, [client, dispatchForm])
+  const fetchJunctures = useCallback(
+    async (
+      page: number = 1,
+      sort: string = "created_at",
+      order: string = "desc",
+      faction_id: string | null
+    ) => {
+      try {
+        const response = await client.getJunctures({
+          page,
+          sort,
+          order,
+          faction_id,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "junctures",
+          value: response.data.junctures,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "factions",
+          value: response.data.factions,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "meta",
+          value: response.data.meta,
+        })
+        dispatchForm({ type: FormActions.ERROR, payload: null })
+      } catch (error_: unknown) {
+        dispatchForm({
+          type: FormActions.ERROR,
+          payload:
+            error_ instanceof Error ? error_.message : "Failed to fetch junctures",
+        })
+        console.error("Fetch junctures error:", error_)
+      }
+    },
+    [client, dispatchForm]
+  )
 
   useEffect(() => {
     if (!campaignData) return
     if (campaignData.junctures === "reload") {
-      const params = new URLSearchParams(window.location.search)
-      const page = params.get("page") ? parseInt(params.get("page")!, 10) : 1
+      const params = new URLSearchParams(globalThis.location.search)
+      const page = params.get("page") ? Number.parseInt(params.get("page")!, 10) : 1
       const sortParam = params.get("sort")
       const orderParam = params.get("order")
-      const currentSort = sortParam && validSorts.includes(sortParam as ValidSort) ? sortParam : "created_at"
-      const currentOrder = orderParam && validOrders.includes(orderParam as ValidOrder) ? orderParam : "desc"
+      const currentSort =
+        sortParam && validSorts.includes(sortParam as ValidSort)
+          ? sortParam
+          : "created_at"
+      const currentOrder =
+        orderParam && validOrders.includes(orderParam as ValidOrder)
+          ? orderParam
+          : "desc"
       setSort(currentSort)
       setOrder(currentOrder)
       fetchJunctures(page, currentSort, currentOrder, faction_id)
     }
-  }, [client, campaignData, dispatchForm, fetchJunctures, validSorts, validOrders, faction_id])
+  }, [
+    client,
+    campaignData,
+    dispatchForm,
+    fetchJunctures,
+    validSorts,
+    validOrders,
+    faction_id,
+  ])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -92,11 +161,19 @@ export default function Junctures({ initialJunctures, initialFactions, initialMe
   }
 
   const handleSaveJuncture = async (newJuncture: Juncture) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "junctures", value: [newJuncture, ...junctures] })
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "junctures",
+      value: [newJuncture, ...junctures],
+    })
   }
 
   const handleDeleteJuncture = (junctureId: string) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "junctures", value: junctures.filter((juncture) => juncture.id !== junctureId) })
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "junctures",
+      value: junctures.filter(juncture => juncture.id !== junctureId),
+    })
     if (selectedJuncture?.id === junctureId) setSelectedJuncture(null)
     router.refresh()
   }
@@ -113,17 +190,27 @@ export default function Junctures({ initialJunctures, initialFactions, initialMe
     dispatchForm({
       type: FormActions.UPDATE,
       name: "junctures",
-      value: junctures.map((f) => (f.id === updatedJuncture.id ? updatedJuncture : f))
+      value: junctures.map(f =>
+        f.id === updatedJuncture.id ? updatedJuncture : f
+      ),
     })
     setSelectedJuncture(null)
   }
 
-  const handlePageChange = async (_event: React.ChangeEvent<unknown>, page: number) => {
+  const handlePageChange = async (
+    _event: React.ChangeEvent<unknown>,
+    page: number
+  ) => {
     if (page <= 0 || page > meta.total_pages) {
-      router.push(`/junctures?page=1&sort=${sort}&order=${order}`, { scroll: false })
+      router.push(`/junctures?page=1&sort=${sort}&order=${order}`, {
+        scroll: false,
+      })
       await fetchJunctures(1, sort, order, faction_id)
     } else {
-      router.push(`/junctures?page=${page}&sort=${sort}&order=${order}&faction_id=${faction_id}`, { scroll: false })
+      router.push(
+        `/junctures?page=${page}&sort=${sort}&order=${order}&faction_id=${faction_id}`,
+        { scroll: false }
+      )
       await fetchJunctures(page, sort, order, faction_id)
     }
   }
@@ -133,7 +220,10 @@ export default function Junctures({ initialJunctures, initialFactions, initialMe
     if (validSorts.includes(newSort)) {
       setSort(newSort)
       // Perform async operations
-      router.push(`/junctures?page=1&sort=${newSort}&order=${order}&faction_id=${faction_id}`, { scroll: false })
+      router.push(
+        `/junctures?page=1&sort=${newSort}&order=${order}&faction_id=${faction_id}`,
+        { scroll: false }
+      )
       fetchJunctures(1, newSort, order, faction_id)
     }
   }
@@ -141,21 +231,31 @@ export default function Junctures({ initialJunctures, initialFactions, initialMe
   const handleOrderChange = async () => {
     const newOrder = order === "asc" ? "desc" : "asc"
     setOrder(newOrder)
-    router.push(`/junctures?page=1&sort=${sort}&order=${newOrder}&faction_id=${faction_id}`, { scroll: false })
+    router.push(
+      `/junctures?page=1&sort=${sort}&order=${newOrder}&faction_id=${faction_id}`,
+      { scroll: false }
+    )
     await fetchJunctures(1, sort, newOrder, faction_id)
   }
 
   const handleFactionChange = async (value: string | null) => {
     const newFactionId = value
-    dispatchForm({ type: FormActions.UPDATE, name: "faction_id", value: newFactionId })
-    router.push(`/junctures?page=1&sort=${sort}&order=${order}&faction_id=${newFactionId}`, { scroll: false })
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "faction_id",
+      value: newFactionId,
+    })
+    router.push(
+      `/junctures?page=1&sort=${sort}&order=${order}&faction_id=${newFactionId}`,
+      { scroll: false }
+    )
     await fetchJunctures(1, sort, order, newFactionId)
   }
 
   const factionOptions = useMemo(() => {
-    return factions.map((faction) => ({
+    return factions.map(faction => ({
       label: faction.name || "",
-      value: faction.id || ""
+      value: faction.id || "",
     }))
   }, [factions])
 
@@ -166,13 +266,19 @@ export default function Junctures({ initialJunctures, initialFactions, initialMe
           variant="h4"
           sx={{
             color: "#ffffff",
-            fontSize: { xs: "1.5rem", sm: "2.125rem" }
+            fontSize: { xs: "1.5rem", sm: "2.125rem" },
           }}
         >
           Junctures
         </Typography>
         <Box sx={{ pb: 2 }}>
-          <Typography>A <InfoLink href="/junctures" info="Juncture" /> is a period in time which has <InfoLink info="Portals" /> opening to the <InfoLink info="Netherworld" />. A Juncture is controlled by the <InfoLink href="/factions" info="Faction" /> which controlls the most powerful <InfoLink href="/sites" info="Feng Shui Sites" />.</Typography>
+          <Typography>
+            A <InfoLink href="/junctures" info="Juncture" /> is a period in time
+            which has <InfoLink info="Portals" /> opening to the{" "}
+            <InfoLink info="Netherworld" />. A Juncture is controlled by the{" "}
+            <InfoLink href="/factions" info="Faction" /> which controlls the
+            most powerful <InfoLink href="/sites" info="Feng Shui Sites" />.
+          </Typography>
         </Box>
         <Box
           sx={{
@@ -180,7 +286,7 @@ export default function Junctures({ initialJunctures, initialFactions, initialMe
             flexDirection: "row",
             gap: { xs: 1, sm: 1.5 },
             alignItems: "center",
-            justifyContent: "space-between"
+            justifyContent: "space-between",
           }}
         >
           <Box
@@ -188,34 +294,47 @@ export default function Junctures({ initialJunctures, initialFactions, initialMe
               display: "flex",
               flexDirection: "row",
               gap: 1,
-              alignItems: "center"
+              alignItems: "center",
             }}
           >
             <FormControl sx={{ minWidth: { xs: 80, sm: 100 } }}>
-              <InputLabel id="sort-label" sx={{ color: "#ffffff" }}>Sort By</InputLabel>
+              <InputLabel id="sort-label" sx={{ color: "#ffffff" }}>
+                Sort By
+              </InputLabel>
               <Select
                 labelId="sort-label"
                 value={sort}
                 label="Sort By"
                 onChange={handleSortChange}
-                sx={{ color: "#ffffff", "& .MuiSvgIcon-root": { color: "#ffffff" } }}
+                sx={{
+                  color: "#ffffff",
+                  "& .MuiSvgIcon-root": { color: "#ffffff" },
+                }}
               >
                 <MenuItem value="created_at">Created At</MenuItem>
                 <MenuItem value="updated_at">Updated At</MenuItem>
                 <MenuItem value="name">Name</MenuItem>
               </Select>
             </FormControl>
-            <Tooltip title={order === "asc" ? "Sort Ascending" : "Sort Descending"}>
+            <Tooltip
+              title={order === "asc" ? "Sort Ascending" : "Sort Descending"}
+            >
               <IconButton
                 onClick={handleOrderChange}
                 sx={{ color: "#ffffff" }}
-                aria-label={order === "asc" ? "sort ascending" : "sort descending"}
+                aria-label={
+                  order === "asc" ? "sort ascending" : "sort descending"
+                }
               >
-                {order === "asc" ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                {order === "asc" ? (
+                  <KeyboardArrowUpIcon />
+                ) : (
+                  <KeyboardArrowDownIcon />
+                )}
               </IconButton>
             </Tooltip>
             <FormControl sx={{ minWidth: { xs: 120, sm: 140 } }}>
-              <FactionsAutocomplete
+              <FactionAutocomplete
                 options={factionOptions}
                 value={faction_id || ""}
                 onChange={handleFactionChange}
@@ -238,14 +357,22 @@ export default function Junctures({ initialJunctures, initialFactions, initialMe
           {error}
         </Alert>
       )}
-      <Pagination count={meta.total_pages} page={meta.current_page} onChange={handlePageChange} variant="outlined" color="primary" shape="rounded" size="large" />
+      <Pagination
+        count={meta.total_pages}
+        page={meta.current_page}
+        onChange={handlePageChange}
+        variant="outlined"
+        color="primary"
+        shape="rounded"
+        size="large"
+      />
       <Box my={2}>
         {junctures.length === 0 ? (
           <Typography variant="body1" sx={{ color: "#ffffff" }}>
             No junctures available
           </Typography>
         ) : (
-          junctures.map((juncture) => (
+          junctures.map(juncture => (
             <JunctureDetail
               key={juncture.id}
               juncture={juncture}
@@ -255,7 +382,15 @@ export default function Junctures({ initialJunctures, initialFactions, initialMe
           ))
         )}
       </Box>
-      <Pagination count={meta.total_pages} page={meta.current_page} onChange={handlePageChange} variant="outlined" color="primary" shape="rounded" size="large" />
+      <Pagination
+        count={meta.total_pages}
+        page={meta.current_page}
+        onChange={handlePageChange}
+        variant="outlined"
+        color="primary"
+        shape="rounded"
+        size="large"
+      />
       <CreateJunctureForm
         open={drawerOpen}
         onClose={handleCloseCreateDrawer}
@@ -272,4 +407,3 @@ export default function Junctures({ initialJunctures, initialFactions, initialMe
     </Box>
   )
 }
-

@@ -10,7 +10,11 @@ interface CreateSiteFormProps {
   onSave: (newSite: Site) => void
 }
 
-export default function CreateSiteForm({ open, onClose, onSave }: CreateSiteFormProps) {
+export default function CreateSiteForm({
+  open,
+  onClose,
+  onSave,
+}: CreateSiteFormProps) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, siteData: Site) => {
@@ -25,9 +29,8 @@ export default function CreateSiteForm({ open, onClose, onSave }: CreateSiteForm
       open={open}
       onClose={onClose}
       onSave={handleSave}
-      initialFormData={{ name: "", description: "", image: null }}
+      initialFormData={{ ...defaultSite, image: null }}
       title="New Site"
     />
   )
 }
-

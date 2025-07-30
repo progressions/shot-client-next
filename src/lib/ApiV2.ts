@@ -1,5 +1,7 @@
 import {
   ID,
+  User,
+  Campaign,
   Fight,
   Character,
   Vehicle,
@@ -12,82 +14,77 @@ import {
 } from "@/types"
 
 class ApiV2 {
-  base():string { return process.env.NEXT_PUBLIC_SERVER_URL as string }
+  base(): string {
+    return process.env.NEXT_PUBLIC_SERVER_URL as string
+  }
 
-  api():string { return `${this.base()}/api/v2` }
+  api(): string {
+    return `${this.base()}/api/v2`
+  }
 
   characters(character?: Character | ID): string {
-    if (character?.id) {
-      return `${this.api()}/characters/${character.id}`
-    } else {
-      return `${this.api()}/characters`
-    }
+    return character?.id ? `${this.api()}/characters/${character.id}` : `${this.api()}/characters`;
   }
 
   vehicles(vehicle?: Vehicle | ID): string {
-    if (vehicle?.id) {
-      return `${this.api()}/vehicles/${vehicle.id}`
-    } else {
-      return `${this.api()}/vehicles`
-    }
+    return vehicle?.id ? `${this.api()}/vehicles/${vehicle.id}` : `${this.api()}/vehicles`;
   }
 
   sites(site?: Site | ID): string {
-    if (site?.id) {
-      return `${this.api()}/sites/${site.id}`
-    } else {
-      return `${this.api()}/sites`
-    }
+    return site?.id ? `${this.api()}/sites/${site.id}` : `${this.api()}/sites`;
   }
 
   junctures(juncture?: Juncture | ID): string {
-    if (juncture?.id) {
-      return `${this.api()}/junctures/${juncture.id}`
-    } else {
-      return `${this.api()}/junctures`
-    }
+    return juncture?.id ? `${this.api()}/junctures/${juncture.id}` : `${this.api()}/junctures`;
   }
 
   parties(party?: Party | ID): string {
-    if (party?.id) {
-      return `${this.api()}/parties/${party.id}`
-    } else {
-      return `${this.api()}/parties`
-    }
+    return party?.id ? `${this.api()}/parties/${party.id}` : `${this.api()}/parties`;
   }
 
   weapons(weapon?: Weapon | ID): string {
-    if (weapon?.id) {
-      return `${this.api()}/weapons/${weapon.id}`
-    } else {
-      return `${this.api()}/weapons`
-    }
+    return weapon?.id ? `${this.api()}/weapons/${weapon.id}` : `${this.api()}/weapons`;
+  }
+
+  weaponJunctures(): string {
+    return `${this.api()}/weapons/junctures`
+  }
+
+  weaponCategories(): string {
+    return `${this.api()}/weapons/categories`
   }
 
   schticks(schtick?: Schtick | ID): string {
-    if (schtick?.id) {
-      return `${this.api()}/schticks/${schtick.id}`
-    } else {
-      return `${this.api()}/schticks`
-    }
+    return schtick?.id ? `${this.api()}/schticks/${schtick.id}` : `${this.api()}/schticks`;
+  }
+
+  schtickCategories(): string {
+    return `${this.api()}/schticks/categories`
+  }
+
+  schtickPaths(): string {
+    return `${this.api()}/schticks/paths`
   }
 
   factions(faction?: Faction | ID): string {
-    if (faction?.id) {
-      return `${this.api()}/factions/${faction.id}`
-    } else {
-      return `${this.api()}/factions`
-    }
+    return faction?.id ? `${this.api()}/factions/${faction.id}` : `${this.api()}/factions`;
   }
 
-  fights(fight?: Fight | ID | undefined): string {
-    if (fight?.id) {
-      return `${this.api()}/fights/${fight.id}`
-    } else {
-      return `${this.api()}/fights`
-    }
+  fights(fight?: Fight | ID): string {
+    return fight?.id ? `${this.api()}/fights/${fight.id}` : `${this.api()}/fights`;
   }
 
+  currentCampaign() {
+    return `${this.campaigns()}/current`
+  }
+
+  campaigns(campaign?: Campaign | ID) {
+    return campaign ? `${this.api()}/campaigns/${campaign.id}` : `${this.api()}/campaigns`;
+  }
+
+  users(user?: User | ID): string {
+    return user ? `${this.api()}/users/${user.id}` : `${this.api()}/users`;
+  }
 }
 
 export default ApiV2

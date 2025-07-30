@@ -1,7 +1,7 @@
 "use client"
 
 import { useClient } from "@/contexts"
-import { type Schtick } from "@/types/types"
+import { type Schtick } from "@/types"
 import SchtickForm from "./SchtickForm"
 
 interface EditSchtickFormProps {
@@ -11,18 +11,22 @@ interface EditSchtickFormProps {
   schtick: Schtick
 }
 
-export default function EditSchtickForm({ open, onClose, onSave, schtick }: EditSchtickFormProps) {
+export default function EditSchtickForm({
+  open,
+  onClose,
+  onSave,
+  schtick,
+}: EditSchtickFormProps) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, schtickData: Schtick) => {
     const updatedSchtickData = {
       ...schtick,
-      id: schtick.id,
-      name: schtickData.name,
-      description: schtickData.description,
+      ...schtickData,
     } as Schtick
+    console.log("updatedSchtickData", updatedSchtickData)
     formData.set("schtick", JSON.stringify(updatedSchtickData))
-    const response = await client.updateSchtick(schtick.id as string, formData)
+    const response = await client.updateSchtick(schtick.id, formData)
     onSave(response.data)
   }
 
@@ -31,10 +35,9 @@ export default function EditSchtickForm({ open, onClose, onSave, schtick }: Edit
       open={open}
       onClose={onClose}
       onSave={handleSave}
-      initialFormData={{ name: schtick.name || "", description: schtick.description || "", image: null }}
+      initialFormData={{ ...schtick, image: null }}
       title="Edit Schtick"
       existingImageUrl={schtick.image_url}
     />
   )
 }
-

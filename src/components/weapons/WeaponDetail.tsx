@@ -1,13 +1,25 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardContent, CardMedia, Box, Alert, IconButton, Tooltip, Typography } from "@mui/material"
+import {
+  Stack,
+  Chip,
+  Card,
+  CardContent,
+  CardMedia,
+  Box,
+  Alert,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
-import type { Weapon } from "@/types/types"
+import type { Weapon } from "@/types"
 import Link from "next/link"
-import { WeaponName, WeaponDescription } from "@/components/weapons"
+import { WeaponName } from "@/components/weapons"
 import { useCampaign, useClient } from "@/contexts"
+import { RichTextRenderer } from "@/components/editor"
 
 interface WeaponDetailProps {
   weapon: Weapon
@@ -15,7 +27,11 @@ interface WeaponDetailProps {
   onEdit: (weapon: Weapon) => void
 }
 
-export default function WeaponDetail({ weapon: initialWeapon, onDelete, onEdit }: WeaponDetailProps) {
+export default function WeaponDetail({
+  weapon: initialWeapon,
+  onDelete,
+  onEdit,
+}: WeaponDetailProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
@@ -23,29 +39,22 @@ export default function WeaponDetail({ weapon: initialWeapon, onDelete, onEdit }
 
   useEffect(() => {
     if (campaignData?.weapon && campaignData.weapon.id === initialWeapon.id) {
-      setWeapon({
-        ...initialWeapon,
-        name: campaignData.weapon.name || initialWeapon.name,
-        description: campaignData.weapon.description || initialWeapon.description,
-        damage: campaignData.weapon.damage || initialWeapon.damage,
-        concealment: campaignData.weapon.concealment || initialWeapon.concealment,
-        reload_value: campaignData.weapon.reload_value || initialWeapon.reload_value,
-        image_url: campaignData.weapon.image_url || initialWeapon.image_url,
-      })
+      setWeapon(campaignData.weapon)
     }
   }, [campaignData, initialWeapon])
 
   const handleDelete = async () => {
     if (!weapon?.id) return
-    if (!confirm(`Are you sure you want to delete the weapon: ${weapon.name}?`)) return
+    if (!confirm(`Are you sure you want to delete the weapon: ${weapon.name}?`))
+      return
 
     try {
       await client.deleteWeapon(weapon)
       onDelete(weapon.id)
       setError(null)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete weapon")
-      console.error("Delete weapon error:", err)
+    } catch (error_) {
+      setError(error_ instanceof Error ? error_.message : "Failed to delete weapon")
+      console.error("Delete weapon error:", error_)
     }
   }
 
@@ -65,12 +74,19 @@ export default function WeaponDetail({ weapon: initialWeapon, onDelete, onEdit }
         />
       )}
       <CardContent sx={{ p: "1rem" }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Typography variant="h6" sx={{ color: "#ffffff" }}>
             <Link href={`/weapons/${weapon.id}`} style={{ color: "#fff" }}>
               <WeaponName weapon={weapon} />
-            </Link>
-            {' '}({weapon.damage}/{weapon.concealment || "-"}/{weapon.reload_value || "-"})
+            </Link>{" "}
+            ({weapon.damage}/{weapon.concealment || "-"}/
+            {weapon.reload_value || "-"})
           </Typography>
           <Box sx={{ display: "flex", gap: "0.5rem" }}>
             <Tooltip title="Edit Weapon">
@@ -95,18 +111,28 @@ export default function WeaponDetail({ weapon: initialWeapon, onDelete, onEdit }
             </Tooltip>
           </Box>
         </Box>
+        <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+          {weapon.juncture && (
+            <Typography variant="h6" sx={{ mb: 1 }}>
+              <Chip size="small" label={`${weapon.juncture}`} />
+            </Typography>
+          )}
+          {weapon.category && (
+            <Typography variant="h6" sx={{ mb: 1 }}>
+              <Chip size="small" label={`${weapon.category}`} />
+            </Typography>
+          )}
+        </Stack>
         <Box sx={{ mt: 1, mb: 2 }}>
           <Typography variant="body2">
             Damage: {weapon.damage || "Unknown"}
-          </Typography>
-          <Typography variant="body2">
+            {" / "}
             Concealment: {weapon.concealment || "-"}
-          </Typography>
-          <Typography variant="body2">
+            {" / "}
             Reload: {weapon.reload_value || "-"}
           </Typography>
         </Box>
-        <WeaponDescription weapon={weapon} />
+        <RichTextRenderer key={weapon.description} html={weapon.description} />
         {error && (
           <Alert severity="error" sx={{ mt: 2 }}>
             {error}

@@ -1,10 +1,19 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Alert, Card, CardContent, CardMedia, Box, IconButton, Tooltip, Typography } from "@mui/material"
+import {
+  Alert,
+  Card,
+  CardContent,
+  CardMedia,
+  Box,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
-import type { Party } from "@/types/types"
+import type { Party } from "@/types"
 import Link from "next/link"
 import { PartyName, PartyDescription } from "@/components/parties"
 import { useCampaign, useClient } from "@/contexts"
@@ -16,7 +25,11 @@ interface PartyDetailProps {
   onEdit: (party: Party) => void
 }
 
-export default function PartyDetail({ party: initialParty, onDelete, onEdit }: PartyDetailProps) {
+export default function PartyDetail({
+  party: initialParty,
+  onDelete,
+  onEdit,
+}: PartyDetailProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
@@ -30,15 +43,16 @@ export default function PartyDetail({ party: initialParty, onDelete, onEdit }: P
 
   const handleDelete = async () => {
     if (!party?.id) return
-    if (!confirm(`Are you sure you want to delete the party: ${party.name}?`)) return
+    if (!confirm(`Are you sure you want to delete the party: ${party.name}?`))
+      return
 
     try {
       await client.deleteParty(party)
       onDelete(party.id)
       setError(null)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete party")
-      console.error("Delete party error:", err)
+    } catch (error_) {
+      setError(error_ instanceof Error ? error_.message : "Failed to delete party")
+      console.error("Delete party error:", error_)
     }
   }
 
@@ -67,7 +81,13 @@ export default function PartyDetail({ party: initialParty, onDelete, onEdit }: P
         />
       )}
       <CardContent sx={{ p: "1rem" }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Typography variant="h6" sx={{ color: "#ffffff" }}>
             <Link href={`/parties/${party.id}`} style={{ color: "#fff" }}>
               <PartyName party={party} />
@@ -96,20 +116,29 @@ export default function PartyDetail({ party: initialParty, onDelete, onEdit }: P
             </Tooltip>
           </Box>
         </Box>
-        { party.faction && <Typography variant="body1" sx={{ textTransform: "lowercase", fontVariant: "small-caps", mb: 2, color: "#ffffff" }}>
-          Belongs to{' '}
-          <FactionLink faction={party.faction} />
-        </Typography> }
+        {party.faction && (
+          <Typography
+            variant="body1"
+            sx={{
+              textTransform: "lowercase",
+              fontVariant: "small-caps",
+              mb: 2,
+              color: "#ffffff",
+            }}
+          >
+            Belongs to <FactionLink faction={party.faction} />
+          </Typography>
+        )}
         <PartyDescription party={party} />
         <Typography variant="body2" sx={{ mt: 2 }}>
-          {party.characters && party.characters.length > 0 ? (
-            party.characters.map((actor, index) => (
-              <span key={`${actor.id}-${index}`}>
-                <CharacterLink character={actor} />
-                {index < party.characters.length - 1 && ", "}
-              </span>
-            ))
-          ) : null }
+          {party.characters && party.characters.length > 0
+            ? party.characters.map((actor, index) => (
+                <span key={`${actor.id}-${index}`}>
+                  <CharacterLink character={actor} />
+                  {index < party.characters.length - 1 && ", "}
+                </span>
+              ))
+            : null}
         </Typography>
         <Typography variant="body2" sx={{ mt: 2, color: "#ffffff" }}>
           Created: {formattedCreatedAt}

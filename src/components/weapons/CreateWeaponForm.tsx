@@ -10,7 +10,11 @@ interface CreateWeaponFormProps {
   onSave: (newWeapon: Weapon) => void
 }
 
-export default function CreateWeaponForm({ open, onClose, onSave }: CreateWeaponFormProps) {
+export default function CreateWeaponForm({
+  open,
+  onClose,
+  onSave,
+}: CreateWeaponFormProps) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, weaponData: Weapon) => {
@@ -30,4 +34,3 @@ export default function CreateWeaponForm({ open, onClose, onSave }: CreateWeapon
     />
   )
 }
-

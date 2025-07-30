@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
-import type { Faction } from "@/types/types"
+import type { Faction } from "@/types"
 import { FactionPageClient } from "@/components/factions"
 
 type FactionPageProps = {
@@ -20,7 +20,5 @@ export default async function FactionPage({ params }: FactionPageProps) {
     return <Typography>Faction not found</Typography>
   }
 
-  return (
-    <FactionPageClient faction={faction} />
-  )
+  return <FactionPageClient faction={faction} />
 }

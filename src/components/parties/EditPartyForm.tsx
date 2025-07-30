@@ -1,7 +1,7 @@
 "use client"
 
 import { useClient } from "@/contexts"
-import { type Party } from "@/types/types"
+import { type Party } from "@/types"
 import PartyForm from "./PartyForm"
 
 interface EditPartyFormProps {
@@ -11,7 +11,12 @@ interface EditPartyFormProps {
   party: Party
 }
 
-export default function EditPartyForm({ open, onClose, onSave, party }: EditPartyFormProps) {
+export default function EditPartyForm({
+  open,
+  onClose,
+  onSave,
+  party,
+}: EditPartyFormProps) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, partyData: Party) => {
@@ -21,7 +26,7 @@ export default function EditPartyForm({ open, onClose, onSave, party }: EditPart
     } as Party
 
     formData.set("party", JSON.stringify(updatedPartyData))
-    const response = await client.updateParty(party.id as string, formData)
+    const response = await client.updateParty(party.id, formData)
     onSave(response.data)
   }
 
@@ -36,4 +41,3 @@ export default function EditPartyForm({ open, onClose, onSave, party }: EditPart
     />
   )
 }
-

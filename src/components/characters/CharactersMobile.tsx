@@ -1,6 +1,18 @@
 "use client"
 
-import { useMediaQuery, Stack, Box, Typography, Card, CardContent, Pagination, FormControl, InputLabel, Select, MenuItem } from "@mui/material"
+import {
+  useMediaQuery,
+  Stack,
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Pagination,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material"
 import type { SelectChangeEvent } from "@mui/material"
 import { type PaginationMeta, type Character } from "@/types"
 import { useTheme } from "@mui/material/styles"
@@ -15,7 +27,7 @@ export default function CharactersMobile({
   order,
   onPageChange,
   onSortChange,
-  onOrderChange
+  onOrderChange,
 }: {
   characters: Character[]
   meta: PaginationMeta
@@ -37,13 +49,18 @@ export default function CharactersMobile({
     <Stack spacing={2}>
       <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
         <FormControl sx={{ minWidth: 120 }}>
-          <InputLabel id="sort-label" sx={{ color: "#ffffff" }}>Sort By</InputLabel>
+          <InputLabel id="sort-label" sx={{ color: "#ffffff" }}>
+            Sort By
+          </InputLabel>
           <Select
             labelId="sort-label"
             value={sort}
             label="Sort By"
             onChange={onSortChange}
-            sx={{ color: "#ffffff", "& .MuiSvgIcon-root": { color: "#ffffff" } }}
+            sx={{
+              color: "#ffffff",
+              "& .MuiSvgIcon-root": { color: "#ffffff" },
+            }}
           >
             <MenuItem value="name">Name</MenuItem>
             <MenuItem value="created_at">Created</MenuItem>
@@ -56,26 +73,40 @@ export default function CharactersMobile({
             color: "#ffffff",
             cursor: "pointer",
             fontSize: "0.875rem",
-            textDecoration: "underline"
+            textDecoration: "underline",
           }}
         >
           {order === "asc" ? "↑ Asc" : "↓ Desc"}
         </Typography>
       </Box>
       {characters.length === 0 ? (
-        <Typography sx={{ color: "#ffffff" }}>No characters available</Typography>
+        <Typography sx={{ color: "#ffffff" }}>
+          No characters available
+        </Typography>
       ) : (
-        characters.map((character) => (
-          <Card key={character.id} sx={{ bgcolor: "#424242", color: "#ffffff" }}>
+        characters.map(character => (
+          <Card
+            key={character.id}
+            sx={{ bgcolor: "#424242", color: "#ffffff" }}
+          >
             <CardContent sx={{ p: 2 }}>
               <Typography variant="body1">
-                <Link href={`/characters/${character.id}`} style={{ color: "#ffffff", textDecoration: "underline" }}>
+                <Link
+                  href={`/characters/${character.id}`}
+                  style={{ color: "#ffffff", textDecoration: "underline" }}
+                >
                   <CharacterName character={character} />
                 </Link>
               </Typography>
-              <Typography variant="body2">Type: {CS.type(character)}</Typography>
-              <Typography variant="body2">Created: {formatDate(character.created_at || "")}</Typography>
-              <Typography variant="body2">Active: {character.active ? "Yes" : "No"}</Typography>
+              <Typography variant="body2">
+                Type: {CS.type(character)}
+              </Typography>
+              <Typography variant="body2">
+                Created: {formatDate(character.created_at || "")}
+              </Typography>
+              <Typography variant="body2">
+                Active: {character.active ? "Yes" : "No"}
+              </Typography>
             </CardContent>
           </Card>
         ))

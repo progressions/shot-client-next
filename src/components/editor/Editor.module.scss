@@ -2,7 +2,7 @@
   border: 1px solid var(--grey-800);
   border-radius: 4px;
   min-height: 100px;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   width: 100%;
 
   .controlGroup {
@@ -25,7 +25,7 @@
         border-radius: 4px;
         cursor: pointer;
         font-size: 14px;
-        font-family: 'Roboto', sans-serif;
+        font-family: "Roboto", sans-serif;
         color: var(--black);
 
         &:hover {
@@ -127,7 +127,8 @@
   z-index: 1000;
 }
 
-.mentionCategoryLabel, .mentionItem {
+.mentionCategoryLabel,
+.mentionItem {
   color: var(--white);
   background: none;
   border: none;
@@ -136,7 +137,7 @@
   padding: 0.5rem 1rem;
   width: 100%;
   text-align: left;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   font-size: 1rem;
 
   &.focused {
@@ -150,7 +151,6 @@
 .selectedMentionItem {
   background: #3a3a3a;
 }
-
 
 .richText {
   a {
@@ -186,4 +186,3 @@
     }
   }
 }
-

@@ -1,9 +1,17 @@
 import ThemeRegistry from "@/components/ThemeRegistry"
-import { CampaignProvider, ClientProvider, LocalStorageProvider } from "@/contexts"
+import {
+  CampaignProvider,
+  ClientProvider,
+  LocalStorageProvider,
+} from "@/contexts"
 import { getUser } from "@/lib/getServerClient"
 import "@/styles/global.scss"
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const user = await getUser()
 
   return (
@@ -12,9 +20,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <ThemeRegistry>
           <LocalStorageProvider>
             <ClientProvider initialUser={user}>
-              <CampaignProvider>
-                {children}
-              </CampaignProvider>
+              <CampaignProvider>{children}</CampaignProvider>
             </ClientProvider>
           </LocalStorageProvider>
         </ThemeRegistry>

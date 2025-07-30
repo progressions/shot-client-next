@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useCampaign } from "@/contexts"
-import type { Weapon } from "@/types/types"
+import type { Weapon } from "@/types"
 
 interface WeaponNameProps {
   weapon: Weapon
@@ -15,15 +15,11 @@ export default function WeaponName({ weapon }: WeaponNameProps) {
   useEffect(() => {
     if (campaignData && "weapon" in campaignData) {
       const updatedWeapon = campaignData.weapon
-      if (updatedWeapon && updatedWeapon.id === weapon.id) {
-        if (updatedWeapon.name) {
+      if (updatedWeapon && updatedWeapon.id === weapon.id && updatedWeapon.name) {
           setDisplayName(updatedWeapon.name)
         }
-      }
     }
   }, [campaignData, weapon.id])
 
-  return (<>
-    {displayName}
-  </>)
+  return <>{displayName}</>
 }

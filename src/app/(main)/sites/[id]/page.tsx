@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
-import type { Site } from "@/types/types"
+import type { Site } from "@/types"
 import { SitePageClient } from "@/components/sites"
 
 type SitePageProps = {
@@ -20,7 +20,5 @@ export default async function SitePage({ params }: SitePageProps) {
     return <Typography>Site not found</Typography>
   }
 
-  return (
-    <SitePageClient site={site} />
-  )
+  return <SitePageClient site={site} />
 }

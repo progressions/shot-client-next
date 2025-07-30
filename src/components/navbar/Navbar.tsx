@@ -21,7 +21,13 @@ export default function Navbar() {
 
   return (
     <AppBar position="static" sx={{ bgcolor: "#1d1d1d" }}>
-      <Toolbar sx={{ display: "flex", justifyContent: "space-between", px: { xs: 1, sm: 2 } }}>
+      <Toolbar
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          px: { xs: 1, sm: 2 },
+        }}
+      >
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <MainMenu />
           <Typography
@@ -31,16 +37,22 @@ export default function Navbar() {
             sx={{
               color: "#ffffff",
               textDecoration: "none",
-              fontSize: { xs: "1.25rem", sm: "1.5rem" }
+              fontSize: { xs: "1.25rem", sm: "1.5rem" },
             }}
           >
             Chi War
           </Typography>
         </Box>
-        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1, sm: 2 } }}>
+        <Box
+          sx={{ display: "flex", alignItems: "center", gap: { xs: 1, sm: 2 } }}
+        >
           {user.id ? (
             <>
-              <Avatar src={user.image_url ?? undefined} alt={user.name} sx={{ width: 32, height: 32 }} />
+              <Avatar
+                src={user.image_url ?? undefined}
+                alt={user.name}
+                sx={{ width: 32, height: 32 }}
+              />
               <Button variant="outlined" color="error" onClick={handleLogout}>
                 Logout
               </Button>

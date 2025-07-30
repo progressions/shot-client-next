@@ -2,9 +2,28 @@
 
 import { useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Pagination, Box, Typography, Container, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, useMediaQuery, Card, CardContent, Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material"
+import {
+  Pagination,
+  Box,
+  Typography,
+  Container,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  useMediaQuery,
+  Card,
+  CardContent,
+  Stack,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material"
 import Link from "next/link"
-import type { Character, PaginationMeta } from "@/types/types"
+import type { Character, PaginationMeta } from "@/types"
 import { useClient } from "@/contexts"
 import { useTheme } from "@mui/material/styles"
 import type { SelectChangeEvent } from "@mui/material"
@@ -20,7 +39,12 @@ interface CharactersProps {
 }
 
 type ValidSort = "name" | "type" | "created_at" | "updated_at"
-const validSorts: readonly ValidSort[] = ["name", "type", "created_at", "updated_at"]
+const validSorts: readonly ValidSort[] = [
+  "name",
+  "type",
+  "created_at",
+  "updated_at",
+]
 type ValidOrder = "asc" | "desc"
 
 // Mobile-specific component
@@ -31,7 +55,7 @@ function CharactersMobile({
   order,
   onPageChange,
   onSortChange,
-  onOrderChange
+  onOrderChange,
 }: {
   characters: Character[]
   meta: PaginationMeta
@@ -53,13 +77,18 @@ function CharactersMobile({
     <Stack spacing={2}>
       <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
         <FormControl sx={{ minWidth: 120 }}>
-          <InputLabel id="sort-label" sx={{ color: "#ffffff" }}>Sort By</InputLabel>
+          <InputLabel id="sort-label" sx={{ color: "#ffffff" }}>
+            Sort By
+          </InputLabel>
           <Select
             labelId="sort-label"
             value={sort}
             label="Sort By"
             onChange={onSortChange}
-            sx={{ color: "#ffffff", "& .MuiSvgIcon-root": { color: "#ffffff" } }}
+            sx={{
+              color: "#ffffff",
+              "& .MuiSvgIcon-root": { color: "#ffffff" },
+            }}
           >
             <MenuItem value="name">Name</MenuItem>
             <MenuItem value="created_at">Created</MenuItem>
@@ -72,26 +101,40 @@ function CharactersMobile({
             color: "#ffffff",
             cursor: "pointer",
             fontSize: "0.875rem",
-            textDecoration: "underline"
+            textDecoration: "underline",
           }}
         >
           {order === "asc" ? "↑ Asc" : "↓ Desc"}
         </Typography>
       </Box>
       {characters.length === 0 ? (
-        <Typography sx={{ color: "#ffffff" }}>No characters available</Typography>
+        <Typography sx={{ color: "#ffffff" }}>
+          No characters available
+        </Typography>
       ) : (
-        characters.map((character) => (
-          <Card key={character.id} sx={{ bgcolor: "#424242", color: "#ffffff" }}>
+        characters.map(character => (
+          <Card
+            key={character.id}
+            sx={{ bgcolor: "#424242", color: "#ffffff" }}
+          >
             <CardContent sx={{ p: 2 }}>
               <Typography variant="body1">
-                <Link href={`/characters/${character.id}`} style={{ color: "#ffffff", textDecoration: "underline" }}>
+                <Link
+                  href={`/characters/${character.id}`}
+                  style={{ color: "#ffffff", textDecoration: "underline" }}
+                >
                   <CharacterName character={character} />
                 </Link>
               </Typography>
-              <Typography variant="body2">Type: {CS.type(character)}</Typography>
-              <Typography variant="body2">Created: {formatDate(character.created_at || "")}</Typography>
-              <Typography variant="body2">Active: {character.active ? "Yes" : "No"}</Typography>
+              <Typography variant="body2">
+                Type: {CS.type(character)}
+              </Typography>
+              <Typography variant="body2">
+                Created: {formatDate(character.created_at || "")}
+              </Typography>
+              <Typography variant="body2">
+                Active: {character.active ? "Yes" : "No"}
+              </Typography>
             </CardContent>
           </Card>
         ))
@@ -117,7 +160,12 @@ type FormStateData = {
   order: string
 }
 
-export default function Characters({ initialCharacters, initialMeta, initialSort, initialOrder }: CharactersProps) {
+export default function Characters({
+  initialCharacters,
+  initialMeta,
+  initialSort,
+  initialOrder,
+}: CharactersProps) {
   const { client } = useClient()
   const router = useRouter()
   const theme = useTheme()
@@ -126,26 +174,44 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
     characters: initialCharacters,
     meta: initialMeta,
     sort: initialSort,
-    order: initialOrder
+    order: initialOrder,
   })
   const { characters, meta, sort, order } = formState.data
 
-  const fetchCharacters = useCallback(async (page: number = 1, sort: string = "name", order: string = "asc") => {
-    try {
-      const response = await client.getCharacters({ page, sort, order })
-      dispatchForm({ type: FormActions.UPDATE, name: "characters", value: response.data.characters })
-      dispatchForm({ type: FormActions.UPDATE, name: "meta", value: response.data.meta })
-    } catch (err) {
-      console.error("Fetch characters error:", err)
-    }
-  }, [client, dispatchForm])
+  const fetchCharacters = useCallback(
+    async (page: number = 1, sort: string = "name", order: string = "asc") => {
+      try {
+        const response = await client.getCharacters({ page, sort, order })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "characters",
+          value: response.data.characters,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "meta",
+          value: response.data.meta,
+        })
+      } catch (error) {
+        console.error("Fetch characters error:", error)
+      }
+    },
+    [client, dispatchForm]
+  )
 
-  const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
+  const handlePageChange = (
+    _event: React.ChangeEvent<unknown>,
+    page: number
+  ) => {
     if (page <= 0 || page > meta.total_pages) {
-      router.push(`/characters?page=1&sort=${sort}&order=${order}`, { scroll: false })
+      router.push(`/characters?page=1&sort=${sort}&order=${order}`, {
+        scroll: false,
+      })
       fetchCharacters(1, sort, order)
     } else {
-      router.push(`/characters?page=${page}&sort=${sort}&order=${order}`, { scroll: false })
+      router.push(`/characters?page=${page}&sort=${sort}&order=${order}`, {
+        scroll: false,
+      })
       fetchCharacters(page, sort, order)
     }
   }
@@ -154,7 +220,9 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
     const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/characters?page=1&sort=${newSort}&order=${newOrder}`, { scroll: false })
+    router.push(`/characters?page=1&sort=${newSort}&order=${newOrder}`, {
+      scroll: false,
+    })
     fetchCharacters(1, newSort, newOrder)
   }
 
@@ -163,7 +231,9 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
     if (validSorts.includes(newSort)) {
       dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
       dispatchForm({ type: FormActions.UPDATE, name: "order", value: "asc" })
-      router.push(`/characters?page=1&sort=${newSort}&order=asc`, { scroll: false })
+      router.push(`/characters?page=1&sort=${newSort}&order=asc`, {
+        scroll: false,
+      })
       fetchCharacters(1, newSort, "asc")
     }
   }
@@ -171,7 +241,9 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
   const handleOrderChangeMobile = () => {
     const newOrder = order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/characters?page=1&sort=${sort}&order=${newOrder}`, { scroll: false })
+    router.push(`/characters?page=1&sort=${sort}&order=${newOrder}`, {
+      scroll: false,
+    })
     fetchCharacters(1, sort, newOrder)
   }
 
@@ -192,7 +264,11 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
       <Container maxWidth="md">
         <Typography
           variant="h4"
-          sx={{ color: "#ffffff", fontSize: { xs: "1.5rem", sm: "2.125rem" }, mb: 2 }}
+          sx={{
+            color: "#ffffff",
+            fontSize: { xs: "1.5rem", sm: "2.125rem" },
+            mb: 2,
+          }}
         >
           Characters
         </Typography>
@@ -213,7 +289,11 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
     <>
       <Typography
         variant="h4"
-        sx={{ color: "#ffffff", fontSize: { xs: "1.5rem", sm: "2.125rem" }, mb: 2 }}
+        sx={{
+          color: "#ffffff",
+          fontSize: { xs: "1.5rem", sm: "2.125rem" },
+          mb: 2,
+        }}
       >
         Characters
       </Typography>
@@ -229,40 +309,52 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
               <TableCell sx={{ color: "#ffffff" }}>
                 <TableSortLabel
                   active={sort === "name"}
-                  direction={sort === "name" ? order as ValidOrder : "asc"}
+                  direction={sort === "name" ? (order as ValidOrder) : "asc"}
                   onClick={() => handleSortChange("name")}
                   sx={{
                     color: "#ffffff",
                     "&.Mui-active": { color: "#ffffff" },
-                    "& .MuiTableSortLabel-icon": { color: "#ffffff !important" }
+                    "& .MuiTableSortLabel-icon": {
+                      color: "#ffffff !important",
+                    },
                   }}
                 >
                   Name
                 </TableSortLabel>
               </TableCell>
-              <TableCell sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}>
+              <TableCell
+                sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}
+              >
                 <TableSortLabel
                   active={sort === "type"}
-                  direction={sort === "type" ? order as ValidOrder : "asc"}
+                  direction={sort === "type" ? (order as ValidOrder) : "asc"}
                   onClick={() => handleSortChange("type")}
                   sx={{
                     color: "#ffffff",
                     "&.Mui-active": { color: "#ffffff" },
-                    "& .MuiTableSortLabel-icon": { color: "#ffffff !important" }
+                    "& .MuiTableSortLabel-icon": {
+                      color: "#ffffff !important",
+                    },
                   }}
                 >
                   Type
                 </TableSortLabel>
               </TableCell>
-              <TableCell sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}>
+              <TableCell
+                sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}
+              >
                 <TableSortLabel
                   active={sort === "created_at"}
-                  direction={sort === "created_at" ? order as ValidOrder : "asc"}
+                  direction={
+                    sort === "created_at" ? (order as ValidOrder) : "asc"
+                  }
                   onClick={() => handleSortChange("created_at")}
                   sx={{
                     color: "#ffffff",
                     "&.Mui-active": { color: "#ffffff" },
-                    "& .MuiTableSortLabel-icon": { color: "#ffffff !important" }
+                    "& .MuiTableSortLabel-icon": {
+                      color: "#ffffff !important",
+                    },
                   }}
                 >
                   Created
@@ -273,7 +365,7 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
                   color: "#ffffff",
                   width: { xs: "60px", sm: "100px" },
                   textAlign: "center",
-                  padding: { xs: "8px 4px", sm: "16px 8px" }
+                  padding: { xs: "8px 4px", sm: "16px 8px" },
                 }}
               >
                 Active
@@ -288,24 +380,40 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
                 </TableCell>
               </TableRow>
             ) : (
-              characters.map((character) => (
-                <TableRow key={character.id} sx={{ "&:hover": { bgcolor: "#616161" } }}>
+              characters.map(character => (
+                <TableRow
+                  key={character.id}
+                  sx={{ "&:hover": { bgcolor: "#616161" } }}
+                >
                   <TableCell
                     sx={{
                       color: "#ffffff",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
-                      whiteSpace: "nowrap"
+                      whiteSpace: "nowrap",
                     }}
                   >
-                    <Link href={`/characters/${character.id}`} style={{ color: "#ffffff", textDecoration: "underline" }}>
+                    <Link
+                      href={`/characters/${character.id}`}
+                      style={{ color: "#ffffff", textDecoration: "underline" }}
+                    >
                       <CharacterName character={character} />
                     </Link>
                   </TableCell>
-                  <TableCell sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}>
+                  <TableCell
+                    sx={{
+                      color: "#ffffff",
+                      width: { xs: "65px", sm: "150px" },
+                    }}
+                  >
                     {CS.type(character)}
                   </TableCell>
-                  <TableCell sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}>
+                  <TableCell
+                    sx={{
+                      color: "#ffffff",
+                      width: { xs: "65px", sm: "150px" },
+                    }}
+                  >
                     {formatDate(character.created_at || "")}
                   </TableCell>
                   <TableCell
@@ -313,7 +421,7 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
                       color: "#ffffff",
                       width: { xs: "60px", sm: "100px" },
                       textAlign: "center",
-                      padding: { xs: "8px 4px", sm: "16px 8px" }
+                      padding: { xs: "8px 4px", sm: "16px 8px" },
                     }}
                   >
                     {character.active ? "Yes" : "No"}
@@ -334,6 +442,6 @@ export default function Characters({ initialCharacters, initialMeta, initialSort
         size="large"
         sx={{ mt: 2 }}
       />
-  </>
+    </>
   )
 }

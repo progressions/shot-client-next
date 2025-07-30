@@ -1,7 +1,7 @@
 "use client"
 
 import { useClient } from "@/contexts"
-import { type Juncture } from "@/types/types"
+import { type Juncture } from "@/types"
 import JunctureForm from "./JunctureForm"
 
 interface EditJunctureFormProps {
@@ -11,7 +11,12 @@ interface EditJunctureFormProps {
   juncture: Juncture
 }
 
-export default function EditJunctureForm({ open, onClose, onSave, juncture }: EditJunctureFormProps) {
+export default function EditJunctureForm({
+  open,
+  onClose,
+  onSave,
+  juncture,
+}: EditJunctureFormProps) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, junctureData: Juncture) => {
@@ -20,7 +25,7 @@ export default function EditJunctureForm({ open, onClose, onSave, juncture }: Ed
       ...junctureData,
     } as Juncture
     formData.set("juncture", JSON.stringify(updatedJunctureData))
-    const response = await client.updateJuncture(juncture.id as string, formData)
+    const response = await client.updateJuncture(juncture.id, formData)
     onSave(response.data)
   }
 
@@ -35,4 +40,3 @@ export default function EditJunctureForm({ open, onClose, onSave, juncture }: Ed
     />
   )
 }
-

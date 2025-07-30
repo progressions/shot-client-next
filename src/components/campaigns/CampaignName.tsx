@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useCampaign } from "@/contexts"
-import type { Campaign } from "@/types/types"
+import type { Campaign } from "@/types"
 
 interface CampaignNameProps {
   campaign: Campaign
@@ -15,16 +15,11 @@ export default function CampaignName({ campaign }: CampaignNameProps) {
   useEffect(() => {
     if (campaignData && "campaign" in campaignData) {
       const updatedCampaign = campaignData.campaign
-      if (updatedCampaign && updatedCampaign.id === campaign.id) {
-        if (updatedCampaign.name) {
+      if (updatedCampaign && updatedCampaign.id === campaign.id && updatedCampaign.name) {
           setDisplayName(updatedCampaign.name)
         }
-      }
     }
   }, [campaignData, campaign.id])
 
-  return (<>
-    {displayName}
-  </>)
+  return <>{displayName}</>
 }
-

@@ -1,6 +1,6 @@
-import type { Fight } from "@/types/types"
-import { Box, Typography } from "@mui/material"
-import { FightName } from "@/components/fights"
+import type { Fight } from "@/types"
+import { Stack, Box, Typography } from "@mui/material"
+import { FightBadge } from "@/components/badges"
 import Link from "next/link"
 
 type FightsModuleProps = {
@@ -9,21 +9,28 @@ type FightsModuleProps = {
 
 export default function FightsModule({ fights }: FightsModuleProps) {
   return (
-    <Box sx={{ flexGrow: 1, width: { xs: "100%", sm: "auto" }, p: 2, borderRadius: 2, backgroundColor: "#1d1d1d" }}>
+    <Box
+      sx={{
+        flexGrow: 1,
+        width: { xs: "100%", sm: "auto" },
+        p: 2,
+        borderRadius: 2,
+        backgroundColor: "#2d2d2d",
+      }}
+    >
       <Typography variant="h6" gutterBottom>
         Your Fights
       </Typography>
-      {fights.map(fight => (
-        <Box key={fight.id} sx={{ mb: 1, p: 1, borderRadius: 1, backgroundColor: "#2d2d2d" }}>
-          <Typography variant="body1">
-            <Link href={`/fights/${fight.id}`} style={{ color: "#fff", textDecoration: "none" }}>
-              <FightName fight={fight} />
-            </Link>
-          </Typography>
-        </Box>
-      ))}
+      <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
+        {fights.map(fight => (
+          <FightBadge key={fight.id} fight={fight} size="sm" />
+        ))}
+      </Stack>
       <Typography variant="body2">
-        <Link href="/fights" style={{ color: "#fff", textDecoration: "underline" }}>
+        <Link
+          href="/fights"
+          style={{ color: "#fff", textDecoration: "underline" }}
+        >
           All fights
         </Link>
       </Typography>

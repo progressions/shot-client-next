@@ -10,7 +10,11 @@ interface CreatePartyFormProps {
   onSave: (newParty: Party) => void
 }
 
-export default function CreatePartyForm({ open, onClose, onSave }: CreatePartyFormProps) {
+export default function CreatePartyForm({
+  open,
+  onClose,
+  onSave,
+}: CreatePartyFormProps) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, partyData: Party) => {
@@ -30,4 +34,3 @@ export default function CreatePartyForm({ open, onClose, onSave }: CreatePartyFo
     />
   )
 }
-

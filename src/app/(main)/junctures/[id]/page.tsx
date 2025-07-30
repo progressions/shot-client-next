@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
-import type { Juncture } from "@/types/types"
+import type { Juncture } from "@/types"
 import { JuncturePageClient } from "@/components/junctures"
 
 type JuncturePageProps = {
@@ -20,8 +20,5 @@ export default async function JuncturePage({ params }: JuncturePageProps) {
     return <Typography>Juncture not found</Typography>
   }
 
-  return (
-    <JuncturePageClient juncture={juncture} />
-  )
+  return <JuncturePageClient juncture={juncture} />
 }
-

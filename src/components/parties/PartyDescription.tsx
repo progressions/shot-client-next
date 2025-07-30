@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useCampaign } from "@/contexts"
-import type { Party } from "@/types/types"
+import type { Party } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import type { SystemStyleObject, Theme } from "@mui/system"
 
@@ -11,22 +11,23 @@ interface PartyDescriptionProps {
   sx?: SystemStyleObject<Theme>
 }
 
-export default function PartyDescription({ party, sx = {} }: PartyDescriptionProps) {
+export default function PartyDescription({
+  party,
+  sx = {},
+}: PartyDescriptionProps) {
   const { campaignData } = useCampaign()
-  const [displayDescription, setDisplayDescription] = useState(party.description || "")
+  const [displayDescription, setDisplayDescription] = useState(
+    party.description || ""
+  )
 
   useEffect(() => {
     if (campaignData) {
       const updatedParty = campaignData?.party
-      if (updatedParty && updatedParty.id === party.id) {
-        if (updatedParty.description) {
+      if (updatedParty && updatedParty.id === party.id && updatedParty.description) {
           setDisplayDescription(updatedParty.description)
         }
-      }
     }
   }, [campaignData, party.id])
 
-  return (
-    <RichTextRenderer html={displayDescription} sx={sx} />
-  )
+  return <RichTextRenderer html={displayDescription} sx={sx} />
 }

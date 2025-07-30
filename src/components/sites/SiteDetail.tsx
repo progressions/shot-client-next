@@ -1,14 +1,23 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardContent, CardMedia, Box, Alert, IconButton, Tooltip, Typography } from "@mui/material"
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Box,
+  Alert,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
-import type { Site } from "@/types/types"
+import type { Site } from "@/types"
 import Link from "next/link"
-import { SiteName, SiteDescription } from "@/components/sites"
+import { SiteDescription } from "@/components/sites"
 import { useCampaign, useClient } from "@/contexts"
-import { FactionLink, InfoLink, CharacterLink } from "@/components/links"
+import { FactionLink, CharacterLink } from "@/components/links"
 
 interface SiteDetailProps {
   site: Site
@@ -16,7 +25,11 @@ interface SiteDetailProps {
   onEdit: (site: Site) => void
 }
 
-export default function SiteDetail({ site: initialSite, onDelete, onEdit }: SiteDetailProps) {
+export default function SiteDetail({
+  site: initialSite,
+  onDelete,
+  onEdit,
+}: SiteDetailProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
@@ -35,15 +48,16 @@ export default function SiteDetail({ site: initialSite, onDelete, onEdit }: Site
 
   const handleDelete = async () => {
     if (!site?.id) return
-    if (!confirm(`Are you sure you want to delete the site: ${site.name}?`)) return
+    if (!confirm(`Are you sure you want to delete the site: ${site.name}?`))
+      return
 
     try {
       await client.deleteSite(site)
       onDelete(site.id)
       setError(null)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete site")
-      console.error("Delete site error:", err)
+    } catch (error_) {
+      setError(error_ instanceof Error ? error_.message : "Failed to delete site")
+      console.error("Delete site error:", error_)
     }
   }
 
@@ -59,7 +73,7 @@ export default function SiteDetail({ site: initialSite, onDelete, onEdit }: Site
         day: "numeric",
         hour: "numeric",
         minute: "numeric",
-        hour12: true
+        hour12: true,
       })
     : "Unknown"
 
@@ -75,10 +89,16 @@ export default function SiteDetail({ site: initialSite, onDelete, onEdit }: Site
         />
       )}
       <CardContent sx={{ p: "1rem" }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Typography variant="h6" sx={{ color: "#ffffff" }}>
             <Link href={`/sites/${site.id}`} style={{ color: "#fff" }}>
-              <SiteName site={site} />
+              {site.name}
             </Link>
           </Typography>
           <Box sx={{ display: "flex", gap: "0.5rem" }}>
@@ -104,20 +124,29 @@ export default function SiteDetail({ site: initialSite, onDelete, onEdit }: Site
             </Tooltip>
           </Box>
         </Box>
-        { site.faction && <Typography variant="body1" sx={{ textTransform: "lowercase", fontVariant: "small-caps", mb: 2, color: "#ffffff" }}>
-          Controlled by{' '}
-          <FactionLink faction={site.faction} />
-        </Typography> }
+        {site.faction && (
+          <Typography
+            variant="body1"
+            sx={{
+              textTransform: "lowercase",
+              fontVariant: "small-caps",
+              mb: 2,
+              color: "#ffffff",
+            }}
+          >
+            Controlled by <FactionLink faction={site.faction} />
+          </Typography>
+        )}
         <SiteDescription site={site} />
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
-          {site.characters && site.characters.length > 0 ? (
-            site.characters.map((actor, index) => (
-              <span key={`${actor.id}-${index}`}>
-                <CharacterLink character={actor} />
-                {index < site.characters.length - 1 && ", "}
-              </span>
-            ))
-          ) : null }
+          {site.characters && site.characters.length > 0
+            ? site.characters.map((actor, index) => (
+                <span key={`${actor.id}-${index}`}>
+                  <CharacterLink character={actor} />
+                  {index < site.characters.length - 1 && ", "}
+                </span>
+              ))
+            : null}
         </Typography>
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
           Created: {formattedCreatedAt}

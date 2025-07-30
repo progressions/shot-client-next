@@ -1,2 +1,5 @@
 export * from "@/types/types"
 export * from "@/types/defaults"
+export * from "@/types/responses"
+export * from "@/types/resources"
+export * from "@/types/character"

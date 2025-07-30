@@ -2,10 +2,7 @@
 
 import { useEffect, useCallback, useMemo, useRef } from "react"
 import dynamic from "next/dynamic"
-import Document from "@tiptap/extension-document"
 import CustomMention from "@/components/editor/CustomMention"
-import Paragraph from "@tiptap/extension-paragraph"
-import Text from "@tiptap/extension-text"
 import StarterKit from "@tiptap/starter-kit"
 import { EditorProvider } from "@tiptap/react"
 import { useClient } from "@/contexts"
@@ -50,7 +47,7 @@ function Editor({ name, value, onChange }) {
 
   // Debounced onChange handler
   const debouncedOnChange = useCallback(
-    debounce((event) => {
+    debounce(event => {
       onChange(event)
       const editor = editorRef.current?.editor
       if (editor && editor.isFocused) {
@@ -63,9 +60,9 @@ function Editor({ name, value, onChange }) {
 
   if (!user?.id) return <></>
 
-  const preprocessContent = (html) => {
+  const preprocessContent = html => {
     if (!html) return ""
-    let processed = html.replace(/<li><p>(.*?)<\/p><\/li>/g, "<li>$1</li>")
+    let processed = html.replaceAll(/<li><p>(.*?)<\/p><\/li>/g, "<li>$1</li>")
     const regex = new RegExp(
       `<a href="([^"]+)" class="${styles.mention}"[^>]*data-mention-id="([^"]+)"[^>]*data-mention-class-name="([^"]*)"[^>]*>(@[^<]+)</a>`,
       "g"
@@ -92,42 +89,23 @@ function Editor({ name, value, onChange }) {
       Weapon: `/weapons/${id}`,
       Juncture: `/junctures/${id}`,
       Type: `/`,
-      Archetype: `/`
+      Archetype: `/`,
     }
     return urlMap[className] || ""
   }
 
   const extensions = [
     StarterKit.configure({
-      mention: false
+      mention: false,
     }),
     CustomMention.configure({
       HTMLAttributes: { class: styles.mention },
       suggestion: suggestion(user, client),
-      renderHTML({ node }) {
-        const { id, label, className } = node.attrs
-        if (!id || !label) {
-          return ["span", { class: styles.mention }, `@${label || "unknown"}`]
-        }
-        const url = getUrl(className, id)
-        return [
-          "a",
-          {
-            href: url,
-            class: styles.mention,
-            target: "_blank",
-            rel: "noopener noreferrer",
-            "data-mention-id": id,
-            "data-mention-class-name": className || ""
-          },
-          `@${label}`
-        ]
-      }
-    })
+    }),
   ]
 
   const onChangeContent = useCallback(
-    (event) => {
+    event => {
       const { value } = event.target
       console.log("onChangeContent value:", value)
       contentRef.current = value
@@ -142,8 +120,8 @@ function Editor({ name, value, onChange }) {
       const event = {
         target: {
           name,
-          value: html
-        }
+          value: html,
+        },
       }
       console.log("saveOnBlur event:", event)
       onChange(event)
@@ -170,8 +148,8 @@ function Editor({ name, value, onChange }) {
             const syntheticEvent = {
               target: {
                 name,
-                value: html
-              }
+                value: html,
+              },
             }
             onChangeContent(syntheticEvent)
           }
@@ -186,4 +164,4 @@ function Editor({ name, value, onChange }) {
   )
 }
 
-export default Editor
+export default dynamic(() => Promise.resolve(Editor), { ssr: false })

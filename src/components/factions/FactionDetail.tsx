@@ -1,10 +1,19 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardContent, CardMedia, Box, Alert, IconButton, Tooltip, Typography } from "@mui/material"
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Box,
+  Alert,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
-import type { Faction } from "@/types/types"
+import type { Faction } from "@/types"
 import Link from "next/link"
 import { FactionName, FactionDescription } from "@/components/factions"
 import { useCampaign, useClient } from "@/contexts"
@@ -16,18 +25,26 @@ interface FactionDetailProps {
   onEdit: (faction: Faction) => void
 }
 
-export default function FactionDetail({ faction: initialFaction, onDelete, onEdit }: FactionDetailProps) {
+export default function FactionDetail({
+  faction: initialFaction,
+  onDelete,
+  onEdit,
+}: FactionDetailProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
   const [faction, setFaction] = useState<Faction>(initialFaction)
 
   useEffect(() => {
-    if (campaignData?.faction && campaignData.faction.id === initialFaction.id) {
+    if (
+      campaignData?.faction &&
+      campaignData.faction.id === initialFaction.id
+    ) {
       setFaction({
         ...initialFaction,
         name: campaignData.faction.name || initialFaction.name,
-        description: campaignData.faction.description || initialFaction.description,
+        description:
+          campaignData.faction.description || initialFaction.description,
         image_url: campaignData.faction.image_url || initialFaction.image_url,
       })
     }
@@ -35,15 +52,18 @@ export default function FactionDetail({ faction: initialFaction, onDelete, onEdi
 
   const handleDelete = async () => {
     if (!faction?.id) return
-    if (!confirm(`Are you sure you want to delete the faction: ${faction.name}?`)) return
+    if (
+      !confirm(`Are you sure you want to delete the faction: ${faction.name}?`)
+    )
+      return
 
     try {
       await client.deleteFaction(faction)
       onDelete(faction.id)
       setError(null)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete faction")
-      console.error("Delete faction error:", err)
+    } catch (error_) {
+      setError(error_ instanceof Error ? error_.message : "Failed to delete faction")
+      console.error("Delete faction error:", error_)
     }
   }
 
@@ -59,7 +79,7 @@ export default function FactionDetail({ faction: initialFaction, onDelete, onEdi
         day: "numeric",
         hour: "numeric",
         minute: "numeric",
-        hour12: true
+        hour12: true,
       })
     : "Unknown"
 
@@ -75,7 +95,13 @@ export default function FactionDetail({ faction: initialFaction, onDelete, onEdi
         />
       )}
       <CardContent sx={{ p: "1rem" }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Typography variant="h6" sx={{ color: "#ffffff" }}>
             <Link href={`/factions/${faction.id}`} style={{ color: "#fff" }}>
               <FactionName faction={faction} />
@@ -106,16 +132,19 @@ export default function FactionDetail({ faction: initialFaction, onDelete, onEdi
         </Box>
         <FactionDescription faction={faction} />
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
-          {faction.characters && faction.characters.length > 0 ? (
-            faction.characters.map((actor, index) => (
-              <span key={`${actor.id}-${index}`}>
-                <Link href={`/characters/${actor.id}`} style={{ color: "#ffffff", textDecoration: "underline" }}>
-                  <CharacterName character={actor} />
-                </Link>
-                {index < faction.characters.length - 1 && ", "}
-              </span>
-            ))
-          ) : null }
+          {faction.characters && faction.characters.length > 0
+            ? faction.characters.map((actor, index) => (
+                <span key={`${actor.id}-${index}`}>
+                  <Link
+                    href={`/characters/${actor.id}`}
+                    style={{ color: "#ffffff", textDecoration: "underline" }}
+                  >
+                    <CharacterName character={actor} />
+                  </Link>
+                  {index < faction.characters.length - 1 && ", "}
+                </span>
+              ))
+            : null}
         </Typography>
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
           Created: {formattedCreatedAt}

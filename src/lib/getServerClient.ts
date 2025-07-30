@@ -2,7 +2,6 @@
 
 import { cookies } from "next/headers"
 import Client from "@/lib/Client"
-import type { User } from "@/types/types"
 
 export async function getServerClient(): Promise<Client | null> {
   const cookieStore = await cookies()
@@ -27,9 +26,9 @@ export async function getUser() {
     if (!data) {
       throw new Error("Failed to fetch user data")
     }
-    return data as User
-  } catch (err) {
-    console.error(err)
+    return data
+  } catch (error) {
+    console.error(error)
     return null
   }
 }

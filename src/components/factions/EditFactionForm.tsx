@@ -1,7 +1,7 @@
 "use client"
 
 import { useClient } from "@/contexts"
-import { type Faction } from "@/types/types"
+import { type Faction } from "@/types"
 import FactionForm from "./FactionForm"
 
 interface EditFactionFormProps {
@@ -11,17 +11,22 @@ interface EditFactionFormProps {
   faction: Faction
 }
 
-export default function EditFactionForm({ open, onClose, onSave, faction }: EditFactionFormProps) {
+export default function EditFactionForm({
+  open,
+  onClose,
+  onSave,
+  faction,
+}: EditFactionFormProps) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, factionData: Faction) => {
     const updatedFactionData = {
       ...faction,
-      ...factionData
+      ...factionData,
     } as Faction
 
     formData.set("faction", JSON.stringify(updatedFactionData))
-    const response = await client.updateFaction(faction.id as string, formData)
+    const response = await client.updateFaction(faction.id, formData)
     onSave(response.data)
   }
 
@@ -30,10 +35,9 @@ export default function EditFactionForm({ open, onClose, onSave, faction }: Edit
       open={open}
       onClose={onClose}
       onSave={handleSave}
-      initialFormData={{ name: faction.name || "", description: faction.description || "", image: null }}
+      initialFormData={{ ...faction, image: null }}
       title="Edit Faction"
       existingImageUrl={faction.image_url}
     />
   )
 }
-

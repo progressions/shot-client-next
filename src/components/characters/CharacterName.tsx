@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useCampaign } from "@/contexts"
-import type { Character } from "@/types/types"
+import type { Character } from "@/types"
 
 interface CharacterNameProps {
   character: Character
@@ -15,15 +15,11 @@ export default function CharacterName({ character }: CharacterNameProps) {
   useEffect(() => {
     if (campaignData && "character" in campaignData) {
       const updatedCharacter = campaignData.character
-      if (updatedCharacter && updatedCharacter.id === character.id) {
-        if (updatedCharacter.name) {
+      if (updatedCharacter && updatedCharacter.id === character.id && updatedCharacter.name) {
           setDisplayName(updatedCharacter.name)
         }
-      }
     }
   }, [campaignData, character.id])
 
-  return (<>
-    {displayName}
-  </>)
+  return <>{displayName}</>
 }

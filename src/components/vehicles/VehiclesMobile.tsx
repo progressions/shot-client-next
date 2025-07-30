@@ -1,11 +1,23 @@
 "use client"
 
 import Link from "next/link"
-import { useMediaQuery, Stack, Box, Typography, Card, CardContent, Pagination, FormControl, InputLabel, Select, MenuItem } from "@mui/material"
+import {
+  useMediaQuery,
+  Stack,
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Pagination,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import type { SelectChangeEvent } from "@mui/material"
 import { VehicleName } from "@/components/vehicles"
-import type { Vehicle, PaginationMeta } from "@/types/types"
+import type { Vehicle, PaginationMeta } from "@/types"
 
 export default function VehiclesMobile({
   vehicles,
@@ -14,7 +26,7 @@ export default function VehiclesMobile({
   order,
   onPageChange,
   onSortChange,
-  onOrderChange
+  onOrderChange,
 }: {
   vehicles: Vehicle[]
   meta: PaginationMeta
@@ -36,13 +48,18 @@ export default function VehiclesMobile({
     <Stack spacing={2}>
       <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
         <FormControl sx={{ minWidth: 120 }}>
-          <InputLabel id="sort-label" sx={{ color: "#ffffff" }}>Sort By</InputLabel>
+          <InputLabel id="sort-label" sx={{ color: "#ffffff" }}>
+            Sort By
+          </InputLabel>
           <Select
             labelId="sort-label"
             value={sort}
             label="Sort By"
             onChange={onSortChange}
-            sx={{ color: "#ffffff", "& .MuiSvgIcon-root": { color: "#ffffff" } }}
+            sx={{
+              color: "#ffffff",
+              "& .MuiSvgIcon-root": { color: "#ffffff" },
+            }}
           >
             <MenuItem value="name">Name</MenuItem>
             <MenuItem value="created_at">Created</MenuItem>
@@ -55,7 +72,7 @@ export default function VehiclesMobile({
             color: "#ffffff",
             cursor: "pointer",
             fontSize: "0.875rem",
-            textDecoration: "underline"
+            textDecoration: "underline",
           }}
         >
           {order === "asc" ? "↑ Asc" : "↓ Desc"}
@@ -64,17 +81,26 @@ export default function VehiclesMobile({
       {vehicles.length === 0 ? (
         <Typography sx={{ color: "#ffffff" }}>No vehicles available</Typography>
       ) : (
-        vehicles.map((vehicle) => (
+        vehicles.map(vehicle => (
           <Card key={vehicle.id} sx={{ bgcolor: "#424242", color: "#ffffff" }}>
             <CardContent sx={{ p: 2 }}>
               <Typography variant="body1">
-                <Link href={`/vehicles/${vehicle.id}`} style={{ color: "#ffffff", textDecoration: "underline" }}>
+                <Link
+                  href={`/vehicles/${vehicle.id}`}
+                  style={{ color: "#ffffff", textDecoration: "underline" }}
+                >
                   <VehicleName vehicle={vehicle} />
                 </Link>
               </Typography>
-              <Typography variant="body2">Created: {formatDate(vehicle.created_at || "")}</Typography>
-              <Typography variant="body2">Updated: {formatDate(vehicle.updated_at || "")}</Typography>
-              <Typography variant="body2">Active: {vehicle.active ? "Yes" : "No"}</Typography>
+              <Typography variant="body2">
+                Created: {formatDate(vehicle.created_at || "")}
+              </Typography>
+              <Typography variant="body2">
+                Updated: {formatDate(vehicle.updated_at || "")}
+              </Typography>
+              <Typography variant="body2">
+                Active: {vehicle.active ? "Yes" : "No"}
+              </Typography>
             </CardContent>
           </Card>
         ))

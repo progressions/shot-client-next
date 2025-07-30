@@ -10,7 +10,11 @@ interface CreateSchtickFormProps {
   onSave: (newSchtick: Schtick) => void
 }
 
-export default function CreateSchtickForm({ open, onClose, onSave }: CreateSchtickFormProps) {
+export default function CreateSchtickForm({
+  open,
+  onClose,
+  onSave,
+}: CreateSchtickFormProps) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, schtickData: Schtick) => {
@@ -25,9 +29,8 @@ export default function CreateSchtickForm({ open, onClose, onSave }: CreateSchti
       open={open}
       onClose={onClose}
       onSave={handleSave}
-      initialFormData={{ name: "", description: "", image: null }}
+      initialFormData={{ ...defaultSchtick, image: null }}
       title="New Schtick"
     />
   )
 }
-

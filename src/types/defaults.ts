@@ -1,4 +1,6 @@
 import type {
+  VehicleActionValues,
+  ActionValues,
   Faction,
   Person,
   Vehicle,
@@ -16,28 +18,37 @@ import type {
   Weapon,
   PaginationMeta,
   Location,
-  Swerve
-} from "@/types/types"
+  Swerve,
+} from "@/types"
 
-export const defaultFaction:Faction = {
+export const defaultFaction: Faction = {
   id: "",
   name: "",
   description: "",
   characters: [],
   vehicles: [],
   active: true,
-  image_url: null,
+  parties: [],
+  sites: [],
+  junctures: [],
+  character_ids: [],
+  vehicle_ids: [],
+  party_ids: [],
+  site_ids: [],
+  juncture_ids: [],
+  image_url: "",
   created_at: "",
-  updated_at: ""
+  updated_at: "",
 }
 
-export const defaultCharacter:Person = {
-  name: '',
+export const defaultCharacter: Person = {
+  id: "",
+  name: "",
   category: "character",
   active: true,
   current_shot: 0,
   impairments: 0,
-  color: '',
+  color: "",
   faction_id: null,
   faction: defaultFaction,
   action_values: {
@@ -61,18 +72,18 @@ export const defaultCharacter:Person = {
     Vehicle: false,
     "Marks of Death": 0,
     Damage: 0,
-  },
+  } as ActionValues,
   description: {
-    "Nicknames": "",
-    "Age": "",
-    "Height": "",
-    "Weight": "",
+    Nicknames: "",
+    Age: "",
+    Height: "",
+    Weight: "",
     "Hair Color": "",
     "Eye Color": "",
     "Style of Dress": "",
-    "Appearance": "",
-    "Background": "",
-    "Melodramatic Hook": ""
+    Appearance: "",
+    Background: "",
+    "Melodramatic Hook": "",
   },
   schticks: [],
   skills: {},
@@ -86,16 +97,20 @@ export const defaultCharacter:Person = {
   notion_page_id: null,
   wealth: "Poor",
   juncture_id: null,
-  juncture: null
-}
+  juncture: null,
+  user_id: "",
+  created_at: "",
+  updated_at: "",
+} as Person
 
-export const defaultVehicle:Vehicle = {
-  name: '',
+export const defaultVehicle: Vehicle = {
+  id: "",
+  name: "",
   active: true,
   category: "vehicle",
-  current_shot: '',
+  current_shot: "",
   impairments: 0,
-  color: '',
+  color: "",
   faction_id: null,
   faction: defaultFaction,
   action_values: {
@@ -109,18 +124,18 @@ export const defaultVehicle:Vehicle = {
     Pursuer: "true",
     Position: "far",
     Type: "Featured Foe",
-  },
+  } as VehicleActionValues,
   description: {
-    "Nicknames": "",
-    "Age": "",
-    "Height": "",
-    "Weight": "",
+    Nicknames: "",
+    Age: "",
+    Height: "",
+    Weight: "",
     "Hair Color": "",
     "Eye Color": "",
     "Style of Dress": "",
-    "Appearance": "",
-    "Background": "",
-    "Melodramatic Hook": ""
+    Appearance: "",
+    Background: "",
+    "Melodramatic Hook": "",
   },
   schticks: [],
   skills: {},
@@ -135,10 +150,14 @@ export const defaultVehicle:Vehicle = {
   notion_page_id: null,
   wealth: "",
   juncture_id: null,
-  juncture: null
-}
+  juncture: null,
+  created_at: "",
+  updated_at: "",
+  user_id: "",
+} as Vehicle
 
-export const defaultFight:Fight = {
+export const defaultFight: Fight = {
+  id: "",
   name: "",
   description: "",
   active: true,
@@ -149,15 +168,22 @@ export const defaultFight:Fight = {
   shot_order: [],
   character_effects: {},
   vehicle_effects: {},
-  image_url: null,
+  image_url: "",
+  created_at: "",
+  updated_at: "",
 }
 
-export const defaultUser:User = {
-  email: '',
-  name: '',
+export const defaultUser: User = {
+  id: "",
+  email: "",
+  name: "",
+  image_url: "",
+  created_at: "",
+  updated_at: "",
 }
 
-export const defaultEffect:Effect = {
+export const defaultEffect: Effect = {
+  id: "",
   name: "",
   description: "",
   severity: "error",
@@ -167,29 +193,37 @@ export const defaultEffect:Effect = {
   end_shot: 15,
 }
 
-export const defaultToast:Toast = {
+export const defaultToast: Toast = {
   open: false,
   message: "",
-  severity: "success"
+  severity: "success",
 }
 
-export const defaultCampaign:Campaign = {
+export const defaultCampaign: Campaign = {
+  id: "",
   name: "",
   description: "",
   gamemaster: defaultUser,
   players: [],
-  invitations: []
+  player_ids: [],
+  invitations: [],
+  image_url: "",
+  created_at: "",
+  updated_at: "",
 }
 
-export const defaultCharacterEffect:CharacterEffect = {
+export const defaultCharacterEffect: CharacterEffect = {
+  id: "",
   name: "",
   description: "",
   severity: "info",
   character_id: "",
-  shot_id: ""
+  shot_id: "",
+  vehicle_id: "",
 }
 
-export const defaultSchtick:Schtick = {
+export const defaultSchtick: Schtick = {
+  id: "",
   name: "",
   description: "",
   campaign_id: "",
@@ -198,7 +232,7 @@ export const defaultSchtick:Schtick = {
   schtick_id: "",
   prerequisite: {
     id: "",
-    name: ""
+    name: "",
   },
   color: "",
   image_url: "",
@@ -206,48 +240,54 @@ export const defaultSchtick:Schtick = {
   updated_at: "",
 }
 
-export const defaultAdvancement:Advancement = {
-  description: ""
+export const defaultAdvancement: Advancement = {
+  description: "",
 }
 
-export const defaultJuncture:Juncture = {
+export const defaultJuncture: Juncture = {
+  id: "",
   name: "",
   description: "",
   faction: null,
   faction_id: null,
   active: true,
-  image_url: null,
+  image_url: "",
   characters: [],
   created_at: "",
-  updated_at: ""
+  updated_at: "",
 }
 
-export const defaultSite:Site = {
+export const defaultSite: Site = {
+  id: "",
   name: "",
   description: "",
   faction: null,
   faction_id: null,
   secret: false,
-  image_url: null,
+  image_url: "",
   characters: [],
   created_at: "",
-  updated_at: ""
+  updated_at: "",
 }
 
-export const defaultParty:Party = {
+export const defaultParty: Party = {
+  id: "",
   name: "",
   description: "",
   faction: null,
   faction_id: null,
   characters: [],
   vehicles: [],
+  character_ids: [],
+  vehicle_ids: [],
   secret: false,
-  image_url: null,
+  image_url: "",
   created_at: "",
-  updated_at: ""
+  updated_at: "",
 }
 
-export const defaultWeapon:Weapon = {
+export const defaultWeapon: Weapon = {
+  id: "",
   name: "",
   description: "",
   damage: 7,
@@ -262,19 +302,19 @@ export const defaultWeapon:Weapon = {
   updated_at: "",
 }
 
-export const defaultPaginationMeta:PaginationMeta = {
+export const defaultPaginationMeta: PaginationMeta = {
   current_page: 1,
   next_page: null,
   prev_page: null,
   total_pages: 1,
-  total_count: 1
+  total_count: 1,
 }
 
-export const defaultLocation:Location = {
-  name: ""
+export const defaultLocation: Location = {
+  name: "",
 }
 
-export const defaultSwerve:Swerve = {
+export const defaultSwerve: Swerve = {
   result: 0,
   positiveRolls: [],
   negativeRolls: [],
@@ -282,5 +322,3 @@ export const defaultSwerve:Swerve = {
   negative: 0,
   boxcars: false,
 }
-
-

@@ -11,7 +11,7 @@ import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
-import { FactionsAutocomplete } from "@/components/autocomplete"
+import { FactionAutocomplete } from "@/components/autocomplete"
 import { InfoLink } from "@/components/links"
 
 type FormStateData = Juncture & {
@@ -28,8 +28,16 @@ interface JunctureFormProps {
   existingImageUrl?: string | null
 }
 
-export default function JunctureForm({ open, onClose, onSave, initialFormData, title, existingImageUrl }: JunctureFormProps) {
-  const { formState, dispatchForm, initialFormState } = useForm<FormStateData>(initialFormData)
+export default function JunctureForm({
+  open,
+  onClose,
+  onSave,
+  initialFormData,
+  title,
+  existingImageUrl,
+}: JunctureFormProps) {
+  const { formState, dispatchForm, initialFormState } =
+    useForm<FormStateData>(initialFormData)
   const { disabled, error, data } = formState
   const { name, description, faction_id, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -50,12 +58,18 @@ export default function JunctureForm({ open, onClose, onSave, initialFormData, t
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      if (!file.type.match(/^image\/(webp|jpeg|png|gif)$/)) {
-        dispatchForm({ type: FormActions.ERROR, payload: "Image must be WEBP, JPEG, PNG, or GIF" })
+      if (!/^image\/(webp|jpeg|png|gif)$/.test(file.type)) {
+        dispatchForm({
+          type: FormActions.ERROR,
+          payload: "Image must be WEBP, JPEG, PNG, or GIF",
+        })
         return
       }
       if (file.size > 5 * 1024 * 1024) {
-        dispatchForm({ type: FormActions.ERROR, payload: "Image must be less than 5MB" })
+        dispatchForm({
+          type: FormActions.ERROR,
+          payload: "Image must be less than 5MB",
+        })
         return
       }
       dispatchForm({ type: FormActions.UPDATE, name: "image", value: file })
@@ -73,16 +87,21 @@ export default function JunctureForm({ open, onClose, onSave, initialFormData, t
     dispatchForm({ type: FormActions.SUBMIT })
     try {
       const formData = new FormData()
-      const junctureData = { ...defaultJuncture, name, description, faction_id } as Juncture
+      const junctureData = {
+        ...defaultJuncture,
+        name,
+        description,
+        faction_id,
+      } as Juncture
       formData.append("juncture", JSON.stringify(junctureData))
       if (image) {
         formData.append("image", image)
       }
       await onSave(formData, junctureData)
-    } catch (err: unknown) {
+    } catch (error_: unknown) {
       const errorMessage = "An error occurred."
       dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
-      console.error(`${title} error:`, err)
+      console.error(`${title} error:`, error_)
     } finally {
       handleClose()
     }
@@ -99,11 +118,19 @@ export default function JunctureForm({ open, onClose, onSave, initialFormData, t
   }
 
   return (
-    <Drawer anchor={isMobile ? "bottom" : "right"} open={open} onClose={handleClose}>
+    <Drawer
+      anchor={isMobile ? "bottom" : "right"}
+      open={open}
+      onClose={handleClose}
+    >
       <Box
         component="form"
         onSubmit={handleSubmit}
-        sx={{ width: isMobile ? "100%" : "30rem", height: isMobile ? "auto" : "100%", p: isMobile ? "1rem" : "2rem" }}
+        sx={{
+          width: isMobile ? "100%" : "30rem",
+          height: isMobile ? "auto" : "100%",
+          p: isMobile ? "1rem" : "2rem",
+        }}
       >
         <Typography variant="h5" sx={{ mb: 2, color: "#ffffff" }}>
           {title}
@@ -113,11 +140,23 @@ export default function JunctureForm({ open, onClose, onSave, initialFormData, t
             {error}
           </Alert>
         )}
-        <Typography>A <InfoLink href="/junctures" info="Juncture" /> is a period in time which has <InfoLink info="Portals" /> opening to the <InfoLink info="Netherworld" />. A Juncture is controlled by the <InfoLink href="/factions" info="Faction" /> which controlls the most powerful <InfoLink href="/sites" info="Feng Shui Sites" />.</Typography>
+        <Typography>
+          A <InfoLink href="/junctures" info="Juncture" /> is a period in time
+          which has <InfoLink info="Portals" /> opening to the{" "}
+          <InfoLink info="Netherworld" />. A Juncture is controlled by the{" "}
+          <InfoLink href="/factions" info="Faction" /> which controlls the most
+          powerful <InfoLink href="/sites" info="Feng Shui Sites" />.
+        </Typography>
         <TextField
           label="Name"
           value={name}
-          onChange={(e) => dispatchForm({ type: FormActions.UPDATE, name: "name", value: e.target.value })}
+          onChange={e =>
+            dispatchForm({
+              type: FormActions.UPDATE,
+              name: "name",
+              value: e.target.value,
+            })
+          }
           margin="normal"
           required
           autoFocus
@@ -126,12 +165,20 @@ export default function JunctureForm({ open, onClose, onSave, initialFormData, t
           name="description"
           value={description}
           onChange={(e: EditorChangeEvent) => {
-            dispatchForm({ type: FormActions.UPDATE, name: "description", value: e.target.value })
+            dispatchForm({
+              type: FormActions.UPDATE,
+              name: "description",
+              value: e.target.value,
+            })
           }}
         />
         <Box sx={{ mt: 2 }}>
-          <Typography sx={{mb: 2}}>A <InfoLink href="/juncture" info="Juncture" /> belongs to a certain <InfoLink href="/factions" info="Faction" /> that controls the most powerful <InfoLink href="/sites" info="Feng Shuite Sites" />.</Typography>
-          <FactionsAutocomplete
+          <Typography sx={{ mb: 2 }}>
+            A <InfoLink href="/juncture" info="Juncture" /> belongs to a certain{" "}
+            <InfoLink href="/factions" info="Faction" /> that controls the most
+            powerful <InfoLink href="/sites" info="Feng Shuite Sites" />.
+          </Typography>
+          <FactionAutocomplete
             value={faction_id || ""}
             onChange={handleFactionChange}
           />
@@ -147,7 +194,11 @@ export default function JunctureForm({ open, onClose, onSave, initialFormData, t
             />
           </IconButton>
           <Typography variant="body2" sx={{ color: "#ffffff" }}>
-            {image ? image.name : existingImageUrl ? "Current image" : "No image selected"}
+            {image
+              ? image.name
+              : (existingImageUrl
+                ? "Current image"
+                : "No image selected")}
           </Typography>
         </Box>
         {(imagePreview || existingImageUrl) && (
@@ -160,7 +211,7 @@ export default function JunctureForm({ open, onClose, onSave, initialFormData, t
               style={{
                 width: "100%",
                 maxHeight: isMobile ? "150px" : "200px",
-                objectFit: "contain"
+                objectFit: "contain",
               }}
             />
           </Box>
@@ -169,9 +220,7 @@ export default function JunctureForm({ open, onClose, onSave, initialFormData, t
           <SaveButton type="submit" disabled={disabled}>
             Save
           </SaveButton>
-          <CancelButton onClick={handleClose}>
-            Cancel
-          </CancelButton>
+          <CancelButton onClick={handleClose}>Cancel</CancelButton>
         </Box>
       </Box>
     </Drawer>

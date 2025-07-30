@@ -7,10 +7,18 @@ interface DeleteButtonProps extends IconButtonProps {
   tooltipTitle?: string
 }
 
-export function DeleteButton({ tooltipTitle = "Delete", ...props }: DeleteButtonProps) {
+export function DeleteButton({
+  tooltipTitle = "Delete",
+  ...props
+}: DeleteButtonProps) {
   return (
     <Tooltip title={tooltipTitle}>
-      <IconButton color="inherit" size="small" aria-label={tooltipTitle.toLowerCase()} {...props}>
+      <IconButton
+        color="inherit"
+        size="small"
+        aria-label={tooltipTitle.toLowerCase()}
+        {...props}
+      >
         <DeleteIcon />
       </IconButton>
     </Tooltip>

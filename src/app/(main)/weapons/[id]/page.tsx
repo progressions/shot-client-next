@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
-import type { Weapon } from "@/types/types"
+import type { Weapon } from "@/types"
 import { WeaponPageClient } from "@/components/weapons"
 
 type WeaponPageProps = {
@@ -20,7 +20,5 @@ export default async function WeaponPage({ params }: WeaponPageProps) {
     return <Typography>Weapon not found</Typography>
   }
 
-  return (
-    <WeaponPageClient weapon={weapon} />
-  )
+  return <WeaponPageClient weapon={weapon} />
 }

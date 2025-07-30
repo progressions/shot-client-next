@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import { Stack, Container, Typography, Box, Avatar } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
-import type { Vehicle } from "@/types/types"
+import type { Vehicle } from "@/types"
 import type { Metadata } from "next"
 import { VehicleName } from "@/components/vehicles"
 import { VS } from "@/services"
@@ -23,7 +23,11 @@ function VehicleNotFound() {
 }
 
 // Dynamically generate metadata for the page title
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
   const client = await getServerClient()
   const user = await getUser()
   if (!client || !user) {
@@ -39,13 +43,17 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       return { title: "Vehicle Not Found - Chi War" }
     }
     return { title: `${vehicle.name} - Chi War` }
-  } catch (err) {
-    console.error("Fetch vehicle error for metadata:", err)
+  } catch (error) {
+    console.error("Fetch vehicle error for metadata:", error)
     return { title: "Vehicle Not Found - Chi War" }
   }
 }
 
-export default async function VehiclePage({ params }: { params: Promise<{ id: string }> }) {
+export default async function VehiclePage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
   const client = await getServerClient()
   const user = await getUser()
   if (!client || !user) {
@@ -59,8 +67,8 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
     const response = await client.getVehicle({ id })
     vehicle = response.data
     console.log("vehicle data:", vehicle)
-  } catch (err) {
-    console.error("Fetch vehicle error:", err)
+  } catch (error) {
+    console.error("Fetch vehicle error:", error)
   }
 
   if (!vehicle?.id) {
@@ -69,7 +77,10 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
 
   return (
     <Box sx={{ bgcolor: "#424242", p: { xs: 2, sm: 3 }, borderRadius: 1 }}>
-      <Stack direction="row" sx={{ alignItems: "center", mb: 2, gap: { xs: 1, sm: 2 } }}>
+      <Stack
+        direction="row"
+        sx={{ alignItems: "center", mb: 2, gap: { xs: 1, sm: 2 } }}
+      >
         <Avatar
           src={vehicle.image_url ?? undefined}
           alt={vehicle.name}
@@ -80,7 +91,7 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
             variant="h3"
             sx={{
               color: "#ffffff",
-              fontSize: { xs: "1.75rem", sm: "2.5rem" }
+              fontSize: { xs: "1.75rem", sm: "2.5rem" },
             }}
           >
             <VehicleName vehicle={vehicle} />
@@ -90,7 +101,7 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
             variant="h6"
             sx={{
               color: "#ffffff",
-              fontSize: { xs: "1rem", sm: "1.25rem" }
+              fontSize: { xs: "1rem", sm: "1.25rem" },
             }}
           >
             {VS.type(vehicle)}
@@ -118,7 +129,7 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
               border: "1px solid #ffffff",
               borderRadius: 1,
               p: 1,
-              px: 2
+              px: 2,
             }}
           >
             {VS.acceleration(vehicle)}
@@ -136,7 +147,7 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
               border: "1px solid #ffffff",
               borderRadius: 1,
               p: 1,
-              px: 2
+              px: 2,
             }}
           >
             {VS.handling(vehicle)}
@@ -154,7 +165,7 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
               border: "1px solid #ffffff",
               borderRadius: 1,
               p: 1,
-              px: 2
+              px: 2,
             }}
           >
             {VS.squeal(vehicle)}
@@ -172,7 +183,7 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
               border: "1px solid #ffffff",
               borderRadius: 1,
               p: 1,
-              px: 2
+              px: 2,
             }}
           >
             {VS.frame(vehicle)}
@@ -190,7 +201,7 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
               border: "1px solid #ffffff",
               borderRadius: 1,
               p: 1,
-              px: 2
+              px: 2,
             }}
           >
             {VS.crunch(vehicle)}
@@ -200,4 +211,3 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
     </Box>
   )
 }
-

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useCampaign } from "@/contexts"
-import type { Party } from "@/types/types"
+import type { Party } from "@/types"
 
 interface PartyNameProps {
   party: Party
@@ -15,15 +15,11 @@ export default function PartyName({ party }: PartyNameProps) {
   useEffect(() => {
     if (campaignData && "party" in campaignData) {
       const updatedParty = campaignData.party
-      if (updatedParty && updatedParty.id === party.id) {
-        if (updatedParty.name) {
+      if (updatedParty && updatedParty.id === party.id && updatedParty.name) {
           setDisplayName(updatedParty.name)
         }
-      }
     }
   }, [campaignData, party.id])
 
-  return (<>
-    {displayName}
-  </>)
+  return <>{displayName}</>
 }

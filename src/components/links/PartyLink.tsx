@@ -11,10 +11,11 @@ export default function PartyLink({ party, data }: PartyLinkProps) {
   return (
     <Link
       href={`/parties/${party.id}`}
+      target="_blank"
       data-mention-id={party.id}
       data-mention-class-name="Party"
       data-mention-data={data ? JSON.stringify(data) : undefined}
-      style={{fontWeight: "bold", textDecoration: "underline", color: "#fff"}}
+      style={{ fontWeight: "bold", textDecoration: "underline", color: "#fff" }}
     >
       <PartyName party={party} />
     </Link>

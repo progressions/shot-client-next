@@ -1,0 +1,20 @@
+"use client"
+
+import type { User } from "@/types"
+import { UserLink } from "@/components/links"
+import { Badge } from "@/components/badges"
+import { SystemStyleObject, Theme } from "@mui/system"
+
+type UserBadgeProps = {
+  user: User
+  size?: "sm" | "md" | "lg"
+  sx?: SystemStyleObject<Theme>
+}
+
+export default function UserBadge({ user, size, sx = {} }: UserBadgeProps) {
+  return (
+    <Badge entity={user} size={size} sx={sx} title={<UserLink user={user} />}>
+      {user.email}
+    </Badge>
+  )
+}

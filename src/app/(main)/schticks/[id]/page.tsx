@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
-import type { Schtick } from "@/types/types"
+import type { Schtick } from "@/types"
 import { SchtickPageClient } from "@/components/schticks"
 
 type SchtickPageProps = {
@@ -20,7 +20,5 @@ export default async function SchtickPage({ params }: SchtickPageProps) {
     return <Typography>Schtick not found</Typography>
   }
 
-  return (
-    <SchtickPageClient schtick={schtick} />
-  )
+  return <SchtickPageClient schtick={schtick} />
 }

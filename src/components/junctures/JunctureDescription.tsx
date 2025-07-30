@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useCampaign } from "@/contexts"
-import type { Juncture } from "@/types/types"
+import type { Juncture } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import type { SystemStyleObject, Theme } from "@mui/system"
 
@@ -11,22 +11,23 @@ interface JunctureDescriptionProps {
   sx?: SystemStyleObject<Theme>
 }
 
-export default function JunctureDescription({ juncture, sx = {} }: JunctureDescriptionProps) {
+export default function JunctureDescription({
+  juncture,
+  sx = {},
+}: JunctureDescriptionProps) {
   const { campaignData } = useCampaign()
-  const [displayDescription, setDisplayDescription] = useState(juncture.description || "")
+  const [displayDescription, setDisplayDescription] = useState(
+    juncture.description || ""
+  )
 
   useEffect(() => {
     if (campaignData) {
       const updatedJuncture = campaignData?.juncture
-      if (updatedJuncture && updatedJuncture.id === juncture.id) {
-        if (updatedJuncture.description) {
+      if (updatedJuncture && updatedJuncture.id === juncture.id && updatedJuncture.description) {
           setDisplayDescription(updatedJuncture.description)
         }
-      }
     }
   }, [campaignData, juncture.id])
 
-  return (
-    <RichTextRenderer html={displayDescription} sx={sx} />
-  )
+  return <RichTextRenderer html={displayDescription} sx={sx} />
 }

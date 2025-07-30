@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useCampaign } from "@/contexts"
-import type { Faction } from "@/types/types"
+import type { Faction } from "@/types"
 
 interface FactionNameProps {
   faction: Faction
@@ -15,15 +15,11 @@ export default function FactionName({ faction }: FactionNameProps) {
   useEffect(() => {
     if (campaignData && "faction" in campaignData) {
       const updatedFaction = campaignData.faction
-      if (updatedFaction && updatedFaction.id === faction.id) {
-        if (updatedFaction.name) {
+      if (updatedFaction && updatedFaction.id === faction.id && updatedFaction.name) {
           setDisplayName(updatedFaction.name)
         }
-      }
     }
   }, [campaignData, faction.id])
 
-  return (<>
-    {displayName}
-  </>)
+  return <>{displayName}</>
 }

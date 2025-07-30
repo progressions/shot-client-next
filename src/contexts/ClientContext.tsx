@@ -1,10 +1,23 @@
 "use client"
 
-import { type ActionDispatch, useReducer, useEffect, useMemo, createContext, useContext, useRef } from "react"
+import {
+  type ActionDispatch,
+  useReducer,
+  useEffect,
+  useMemo,
+  createContext,
+  useContext,
+  useRef,
+} from "react"
 import Cookies from "js-cookie"
 import Client from "@/lib/Client"
 import { defaultUser, type User } from "@/types"
-import { UserStateAction, UserActions, userReducer, initialUserState } from "@/reducers"
+import {
+  UserStateAction,
+  UserActions,
+  userReducer,
+  initialUserState,
+} from "@/reducers"
 import type { UserStateType } from "@/reducers"
 
 interface ClientContextType {
@@ -25,13 +38,13 @@ const ClientContext = createContext<ClientContextType>({
   jwt: "",
   user: defaultUser,
   currentUserState: initialUserState,
-  dispatchCurrentUser: () => {}
+  dispatchCurrentUser: () => {},
 })
 
 export function ClientProvider({ children, initialUser }: ClientProviderProps) {
   const [state, dispatch] = useReducer(userReducer, {
     ...initialUserState,
-    user: initialUser || defaultUser // Use initialUser if provided
+    user: initialUser || defaultUser, // Use initialUser if provided
   })
 
   const jwt = Cookies.get("jwtToken") ?? ""
@@ -53,8 +66,8 @@ export function ClientProvider({ children, initialUser }: ClientProviderProps) {
           return
         }
         dispatch({ type: UserActions.USER, payload: data })
-      } catch (err) {
-        console.error("Failed to fetch user", err)
+      } catch (error) {
+        console.error("Failed to fetch user", error)
         Cookies.remove("jwtToken")
       }
     }
@@ -63,7 +76,15 @@ export function ClientProvider({ children, initialUser }: ClientProviderProps) {
   }, [jwt, client, state.user.id])
 
   return (
-    <ClientContext.Provider value={{ client, jwt, user: state.user, currentUserState: state, dispatchCurrentUser: dispatch }}>
+    <ClientContext.Provider
+      value={{
+        client,
+        jwt,
+        user: state.user,
+        currentUserState: state,
+        dispatchCurrentUser: dispatch,
+      }}
+    >
       {children}
     </ClientContext.Provider>
   )

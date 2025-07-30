@@ -1,18 +1,33 @@
 "use client"
 
-import { useEffect } from "react"
+import { useState, useEffect } from "react"
 import { Typography, Box } from "@mui/material"
-import { JunctureName, JunctureDescription } from "@/components/junctures"
-import type { Juncture } from "@/types/types"
+import type { Juncture } from "@/types"
+import { RichTextRenderer } from "@/components/editor"
+import { useCampaign } from "@/contexts"
 
 interface JuncturePageClientProps {
   juncture: Juncture
 }
 
-export default function JuncturePageClient({ juncture }: JuncturePageClientProps) {
+export default function JuncturePageClient({
+  juncture: initialJuncture,
+}: JuncturePageClientProps) {
+  const { campaignData } = useCampaign()
+  const [juncture, setJuncture] = useState<Juncture>(initialJuncture)
+
   useEffect(() => {
-    document.title = juncture.name || "Chi War"
+    document.title = juncture.name ? `${juncture.name} - Chi War` : "Chi War"
   }, [juncture.name])
+
+  useEffect(() => {
+    if (
+      campaignData?.juncture &&
+      campaignData.juncture.id === initialJuncture.id
+    ) {
+      setJuncture(campaignData.juncture)
+    }
+  }, [campaignData, initialJuncture])
 
   return (
     <Box
@@ -20,10 +35,28 @@ export default function JuncturePageClient({ juncture }: JuncturePageClientProps
         mb: { xs: 1, md: 2 },
       }}
     >
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        <JunctureName juncture={juncture} />
+      <Typography variant="h4" sx={{ mb: 1 }}>
+        {juncture.name}
       </Typography>
-      <JunctureDescription juncture={juncture} sx={{ mb: { xs: 1, md: 2 } }} />
+      {juncture.image_url && (
+        <Box
+          component="img"
+          src={juncture.image_url}
+          alt={juncture.name}
+          sx={{
+            width: "100%",
+            maxWidth: "400px",
+            mb: 2,
+            display: "block",
+            mx: "auto",
+          }}
+        />
+      )}
+      <RichTextRenderer
+        key={juncture.description}
+        html={juncture.description || ""}
+        sx={{ mb: 2 }}
+      />
     </Box>
   )
 }

@@ -10,7 +10,11 @@ interface CreateFactionFormProps {
   onSave: (newFaction: Faction) => void
 }
 
-export default function CreateFactionForm({ open, onClose, onSave }: CreateFactionFormProps) {
+export default function CreateFactionForm({
+  open,
+  onClose,
+  onSave,
+}: CreateFactionFormProps) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, factionData: Faction) => {
@@ -25,9 +29,8 @@ export default function CreateFactionForm({ open, onClose, onSave }: CreateFacti
       open={open}
       onClose={onClose}
       onSave={handleSave}
-      initialFormData={{ name: "", description: "", image: null }}
+      initialFormData={{ ...defaultFaction, image: null }}
       title="New Faction"
     />
   )
 }
-

@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
-import type { Party } from "@/types/types"
+import type { Party } from "@/types"
 import { PartyPageClient } from "@/components/parties"
 
 type PartyPageProps = {
@@ -20,7 +20,5 @@ export default async function PartyPage({ params }: PartyPageProps) {
     return <Typography>Party not found</Typography>
   }
 
-  return (
-    <PartyPageClient party={party} />
-  )
+  return <PartyPageClient party={party} />
 }

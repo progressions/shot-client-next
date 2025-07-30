@@ -3,5 +3,4 @@ export { default as CampaignBanner } from "@/components/dashboard/CampaignBanner
 export { default as FightsModule } from "@/components/dashboard/FightsModule"
 export { default as CharactersModule } from "@/components/dashboard/CharactersModule"
 export { default as PlayersModule } from "@/components/dashboard/PlayersModule"
-export { default as CampaignsModule } from "@/components/dashboard/CampaignsModule"
 export { default as PartiesModule } from "@/components/dashboard/PartiesModule"

@@ -13,3 +13,11 @@
   --gray-2: #e0e0e0;
   --gray-3: #ccc;
 }
+
+a {
+  color: "#fff";
+
+  &:visited {
+    color: var(--white);
+  }
+}

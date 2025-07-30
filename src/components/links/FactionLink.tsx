@@ -1,5 +1,5 @@
 import Link from "next/link"
-import type { Faction } from "@/types/types"
+import type { Faction } from "@/types"
 import { FactionName } from "@/components/factions"
 
 type FactionLinkProps = {
@@ -11,10 +11,11 @@ export default function FactionLink({ faction, data }: FactionLinkProps) {
   return (
     <Link
       href={`/factions/${faction.id}`}
+      target="_blank"
       data-mention-id={faction.id}
       data-mention-class-name="Faction"
       data-mention-data={data ? JSON.stringify(data) : undefined}
-      style={{fontWeight: "bold", textDecoration: "underline", color: "#fff"}}
+      style={{ fontWeight: "bold", textDecoration: "underline", color: "#fff" }}
     >
       <FactionName faction={faction} />
     </Link>
