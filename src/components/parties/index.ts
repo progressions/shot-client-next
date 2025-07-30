@@ -6,4 +6,4 @@ export { default as CreatePartyForm } from "@/components/parties/CreatePartyForm
 export { default as EditPartyForm } from "@/components/parties/EditPartyForm"
 export { default as PartyForm } from "@/components/parties/PartyForm"
 export { default as PartyPageClient } from "@/components/parties/PartyPageClient"
-export { default as MembersForm } from "@/components/parties/MembersForm"
+export { default as MembersList } from "@/components/parties/MembersList"

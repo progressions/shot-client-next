@@ -6,7 +6,7 @@ import { Button, Stack, Alert, Typography, Box } from "@mui/material"
 import type { Party } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import { useCampaign } from "@/contexts"
-import { MembersForm, EditPartyForm } from "@/components/parties"
+import { MembersList, EditPartyForm } from "@/components/parties"
 import { useClient } from "@/contexts"
 import { CharacterBadge } from "@/components/badges"
 import { FactionLink } from "@/components/links"
@@ -116,65 +116,8 @@ export default function PartyPageClient({
           sx={{ mb: 2 }}
         />
       </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          gap: { xs: 1, sm: 1.5 },
-          alignItems: "center",
-          justifyContent: "space-between",
-          mb: 2,
-        }}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            gap: 1,
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="h5" sx={{ mb: 2 }}>
-            Party Members
-          </Typography>
-        </Box>
-        {membersOpen && (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenMembers}
-            sx={{ px: 2 }}
-          >
-            Close
-          </Button>
-        )}
-        {!membersOpen && (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenMembers}
-            sx={{ px: 2 }}
-          >
-            Manage
-          </Button>
-        )}
-      </Box>
-      <MembersForm open={membersOpen} party={party} />
-      {!membersOpen && (
-        <Box sx={{ mb: 2 }}>
-          <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
-            {party.characters && party.characters.length > 0
-              ? party.characters.map((actor, index) => (
-                  <CharacterBadge
-                    key={`${actor.id}-${index}`}
-                    character={actor}
-                    sx={{ width: "100%", maxWidth: "100%" }}
-                  />
-                ))
-              : null}
-          </Stack>
-        </Box>
-      )}
+
+      <MembersList party={party} />
 
       <EditPartyForm
         key={JSON.stringify(party)}
