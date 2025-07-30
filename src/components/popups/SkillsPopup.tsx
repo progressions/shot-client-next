@@ -1,12 +1,12 @@
 import { Box, Typography } from "@mui/material"
 import type { SkillValue } from "@/types"
 
-interface SkillsPopupProps {
+interface SkillsPopupProperties {
   id: string
   data?: SkillValue[]
 }
 
-export default function SkillsPopup({ data }: SkillsPopupProps) {
+export default function SkillsPopup({ data }: SkillsPopupProperties) {
   const skillValues = data || []
 
   return (

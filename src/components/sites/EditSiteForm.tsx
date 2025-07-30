@@ -4,7 +4,7 @@ import { useClient } from "@/contexts"
 import { type Site } from "@/types"
 import SiteForm from "./SiteForm"
 
-interface EditSiteFormProps {
+interface EditSiteFormProperties {
   open: boolean
   onClose: () => void
   onSave: (updatedSite: Site) => void
@@ -16,7 +16,7 @@ export default function EditSiteForm({
   onClose,
   onSave,
   site,
-}: EditSiteFormProps) {
+}: EditSiteFormProperties) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, siteData: Site) => {

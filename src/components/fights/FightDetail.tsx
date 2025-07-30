@@ -7,19 +7,16 @@ import {
   CardContent,
   Box,
   Alert,
-  IconButton,
-  Tooltip,
   Typography,
 } from "@mui/material"
-import DeleteIcon from "@mui/icons-material/Delete"
-import EditIcon from "@mui/icons-material/Edit"
 import type { Fight } from "@/types"
 import Link from "next/link"
 import { FightName, FightDescription } from "@/components/fights"
 import { useCampaign, useClient } from "@/contexts"
 import { CharacterLink } from "@/components/links"
+import DetailButtons from "@/components/DetailButtons"
 
-interface FightDetailProps {
+interface FightDetailProperties {
   fight: Fight
   onDelete: (fightId: string) => void
   onEdit: (fight: Fight) => void
@@ -29,7 +26,7 @@ export default function FightDetail({
   fight: initialFight,
   onDelete,
   onEdit,
-}: FightDetailProps) {
+}: FightDetailProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
@@ -52,7 +49,9 @@ export default function FightDetail({
       onDelete(fight.id)
       setError(null)
     } catch (error_) {
-      setError(error_ instanceof Error ? error_.message : "Failed to delete fight")
+      setError(
+        error_ instanceof Error ? error_.message : "Failed to delete fight"
+      )
       console.error("Delete fight error:", error_)
     }
   }
@@ -97,28 +96,11 @@ export default function FightDetail({
               <FightName fight={fight} />
             </Link>
           </Typography>
-          <Box sx={{ display: "flex", gap: "0.5rem" }}>
-            <Tooltip title="Edit Fight">
-              <IconButton
-                color="inherit"
-                onClick={handleEdit}
-                size="small"
-                aria-label="edit fight"
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete Fight">
-              <IconButton
-                color="inherit"
-                onClick={handleDelete}
-                size="small"
-                aria-label="delete fight"
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
+          <DetailButtons
+            name="Fight"
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         </Box>
         <FightDescription fight={fight} />
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>

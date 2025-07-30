@@ -4,11 +4,11 @@ import { CampaignName } from "@/components/campaigns"
 import { UserName } from "@/components/users"
 import { RichTextRenderer } from "@/components/editor"
 
-type CampaignProps = {
+type CampaignProperties = {
   campaign: Campaign
 }
 
-export default function CampaignBanner({ campaign }: CampaignProps) {
+export default function CampaignBanner({ campaign }: CampaignProperties) {
   return (
     <Box
       sx={{

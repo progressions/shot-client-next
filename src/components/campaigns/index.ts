@@ -6,4 +6,4 @@ export { default as CreateCampaignForm } from "@/components/campaigns/CreateCamp
 export { default as EditCampaignForm } from "@/components/campaigns/EditCampaignForm"
 export { default as CampaignForm } from "@/components/campaigns/CampaignForm"
 export { default as CampaignPageClient } from "@/components/campaigns/CampaignPageClient"
-export { default as MembersForm } from "@/components/campaigns/MembersForm"
+export { default as MembersList } from "@/components/campaigns/MembersList"

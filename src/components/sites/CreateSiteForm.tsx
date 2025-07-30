@@ -4,7 +4,7 @@ import { defaultSite, type Site } from "@/types"
 import { useClient } from "@/contexts"
 import SiteForm from "./SiteForm"
 
-interface CreateSiteFormProps {
+interface CreateSiteFormProperties {
   open: boolean
   onClose: () => void
   onSave: (newSite: Site) => void
@@ -14,7 +14,7 @@ export default function CreateSiteForm({
   open,
   onClose,
   onSave,
-}: CreateSiteFormProps) {
+}: CreateSiteFormProperties) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, siteData: Site) => {

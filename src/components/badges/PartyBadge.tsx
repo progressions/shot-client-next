@@ -4,12 +4,15 @@ import type { Party } from "@/types"
 import { CharacterLink, FactionLink, PartyLink } from "@/components/links"
 import { Badge } from "@/components/badges"
 
-type PartyBadgeProps = {
+type PartyBadgeProperties = {
   party: Party
   size?: "sm" | "md" | "lg"
 }
 
-export default function PartyBadge({ party, size = "md" }: PartyBadgeProps) {
+export default function PartyBadge({
+  party,
+  size = "md",
+}: PartyBadgeProperties) {
   return (
     <Badge entity={party} size={size} title={<PartyLink party={party} />}>
       {party.faction && (

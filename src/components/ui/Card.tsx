@@ -1,5 +1,5 @@
-import { Card as MuiCard, CardProps as MuiCardProps } from "@mui/material"
+import { Card as MuiCard, CardProps as MuiCardProperties } from "@mui/material"
 
-export function Card(props: MuiCardProps) {
-  return <MuiCard {...props} />
+export function Card(properties: MuiCardProperties) {
+  return <MuiCard {...properties} />
 }

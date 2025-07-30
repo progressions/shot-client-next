@@ -10,7 +10,7 @@ import {
   CampaignBanner,
 } from "@/components/dashboard"
 
-interface DashboardProps {
+interface DashboardProperties {
   user: User
   campaign: Campaign
   fights: Fight[]
@@ -24,7 +24,7 @@ export default function Dashboard({
   fights,
   characters,
   parties,
-}: DashboardProps) {
+}: DashboardProperties) {
   return (
     <Box>
       <Typography variant="h6" color="#fff" gutterBottom>

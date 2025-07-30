@@ -2,12 +2,12 @@ import Link from "next/link"
 import { UserName } from "@/components/users"
 import type { User } from "@/types"
 
-type UserLinkProps = {
+type UserLinkProperties = {
   user: User
   data?: string | object
 }
 
-export default function UserLink({ user, data }: UserLinkProps) {
+export default function UserLink({ user, data }: UserLinkProperties) {
   return (
     <Link
       href={`/users/${user.id}`}

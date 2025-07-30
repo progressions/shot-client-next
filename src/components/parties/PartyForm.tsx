@@ -1,10 +1,9 @@
 "use client"
 
-import Image from "next/image"
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
-import { TextField, SaveButton, CancelButton } from "@/components/ui"
+import { HeroImage, TextField, SaveButton, CancelButton } from "@/components/ui"
 import type { EditorChangeEvent, Party } from "@/types"
 import { defaultParty } from "@/types"
 import { FormActions, useForm } from "@/reducers"
@@ -19,13 +18,12 @@ type FormStateData = Party & {
   image?: File | null
 }
 
-interface PartyFormProps {
+interface PartyFormProperties {
   open: boolean
   onClose: () => void
   onSave: (formData: FormData, partyData: Party) => Promise<void>
   initialFormData: FormStateData
   title: string
-  existingImageUrl?: string | null
 }
 
 export default function PartyForm({
@@ -34,8 +32,7 @@ export default function PartyForm({
   onSave,
   initialFormData,
   title,
-  existingImageUrl,
-}: PartyFormProps) {
+}: PartyFormProperties) {
   const { formState, dispatchForm, initialFormState } =
     useForm<FormStateData>(initialFormData)
   const { disabled, error, data } = formState
@@ -123,6 +120,7 @@ export default function PartyForm({
       open={open}
       onClose={handleClose}
     >
+      <HeroImage entity={formState.data} />
       <Box
         component="form"
         onSubmit={handleSubmit}
@@ -194,28 +192,10 @@ export default function PartyForm({
             />
           </IconButton>
           <Typography variant="body2" sx={{ color: "#ffffff" }}>
-            {image
-              ? image.name
-              : (existingImageUrl
-                ? "Current image"
-                : "No image selected")}
+            Update Image
           </Typography>
         </Box>
-        {(imagePreview || existingImageUrl) && (
-          <Box sx={{ mt: 2 }}>
-            <Image
-              src={imagePreview || existingImageUrl || ""}
-              alt="Party image preview"
-              width={isMobile ? 150 : 200}
-              height={isMobile ? 150 : 200}
-              style={{
-                width: "100%",
-                maxHeight: isMobile ? "150px" : "200px",
-                objectFit: "contain",
-              }}
-            />
-          </Box>
-        )}
+        {imagePreview && <HeroImage entity={{ image_url: imagePreview }} />}
         <Box sx={{ display: "flex", gap: "1rem", mt: 3 }}>
           <SaveButton type="submit" disabled={disabled}>
             Save

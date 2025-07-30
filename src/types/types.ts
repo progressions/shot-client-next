@@ -156,7 +156,7 @@ export interface CharacterJson {
   wealth: string
 }
 
-export interface PopupProps {
+export interface PopupProperties {
   id: string
   data?: object | object[]
 }
@@ -218,7 +218,7 @@ export interface OptionType {
   inputValue: string
 }
 
-export interface FilterParamsType {
+export interface FilterParametersType {
   getOptionLabel: (option: string | OptionType) => string
   inputValue: string
 }
@@ -229,7 +229,7 @@ export type WeaponCategory = string
 export type SchtickCategory = string
 export type SchtickPath = string
 
-export interface InputParamsType {
+export interface InputParametersType {
   [key: string]: unknown
 }
 
@@ -315,7 +315,7 @@ export interface CharacterFilter {
   name: string | null
 }
 
-export interface ParamsType {
+export interface ParametersType {
   [key: string]: string
   id: string
 }

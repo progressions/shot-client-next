@@ -30,18 +30,18 @@ const suggestion = (user, client) => ({
     let popup
 
     return {
-      onStart: props => {
+      onStart: properties => {
         component = new ReactRenderer(MentionList, {
-          props,
-          editor: props.editor,
+          props: properties,
+          editor: properties.editor,
         })
 
-        if (!props.clientRect) {
+        if (!properties.clientRect) {
           return
         }
 
         popup = tippy("body", {
-          getReferenceClientRect: props.clientRect,
+          getReferenceClientRect: properties.clientRect,
           appendTo: () => document.body,
           content: component.element,
           showOnCreate: true,
@@ -51,27 +51,27 @@ const suggestion = (user, client) => ({
         })
       },
 
-      onUpdate(props) {
-        component.updateProps(props)
+      onUpdate(properties) {
+        component.updateProps(properties)
 
-        if (!props.clientRect) {
+        if (!properties.clientRect) {
           return
         }
 
         popup[0].setProps({
-          getReferenceClientRect: props.clientRect,
+          getReferenceClientRect: properties.clientRect,
         })
       },
 
-      onKeyDown(props) {
-        console.log("suggestion keydown props", props)
-        if (props.event.key === "Escape") {
+      onKeyDown(properties) {
+        console.log("suggestion keydown props", properties)
+        if (properties.event.key === "Escape") {
           popup[0].hide()
 
           return true
         }
 
-        return component.ref?.onKeyDown(props)
+        return component.ref?.onKeyDown(properties)
       },
 
       onExit() {

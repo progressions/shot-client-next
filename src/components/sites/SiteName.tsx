@@ -4,11 +4,11 @@ import { useState, useEffect } from "react"
 import { useCampaign } from "@/contexts"
 import type { Site } from "@/types"
 
-interface SiteNameProps {
+interface SiteNameProperties {
   site: Site
 }
 
-export default function SiteName({ site }: SiteNameProps) {
+export default function SiteName({ site }: SiteNameProperties) {
   const { campaignData } = useCampaign()
   const [displayName, setDisplayName] = useState(site.name)
 
@@ -16,8 +16,8 @@ export default function SiteName({ site }: SiteNameProps) {
     if (campaignData && "site" in campaignData) {
       const updatedSite = campaignData.site
       if (updatedSite && updatedSite.id === site.id && updatedSite.name) {
-          setDisplayName(updatedSite.name)
-        }
+        setDisplayName(updatedSite.name)
+      }
     }
   }, [campaignData, site.id])
 

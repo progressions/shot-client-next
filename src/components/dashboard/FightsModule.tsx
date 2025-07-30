@@ -3,11 +3,11 @@ import { Stack, Box, Typography } from "@mui/material"
 import { FightBadge } from "@/components/badges"
 import Link from "next/link"
 
-type FightsModuleProps = {
+type FightsModuleProperties = {
   fights: Fight[]
 }
 
-export default function FightsModule({ fights }: FightsModuleProps) {
+export default function FightsModule({ fights }: FightsModuleProperties) {
   return (
     <Box
       sx={{

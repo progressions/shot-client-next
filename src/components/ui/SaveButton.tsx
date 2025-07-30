@@ -1,8 +1,17 @@
 import {
   Button as MuiButton,
-  ButtonProps as MuiButtonProps,
+  ButtonProps as MuiButtonProperties,
 } from "@mui/material"
 
-export function SaveButton(props: MuiButtonProps) {
-  return <MuiButton variant="contained" color="primary" {...props} />
+export function SaveButton(properties: MuiButtonProperties) {
+  return (
+    <MuiButton
+      type="submit"
+      variant="contained"
+      color="primary"
+      {...properties}
+    >
+      {properties.children ? properties.children : "Save"}
+    </MuiButton>
+  )
 }

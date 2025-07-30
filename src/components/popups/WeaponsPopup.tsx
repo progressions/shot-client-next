@@ -4,12 +4,12 @@ import WS from "@/services/WeaponService"
 import ImageIcon from "@mui/icons-material/Image"
 import { GiDeathSkull, GiShotgun } from "react-icons/gi"
 
-interface WeaponsPopupProps {
+interface WeaponsPopupProperties {
   id: string
   data?: Weapon[]
 }
 
-export default function WeaponsPopup({ data }: WeaponsPopupProps) {
+export default function WeaponsPopup({ data }: WeaponsPopupProperties) {
   const weapons = data || []
 
   return (

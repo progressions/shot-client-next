@@ -2,12 +2,12 @@ import Link from "next/link"
 import { VehicleName } from "@/components/vehicles"
 import type { Vehicle } from "@/types"
 
-type VehicleLinkProps = {
+type VehicleLinkProperties = {
   vehicle: Vehicle
   data?: string | object
 }
 
-export default function VehicleLink({ vehicle, data }: VehicleLinkProps) {
+export default function VehicleLink({ vehicle, data }: VehicleLinkProperties) {
   return (
     <Link
       href={`/vehicles/${vehicle.id}`}

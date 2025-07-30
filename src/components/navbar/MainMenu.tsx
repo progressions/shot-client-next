@@ -8,15 +8,15 @@ import { useClient } from "@/contexts"
 
 export default function HamburgerMenu() {
   const { user } = useClient()
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const open = Boolean(anchorEl)
+  const [anchorElement, setAnchorElement] = useState<null | HTMLElement>(null)
+  const open = Boolean(anchorElement)
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
+    setAnchorElement(event.currentTarget)
   }
 
   const handleMenuClose = () => {
-    setAnchorEl(null)
+    setAnchorElement(null)
   }
 
   return (
@@ -31,7 +31,7 @@ export default function HamburgerMenu() {
         <MenuIcon />
       </IconButton>
       <Menu
-        anchorEl={anchorEl}
+        anchorEl={anchorElement}
         open={open}
         onClose={handleMenuClose}
         PaperProps={{
@@ -120,7 +120,8 @@ export default function HamburgerMenu() {
             Junctures
           </Link>
         </MenuItem>
-        <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />
+        {user.gamemaster ||
+          (user.admin && <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />)}
         {user.gamemaster && (
           <MenuItem onClick={handleMenuClose}>
             <Link

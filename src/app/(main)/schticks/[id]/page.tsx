@@ -3,11 +3,11 @@ import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Schtick } from "@/types"
 import { SchtickPageClient } from "@/components/schticks"
 
-type SchtickPageProps = {
+type SchtickPageProperties = {
   params: Promise<{ id: string }>
 }
 
-export default async function SchtickPage({ params }: SchtickPageProps) {
+export default async function SchtickPage({ params }: SchtickPageProperties) {
   const { id } = await params
   const client = await getServerClient()
   const user = await getUser()

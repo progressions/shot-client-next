@@ -2,12 +2,12 @@ import Link from "next/link"
 import type { Fight } from "@/types"
 import { FightName } from "@/components/fights"
 
-type FightLinkProps = {
+type FightLinkProperties = {
   fight: Fight
   data?: string | object
 }
 
-export default function FightLink({ fight, data }: FightLinkProps) {
+export default function FightLink({ fight, data }: FightLinkProperties) {
   return (
     <Link
       href={`/fights/${fight.id}`}

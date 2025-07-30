@@ -158,6 +158,12 @@ async function fetchCrumbName(
     return <VehicleName vehicle={response.data} />
   }
   if (pathnames[0] === "characters") {
+    if (id === "import") {
+      return "Import"
+    }
+    if (id === "generate") {
+      return "Generate"
+    }
     const response = await client.getCharacter({ id })
     return <CharacterName character={response.data} />
   }

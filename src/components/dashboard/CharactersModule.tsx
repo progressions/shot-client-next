@@ -3,13 +3,13 @@ import Link from "next/link"
 import type { Character } from "@/types"
 import { CharacterBadge } from "@/components/badges"
 
-type CharactersModuleProps = {
+type CharactersModuleProperties = {
   characters: Character[]
 }
 
 export default function CharactersModule({
   characters,
-}: CharactersModuleProps) {
+}: CharactersModuleProperties) {
   return (
     <Box
       sx={{

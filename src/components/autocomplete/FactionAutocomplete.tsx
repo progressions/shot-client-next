@@ -4,7 +4,7 @@ import type { Faction } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
 
-type FactionAutocompleteProps = {
+type FactionAutocompleteProperties = {
   value: string
   onChange: (value: string | null) => void
   options?: Option[]
@@ -18,7 +18,7 @@ export default function FactionAutocomplete({
   options,
   exclude = [],
   allowNone = true,
-}: FactionAutocompleteProps) {
+}: FactionAutocompleteProperties) {
   const { client } = useClient()
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
@@ -27,7 +27,7 @@ export default function FactionAutocomplete({
         option.label.toLowerCase().includes(inputValue.toLowerCase())
       )
 
-      return filteredOptions;
+      return filteredOptions
     }
     try {
       const response = await client.getFactions({ search: inputValue })

@@ -23,7 +23,7 @@ import { FormActions, useForm } from "@/reducers"
 import { useCollection } from "@/hooks"
 import { VehiclesMobile } from "@/components/vehicles"
 
-interface VehiclesProps {
+interface VehiclesProperties {
   initialVehicles: Vehicle[]
   initialMeta: PaginationMeta
   initialSort: string
@@ -46,7 +46,7 @@ export default function Vehicles({
   initialMeta,
   initialSort,
   initialOrder,
-}: VehiclesProps) {
+}: VehiclesProperties) {
   const { client } = useClient()
   const router = useRouter()
   const theme = useTheme()

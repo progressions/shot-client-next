@@ -3,11 +3,11 @@ import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Faction } from "@/types"
 import { FactionPageClient } from "@/components/factions"
 
-type FactionPageProps = {
+type FactionPageProperties = {
   params: Promise<{ id: string }>
 }
 
-export default async function FactionPage({ params }: FactionPageProps) {
+export default async function FactionPage({ params }: FactionPageProperties) {
   const { id } = await params
   const client = await getServerClient()
   const user = await getUser()

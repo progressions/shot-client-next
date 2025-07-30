@@ -28,7 +28,7 @@ interface ClientContextType {
   dispatchCurrentUser: ActionDispatch<[action: UserStateAction]>
 }
 
-interface ClientProviderProps {
+interface ClientProviderProperties {
   children: React.ReactNode
   initialUser?: User | null
 }
@@ -41,7 +41,10 @@ const ClientContext = createContext<ClientContextType>({
   dispatchCurrentUser: () => {},
 })
 
-export function ClientProvider({ children, initialUser }: ClientProviderProps) {
+export function ClientProvider({
+  children,
+  initialUser,
+}: ClientProviderProperties) {
   const [state, dispatch] = useReducer(userReducer, {
     ...initialUserState,
     user: initialUser || defaultUser, // Use initialUser if provided
@@ -50,13 +53,13 @@ export function ClientProvider({ children, initialUser }: ClientProviderProps) {
   const jwt = Cookies.get("jwtToken") ?? ""
   const client = useMemo(() => new Client({ jwt }), [jwt])
 
-  const hasFetchedRef = useRef(false)
+  const hasFetchedReference = useRef(false)
 
   useEffect(() => {
     async function fetchUser() {
-      if (!jwt || hasFetchedRef.current || state.user.id) return // Skip if initialUser provided or fetched
+      if (!jwt || hasFetchedReference.current || state.user.id) return // Skip if initialUser provided or fetched
 
-      hasFetchedRef.current = true
+      hasFetchedReference.current = true
       try {
         const response = await client.getCurrentUser()
         const { data } = response || {}

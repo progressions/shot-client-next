@@ -4,12 +4,15 @@ import type { Fight } from "@/types"
 import { CharacterLink, FightLink } from "@/components/links"
 import { Badge } from "@/components/badges"
 
-type FightBadgeProps = {
+type FightBadgeProperties = {
   fight: Fight
   size?: "sm" | "md" | "lg"
 }
 
-export default function FightBadge({ fight, size = "md" }: FightBadgeProps) {
+export default function FightBadge({
+  fight,
+  size = "md",
+}: FightBadgeProperties) {
   return (
     <Badge entity={fight} size={size} title={<FightLink fight={fight} />}>
       {fight.actors.length === 0 && "No fighters yet!"}

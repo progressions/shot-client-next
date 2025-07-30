@@ -1,23 +1,24 @@
 import type { Swerve, ExplodingDiceRolls } from "@/types"
 
 const DiceService = {
+  // @ts-expect-error This will be used one day
   rollDie: function (): number {
     const result = Math.floor(Math.random() * 6) + 1
     return result
   },
 
   rollExplodingDie: function (rollDie: () => number): ExplodingDiceRolls {
-    let result = this.rollDie()
+    let result = rollDie()
     const total = []
     do {
-      result = this.rollDie()
+      result = rollDie()
       total.push(result)
     } while (result == 6)
 
     return [
       total,
-      total.reduce((sum, num) => {
-        return sum + num
+      total.reduce((sum, number_) => {
+        return sum + number_
       }, 0),
     ]
   },

@@ -4,7 +4,7 @@ import { defaultJuncture, type Juncture } from "@/types"
 import { useClient } from "@/contexts"
 import JunctureForm from "./JunctureForm"
 
-interface CreateJunctureFormProps {
+interface CreateJunctureFormProperties {
   open: boolean
   onClose: () => void
   onSave: (newJuncture: Juncture) => void
@@ -14,7 +14,7 @@ export default function CreateJunctureForm({
   open,
   onClose,
   onSave,
-}: CreateJunctureFormProps) {
+}: CreateJunctureFormProperties) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, junctureData: Juncture) => {

@@ -22,7 +22,7 @@ export interface CampaignContextType {
   campaignData: CampaignCableData | null
 }
 
-interface CampaignProviderProps {
+interface CampaignProviderProperties {
   children: React.ReactNode
 }
 
@@ -36,7 +36,7 @@ const defaultContext: CampaignContextType = {
 
 const CampaignContext = createContext<CampaignContextType>(defaultContext)
 
-export function CampaignProvider({ children }: CampaignProviderProps) {
+export function CampaignProvider({ children }: CampaignProviderProperties) {
   const { user, client } = useClient()
   const { saveLocally, getLocally } = useLocalStorage()
   const consumer = useMemo(() => client.consumer(), [client])

@@ -4,7 +4,7 @@ import type { Site } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
 
-type SitesAutocompleteProps = {
+type SitesAutocompleteProperties = {
   value: string
   onChange: (value: string | null) => void
   options?: Option[]
@@ -18,7 +18,7 @@ export default function SitesAutocomplete({
   options,
   exclude = [],
   allowNone = true,
-}: SitesAutocompleteProps) {
+}: SitesAutocompleteProperties) {
   const { client } = useClient()
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
@@ -29,7 +29,7 @@ export default function SitesAutocomplete({
         )
         .filter(option => !exclude.includes(option.value))
 
-      return filteredOptions;
+      return filteredOptions
     }
     try {
       const response = await client.getSites({ search: inputValue })

@@ -40,7 +40,7 @@ import type {
 } from "@/types"
 import { createConsumer, Consumer } from "@rails/actioncable"
 
-interface ClientParams {
+interface ClientParameters {
   jwt?: string
 }
 
@@ -49,7 +49,7 @@ interface CacheOptions {
   revalidate?: number
 }
 
-type Params = Record<string, unknown>
+type Parameters_ = Record<string, unknown>
 
 class Client {
   jwt?: string
@@ -57,9 +57,9 @@ class Client {
   apiV2: ApiV2
   consumerInstance?: Consumer
 
-  constructor(params: ClientParams = {}) {
-    if (params.jwt) {
-      this.jwt = params.jwt
+  constructor(parameters: ClientParameters = {}) {
+    if (parameters.jwt) {
+      this.jwt = parameters.jwt
     }
     this.api = new Api()
     this.apiV2 = new ApiV2()
@@ -75,24 +75,24 @@ class Client {
   }
 
   async generateAiCharacter(
-    params: { description: string } = { description: "" }
+    parameters: { description: string } = { description: "" }
   ): Promise<AxiosResponse<CharacterJson>> {
-    return this.post(this.api.ai(), { ai: params })
+    return this.post(this.api.ai(), { ai: parameters })
   }
 
   async getSuggestions(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<SuggestionsResponse>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(`${this.api.suggestions()}?${query}`, {}, cacheOptions)
   }
 
   async getNotionCharacters(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<NotionPage[]>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(`${this.api.notionCharacters()}?${query}`, {}, cacheOptions)
   }
 
@@ -102,7 +102,7 @@ class Client {
   ): Promise<AxiosResponse<Location>> {
     return this.get(
       this.api.locations(),
-      { shot_id: character.shot_id } as Params,
+      { shot_id: character.shot_id } as Parameters_,
       cacheOptions
     )
   }
@@ -113,7 +113,7 @@ class Client {
   ): Promise<AxiosResponse<Location>> {
     return this.get(
       this.api.locations(),
-      { shot_id: vehicle.shot_id } as Params,
+      { shot_id: vehicle.shot_id } as Parameters_,
       cacheOptions
     )
   }
@@ -169,10 +169,10 @@ class Client {
   }
 
   async getParties(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<PartiesResponse>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(`${this.apiV2.parties()}?${query}`, {}, cacheOptions)
   }
 
@@ -214,10 +214,10 @@ class Client {
   }
 
   async getFights(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<FightsResponse>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(`${this.apiV2.fights()}?${query}`, {}, cacheOptions)
   }
 
@@ -266,18 +266,18 @@ class Client {
   }
 
   async getCharacters(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<CharactersResponse>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(`${this.apiV2.characters()}?${query}`, {}, cacheOptions)
   }
 
   async getCharacterNames(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<CharactersResponse>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(
       `${this.apiV2.characters()}/names?${query}`,
       {},
@@ -287,10 +287,10 @@ class Client {
 
   async getCharactersInFight(
     fight: Fight | ID,
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<Person[]>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(
       `${this.api.charactersAndVehicles(fight)}/characters?${query}`,
       {},
@@ -299,19 +299,19 @@ class Client {
   }
 
   async getVehicles(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<VehiclesResponse>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(`${this.apiV2.vehicles()}?${query}`, {}, cacheOptions)
   }
 
   async getVehiclesInFight(
     fight: Fight | ID,
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<VehiclesResponse>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(
       `${this.api.charactersAndVehicles(fight)}/vehicles?${query}`,
       {},
@@ -320,10 +320,10 @@ class Client {
   }
 
   async getCharactersAndVehicles(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<CharactersAndVehiclesResponse>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(
       `${this.api.charactersAndVehicles()}?${query}`,
       {},
@@ -341,7 +341,7 @@ class Client {
   async getCharacterPdf(
     character: Character | ID
   ): Promise<AxiosResponse<string>> {
-    const url = `${this.api.characterPdf(character)}`
+    const url = `${this.apiV2.characterPdf(character)}`
     return await axios({
       url: url,
       method: "GET",
@@ -349,7 +349,7 @@ class Client {
       responseType: "arraybuffer",
       headers: {
         "Content-Type": "application/json",
-        Authorization: this.jwt,
+        Authorization: `Bearer ${this.jwt}`,
       },
       proxy: false,
     })
@@ -397,9 +397,11 @@ class Client {
     character: Character,
     fight?: Fight | null
   ): Promise<AxiosResponse<void>> {
-    return fight?.id ? this.delete(
-        this.api.characters(fight, { id: character.shot_id } as Character)
-      ) : this.delete(this.api.characters(null, character));
+    return fight?.id
+      ? this.delete(
+          this.api.characters(fight, { id: character.shot_id } as Character)
+        )
+      : this.delete(this.apiV2.characters(character))
   }
 
   async deleteCharacterImage(
@@ -562,10 +564,10 @@ class Client {
   }
 
   async getJunctures(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<JuncturesResponse>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(`${this.apiV2.junctures()}?${query}`, {}, cacheOptions)
   }
 
@@ -600,10 +602,10 @@ class Client {
   }
 
   async getSites(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<SitesResponse>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(`${this.apiV2.sites()}?${query}`, {}, cacheOptions)
   }
 
@@ -768,10 +770,10 @@ class Client {
   }
 
   async getCampaigns(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<CampaignsResponse>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(`${this.apiV2.campaigns()}?${query}`, {}, cacheOptions)
   }
 
@@ -853,10 +855,10 @@ class Client {
   }
 
   async getUsers(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<UsersResponse>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(`${this.apiV2.users()}?${query}`, {}, cacheOptions)
   }
 
@@ -868,10 +870,10 @@ class Client {
   }
 
   async getFactions(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<FactionsResponse>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(`${this.apiV2.factions()}?${query}`, {}, cacheOptions)
   }
 
@@ -899,18 +901,18 @@ class Client {
   }
 
   async getSchtickPaths(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<{ paths: string[] }>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(`${this.apiV2.schtickPaths()}?${query}`, {}, cacheOptions)
   }
 
   async getSchtickCategories(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<{ categories: string[] }>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(
       `${this.apiV2.schtickCategories()}?${query}`,
       {},
@@ -919,10 +921,10 @@ class Client {
   }
 
   async getSchticks(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<SchticksResponse>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(`${this.apiV2.schticks()}?${query}`, {}, cacheOptions)
   }
 
@@ -954,10 +956,10 @@ class Client {
 
   async getCharacterSchticks(
     character: Character | ID,
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<SchticksResponse>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(
       `${this.api.characterSchticks(character)}?${query}`,
       {},
@@ -983,7 +985,7 @@ class Client {
   ): Promise<AxiosResponse<Character>> {
     return this.requestFormData(
       "POST",
-      `${this.api.characters()}/pdf`,
+      `${this.apiV2.characters()}/pdf`,
       formData
     )
   }
@@ -997,10 +999,10 @@ class Client {
 
   async getCharacterWeapons(
     character: Character | ID,
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<WeaponsResponse>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(
       `${this.api.characterWeapons(character)}?${query}`,
       {},
@@ -1009,10 +1011,10 @@ class Client {
   }
 
   async getWeapons(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<WeaponsResponse>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(`${this.apiV2.weapons()}?${query}`, {}, cacheOptions)
   }
 
@@ -1024,10 +1026,10 @@ class Client {
   }
 
   async getWeaponJunctures(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<{ junctures: string[] }>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(
       `${this.apiV2.weaponJunctures()}?${query}`,
       {},
@@ -1036,10 +1038,10 @@ class Client {
   }
 
   async getWeaponCategories(
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<{ categories: string[] }>> {
-    const query = this.queryParams(params)
+    const query = this.queryParams(parameters)
     return this.get(
       `${this.apiV2.weaponCategories()}?${query}`,
       {},
@@ -1090,24 +1092,24 @@ class Client {
 
   async patch<T>(
     url: string,
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<T>> {
-    return await this.request("PATCH", url, params, cacheOptions)
+    return await this.request("PATCH", url, parameters, cacheOptions)
   }
 
   async post<T>(
     url: string,
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<T>> {
-    return await this.request("POST", url, params, cacheOptions)
+    return await this.request("POST", url, parameters, cacheOptions)
   }
 
   async request<T>(
     method: string,
     url: string,
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<T>> {
     const headers: { [key: string]: string } = {
@@ -1131,9 +1133,9 @@ class Client {
     }
 
     if (method === "GET") {
-      config.params = params
+      config.params = parameters
     } else {
-      config.data = params
+      config.data = parameters
     }
 
     return await axios(config)
@@ -1141,12 +1143,12 @@ class Client {
 
   async get<T>(
     url: string,
-    params: Params = {},
+    parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<T>> {
     if (!this.jwt) {
       console.log("No JWT provided, cannot make GET request", url)
-      throw new Error("No JWT provided");
+      throw new Error("No JWT provided")
     }
 
     const headers: { [key: string]: string } = {
@@ -1165,7 +1167,7 @@ class Client {
     const config: AxiosRequestConfig = {
       url: url,
       method: "GET",
-      params: params,
+      params: parameters,
       headers: headers,
       proxy: false,
     }
@@ -1203,12 +1205,12 @@ class Client {
       proxy: false,
     }).catch(error => {
       console.error("Error in requestFormData:", error)
-      throw error;
+      throw error
     })
   }
 
-  queryParams(params: Params = {}) {
-    return Object.entries(params)
+  queryParams(parameters: Parameters_ = {}) {
+    return Object.entries(parameters)
       .map(([key, value]) => `${key}=${value || ""}`)
       .join("&")
   }

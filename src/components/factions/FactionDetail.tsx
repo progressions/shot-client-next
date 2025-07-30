@@ -7,19 +7,16 @@ import {
   CardMedia,
   Box,
   Alert,
-  IconButton,
-  Tooltip,
   Typography,
 } from "@mui/material"
-import DeleteIcon from "@mui/icons-material/Delete"
-import EditIcon from "@mui/icons-material/Edit"
 import type { Faction } from "@/types"
 import Link from "next/link"
 import { FactionName, FactionDescription } from "@/components/factions"
 import { useCampaign, useClient } from "@/contexts"
 import { CharacterName } from "@/components/characters"
+import DetailButtons from "@/components/DetailButtons"
 
-interface FactionDetailProps {
+interface FactionDetailProperties {
   faction: Faction
   onDelete: (factionId: string) => void
   onEdit: (faction: Faction) => void
@@ -29,7 +26,7 @@ export default function FactionDetail({
   faction: initialFaction,
   onDelete,
   onEdit,
-}: FactionDetailProps) {
+}: FactionDetailProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
@@ -62,7 +59,9 @@ export default function FactionDetail({
       onDelete(faction.id)
       setError(null)
     } catch (error_) {
-      setError(error_ instanceof Error ? error_.message : "Failed to delete faction")
+      setError(
+        error_ instanceof Error ? error_.message : "Failed to delete faction"
+      )
       console.error("Delete faction error:", error_)
     }
   }
@@ -107,28 +106,11 @@ export default function FactionDetail({
               <FactionName faction={faction} />
             </Link>
           </Typography>
-          <Box sx={{ display: "flex", gap: "0.5rem" }}>
-            <Tooltip title="Edit Faction">
-              <IconButton
-                color="inherit"
-                onClick={handleEdit}
-                size="small"
-                aria-label="edit faction"
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete Faction">
-              <IconButton
-                color="inherit"
-                onClick={handleDelete}
-                size="small"
-                aria-label="delete faction"
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
+          <DetailButtons
+            name="Faction"
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         </Box>
         <FactionDescription faction={faction} />
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>

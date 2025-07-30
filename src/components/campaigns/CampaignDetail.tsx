@@ -7,19 +7,16 @@ import {
   CardMedia,
   Box,
   Alert,
-  IconButton,
-  Tooltip,
   Typography,
 } from "@mui/material"
-import DeleteIcon from "@mui/icons-material/Delete"
-import EditIcon from "@mui/icons-material/Edit"
 import type { Campaign } from "@/types"
 import Link from "next/link"
 import { CampaignDescription } from "@/components/campaigns"
 import { useCampaign, useClient } from "@/contexts"
 import { UserName } from "@/components/names"
+import DetailButtons from "@/components/DetailButtons"
 
-interface CampaignDetailProps {
+interface CampaignDetailProperties {
   campaign: Campaign
   onDelete: (campaignId: string) => void
   onEdit: (campaign: Campaign) => void
@@ -29,7 +26,7 @@ export default function CampaignDetail({
   campaign: initialCampaign,
   onDelete,
   onEdit,
-}: CampaignDetailProps) {
+}: CampaignDetailProperties) {
   const { user, client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
@@ -61,7 +58,9 @@ export default function CampaignDetail({
       onDelete(campaign.id)
       setError(null)
     } catch (error_) {
-      setError(error_ instanceof Error ? error_.message : "Failed to delete campaign")
+      setError(
+        error_ instanceof Error ? error_.message : "Failed to delete campaign"
+      )
       console.error("Delete campaign error:", error_)
     }
   }
@@ -107,28 +106,11 @@ export default function CampaignDetail({
             </Link>
           </Typography>
           {gameMaster && (
-            <Box sx={{ display: "flex", gap: "0.5rem" }}>
-              <Tooltip title="Edit Campaign">
-                <IconButton
-                  color="inherit"
-                  onClick={handleEdit}
-                  size="small"
-                  aria-label="edit campaign"
-                >
-                  <EditIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Delete Campaign">
-                <IconButton
-                  color="inherit"
-                  onClick={handleDelete}
-                  size="small"
-                  aria-label="delete campaign"
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
+            <DetailButtons
+              name="Campaign"
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
           )}
         </Box>
         <CampaignDescription campaign={campaign} />

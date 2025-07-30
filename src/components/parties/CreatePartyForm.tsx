@@ -4,7 +4,7 @@ import { defaultParty, type Party } from "@/types"
 import { useClient } from "@/contexts"
 import PartyForm from "./PartyForm"
 
-interface CreatePartyFormProps {
+interface CreatePartyFormProperties {
   open: boolean
   onClose: () => void
   onSave: (newParty: Party) => void
@@ -14,7 +14,7 @@ export default function CreatePartyForm({
   open,
   onClose,
   onSave,
-}: CreatePartyFormProps) {
+}: CreatePartyFormProperties) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, partyData: Party) => {

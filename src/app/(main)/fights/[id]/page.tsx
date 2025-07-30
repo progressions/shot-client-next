@@ -3,11 +3,11 @@ import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Fight } from "@/types"
 import { FightPageClient } from "@/components/fights"
 
-type FightPageProps = {
+type FightPageProperties = {
   params: Promise<{ id: string }>
 }
 
-export default async function FightPage({ params }: FightPageProps) {
+export default async function FightPage({ params }: FightPageProperties) {
   const { id } = await params
   const client = await getServerClient()
   const user = await getUser()

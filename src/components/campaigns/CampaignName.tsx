@@ -4,20 +4,24 @@ import { useState, useEffect } from "react"
 import { useCampaign } from "@/contexts"
 import type { Campaign } from "@/types"
 
-interface CampaignNameProps {
+interface CampaignNameProperties {
   campaign: Campaign
 }
 
-export default function CampaignName({ campaign }: CampaignNameProps) {
+export default function CampaignName({ campaign }: CampaignNameProperties) {
   const { campaignData } = useCampaign()
   const [displayName, setDisplayName] = useState(campaign.name)
 
   useEffect(() => {
     if (campaignData && "campaign" in campaignData) {
       const updatedCampaign = campaignData.campaign
-      if (updatedCampaign && updatedCampaign.id === campaign.id && updatedCampaign.name) {
-          setDisplayName(updatedCampaign.name)
-        }
+      if (
+        updatedCampaign &&
+        updatedCampaign.id === campaign.id &&
+        updatedCampaign.name
+      ) {
+        setDisplayName(updatedCampaign.name)
+      }
     }
   }, [campaignData, campaign.id])
 

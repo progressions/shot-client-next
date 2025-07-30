@@ -5,7 +5,7 @@ import { VehicleLink } from "@/components/links"
 import { Badge } from "@/components/badges"
 import { SystemStyleObject, Theme } from "@mui/system"
 
-type VehicleBadgeProps = {
+type VehicleBadgeProperties = {
   vehicle: Vehicle
   size?: "sm" | "md" | "lg"
   sx?: SystemStyleObject<Theme>
@@ -15,7 +15,7 @@ export default function VehicleBadge({
   vehicle,
   size = "md",
   sx = {},
-}: VehicleBadgeProps) {
+}: VehicleBadgeProperties) {
   return (
     <Badge
       entity={vehicle}

@@ -5,22 +5,21 @@ import { useClient } from "@/contexts"
 import { InfoLink } from "@/components/links"
 import { ListManager } from "@/components/lists"
 
-type FormStateData = {
-  page: number
-  open: boolean
-  character_id?: string | null
-}
-
-type MembersListProps = {
+type MembersListProperties = {
   fight: Fight
+  setFight: (fight: Fight) => void
 }
 
-export default function MembersList({ fight }: MembersListProps) {
+export default function MembersList({
+  fight,
+  setFight,
+}: MembersListProperties) {
   const { client } = useClient()
 
   async function update(fightId: string, formData: FormData) {
     try {
-      await client.updateFight(fightId, formData)
+      const response = await client.updateFight(fightId, formData)
+      setFight(response.data)
     } catch (error) {
       console.error("Error updating fight:", error)
       throw error

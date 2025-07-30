@@ -2,12 +2,12 @@ import Link from "next/link"
 import type { Faction } from "@/types"
 import { FactionName } from "@/components/factions"
 
-type FactionLinkProps = {
+type FactionLinkProperties = {
   faction: Faction
   data?: string | object
 }
 
-export default function FactionLink({ faction, data }: FactionLinkProps) {
+export default function FactionLink({ faction, data }: FactionLinkProperties) {
   return (
     <Link
       href={`/factions/${faction.id}`}

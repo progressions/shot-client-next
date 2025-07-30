@@ -6,7 +6,7 @@ import type { Faction } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import type { SystemStyleObject, Theme } from "@mui/system"
 
-interface FactionDescriptionProps {
+interface FactionDescriptionProperties {
   faction: Faction
   sx?: SystemStyleObject<Theme>
 }
@@ -14,7 +14,7 @@ interface FactionDescriptionProps {
 export default function FactionDescription({
   faction,
   sx = {},
-}: FactionDescriptionProps) {
+}: FactionDescriptionProperties) {
   const { campaignData } = useCampaign()
   const [displayDescription, setDisplayDescription] = useState(
     faction.description || ""
@@ -23,9 +23,13 @@ export default function FactionDescription({
   useEffect(() => {
     if (campaignData) {
       const updatedFaction = campaignData?.faction
-      if (updatedFaction && updatedFaction.id === faction.id && updatedFaction.description) {
-          setDisplayDescription(updatedFaction.description)
-        }
+      if (
+        updatedFaction &&
+        updatedFaction.id === faction.id &&
+        updatedFaction.description
+      ) {
+        setDisplayDescription(updatedFaction.description)
+      }
     }
   }, [campaignData, faction.id])
 

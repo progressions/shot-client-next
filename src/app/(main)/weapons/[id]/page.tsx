@@ -3,11 +3,11 @@ import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Weapon } from "@/types"
 import { WeaponPageClient } from "@/components/weapons"
 
-type WeaponPageProps = {
+type WeaponPageProperties = {
   params: Promise<{ id: string }>
 }
 
-export default async function WeaponPage({ params }: WeaponPageProps) {
+export default async function WeaponPage({ params }: WeaponPageProperties) {
   const { id } = await params
   const client = await getServerClient()
   const user = await getUser()

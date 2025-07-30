@@ -6,3 +6,4 @@ export { default as CreateSchtickForm } from "@/components/schticks/CreateSchtic
 export { default as EditSchtickForm } from "@/components/schticks/EditSchtickForm"
 export { default as SchtickForm } from "@/components/schticks/SchtickForm"
 export { default as SchtickPageClient } from "@/components/schticks/SchtickPageClient"
+export { default as CategoryPath } from "@/components/schticks/CategoryPath"

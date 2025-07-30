@@ -11,7 +11,7 @@ import { CS } from "@/services"
 import { Badge } from "@/components/badges"
 import { SystemStyleObject, Theme } from "@mui/system"
 
-type CharacterBadgeProps = {
+type CharacterBadgeProperties = {
   character: Character
   size?: "sm" | "md" | "lg"
   sx?: SystemStyleObject<Theme>
@@ -21,7 +21,7 @@ export default function CharacterBadge({
   character,
   size = "md",
   sx = {},
-}: CharacterBadgeProps) {
+}: CharacterBadgeProperties) {
   return (
     <Badge
       entity={character}

@@ -4,7 +4,7 @@ import type { WeaponCategory } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
 
-type WeaponCategoryAutocompleteProps = {
+type WeaponCategoryAutocompleteProperties = {
   value: string
   onChange: (value: string | null) => void
   options?: Option[]
@@ -18,7 +18,7 @@ export default function WeaponCategoryAutocomplete({
   options,
   allowNone = true,
   exclude = [],
-}: WeaponCategoryAutocompleteProps) {
+}: WeaponCategoryAutocompleteProperties) {
   const { client } = useClient()
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
@@ -29,7 +29,7 @@ export default function WeaponCategoryAutocomplete({
         )
         .filter(option => !exclude.includes(option.value))
 
-      return filteredOptions;
+      return filteredOptions
     }
     try {
       const response = await client.getWeaponCategories({ search: inputValue })

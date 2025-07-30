@@ -1,12 +1,12 @@
 import { Link } from "@mui/material"
 
-type InfoLinkProps = {
+type InfoLinkProperties = {
   info: string
   data?: string | object
   href?: string
 }
 
-export default function InfoLink({ info, data, href }: InfoLinkProps) {
+export default function InfoLink({ info, data, href }: InfoLinkProperties) {
   return (
     <Link
       href={href}

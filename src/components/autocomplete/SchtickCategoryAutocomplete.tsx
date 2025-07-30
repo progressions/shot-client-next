@@ -4,7 +4,7 @@ import type { SchtickCategory } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
 
-type SchtickCategoryAutocompleteProps = {
+type SchtickCategoryAutocompleteProperties = {
   value: string
   onChange: (value: string | null) => void
   options?: Option[]
@@ -18,7 +18,7 @@ export default function SchtickCategoryAutocomplete({
   options,
   allowNone = true,
   exclude = [],
-}: SchtickCategoryAutocompleteProps) {
+}: SchtickCategoryAutocompleteProperties) {
   const { client } = useClient()
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
@@ -29,7 +29,7 @@ export default function SchtickCategoryAutocomplete({
         )
         .filter(option => !exclude.includes(option.value))
 
-      return filteredOptions;
+      return filteredOptions
     }
     try {
       const response = await client.getSchtickCategories({ search: inputValue })

@@ -222,7 +222,7 @@ const SharedService = {
 
   notionLink: function (character: Character): string | null {
     return character?.notion_page_id
-      ? `https://www.notion.so/isaacrpg/${character.notion_page_id.replaceAll('-', "")}`
+      ? `https://www.notion.so/isaacrpg/${character.notion_page_id.replaceAll("-", "")}`
       : null
   },
 

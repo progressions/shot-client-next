@@ -3,7 +3,7 @@ import { RefObject, useRef } from "react"
 import type { Faction } from "@/types"
 import { SystemStyleObject, Theme } from "@mui/system"
 
-interface FactionAvatarProps {
+interface FactionAvatarProperties {
   faction: Faction
   href?: string
   disablePopup?: boolean
@@ -15,8 +15,8 @@ const FactionAvatar = ({
   href,
   disablePopup,
   sx = {},
-}: FactionAvatarProps) => {
-  const avatarRef: RefObject<HTMLDivElement | null> = useRef(null)
+}: FactionAvatarProperties) => {
+  const avatarReference: RefObject<HTMLDivElement | null> = useRef(null)
 
   if (!faction?.id) {
     return <></>
@@ -33,7 +33,7 @@ const FactionAvatar = ({
     <Avatar
       alt={faction.name}
       src={faction.image_url || ""}
-      ref={avatarRef}
+      ref={avatarReference}
       data-mention-id={faction.id}
       data-mention-class-name="Faction"
       sx={sx}

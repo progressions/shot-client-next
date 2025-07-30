@@ -2,40 +2,28 @@
 
 import { redirect } from "next/navigation"
 import { useState, useEffect } from "react"
-import { Button, Stack, Alert, Typography, Box } from "@mui/material"
+import { Alert, Typography, Box } from "@mui/material"
 import type { Party } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import { useCampaign } from "@/contexts"
 import { MembersList, EditPartyForm } from "@/components/parties"
 import { useClient } from "@/contexts"
-import { CharacterBadge } from "@/components/badges"
 import { FactionLink } from "@/components/links"
-import { SpeedDialMenu } from "@/components/ui"
+import { HeroImage, SpeedDialMenu } from "@/components/ui"
 
-interface PartyPageClientProps {
+interface PartyPageClientProperties {
   party: Party
 }
 
 export default function PartyPageClient({
   party: initialParty,
-}: PartyPageClientProps) {
+}: PartyPageClientProperties) {
   const { campaignData } = useCampaign()
   const { client } = useClient()
 
   const [party, setParty] = useState<Party>(initialParty)
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const open = Boolean(anchorEl)
   const [editOpen, setEditOpen] = useState(false)
-  const [membersOpen, setMembersOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleMenuClose = () => {
-    setAnchorEl(null)
-  }
 
   useEffect(() => {
     document.title = party.name ? `${party.name} - Chi War` : "Chi War"
@@ -66,10 +54,6 @@ export default function PartyPageClient({
     }
   }
 
-  const handleOpenMembers = () => {
-    setMembersOpen(prev => !prev)
-  }
-
   return (
     <Box
       sx={{
@@ -88,22 +72,7 @@ export default function PartyPageClient({
       >
         <Typography variant="h4">{party.name}</Typography>
       </Box>
-      {party.image_url && (
-        <Box
-          component="img"
-          src={party.image_url}
-          alt={party.name}
-          sx={{
-            width: "100%",
-            height: "300px",
-            objectFit: "cover",
-            objectPosition: "50% 20%",
-            mb: 2,
-            display: "block",
-            mx: "auto",
-          }}
-        />
-      )}
+      <HeroImage entity={party} />
       {party.faction && (
         <Typography variant="h6">
           Belongs to <FactionLink faction={party.faction} />

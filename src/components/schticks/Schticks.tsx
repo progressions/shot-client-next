@@ -28,7 +28,7 @@ import { FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
 import type { SelectChangeEvent } from "@mui/material"
 
-interface SchticksProps {
+interface SchticksProperties {
   initialSchticks: Schtick[]
   initialMeta: PaginationMeta
   initialSort: string
@@ -47,7 +47,7 @@ export default function Schticks({
   initialMeta,
   initialSort,
   initialOrder,
-}: SchticksProps) {
+}: SchticksProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
@@ -94,7 +94,9 @@ export default function Schticks({
         dispatchForm({
           type: FormActions.ERROR,
           payload:
-            error_ instanceof Error ? error_.message : "Failed to fetch schticks",
+            error_ instanceof Error
+              ? error_.message
+              : "Failed to fetch schticks",
         })
         console.error("Fetch schticks error:", error_)
       }
@@ -106,17 +108,19 @@ export default function Schticks({
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
     if (campaignData.schticks === "reload") {
-      const params = new URLSearchParams(globalThis.location.search)
-      const page = params.get("page") ? Number.parseInt(params.get("page")!, 10) : 1
-      const sortParam = params.get("sort")
-      const orderParam = params.get("order")
+      const parameters = new URLSearchParams(globalThis.location.search)
+      const page = parameters.get("page")
+        ? Number.parseInt(parameters.get("page")!, 10)
+        : 1
+      const sortParameter = parameters.get("sort")
+      const orderParameter = parameters.get("order")
       const currentSort =
-        sortParam && validSorts.includes(sortParam as ValidSort)
-          ? sortParam
+        sortParameter && validSorts.includes(sortParameter as ValidSort)
+          ? sortParameter
           : "created_at"
       const currentOrder =
-        orderParam && validOrders.includes(orderParam as ValidOrder)
-          ? orderParam
+        orderParameter && validOrders.includes(orderParameter as ValidOrder)
+          ? orderParameter
           : "desc"
       setSort(currentSort)
       setOrder(currentOrder)

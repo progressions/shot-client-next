@@ -7,7 +7,7 @@ export interface LocalStorageContextType {
   getLocally: (key: string) => unknown | null
 }
 
-interface LocalStorageProviderProps {
+interface LocalStorageProviderProperties {
   children: React.ReactNode
 }
 
@@ -16,7 +16,9 @@ const LocalStorageContext = createContext<LocalStorageContextType>({
   getLocally: () => null,
 })
 
-export function LocalStorageProvider({ children }: LocalStorageProviderProps) {
+export function LocalStorageProvider({
+  children,
+}: LocalStorageProviderProperties) {
   function saveLocally(key: string, value: unknown) {
     if (globalThis.window !== undefined) {
       try {

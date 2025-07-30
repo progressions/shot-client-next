@@ -7,19 +7,16 @@ import {
   CardMedia,
   Box,
   Alert,
-  IconButton,
-  Tooltip,
   Typography,
 } from "@mui/material"
-import DeleteIcon from "@mui/icons-material/Delete"
-import EditIcon from "@mui/icons-material/Edit"
 import type { Site } from "@/types"
 import Link from "next/link"
 import { SiteDescription } from "@/components/sites"
 import { useCampaign, useClient } from "@/contexts"
 import { FactionLink, CharacterLink } from "@/components/links"
+import DetailButtons from "@/components/DetailButtons"
 
-interface SiteDetailProps {
+interface SiteDetailProperties {
   site: Site
   onDelete: (siteId: string) => void
   onEdit: (site: Site) => void
@@ -29,7 +26,7 @@ export default function SiteDetail({
   site: initialSite,
   onDelete,
   onEdit,
-}: SiteDetailProps) {
+}: SiteDetailProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
@@ -56,7 +53,9 @@ export default function SiteDetail({
       onDelete(site.id)
       setError(null)
     } catch (error_) {
-      setError(error_ instanceof Error ? error_.message : "Failed to delete site")
+      setError(
+        error_ instanceof Error ? error_.message : "Failed to delete site"
+      )
       console.error("Delete site error:", error_)
     }
   }
@@ -101,28 +100,11 @@ export default function SiteDetail({
               {site.name}
             </Link>
           </Typography>
-          <Box sx={{ display: "flex", gap: "0.5rem" }}>
-            <Tooltip title="Edit Site">
-              <IconButton
-                color="inherit"
-                onClick={handleEdit}
-                size="small"
-                aria-label="edit site"
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete Site">
-              <IconButton
-                color="inherit"
-                onClick={handleDelete}
-                size="small"
-                aria-label="delete site"
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
+          <DetailButtons
+            name="site"
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         </Box>
         {site.faction && (
           <Typography

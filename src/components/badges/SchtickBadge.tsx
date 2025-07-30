@@ -4,7 +4,7 @@ import type { Schtick } from "@/types"
 import { SchtickLink } from "@/components/links"
 import { Badge } from "@/components/badges"
 
-type SchtickBadgeProps = {
+type SchtickBadgeProperties = {
   schtick: Schtick
   size?: "sm" | "md" | "lg"
 }
@@ -12,7 +12,7 @@ type SchtickBadgeProps = {
 export default function SchtickBadge({
   schtick,
   size = "md",
-}: SchtickBadgeProps) {
+}: SchtickBadgeProperties) {
   return (
     <Badge
       entity={schtick}

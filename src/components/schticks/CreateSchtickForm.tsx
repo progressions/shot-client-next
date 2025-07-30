@@ -4,7 +4,7 @@ import { defaultSchtick, type Schtick } from "@/types"
 import { useClient } from "@/contexts"
 import SchtickForm from "./SchtickForm"
 
-interface CreateSchtickFormProps {
+interface CreateSchtickFormProperties {
   open: boolean
   onClose: () => void
   onSave: (newSchtick: Schtick) => void
@@ -14,7 +14,7 @@ export default function CreateSchtickForm({
   open,
   onClose,
   onSave,
-}: CreateSchtickFormProps) {
+}: CreateSchtickFormProperties) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, schtickData: Schtick) => {

@@ -6,7 +6,7 @@ import type { Site } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import type { SystemStyleObject, Theme } from "@mui/system"
 
-interface SiteDescriptionProps {
+interface SiteDescriptionProperties {
   site: Site
   sx?: SystemStyleObject<Theme>
 }
@@ -14,7 +14,7 @@ interface SiteDescriptionProps {
 export default function SiteDescription({
   site,
   sx = {},
-}: SiteDescriptionProps) {
+}: SiteDescriptionProperties) {
   const { campaignData } = useCampaign()
   const [displayDescription, setDisplayDescription] = useState(
     site.description || ""
@@ -23,9 +23,13 @@ export default function SiteDescription({
   useEffect(() => {
     if (campaignData) {
       const updatedSite = campaignData?.site
-      if (updatedSite && updatedSite.id === site.id && updatedSite.description) {
-          setDisplayDescription(updatedSite.description)
-        }
+      if (
+        updatedSite &&
+        updatedSite.id === site.id &&
+        updatedSite.description
+      ) {
+        setDisplayDescription(updatedSite.description)
+      }
     }
   }, [campaignData, site.id])
 

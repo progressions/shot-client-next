@@ -11,6 +11,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete"
 import PersonAddIcon from "@mui/icons-material/PersonAdd"
 import type {
+  User,
   Weapon,
   Schtick,
   Faction,
@@ -29,10 +30,11 @@ import {
   SiteBadge,
   WeaponBadge,
   SchtickBadge,
+  UserBadge,
 } from "@/components/badges"
-import { useClient } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
 import {
+  UserAutocomplete,
   CharacterAutocomplete,
   VehicleAutocomplete,
   PartyAutocomplete,
@@ -50,7 +52,7 @@ type FormStateData = {
   id?: string | null
 }
 
-type ListManagerProps = {
+type ListManagerProperties = {
   entity: Entity
   name: string
   title: string
@@ -68,8 +70,7 @@ export default function ListManager({
   description,
   collection,
   collection_ids,
-}: ListManagerProps) {
-  const { client } = useClient()
+}: ListManagerProperties) {
   const { formState, dispatchForm } = useForm<FormStateData>({
     id: null,
     page: 1,
@@ -221,6 +222,22 @@ export default function ListManager({
         allowNone={false}
       />
     ),
+    players: (
+      <UserAutocomplete
+        value={id || ""}
+        onChange={handleAutocompleteChange}
+        exclude={ids as string[]}
+        allowNone={false}
+      />
+    ),
+    users: (
+      <UserAutocomplete
+        value={id || ""}
+        onChange={handleAutocompleteChange}
+        exclude={ids as string[]}
+        allowNone={false}
+      />
+    ),
   }
 
   const autocomplete = autocompleteMap[collection]
@@ -241,6 +258,8 @@ export default function ListManager({
     weapons: (thing: Entity) => <WeaponBadge weapon={thing as Weapon} />,
     factions: (thing: Entity) => <FactionBadge faction={thing as Faction} />,
     schticks: (thing: Entity) => <SchtickBadge schtick={thing as Schtick} />,
+    users: (thing: Entity) => <UserBadge user={thing as User} />,
+    players: (thing: Entity) => <UserBadge user={thing as User} />,
   }
 
   const badge = badgeMap[collection]

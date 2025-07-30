@@ -1,8 +1,8 @@
 import {
   Button as MuiButton,
-  ButtonProps as MuiButtonProps,
+  ButtonProps as MuiButtonProperties,
 } from "@mui/material"
 
-export function Button(props: MuiButtonProps) {
-  return <MuiButton {...props} />
+export function Button(properties: MuiButtonProperties) {
+  return <MuiButton {...properties} />
 }

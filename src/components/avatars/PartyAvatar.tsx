@@ -3,7 +3,7 @@ import { RefObject, useRef } from "react"
 import type { Party } from "@/types"
 import { SystemStyleObject, Theme } from "@mui/system"
 
-interface PartyAvatarProps {
+interface PartyAvatarProperties {
   party: Party
   href?: string
   disablePopup?: boolean
@@ -15,8 +15,8 @@ const PartyAvatar = ({
   href,
   disablePopup,
   sx = {},
-}: PartyAvatarProps) => {
-  const avatarRef: RefObject<HTMLDivElement | null> = useRef(null)
+}: PartyAvatarProperties) => {
+  const avatarReference: RefObject<HTMLDivElement | null> = useRef(null)
 
   if (!party?.id) {
     return <></>
@@ -33,7 +33,7 @@ const PartyAvatar = ({
     <Avatar
       alt={party.name}
       src={party.image_url || ""}
-      ref={avatarRef}
+      ref={avatarReference}
       sx={sx}
     >
       {initials}

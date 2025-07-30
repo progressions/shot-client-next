@@ -4,11 +4,11 @@ import { useState, useEffect } from "react"
 import { useCampaign } from "@/contexts"
 import type { User } from "@/types"
 
-interface UserNameProps {
+interface UserNameProperties {
   user: User
 }
 
-export default function UserName({ user }: UserNameProps) {
+export default function UserName({ user }: UserNameProperties) {
   const { campaignData } = useCampaign()
   const [displayName, setDisplayName] = useState(user.name || user.email)
 
@@ -16,8 +16,8 @@ export default function UserName({ user }: UserNameProps) {
     if (campaignData && "user" in campaignData) {
       const updatedUser = campaignData.user
       if (updatedUser && updatedUser.id === user.id && updatedUser.name) {
-          setDisplayName(updatedUser.name || updatedUser.email)
-        }
+        setDisplayName(updatedUser.name || updatedUser.email)
+      }
     }
   }, [campaignData, user.id])
 

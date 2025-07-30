@@ -6,7 +6,7 @@ import type { Party } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import type { SystemStyleObject, Theme } from "@mui/system"
 
-interface PartyDescriptionProps {
+interface PartyDescriptionProperties {
   party: Party
   sx?: SystemStyleObject<Theme>
 }
@@ -14,7 +14,7 @@ interface PartyDescriptionProps {
 export default function PartyDescription({
   party,
   sx = {},
-}: PartyDescriptionProps) {
+}: PartyDescriptionProperties) {
   const { campaignData } = useCampaign()
   const [displayDescription, setDisplayDescription] = useState(
     party.description || ""
@@ -23,9 +23,13 @@ export default function PartyDescription({
   useEffect(() => {
     if (campaignData) {
       const updatedParty = campaignData?.party
-      if (updatedParty && updatedParty.id === party.id && updatedParty.description) {
-          setDisplayDescription(updatedParty.description)
-        }
+      if (
+        updatedParty &&
+        updatedParty.id === party.id &&
+        updatedParty.description
+      ) {
+        setDisplayDescription(updatedParty.description)
+      }
     }
   }, [campaignData, party.id])
 

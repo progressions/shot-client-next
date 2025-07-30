@@ -5,36 +5,23 @@ import { useState, useEffect } from "react"
 import { Stack, Alert, Typography, Box } from "@mui/material"
 import type { Fight } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
-import { useCampaign } from "@/contexts"
+import { useClient, useCampaign } from "@/contexts"
 import { MembersList, VehiclesList, EditFightForm } from "@/components/fights"
-import { useClient } from "@/contexts"
-import { SpeedDialMenu } from "@/components/ui"
+import { HeroImage, SpeedDialMenu } from "@/components/ui"
 
-interface FightPageClientProps {
+interface FightPageClientProperties {
   fight: Fight
 }
 
 export default function FightPageClient({
   fight: initialFight,
-}: FightPageClientProps) {
+}: FightPageClientProperties) {
   const { campaignData } = useCampaign()
   const { client } = useClient()
 
   const [fight, setFight] = useState<Fight>(initialFight)
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const open = Boolean(anchorEl)
   const [editOpen, setEditOpen] = useState(false)
-  const [membersOpen, setMembersOpen] = useState(false)
-  const [vehiclesOpen, setVehiclesOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleMenuClose = () => {
-    setAnchorEl(null)
-  }
 
   useEffect(() => {
     document.title = fight.name ? `${fight.name} - Chi War` : "Chi War"
@@ -65,12 +52,8 @@ export default function FightPageClient({
     }
   }
 
-  const handleOpenMembers = () => {
-    setMembersOpen(prev => !prev)
-  }
-
-  const handleOpenVehicles = () => {
-    setVehiclesOpen(prev => !prev)
+  const replaceFight = (fight: Fight) => {
+    setFight(fight)
   }
 
   return (
@@ -91,22 +74,7 @@ export default function FightPageClient({
       >
         <Typography variant="h4">{fight.name}</Typography>
       </Box>
-      {fight.image_url && (
-        <Box
-          component="img"
-          src={fight.image_url}
-          alt={fight.name}
-          sx={{
-            width: "100%",
-            height: "300px",
-            objectFit: "cover",
-            objectPosition: "50% 20%",
-            mb: 2,
-            display: "block",
-            mx: "auto",
-          }}
-        />
-      )}
+      <HeroImage entity={fight} />
       <Box sx={{ p: 2, backgroundColor: "#2e2e2e", borderRadius: 1, my: 2 }}>
         <RichTextRenderer
           key={fight.description}
@@ -115,8 +83,8 @@ export default function FightPageClient({
         />
       </Box>
       <Stack direction="column" spacing={2}>
-        <MembersList fight={fight} />
-        <VehiclesList fight={fight} />
+        <MembersList fight={fight} setFight={replaceFight} />
+        <VehiclesList fight={fight} setFight={replaceFight} />
       </Stack>
 
       <EditFightForm

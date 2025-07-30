@@ -38,11 +38,11 @@ export default function LoginPage() {
         sameSite: "Strict",
       })
 
-      const tempClient = new Client({ jwt: token })
-      const tempResponse = await tempClient.getCurrentUser()
+      const temporaryClient = new Client({ jwt: token })
+      const temporaryResponse = await temporaryClient.getCurrentUser()
       dispatchCurrentUser({
         type: UserActions.USER,
-        payload: tempResponse.data,
+        payload: temporaryResponse.data,
       })
 
       router.push("/")

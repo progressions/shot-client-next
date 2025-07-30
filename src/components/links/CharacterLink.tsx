@@ -2,12 +2,15 @@ import Link from "next/link"
 import { CharacterName } from "@/components/characters"
 import type { Character } from "@/types"
 
-type CharacterLinkProps = {
+type CharacterLinkProperties = {
   character: Character
   data?: string | object
 }
 
-export default function CharacterLink({ character, data }: CharacterLinkProps) {
+export default function CharacterLink({
+  character,
+  data,
+}: CharacterLinkProperties) {
   return (
     <Link
       href={`/characters/${character.id}`}

@@ -4,7 +4,7 @@ import { Avatar, Typography, Stack } from "@mui/material"
 import type { Entity } from "@/types"
 import type { SystemStyleObject, Theme } from "@mui/system"
 
-type BadgeProps = {
+type BadgeProperties = {
   entity: Entity
   size?: "sm" | "md" | "lg"
   title: React.ReactNode
@@ -36,7 +36,7 @@ export default function Badge({
   title,
   children,
   sx = {},
-}: BadgeProps) {
+}: BadgeProperties) {
   const { avatar, titleFont, subtitleFont } = sizes[size]
   const initials = entity.name
     ? entity.name

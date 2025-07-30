@@ -17,7 +17,7 @@ import {
 import SharedService from "@/services/SharedService"
 
 interface Service {
-  [key: string]: (character: Character, ...args: object[]) => Character
+  [key: string]: (character: Character, ...arguments_: object[]) => Character
 }
 
 const CharacterService = {
@@ -28,11 +28,11 @@ const CharacterService = {
     calls: Array<[string, object[]]>
   ): Character {
     let char = character
-    for (const [funcName, args] of calls) {
+    for (const [functionName, arguments_] of calls) {
       const unknownService = this as unknown
       const service = unknownService as Service
 
-      char = service[funcName](char, ...args)
+      char = service[functionName](char, ...arguments_)
     }
     return char
   },
@@ -236,11 +236,13 @@ const CharacterService = {
   },
 
   attackValues: function (character: Character): string[] {
-    return [...new Set(
+    return [
+      ...new Set(
         [this.mainAttack(character), this.secondaryAttack(character)].filter(
           key => this.actionValue(character, key) > 0
         )
-      )]
+      ),
+    ]
   },
 
   damage: function (character: Character): number {

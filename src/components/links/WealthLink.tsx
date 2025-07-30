@@ -1,11 +1,11 @@
 import { Link } from "@mui/material"
 
-type WealthLinkProps = {
+type WealthLinkProperties = {
   wealth: string
   data?: string | object
 }
 
-export default function WealthLink({ wealth, data }: WealthLinkProps) {
+export default function WealthLink({ wealth, data }: WealthLinkProperties) {
   return (
     <Link
       data-mention-id={wealth}

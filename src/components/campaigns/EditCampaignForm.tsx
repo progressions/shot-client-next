@@ -4,7 +4,7 @@ import { useClient } from "@/contexts"
 import { type Campaign } from "@/types"
 import CampaignForm from "./CampaignForm"
 
-interface EditCampaignFormProps {
+interface EditCampaignFormProperties {
   open: boolean
   onClose: () => void
   onSave: (updatedCampaign: Campaign) => void
@@ -16,7 +16,7 @@ export default function EditCampaignForm({
   onClose,
   onSave,
   campaign,
-}: EditCampaignFormProps) {
+}: EditCampaignFormProperties) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, campaignData: Campaign) => {

@@ -2,14 +2,18 @@ import { Avatar, Link } from "@mui/material"
 import { RefObject, useRef } from "react"
 import type { Weapon } from "@/types"
 
-interface WeaponAvatarProps {
+interface WeaponAvatarProperties {
   weapon: Weapon
   href?: string
   disablePopup?: boolean
 }
 
-const WeaponAvatar = ({ weapon, href, disablePopup }: WeaponAvatarProps) => {
-  const avatarRef: RefObject<HTMLDivElement | null> = useRef(null)
+const WeaponAvatar = ({
+  weapon,
+  href,
+  disablePopup,
+}: WeaponAvatarProperties) => {
+  const avatarReference: RefObject<HTMLDivElement | null> = useRef(null)
 
   if (!weapon?.id) {
     return <></>
@@ -23,7 +27,11 @@ const WeaponAvatar = ({ weapon, href, disablePopup }: WeaponAvatarProps) => {
     : ""
 
   const baseAvatar = (
-    <Avatar alt={weapon.name} src={weapon.image_url || ""} ref={avatarRef}>
+    <Avatar
+      alt={weapon.name}
+      src={weapon.image_url || ""}
+      ref={avatarReference}
+    >
       {initials}
     </Avatar>
   )

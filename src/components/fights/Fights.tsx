@@ -28,7 +28,7 @@ import { FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
 import type { SelectChangeEvent } from "@mui/material"
 
-interface FightsProps {
+interface FightsProperties {
   initialFights: Fight[]
   initialMeta: PaginationMeta
   initialSort: string
@@ -47,7 +47,7 @@ export default function Fights({
   initialMeta,
   initialSort,
   initialOrder,
-}: FightsProps) {
+}: FightsProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
@@ -106,17 +106,19 @@ export default function Fights({
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
     if (campaignData.fights === "reload") {
-      const params = new URLSearchParams(globalThis.location.search)
-      const page = params.get("page") ? Number.parseInt(params.get("page")!, 10) : 1
-      const sortParam = params.get("sort")
-      const orderParam = params.get("order")
+      const parameters = new URLSearchParams(globalThis.location.search)
+      const page = parameters.get("page")
+        ? Number.parseInt(parameters.get("page")!, 10)
+        : 1
+      const sortParameter = parameters.get("sort")
+      const orderParameter = parameters.get("order")
       const currentSort =
-        sortParam && validSorts.includes(sortParam as ValidSort)
-          ? sortParam
+        sortParameter && validSorts.includes(sortParameter as ValidSort)
+          ? sortParameter
           : "created_at"
       const currentOrder =
-        orderParam && validOrders.includes(orderParam as ValidOrder)
-          ? orderParam
+        orderParameter && validOrders.includes(orderParameter as ValidOrder)
+          ? orderParameter
           : "desc"
       setSort(currentSort)
       setOrder(currentOrder)

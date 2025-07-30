@@ -3,11 +3,11 @@ import Link from "next/link"
 import { PartyBadge } from "@/components/badges"
 import type { Party } from "@/types"
 
-type PartiesModuleProps = {
+type PartiesModuleProperties = {
   parties: Party[]
 }
 
-export default function PartiesModule({ parties }: PartiesModuleProps) {
+export default function PartiesModule({ parties }: PartiesModuleProperties) {
   return (
     <Box
       sx={{

@@ -7,18 +7,19 @@ import {
   CardMedia,
   Box,
   Alert,
-  IconButton,
-  Tooltip,
   Typography,
 } from "@mui/material"
-import DeleteIcon from "@mui/icons-material/Delete"
-import EditIcon from "@mui/icons-material/Edit"
 import type { Schtick } from "@/types"
 import Link from "next/link"
-import { SchtickName, SchtickDescription } from "@/components/schticks"
+import {
+  CategoryPath,
+  SchtickName,
+  SchtickDescription,
+} from "@/components/schticks"
 import { useCampaign, useClient } from "@/contexts"
+import DetailButtons from "@/components/DetailButtons"
 
-interface SchtickDetailProps {
+interface SchtickDetailProperties {
   schtick: Schtick
   onDelete: (schtickId: string) => void
   onEdit: (schtick: Schtick) => void
@@ -28,7 +29,7 @@ export default function SchtickDetail({
   schtick: initialSchtick,
   onDelete,
   onEdit,
-}: SchtickDetailProps) {
+}: SchtickDetailProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
@@ -61,7 +62,9 @@ export default function SchtickDetail({
       onDelete(schtick.id)
       setError(null)
     } catch (error_) {
-      setError(error_ instanceof Error ? error_.message : "Failed to delete schtick")
+      setError(
+        error_ instanceof Error ? error_.message : "Failed to delete schtick"
+      )
       console.error("Delete schtick error:", error_)
     }
   }
@@ -106,29 +109,13 @@ export default function SchtickDetail({
               <SchtickName schtick={schtick} />
             </Link>
           </Typography>
-          <Box sx={{ display: "flex", gap: "0.5rem" }}>
-            <Tooltip title="Edit Schtick">
-              <IconButton
-                color="inherit"
-                onClick={handleEdit}
-                size="small"
-                aria-label="edit schtick"
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete Schtick">
-              <IconButton
-                color="inherit"
-                onClick={handleDelete}
-                size="small"
-                aria-label="delete schtick"
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
+          <DetailButtons
+            name="Schtick"
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         </Box>
+        <CategoryPath schtick={schtick} />
         <SchtickDescription schtick={schtick} />
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
           Created: {formattedCreatedAt}

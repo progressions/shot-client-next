@@ -12,7 +12,7 @@ interface DataShape {
 }
 
 // Define the generic type for the hook
-type UseCollectionProps<T extends DataShape> = {
+type UseCollectionProperties<T extends DataShape> = {
   url: string
   fetch: (page: number, sort: string, order: string) => Promise<void>
   dispatchForm: React.Dispatch<FormStateAction<T>>
@@ -30,7 +30,7 @@ export function useCollection<T extends DataShape>({
   data,
   router,
   validSorts = ["name", "created_at", "updated_at"] as const,
-}: UseCollectionProps<T>) {
+}: UseCollectionProperties<T>) {
   const { sort, order, meta } = data
 
   const handlePageChange = (

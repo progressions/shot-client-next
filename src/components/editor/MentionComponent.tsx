@@ -23,39 +23,39 @@ export default function MentionComponent({ node }: NodeViewProps) {
   const displayLabel = label || "unknown"
   const href = getUrl(className, id)
 
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const [anchorElement, setAnchorElement] = useState<HTMLElement | null>(null)
+  const timeoutReference = useRef<NodeJS.Timeout | null>(null)
 
   const handleMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
+    if (timeoutReference.current) {
+      clearTimeout(timeoutReference.current)
     }
-    setAnchorEl(event.currentTarget)
+    setAnchorElement(event.currentTarget)
   }
 
   const handleMouseLeave = () => {
-    timeoutRef.current = setTimeout(() => {
-      setAnchorEl(null)
+    timeoutReference.current = setTimeout(() => {
+      setAnchorElement(null)
     }, 200) // Delay to allow moving to popover
   }
 
   const handlePopoverMouseEnter = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
+    if (timeoutReference.current) {
+      clearTimeout(timeoutReference.current)
     }
   }
 
   const handlePopoverMouseLeave = () => {
-    timeoutRef.current = setTimeout(() => {
-      setAnchorEl(null)
+    timeoutReference.current = setTimeout(() => {
+      setAnchorElement(null)
     }, 200)
   }
 
   const handleClose = () => {
-    setAnchorEl(null)
+    setAnchorElement(null)
   }
 
-  const open = Boolean(anchorEl)
+  const open = Boolean(anchorElement)
 
   // Mapping object for popup components with TypeScript types
   const popupComponents: { [key: string]: React.ComponentType<PopupProps> } = {
@@ -113,7 +113,7 @@ export default function MentionComponent({ node }: NodeViewProps) {
           </Link>
           <Popover
             open={open}
-            anchorEl={anchorEl}
+            anchorEl={anchorElement}
             onClose={handleClose}
             anchorOrigin={{
               vertical: "bottom",

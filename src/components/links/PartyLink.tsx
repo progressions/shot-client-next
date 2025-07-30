@@ -2,12 +2,12 @@ import Link from "next/link"
 import type { Party } from "@/types"
 import { PartyName } from "@/components/parties"
 
-type PartyLinkProps = {
+type PartyLinkProperties = {
   party: Party
   data?: string | object
 }
 
-export default function PartyLink({ party, data }: PartyLinkProps) {
+export default function PartyLink({ party, data }: PartyLinkProperties) {
   return (
     <Link
       href={`/parties/${party.id}`}

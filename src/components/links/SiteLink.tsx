@@ -2,12 +2,12 @@ import Link from "next/link"
 import type { Site } from "@/types"
 import { SiteName } from "@/components/sites"
 
-type SiteLinkProps = {
+type SiteLinkProperties = {
   site: Site
   data?: string | object
 }
 
-export default function SiteLink({ site, data }: SiteLinkProps) {
+export default function SiteLink({ site, data }: SiteLinkProperties) {
   return (
     <Link
       href={`/sites/${site.id}`}

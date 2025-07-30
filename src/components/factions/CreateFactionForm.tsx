@@ -4,7 +4,7 @@ import { defaultFaction, type Faction } from "@/types"
 import { useClient } from "@/contexts"
 import FactionForm from "./FactionForm"
 
-interface CreateFactionFormProps {
+interface CreateFactionFormProperties {
   open: boolean
   onClose: () => void
   onSave: (newFaction: Faction) => void
@@ -14,7 +14,7 @@ export default function CreateFactionForm({
   open,
   onClose,
   onSave,
-}: CreateFactionFormProps) {
+}: CreateFactionFormProperties) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, factionData: Faction) => {

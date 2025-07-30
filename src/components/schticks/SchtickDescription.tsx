@@ -6,7 +6,7 @@ import type { Schtick } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import type { SystemStyleObject, Theme } from "@mui/system"
 
-interface SchtickDescriptionProps {
+interface SchtickDescriptionProperties {
   schtick: Schtick
   sx?: SystemStyleObject<Theme>
 }
@@ -14,7 +14,7 @@ interface SchtickDescriptionProps {
 export default function SchtickDescription({
   schtick,
   sx = {},
-}: SchtickDescriptionProps) {
+}: SchtickDescriptionProperties) {
   const { campaignData } = useCampaign()
   const [displayDescription, setDisplayDescription] = useState(
     schtick.description || ""
@@ -23,9 +23,13 @@ export default function SchtickDescription({
   useEffect(() => {
     if (campaignData) {
       const updatedSchtick = campaignData?.schtick
-      if (updatedSchtick && updatedSchtick.id === schtick.id && updatedSchtick.description) {
-          setDisplayDescription(updatedSchtick.description)
-        }
+      if (
+        updatedSchtick &&
+        updatedSchtick.id === schtick.id &&
+        updatedSchtick.description
+      ) {
+        setDisplayDescription(updatedSchtick.description)
+      }
     }
   }, [campaignData, schtick.id])
 

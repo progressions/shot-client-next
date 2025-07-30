@@ -3,11 +3,11 @@ import Link from "next/link"
 import type { User } from "@/types"
 import { UserName } from "@/components/users"
 
-type PlayersModuleProps = {
+type PlayersModuleProperties = {
   players: User[]
 }
 
-export default function PlayersModule({ players }: PlayersModuleProps) {
+export default function PlayersModule({ players }: PlayersModuleProperties) {
   return (
     <Box
       sx={{

@@ -3,11 +3,11 @@ import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Party } from "@/types"
 import { PartyPageClient } from "@/components/parties"
 
-type PartyPageProps = {
+type PartyPageProperties = {
   params: Promise<{ id: string }>
 }
 
-export default async function PartyPage({ params }: PartyPageProps) {
+export default async function PartyPage({ params }: PartyPageProperties) {
   const { id } = await params
   const client = await getServerClient()
   const user = await getUser()

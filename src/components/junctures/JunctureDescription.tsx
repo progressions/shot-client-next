@@ -6,7 +6,7 @@ import type { Juncture } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import type { SystemStyleObject, Theme } from "@mui/system"
 
-interface JunctureDescriptionProps {
+interface JunctureDescriptionProperties {
   juncture: Juncture
   sx?: SystemStyleObject<Theme>
 }
@@ -14,7 +14,7 @@ interface JunctureDescriptionProps {
 export default function JunctureDescription({
   juncture,
   sx = {},
-}: JunctureDescriptionProps) {
+}: JunctureDescriptionProperties) {
   const { campaignData } = useCampaign()
   const [displayDescription, setDisplayDescription] = useState(
     juncture.description || ""
@@ -23,9 +23,13 @@ export default function JunctureDescription({
   useEffect(() => {
     if (campaignData) {
       const updatedJuncture = campaignData?.juncture
-      if (updatedJuncture && updatedJuncture.id === juncture.id && updatedJuncture.description) {
-          setDisplayDescription(updatedJuncture.description)
-        }
+      if (
+        updatedJuncture &&
+        updatedJuncture.id === juncture.id &&
+        updatedJuncture.description
+      ) {
+        setDisplayDescription(updatedJuncture.description)
+      }
     }
   }, [campaignData, juncture.id])
 

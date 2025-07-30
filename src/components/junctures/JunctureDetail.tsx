@@ -7,19 +7,16 @@ import {
   CardMedia,
   Box,
   Alert,
-  IconButton,
-  Tooltip,
   Typography,
 } from "@mui/material"
-import DeleteIcon from "@mui/icons-material/Delete"
-import EditIcon from "@mui/icons-material/Edit"
 import type { Juncture } from "@/types"
 import Link from "next/link"
 import { JunctureName, JunctureDescription } from "@/components/junctures"
 import { useCampaign, useClient } from "@/contexts"
 import { CharacterLink, FactionLink } from "@/components/links"
+import DetailButtons from "@/components/DetailButtons"
 
-interface JunctureDetailProps {
+interface JunctureDetailProperties {
   juncture: Juncture
   onDelete: (junctureId: string) => void
   onEdit: (juncture: Juncture) => void
@@ -29,7 +26,7 @@ export default function JunctureDetail({
   juncture: initialJuncture,
   onDelete,
   onEdit,
-}: JunctureDetailProps) {
+}: JunctureDetailProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
@@ -64,7 +61,9 @@ export default function JunctureDetail({
       onDelete(juncture.id)
       setError(null)
     } catch (error_) {
-      setError(error_ instanceof Error ? error_.message : "Failed to delete juncture")
+      setError(
+        error_ instanceof Error ? error_.message : "Failed to delete juncture"
+      )
       console.error("Delete juncture error:", error_)
     }
   }
@@ -109,28 +108,11 @@ export default function JunctureDetail({
               <JunctureName juncture={juncture} />
             </Link>
           </Typography>
-          <Box sx={{ display: "flex", gap: "0.5rem" }}>
-            <Tooltip title="Edit Juncture">
-              <IconButton
-                color="inherit"
-                onClick={handleEdit}
-                size="small"
-                aria-label="edit juncture"
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete Juncture">
-              <IconButton
-                color="inherit"
-                onClick={handleDelete}
-                size="small"
-                aria-label="delete juncture"
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
+          <DetailButtons
+            name="Juncture"
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         </Box>
         {juncture.faction && (
           <Typography

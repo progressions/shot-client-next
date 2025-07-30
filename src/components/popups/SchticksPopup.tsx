@@ -2,12 +2,12 @@ import { Box, Typography } from "@mui/material"
 import type { Schtick } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 
-interface SchticksPopupProps {
+interface SchticksPopupProperties {
   id: string
   data?: Schtick[]
 }
 
-export default function SchticksPopup({ data }: SchticksPopupProps) {
+export default function SchticksPopup({ data }: SchticksPopupProperties) {
   const schticks = data || []
 
   return (

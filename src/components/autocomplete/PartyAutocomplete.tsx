@@ -4,7 +4,7 @@ import type { Party } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
 
-type PartyAutocompleteProps = {
+type PartyAutocompleteProperties = {
   value: string
   onChange: (value: string | null) => void
   options?: Option[]
@@ -18,7 +18,7 @@ export default function PartyAutocomplete({
   options,
   exclude = [],
   allowNone = true,
-}: PartyAutocompleteProps) {
+}: PartyAutocompleteProperties) {
   const { client } = useClient()
 
   console.log("exclude:", exclude)
@@ -29,7 +29,7 @@ export default function PartyAutocomplete({
         option.label.toLowerCase().includes(inputValue.toLowerCase())
       )
 
-      return filteredOptions;
+      return filteredOptions
     }
     try {
       const response = await client.getParties({ search: inputValue })

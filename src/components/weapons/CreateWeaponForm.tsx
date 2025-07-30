@@ -4,7 +4,7 @@ import { defaultWeapon, type Weapon } from "@/types"
 import { useClient } from "@/contexts"
 import WeaponForm from "./WeaponForm"
 
-interface CreateWeaponFormProps {
+interface CreateWeaponFormProperties {
   open: boolean
   onClose: () => void
   onSave: (newWeapon: Weapon) => void
@@ -14,7 +14,7 @@ export default function CreateWeaponForm({
   open,
   onClose,
   onSave,
-}: CreateWeaponFormProps) {
+}: CreateWeaponFormProperties) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, weaponData: Weapon) => {

@@ -4,7 +4,7 @@ import type { Juncture } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
 
-type JuncturesAutocompleteProps = {
+type JuncturesAutocompleteProperties = {
   value: string
   onChange: (value: string | null) => void
   options?: Option[]
@@ -18,7 +18,7 @@ export default function JuncturesAutocomplete({
   options,
   exclude = [],
   allowNone = true,
-}: JuncturesAutocompleteProps) {
+}: JuncturesAutocompleteProperties) {
   const { client } = useClient()
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
@@ -27,7 +27,7 @@ export default function JuncturesAutocomplete({
         option.label.toLowerCase().includes(inputValue.toLowerCase())
       )
 
-      return filteredOptions;
+      return filteredOptions
     }
     try {
       const response = await client.getJunctures({ search: inputValue })

@@ -1,8 +1,8 @@
 import {
   TextField as MuiTextField,
-  TextFieldProps as MuiTextFieldProps,
+  TextFieldProps as MuiTextFieldProperties,
 } from "@mui/material"
 
-export function TextField(props: MuiTextFieldProps) {
-  return <MuiTextField {...props} />
+export function TextField(properties: MuiTextFieldProperties) {
+  return <MuiTextField {...properties} />
 }

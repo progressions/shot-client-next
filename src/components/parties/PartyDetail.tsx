@@ -7,19 +7,16 @@ import {
   CardContent,
   CardMedia,
   Box,
-  IconButton,
-  Tooltip,
   Typography,
 } from "@mui/material"
-import DeleteIcon from "@mui/icons-material/Delete"
-import EditIcon from "@mui/icons-material/Edit"
 import type { Party } from "@/types"
 import Link from "next/link"
 import { PartyName, PartyDescription } from "@/components/parties"
 import { useCampaign, useClient } from "@/contexts"
 import { CharacterLink, FactionLink } from "@/components/links"
+import DetailButtons from "@/components/DetailButtons"
 
-interface PartyDetailProps {
+interface PartyDetailProperties {
   party: Party
   onDelete: (partyId: string) => void
   onEdit: (party: Party) => void
@@ -29,7 +26,7 @@ export default function PartyDetail({
   party: initialParty,
   onDelete,
   onEdit,
-}: PartyDetailProps) {
+}: PartyDetailProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
@@ -51,7 +48,9 @@ export default function PartyDetail({
       onDelete(party.id)
       setError(null)
     } catch (error_) {
-      setError(error_ instanceof Error ? error_.message : "Failed to delete party")
+      setError(
+        error_ instanceof Error ? error_.message : "Failed to delete party"
+      )
       console.error("Delete party error:", error_)
     }
   }
@@ -93,28 +92,11 @@ export default function PartyDetail({
               <PartyName party={party} />
             </Link>
           </Typography>
-          <Box sx={{ display: "flex", gap: "0.5rem" }}>
-            <Tooltip title="Edit Party">
-              <IconButton
-                color="inherit"
-                onClick={handleEdit}
-                size="small"
-                aria-label="edit party"
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete Party">
-              <IconButton
-                color="inherit"
-                onClick={handleDelete}
-                size="small"
-                aria-label="delete party"
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
+          <DetailButtons
+            name="Party"
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         </Box>
         {party.faction && (
           <Typography

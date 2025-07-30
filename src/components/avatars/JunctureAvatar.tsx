@@ -3,7 +3,7 @@ import { RefObject, useRef } from "react"
 import type { Juncture } from "@/types"
 import { SystemStyleObject, Theme } from "@mui/system"
 
-interface JunctureAvatarProps {
+interface JunctureAvatarProperties {
   juncture: Juncture
   href?: string
   disablePopup?: boolean
@@ -15,8 +15,8 @@ const JunctureAvatar = ({
   href,
   disablePopup,
   sx = {},
-}: JunctureAvatarProps) => {
-  const avatarRef: RefObject<HTMLDivElement | null> = useRef(null)
+}: JunctureAvatarProperties) => {
+  const avatarReference: RefObject<HTMLDivElement | null> = useRef(null)
 
   if (!juncture?.id) {
     return <></>
@@ -33,7 +33,7 @@ const JunctureAvatar = ({
     <Avatar
       alt={juncture.name}
       src={juncture.image_url || ""}
-      ref={avatarRef}
+      ref={avatarReference}
       sx={sx}
     >
       {initials}

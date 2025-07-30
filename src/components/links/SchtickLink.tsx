@@ -2,12 +2,12 @@ import Link from "next/link"
 import type { Schtick } from "@/types"
 import { SchtickName } from "@/components/schticks"
 
-type SchtickLinkProps = {
+type SchtickLinkProperties = {
   schtick: Schtick
   data?: string | object
 }
 
-export default function SchtickLink({ schtick, data }: SchtickLinkProps) {
+export default function SchtickLink({ schtick, data }: SchtickLinkProperties) {
   return (
     <Link
       href={`/schticks/${schtick.id}`}

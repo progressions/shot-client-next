@@ -2,12 +2,15 @@ import Link from "next/link"
 import type { Juncture } from "@/types"
 import { JunctureName } from "@/components/junctures"
 
-type JunctureLinkProps = {
+type JunctureLinkProperties = {
   juncture: Juncture
   data?: string | object
 }
 
-export default function JunctureLink({ juncture, data }: JunctureLinkProps) {
+export default function JunctureLink({
+  juncture,
+  data,
+}: JunctureLinkProperties) {
   return (
     <Link
       href={`/junctures/${juncture.id}`}

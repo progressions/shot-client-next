@@ -3,15 +3,20 @@ import { RefObject, useRef } from "react"
 import type { User } from "@/types"
 import { SystemStyleObject, Theme } from "@mui/system"
 
-interface UserAvatarProps {
+interface UserAvatarProperties {
   user: User
   href?: string
   disablePopup?: boolean
   sx?: SystemStyleObject<Theme>
 }
 
-const UserAvatar = ({ user, href, disablePopup, sx = {} }: UserAvatarProps) => {
-  const avatarRef: RefObject<HTMLDivElement | null> = useRef(null)
+const UserAvatar = ({
+  user,
+  href,
+  disablePopup,
+  sx = {},
+}: UserAvatarProperties) => {
+  const avatarReference: RefObject<HTMLDivElement | null> = useRef(null)
 
   if (!user?.id) {
     return <></>
@@ -25,7 +30,12 @@ const UserAvatar = ({ user, href, disablePopup, sx = {} }: UserAvatarProps) => {
     : ""
 
   const avatar = (
-    <Avatar alt={user.name} src={user.image_url || ""} ref={avatarRef} sx={sx}>
+    <Avatar
+      alt={user.name}
+      src={user.image_url || ""}
+      ref={avatarReference}
+      sx={sx}
+    >
       {initials}
     </Avatar>
   )

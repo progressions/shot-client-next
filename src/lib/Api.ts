@@ -40,15 +40,21 @@ class Api {
   }
 
   locations(location?: Location | ID): string {
-    return location?.id ? `${this.api()}/locations/${location.id}` : `${this.api()}/locations`;
+    return location?.id
+      ? `${this.api()}/locations/${location.id}`
+      : `${this.api()}/locations`
   }
 
   memberships(party: Party | ID, person?: Character | Vehicle | ID): string {
-    return person?.id ? `${this.parties(party)}/memberships/${person.id}` : `${this.parties(party)}/memberships`;
+    return person?.id
+      ? `${this.parties(party)}/memberships/${person.id}`
+      : `${this.parties(party)}/memberships`
   }
 
   parties(party?: Party | ID): string {
-    return party?.id ? `${this.api()}/parties/${party.id}` : `${this.api()}/parties`;
+    return party?.id
+      ? `${this.api()}/parties/${party.id}`
+      : `${this.api()}/parties`
   }
 
   addPartyToFight(party: Party | ID, fight: Fight | ID): string {
@@ -56,7 +62,9 @@ class Api {
   }
 
   fights(fight?: Fight | ID): string {
-    return fight?.id ? `${this.api()}/fights/${fight.id}` : `${this.api()}/fights`;
+    return fight?.id
+      ? `${this.api()}/fights/${fight.id}`
+      : `${this.api()}/fights`
   }
 
   fightEvents(fight: Fight | ID): string {
@@ -64,14 +72,18 @@ class Api {
   }
 
   charactersAndVehicles(fight?: Fight | ID): string {
-    return fight?.id ? `${this.api()}/characters_and_vehicles/${fight.id}` : `${this.api()}/characters_and_vehicles`;
+    return fight?.id
+      ? `${this.api()}/characters_and_vehicles/${fight.id}`
+      : `${this.api()}/characters_and_vehicles`
   }
 
   characters(fight?: Fight | null, character?: Character | ID): string {
     if (!fight?.id) {
       return this.allCharacters(character)
     }
-    return character?.id ? `${this.fights(fight)}/actors/${character.id}` : `${this.fights(fight)}/actors`;
+    return character?.id
+      ? `${this.fights(fight)}/actors/${character.id}`
+      : `${this.fights(fight)}/actors`
   }
 
   characterPdf(character: Character | ID): string {
@@ -82,7 +94,9 @@ class Api {
     if (!fight?.id) {
       return this.allVehicles(vehicle)
     }
-    return vehicle?.id ? `${this.fights(fight)}/drivers/${vehicle.id}` : `${this.fights(fight)}/drivers`;
+    return vehicle?.id
+      ? `${this.fights(fight)}/drivers/${vehicle.id}`
+      : `${this.fights(fight)}/drivers`
   }
 
   actVehicle(fight: Fight, vehicle: Vehicle): string {
@@ -118,42 +132,58 @@ class Api {
   }
 
   allVehicles(vehicle?: Vehicle | ID): string {
-    return vehicle?.id ? `${this.api()}/vehicles/${vehicle.id}` : `${this.api()}/vehicles`;
+    return vehicle?.id
+      ? `${this.api()}/vehicles/${vehicle.id}`
+      : `${this.api()}/vehicles`
   }
 
   allCharacters(character?: Character | ID): string {
-    return character?.id ? `${this.api()}/characters/${character.id}` : `${this.api()}/characters`;
+    return character?.id
+      ? `${this.api()}/characters/${character.id}`
+      : `${this.api()}/characters`
   }
 
   advancements(character: Character, advancement?: Advancement | ID): string {
-    return advancement?.id ? `${this.allCharacters(character)}/advancements/${advancement.id}` : `${this.allCharacters(character)}/advancements`;
+    return advancement?.id
+      ? `${this.allCharacters(character)}/advancements/${advancement.id}`
+      : `${this.allCharacters(character)}/advancements`
   }
 
   junctures(juncture?: Juncture | ID): string {
-    return juncture?.id ? `${this.api()}/junctures/${juncture.id}` : `${this.api()}/junctures`;
+    return juncture?.id
+      ? `${this.api()}/junctures/${juncture.id}`
+      : `${this.api()}/junctures`
   }
 
   allSites(site?: Site | ID): string {
-    return site?.id ? `${this.api()}/sites/${site.id}` : `${this.api()}/sites`;
+    return site?.id ? `${this.api()}/sites/${site.id}` : `${this.api()}/sites`
   }
 
   sites(character: Character, site?: Site | ID): string {
-    return site?.id ? `${this.allCharacters(character)}/sites/${site.id}` : `${this.allCharacters(character)}/sites`;
+    return site?.id
+      ? `${this.allCharacters(character)}/sites/${site.id}`
+      : `${this.allCharacters(character)}/sites`
   }
 
   effects(fight: Fight, effect?: Effect | ID): string {
-    return effect?.id ? `${this.fights(fight)}/effects/${effect.id}` : `${this.fights(fight)}/effects`;
+    return effect?.id
+      ? `${this.fights(fight)}/effects/${effect.id}`
+      : `${this.fights(fight)}/effects`
   }
 
   characterEffects(
     fight: Fight,
     characterEffect?: CharacterEffect | ID
   ): string {
-    return characterEffect?.id ? `${this.fights(fight)}/character_effects/${characterEffect.id}` : `${this.fights(fight)}/character_effects`;
+    return characterEffect?.id
+      ? `${this.fights(fight)}/character_effects/${characterEffect.id}`
+      : `${this.fights(fight)}/character_effects`
   }
 
   invitations(invitation?: Invitation): string {
-    return invitation?.id ? `${this.api()}/invitations/${invitation.id}` : `${this.api()}/invitations`;
+    return invitation?.id
+      ? `${this.api()}/invitations/${invitation.id}`
+      : `${this.api()}/invitations`
   }
 
   currentCampaign() {
@@ -161,7 +191,9 @@ class Api {
   }
 
   campaigns(campaign?: Campaign | ID) {
-    return campaign ? `${this.api()}/campaigns/${campaign.id}` : `${this.api()}/campaigns`;
+    return campaign
+      ? `${this.api()}/campaigns/${campaign.id}`
+      : `${this.api()}/campaigns`
   }
 
   campaignMemberships() {
@@ -169,7 +201,7 @@ class Api {
   }
 
   adminUsers(user?: User | ID): string {
-    return user ? `${this.api()}/users/${user.id}` : `${this.api()}/users`;
+    return user ? `${this.api()}/users/${user.id}` : `${this.api()}/users`
   }
 
   currentUser(): string {
@@ -177,7 +209,7 @@ class Api {
   }
 
   users(user?: User | ID): string {
-    return user?.id ? `${this.api()}/users/${user.id}` : `${this.api()}/users`;
+    return user?.id ? `${this.api()}/users/${user.id}` : `${this.api()}/users`
   }
 
   unlockUser(): string {
@@ -201,7 +233,9 @@ class Api {
   }
 
   factions(faction?: Faction | ID): string {
-    return faction?.id ? `${this.api()}/factions/${faction.id}` : `${this.api()}/factions`;
+    return faction?.id
+      ? `${this.api()}/factions/${faction.id}`
+      : `${this.api()}/factions`
   }
 
   notionCharacters(): string {
@@ -209,19 +243,27 @@ class Api {
   }
 
   characterSchticks(character: Character | ID, schtick?: Schtick | ID): string {
-    return schtick?.id ? `${this.allCharacters(character)}/schticks/${schtick.id}` : `${this.allCharacters(character)}/schticks`;
+    return schtick?.id
+      ? `${this.allCharacters(character)}/schticks/${schtick.id}`
+      : `${this.allCharacters(character)}/schticks`
   }
 
   characterWeapons(character: Character | ID, weapon?: Weapon | ID): string {
-    return weapon?.id ? `${this.allCharacters(character)}/weapons/${weapon.id}` : `${this.allCharacters(character)}/weapons`;
+    return weapon?.id
+      ? `${this.allCharacters(character)}/weapons/${weapon.id}`
+      : `${this.allCharacters(character)}/weapons`
   }
 
   weapons(weapon?: Weapon | ID): string {
-    return weapon?.id ? `${this.api()}/weapons/${weapon.id}` : `${this.api()}/weapons`;
+    return weapon?.id
+      ? `${this.api()}/weapons/${weapon.id}`
+      : `${this.api()}/weapons`
   }
 
   schticks(schtick?: Schtick | ID): string {
-    return schtick?.id ? `${this.api()}/schticks/${schtick.id}` : `${this.api()}/schticks`;
+    return schtick?.id
+      ? `${this.api()}/schticks/${schtick.id}`
+      : `${this.api()}/schticks`
   }
 
   importSchticks() {

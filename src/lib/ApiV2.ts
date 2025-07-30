@@ -23,27 +23,41 @@ class ApiV2 {
   }
 
   characters(character?: Character | ID): string {
-    return character?.id ? `${this.api()}/characters/${character.id}` : `${this.api()}/characters`;
+    return character?.id
+      ? `${this.api()}/characters/${character.id}`
+      : `${this.api()}/characters`
+  }
+
+  characterPdf(character: Character | ID): string {
+    return `${this.characters(character)}/pdf`
   }
 
   vehicles(vehicle?: Vehicle | ID): string {
-    return vehicle?.id ? `${this.api()}/vehicles/${vehicle.id}` : `${this.api()}/vehicles`;
+    return vehicle?.id
+      ? `${this.api()}/vehicles/${vehicle.id}`
+      : `${this.api()}/vehicles`
   }
 
   sites(site?: Site | ID): string {
-    return site?.id ? `${this.api()}/sites/${site.id}` : `${this.api()}/sites`;
+    return site?.id ? `${this.api()}/sites/${site.id}` : `${this.api()}/sites`
   }
 
   junctures(juncture?: Juncture | ID): string {
-    return juncture?.id ? `${this.api()}/junctures/${juncture.id}` : `${this.api()}/junctures`;
+    return juncture?.id
+      ? `${this.api()}/junctures/${juncture.id}`
+      : `${this.api()}/junctures`
   }
 
   parties(party?: Party | ID): string {
-    return party?.id ? `${this.api()}/parties/${party.id}` : `${this.api()}/parties`;
+    return party?.id
+      ? `${this.api()}/parties/${party.id}`
+      : `${this.api()}/parties`
   }
 
   weapons(weapon?: Weapon | ID): string {
-    return weapon?.id ? `${this.api()}/weapons/${weapon.id}` : `${this.api()}/weapons`;
+    return weapon?.id
+      ? `${this.api()}/weapons/${weapon.id}`
+      : `${this.api()}/weapons`
   }
 
   weaponJunctures(): string {
@@ -55,7 +69,9 @@ class ApiV2 {
   }
 
   schticks(schtick?: Schtick | ID): string {
-    return schtick?.id ? `${this.api()}/schticks/${schtick.id}` : `${this.api()}/schticks`;
+    return schtick?.id
+      ? `${this.api()}/schticks/${schtick.id}`
+      : `${this.api()}/schticks`
   }
 
   schtickCategories(): string {
@@ -67,11 +83,15 @@ class ApiV2 {
   }
 
   factions(faction?: Faction | ID): string {
-    return faction?.id ? `${this.api()}/factions/${faction.id}` : `${this.api()}/factions`;
+    return faction?.id
+      ? `${this.api()}/factions/${faction.id}`
+      : `${this.api()}/factions`
   }
 
   fights(fight?: Fight | ID): string {
-    return fight?.id ? `${this.api()}/fights/${fight.id}` : `${this.api()}/fights`;
+    return fight?.id
+      ? `${this.api()}/fights/${fight.id}`
+      : `${this.api()}/fights`
   }
 
   currentCampaign() {
@@ -79,11 +99,13 @@ class ApiV2 {
   }
 
   campaigns(campaign?: Campaign | ID) {
-    return campaign ? `${this.api()}/campaigns/${campaign.id}` : `${this.api()}/campaigns`;
+    return campaign
+      ? `${this.api()}/campaigns/${campaign.id}`
+      : `${this.api()}/campaigns`
   }
 
   users(user?: User | ID): string {
-    return user ? `${this.api()}/users/${user.id}` : `${this.api()}/users`;
+    return user ? `${this.api()}/users/${user.id}` : `${this.api()}/users`
   }
 }
 

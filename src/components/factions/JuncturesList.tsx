@@ -5,22 +5,21 @@ import { useClient } from "@/contexts"
 import { InfoLink } from "@/components/links"
 import { ListManager } from "@/components/lists"
 
-type FormStateData = {
-  page: number
-  open: boolean
-  juncture_id?: string | null
-}
-
-type JuncturesListProps = {
+type JuncturesListProperties = {
   faction: Faction
+  setFaction: (faction: Faction) => void
 }
 
-export default function JuncturesList({ faction }: JuncturesListProps) {
+export default function JuncturesList({
+  faction,
+  setFaction,
+}: JuncturesListProperties) {
   const { client } = useClient()
 
   async function update(factionId: string, formData: FormData) {
     try {
-      await client.updateFaction(factionId, formData)
+      const response = await client.updateFaction(factionId, formData)
+      setFaction(response.data)
     } catch (error) {
       console.error("Error updating faction:", error)
       throw error

@@ -6,7 +6,7 @@ import type { Weapon } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import type { SystemStyleObject, Theme } from "@mui/system"
 
-interface WeaponDescriptionProps {
+interface WeaponDescriptionProperties {
   weapon: Weapon
   sx?: SystemStyleObject<Theme>
 }
@@ -14,7 +14,7 @@ interface WeaponDescriptionProps {
 export default function WeaponDescription({
   weapon,
   sx = {},
-}: WeaponDescriptionProps) {
+}: WeaponDescriptionProperties) {
   const { campaignData } = useCampaign()
   const [displayDescription, setDisplayDescription] = useState(
     weapon.description || ""
@@ -23,9 +23,13 @@ export default function WeaponDescription({
   useEffect(() => {
     if (campaignData) {
       const updatedWeapon = campaignData?.weapon
-      if (updatedWeapon && updatedWeapon.id === weapon.id && updatedWeapon.description) {
-          setDisplayDescription(updatedWeapon.description)
-        }
+      if (
+        updatedWeapon &&
+        updatedWeapon.id === weapon.id &&
+        updatedWeapon.description
+      ) {
+        setDisplayDescription(updatedWeapon.description)
+      }
     }
   }, [campaignData, weapon.id])
 

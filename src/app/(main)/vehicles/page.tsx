@@ -20,9 +20,9 @@ export default async function VehiclesPage({
     redirect("/login")
   }
 
-  const params = await searchParams
-  const pageParam = params.page
-  const page = pageParam ? Number.parseInt(pageParam, 10) : 1
+  const parameters = await searchParams
+  const pageParameter = parameters.page
+  const page = pageParameter ? Number.parseInt(pageParameter, 10) : 1
   if (isNaN(page) || page <= 0) {
     redirect("/vehicles?page=1&sort=name&order=asc")
   }
@@ -30,15 +30,15 @@ export default async function VehiclesPage({
   type ValidSort = "name" | "created_at" | "updated_at"
   const validSorts: readonly ValidSort[] = ["name", "created_at", "updated_at"]
   const sort =
-    params.sort && validSorts.includes(params.sort as ValidSort)
-      ? params.sort
+    parameters.sort && validSorts.includes(parameters.sort as ValidSort)
+      ? parameters.sort
       : "name"
 
   type ValidOrder = "asc" | "desc"
   const validOrders: readonly ValidOrder[] = ["asc", "desc"]
   const order =
-    params.order && validOrders.includes(params.order as ValidOrder)
-      ? params.order
+    parameters.order && validOrders.includes(parameters.order as ValidOrder)
+      ? parameters.order
       : "asc"
 
   const response = await client.getVehicles({ page, sort, order })

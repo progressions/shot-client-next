@@ -5,22 +5,21 @@ import { useClient } from "@/contexts"
 import { InfoLink } from "@/components/links"
 import { ListManager } from "@/components/lists"
 
-type FormStateData = {
-  page: number
-  open: boolean
-  party_id?: string | null
-}
-
-type MembersListProps = {
+type PartiesListProperties = {
   faction: Faction
+  setFaction: (faction: Faction) => void
 }
 
-export default function MembersList({ faction }: MembersListProps) {
+export default function PartiesList({
+  faction,
+  setFaction,
+}: PartiesListProperties) {
   const { client } = useClient()
 
   async function update(factionId: string, formData: FormData) {
     try {
-      await client.updateFaction(factionId, formData)
+      const response = await client.updateFaction(factionId, formData)
+      setFaction(response.data)
     } catch (error) {
       console.error("Error updating faction:", error)
       throw error

@@ -1,7 +1,7 @@
 export { default as CharacterAutocomplete } from "@/components/autocomplete/CharacterAutocomplete"
 export { default as VehicleAutocomplete } from "@/components/autocomplete/VehicleAutocomplete"
 export { default as FactionAutocomplete } from "@/components/autocomplete/FactionAutocomplete"
-export { default as UsersAutocomplete } from "@/components/autocomplete/UsersAutocomplete"
+export { default as UserAutocomplete } from "@/components/autocomplete/UserAutocomplete"
 export { default as SchtickCategoryAutocomplete } from "@/components/autocomplete/SchtickCategoryAutocomplete"
 export { default as SchtickPathAutocomplete } from "@/components/autocomplete/SchtickPathAutocomplete"
 export { default as WeaponAutocomplete } from "@/components/autocomplete/WeaponAutocomplete"

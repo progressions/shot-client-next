@@ -4,7 +4,7 @@ import { useClient } from "@/contexts"
 import { type Fight } from "@/types"
 import FightForm from "./FightForm"
 
-interface EditFightFormProps {
+interface EditFightFormProperties {
   open: boolean
   onClose: () => void
   onSave: (updatedFight: Fight) => void
@@ -16,7 +16,7 @@ export default function EditFightForm({
   onClose,
   onSave,
   fight,
-}: EditFightFormProps) {
+}: EditFightFormProperties) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, fightData: Fight) => {
@@ -37,11 +37,7 @@ export default function EditFightForm({
       open={open}
       onClose={onClose}
       onSave={handleSave}
-      initialFormData={{
-        name: fight.name || "",
-        description: fight.description || "",
-        image: null,
-      }}
+      initialFormData={{ ...fight, image: null }}
       title="Edit Fight"
       existingImageUrl={fight.image_url}
     />

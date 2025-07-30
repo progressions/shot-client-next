@@ -43,6 +43,7 @@ export function SpeedDialMenu({
           minHeight: 36,
           boxShadow: "none",
         },
+        ...sx,
       }}
       icon={<SpeedDialIcon openIcon={<MoreHorizIcon />} />}
       direction="down"

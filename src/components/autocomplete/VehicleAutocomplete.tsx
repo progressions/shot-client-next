@@ -4,7 +4,7 @@ import type { Vehicle } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
 
-type VehicleAutocompleteProps = {
+type VehicleAutocompleteProperties = {
   value: string
   onChange: (value: string | null) => void
   options?: Option[]
@@ -18,7 +18,7 @@ export default function VehicleAutocomplete({
   exclude = [],
   onChange,
   allowNone = true,
-}: VehicleAutocompleteProps) {
+}: VehicleAutocompleteProperties) {
   const { client } = useClient()
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
@@ -29,7 +29,7 @@ export default function VehicleAutocomplete({
         )
         .filter(option => !exclude.includes(option.value))
 
-      return filteredOptions;
+      return filteredOptions
     }
     try {
       const response = await client.getVehicles({

@@ -1,8 +1,12 @@
 import {
   Button as MuiButton,
-  ButtonProps as MuiButtonProps,
+  ButtonProps as MuiButtonProperties,
 } from "@mui/material"
 
-export function CancelButton(props: MuiButtonProps) {
-  return <MuiButton variant="outlined" color="secondary" {...props} />
+export function CancelButton(properties: MuiButtonProperties) {
+  return (
+    <MuiButton variant="outlined" color="secondary" {...properties}>
+      {properties.children ? properties.children : "Cancel"}
+    </MuiButton>
+  )
 }

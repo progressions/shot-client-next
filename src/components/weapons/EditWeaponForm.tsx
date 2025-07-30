@@ -4,7 +4,7 @@ import { useClient } from "@/contexts"
 import { type Weapon } from "@/types"
 import WeaponForm from "./WeaponForm"
 
-interface EditWeaponFormProps {
+interface EditWeaponFormProperties {
   open: boolean
   onClose: () => void
   onSave: (updatedWeapon: Weapon) => void
@@ -16,7 +16,7 @@ export default function EditWeaponForm({
   onClose,
   onSave,
   weapon,
-}: EditWeaponFormProps) {
+}: EditWeaponFormProperties) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, weaponData: Weapon) => {

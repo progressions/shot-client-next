@@ -5,17 +5,11 @@ import { useClient } from "@/contexts"
 import { InfoLink } from "@/components/links"
 import { ListManager } from "@/components/lists"
 
-type FormStateData = {
-  page: number
-  open: boolean
-  character_id?: string | null
-}
-
-type MembersListProps = {
+type MembersListProperties = {
   party: Party
 }
 
-export default function MembersList({ party }: MembersListProps) {
+export default function MembersList({ party }: MembersListProperties) {
   const { client } = useClient()
 
   async function update(partyId: string, formData: FormData) {
@@ -45,4 +39,3 @@ export default function MembersList({ party }: MembersListProps) {
     />
   )
 }
-

@@ -16,13 +16,13 @@ import {
 import { useClient } from "@/contexts"
 import { SpeedDialMenu } from "@/components/ui"
 
-interface FactionPageClientProps {
+interface FactionPageClientProperties {
   faction: Faction
 }
 
 export default function FactionPageClient({
   faction: initialFaction,
-}: FactionPageClientProps) {
+}: FactionPageClientProperties) {
   const { campaignData } = useCampaign()
   const { client } = useClient()
 
@@ -62,6 +62,10 @@ export default function FactionPageClient({
       console.error("Failed to delete faction:", error_)
       setError("Failed to delete faction.")
     }
+  }
+
+  const replaceFaction = (faction: Faction) => {
+    setFaction(faction)
   }
 
   return (
@@ -107,10 +111,10 @@ export default function FactionPageClient({
       </Box>
 
       <Stack direction="column" spacing={2}>
-        <MembersList faction={faction} />
-        <PartiesList faction={faction} />
-        <SitesList faction={faction} />
-        <JuncturesList faction={faction} />
+        <MembersList faction={faction} setFaction={replaceFaction} />
+        <PartiesList faction={faction} setFaction={replaceFaction} />
+        <SitesList faction={faction} setFaction={replaceFaction} />
+        <JuncturesList faction={faction} setFaction={replaceFaction} />
       </Stack>
 
       <EditFactionForm

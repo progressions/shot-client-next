@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useEffect, useMemo, useRef } from "react"
 import {
   Autocomplete as MuiAutocomplete,
@@ -12,7 +14,7 @@ export interface Option {
   value: string
 }
 
-interface AutocompleteProps {
+interface AutocompleteProperties {
   label: string
   fetchOptions: (query: string) => Promise<Option[]>
   onChange: (value: string | null) => void
@@ -57,13 +59,13 @@ export function Autocomplete({
   value,
   allowNone = true,
   exclude = [],
-}: AutocompleteProps) {
+}: AutocompleteProperties) {
   const { formState, dispatchForm } = useForm<FormStateData>({
     options: [],
   })
   const { loading } = formState
   const { options } = formState.data
-  const inputRef = useRef("")
+  const inputReference = useRef("")
   const fetchedMissing = useRef(new Set<string>())
 
   const noneOption: Option = useMemo(
@@ -144,12 +146,12 @@ export function Autocomplete({
         }
       }}
       onInputChange={(_event, newInputValue, reason) => {
-        inputRef.current = newInputValue
+        inputReference.current = newInputValue
         if (reason === "input" || reason === "clear") {
           dispatchForm({ type: FormActions.SUBMIT })
 
           fetchOptions(newInputValue).then(newOptions => {
-            if (inputRef.current === newInputValue) {
+            if (inputReference.current === newInputValue) {
               dispatchForm({
                 type: FormActions.UPDATE,
                 name: "options",
@@ -164,22 +166,22 @@ export function Autocomplete({
           })
         }
       }}
-      renderInput={params => (
+      renderInput={parameters => (
         <TextField
-          {...params}
+          {...parameters}
           label={label || "Select an option"}
           variant="outlined"
           InputLabelProps={{
             style: { color: "inherit" },
           }}
           InputProps={{
-            ...params.InputProps,
+            ...parameters.InputProps,
             endAdornment: (
               <>
                 {loading ? (
                   <CircularProgress color="inherit" size={20} />
                 ) : null}
-                {params.InputProps.endAdornment}
+                {parameters.InputProps.endAdornment}
               </>
             ),
           }}

@@ -30,7 +30,7 @@ import type { SelectChangeEvent } from "@mui/material"
 import { InfoLink } from "@/components/links"
 import { FactionAutocomplete } from "@/components/autocomplete"
 
-interface PartiesProps {
+interface PartiesProperties {
   initialParties: Party[]
   initialFactions: Faction[]
   initialMeta: PaginationMeta
@@ -53,7 +53,7 @@ export default function Parties({
   initialMeta,
   initialSort,
   initialOrder,
-}: PartiesProps) {
+}: PartiesProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
@@ -113,7 +113,9 @@ export default function Parties({
         dispatchForm({
           type: FormActions.ERROR,
           payload:
-            error_ instanceof Error ? error_.message : "Failed to fetch parties",
+            error_ instanceof Error
+              ? error_.message
+              : "Failed to fetch parties",
         })
         console.error("Fetch parties error:", error_)
       }
@@ -125,17 +127,19 @@ export default function Parties({
     if (!campaignData) return
     if (campaignData.parties === "reload") {
       console.log("RELOADING PARTIES")
-      const params = new URLSearchParams(globalThis.location.search)
-      const page = params.get("page") ? Number.parseInt(params.get("page")!, 10) : 1
-      const sortParam = params.get("sort")
-      const orderParam = params.get("order")
+      const parameters = new URLSearchParams(globalThis.location.search)
+      const page = parameters.get("page")
+        ? Number.parseInt(parameters.get("page")!, 10)
+        : 1
+      const sortParameter = parameters.get("sort")
+      const orderParameter = parameters.get("order")
       const currentSort =
-        sortParam && validSorts.includes(sortParam as ValidSort)
-          ? sortParam
+        sortParameter && validSorts.includes(sortParameter as ValidSort)
+          ? sortParameter
           : "created_at"
       const currentOrder =
-        orderParam && validOrders.includes(orderParam as ValidOrder)
-          ? orderParam
+        orderParameter && validOrders.includes(orderParameter as ValidOrder)
+          ? orderParameter
           : "desc"
       setSort(currentSort)
       setOrder(currentOrder)

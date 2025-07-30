@@ -3,11 +3,11 @@ import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Site } from "@/types"
 import { SitePageClient } from "@/components/sites"
 
-type SitePageProps = {
+type SitePageProperties = {
   params: Promise<{ id: string }>
 }
 
-export default async function SitePage({ params }: SitePageProps) {
+export default async function SitePage({ params }: SitePageProperties) {
   const { id } = await params
   const client = await getServerClient()
   const user = await getUser()

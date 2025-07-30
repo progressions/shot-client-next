@@ -1,11 +1,14 @@
 import { Link } from "@mui/material"
 
-type ArchetypeLinkProps = {
+type ArchetypeLinkProperties = {
   archetype: string
   data?: string | object
 }
 
-export default function ArchetypeLink({ archetype, data }: ArchetypeLinkProps) {
+export default function ArchetypeLink({
+  archetype,
+  data,
+}: ArchetypeLinkProperties) {
   return (
     <Link
       data-mention-id={archetype}

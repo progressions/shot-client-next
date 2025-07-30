@@ -4,7 +4,7 @@ import type { User } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
 
-type UsersAutocompleteProps = {
+type UserAutocompleteProperties = {
   value: string
   onChange: (value: string | null) => void
   options?: Option[]
@@ -12,13 +12,13 @@ type UsersAutocompleteProps = {
   allowNone?: boolean
 }
 
-export default function UsersAutocomplete({
+export default function UserAutocomplete({
   options,
   value,
   exclude = [],
   onChange,
   allowNone = true,
-}: UsersAutocompleteProps) {
+}: UserAutocompleteProperties) {
   const { client } = useClient()
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
@@ -29,7 +29,7 @@ export default function UsersAutocomplete({
         )
         .filter(option => !exclude.includes(option.value))
 
-      return filteredOptions;
+      return filteredOptions
     }
     try {
       const response = await client.getUsers({
@@ -41,7 +41,7 @@ export default function UsersAutocomplete({
       const { users } = response.data
       return users
         .map((user: User) => ({
-          label: user.name || "",
+          label: user.name || user.email,
           value: user.id || "",
         }))
         .filter(option => !exclude.includes(option.value))

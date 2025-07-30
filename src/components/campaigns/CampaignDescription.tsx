@@ -6,7 +6,7 @@ import type { Campaign } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import type { SystemStyleObject, Theme } from "@mui/system"
 
-interface CampaignDescriptionProps {
+interface CampaignDescriptionProperties {
   campaign: Campaign
   sx?: SystemStyleObject<Theme>
 }
@@ -14,7 +14,7 @@ interface CampaignDescriptionProps {
 export default function CampaignDescription({
   campaign,
   sx = {},
-}: CampaignDescriptionProps) {
+}: CampaignDescriptionProperties) {
   const { campaignData } = useCampaign()
   const [displayDescription, setDisplayDescription] = useState(
     campaign.description || ""
@@ -23,9 +23,13 @@ export default function CampaignDescription({
   useEffect(() => {
     if (campaignData) {
       const updatedCampaign = campaignData?.campaign
-      if (updatedCampaign && updatedCampaign.id === campaign.id && updatedCampaign.description) {
-          setDisplayDescription(updatedCampaign.description)
-        }
+      if (
+        updatedCampaign &&
+        updatedCampaign.id === campaign.id &&
+        updatedCampaign.description
+      ) {
+        setDisplayDescription(updatedCampaign.description)
+      }
     }
   }, [campaignData, campaign.id])
 

@@ -1,7 +1,11 @@
 "use client"
 
-import { useCallback } from "react"
-import { useRouter } from "next/navigation"
+import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
+import UploadIcon from "@mui/icons-material/Upload"
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
+
+import { useRouter, redirect } from "next/navigation"
+import { useMemo, useEffect, useCallback } from "react"
 import {
   Pagination,
   Box,
@@ -24,14 +28,15 @@ import {
 } from "@mui/material"
 import Link from "next/link"
 import type { Character, PaginationMeta } from "@/types"
-import { useClient } from "@/contexts"
+import { useCampaign, useClient } from "@/contexts"
 import { useTheme } from "@mui/material/styles"
 import type { SelectChangeEvent } from "@mui/material"
 import { CharacterName } from "@/components/characters"
 import { CS } from "@/services"
 import { FormActions, useForm } from "@/reducers"
+import { HeroTitle, SpeedDialMenu } from "@/components/ui"
 
-interface CharactersProps {
+interface CharactersProperties {
   initialCharacters: Character[]
   initialMeta: PaginationMeta
   initialSort: string
@@ -165,8 +170,9 @@ export default function Characters({
   initialMeta,
   initialSort,
   initialOrder,
-}: CharactersProps) {
+}: CharactersProperties) {
   const { client } = useClient()
+  const { campaignData } = useCampaign()
   const router = useRouter()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
@@ -177,6 +183,8 @@ export default function Characters({
     order: initialOrder,
   })
   const { characters, meta, sort, order } = formState.data
+
+  const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
   const fetchCharacters = useCallback(
     async (page: number = 1, sort: string = "name", order: string = "asc") => {
@@ -198,6 +206,38 @@ export default function Characters({
     },
     [client, dispatchForm]
   )
+
+  useEffect(() => {
+    if (!campaignData) return
+    console.log("Campaign data:", campaignData)
+    if (campaignData.characters === "reload") {
+      const parameters = new URLSearchParams(globalThis.location.search)
+      const page = parameters.get("page")
+        ? Number.parseInt(parameters.get("page")!, 10)
+        : 1
+      const sortParameter = parameters.get("sort")
+      const orderParameter = parameters.get("order")
+      const currentSort =
+        sortParameter && validSorts.includes(sortParameter as ValidSort)
+          ? sortParameter
+          : "created_at"
+      const currentOrder =
+        orderParameter && validOrders.includes(orderParameter as ValidOrder)
+          ? orderParameter
+          : "desc"
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "sort",
+        value: currentSort,
+      })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "order",
+        value: currentOrder,
+      })
+      fetchCharacters(page, currentSort, currentOrder)
+    }
+  }, [client, campaignData, dispatchForm, fetchCharacters, validOrders])
 
   const handlePageChange = (
     _event: React.ChangeEvent<unknown>,
@@ -285,18 +325,22 @@ export default function Characters({
     )
   }
 
+  const handle = () => {}
+
+  const handleImport = () => {
+    redirect("/characters/import")
+  }
+
+  const actions = [
+    { icon: <PersonAddAlt1Icon />, name: "Create", onClick: handle },
+    { icon: <UploadIcon />, name: "Import", onClick: handleImport },
+    { icon: <AddCircleOutlineIcon />, name: "Generate", onClick: handle },
+  ]
+
   return (
     <>
-      <Typography
-        variant="h4"
-        sx={{
-          color: "#ffffff",
-          fontSize: { xs: "1.5rem", sm: "2.125rem" },
-          mb: 2,
-        }}
-      >
-        Characters
-      </Typography>
+      <SpeedDialMenu actions={actions} />
+      <HeroTitle>Characters</HeroTitle>
       <Box sx={{ bgcolor: "#424242", borderRadius: 1, overflowX: "auto" }}>
         <Table
           sx={{

@@ -8,22 +8,22 @@ export const metadata = {
   title: "Characters - Chi War",
 }
 
-type CharactersPageProps = {
+type CharactersPageProperties = {
   searchParams: Promise<{ page?: string; sort?: string; order?: string }>
 }
 
 export default async function CharactersPage({
   searchParams,
-}: CharactersPageProps) {
+}: CharactersPageProperties) {
   const client = await getServerClient()
   const user = await getUser()
   if (!client || !user) {
     redirect("/login")
   }
 
-  const params = await searchParams
-  const pageParam = params.page
-  const page = pageParam ? Number.parseInt(pageParam, 10) : 1
+  const parameters = await searchParams
+  const pageParameter = parameters.page
+  const page = pageParameter ? Number.parseInt(pageParameter, 10) : 1
   if (isNaN(page) || page <= 0) {
     redirect("/characters?page=1&sort=name&order=asc")
   }
@@ -31,15 +31,15 @@ export default async function CharactersPage({
   type ValidSort = "name" | "created_at" | "updated_at"
   const validSorts: readonly ValidSort[] = ["name", "created_at", "updated_at"]
   const sort =
-    params.sort && validSorts.includes(params.sort as ValidSort)
-      ? params.sort
+    parameters.sort && validSorts.includes(parameters.sort as ValidSort)
+      ? parameters.sort
       : "name"
 
   type ValidOrder = "asc" | "desc"
   const validOrders: readonly ValidOrder[] = ["asc", "desc"]
   const order =
-    params.order && validOrders.includes(params.order as ValidOrder)
-      ? params.order
+    parameters.order && validOrders.includes(parameters.order as ValidOrder)
+      ? parameters.order
       : "asc"
 
   const response = await client.getCharacters({ page, sort, order })
@@ -50,7 +50,14 @@ export default async function CharactersPage({
   }
 
   return (
-    <Box sx={{ justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+    <Box
+      sx={{
+        justifyContent: "space-between",
+        alignItems: "center",
+        mb: 2,
+        position: "relative",
+      }}
+    >
       <Suspense fallback={<CircularProgress />}>
         <Characters
           initialCharacters={characters}

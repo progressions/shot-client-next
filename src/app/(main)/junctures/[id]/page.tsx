@@ -3,11 +3,11 @@ import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Juncture } from "@/types"
 import { JuncturePageClient } from "@/components/junctures"
 
-type JuncturePageProps = {
+type JuncturePageProperties = {
   params: Promise<{ id: string }>
 }
 
-export default async function JuncturePage({ params }: JuncturePageProps) {
+export default async function JuncturePage({ params }: JuncturePageProperties) {
   const { id } = await params
   const client = await getServerClient()
   const user = await getUser()

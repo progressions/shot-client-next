@@ -1,11 +1,14 @@
 import { Link } from "@mui/material"
 
-type ActionValueLinkProps = {
+type ActionValueLinkProperties = {
   name: string
   data?: string | object
 }
 
-export default function ActionValueLink({ name, data }: ActionValueLinkProps) {
+export default function ActionValueLink({
+  name,
+  data,
+}: ActionValueLinkProperties) {
   return (
     <Link
       data-mention-id={name}

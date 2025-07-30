@@ -3,15 +3,20 @@ import { RefObject, useRef } from "react"
 import type { Site } from "@/types"
 import { SystemStyleObject, Theme } from "@mui/system"
 
-interface SiteAvatarProps {
+interface SiteAvatarProperties {
   site: Site
   href?: string
   disablePopup?: boolean
   sx?: SystemStyleObject<Theme>
 }
 
-const SiteAvatar = ({ site, href, disablePopup, sx = {} }: SiteAvatarProps) => {
-  const avatarRef: RefObject<HTMLDivElement | null> = useRef(null)
+const SiteAvatar = ({
+  site,
+  href,
+  disablePopup,
+  sx = {},
+}: SiteAvatarProperties) => {
+  const avatarReference: RefObject<HTMLDivElement | null> = useRef(null)
 
   if (!site?.id) {
     return <></>
@@ -25,7 +30,12 @@ const SiteAvatar = ({ site, href, disablePopup, sx = {} }: SiteAvatarProps) => {
     : ""
 
   const baseAvatar = (
-    <Avatar alt={site.name} src={site.image_url || ""} ref={avatarRef} sx={sx}>
+    <Avatar
+      alt={site.name}
+      src={site.image_url || ""}
+      ref={avatarReference}
+      sx={sx}
+    >
       {initials}
     </Avatar>
   )

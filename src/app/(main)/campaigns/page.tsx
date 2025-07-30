@@ -23,11 +23,11 @@ export default async function CampaignsPage({
   if (!user.gamemaster) redirect("/")
 
   // Resolve searchParams
-  const params = await searchParams
+  const parameters = await searchParams
 
   // Extract and validate page parameter
-  const pageParam = params.page
-  const page = pageParam ? Number.parseInt(pageParam, 10) : 1
+  const pageParameter = parameters.page
+  const page = pageParameter ? Number.parseInt(pageParameter, 10) : 1
   if (isNaN(page) || page <= 0) {
     redirect("/campaigns?page=1&sort=created_at&order=desc")
   }
@@ -36,16 +36,16 @@ export default async function CampaignsPage({
   type ValidSort = "created_at" | "updated_at" | "name"
   const validSorts: readonly ValidSort[] = ["created_at", "updated_at", "name"]
   const sort =
-    params.sort && validSorts.includes(params.sort as ValidSort)
-      ? params.sort
+    parameters.sort && validSorts.includes(parameters.sort as ValidSort)
+      ? parameters.sort
       : "created_at"
 
   // Extract and validate order parameter
   type ValidOrder = "asc" | "desc"
   const validOrders: readonly ValidOrder[] = ["asc", "desc"]
   const order =
-    params.order && validOrders.includes(params.order as ValidOrder)
-      ? params.order
+    parameters.order && validOrders.includes(parameters.order as ValidOrder)
+      ? parameters.order
       : "desc"
 
   // Fetch campaigns for the requested page, sort, and order

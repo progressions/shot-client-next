@@ -2,12 +2,12 @@ import Link from "next/link"
 import type { Weapon } from "@/types"
 import { WeaponName } from "@/components/weapons"
 
-type WeaponLinkProps = {
+type WeaponLinkProperties = {
   weapon: Weapon
   data?: string | object
 }
 
-export default function WeaponLink({ weapon, data }: WeaponLinkProps) {
+export default function WeaponLink({ weapon, data }: WeaponLinkProperties) {
   return (
     <>
       <Link

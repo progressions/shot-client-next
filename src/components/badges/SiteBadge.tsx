@@ -4,12 +4,12 @@ import type { Site } from "@/types"
 import { CharacterLink, FactionLink, SiteLink } from "@/components/links"
 import { Badge } from "@/components/badges"
 
-type SiteBadgeProps = {
+type SiteBadgeProperties = {
   site: Site
   size?: "sm" | "md" | "lg"
 }
 
-export default function SiteBadge({ site, size = "md" }: SiteBadgeProps) {
+export default function SiteBadge({ site, size = "md" }: SiteBadgeProperties) {
   return (
     <Badge entity={site} size={size} title={<SiteLink site={site} />}>
       {site.faction && (

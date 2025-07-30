@@ -6,7 +6,7 @@ import type { Fight } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import type { SystemStyleObject, Theme } from "@mui/system"
 
-interface FightDescriptionProps {
+interface FightDescriptionProperties {
   fight: Fight
   sx?: SystemStyleObject<Theme>
 }
@@ -14,7 +14,7 @@ interface FightDescriptionProps {
 export default function FightDescription({
   fight,
   sx = {},
-}: FightDescriptionProps) {
+}: FightDescriptionProperties) {
   const { campaignData } = useCampaign()
   const [displayDescription, setDisplayDescription] = useState(
     fight.description || ""
@@ -23,9 +23,13 @@ export default function FightDescription({
   useEffect(() => {
     if (campaignData) {
       const updatedFight = campaignData?.fight
-      if (updatedFight && updatedFight.id === fight.id && updatedFight.description) {
-          setDisplayDescription(updatedFight.description)
-        }
+      if (
+        updatedFight &&
+        updatedFight.id === fight.id &&
+        updatedFight.description
+      ) {
+        setDisplayDescription(updatedFight.description)
+      }
     }
   }, [campaignData, fight.id])
 

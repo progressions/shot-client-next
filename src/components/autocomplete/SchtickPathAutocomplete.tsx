@@ -4,7 +4,7 @@ import type { SchtickPath } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
 
-type SchtickPathAutocompleteProps = {
+type SchtickPathAutocompleteProperties = {
   value: string
   onChange: (value: string | null) => void
   fetchOptions?: (inputValue: string) => Promise<Option[]>
@@ -20,7 +20,7 @@ export default function SchtickPathAutocomplete({
   options,
   allowNone = true,
   exclude = [],
-}: SchtickPathAutocompleteProps) {
+}: SchtickPathAutocompleteProperties) {
   const { client } = useClient()
 
   const handleFetchOptions = async (inputValue: string): Promise<Option[]> => {
@@ -31,7 +31,7 @@ export default function SchtickPathAutocomplete({
         )
         .filter(option => !exclude.includes(option.value))
 
-      return filteredOptions;
+      return filteredOptions
     }
     try {
       const response = await client.getSchtickPaths({ search: inputValue })

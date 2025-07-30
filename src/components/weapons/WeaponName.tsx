@@ -4,20 +4,24 @@ import { useState, useEffect } from "react"
 import { useCampaign } from "@/contexts"
 import type { Weapon } from "@/types"
 
-interface WeaponNameProps {
+interface WeaponNameProperties {
   weapon: Weapon
 }
 
-export default function WeaponName({ weapon }: WeaponNameProps) {
+export default function WeaponName({ weapon }: WeaponNameProperties) {
   const { campaignData } = useCampaign()
   const [displayName, setDisplayName] = useState(weapon.name)
 
   useEffect(() => {
     if (campaignData && "weapon" in campaignData) {
       const updatedWeapon = campaignData.weapon
-      if (updatedWeapon && updatedWeapon.id === weapon.id && updatedWeapon.name) {
-          setDisplayName(updatedWeapon.name)
-        }
+      if (
+        updatedWeapon &&
+        updatedWeapon.id === weapon.id &&
+        updatedWeapon.name
+      ) {
+        setDisplayName(updatedWeapon.name)
+      }
     }
   }, [campaignData, weapon.id])
 

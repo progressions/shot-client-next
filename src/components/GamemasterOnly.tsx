@@ -1,7 +1,7 @@
 import type { Campaign, User, Character } from "@/types"
 import { useCampaign } from "@/contexts"
 
-interface GamemasterOnlyProps {
+interface GamemasterOnlyProperties {
   user: User | null
   character?: Character
   campaign?: Campaign
@@ -15,7 +15,7 @@ export default function GamemasterOnly({
   character,
   override,
   except,
-}: React.PropsWithChildren<GamemasterOnlyProps>) {
+}: React.PropsWithChildren<GamemasterOnlyProperties>) {
   const { campaign } = useCampaign()
 
   if (

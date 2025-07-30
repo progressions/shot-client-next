@@ -4,7 +4,7 @@ import { defaultFight, type Fight } from "@/types"
 import { useClient } from "@/contexts"
 import FightForm from "./FightForm"
 
-interface CreateFightFormProps {
+interface CreateFightFormProperties {
   open: boolean
   onClose: () => void
   onSave: (newFight: Fight) => void
@@ -14,7 +14,7 @@ export default function CreateFightForm({
   open,
   onClose,
   onSave,
-}: CreateFightFormProps) {
+}: CreateFightFormProperties) {
   const { client } = useClient()
 
   const handleSave = async (formData: FormData, fightData: Fight) => {
@@ -29,7 +29,7 @@ export default function CreateFightForm({
       open={open}
       onClose={onClose}
       onSave={handleSave}
-      initialFormData={{ name: "", description: "", image: null }}
+      initialFormData={{ ...defaultFight, image: null }}
       title="New Fight"
     />
   )

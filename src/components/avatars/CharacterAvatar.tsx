@@ -3,7 +3,7 @@ import { RefObject, useRef } from "react"
 import type { Character } from "@/types"
 import { SystemStyleObject, Theme } from "@mui/system"
 
-interface CharacterAvatarProps {
+interface CharacterAvatarProperties {
   character: Character
   href?: string
   disablePopup?: boolean
@@ -15,8 +15,8 @@ const CharacterAvatar = ({
   href,
   disablePopup,
   sx = {},
-}: CharacterAvatarProps) => {
-  const avatarRef: RefObject<HTMLDivElement | null> = useRef(null)
+}: CharacterAvatarProperties) => {
+  const avatarReference: RefObject<HTMLDivElement | null> = useRef(null)
 
   if (!character?.id) {
     return <></>
@@ -33,7 +33,7 @@ const CharacterAvatar = ({
     <Avatar
       alt={character.name}
       src={character.image_url || ""}
-      ref={avatarRef}
+      ref={avatarReference}
       sx={sx}
     >
       {initials}

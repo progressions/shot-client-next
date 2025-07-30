@@ -4,7 +4,7 @@ import type { Juncture } from "@/types"
 import { CharacterLink, FactionLink, JunctureLink } from "@/components/links"
 import { Badge } from "@/components/badges"
 
-type JunctureBadgeProps = {
+type JunctureBadgeProperties = {
   juncture: Juncture
   size?: "sm" | "md" | "lg"
 }
@@ -12,7 +12,7 @@ type JunctureBadgeProps = {
 export default function JunctureBadge({
   juncture,
   size = "md",
-}: JunctureBadgeProps) {
+}: JunctureBadgeProperties) {
   return (
     <Badge
       entity={juncture}

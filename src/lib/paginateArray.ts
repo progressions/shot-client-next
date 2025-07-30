@@ -25,14 +25,14 @@ function paginateArray<T>(
 
   // Calculate next and previous pages
   const nextPage = currentPage < totalPages ? currentPage + 1 : null
-  const prevPage = currentPage > 1 ? currentPage - 1 : null
+  const previousPage = currentPage > 1 ? currentPage - 1 : null
 
   return {
     items: paginatedItems,
     meta: {
       current_page: currentPage,
       next_page: nextPage,
-      prev_page: prevPage,
+      prev_page: previousPage,
       total_pages: totalPages,
       total_count: totalCount,
     },

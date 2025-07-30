@@ -6,13 +6,11 @@ import { Alert, Stack, Chip, Typography, Box } from "@mui/material"
 import type { Weapon } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import { useCampaign } from "@/contexts"
-import EditIcon from "@mui/icons-material/Edit"
-import DeleteIcon from "@mui/icons-material/Delete"
 import { EditWeaponForm } from "@/components/weapons"
 import { useClient } from "@/contexts"
-import { SpeedDialMenu } from "@/components/ui"
+import { HeroImage, SpeedDialMenu } from "@/components/ui"
 
-interface WeaponPageClientProps {
+interface WeaponPageClientProperties {
   weapon: Weapon
 }
 
@@ -44,14 +42,12 @@ const junctureColors: Record<
 
 export default function WeaponPageClient({
   weapon: initialWeapon,
-}: WeaponPageClientProps) {
+}: WeaponPageClientProperties) {
   const { campaignData } = useCampaign()
   const { client } = useClient()
   const [weapon, setWeapon] = useState<Weapon>(initialWeapon)
   const [editOpen, setEditOpen] = useState(false)
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [error, setError] = useState<string | null>(null)
-  const open = Boolean(anchorEl)
 
   useEffect(() => {
     document.title = weapon.name ? `${weapon.name} - Chi War` : "Chi War"
@@ -62,14 +58,6 @@ export default function WeaponPageClient({
       setWeapon(campaignData.weapon)
     }
   }, [campaignData, initialWeapon])
-
-  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleMenuClose = () => {
-    setAnchorEl(null)
-  }
 
   const handleSave = async () => {
     setEditOpen(false)
@@ -91,11 +79,6 @@ export default function WeaponPageClient({
   }
 
   const junctureColor = junctureColors[weapon.juncture] || junctureColors.Modern
-
-  const actions = [
-    { icon: <EditIcon />, name: "Edit", onClick: () => setEditOpen(true) },
-    { icon: <DeleteIcon />, name: "Delete", onClick: handleDelete },
-  ]
 
   return (
     <Box
@@ -119,22 +102,7 @@ export default function WeaponPageClient({
           {weapon.reload_value || "-"})
         </Typography>
       </Box>
-      {weapon.image_url && (
-        <Box
-          component="img"
-          src={weapon.image_url}
-          alt={weapon.name}
-          sx={{
-            width: "100%",
-            height: "300px",
-            objectFit: "cover",
-            objectPosition: "50% 20%",
-            mb: 2,
-            display: "block",
-            mx: "auto",
-          }}
-        />
-      )}
+      <HeroImage entity={weapon} />
       <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
         {weapon.juncture && (
           <Chip

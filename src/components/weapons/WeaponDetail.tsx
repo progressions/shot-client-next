@@ -9,19 +9,16 @@ import {
   CardMedia,
   Box,
   Alert,
-  IconButton,
-  Tooltip,
   Typography,
 } from "@mui/material"
-import DeleteIcon from "@mui/icons-material/Delete"
-import EditIcon from "@mui/icons-material/Edit"
 import type { Weapon } from "@/types"
 import Link from "next/link"
 import { WeaponName } from "@/components/weapons"
 import { useCampaign, useClient } from "@/contexts"
 import { RichTextRenderer } from "@/components/editor"
+import DetailButtons from "@/components/DetailButtons"
 
-interface WeaponDetailProps {
+interface WeaponDetailProperties {
   weapon: Weapon
   onDelete: (weaponId: string) => void
   onEdit: (weapon: Weapon) => void
@@ -31,7 +28,7 @@ export default function WeaponDetail({
   weapon: initialWeapon,
   onDelete,
   onEdit,
-}: WeaponDetailProps) {
+}: WeaponDetailProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
@@ -53,7 +50,9 @@ export default function WeaponDetail({
       onDelete(weapon.id)
       setError(null)
     } catch (error_) {
-      setError(error_ instanceof Error ? error_.message : "Failed to delete weapon")
+      setError(
+        error_ instanceof Error ? error_.message : "Failed to delete weapon"
+      )
       console.error("Delete weapon error:", error_)
     }
   }
@@ -88,28 +87,11 @@ export default function WeaponDetail({
             ({weapon.damage}/{weapon.concealment || "-"}/
             {weapon.reload_value || "-"})
           </Typography>
-          <Box sx={{ display: "flex", gap: "0.5rem" }}>
-            <Tooltip title="Edit Weapon">
-              <IconButton
-                color="inherit"
-                onClick={handleEdit}
-                size="small"
-                aria-label="edit weapon"
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete Weapon">
-              <IconButton
-                color="inherit"
-                onClick={handleDelete}
-                size="small"
-                aria-label="delete weapon"
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
+          <DetailButtons
+            name="Weapon"
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         </Box>
         <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
           {weapon.juncture && (

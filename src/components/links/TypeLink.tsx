@@ -1,11 +1,11 @@
 import { Link } from "@mui/material"
 
-type TypeLinkProps = {
+type TypeLinkProperties = {
   characterType: string
   data?: string | object
 }
 
-export default function TypeLink({ characterType, data }: TypeLinkProps) {
+export default function TypeLink({ characterType, data }: TypeLinkProperties) {
   return (
     <Link
       data-mention-id={characterType}

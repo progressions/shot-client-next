@@ -5,22 +5,21 @@ import { useClient } from "@/contexts"
 import { InfoLink } from "@/components/links"
 import { ListManager } from "@/components/lists"
 
-type FormStateData = {
-  page: number
-  open: boolean
-  character_id?: string | null
-}
-
-type MembersListProps = {
+type MembersListProperties = {
   faction: Faction
+  setFaction: (faction: Faction) => void
 }
 
-export default function MembersList({ faction }: MembersListProps) {
+export default function MembersList({
+  faction,
+  setFaction,
+}: MembersListProperties) {
   const { client } = useClient()
 
   async function update(factionId: string, formData: FormData) {
     try {
-      await client.updateFaction(factionId, formData)
+      const response = await client.updateFaction(factionId, formData)
+      setFaction(response.data)
     } catch (error) {
       console.error("Error updating faction:", error)
       throw error
@@ -37,7 +36,7 @@ export default function MembersList({ faction }: MembersListProps) {
       description={
         <>
           A <InfoLink href="/factions" info="Faction" /> recruits{" "}
-          <InfoLink href="/characters" info="Characters" /> to join its cause,
+          <InfoLink href="/characters" info="Characters" /> to join its cause,{" "}
           acting as a unified force in the world of the{" "}
           <InfoLink info="Chi War" />.
         </>

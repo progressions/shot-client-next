@@ -4,7 +4,7 @@ import type { Faction } from "@/types"
 import { CharacterLink, FactionLink } from "@/components/links"
 import { Badge } from "@/components/badges"
 
-type FactionBadgeProps = {
+type FactionBadgeProperties = {
   faction: Faction
   size?: "sm" | "md" | "lg"
 }
@@ -12,7 +12,7 @@ type FactionBadgeProps = {
 export default function FactionBadge({
   faction,
   size = "md",
-}: FactionBadgeProps) {
+}: FactionBadgeProperties) {
   return (
     <Badge
       entity={faction}
