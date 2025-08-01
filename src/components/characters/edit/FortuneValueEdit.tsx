@@ -3,9 +3,9 @@ import type { Character } from "@/types"
 import { useState, useEffect } from "react"
 import { Box, Stack, Typography, FormControl, FormHelperText, Select, MenuItem } from "@mui/material"
 import { TextField } from "@/components/ui"
-import { ActionValueLink } from "@/components/links"
+import { FortuneValueEditLink } from "@/components/links"
 
-type ActionValueProps = {
+type FortuneValueEditProps = {
   name: string
   value: number | string | null
   size: "small" | "large"
@@ -14,21 +14,20 @@ type ActionValueProps = {
   updateCharacter: (updatedCharacter: Character) => Promise<void>
 }
 
-export default function ActionValue({
+export default function FortuneValueEdit({
   name,
   value,
   size = "large",
   character,
   setCharacter,
   updateCharacter,
-}: ActionValueProps) {
+}: FortuneValueEditProps) {
   const [inputValue, setInputValue] = useState<string>(value?.toString() || "")
   const [valueError, setValueError] = useState<string>("")
   const [serverError, setServerError] = useState<string>("")
   const [selectedName, setSelectedName] = useState<string>(name)
 
-  const attackOptions = ["Guns", "Martial Arts", "Scroungetech", "Sorcery", "Genome"]
-  const isAttack = attackOptions.includes(name)
+  const fortuneOptions = ["Fortune", "Chi", "Magic", "Genome"]
 
   useEffect(() => {
     setInputValue(value?.toString() || "")
@@ -56,7 +55,7 @@ export default function ActionValue({
     if (!val.trim()) {
       return "Attack type is required"
     }
-    if (!attackOptions.includes(val)) {
+    if (!fortuneOptions.includes(val)) {
       return "Invalid attack type"
     }
     return ""
@@ -120,20 +119,41 @@ export default function ActionValue({
 
   return (
     <Stack direction="column" sx={{ alignItems: "flex-start", gap: 0.5 }}>
-      <FormControl error={!!valueError || !!serverError} sx={{ width: "110px" }}>
-        <Typography
-          variant="body2"
+      <FormControl error={!!valueError || !!serverError} sx={{ width: "140px" }}>
+        <Select
+          value={selectedName}
+          onChange={handleNameChange}
           sx={{
-            width: "110px",
+            width: "140px",
             color: "#ffffff",
             fontSize: "1rem",
-            textAlign: "left",
+            lineHeight: "1.5rem",
             height: "2rem",
-            lineHeight: "1.5rem"
+            "& .MuiSelect-select": {
+              padding: "0 24px 0 8px",
+              textAlign: "left"
+            }
+          }}
+          MenuProps={{
+            PaperProps: {
+              sx: {
+                "& .MuiMenuItem-root": {
+                  color: "#ffffff",
+                  fontSize: "1rem",
+                  lineHeight: "1.5rem",
+                  textAlign: "left",
+                  width: "140px"
+                }
+              }
+            }
           }}
         >
-          <ActionValueLink name={name} />
-        </Typography>
+          {fortuneOptions.map((option) => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
         <TextField
           name={name}
           value={inputValue}
@@ -143,7 +163,7 @@ export default function ActionValue({
           type="text"
           InputProps={{
             sx: {
-              width: "110px",
+              width: "140px",
               fontSize: fontSizeMap[size],
               border: "1px solid #ffffff",
               borderRadius: 1,

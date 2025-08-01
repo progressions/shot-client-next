@@ -120,20 +120,41 @@ export default function ActionValue({
 
   return (
     <Stack direction="column" sx={{ alignItems: "flex-start", gap: 0.5 }}>
-      <FormControl error={!!valueError || !!serverError} sx={{ width: "110px" }}>
-        <Typography
-          variant="body2"
+      <FormControl error={!!valueError || !!serverError} sx={{ width: "140px" }}>
+        <Select
+          value={selectedName}
+          onChange={handleNameChange}
           sx={{
-            width: "110px",
+            width: "140px",
             color: "#ffffff",
             fontSize: "1rem",
-            textAlign: "left",
+            lineHeight: "1.5rem",
             height: "2rem",
-            lineHeight: "1.5rem"
+            "& .MuiSelect-select": {
+              padding: "0 24px 0 8px",
+              textAlign: "left"
+            }
+          }}
+          MenuProps={{
+            PaperProps: {
+              sx: {
+                "& .MuiMenuItem-root": {
+                  color: "#ffffff",
+                  fontSize: "1rem",
+                  lineHeight: "1.5rem",
+                  textAlign: "left",
+                  width: "140px"
+                }
+              }
+            }
           }}
         >
-          <ActionValueLink name={name} />
-        </Typography>
+          {attackOptions.map((option) => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
         <TextField
           name={name}
           value={inputValue}
@@ -143,7 +164,7 @@ export default function ActionValue({
           type="text"
           InputProps={{
             sx: {
-              width: "110px",
+              width: "140px",
               fontSize: fontSizeMap[size],
               border: "1px solid #ffffff",
               borderRadius: 1,

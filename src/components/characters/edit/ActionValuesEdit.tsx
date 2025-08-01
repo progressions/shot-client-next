@@ -3,7 +3,7 @@
 import type { Character } from "@/types"
 import { Box, Stack } from "@mui/material"
 import { CS } from "@/services"
-import { ActionValueEdit as ActionValue } from "@/components/characters"
+import { FortuneValueEdit, AttackValueEdit, ActionValueEdit as ActionValue } from "@/components/characters"
 
 type ActionValuesProps = {
   character: Character
@@ -29,7 +29,7 @@ export default function ActionValues({
           mb: 3,
         }}
       >
-        <ActionValue
+        <AttackValueEdit
           name={CS.mainAttack(character)}
           value={CS.mainAttackValue(character)}
           size={size}
@@ -37,7 +37,7 @@ export default function ActionValues({
           setCharacter={setCharacter}
           updateCharacter={updateCharacter}
         />
-        <ActionValue
+        <AttackValueEdit
           name={CS.secondaryAttack(character) || "What"}
           value={CS.secondaryAttackValue(character)}
           size={size}
@@ -70,7 +70,7 @@ export default function ActionValues({
           updateCharacter={updateCharacter}
         />
         {CS.isPC(character) && (
-          <ActionValue
+          <FortuneValueEdit
             name={CS.fortuneType(character)}
             value={CS.fortune(character)}
             size={size}
