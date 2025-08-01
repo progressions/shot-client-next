@@ -16,9 +16,9 @@ type TemplateProps = {
 
 export default function Template({ template }: TemplateProps) {
   return (
-    <Box sx={{ width: 500 }}>
+    <Box sx={{ width: 800, mx: "auto" }}>
       <Header character={template} />
-      <ActionValues character={template} size="small" />
+      <ActionValues character={template} size="large" />
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 2 }}>
         <Box sx={{ flex: 1, flexGrow: 1 }}>
           <Skills character={template} />

@@ -1,9 +1,10 @@
 "use client"
 
 import React, { useState } from "react"
-import { Box, IconButton, Paper, Button } from "@mui/material"
+import { Box, IconButton, Paper } from "@mui/material"
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos"
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
+import PersonAddIcon from "@mui/icons-material/PersonAdd"
 
 interface CarouselProps {
   items: { id: number; content: string }[]
@@ -26,9 +27,8 @@ export function Carousel({ items, onSelect }: CarouselProps) {
       sx={{
         position: "relative",
         width: "100%",
-        maxWidth: 600,
+        minWidth: 900,
         mx: "auto",
-        my: 4,
       }}
     >
       <Paper
@@ -53,27 +53,27 @@ export function Carousel({ items, onSelect }: CarouselProps) {
                 bgcolor: "grey.800",
                 color: "white",
                 flexShrink: 0,
-                px: 4,
-                pt: 1,
-                pb: 4,
+                p: 4,
+                pb: 20,
                 overflow: "scroll",
+                position: "relative",
               }}
             >
               {onSelect && (
-                <Button
-                  variant="contained"
+                <IconButton
                   onClick={() => onSelect(item)}
                   sx={{
-                    alignSelf: "center",
-                    mb: 2,
+                    position: "absolute",
+                    top: 16,
+                    right: 16,
                     bgcolor: "primary.main",
+                    color: "white",
                     "&:hover": { bgcolor: "primary.dark" },
-                    minWidth: 150,
-                    fontSize: "1rem",
+                    zIndex: 1,
                   }}
                 >
-                  Select
-                </Button>
+                  <PersonAddIcon sx={{ fontSize: "2rem" }} />
+                </IconButton>
               )}
               {item.content}
             </Box>

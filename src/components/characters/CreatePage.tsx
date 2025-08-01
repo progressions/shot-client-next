@@ -26,13 +26,13 @@ export default function CreatePage({ templates: templates }: CreatePageProps) {
   }))
 
   return (
-    <Box sx={{ maxWidth: 700, mx: "auto", mt: 4, position: "relative" }}>
+    <Box sx={{ position: "relative" }}>
       <SpeedDial />
       <HeroTitle>Create</HeroTitle>
       <Typography variant="body1" sx={{ mt: 2 }}>
         Choose your Archetype:
       </Typography>
-      <Box sx={{ width: 700 }}>
+      <Box>
         <Carousel items={items} onSelect={handleSelect} />
       </Box>
     </Box>
