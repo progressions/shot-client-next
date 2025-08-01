@@ -5,8 +5,7 @@ import type { Character } from "@/types"
 import type { Metadata } from "next"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import { Suspense } from "react"
-
-import { CharacterPageClient } from "@/components/characters"
+import { EditCharacter } from "@/components/characters"
 
 // Component for character not found
 function CharacterNotFound() {
@@ -79,7 +78,7 @@ export default async function CharacterPage({
   return <>
     <Breadcrumbs />
     <Suspense fallback={<CircularProgress />}>
-      <CharacterPageClient character={character} />
+      <EditCharacter character={character} />
     </Suspense>
   </>
 }
