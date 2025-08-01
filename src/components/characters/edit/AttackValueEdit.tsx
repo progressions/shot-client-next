@@ -6,7 +6,7 @@ import { Box, Stack, FormControl, FormHelperText, Select, MenuItem } from "@mui/
 import { TextField } from "@/components/ui"
 import { CS } from "@/services"
 
-type ActionValueProps = {
+type AttackValueEditProps = {
   attack: string
   name: string
   value: number | string | null
@@ -16,7 +16,7 @@ type ActionValueProps = {
   updateCharacter: (updatedCharacter: Character) => Promise<void>
 }
 
-export default function ActionValue({
+export default function AttackValueEdit({
   attack = "MainAttack",
   name,
   value,
@@ -24,11 +24,11 @@ export default function ActionValue({
   character,
   setCharacter,
   updateCharacter,
-}: ActionValueProps) {
+}: AttackValueEditProps) {
   const [inputValue, setInputValue] = useState<string>(value?.toString() || "")
   const [valueError, setValueError] = useState<string>("")
   const [serverError, setServerError] = useState<string>("")
-  const [selectedName, setSelectedName] = useState<string>(CS.mainAttack(character) || "")
+  const [selectedName, setSelectedName] = useState<string>(name || "")
 
   const attackOptions = ["Guns", "Martial Arts", "Scroungetech", "Sorcery", "Genome"]
 
@@ -64,15 +64,24 @@ export default function ActionValue({
     return ""
   }
 
-  const handleValueChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value
     setInputValue(newValue)
     setValueError("") // Clear client-side error while typing
     setServerError("") // Clear server-side error while typing
-    const error = validateValue(newValue)
+  }
+
+  const handleAttackNameChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const newName = event.target.value as string
+    setSelectedName(newName)
+    setServerError("") // Clear server-side error
+  }
+
+  const handleValueBlur = async () => {
+    const error = validateValue(inputValue)
     setValueError(error)
     if (!error) {
-      const updatedCharacter = CS.changeAttackValue(character, selectedName, newValue)
+      const updatedCharacter = CS.changeAttackValue(character, selectedName, inputValue)
       setCharacter(updatedCharacter)
       try {
         await updateCharacter({ ...updatedCharacter, sites: undefined, schticks: undefined, parties: undefined })
@@ -82,13 +91,11 @@ export default function ActionValue({
     }
   }
 
-  const handleAttackNameChange = async (event: React.ChangeEvent<{ value: unknown }>) => {
-    const newName = event.target.value as string
-    setSelectedName(newName)
-    setServerError("") // Clear server-side error
-    const nameError = validateName(newName)
+  const handleAttackNameBlur = async () => {
+    const nameError = validateName(selectedName)
+    setServerError(nameError)
     if (!nameError) {
-      const updatedCharacter = CS.changeAttack(character, attack, newName)
+      const updatedCharacter = CS.changeAttack(character, attack, selectedName)
       setCharacter(updatedCharacter)
       try {
         await updateCharacter({ ...updatedCharacter, sites: undefined, schticks: undefined, parties: undefined })
@@ -104,6 +111,7 @@ export default function ActionValue({
         <Select
           value={selectedName}
           onChange={handleAttackNameChange}
+          onBlur={handleAttackNameBlur}
           sx={{
             width: "140px",
             color: "#ffffff",
@@ -139,6 +147,7 @@ export default function ActionValue({
           name={name}
           value={inputValue}
           onChange={handleValueChange}
+          onBlur={handleValueBlur}
           error={!!valueError || !!serverError}
           type="text"
           InputProps={{

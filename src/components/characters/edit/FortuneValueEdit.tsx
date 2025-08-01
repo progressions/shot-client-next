@@ -1,9 +1,10 @@
 "use client"
+
 import type { Character } from "@/types"
 import { useState, useEffect } from "react"
-import { Box, Stack, Typography, FormControl, FormHelperText, Select, MenuItem } from "@mui/material"
+import { Box, Stack, FormControl, FormHelperText, Select, MenuItem } from "@mui/material"
 import { TextField } from "@/components/ui"
-import { FortuneValueEditLink } from "@/components/links"
+import { CS } from "@/services"
 
 type FortuneValueEditProps = {
   name: string
@@ -25,7 +26,7 @@ export default function FortuneValueEdit({
   const [inputValue, setInputValue] = useState<string>(value?.toString() || "")
   const [valueError, setValueError] = useState<string>("")
   const [serverError, setServerError] = useState<string>("")
-  const [selectedName, setSelectedName] = useState<string>(name)
+  const [selectedName, setSelectedName] = useState<string>(name || "")
 
   const fortuneOptions = ["Fortune", "Chi", "Magic", "Genome"]
 
@@ -53,10 +54,10 @@ export default function FortuneValueEdit({
 
   const validateName = (val: string): string => {
     if (!val.trim()) {
-      return "Attack type is required"
+      return "Fortune type is required"
     }
     if (!fortuneOptions.includes(val)) {
-      return "Invalid attack type"
+      return "Invalid fortune type"
     }
     return ""
   }
@@ -68,49 +69,35 @@ export default function FortuneValueEdit({
     setServerError("") // Clear server-side error while typing
   }
 
-  const handleNameChange = async (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleFortuneNameChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const newName = event.target.value as string
     setSelectedName(newName)
     setServerError("") // Clear server-side error
-    const nameError = validateName(newName)
-    if (!nameError) {
-      const updatedCharacter = {
-        ...character,
-        action_values: {
-          ...character.action_values,
-          [newName]: inputValue || null,
-          [name]: undefined // Clear old name if changed
-        },
-        parties: undefined,
-        schticks: undefined,
-        sites: undefined,
-      }
-      setCharacter(updatedCharacter)
-      try {
-        await updateCharacter(updatedCharacter)
-      } catch (error) {
-        setServerError(error.message)
-      }
-    }
   }
 
   const handleValueBlur = async () => {
     const error = validateValue(inputValue)
     setValueError(error)
     if (!error) {
-      const updatedCharacter = {
-        ...character,
-        action_values: {
-          ...character.action_values,
-          [selectedName]: parseInt(inputValue, 10) || null
-        },
-        parties: undefined,
-        schticks: undefined,
-        sites: undefined,
-      }
+      const updatedCharacter = CS.changeFortuneValue(character, parseInt(inputValue, 10) || null)
+      console.log("updatedCharacter", updatedCharacter)
       setCharacter(updatedCharacter)
       try {
-        await updateCharacter(updatedCharacter)
+        await updateCharacter({ ...updatedCharacter, sites: undefined, schticks: undefined, parties: undefined })
+      } catch (error) {
+        setServerError(error.message)
+      }
+    }
+  }
+
+  const handleFortuneNameBlur = async () => {
+    const nameError = validateName(selectedName)
+    setServerError(nameError)
+    if (!nameError) {
+      const updatedCharacter = CS.changeFortuneType(character, selectedName)
+      setCharacter(updatedCharacter)
+      try {
+        await updateCharacter({ ...updatedCharacter, sites: undefined, schticks: undefined, parties: undefined })
       } catch (error) {
         setServerError(error.message)
       }
@@ -119,12 +106,13 @@ export default function FortuneValueEdit({
 
   return (
     <Stack direction="column" sx={{ alignItems: "flex-start", gap: 0.5 }}>
-      <FormControl error={!!valueError || !!serverError} sx={{ width: "120px" }}>
+      <FormControl error={!!valueError || !!serverError} sx={{ width: "140px" }}>
         <Select
           value={selectedName}
-          onChange={handleNameChange}
+          onChange={handleFortuneNameChange}
+          onBlur={handleFortuneNameBlur}
           sx={{
-            width: "120px",
+            width: "140px",
             color: "#ffffff",
             fontSize: "1rem",
             lineHeight: "1.5rem",
@@ -142,7 +130,7 @@ export default function FortuneValueEdit({
                   fontSize: "1rem",
                   lineHeight: "1.5rem",
                   textAlign: "left",
-                  width: "120px"
+                  width: "140px"
                 }
               }
             }
@@ -163,7 +151,7 @@ export default function FortuneValueEdit({
           type="text"
           InputProps={{
             sx: {
-              width: "120px",
+              width: "140px",
               fontSize: fontSizeMap[size],
               border: "1px solid #ffffff",
               borderRadius: 1,
