@@ -27,7 +27,7 @@ export function Carousel({ items, onSelect }: CarouselProps) {
       sx={{
         position: "relative",
         width: "100%",
-        minWidth: 900,
+        minWidth: 800,
         mx: "auto",
       }}
     >

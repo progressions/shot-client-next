@@ -16,7 +16,7 @@ type TemplateProps = {
 
 export default function Template({ template }: TemplateProps) {
   return (
-    <Box sx={{ width: 800, mx: "auto" }}>
+    <Box sx={{ width: 700, mx: "auto" }}>
       <Header character={template} />
       <ActionValues character={template} size="large" />
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 2 }}>
