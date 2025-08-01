@@ -49,22 +49,19 @@ export default function ActionValue({
     return ""
   }
 
-  const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleValueChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value
     setInputValue(newValue)
     setValueError("") // Clear client-side error while typing
     setServerError("") // Clear server-side error while typing
-  }
-
-  const handleValueBlur = async () => {
-    const error = validateValue(inputValue)
+    const error = validateValue(newValue)
     setValueError(error)
     if (!error) {
       const updatedCharacter = {
         ...character,
         action_values: {
           ...character.action_values,
-          [name]: parseInt(inputValue, 10) || null
+          [name]: parseInt(newValue, 10) || null
         },
         parties: undefined,
         schticks: undefined,
@@ -101,7 +98,6 @@ export default function ActionValue({
           name={name}
           value={inputValue}
           onChange={handleValueChange}
-          onBlur={handleValueBlur}
           error={!!valueError || !!serverError}
           type="text"
           InputProps={{
