@@ -1,6 +1,5 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import type { Character } from "@/types"
 import { useClient, useCampaign } from "@/contexts"
 import { useState, useEffect } from "react"
@@ -30,7 +29,6 @@ export default function CharacterPageClient({
   const { campaignData } = useCampaign()
   const { client } = useClient()
   const [character, setCharacter] = useState<Character>(initialCharacter)
-  const router = useRouter()
 
   useEffect(() => {
     document.title = character.name ? `${character.name} - Chi War` : "Chi War"

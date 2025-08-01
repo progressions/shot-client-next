@@ -53,18 +53,19 @@ export function SpeedDialMenu({
 
   const actions = initialActions || defaultActions
 
-  const handleActionClick = (action: Action) => (event: MouseEvent<HTMLElement>) => {
-    if (action.preventClose) {
-      event.stopPropagation()
-      setPersist(true)
-    } else {
-      setPersist(false)
-      onClose()
+  const handleActionClick =
+    (action: Action) => (event: MouseEvent<HTMLElement>) => {
+      if (action.preventClose) {
+        event.stopPropagation()
+        setPersist(true)
+      } else {
+        setPersist(false)
+        onClose()
+      }
+      if (action.onClick) {
+        action.onClick(event)
+      }
     }
-    if (action.onClick) {
-      action.onClick(event)
-    }
-  }
 
   const handleClose = () => {
     if (!persist) {

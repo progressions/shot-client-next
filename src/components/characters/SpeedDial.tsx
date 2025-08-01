@@ -33,7 +33,9 @@ type SpeedDialProps = {
   actions?: typeof actions
 }
 
-export default function SpeedDial({ actions: initialActions = actions }: SpeedDialProps) {
+export default function SpeedDial({
+  actions: initialActions = actions,
+}: SpeedDialProps) {
   const [open, setOpen] = useState(false)
 
   return (

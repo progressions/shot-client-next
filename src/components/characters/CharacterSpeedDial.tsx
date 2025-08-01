@@ -4,10 +4,16 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload"
 import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/Delete"
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
-import { SpeedDial, SpeedDialAction, SpeedDialIcon, Menu, MenuItem } from "@mui/material"
+import {
+  SpeedDial,
+  SpeedDialAction,
+  SpeedDialIcon,
+  Menu,
+  MenuItem,
+} from "@mui/material"
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
 import { SystemStyleObject, Theme } from "@mui/system"
-import type { MouseEvent, Dispatch, SetStateAction } from "react"
+import type { MouseEvent } from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import type { Character } from "@/types"
@@ -24,13 +30,11 @@ type Action = {
 
 type CharacterSpeedDialProps = {
   character: Character
-  setCharacter: Dispatch<SetStateAction<Character>>
   sx?: SystemStyleObject<Theme>
 }
 
 export default function CharacterSpeedDial({
   character,
-  setCharacter,
   sx = {},
 }: CharacterSpeedDialProps) {
   const { client } = useClient()
@@ -142,24 +146,37 @@ Action Values: ${JSON.stringify(character.actionValues, null, 2)}
   }
 
   const actions = [
-    { icon: <EditIcon />, name: "Edit", onClick: () => { setEditOpen(true); setSpeedDialOpen(false) } },
-    { icon: <FileDownloadIcon />, name: "Export", onClick: handleExportClick, preventClose: true },
+    {
+      icon: <EditIcon />,
+      name: "Edit",
+      onClick: () => {
+        setEditOpen(true)
+        setSpeedDialOpen(false)
+      },
+    },
+    {
+      icon: <FileDownloadIcon />,
+      name: "Export",
+      onClick: handleExportClick,
+      preventClose: true,
+    },
     { icon: <PeopleAltIcon />, name: "Copy", onClick: handleDuplicate },
     { icon: <DeleteIcon />, name: "Delete", onClick: handleDelete },
   ]
 
-  const handleActionClick = (action: Action) => (event: MouseEvent<HTMLElement>) => {
-    if (action.preventClose) {
-      event.stopPropagation()
-      setPersist(true)
-    } else {
-      setPersist(false)
-      setSpeedDialOpen(false)
+  const handleActionClick =
+    (action: Action) => (event: MouseEvent<HTMLElement>) => {
+      if (action.preventClose) {
+        event.stopPropagation()
+        setPersist(true)
+      } else {
+        setPersist(false)
+        setSpeedDialOpen(false)
+      }
+      if (action.onClick) {
+        action.onClick(event)
+      }
     }
-    if (action.onClick) {
-      action.onClick(event)
-    }
-  }
 
   return (
     <>
