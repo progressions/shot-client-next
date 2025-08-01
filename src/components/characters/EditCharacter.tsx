@@ -1,13 +1,14 @@
 "use client"
 
 import type { Character } from "@/types"
-import { useClient, useCampaign } from "@/contexts"
+import { useToast, useClient, useCampaign } from "@/contexts"
 import { useState, useEffect } from "react"
-import { Box, Stack } from "@mui/material"
+import { Box, Stack, FormControl, FormHelperText } from "@mui/material"
+import { TextField } from "@/components/ui"
 import { CharacterSpeedDial } from "@/components/characters"
 import { CS } from "@/services"
+
 import {
-  Header,
   Owner,
   Associations,
   ActionValues,
@@ -28,7 +29,10 @@ export default function EditCharacter({
 }: EditCharacterProps) {
   const { campaignData } = useCampaign()
   const { client } = useClient()
+  const { toastSuccess, toastError } = useToast()
   const [character, setCharacter] = useState<Character>(initialCharacter)
+  const [nameError, setNameError] = useState<string>("")
+  const [serverError, setServerError] = useState<string>("")
 
   useEffect(() => {
     document.title = character.name ? `${character.name} - Chi War` : "Chi War"
@@ -43,6 +47,49 @@ export default function EditCharacter({
     }
   }, [campaignData, initialCharacter])
 
+  const validateName = (name: string): string => {
+    if (!name.trim()) {
+      return "Character name is required"
+    }
+    return ""
+  }
+
+  const updateCharacter = async (updatedCharacter: Character) => {
+    try {
+      const formData = new FormData()
+      const characterData = { ...updatedCharacter, schticks: undefined, parties: undefined, sites: undefined }
+      formData.append("character", JSON.stringify(characterData))
+      const response = await client.updateCharacter(character.id, formData)
+      setCharacter(response.data)
+      setServerError("") // Clear server error on success
+      toastSuccess("Character updated successfully")
+    } catch (error) {
+      const nameErrors = error.response?.data?.errors?.name
+      const errorMessage = Array.isArray(nameErrors) && nameErrors.length > 0
+        ? nameErrors[0]
+        : "Failed to update character"
+      setServerError(errorMessage)
+      toastError(`Error updating character: ${errorMessage}`)
+      console.error("Error updating character:", errorMessage)
+    }
+  }
+
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = event.target.value
+    const updatedCharacter = { ...character, name: newName }
+    setCharacter(updatedCharacter)
+    setNameError("") // Clear client-side error while typing
+    setServerError("") // Clear server-side error while typing
+  }
+
+  const handleNameBlur = () => {
+    const error = validateName(character.name)
+    setNameError(error)
+    if (!error) {
+      updateCharacter(character)
+    }
+  }
+
   return (
     <Box
       sx={{
@@ -55,7 +102,20 @@ export default function EditCharacter({
         client={client}
         setCharacter={setCharacter}
       />
-      <Header character={character} />
+      <FormControl fullWidth error={!!nameError || !!serverError} sx={{ mb: 2 }}>
+        <TextField
+          fullWidth
+          label="Character Name"
+          value={character.name || ""}
+          onChange={handleNameChange}
+          onBlur={handleNameBlur}
+          error={!!nameError || !!serverError}
+          sx={{ fontSize: "1.5rem", fontWeight: "bold", color: "#ffffff" }}
+        />
+        {(nameError || serverError) && (
+          <FormHelperText sx={{ mt: 1 }}>{nameError || serverError}</FormHelperText>
+        )}
+      </FormControl>
       <Owner character={character} />
       <ActionValues character={character} />
       {!CS.isMook(character) && (
