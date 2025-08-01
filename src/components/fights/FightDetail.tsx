@@ -1,19 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import {
-  CardMedia,
-  Card,
-  CardContent,
-  Box,
-  Alert,
-  Typography,
-} from "@mui/material"
+import { Card, CardContent, Box, Alert, Typography } from "@mui/material"
 import type { Fight } from "@/types"
 import { FightDescription } from "@/components/fights"
 import { useCampaign, useClient } from "@/contexts"
 import { FightLink, CharacterLink } from "@/components/links"
 import DetailButtons from "@/components/DetailButtons"
+import { PositionableImage } from "@/components/ui"
 
 interface FightDetailProperties {
   fight: Fight
@@ -74,13 +68,7 @@ export default function FightDetail({
   return (
     <Card sx={{ mb: 2, bgcolor: "#424242" }}>
       {fight.image_url && (
-        <CardMedia
-          component="img"
-          height="140"
-          image={`${fight.image_url}?tr=w-600,h-300,fo-auto`}
-          alt={fight.name}
-          sx={{ objectFit: "cover" }}
-        />
+        <PositionableImage entity={fight} pageContext="index" height="200" />
       )}
       <CardContent sx={{ p: "1rem" }}>
         <Box

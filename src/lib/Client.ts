@@ -1,6 +1,7 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios"
 import { Api, ApiV2, queryParams } from "@/lib"
 import type {
+  ImagePosition,
   NotionPage,
   Location,
   CharacterJson,
@@ -72,6 +73,31 @@ class Client {
     const websocketUrl = this.api.cable(this.jwt)
     this.consumerInstance = createConsumer(websocketUrl)
     return this.consumerInstance
+  }
+
+  async createImagePosition(
+    entity: Entity,
+    parameters: Parameters_ = {
+      context: "desktop_index",
+      x_position: 0,
+      y_position: 0,
+    }
+  ): Promise<AxiosResponse<Entity>> {
+    return this.post(this.apiV2.imagePositions(entity), {
+      image_position: parameters,
+    })
+  }
+
+  async updateImagePosition(
+    entity: Entity,
+    imagePosition: ImagePosition
+  ): Promise<AxiosResponse<ImagePosition>> {
+    return this.patch(
+      `${this.apiV2.imagePositions()}/${entity.entity_class}/${entity.id}`,
+      {
+        image_position: imagePosition,
+      }
+    )
   }
 
   async generateAiCharacter(

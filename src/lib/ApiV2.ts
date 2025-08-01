@@ -38,6 +38,10 @@ class ApiV2 {
       : `${this.api()}/vehicles`
   }
 
+  imagePositions(): string {
+    return `${this.api()}/image_positions`
+  }
+
   sites(site?: Site | ID): string {
     return site?.id ? `${this.api()}/sites/${site.id}` : `${this.api()}/sites`
   }
