@@ -10,6 +10,6 @@ type HeroImageProps = {
 
 export function HeroImage({ entity, pageContext = "entity" }: HeroImageProps) {
   return (
-    <PositionableImage entity={entity} pageContext={pageContext} height={300} />
+    <PositionableImage entity={entity} pageContext={pageContext} height={500} />
   )
 }
