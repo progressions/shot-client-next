@@ -62,11 +62,13 @@ export default function NameEditor({
         onBlur={handleNameBlur}
         error={!!nameError || !!serverError}
         InputProps={{
-          sx: { fontSize: "2rem", fontWeight: "bold", color: "#ffffff" }
+          sx: { fontSize: "2rem", fontWeight: "bold", color: "#ffffff" },
         }}
       />
       {(nameError || serverError) && (
-        <FormHelperText sx={{ mt: -0.5 }}>{nameError || serverError}</FormHelperText>
+        <FormHelperText sx={{ mt: -0.5 }}>
+          {nameError || serverError}
+        </FormHelperText>
       )}
     </FormControl>
   )

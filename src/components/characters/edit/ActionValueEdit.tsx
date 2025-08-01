@@ -2,7 +2,13 @@
 
 import type { Character } from "@/types"
 import { useState, useEffect } from "react"
-import { Box, Stack, Typography, FormControl, FormHelperText } from "@mui/material"
+import {
+  Box,
+  Stack,
+  Typography,
+  FormControl,
+  FormHelperText,
+} from "@mui/material"
 import { TextField } from "@/components/ui"
 import { ActionValueLink } from "@/components/links"
 
@@ -59,7 +65,17 @@ export default function ActionValue({
     const error = validateValue(inputValue)
     setValueError(error)
     if (!error) {
-      const updatedCharacter = { ...character, [name.toLowerCase()]: inputValue }
+      const updatedCharacter = {
+        ...character,
+        action_values: {
+          ...character.action_values,
+          [name]: parseInt(inputValue, 10) || null, // Convert to number or null
+        },
+        parties: undefined,
+        schticks: undefined,
+        sites: undefined,
+      }
+      console.log("updatedCharacter:", updatedCharacter)
       setCharacter(updatedCharacter)
       try {
         await updateCharacter(updatedCharacter)
@@ -76,6 +92,7 @@ export default function ActionValue({
       </Typography>
       <FormControl error={!!valueError || !!serverError}>
         <TextField
+          name={name}
           value={inputValue}
           onChange={handleValueChange}
           onBlur={handleValueBlur}
@@ -91,13 +108,15 @@ export default function ActionValue({
               "& input": {
                 textAlign: "center",
                 WebkitAppearance: "none",
-                MozAppearance: "textfield"
-              }
-            }
+                MozAppearance: "textfield",
+              },
+            },
           }}
         />
         {(valueError || serverError) && (
-          <FormHelperText sx={{ mt: -0.5 }}>{valueError || serverError}</FormHelperText>
+          <FormHelperText sx={{ mt: -0.5 }}>
+            {valueError || serverError}
+          </FormHelperText>
         )}
       </FormControl>
     </Stack>

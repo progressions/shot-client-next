@@ -46,16 +46,22 @@ export default function EditCharacter({
   const updateCharacter = async (updatedCharacter: Character) => {
     try {
       const formData = new FormData()
-      const characterData = { ...updatedCharacter, schticks: undefined, parties: undefined, sites: undefined }
+      const characterData = {
+        ...updatedCharacter,
+        schticks: undefined,
+        parties: undefined,
+        sites: undefined,
+      }
       formData.append("character", JSON.stringify(characterData))
       const response = await client.updateCharacter(character.id, formData)
       setCharacter(response.data)
       toastSuccess("Character updated successfully")
     } catch (error) {
       const nameErrors = error.response?.data?.errors?.name
-      const errorMessage = Array.isArray(nameErrors) && nameErrors.length > 0
-        ? nameErrors[0]
-        : "Failed to update character"
+      const errorMessage =
+        Array.isArray(nameErrors) && nameErrors.length > 0
+          ? nameErrors[0]
+          : "Failed to update character"
       toastError(`Error updating character: ${errorMessage}`)
       console.error("Error updating character:", errorMessage)
       throw new Error(errorMessage) // Rethrow to let NameEditor handle serverError
@@ -83,7 +89,11 @@ export default function EditCharacter({
         updateCharacter={updateCharacter}
       />
       <Owner character={memoizedCharacter} />
-      <ActionValuesEdit character={memoizedCharacter} />
+      <ActionValuesEdit
+        character={memoizedCharacter}
+        setCharacter={setCharacter}
+        updateCharacter={updateCharacter}
+      />
       {!CS.isMook(memoizedCharacter) && (
         <Stack
           direction={{ xs: "column", md: "row" }}
