@@ -13,16 +13,27 @@ export function Carousel({ items }: CarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => (prev === 0 ? items.length - 1 : prev - 1))
+    setCurrentIndex(prev => (prev === 0 ? items.length - 1 : prev - 1))
   }
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev === items.length - 1 ? 0 : prev + 1))
+    setCurrentIndex(prev => (prev === items.length - 1 ? 0 : prev + 1))
   }
 
   return (
-    <Box sx={{ position: "relative", width: "100%", maxWidth: 600, mx: "auto", my: 4 }}>
-      <Paper elevation={3} sx={{ overflow: "hidden", borderRadius: 2, bgcolor: "grey.900" }}>
+    <Box
+      sx={{
+        position: "relative",
+        width: "100%",
+        maxWidth: 600,
+        mx: "auto",
+        my: 4,
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{ overflow: "hidden", borderRadius: 2, bgcolor: "grey.900" }}
+      >
         <Box
           sx={{
             display: "flex",
@@ -30,17 +41,19 @@ export function Carousel({ items }: CarouselProps) {
             transform: `translateX(-${currentIndex * 100}%)`,
           }}
         >
-          {items.map((item) => (
+          {items.map(item => (
             <Box
               key={item.id}
               sx={{
                 minWidth: "100%",
-                height: 600,
+                height: 900,
                 display: "flex",
                 bgcolor: "grey.800",
                 color: "white",
                 flexShrink: 0,
-                p: 2,
+                p: 4,
+                pb: 20,
+                overflow: "scroll",
               }}
             >
               {item.content}

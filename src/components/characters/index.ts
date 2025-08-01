@@ -22,3 +22,4 @@ export { default as CharacterManager } from "@/components/characters/CharacterMa
 export { default as CharacterDetail } from "@/components/characters/CharacterDetail"
 export { default as CharacterDescription } from "@/components/characters/CharacterDescription"
 export { default as CharacterSpeedDial } from "@/components/characters/CharacterSpeedDial"
+export { default as Template } from "@/components/characters/create/Template"

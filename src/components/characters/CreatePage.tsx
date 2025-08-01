@@ -1,23 +1,35 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Box, Typography } from "@mui/material"
 import { HeroTitle, Carousel } from "@/components/ui"
-import { SpeedDial } from "@/components/characters"
+import { Template, SpeedDial } from "@/components/characters"
+import { useClient } from "@/contexts"
+import type { Character } from "@/types"
 
-export default function CreatePage() {
-  const items = [
-    { id: 1, content: "First Item" },
-    { id: 2, content: "Second Item" },
-    { id: 3, content: "Third Item" },
-  ]
+type CreatePageProps = {
+  templates?: Character[]
+}
+
+export default function CreatePage({ templates: templates }: CreatePageProps) {
+  const { client } = useClient()
+
+  if (!templates?.length) return
+
+  const items = templates.map(template => ({
+    id: template.id,
+    content: <Template template={template} />,
+  }))
   return (
     <Box sx={{ maxWidth: 700, mx: "auto", mt: 4, position: "relative" }}>
       <SpeedDial />
       <HeroTitle>Create</HeroTitle>
       <Typography variant="body1" sx={{ mt: 2 }}>
-        This page is under construction. Please check back later for updates.
+        Choose your Archetype:
       </Typography>
-      <Carousel items={items} />
+      <Box sx={{ width: 700 }}>
+        <Carousel items={items} />
+      </Box>
     </Box>
   )
 }

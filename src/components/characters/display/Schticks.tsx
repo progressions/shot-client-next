@@ -7,9 +7,10 @@ import { ListManager } from "@/components/lists"
 
 type SchticksProperties = {
   character: Character
+  manage?: boolean
 }
 
-export default function Schticks({ character }: SchticksProperties) {
+export default function Schticks({ character, manage = true }: SchticksProperties) {
   const { client } = useClient()
 
   async function update(characterId: string, formData: FormData) {
@@ -35,6 +36,7 @@ export default function Schticks({ character }: SchticksProperties) {
         </>
       }
       update={update}
+      manage={manage}
     />
   )
 }
