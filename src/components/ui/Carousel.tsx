@@ -53,8 +53,8 @@ export function Carousel({ items, onSelect }: CarouselProps) {
                 bgcolor: "grey.800",
                 color: "white",
                 flexShrink: 0,
-                p: 4,
-                pb: 20,
+                p: 2,
+                pb: 8,
                 overflow: "scroll",
                 position: "relative",
               }}
