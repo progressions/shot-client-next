@@ -1,8 +1,10 @@
 import { redirect } from "next/navigation"
-import { Container, Typography, Box } from "@mui/material"
+import { CircularProgress, Container, Typography, Box } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import type { Character } from "@/types"
 import type { Metadata } from "next"
+import Breadcrumbs from "@/components/Breadcrumbs"
+import { Suspense } from "react"
 
 import { CharacterPageClient } from "@/components/characters"
 
@@ -74,6 +76,11 @@ export default async function CharacterPage({
     return <CharacterNotFound />
   }
 
-  return <CharacterPageClient character={character} />
+  return <>
+    <Breadcrumbs />
+    <Suspense fallback={<CircularProgress />}>
+      <CharacterPageClient character={character} />
+    </Suspense>
+  </>
 }
 

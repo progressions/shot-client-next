@@ -32,7 +32,6 @@ export default async function RootLayout({
                     maxWidth="md"
                     sx={{ paddingTop: 2, paddingBottom: 2 }}
                   >
-                    <Breadcrumbs />
                     {children}
                     <PopupToast />
                   </Container>

@@ -1,12 +1,9 @@
-"use client"
-
-import { usePathname } from "next/navigation"
-import { useMemo, useState, useEffect } from "react"
+// components/Breadcrumbs.tsx
 import Link from "next/link"
+import { headers } from "next/headers"
 import { Breadcrumbs as MuiBreadcrumbs, Typography } from "@mui/material"
 import NavigateNextIcon from "@mui/icons-material/NavigateNext"
-import { useClient } from "@/contexts"
-import Client from "@/lib/Client"
+import { getServerClient } from "@/lib"
 import {
   SiteName,
   WeaponName,
@@ -22,115 +19,18 @@ import {
 } from "@/components/names"
 
 interface BreadcrumbItem {
-  label: string
+  label: string | React.ReactNode
   path: string
 }
 
-export default function Breadcrumbs() {
-  const { client } = useClient()
-  const pathname = usePathname()
-  const pathnames = useMemo(
-    () => (pathname ? pathname.split("/").filter(Boolean) : []),
-    [pathname]
-  )
-  const [crumbName, setCrumbName] = useState<string | React.ReactNode | null>(
-    null
-  )
+interface BreadcrumbsProps {}
 
-  const labelMap: { [key: string]: string } = useMemo(
-    () => ({
-      characters: "Characters",
-      vehicles: "Vehicles",
-      fights: "Fights",
-      campaigns: "Campaigns",
-      users: "Users",
-      home: "Home",
-      factions: "Factions",
-      weapons: "Weapons",
-      schticks: "Schticks",
-      parties: "Parties",
-      sites: "Sites",
-    }),
-    []
-  )
-
-  useEffect(() => {
-    const fetchName = async () => {
-      setCrumbName(null)
-
-      const crumb = await fetchCrumbName(pathnames, client)
-      setCrumbName(crumb)
-    }
-    fetchName().catch(error => {
-      console.error("Error fetching breadcrumb name:", error)
-      setCrumbName(null)
-    })
-  }, [pathnames, client, labelMap])
-
-  const getBreadcrumbs = (): BreadcrumbItem[] => {
-    const items: BreadcrumbItem[] = [{ label: "Home", path: "/" }]
-
-    let currentPath = ""
-    for (const [index, segment] of pathnames.entries()) {
-      currentPath += `/${segment}`
-      let label =
-        labelMap[segment] || segment.charAt(0).toUpperCase() + segment.slice(1)
-      if (index === pathnames.length - 1 && crumbName) {
-        label = crumbName as string
-      }
-
-      items.push({ label, path: currentPath })
-    }
-
-    return items
+async function fetchCrumbName(pathnames: string[], client: Client): Promise<React.ReactNode | null> {
+  if (!pathnames || pathnames.length === 0) {
+    console.warn("fetchCrumbName: pathnames is empty or undefined", { pathnames })
+    return null
   }
 
-  const breadcrumbs = getBreadcrumbs()
-  if (breadcrumbs.length === 1) return null
-
-  return (
-    <MuiBreadcrumbs
-      separator={<NavigateNextIcon fontSize="small" sx={{ color: "#fff" }} />}
-      aria-label="breadcrumb"
-      sx={{ mb: 2 }}
-    >
-      {breadcrumbs.map((item, index) => {
-        const isLast = index === breadcrumbs.length - 1
-        return isLast ? (
-          <Typography key={item.path} color="#fff">
-            {item.label}
-          </Typography>
-        ) : (
-          <Link
-            key={item.path}
-            href={item.path}
-            passHref
-            style={{ textDecoration: "none" }}
-          >
-            <Typography
-              component="span"
-              color="#fff"
-              sx={{
-                textDecoration: "none",
-                "&:hover": {
-                  textDecoration: "underline",
-                  textDecorationColor: "#fff",
-                },
-              }}
-            >
-              {item.label}
-            </Typography>
-          </Link>
-        )
-      })}
-    </MuiBreadcrumbs>
-  )
-}
-
-async function fetchCrumbName(
-  pathnames: string[],
-  client: Client
-): Promise<React.ReactNode | null> {
   const id = pathnames.at(-1)
   if (!id || id === pathnames[0]) return null
 
@@ -159,15 +59,9 @@ async function fetchCrumbName(
     return <VehicleName vehicle={response.data} />
   }
   if (pathnames[0] === "characters") {
-    if (id === "import") {
-      return "Import"
-    }
-    if (id === "generate") {
-      return "Generate"
-    }
-    if (id === "create") {
-      return "Create"
-    }
+    if (id === "import") return "Import"
+    if (id === "generate") return "Generate"
+    if (id === "create") return "Create"
     const response = await client.getCharacter({ id })
     return <CharacterName character={response.data} />
   }
@@ -187,6 +81,110 @@ async function fetchCrumbName(
     const response = await client.getUser({ id })
     return <UserName user={response.data} />
   }
-  // Add more cases as needed
   return null
+}
+
+export default async function Breadcrumbs({}: BreadcrumbsProps) {
+  const labelMap: { [key: string]: string } = {
+    characters: "Characters",
+    vehicles: "Vehicles",
+    fights: "Fights",
+    campaigns: "Campaigns",
+    users: "Users",
+    home: "Home",
+    factions: "Factions",
+    weapons: "Weapons",
+    schticks: "Schticks",
+    parties: "Parties",
+    sites: "Sites",
+  }
+
+  const client = await getServerClient()
+
+  // Infer pathnames from URL
+  const headersState = await headers()
+  let pathname = headersState.get("x-invoke-path") || ""
+
+  // Fallback to referer header if x-invoke-path is empty or not present
+  if (!pathname || pathname === "/") {
+    const referer = headersState.get("referer") || ""
+    console.log("Breadcrumbs: x-invoke-path empty, using referer", { referer })
+    if (referer) {
+      // Extract pathname from referer URL (e.g., "http://localhost:3001/characters?page=1" -> "/characters")
+      try {
+        const url = new URL(referer)
+        pathname = url.pathname
+      } catch (error) {
+        console.error("Breadcrumbs: failed to parse referer", { referer, error })
+      }
+    }
+  }
+
+  const pathnames = pathname.split("/").filter(Boolean)
+
+  // Detailed debugging
+  console.log("Breadcrumbs: processing path", { pathname, pathnames, referer: headersState.get("referer") })
+
+  if (!pathnames || pathnames.length === 0) {
+    console.log("Breadcrumbs: empty pathnames, likely root route", { pathname })
+    return null
+  }
+
+  const crumbName = await fetchCrumbName(pathnames, client).catch(error => {
+    console.error("Error fetching breadcrumb name:", error)
+    return null
+  })
+
+  const getBreadcrumbs = (): BreadcrumbItem[] => {
+    const items: BreadcrumbItem[] = [{ label: "Home", path: "/" }]
+    let currentPath = ""
+
+    for (const [index, segment] of pathnames.entries()) {
+      currentPath += `/${segment}`
+      let label = labelMap[segment] || segment.charAt(0).toUpperCase() + segment.slice(1)
+      if (index === pathnames.length - 1 && crumbName) {
+        label = crumbName
+      }
+      items.push({ label, path: currentPath })
+    }
+
+    return items
+  }
+
+  const breadcrumbs = getBreadcrumbs()
+
+  if (breadcrumbs.length === 1) return null
+
+  return (
+    <MuiBreadcrumbs
+      separator={<NavigateNextIcon fontSize="small" sx={{ color: "#fff" }} />}
+      aria-label="breadcrumb"
+      sx={{ mb: 2 }}
+    >
+      {breadcrumbs.map((item, index) => {
+        const isLast = index === breadcrumbs.length - 1
+        return isLast ? (
+          <Typography key={item.path} color="#fff">
+            {item.label}
+          </Typography>
+        ) : (
+          <Link key={item.path} href={item.path} passHref style={{ textDecoration: "none" }}>
+            <Typography
+              component="span"
+              color="#fff"
+              sx={{
+                textDecoration: "none",
+                "&:hover": {
+                  textDecoration: "underline",
+                  textDecorationColor: "#fff",
+                },
+              }}
+            >
+              {item.label}
+            </Typography>
+          </Link>
+        )
+      })}
+    </MuiBreadcrumbs>
+  )
 }

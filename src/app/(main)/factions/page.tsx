@@ -4,6 +4,7 @@ import { CircularProgress, Box } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Factions } from "@/components/factions"
 import type { FactionsResponse } from "@/types"
+import Breadcrumbs from "@/components/Breadcrumbs"
 
 export const metadata = {
   title: "Factions - Chi War",
@@ -55,16 +56,15 @@ export default async function FactionsPage({
     redirect("/factions?page=1&sort=created_at&order=desc")
   }
 
-  return (
-    <Box sx={{ justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-      <Suspense fallback={<CircularProgress />}>
-        <Factions
-          initialFactions={factions}
-          initialMeta={meta}
-          initialSort={sort}
-          initialOrder={order}
-        />
-      </Suspense>
-    </Box>
-  )
+  return <>
+    <Breadcrumbs />
+    <Suspense fallback={<CircularProgress />}>
+      <Factions
+        initialFactions={factions}
+        initialMeta={meta}
+        initialSort={sort}
+        initialOrder={order}
+      />
+    </Suspense>
+  </>
 }
