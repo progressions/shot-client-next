@@ -101,29 +101,13 @@ export default async function Breadcrumbs({}: BreadcrumbsProps) {
 
   const client = await getServerClient()
 
-  // Infer pathnames from URL
+  // Infer pathnames from custom header
   const headersState = await headers()
-  let pathname = headersState.get("x-invoke-path") || ""
-
-  // Fallback to referer header if x-invoke-path is empty or not present
-  if (!pathname || pathname === "/") {
-    const referer = headersState.get("referer") || ""
-    console.log("Breadcrumbs: x-invoke-path empty, using referer", { referer })
-    if (referer) {
-      // Extract pathname from referer URL (e.g., "http://localhost:3001/characters?page=1" -> "/characters")
-      try {
-        const url = new URL(referer)
-        pathname = url.pathname
-      } catch (error) {
-        console.error("Breadcrumbs: failed to parse referer", { referer, error })
-      }
-    }
-  }
-
+  const pathname = headersState.get("x-pathname") || ""
   const pathnames = pathname.split("/").filter(Boolean)
 
-  // Detailed debugging
-  console.log("Breadcrumbs: processing path", { pathname, pathnames, referer: headersState.get("referer") })
+  // Debugging
+  console.log("Breadcrumbs: processing path", { pathname, pathnames })
 
   if (!pathnames || pathnames.length === 0) {
     console.log("Breadcrumbs: empty pathnames, likely root route", { pathname })
