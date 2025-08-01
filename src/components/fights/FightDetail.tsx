@@ -13,12 +13,14 @@ interface FightDetailProperties {
   fight: Fight
   onDelete: (fightId: string) => void
   onEdit: (fight: Fight) => void
+  isMobile?: boolean
 }
 
 export default function FightDetail({
   fight: initialFight,
   onDelete,
   onEdit,
+  isMobile = false,
 }: FightDetailProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
@@ -68,7 +70,12 @@ export default function FightDetail({
   return (
     <Card sx={{ mb: 2, bgcolor: "#424242" }}>
       {fight.image_url && (
-        <PositionableImage entity={fight} pageContext="index" height="200" />
+        <PositionableImage
+          entity={fight}
+          pageContext="index"
+          height="200"
+          isMobile={isMobile}
+        />
       )}
       <CardContent sx={{ p: "1rem" }}>
         <Box

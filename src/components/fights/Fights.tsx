@@ -2,6 +2,7 @@
 
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useMediaQuery, useTheme } from "@mui/material"
 import {
   Pagination,
   Box,
@@ -33,6 +34,7 @@ interface FightsProperties {
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
+  initialIsMobile?: boolean
 }
 
 type FormStateData = {
@@ -47,6 +49,7 @@ export default function Fights({
   initialMeta,
   initialSort,
   initialOrder,
+  initialIsMobile,
 }: FightsProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
@@ -61,6 +64,11 @@ export default function Fights({
   const [sort, setSort] = useState<string>(initialSort)
   const [order, setOrder] = useState<string>(initialOrder)
   const router = useRouter()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"), {
+    noSsr: true,
+    defaultMatches: initialIsMobile ?? false,
+  })
 
   type ValidSort = "created_at" | "updated_at" | "name"
   const validSorts: readonly ValidSort[] = useMemo(
@@ -310,6 +318,7 @@ export default function Fights({
               fight={fight}
               onDelete={handleDeleteFight}
               onEdit={handleEditFight}
+              isMobile={isMobile}
             />
           ))
         )}

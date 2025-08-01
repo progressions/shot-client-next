@@ -19,6 +19,7 @@ import { CharacterDetail, CharacterFilter } from "@/components/characters"
 import { useState } from "react"
 import { queryParams } from "@/lib"
 import { FormActions } from "@/reducers"
+import { useToast } from "@/contexts"
 
 type CharactersMobileProps = {
   formState
@@ -31,6 +32,7 @@ export default function CharactersMobile({
   dispatchForm,
   onPageChange,
 }: CharactersMobileProps) {
+  const { toastSuccess, toastError } = useToast()
   const theme = useTheme()
   const {
     characters,
@@ -84,6 +86,10 @@ export default function CharactersMobile({
       scroll: false,
     })
     fetchCharacters(1, sort, newOrder)
+  }
+
+  const handleDelete = async (characterId: string) => {
+    toastSuccess("Character deleted successfully")
   }
 
   return (
@@ -158,7 +164,11 @@ export default function CharactersMobile({
         sx={{ mt: 2 }}
       />
       {characters.map(character => (
-        <CharacterDetail character={character} key={character.id} />
+        <CharacterDetail
+          character={character}
+          key={character.id}
+          onDelete={handleDelete}
+        />
       ))}
       <Pagination
         count={meta.total_pages}

@@ -4,11 +4,13 @@ import {
   CampaignProvider,
   ClientProvider,
   LocalStorageProvider,
+  ToastProvider,
 } from "@/contexts"
 import { getUser } from "@/lib/getServerClient"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import "@/styles/global.scss"
 import { Container } from "@mui/material"
+import PopupToast from "@/components/PopupToast"
 
 export default async function RootLayout({
   children,
@@ -24,14 +26,17 @@ export default async function RootLayout({
           <LocalStorageProvider>
             <ClientProvider initialUser={user}>
               <CampaignProvider>
-                <Navbar />
-                <Container
-                  maxWidth="md"
-                  sx={{ paddingTop: 2, paddingBottom: 2 }}
-                >
-                  <Breadcrumbs />
-                  {children}
-                </Container>
+                <ToastProvider>
+                  <Navbar />
+                  <Container
+                    maxWidth="md"
+                    sx={{ paddingTop: 2, paddingBottom: 2 }}
+                  >
+                    <Breadcrumbs />
+                    {children}
+                    <PopupToast />
+                  </Container>
+                </ToastProvider>
               </CampaignProvider>
             </ClientProvider>
           </LocalStorageProvider>

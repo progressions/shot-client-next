@@ -23,7 +23,7 @@ type SpeedDialMenuProps = {
   sx?: SystemStyleObject<Theme>
   open: boolean
   onOpen: () => void
-  onClose: () => void
+  onClose?: () => void // Made optional
 }
 
 export function SpeedDialMenu({
@@ -60,7 +60,9 @@ export function SpeedDialMenu({
         setPersist(true)
       } else {
         setPersist(false)
-        onClose()
+        if (onClose) {
+          onClose() // Guarded call to onClose
+        }
       }
       if (action.onClick) {
         action.onClick(event)
@@ -68,8 +70,8 @@ export function SpeedDialMenu({
     }
 
   const handleClose = () => {
-    if (!persist) {
-      onClose()
+    if (!persist && onClose) {
+      onClose() // Guarded call to onClose
     }
   }
 

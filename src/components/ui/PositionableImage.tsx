@@ -1,28 +1,30 @@
 "use client"
 
 import type { Entity } from "@/types"
-import { Box, useMediaQuery, useTheme } from "@mui/material"
+import { Box } from "@mui/material"
 import { useState, useEffect, useRef } from "react"
 import { RepositionButton, SaveButton, CancelButton } from "@/components/ui"
-import { useClient } from "@/contexts"
+import { useToast, useClient } from "@/contexts"
 
 type PositionableImageProps = {
   entity: Entity
   pageContext: "index" | "entity"
   height?: number
+  isMobile?: boolean
 }
 
 export function PositionableImage({
   entity,
   pageContext = "entity",
   height,
+  isMobile = false,
 }: PositionableImageProps) {
   const { client } = useClient()
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
   const imgRef = useRef<HTMLImageElement>(null)
   const [boxWidth, setBoxWidth] = useState(0)
   const [isRepositioning, setIsRepositioning] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const { toastSuccess, toastError } = useToast()
   const context = `${isMobile ? "mobile" : "desktop"}_${pageContext}`
   const position = entity.image_positions?.find(
     pos => pos.context === context
@@ -30,6 +32,16 @@ export function PositionableImage({
   const [currentX, setCurrentX] = useState(position.x_position)
   const [currentY, setCurrentY] = useState(position.y_position)
   const [isDragging, setIsDragging] = useState(false)
+
+  if (entity.name == "Highway Brawl") {
+    console.log("PositionableImage rendered with entity:", {
+      entity,
+      currentX,
+      currentY,
+      context,
+      position,
+    })
+  }
 
   useEffect(() => {
     const updateBoxWidth = () => {
@@ -46,21 +58,27 @@ export function PositionableImage({
 
   const boxHeight = height || 300
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLImageElement>) => {
-    if (!isRepositioning || !imgRef.current) return
+  const handleDragStart = (
+    e: React.MouseEvent<HTMLImageElement> | React.TouchEvent<HTMLImageElement>
+  ) => {
     e.preventDefault()
+    if (!isRepositioning || !imgRef.current) return
+    if ("touches" in e) e.preventDefault()
     setIsDragging(true)
-    const startX = e.clientX
-    const startY = e.clientY
+    const startX = "touches" in e ? e.touches[0].clientX : e.clientX
+    const startY = "touches" in e ? e.touches[0].clientY : e.clientY
     const startTranslateX = currentX
     const startTranslateY = currentY
     const { naturalWidth, naturalHeight } = imgRef.current
     const scaledWidth = boxWidth
     const scaledHeight = (naturalHeight / naturalWidth) * boxWidth
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const deltaX = e.clientX - startX
-      const deltaY = e.clientY - startY
+    const handleMove = (e: MouseEvent | TouchEvent) => {
+      if ("touches" in e) e.preventDefault()
+      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX
+      const clientY = "touches" in e ? e.touches[0].clientY : e.clientY
+      const deltaX = clientX - startX
+      const deltaY = clientY - startY
       const newX = startTranslateX + deltaX
       const newY = startTranslateY + deltaY
       const maxX = (scaledWidth - boxWidth) / 2
@@ -69,27 +87,41 @@ export function PositionableImage({
       setCurrentY(Math.max(-maxY, Math.min(maxY, newY)))
     }
 
-    const handleMouseUp = () => {
+    const handleEnd = () => {
       setIsDragging(false)
-      document.removeEventListener("mousemove", handleMouseMove)
-      document.removeEventListener("mouseup", handleMouseUp)
+      document.removeEventListener("mousemove", handleMove as EventListener)
+      document.removeEventListener("touchmove", handleMove as EventListener)
+      document.removeEventListener("mouseup", handleEnd)
+      document.removeEventListener("touchend", handleEnd)
     }
 
-    document.addEventListener("mousemove", handleMouseMove)
-    document.addEventListener("mouseup", handleMouseUp)
+    document.addEventListener("mousemove", handleMove as EventListener)
+    document.addEventListener("touchmove", handleMove as EventListener, {
+      passive: false,
+    })
+    document.addEventListener("mouseup", handleEnd)
+    document.addEventListener("touchend", handleEnd)
   }
 
   const handleSave = async () => {
     if (!entity.id) return
+    setIsSaving(true)
     try {
-      await client.updateImagePosition(entity, {
+      const response = await client.updateImagePosition(entity, {
         x_position: currentX,
         y_position: currentY,
         context,
       })
+      setCurrentX(response.data.x_position)
+      setCurrentY(response.data.y_position)
       setIsRepositioning(false)
-    } catch (error) {
-      console.error("Failed to save image position:", error)
+      toastSuccess("Image position saved successfully")
+      // setSnackbarMessage("Image position saved successfully")
+    } catch (_error) {
+      toastError("Failed to save image position")
+      // setSnackbarMessage("Failed to save image position")
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -112,7 +144,8 @@ export function PositionableImage({
         component="img"
         src={entity.image_url}
         alt={entity.name}
-        onMouseDown={handleMouseDown}
+        onMouseDown={handleDragStart}
+        onTouchStart={handleDragStart}
         sx={{
           width: "100%",
           height: "auto",
@@ -121,6 +154,7 @@ export function PositionableImage({
           transform: `translate(${currentX}px, ${currentY}px)`,
           cursor: isRepositioning ? (isDragging ? "move" : "grab") : "default",
           userSelect: "none",
+          touchAction: isRepositioning ? "none" : "auto",
         }}
       />
       {isRepositioning ? (
@@ -133,11 +167,12 @@ export function PositionableImage({
             gap: 1,
           }}
         >
-          <SaveButton size="mini" onClick={handleSave} />
+          <SaveButton size="mini" onClick={handleSave} disabled={isSaving} />
           <CancelButton
             variant="contained"
             size="mini"
             onClick={() => setIsRepositioning(false)}
+            disabled={isSaving}
           />
         </Box>
       ) : (

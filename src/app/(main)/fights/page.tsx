@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
+import { headers } from "next/headers"
 import { CircularProgress, Box } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Fights } from "@/components/fights"
@@ -55,6 +56,11 @@ export default async function FightsPage({
     redirect("/fights?page=1&sort=created_at&order=desc")
   }
 
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
   return (
     <Box sx={{ justifyContent: "space-between", alignItems: "center", mb: 2 }}>
       <Suspense fallback={<CircularProgress />}>
@@ -63,6 +69,7 @@ export default async function FightsPage({
           initialMeta={meta}
           initialSort={sort}
           initialOrder={order}
+          initialIsMobile={initialIsMobile}
         />
       </Suspense>
     </Box>

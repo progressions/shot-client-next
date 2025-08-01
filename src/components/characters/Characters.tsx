@@ -137,7 +137,14 @@ export default function Characters({
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
     if (campaignData.characters === "reload") {
-      fetchCharacters(page, sort, order, character_type, faction_id, archetype)
+      fetchCharacters(
+        meta.current_page,
+        sort,
+        order,
+        character_type,
+        faction_id,
+        archetype
+      )
     }
   }, [
     client,

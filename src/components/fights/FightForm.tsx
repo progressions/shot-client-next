@@ -103,14 +103,13 @@ export default function FightForm({
     onClose()
   }
 
-  console.log("formState.data", formState.data)
   return (
     <Drawer
       anchor={isMobile ? "bottom" : "right"}
       open={open}
       onClose={handleClose}
     >
-      <HeroImage entity={formState.data} />
+      <HeroImage entity={formState.data} positionable={false} />
       <Box
         component="form"
         onSubmit={handleSubmit}
