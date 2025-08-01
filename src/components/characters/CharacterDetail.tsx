@@ -20,6 +20,7 @@ import {
 } from "@/components/links"
 import DetailButtons from "@/components/DetailButtons"
 import { CS } from "@/services"
+import { PositionableImage } from "@/components/ui"
 
 interface CharacterDetailProperties {
   character: Character
@@ -89,15 +90,7 @@ export default function CharacterDetail({
 
   return (
     <Card sx={{ mb: 2, bgcolor: "#424242" }}>
-      {character.image_url && (
-        <CardMedia
-          component="img"
-          height="140"
-          image={character.image_url}
-          alt={character.name}
-          sx={{ objectFit: "cover" }}
-        />
-      )}
+      <PositionableImage entity={character} pageContext="index" size={200} />
       <CardContent sx={{ p: "1rem" }}>
         <Box
           sx={{

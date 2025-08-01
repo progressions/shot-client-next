@@ -1,9 +1,11 @@
+"use client"
+
 import { redirect } from "next/navigation"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
 import UploadIcon from "@mui/icons-material/Upload"
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
-
 import { SpeedDialMenu } from "@/components/ui"
+import { useState } from "react"
 
 const handleCreate = () => {
   redirect("/characters/create")
@@ -28,9 +30,18 @@ export const actions = [
 ]
 
 type SpeedDialProps = {
-  actions: typeof actions
+  actions?: typeof actions
 }
 
-export default function SpeedDial({ actions: initialActions }: SpeedDialProps) {
-  return <SpeedDialMenu actions={initialActions || actions} />
+export default function SpeedDial({ actions: initialActions = actions }: SpeedDialProps) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <SpeedDialMenu
+      actions={initialActions}
+      open={open}
+      onOpen={() => setOpen(true)}
+      onClose={() => setOpen(false)}
+    />
+  )
 }
