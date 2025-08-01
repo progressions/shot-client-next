@@ -9,7 +9,7 @@ import { CS } from "@/services"
 import {
   Owner,
   Associations,
-  ActionValues,
+  ActionValuesEdit,
   Skills,
   Weapons,
   Description,
@@ -83,7 +83,7 @@ export default function EditCharacter({
         updateCharacter={updateCharacter}
       />
       <Owner character={memoizedCharacter} />
-      <ActionValues character={memoizedCharacter} />
+      <ActionValuesEdit character={memoizedCharacter} />
       {!CS.isMook(memoizedCharacter) && (
         <Stack
           direction={{ xs: "column", md: "row" }}

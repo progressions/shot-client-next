@@ -61,7 +61,9 @@ export default function NameEditor({
         onChange={handleNameChange}
         onBlur={handleNameBlur}
         error={!!nameError || !!serverError}
-        sx={{ fontSize: "1.5rem", fontWeight: "bold", color: "#ffffff" }}
+        InputProps={{
+          sx: { fontSize: "2rem", fontWeight: "bold", color: "#ffffff" }
+        }}
       />
       {(nameError || serverError) && (
         <FormHelperText sx={{ mt: -0.5 }}>{nameError || serverError}</FormHelperText>

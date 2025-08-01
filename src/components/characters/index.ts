@@ -25,3 +25,5 @@ export { default as CharacterSpeedDial } from "@/components/characters/Character
 export { default as Template } from "@/components/characters/create/Template"
 export { default as EditCharacter } from "@/components/characters/EditCharacter"
 export { default as NameEditor } from "@/components/characters/edit/NameEditor"
+export { default as ActionValuesEdit } from "@/components/characters/edit/ActionValuesEdit"
+export { default as ActionValueEdit } from "@/components/characters/edit/ActionValueEdit"
