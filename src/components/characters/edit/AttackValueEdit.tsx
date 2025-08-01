@@ -1,11 +1,13 @@
 "use client"
+
 import type { Character } from "@/types"
 import { useState, useEffect } from "react"
-import { Box, Stack, Typography, FormControl, FormHelperText, Select, MenuItem } from "@mui/material"
+import { Box, Stack, FormControl, FormHelperText, Select, MenuItem } from "@mui/material"
 import { TextField } from "@/components/ui"
-import { ActionValueLink } from "@/components/links"
+import { CS } from "@/services"
 
 type ActionValueProps = {
+  attack: string
   name: string
   value: number | string | null
   size: "small" | "large"
@@ -15,6 +17,7 @@ type ActionValueProps = {
 }
 
 export default function ActionValue({
+  attack = "MainAttack",
   name,
   value,
   size = "large",
@@ -25,10 +28,9 @@ export default function ActionValue({
   const [inputValue, setInputValue] = useState<string>(value?.toString() || "")
   const [valueError, setValueError] = useState<string>("")
   const [serverError, setServerError] = useState<string>("")
-  const [selectedName, setSelectedName] = useState<string>(name)
+  const [selectedName, setSelectedName] = useState<string>(CS.mainAttack(character) || "")
 
   const attackOptions = ["Guns", "Martial Arts", "Scroungetech", "Sorcery", "Genome"]
-  const isAttack = attackOptions.includes(name)
 
   useEffect(() => {
     setInputValue(value?.toString() || "")
@@ -62,56 +64,34 @@ export default function ActionValue({
     return ""
   }
 
-  const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleValueChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value
     setInputValue(newValue)
     setValueError("") // Clear client-side error while typing
     setServerError("") // Clear server-side error while typing
-  }
-
-  const handleNameChange = async (event: React.ChangeEvent<{ value: unknown }>) => {
-    const newName = event.target.value as string
-    setSelectedName(newName)
-    setServerError("") // Clear server-side error
-    const nameError = validateName(newName)
-    if (!nameError) {
-      const updatedCharacter = {
-        ...character,
-        action_values: {
-          ...character.action_values,
-          [newName]: inputValue || null,
-          [name]: undefined // Clear old name if changed
-        },
-        parties: undefined,
-        schticks: undefined,
-        sites: undefined,
-      }
+    const error = validateValue(newValue)
+    setValueError(error)
+    if (!error) {
+      const updatedCharacter = CS.changeAttackValue(character, selectedName, newValue)
       setCharacter(updatedCharacter)
       try {
-        await updateCharacter(updatedCharacter)
+        await updateCharacter({ ...updatedCharacter, sites: undefined, schticks: undefined, parties: undefined })
       } catch (error) {
         setServerError(error.message)
       }
     }
   }
 
-  const handleValueBlur = async () => {
-    const error = validateValue(inputValue)
-    setValueError(error)
-    if (!error) {
-      const updatedCharacter = {
-        ...character,
-        action_values: {
-          ...character.action_values,
-          [selectedName]: parseInt(inputValue, 10) || null
-        },
-        parties: undefined,
-        schticks: undefined,
-        sites: undefined,
-      }
+  const handleAttackNameChange = async (event: React.ChangeEvent<{ value: unknown }>) => {
+    const newName = event.target.value as string
+    setSelectedName(newName)
+    setServerError("") // Clear server-side error
+    const nameError = validateName(newName)
+    if (!nameError) {
+      const updatedCharacter = CS.changeAttack(character, attack, newName)
       setCharacter(updatedCharacter)
       try {
-        await updateCharacter(updatedCharacter)
+        await updateCharacter({ ...updatedCharacter, sites: undefined, schticks: undefined, parties: undefined })
       } catch (error) {
         setServerError(error.message)
       }
@@ -123,7 +103,7 @@ export default function ActionValue({
       <FormControl error={!!valueError || !!serverError} sx={{ width: "140px" }}>
         <Select
           value={selectedName}
-          onChange={handleNameChange}
+          onChange={handleAttackNameChange}
           sx={{
             width: "140px",
             color: "#ffffff",
@@ -159,7 +139,6 @@ export default function ActionValue({
           name={name}
           value={inputValue}
           onChange={handleValueChange}
-          onBlur={handleValueBlur}
           error={!!valueError || !!serverError}
           type="text"
           InputProps={{

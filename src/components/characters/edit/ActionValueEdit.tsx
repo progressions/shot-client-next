@@ -1,9 +1,10 @@
 "use client"
 import type { Character } from "@/types"
 import { useState, useEffect } from "react"
-import { Box, Stack, Typography, FormControl, FormHelperText, Select, MenuItem } from "@mui/material"
+import { Box, Stack, Typography, FormControl, FormHelperText } from "@mui/material"
 import { TextField } from "@/components/ui"
 import { ActionValueLink } from "@/components/links"
+import { useToast } from "@/contexts"
 
 type ActionValueProps = {
   name: string
@@ -22,18 +23,14 @@ export default function ActionValue({
   setCharacter,
   updateCharacter,
 }: ActionValueProps) {
+  const { toastSuccess, toastError } = useToast()
   const [inputValue, setInputValue] = useState<string>(value?.toString() || "")
   const [valueError, setValueError] = useState<string>("")
   const [serverError, setServerError] = useState<string>("")
-  const [selectedName, setSelectedName] = useState<string>(name)
-
-  const attackOptions = ["Guns", "Martial Arts", "Scroungetech", "Sorcery", "Genome"]
-  const isAttack = attackOptions.includes(name)
 
   useEffect(() => {
     setInputValue(value?.toString() || "")
-    setSelectedName(name)
-  }, [value, name])
+  }, [value])
 
   const minWidthMap = {
     small: { xs: "4rem", sm: "5rem" },
@@ -52,58 +49,19 @@ export default function ActionValue({
     return ""
   }
 
-  const validateName = (val: string): string => {
-    if (!val.trim()) {
-      return "Attack type is required"
-    }
-    if (!attackOptions.includes(val)) {
-      return "Invalid attack type"
-    }
-    return ""
-  }
-
-  const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleValueChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value
     setInputValue(newValue)
     setValueError("") // Clear client-side error while typing
     setServerError("") // Clear server-side error while typing
-  }
-
-  const handleNameChange = async (event: React.ChangeEvent<{ value: unknown }>) => {
-    const newName = event.target.value as string
-    setSelectedName(newName)
-    setServerError("") // Clear server-side error
-    const nameError = validateName(newName)
-    if (!nameError) {
-      const updatedCharacter = {
-        ...character,
-        action_values: {
-          ...character.action_values,
-          [newName]: inputValue || null,
-          [name]: undefined // Clear old name if changed
-        },
-        parties: undefined,
-        schticks: undefined,
-        sites: undefined,
-      }
-      setCharacter(updatedCharacter)
-      try {
-        await updateCharacter(updatedCharacter)
-      } catch (error) {
-        setServerError(error.message)
-      }
-    }
-  }
-
-  const handleValueBlur = async () => {
-    const error = validateValue(inputValue)
+    const error = validateValue(newValue)
     setValueError(error)
     if (!error) {
       const updatedCharacter = {
         ...character,
         action_values: {
           ...character.action_values,
-          [selectedName]: parseInt(inputValue, 10) || null
+          [name]: parseInt(newValue, 10) || null
         },
         parties: undefined,
         schticks: undefined,
@@ -112,8 +70,10 @@ export default function ActionValue({
       setCharacter(updatedCharacter)
       try {
         await updateCharacter(updatedCharacter)
+        toastSuccess("Character updated successfully")
       } catch (error) {
         setServerError(error.message)
+        toastError(`Error updating character: ${error.message}`)
       }
     }
   }
@@ -138,7 +98,6 @@ export default function ActionValue({
           name={name}
           value={inputValue}
           onChange={handleValueChange}
-          onBlur={handleValueBlur}
           error={!!valueError || !!serverError}
           type="text"
           InputProps={{

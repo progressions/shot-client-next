@@ -42,6 +42,26 @@ const CharacterService = {
 
   /* Writer functions, change the state */
 
+  changeAttack: function(character: Character, mainOrSecondary, attackName: string): Character {
+    return {
+      ...character,
+      action_values: {
+        ...character.action_values,
+        [mainOrSecondary]: attackName,
+      }
+    }
+  },
+
+  changeAttackValue: function (character: Character, attackName: string, value: number): Character {
+    return {
+      ...character,
+      action_values: {
+        ...character.action_values,
+        [attackName]: value,
+      },
+    }
+  },
+
   // Take a Smackdown, reduced by Toughness
   takeSmackdown: function (
     character: Character,

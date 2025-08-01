@@ -30,6 +30,7 @@ export default function ActionValues({
         }}
       >
         <AttackValueEdit
+          attack="MainAttack"
           name={CS.mainAttack(character)}
           value={CS.mainAttackValue(character)}
           size={size}
@@ -38,7 +39,8 @@ export default function ActionValues({
           updateCharacter={updateCharacter}
         />
         <AttackValueEdit
-          name={CS.secondaryAttack(character) || "What"}
+          attack="SecondaryAttack"
+          name={CS.secondaryAttack(character)}
           value={CS.secondaryAttackValue(character)}
           size={size}
           character={character}

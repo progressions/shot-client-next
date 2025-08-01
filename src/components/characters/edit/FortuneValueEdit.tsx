@@ -119,12 +119,12 @@ export default function FortuneValueEdit({
 
   return (
     <Stack direction="column" sx={{ alignItems: "flex-start", gap: 0.5 }}>
-      <FormControl error={!!valueError || !!serverError} sx={{ width: "140px" }}>
+      <FormControl error={!!valueError || !!serverError} sx={{ width: "120px" }}>
         <Select
           value={selectedName}
           onChange={handleNameChange}
           sx={{
-            width: "140px",
+            width: "120px",
             color: "#ffffff",
             fontSize: "1rem",
             lineHeight: "1.5rem",
@@ -142,7 +142,7 @@ export default function FortuneValueEdit({
                   fontSize: "1rem",
                   lineHeight: "1.5rem",
                   textAlign: "left",
-                  width: "140px"
+                  width: "120px"
                 }
               }
             }
@@ -163,7 +163,7 @@ export default function FortuneValueEdit({
           type="text"
           InputProps={{
             sx: {
-              width: "140px",
+              width: "120px",
               fontSize: fontSizeMap[size],
               border: "1px solid #ffffff",
               borderRadius: 1,
