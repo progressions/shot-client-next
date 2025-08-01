@@ -16,10 +16,15 @@ export default function CreatePage({ templates: templates }: CreatePageProps) {
 
   if (!templates?.length) return
 
+  const handleSelect = (template: Character) => {
+    console.log("Selected template:", template)
+  }
+
   const items = templates.map(template => ({
     id: template.id,
     content: <Template template={template} />,
   }))
+
   return (
     <Box sx={{ maxWidth: 700, mx: "auto", mt: 4, position: "relative" }}>
       <SpeedDial />
@@ -28,7 +33,7 @@ export default function CreatePage({ templates: templates }: CreatePageProps) {
         Choose your Archetype:
       </Typography>
       <Box sx={{ width: 700 }}>
-        <Carousel items={items} />
+        <Carousel items={items} onSelect={handleSelect} />
       </Box>
     </Box>
   )

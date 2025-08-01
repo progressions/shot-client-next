@@ -1,15 +1,16 @@
 "use client"
 
 import React, { useState } from "react"
-import { Box, IconButton, Paper } from "@mui/material"
+import { Box, IconButton, Paper, Button } from "@mui/material"
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos"
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
 
 interface CarouselProps {
   items: { id: number; content: string }[]
+  onSelect?: (item: { id: number; content: string }) => void
 }
 
-export function Carousel({ items }: CarouselProps) {
+export function Carousel({ items, onSelect }: CarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const handlePrev = () => {
@@ -48,14 +49,32 @@ export function Carousel({ items }: CarouselProps) {
                 minWidth: "100%",
                 height: 900,
                 display: "flex",
+                flexDirection: "column",
                 bgcolor: "grey.800",
                 color: "white",
                 flexShrink: 0,
-                p: 4,
-                pb: 20,
+                px: 4,
+                pt: 1,
+                pb: 4,
                 overflow: "scroll",
               }}
             >
+              {onSelect && (
+                <Button
+                  variant="contained"
+                  onClick={() => onSelect(item)}
+                  sx={{
+                    alignSelf: "center",
+                    mb: 2,
+                    bgcolor: "primary.main",
+                    "&:hover": { bgcolor: "primary.dark" },
+                    minWidth: 150,
+                    fontSize: "1rem",
+                  }}
+                >
+                  Select
+                </Button>
+              )}
               {item.content}
             </Box>
           ))}

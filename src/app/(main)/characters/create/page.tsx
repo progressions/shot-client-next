@@ -13,7 +13,7 @@ export default async function CharacterCreatePage() {
     redirect("/login")
   }
 
-  const response = await client.getCharacters({ is_template: true, sort: "name", order: "asc" })
+  const response = await client.getCharacters({ is_template: true, sort: "name", order: "asc", per_page: 50 })
   const { characters } = response.data
 
   return <CreatePage templates={characters} />
