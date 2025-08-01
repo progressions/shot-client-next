@@ -4,6 +4,7 @@ import tseslint from "typescript-eslint"
 import pluginReact from "eslint-plugin-react"
 import { FlatCompat } from "@eslint/eslintrc"
 import unusedImports from "eslint-plugin-unused-imports"
+import eslintPluginImport from "eslint-plugin-import"
 
 const compat = new FlatCompat({
   // import.meta.dirname is available after Node.js v20.11.0
@@ -32,11 +33,12 @@ const config = [
   {
     plugins: {
           "unused-imports": unusedImports,
+          "eslint-plugin-import": eslintPluginImport,
         },
   },
   {
     rules: {
-      "no-undef": "off",
+      "no-undef": 0,
       "no-console": "off",
       "react/react-in-jsx-scope": "off",
       "no-prototype-builtins": "off",
@@ -61,6 +63,9 @@ const config = [
       "no-console": "off",
       "no-prototype-builtins": "off",
       "drizzle/enforce-delete-with-where": "off",
+      "import/no-unresolved": "error",
+      "import/named": "error",
+      "import/no-extraneous-dependencies": "error"
     },
   },
 ]

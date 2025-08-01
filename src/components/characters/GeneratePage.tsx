@@ -23,6 +23,8 @@ import { SaveButton, SaveCancelButtons } from "@/components/ui"
 import CS from "@/services/CharacterService"
 import { FormEvent, useState, useEffect } from "react"
 import { Subscription } from "@rails/actioncable"
+import { HeroTitle } from "@/components/ui"
+import { SpeedDial } from "@/components/characters"
 
 type FormStateData = {
   description: string
@@ -160,10 +162,9 @@ export default function UploadForm() {
 
   return (
     <>
-      <Box sx={{ maxWidth: 700, mx: "auto", mt: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Generate Characters
-        </Typography>
+      <Box sx={{ mx: "auto", mt: 4, position: "relative" }}>
+        <SpeedDial />
+        <HeroTitle>Generate Characters</HeroTitle>
         {!json && !saving && !pending && (
           <Typography>Enter a description to generate a character</Typography>
         )}

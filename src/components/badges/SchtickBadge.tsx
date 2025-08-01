@@ -15,6 +15,7 @@ export default function SchtickBadge({
 }: SchtickBadgeProperties) {
   return (
     <Badge
+      name="schtick"
       entity={schtick}
       size={size}
       title={<SchtickLink schtick={schtick} />}

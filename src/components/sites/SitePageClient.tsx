@@ -6,10 +6,12 @@ import { Stack, Alert, Typography, Box } from "@mui/material"
 import type { Site } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import { useCampaign } from "@/contexts"
-import { MembersList, EditSiteForm } from "@/components/sites"
+import { EditSiteForm } from "@/components/sites"
 import { useClient } from "@/contexts"
 import { FactionLink } from "@/components/links"
 import { HeroImage, SpeedDialMenu } from "@/components/ui"
+import { CharacterManager } from "@/components/characters"
+import { InfoLink } from "@/components/links"
 
 interface SitePageClientProperties {
   site: Site
@@ -34,6 +36,16 @@ export default function SitePageClient({
       setSite(campaignData.site)
     }
   }, [campaignData, initialSite])
+
+  async function updateSite(siteId: string, formData: FormData) {
+    try {
+      const response = await client.updateSite(siteId, formData)
+      setSite(response.data)
+    } catch (error) {
+      console.error("Error updating site:", error)
+      throw error
+    }
+  }
 
   const handleSave = async () => {
     setEditOpen(false)
@@ -90,7 +102,22 @@ export default function SitePageClient({
         />
       </Box>
       <Stack direction="column" spacing={2}>
-        <MembersList site={site} setSite={replaceSite} />
+        <CharacterManager
+          name="site"
+          title="Attuned Characters"
+          description={
+            <>
+              A <InfoLink href="/sites" info="Feng Shui Site" /> is a location
+              whose energy flow produces powerful <InfoLink info="Chi" /> for
+              those <InfoLink info="Attuned" /> to it.{" "}
+            </>
+          }
+          entity={site}
+          characters={site.characters}
+          character_ids={site.character_ids}
+          update={updateSite}
+          setEntity={replaceSite}
+        />
       </Stack>
 
       <EditSiteForm

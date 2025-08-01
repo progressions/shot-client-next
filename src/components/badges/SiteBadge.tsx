@@ -11,7 +11,12 @@ type SiteBadgeProperties = {
 
 export default function SiteBadge({ site, size = "md" }: SiteBadgeProperties) {
   return (
-    <Badge entity={site} size={size} title={<SiteLink site={site} />}>
+    <Badge
+      name="site"
+      entity={site}
+      size={size}
+      title={<SiteLink site={site} />}
+    >
       {site.faction && (
         <span>
           <FactionLink faction={site.faction} />

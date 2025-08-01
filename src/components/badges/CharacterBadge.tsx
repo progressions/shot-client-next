@@ -24,6 +24,7 @@ export default function CharacterBadge({
 }: CharacterBadgeProperties) {
   return (
     <Badge
+      name="character"
       entity={character}
       size={size}
       sx={sx}

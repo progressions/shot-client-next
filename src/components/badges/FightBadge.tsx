@@ -14,7 +14,12 @@ export default function FightBadge({
   size = "md",
 }: FightBadgeProperties) {
   return (
-    <Badge entity={fight} size={size} title={<FightLink fight={fight} />}>
+    <Badge
+      name="fight"
+      entity={fight}
+      size={size}
+      title={<FightLink fight={fight} />}
+    >
       {fight.actors.length === 0 && "No fighters yet!"}
       {fight.actors.slice(0, 3).map((character, index) => (
         <span key={`fight-actor-${character.id}-${index}`}>

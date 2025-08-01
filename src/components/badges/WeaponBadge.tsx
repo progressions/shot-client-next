@@ -14,8 +14,13 @@ export default function WeaponBadge({
   size = "md",
 }: WeaponBadgeProperties) {
   return (
-    <Badge entity={weapon} size={size} title={<WeaponLink weapon={weapon} />}>
-      {" "}
+    <Badge
+      name="weapon"
+      entity={weapon}
+      size={size}
+      title={<WeaponLink weapon={weapon} />}
+    >
+      ({weapon.damage}/{weapon.concealment || "-"}/{weapon.reload_value || "-"})
     </Badge>
   )
 }

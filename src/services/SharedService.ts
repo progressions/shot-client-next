@@ -30,6 +30,10 @@ const SharedService = {
     return this.otherActionValue(character, "Type") as CharacterTypes
   },
 
+  archetype: function (character: Character | Vehicle): CharacterTypes {
+    return this.otherActionValue(character, "Archetype") as string
+  },
+
   hidden: function (character: Character | Vehicle): boolean {
     return (
       character.current_shot === undefined || character.current_shot === null
@@ -133,6 +137,13 @@ const SharedService = {
       console.log("key", key)
       return ""
     }
+  },
+
+  descriptionValue: function (
+    character: Character | Vehicle,
+    key: keyof VehicleDescriptionValues
+  ): string {
+    return character.description[key] || ""
   },
 
   faction: function (character: Character | Vehicle): Faction | null {

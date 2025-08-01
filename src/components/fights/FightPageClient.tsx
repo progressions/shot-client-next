@@ -6,8 +6,10 @@ import { Stack, Alert, Typography, Box } from "@mui/material"
 import type { Fight } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import { useClient, useCampaign } from "@/contexts"
-import { MembersList, VehiclesList, EditFightForm } from "@/components/fights"
+import { VehiclesList, EditFightForm } from "@/components/fights"
 import { HeroImage, SpeedDialMenu } from "@/components/ui"
+import { CharacterManager } from "@/components/characters"
+import { InfoLink } from "@/components/links"
 
 interface FightPageClientProperties {
   fight: Fight
@@ -35,6 +37,16 @@ export default function FightPageClient({
 
   const handleSave = async () => {
     setEditOpen(false)
+  }
+
+  async function updateFight(fightId: string, formData: FormData) {
+    try {
+      const response = await client.updateFight(fightId, formData)
+      setFight(response.data)
+    } catch (error) {
+      console.error("Error updating fight:", error)
+      throw error
+    }
   }
 
   const handleDelete = async () => {
@@ -83,7 +95,23 @@ export default function FightPageClient({
         />
       </Box>
       <Stack direction="column" spacing={2}>
-        <MembersList fight={fight} setFight={replaceFight} />
+        <CharacterManager
+          name="fight"
+          title="Fighters"
+          description={
+            <>
+              A <InfoLink href="/fights" info="Fight" /> is a battle between{" "}
+              <InfoLink href="/characters" info="Characters" />, with the stakes{" "}
+              often involving control of a{" "}
+              <InfoLink href="/sites" info="Feng Shui Site" />.
+            </>
+          }
+          entity={fight}
+          characters={fight.actors}
+          character_ids={fight.character_ids}
+          update={updateFight}
+          setEntity={replaceFight}
+        />
         <VehiclesList fight={fight} setFight={replaceFight} />
       </Stack>
 

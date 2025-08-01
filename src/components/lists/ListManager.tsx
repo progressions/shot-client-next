@@ -1,37 +1,9 @@
 "use client"
 
-import {
-  IconButton,
-  Pagination,
-  Box,
-  Button,
-  Stack,
-  Typography,
-} from "@mui/material"
-import DeleteIcon from "@mui/icons-material/Delete"
+import { Box, Button, Stack, Typography } from "@mui/material"
 import PersonAddIcon from "@mui/icons-material/PersonAdd"
-import type {
-  User,
-  Weapon,
-  Schtick,
-  Faction,
-  Site,
-  Party,
-  Juncture,
-  Entity,
-  Character,
-} from "@/types"
-import {
-  CharacterBadge,
-  VehicleBadge,
-  PartyBadge,
-  FactionBadge,
-  JunctureBadge,
-  SiteBadge,
-  WeaponBadge,
-  SchtickBadge,
-  UserBadge,
-} from "@/components/badges"
+import type { Entity } from "@/types"
+
 import { FormActions, useForm } from "@/reducers"
 import {
   UserAutocomplete,
@@ -45,6 +17,7 @@ import {
   SchtickAutocomplete,
 } from "@/components/autocomplete"
 import { paginateArray } from "@/lib"
+import { BadgeList } from "@/components/lists"
 
 type FormStateData = {
   page: number
@@ -242,28 +215,6 @@ export default function ListManager({
 
   const autocomplete = autocompleteMap[collection]
 
-  const badgeMap: Record<string, (thing: Entity) => React.ReactNode> = {
-    actors: (thing: Entity) => (
-      <CharacterBadge character={thing as Character} />
-    ),
-    characters: (thing: Entity) => (
-      <CharacterBadge character={thing as Character} />
-    ),
-    vehicles: (thing: Entity) => <VehicleBadge vehicle={thing as Vehicle} />,
-    parties: (thing: Entity) => <PartyBadge party={thing as Party} />,
-    junctures: (thing: Entity) => (
-      <JunctureBadge juncture={thing as Juncture} />
-    ),
-    sites: (thing: Entity) => <SiteBadge site={thing as Site} />,
-    weapons: (thing: Entity) => <WeaponBadge weapon={thing as Weapon} />,
-    factions: (thing: Entity) => <FactionBadge faction={thing as Faction} />,
-    schticks: (thing: Entity) => <SchtickBadge schtick={thing as Schtick} />,
-    users: (thing: Entity) => <UserBadge user={thing as User} />,
-    players: (thing: Entity) => <UserBadge user={thing as User} />,
-  }
-
-  const badge = badgeMap[collection]
-
   return (
     <>
       <Box sx={{ my: 4 }}>
@@ -332,38 +283,14 @@ export default function ListManager({
             </Button>
           </Stack>
         )}
-        <Stack direction="column" spacing={1} sx={{ mt: 2 }}>
-          {items.map((item: Entity, index: number) => (
-            <Stack
-              direction="row"
-              spacing={1}
-              alignItems="center"
-              key={`${item.id}-${index}`}
-            >
-              <Box sx={{ width: "100%" }}>{badge(item)}</Box>
-              {open && (
-                <Box>
-                  <IconButton
-                    color="inherit"
-                    onClick={() => handleDelete(item)}
-                    sx={{ ml: 1 }}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Box>
-              )}
-            </Stack>
-          ))}
-          <Pagination
-            count={meta.total_pages}
-            page={meta.current_page}
-            onChange={handlePageChange}
-            variant="outlined"
-            color="primary"
-            shape="rounded"
-            size="medium"
-          />
-        </Stack>
+        <BadgeList
+          items={items}
+          open={open}
+          handleDelete={handleDelete}
+          collection={collection}
+          meta={meta}
+          handlePageChange={handlePageChange}
+        />
       </Box>
     </>
   )

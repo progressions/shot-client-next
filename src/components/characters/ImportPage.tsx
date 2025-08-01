@@ -17,6 +17,8 @@ import { useClient } from "@/contexts"
 import type { Character } from "@/types/types"
 import { FormActions, useForm } from "@/reducers/formState"
 import { AxiosError } from "axios"
+import { HeroTitle } from "@/components/ui"
+import { SpeedDial } from "@/components/characters"
 
 type FormStateData = {
   files: File[]
@@ -222,10 +224,9 @@ export default function UploadForm() {
 
   return (
     <>
-      <Box sx={{ maxWidth: 700, mx: "auto", mt: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Upload PDFs to Create Characters
-        </Typography>
+      <Box sx={{ maxWidth: 700, mx: "auto", mt: 4, position: "relative" }}>
+        <SpeedDial />
+        <HeroTitle>Upload PDFs to Create Characters</HeroTitle>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}

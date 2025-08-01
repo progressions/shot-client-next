@@ -15,6 +15,7 @@ export default function JunctureBadge({
 }: JunctureBadgeProperties) {
   return (
     <Badge
+      name="juncture"
       entity={juncture}
       size={size}
       title={<JunctureLink juncture={juncture} />}

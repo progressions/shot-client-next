@@ -6,7 +6,6 @@ export { default as CreateFactionForm } from "@/components/factions/CreateFactio
 export { default as EditFactionForm } from "@/components/factions/EditFactionForm"
 export { default as FactionForm } from "@/components/factions/FactionForm"
 export { default as FactionPageClient } from "@/components/factions/FactionPageClient"
-export { default as MembersList } from "@/components/factions/MembersList"
 export { default as SitesList } from "@/components/factions/SitesList"
 export { default as PartiesList } from "@/components/factions/PartiesList"
 export { default as JuncturesList } from "@/components/factions/JuncturesList"

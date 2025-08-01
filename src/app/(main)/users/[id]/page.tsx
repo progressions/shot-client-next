@@ -11,13 +11,13 @@ type UserPageProperties = {
 export default async function UserPage({ params }: UserPageProperties) {
   const { id } = await params
   const client = await getServerClient()
-  const user = await getUser()
-  if (!client || !user) return <Typography>Not logged in</Typography>
+  const currentUser = await getUser()
+  if (!client || !currentUser) return <Typography>Not logged in</Typography>
 
   const response = await client.getUser({ id })
   const user: User = response.data
 
-  if (!user.admin) redirect("/")
+  if (!currentUser.admin) redirect("/")
 
   if (!user?.id) {
     return <Typography>User not found</Typography>

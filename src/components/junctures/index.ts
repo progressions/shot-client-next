@@ -6,4 +6,3 @@ export { default as CreateJunctureForm } from "@/components/junctures/CreateJunc
 export { default as EditJunctureForm } from "@/components/junctures/EditJunctureForm"
 export { default as JunctureForm } from "@/components/junctures/JunctureForm"
 export { default as JuncturePageClient } from "@/components/junctures/JuncturePageClient"
-export { default as MembersList } from "@/components/junctures/MembersList"

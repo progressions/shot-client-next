@@ -4,8 +4,9 @@ import type { PopupProps, Party } from "@/types"
 import { defaultParty } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
-import PartyAvatar from "@/components/avatars/PartyAvatar"
+import { PartyAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
+import { PartyLink } from "@/components/links"
 
 export default function PartyPopup({ id }: PopupProps) {
   const { user, client } = useClient()
@@ -51,7 +52,9 @@ export default function PartyPopup({ id }: PopupProps) {
     <Box className={styles.mentionPopup}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
         <PartyAvatar party={party} disablePopup={true} />
-        <Typography>{party.name}</Typography>
+        <Typography>
+          <PartyLink party={party} disablePopup={true} />
+        </Typography>
       </Stack>
       <Typography variant="caption" sx={{ textTransform: "uppercase" }}>
         {subhead}

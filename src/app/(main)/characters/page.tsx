@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
+import { headers } from "next/headers"
 import { CircularProgress, Box } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Characters } from "@/components/characters"
@@ -17,6 +18,7 @@ export default async function CharactersPage({
 }: CharactersPageProperties) {
   const client = await getServerClient()
   const user = await getUser()
+
   if (!client || !user) {
     redirect("/login")
   }
@@ -24,6 +26,7 @@ export default async function CharactersPage({
   const parameters = await searchParams
   const pageParameter = parameters.page
   const page = pageParameter ? Number.parseInt(pageParameter, 10) : 1
+
   if (isNaN(page) || page <= 0) {
     redirect("/characters?page=1&sort=name&order=asc")
   }
@@ -49,6 +52,11 @@ export default async function CharactersPage({
     redirect("/characters?page=1&sort=name&order=asc")
   }
 
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
   return (
     <Box
       sx={{
@@ -64,6 +72,7 @@ export default async function CharactersPage({
           initialMeta={meta}
           initialSort={sort}
           initialOrder={order}
+          initialIsMobile={initialIsMobile} // Pass mobile detection result
         />
       </Suspense>
     </Box>

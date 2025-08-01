@@ -1,16 +1,10 @@
 "use client"
 
-import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
-import UploadIcon from "@mui/icons-material/Upload"
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
-
-import { useRouter, redirect } from "next/navigation"
-import { useMemo, useEffect, useCallback } from "react"
+import { useRouter } from "next/navigation"
+import { useMemo, useEffect, useCallback, useState } from "react"
 import {
   Pagination,
   Box,
-  Typography,
-  Container,
   Table,
   TableBody,
   TableCell,
@@ -18,151 +12,50 @@ import {
   TableRow,
   TableSortLabel,
   useMediaQuery,
-  Card,
-  CardContent,
-  Stack,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
 } from "@mui/material"
+import { GridView, ViewList } from "@mui/icons-material"
 import Link from "next/link"
 import type { Character, PaginationMeta } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
 import { useTheme } from "@mui/material/styles"
-import type { SelectChangeEvent } from "@mui/material"
-import { CharacterName } from "@/components/characters"
+import {
+  CharactersMobile,
+  CharacterFilter,
+  SpeedDial,
+  CharacterName,
+} from "@/components/characters"
 import { CS } from "@/services"
 import { FormActions, useForm } from "@/reducers"
-import { HeroTitle, SpeedDialMenu } from "@/components/ui"
+import { HeroTitle } from "@/components/ui"
+import { queryParams } from "@/lib"
+import { actions as initialActions } from "@/components/characters/SpeedDial"
 
 interface CharactersProperties {
   initialCharacters: Character[]
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
+  initialIsMobile: boolean
 }
 
 type ValidSort = "name" | "type" | "created_at" | "updated_at"
-const validSorts: readonly ValidSort[] = [
+const _validSorts: readonly ValidSort[] = [
   "name",
   "type",
   "created_at",
   "updated_at",
 ]
+
 type ValidOrder = "asc" | "desc"
-
-// Mobile-specific component
-function CharactersMobile({
-  characters,
-  meta,
-  sort,
-  order,
-  onPageChange,
-  onSortChange,
-  onOrderChange,
-}: {
-  characters: Character[]
-  meta: PaginationMeta
-  sort: string
-  order: string
-  onPageChange: (_event: React.ChangeEvent<unknown>, page: number) => void
-  onSortChange: (event: SelectChangeEvent<string>) => void
-  onOrderChange: () => void
-}) {
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
-
-  const formatDate = (date: string) => {
-    const d = new Date(date)
-    return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear().toString().slice(-2)}`
-  }
-
-  return (
-    <Stack spacing={2}>
-      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-        <FormControl sx={{ minWidth: 120 }}>
-          <InputLabel id="sort-label" sx={{ color: "#ffffff" }}>
-            Sort By
-          </InputLabel>
-          <Select
-            labelId="sort-label"
-            value={sort}
-            label="Sort By"
-            onChange={onSortChange}
-            sx={{
-              color: "#ffffff",
-              "& .MuiSvgIcon-root": { color: "#ffffff" },
-            }}
-          >
-            <MenuItem value="name">Name</MenuItem>
-            <MenuItem value="created_at">Created</MenuItem>
-            <MenuItem value="updated_at">Updated</MenuItem>
-          </Select>
-        </FormControl>
-        <Typography
-          onClick={onOrderChange}
-          sx={{
-            color: "#ffffff",
-            cursor: "pointer",
-            fontSize: "0.875rem",
-            textDecoration: "underline",
-          }}
-        >
-          {order === "asc" ? "↑ Asc" : "↓ Desc"}
-        </Typography>
-      </Box>
-      {characters.length === 0 ? (
-        <Typography sx={{ color: "#ffffff" }}>
-          No characters available
-        </Typography>
-      ) : (
-        characters.map(character => (
-          <Card
-            key={character.id}
-            sx={{ bgcolor: "#424242", color: "#ffffff" }}
-          >
-            <CardContent sx={{ p: 2 }}>
-              <Typography variant="body1">
-                <Link
-                  href={`/characters/${character.id}`}
-                  style={{ color: "#ffffff", textDecoration: "underline" }}
-                >
-                  <CharacterName character={character} />
-                </Link>
-              </Typography>
-              <Typography variant="body2">
-                Type: {CS.type(character)}
-              </Typography>
-              <Typography variant="body2">
-                Created: {formatDate(character.created_at || "")}
-              </Typography>
-              <Typography variant="body2">
-                Active: {character.active ? "Yes" : "No"}
-              </Typography>
-            </CardContent>
-          </Card>
-        ))
-      )}
-      <Pagination
-        count={meta.total_pages}
-        page={meta.current_page}
-        onChange={onPageChange}
-        variant="outlined"
-        color="primary"
-        shape="rounded"
-        size={isMobile ? "small" : "large"}
-        sx={{ mt: 2 }}
-      />
-    </Stack>
-  )
-}
 
 type FormStateData = {
   characters: Character[]
   meta: PaginationMeta
   sort: string
   order: string
+  character_type: string
+  archetype: string
+  faction_id: string
 }
 
 export default function Characters({
@@ -170,26 +63,59 @@ export default function Characters({
   initialMeta,
   initialSort,
   initialOrder,
+  initialIsMobile,
 }: CharactersProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const router = useRouter()
   const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
+  const smallScreen = useMediaQuery(theme.breakpoints.down("sm"))
+  const isMobile = initialIsMobile || smallScreen
+
+  const [viewMode, setViewMode] = useState<"table" | "mobile">(
+    isMobile ? "mobile" : "table"
+  )
+
   const { formState, dispatchForm } = useForm<FormStateData>({
     characters: initialCharacters,
     meta: initialMeta,
     sort: initialSort,
     order: initialOrder,
+    character_type: "",
+    archetype: "",
+    faction_id: "",
   })
-  const { characters, meta, sort, order } = formState.data
+
+  const {
+    characters,
+    meta,
+    sort,
+    order,
+    character_type,
+    archetype,
+    faction_id,
+  } = formState.data
 
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
   const fetchCharacters = useCallback(
-    async (page: number = 1, sort: string = "name", order: string = "asc") => {
+    async (
+      page: number = 1,
+      sort: string = "name",
+      order: string = "asc",
+      character_type: string = "",
+      faction_id: string = "",
+      archetype: string = ""
+    ) => {
       try {
-        const response = await client.getCharacters({ page, sort, order })
+        const response = await client.getCharacters({
+          archetype,
+          page,
+          sort,
+          order,
+          type: character_type,
+          faction_id,
+        })
         dispatchForm({
           type: FormActions.UPDATE,
           name: "characters",
@@ -211,45 +137,71 @@ export default function Characters({
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
     if (campaignData.characters === "reload") {
-      const parameters = new URLSearchParams(globalThis.location.search)
-      const page = parameters.get("page")
-        ? Number.parseInt(parameters.get("page")!, 10)
-        : 1
-      const sortParameter = parameters.get("sort")
-      const orderParameter = parameters.get("order")
-      const currentSort =
-        sortParameter && validSorts.includes(sortParameter as ValidSort)
-          ? sortParameter
-          : "created_at"
-      const currentOrder =
-        orderParameter && validOrders.includes(orderParameter as ValidOrder)
-          ? orderParameter
-          : "desc"
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "sort",
-        value: currentSort,
-      })
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "order",
-        value: currentOrder,
-      })
-      fetchCharacters(page, currentSort, currentOrder)
+      fetchCharacters(page, sort, order, character_type, faction_id, archetype)
     }
-  }, [client, campaignData, dispatchForm, fetchCharacters, validOrders])
+  }, [
+    client,
+    campaignData,
+    dispatchForm,
+    fetchCharacters,
+    validOrders,
+    archetype,
+    faction_id,
+    character_type,
+    sort,
+    order,
+  ])
+
+  useEffect(() => {
+    const url = `/characters?${queryParams({
+      page: 1,
+      sort,
+      order,
+      type: character_type,
+      faction_id,
+      archetype,
+    })}`
+    router.push(url, {
+      scroll: false,
+    })
+    fetchCharacters(1, sort, order, character_type, faction_id, archetype)
+  }, [
+    character_type,
+    archetype,
+    faction_id,
+    fetchCharacters,
+    order,
+    router,
+    sort,
+  ])
 
   const handlePageChange = (
     _event: React.ChangeEvent<unknown>,
     page: number
   ) => {
     if (page <= 0 || page > meta.total_pages) {
-      router.push(`/characters?page=1&sort=${sort}&order=${order}`, {
+      const url = `/characters?${queryParams({
+        page: 1,
+        sort,
+        order,
+        type: character_type,
+        faction_id,
+        archetype,
+      })}`
+      router.push(url, {
         scroll: false,
       })
       fetchCharacters(1, sort, order)
     } else {
-      router.push(`/characters?page=${page}&sort=${sort}&order=${order}`, {
+      const url = `/characters?${queryParams({
+        page,
+        sort,
+        order,
+        type: character_type,
+        faction_id,
+        archetype,
+      })}`
+      router.push(url, {
         scroll: false,
       })
       fetchCharacters(page, sort, order)
@@ -260,35 +212,26 @@ export default function Characters({
     const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/characters?page=1&sort=${newSort}&order=${newOrder}`, {
+    const url = `/characters?${queryParams({
+      page: 1,
+      sort: newSort,
+      order: newOrder,
+      type: character_type,
+      faction_id,
+      archetype,
+    })}`
+    router.push(url, {
       scroll: false,
     })
     fetchCharacters(1, newSort, newOrder)
   }
 
-  const handleSortChangeMobile = (event: SelectChangeEvent<string>) => {
-    const newSort = event.target.value as ValidSort
-    if (validSorts.includes(newSort)) {
-      dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
-      dispatchForm({ type: FormActions.UPDATE, name: "order", value: "asc" })
-      router.push(`/characters?page=1&sort=${newSort}&order=asc`, {
-        scroll: false,
-      })
-      fetchCharacters(1, newSort, "asc")
-    }
-  }
-
-  const handleOrderChangeMobile = () => {
-    const newOrder = order === "asc" ? "desc" : "asc"
-    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/characters?page=1&sort=${sort}&order=${newOrder}`, {
-      scroll: false,
-    })
-    fetchCharacters(1, sort, newOrder)
+  const handleToggleView = () => {
+    setViewMode(viewMode === "table" ? "mobile" : "table")
   }
 
   const formatDate = (date: string) => {
-    if (isMobile) {
+    if (viewMode === "mobile") {
       const d = new Date(date)
       return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear().toString().slice(-2)}`
     }
@@ -299,193 +242,206 @@ export default function Characters({
     })
   }
 
-  if (isMobile) {
-    return (
-      <Container maxWidth="md">
-        <Typography
-          variant="h4"
-          sx={{
-            color: "#ffffff",
-            fontSize: { xs: "1.5rem", sm: "2.125rem" },
-            mb: 2,
-          }}
-        >
-          Characters
-        </Typography>
-        <CharactersMobile
-          characters={characters}
-          meta={meta}
-          sort={sort}
-          order={order}
-          onPageChange={handlePageChange}
-          onSortChange={handleSortChangeMobile}
-          onOrderChange={handleOrderChangeMobile}
-        />
-      </Container>
-    )
-  }
-
-  const handle = () => {}
-
-  const handleImport = () => {
-    redirect("/characters/import")
-  }
-
   const actions = [
-    { icon: <PersonAddAlt1Icon />, name: "Create", onClick: handle },
-    { icon: <UploadIcon />, name: "Import", onClick: handleImport },
-    { icon: <AddCircleOutlineIcon />, name: "Generate", onClick: handle },
+    {
+      icon: viewMode === "table" ? <GridView /> : <ViewList />,
+      name:
+        viewMode === "table" ? "Switch to Mobile View" : "Switch to Table View",
+      onClick: handleToggleView,
+    },
+    ...initialActions,
   ]
 
   return (
     <>
-      <SpeedDialMenu actions={actions} />
-      <HeroTitle>Characters</HeroTitle>
-      <Box sx={{ bgcolor: "#424242", borderRadius: 1, overflowX: "auto" }}>
-        <Table
-          sx={{
-            maxWidth: { xs: "400px", sm: "100%" },
-            tableLayout: "fixed",
-          }}
-        >
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ color: "#ffffff" }}>
-                <TableSortLabel
-                  active={sort === "name"}
-                  direction={sort === "name" ? (order as ValidOrder) : "asc"}
-                  onClick={() => handleSortChange("name")}
-                  sx={{
-                    color: "#ffffff",
-                    "&.Mui-active": { color: "#ffffff" },
-                    "& .MuiTableSortLabel-icon": {
-                      color: "#ffffff !important",
-                    },
-                  }}
-                >
-                  Name
-                </TableSortLabel>
-              </TableCell>
-              <TableCell
-                sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}
-              >
-                <TableSortLabel
-                  active={sort === "type"}
-                  direction={sort === "type" ? (order as ValidOrder) : "asc"}
-                  onClick={() => handleSortChange("type")}
-                  sx={{
-                    color: "#ffffff",
-                    "&.Mui-active": { color: "#ffffff" },
-                    "& .MuiTableSortLabel-icon": {
-                      color: "#ffffff !important",
-                    },
-                  }}
-                >
-                  Type
-                </TableSortLabel>
-              </TableCell>
-              <TableCell
-                sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}
-              >
-                <TableSortLabel
-                  active={sort === "created_at"}
-                  direction={
-                    sort === "created_at" ? (order as ValidOrder) : "asc"
-                  }
-                  onClick={() => handleSortChange("created_at")}
-                  sx={{
-                    color: "#ffffff",
-                    "&.Mui-active": { color: "#ffffff" },
-                    "& .MuiTableSortLabel-icon": {
-                      color: "#ffffff !important",
-                    },
-                  }}
-                >
-                  Created
-                </TableSortLabel>
-              </TableCell>
-              <TableCell
+      <SpeedDial actions={actions} />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
+        <HeroTitle>Characters</HeroTitle>
+      </Box>
+      <Box sx={{ width: "100%", mb: 2 }}>
+        {viewMode === "mobile" ? (
+          <CharactersMobile
+            formState={formState}
+            dispatchForm={dispatchForm}
+            onPageChange={handlePageChange}
+            onSortChange={handleSortChange}
+            onOrderChange={() => handleSortChange(sort as ValidSort)}
+            initialIsMobile={initialIsMobile}
+          />
+        ) : (
+          <>
+            <CharacterFilter
+              dispatch={dispatchForm}
+              includeCharacters={false}
+            />
+            <Box sx={{ bgcolor: "#424242", borderRadius: 1 }}>
+              <Table
                 sx={{
-                  color: "#ffffff",
-                  width: { xs: "60px", sm: "100px" },
-                  textAlign: "center",
-                  padding: { xs: "8px 4px", sm: "16px 8px" },
+                  maxWidth: { xs: "400px", sm: "100%" },
+                  tableLayout: "fixed",
                 }}
               >
-                Active
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {characters.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} sx={{ color: "#ffffff" }}>
-                  No characters available
-                </TableCell>
-              </TableRow>
-            ) : (
-              characters.map(character => (
-                <TableRow
-                  key={character.id}
-                  sx={{ "&:hover": { bgcolor: "#616161" } }}
-                >
-                  <TableCell
-                    sx={{
-                      color: "#ffffff",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    <Link
-                      href={`/characters/${character.id}`}
-                      style={{ color: "#ffffff", textDecoration: "underline" }}
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ color: "#ffffff" }}>
+                      <TableSortLabel
+                        active={sort === "name"}
+                        direction={
+                          sort === "name" ? (order as ValidOrder) : "asc"
+                        }
+                        onClick={() => handleSortChange("name")}
+                        sx={{
+                          color: "#ffffff",
+                          "&.Mui-active": { color: "#ffffff" },
+                          "& .MuiTableSortLabel-icon": {
+                            color: "#ffffff !important",
+                          },
+                        }}
+                      >
+                        Name
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#ffffff",
+                        width: { xs: "65px", sm: "150px" },
+                      }}
                     >
-                      <CharacterName character={character} />
-                    </Link>
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "#ffffff",
-                      width: { xs: "65px", sm: "150px" },
-                    }}
-                  >
-                    {CS.type(character)}
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "#ffffff",
-                      width: { xs: "65px", sm: "150px" },
-                    }}
-                  >
-                    {formatDate(character.created_at || "")}
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "#ffffff",
-                      width: { xs: "60px", sm: "100px" },
-                      textAlign: "center",
-                      padding: { xs: "8px 4px", sm: "16px 8px" },
-                    }}
-                  >
-                    {character.active ? "Yes" : "No"}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+                      <TableSortLabel
+                        active={sort === "type"}
+                        direction={
+                          sort === "type" ? (order as ValidOrder) : "asc"
+                        }
+                        onClick={() => handleSortChange("type")}
+                        sx={{
+                          color: "#ffffff",
+                          "&.Mui-active": { color: "#ffffff" },
+                          "& .MuiTableSortLabel-icon": {
+                            color: "#ffffff !important",
+                          },
+                        }}
+                      >
+                        Type
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#ffffff",
+                        width: { xs: "65px", sm: "150px" },
+                      }}
+                    >
+                      <TableSortLabel
+                        active={sort === "created_at"}
+                        direction={
+                          sort === "created_at" ? (order as ValidOrder) : "asc"
+                        }
+                        onClick={() => handleSortChange("created_at")}
+                        sx={{
+                          color: "#ffffff",
+                          "&.Mui-active": { color: "#ffffff" },
+                          "& .MuiTableSortLabel-icon": {
+                            color: "#ffffff !important",
+                          },
+                        }}
+                      >
+                        Created
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#ffffff",
+                        width: { xs: "60px", sm: "100px" },
+                        textAlign: "center",
+                        padding: { xs: "8px 4px", sm: "16px 8px" },
+                      }}
+                    >
+                      Active
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {characters.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} sx={{ color: "#ffffff" }}>
+                        No characters available
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    characters.map(character => (
+                      <TableRow
+                        key={character.id}
+                        sx={{ "&:hover": { bgcolor: "#616161" } }}
+                      >
+                        <TableCell
+                          sx={{
+                            color: "#ffffff",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          <Link
+                            href={`/characters/${character.id}`}
+                            style={{
+                              color: "#ffffff",
+                              textDecoration: "underline",
+                            }}
+                          >
+                            <CharacterName character={character} />
+                          </Link>
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            color: "#ffffff",
+                            width: { xs: "65px", sm: "150px" },
+                          }}
+                        >
+                          {CS.type(character)}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            color: "#ffffff",
+                            width: { xs: "65px", sm: "150px" },
+                          }}
+                        >
+                          {formatDate(character.created_at || "")}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            color: "#ffffff",
+                            width: { xs: "60px", sm: "100px" },
+                            textAlign: "center",
+                            padding: { xs: "8px 4px", sm: "16px 8px" },
+                          }}
+                        >
+                          {character.active ? "Yes" : "No"}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </Box>
+            <Pagination
+              count={meta.total_pages}
+              page={meta.current_page}
+              onChange={handlePageChange}
+              variant="outlined"
+              color="primary"
+              shape="rounded"
+              size="large"
+              sx={{ mt: 2 }}
+            />
+          </>
+        )}
       </Box>
-      <Pagination
-        count={meta.total_pages}
-        page={meta.current_page}
-        onChange={handlePageChange}
-        variant="outlined"
-        color="primary"
-        shape="rounded"
-        size="large"
-        sx={{ mt: 2 }}
-      />
     </>
   )
 }

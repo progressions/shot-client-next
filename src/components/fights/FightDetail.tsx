@@ -10,10 +10,9 @@ import {
   Typography,
 } from "@mui/material"
 import type { Fight } from "@/types"
-import Link from "next/link"
-import { FightName, FightDescription } from "@/components/fights"
+import { FightDescription } from "@/components/fights"
 import { useCampaign, useClient } from "@/contexts"
-import { CharacterLink } from "@/components/links"
+import { FightLink, CharacterLink } from "@/components/links"
 import DetailButtons from "@/components/DetailButtons"
 
 interface FightDetailProperties {
@@ -78,7 +77,7 @@ export default function FightDetail({
         <CardMedia
           component="img"
           height="140"
-          image={fight.image_url}
+          image={`${fight.image_url}?tr=w-600,h-300,fo-auto`}
           alt={fight.name}
           sx={{ objectFit: "cover" }}
         />
@@ -92,9 +91,7 @@ export default function FightDetail({
           }}
         >
           <Typography variant="h6" sx={{ color: "#ffffff" }}>
-            <Link href={`/fights/${fight.id}`} style={{ color: "#fff" }}>
-              <FightName fight={fight} />
-            </Link>
+            <FightLink fight={fight} disablePopup={true} />
           </Typography>
           <DetailButtons
             name="Fight"

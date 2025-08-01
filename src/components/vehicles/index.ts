@@ -1,3 +1,7 @@
 export { default as Vehicles } from "@/components/vehicles/Vehicles"
 export { default as VehiclesMobile } from "@/components/vehicles/VehiclesMobile"
 export { default as VehicleName } from "@/components/vehicles/VehicleName"
+export { default as VehicleDescription } from "@/components/vehicles/VehicleDescription"
+export { default as VehicleDetail } from "@/components/vehicles/VehicleDetail"
+export { default as VehicleFilter } from "@/components/vehicles/VehicleFilter"
+export { default as SpeedDial } from "@/components/vehicles/SpeedDial"

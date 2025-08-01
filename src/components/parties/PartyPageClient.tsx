@@ -2,14 +2,16 @@
 
 import { redirect } from "next/navigation"
 import { useState, useEffect } from "react"
-import { Alert, Typography, Box } from "@mui/material"
+import { Stack, Alert, Typography, Box } from "@mui/material"
 import type { Party } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import { useCampaign } from "@/contexts"
-import { MembersList, EditPartyForm } from "@/components/parties"
+import { EditPartyForm } from "@/components/parties"
 import { useClient } from "@/contexts"
 import { FactionLink } from "@/components/links"
 import { HeroImage, SpeedDialMenu } from "@/components/ui"
+import { CharacterManager } from "@/components/characters"
+import { InfoLink } from "@/components/links"
 
 interface PartyPageClientProperties {
   party: Party
@@ -34,6 +36,20 @@ export default function PartyPageClient({
       setParty(campaignData.party)
     }
   }, [campaignData, initialParty])
+
+  async function updateParty(partyId: string, formData: FormData) {
+    try {
+      const response = await client.updateParty(partyId, formData)
+      setParty(response.data)
+    } catch (error) {
+      console.error("Error updating party:", error)
+      throw error
+    }
+  }
+
+  const replaceParty = (party: Party) => {
+    setParty(party)
+  }
 
   const handleSave = async () => {
     setEditOpen(false)
@@ -86,7 +102,24 @@ export default function PartyPageClient({
         />
       </Box>
 
-      <MembersList party={party} />
+      <Stack direction="column" spacing={2}>
+        <CharacterManager
+          name="party"
+          title="Party Members"
+          description={
+            <>
+              A <InfoLink href="/parties" info="Party" /> consists of{" "}
+              <InfoLink href="/characters" info="Characters" /> who work
+              together for a <InfoLink href="/factions" info="Faction" />.
+            </>
+          }
+          entity={party}
+          characters={party.characters}
+          character_ids={party.character_ids}
+          update={updateParty}
+          setEntity={replaceParty}
+        />
+      </Stack>
 
       <EditPartyForm
         key={JSON.stringify(party)}

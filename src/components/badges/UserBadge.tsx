@@ -17,7 +17,13 @@ export default function UserBadge({
   sx = {},
 }: UserBadgeProperties) {
   return (
-    <Badge entity={user} size={size} sx={sx} title={<UserLink user={user} />}>
+    <Badge
+      name="user"
+      entity={user}
+      size={size}
+      sx={sx}
+      title={<UserLink user={user} />}
+    >
       {user.email}
     </Badge>
   )

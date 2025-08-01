@@ -10,11 +10,12 @@ import {
   JuncturesList,
   SitesList,
   PartiesList,
-  MembersList,
   EditFactionForm,
 } from "@/components/factions"
 import { useClient } from "@/contexts"
-import { SpeedDialMenu } from "@/components/ui"
+import { HeroImage, SpeedDialMenu } from "@/components/ui"
+import { CharacterManager } from "@/components/characters"
+import { InfoLink } from "@/components/links"
 
 interface FactionPageClientProperties {
   faction: Faction
@@ -39,10 +40,19 @@ export default function FactionPageClient({
       campaignData?.faction &&
       campaignData.faction.id === initialFaction.id
     ) {
-      console.log("Setting faction from campaign data:", campaignData.faction)
       setFaction(campaignData.faction)
     }
   }, [campaignData, initialFaction])
+
+  async function updateFaction(factionId: string, formData: FormData) {
+    try {
+      const response = await client.updateFaction(factionId, formData)
+      setFaction(response.data)
+    } catch (error) {
+      console.error("Error updating faction:", error)
+      throw error
+    }
+  }
 
   const handleSave = async () => {
     setEditOpen(false)
@@ -86,22 +96,7 @@ export default function FactionPageClient({
       >
         <Typography variant="h4">{faction.name}</Typography>
       </Box>
-      {faction.image_url && (
-        <Box
-          component="img"
-          src={faction.image_url}
-          alt={faction.name}
-          sx={{
-            width: "100%",
-            height: "300px",
-            objectFit: "cover",
-            objectPosition: "50% 20%",
-            mb: 2,
-            display: "block",
-            mx: "auto",
-          }}
-        />
-      )}
+      <HeroImage entity={faction} />
       <Box sx={{ p: 2, backgroundColor: "#2e2e2e", borderRadius: 1, my: 2 }}>
         <RichTextRenderer
           key={faction.description}
@@ -111,7 +106,23 @@ export default function FactionPageClient({
       </Box>
 
       <Stack direction="column" spacing={2}>
-        <MembersList faction={faction} setFaction={replaceFaction} />
+        <CharacterManager
+          name="faction"
+          title="Attuned Characters"
+          description={
+            <>
+              A <InfoLink href="/factions" info="Faction" /> recruits{" "}
+              <InfoLink href="/characters" info="Characters" /> to join its
+              cause, acting as a unified force in the world of the{" "}
+              <InfoLink info="Chi War" />.
+            </>
+          }
+          entity={faction}
+          characters={faction.characters}
+          character_ids={faction.character_ids}
+          update={updateFaction}
+          setEntity={replaceFaction}
+        />
         <PartiesList faction={faction} setFaction={replaceFaction} />
         <SitesList faction={faction} setFaction={replaceFaction} />
         <JuncturesList faction={faction} setFaction={replaceFaction} />

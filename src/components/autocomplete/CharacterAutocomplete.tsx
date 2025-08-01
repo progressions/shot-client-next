@@ -30,7 +30,7 @@ export default function CharacterAutocomplete({
       return filteredOptions
     }
     try {
-      const response = await client.getCharacters({
+      const response = await client.getCharacterNames({
         search: inputValue,
         per_page: 120,
         sort: "name",

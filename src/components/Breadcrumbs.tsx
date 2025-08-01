@@ -86,6 +86,7 @@ export default function Breadcrumbs() {
   }
 
   const breadcrumbs = getBreadcrumbs()
+  if (breadcrumbs.length === 1) return null
 
   return (
     <MuiBreadcrumbs
@@ -163,6 +164,9 @@ async function fetchCrumbName(
     }
     if (id === "generate") {
       return "Generate"
+    }
+    if (id === "create") {
+      return "Create"
     }
     const response = await client.getCharacter({ id })
     return <CharacterName character={response.data} />

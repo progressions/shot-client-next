@@ -16,6 +16,17 @@ import {
   SchtickPath,
 } from "@/types"
 
+export enum VehicleDescriptionKeys {
+  Size = "Size",
+  Weight = "Weight",
+  Color = "Color",
+  Appearance = "Appearance",
+}
+
+export type DescriptionValues = {
+  [key in DescriptionKeys]: string
+}
+
 export interface Campaign extends BaseEntity {
   id: string
   name: string

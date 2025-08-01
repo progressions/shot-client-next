@@ -1,21 +1,24 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
+import { headers } from "next/headers"
 import { CircularProgress, Box } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Vehicles } from "@/components/vehicles"
-import type { VehiclesResponse } from "@/types"
 
 export const metadata = {
   title: "Vehicles - Chi War",
 }
 
+type VehiclesPageProperties = {
+  searchParams: Promise<{ page?: string; sort?: string; order?: string }>
+}
+
 export default async function VehiclesPage({
   searchParams,
-}: {
-  searchParams: Promise<{ page?: string; sort?: string; order?: string }>
-}) {
+}: VehiclesPageProperties) {
   const client = await getServerClient()
   const user = await getUser()
+
   if (!client || !user) {
     redirect("/login")
   }
@@ -23,6 +26,7 @@ export default async function VehiclesPage({
   const parameters = await searchParams
   const pageParameter = parameters.page
   const page = pageParameter ? Number.parseInt(pageParameter, 10) : 1
+
   if (isNaN(page) || page <= 0) {
     redirect("/vehicles?page=1&sort=name&order=asc")
   }
@@ -42,20 +46,33 @@ export default async function VehiclesPage({
       : "asc"
 
   const response = await client.getVehicles({ page, sort, order })
-  const { vehicles, meta }: VehiclesResponse = response.data
+  const { vehicles, meta } = response.data
 
   if (page > meta.total_pages) {
     redirect("/vehicles?page=1&sort=name&order=asc")
   }
 
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
   return (
-    <Box sx={{ justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+    <Box
+      sx={{
+        justifyContent: "space-between",
+        alignItems: "center",
+        mb: 2,
+        position: "relative",
+      }}
+    >
       <Suspense fallback={<CircularProgress />}>
         <Vehicles
           initialVehicles={vehicles}
           initialMeta={meta}
           initialSort={sort}
           initialOrder={order}
+          initialIsMobile={initialIsMobile} // Pass mobile detection result
         />
       </Suspense>
     </Box>

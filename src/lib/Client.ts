@@ -1,5 +1,5 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios"
-import { Api, ApiV2 } from "@/lib"
+import { Api, ApiV2, queryParams } from "@/lib"
 import type {
   NotionPage,
   Location,
@@ -84,7 +84,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<SuggestionsResponse>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(`${this.api.suggestions()}?${query}`, {}, cacheOptions)
   }
 
@@ -92,7 +92,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<NotionPage[]>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(`${this.api.notionCharacters()}?${query}`, {}, cacheOptions)
   }
 
@@ -172,7 +172,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<PartiesResponse>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(`${this.apiV2.parties()}?${query}`, {}, cacheOptions)
   }
 
@@ -217,7 +217,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<FightsResponse>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(`${this.apiV2.fights()}?${query}`, {}, cacheOptions)
   }
 
@@ -269,7 +269,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<CharactersResponse>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(`${this.apiV2.characters()}?${query}`, {}, cacheOptions)
   }
 
@@ -277,7 +277,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<CharactersResponse>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(
       `${this.apiV2.characters()}/names?${query}`,
       {},
@@ -290,7 +290,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<Person[]>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(
       `${this.api.charactersAndVehicles(fight)}/characters?${query}`,
       {},
@@ -302,7 +302,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<VehiclesResponse>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(`${this.apiV2.vehicles()}?${query}`, {}, cacheOptions)
   }
 
@@ -311,7 +311,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<VehiclesResponse>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(
       `${this.api.charactersAndVehicles(fight)}/vehicles?${query}`,
       {},
@@ -323,7 +323,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<CharactersAndVehiclesResponse>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(
       `${this.api.charactersAndVehicles()}?${query}`,
       {},
@@ -369,19 +369,20 @@ class Client {
   }
 
   async updateCharacter(
-    character: Character,
-    fight?: Fight | null
+    id: string,
+    formData: FormData
+  ): Promise<AxiosResponse<Character>> {
+    return this.requestFormData(
+      "PATCH",
+      `${this.apiV2.characters({ id })}`,
+      formData
+    )
+  }
+
+  async duplicateCharacter(
+    character: Character
   ): Promise<AxiosResponse<Person>> {
-    const updatedCharacter = {
-      ...character,
-      advancements: undefined,
-      sites: undefined,
-      schticks: undefined,
-      weapons: undefined,
-    }
-    return this.patch(this.api.characters(fight, { id: character.id } as ID), {
-      character: updatedCharacter,
-    })
+    return this.post(`${this.apiV2.characters(character)}/duplicate`)
   }
 
   async createCharacter(
@@ -391,6 +392,16 @@ class Client {
     return this.post(this.api.characters(fight, character), {
       character: character,
     })
+  }
+
+  async uploadCharacterPdf(
+    formData: FormData
+  ): Promise<AxiosResponse<Character>> {
+    return this.requestFormData(
+      "POST",
+      `${this.apiV2.characters()}/pdf`,
+      formData
+    )
   }
 
   async deleteCharacter(
@@ -567,7 +578,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<JuncturesResponse>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(`${this.apiV2.junctures()}?${query}`, {}, cacheOptions)
   }
 
@@ -605,7 +616,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<SitesResponse>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(`${this.apiV2.sites()}?${query}`, {}, cacheOptions)
   }
 
@@ -773,7 +784,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<CampaignsResponse>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(`${this.apiV2.campaigns()}?${query}`, {}, cacheOptions)
   }
 
@@ -858,7 +869,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<UsersResponse>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(`${this.apiV2.users()}?${query}`, {}, cacheOptions)
   }
 
@@ -873,7 +884,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<FactionsResponse>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(`${this.apiV2.factions()}?${query}`, {}, cacheOptions)
   }
 
@@ -904,7 +915,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<{ paths: string[] }>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(`${this.apiV2.schtickPaths()}?${query}`, {}, cacheOptions)
   }
 
@@ -912,7 +923,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<{ categories: string[] }>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(
       `${this.apiV2.schtickCategories()}?${query}`,
       {},
@@ -924,7 +935,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<SchticksResponse>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(`${this.apiV2.schticks()}?${query}`, {}, cacheOptions)
   }
 
@@ -959,7 +970,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<SchticksResponse>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(
       `${this.api.characterSchticks(character)}?${query}`,
       {},
@@ -980,16 +991,6 @@ class Client {
     return this.post(this.api.importSchticks(), { schtick: { yaml: content } })
   }
 
-  async uploadCharacterPdf(
-    formData: FormData
-  ): Promise<AxiosResponse<Character>> {
-    return this.requestFormData(
-      "POST",
-      `${this.apiV2.characters()}/pdf`,
-      formData
-    )
-  }
-
   async removeSchtick(
     character: Character | ID,
     schtick: Schtick | ID
@@ -1002,7 +1003,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<WeaponsResponse>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(
       `${this.api.characterWeapons(character)}?${query}`,
       {},
@@ -1014,7 +1015,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<WeaponsResponse>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(`${this.apiV2.weapons()}?${query}`, {}, cacheOptions)
   }
 
@@ -1029,7 +1030,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<{ junctures: string[] }>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(
       `${this.apiV2.weaponJunctures()}?${query}`,
       {},
@@ -1041,7 +1042,7 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<{ categories: string[] }>> {
-    const query = this.queryParams(parameters)
+    const query = queryParams(parameters)
     return this.get(
       `${this.apiV2.weaponCategories()}?${query}`,
       {},
@@ -1147,7 +1148,7 @@ class Client {
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<T>> {
     if (!this.jwt) {
-      console.log("No JWT provided, cannot make GET request", url)
+      console.error("No JWT provided, cannot make GET request", url)
       throw new Error("No JWT provided")
     }
 
@@ -1207,12 +1208,6 @@ class Client {
       console.error("Error in requestFormData:", error)
       throw error
     })
-  }
-
-  queryParams(parameters: Parameters_ = {}) {
-    return Object.entries(parameters)
-      .map(([key, value]) => `${key}=${value || ""}`)
-      .join("&")
   }
 }
 

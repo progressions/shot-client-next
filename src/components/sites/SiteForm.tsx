@@ -186,7 +186,7 @@ export default function SiteForm({
             />
           </IconButton>
           <Typography variant="body2" sx={{ color: "#ffffff" }}>
-            UpdateImage
+            Update Image
           </Typography>
         </Box>
         {imagePreview && <HeroImage entity={{ image_url: imagePreview }} />}

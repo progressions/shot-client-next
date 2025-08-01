@@ -6,9 +6,11 @@ import { Stack, Alert, Typography, Box } from "@mui/material"
 import type { Juncture } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import { useCampaign } from "@/contexts"
-import { MembersList, EditJunctureForm } from "@/components/junctures"
+import { EditJunctureForm } from "@/components/junctures"
 import { useClient } from "@/contexts"
 import { HeroImage, SpeedDialMenu } from "@/components/ui"
+import { CharacterManager } from "@/components/characters"
+import { InfoLink } from "@/components/links"
 
 interface JuncturePageClientProperties {
   juncture: Juncture
@@ -33,10 +35,19 @@ export default function JuncturePageClient({
       campaignData?.juncture &&
       campaignData.juncture.id === initialJuncture.id
     ) {
-      console.log("Setting juncture from campaign data:", campaignData.juncture)
       setJuncture(campaignData.juncture)
     }
   }, [campaignData, initialJuncture])
+
+  async function updateJuncture(junctureId: string, formData: FormData) {
+    try {
+      const response = await client.updateJuncture(junctureId, formData)
+      setJuncture(response.data)
+    } catch (error) {
+      console.error("Error updating juncture:", error)
+      throw error
+    }
+  }
 
   const handleSave = async () => {
     setEditOpen(false)
@@ -92,7 +103,24 @@ export default function JuncturePageClient({
       </Box>
 
       <Stack direction="column" spacing={2}>
-        <MembersList juncture={juncture} setJuncture={replaceJuncture} />
+        <CharacterManager
+          name="juncture"
+          title="Juncture Natives"
+          description={
+            <>
+              <InfoLink href="/characters" info="Characters" /> born into a
+              specific <InfoLink href="/junctures" info="Juncture" /> often
+              travel through the <InfoLink info="Netherworld" />, participating
+              in the <InfoLink info="Chi War" />, enaging in its conflicts and
+              shaping its outcomes.
+            </>
+          }
+          entity={juncture}
+          characters={juncture.characters}
+          character_ids={juncture.character_ids}
+          update={updateJuncture}
+          setEntity={replaceJuncture}
+        />
       </Stack>
 
       <EditJunctureForm

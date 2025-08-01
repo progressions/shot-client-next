@@ -3,12 +3,16 @@
 import { Avatar, Typography, Stack } from "@mui/material"
 import type { Entity } from "@/types"
 import type { SystemStyleObject, Theme } from "@mui/system"
+import { useCampaign } from "@/contexts"
+import { useState, useEffect } from "react"
 
 type BadgeProperties = {
+  name?: string
   entity: Entity
   size?: "sm" | "md" | "lg"
   title: React.ReactNode
   children: React.ReactNode
+  disableAvatar?: boolean
   sx?: SystemStyleObject<Theme>
 }
 
@@ -31,12 +35,16 @@ const sizes = {
 }
 
 export default function Badge({
-  entity,
+  name,
+  entity: initialEntity,
   size = "md",
   title,
   children,
+  disableAvatar = false,
   sx = {},
 }: BadgeProperties) {
+  const { campaignData } = useCampaign()
+  const [entity, setEntity] = useState<Entity>(initialEntity)
   const { avatar, titleFont, subtitleFont } = sizes[size]
   const initials = entity.name
     ? entity.name
@@ -44,6 +52,15 @@ export default function Badge({
         .map((part: string) => part.charAt(0).toUpperCase())
         .join("")
     : ""
+
+  useEffect(() => {
+    if (!campaignData) return
+    if (!name) return
+
+    if (campaignData[name] && campaignData[name].id === entity.id) {
+      setEntity(campaignData[name])
+    }
+  }, [name, campaignData, entity.id])
 
   return (
     <Stack
@@ -57,11 +74,12 @@ export default function Badge({
         height: avatar, // Explicit height to match avatar size
         alignItems: "center",
         paddingRight: "0.5rem",
+        paddingLeft: disableAvatar ? "1rem" : undefined,
         maxWidth: "100%",
         ...sx,
       }}
     >
-      {entity.image_url && (
+      {!disableAvatar && entity.image_url && (
         <div
           style={{
             width: avatar,
@@ -76,7 +94,7 @@ export default function Badge({
           aria-label={entity.name}
         />
       )}
-      {!entity.image_url && (
+      {!disableAvatar && !entity.image_url && (
         <div
           style={{
             width: avatar,

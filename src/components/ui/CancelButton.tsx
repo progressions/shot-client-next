@@ -5,7 +5,7 @@ import {
 
 export function CancelButton(properties: MuiButtonProperties) {
   return (
-    <MuiButton variant="outlined" color="secondary" {...properties}>
+    <MuiButton variant={properties.variant || "outlined"} color="secondary" {...properties}>
       {properties.children ? properties.children : "Cancel"}
     </MuiButton>
   )

@@ -15,6 +15,7 @@ export default function FactionBadge({
 }: FactionBadgeProperties) {
   return (
     <Badge
+      name="faction"
       entity={faction}
       size={size}
       title={<FactionLink faction={faction} />}

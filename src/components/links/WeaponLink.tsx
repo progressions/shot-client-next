@@ -1,13 +1,34 @@
-import Link from "next/link"
-import type { Weapon } from "@/types"
+"use client"
+
+import { Box, Popover, Link } from "@mui/material"
+import { useState, MouseEvent } from "react"
+import { WeaponPopup } from "@/components/popups"
 import { WeaponName } from "@/components/weapons"
 
 type WeaponLinkProperties = {
   weapon: Weapon
   data?: string | object
+  disablePopup?: boolean
 }
 
-export default function WeaponLink({ weapon, data }: WeaponLinkProperties) {
+export default function WeaponLink({
+  weapon,
+  data,
+  disablePopup = false,
+}: WeaponLinkProperties) {
+  const [anchorEl, setAnchorEl] = useState<HTMLAnchorElement | null>(null)
+
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault()
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleClose = () => {
+    setAnchorEl(null)
+  }
+
+  const open = Boolean(anchorEl)
+
   return (
     <>
       <Link
@@ -21,10 +42,27 @@ export default function WeaponLink({ weapon, data }: WeaponLinkProperties) {
           textDecoration: "underline",
           color: "#fff",
         }}
+        onClick={!disablePopup ? handleClick : null}
       >
         <WeaponName weapon={weapon} />
-      </Link>{" "}
-      ({weapon.damage}/{weapon.concealment || "-"}/{weapon.reload_value || "-"})
+      </Link>
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <Box sx={{ p: 2, maxWidth: 400 }}>
+          <WeaponPopup id={weapon.id} />
+        </Box>
+      </Popover>
     </>
   )
 }

@@ -5,6 +5,7 @@ import { defaultSchtick } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
 import { useClient } from "@/contexts"
+import { SchtickLink } from "@/components/links"
 
 export default function SchtickPopup({ id }: PopupProps) {
   const { user, client } = useClient()
@@ -49,7 +50,9 @@ export default function SchtickPopup({ id }: PopupProps) {
   return (
     <Box className={styles.mentionPopup}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
-        <Typography>{schtick.name}</Typography>
+        <Typography>
+          <SchtickLink schtick={schtick} disablePopup={true} />
+        </Typography>
       </Stack>
       <Typography variant="caption" sx={{ textTransform: "uppercase" }}>
         {subhead}

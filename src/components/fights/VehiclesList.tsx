@@ -5,15 +5,15 @@ import { useClient } from "@/contexts"
 import { InfoLink } from "@/components/links"
 import { ListManager } from "@/components/lists"
 
-type MembersListProperties = {
+type VehiclesListProperties = {
   fight: Fight
   setFight: (fight: Fight) => void
 }
 
-export default function MembersList({
+export default function VehiclesList({
   fight,
   setFight,
-}: MembersListProperties) {
+}: VehiclesListProperties) {
   const { client } = useClient()
 
   async function update(fightId: string, formData: FormData) {
@@ -36,8 +36,8 @@ export default function MembersList({
       description={
         <>
           A <InfoLink href="/fights" info="Fight" /> may include{" "}
-          <InfoLink href="/vehicles" info="Characters" />, either as a chase or
-          a road battle.
+          <InfoLink href="/vehicles" info="Vehicles" />, either as a chase or a
+          road battle.
         </>
       }
       update={update}

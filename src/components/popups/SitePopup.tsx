@@ -4,8 +4,9 @@ import type { PopupProps, Site } from "@/types"
 import { defaultSite } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
-import SiteAvatar from "@/components/avatars/SiteAvatar"
+import { SiteAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
+import { SiteLink } from "@/components/links"
 
 export default function SitePopup({ id }: PopupProps) {
   const { user, client } = useClient()
@@ -53,7 +54,9 @@ export default function SitePopup({ id }: PopupProps) {
     <Box className={styles.mentionPopup}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
         <SiteAvatar site={site} disablePopup={true} />
-        <Typography>{site.name}</Typography>
+        <Typography>
+          <SiteLink site={site} disablePopup={true} />
+        </Typography>
       </Stack>
       <Typography variant="caption" sx={{ textTransform: "uppercase" }}>
         {subhead}

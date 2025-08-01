@@ -1,4 +1,5 @@
 import type { Character, Position, Vehicle, VehicleArchetype } from "@/types"
+import { VehicleDescriptionKeys } from "@/types"
 import CS from "@/services/CharacterService"
 import SharedService from "@/services/SharedService"
 
@@ -111,6 +112,12 @@ const VehicleService = {
       }
     }
   },
+
+  description: function (vehicle: Vehicle): string {
+    return this.descriptionValue(vehicle, VehicleDescriptionKeys.Appearance)
+  },
+
+  // Writer functions, modify the vehicle
 
   evade: function (
     attacker: Vehicle,

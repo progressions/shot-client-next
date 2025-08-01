@@ -1,0 +1,151 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import {
+  CardMedia,
+  Card,
+  CardContent,
+  Box,
+  Alert,
+  Typography,
+} from "@mui/material"
+import type { Character } from "@/types"
+import { CharacterDescription } from "@/components/characters"
+import { useCampaign, useClient } from "@/contexts"
+import {
+  TypeLink,
+  ArchetypeLink,
+  FactionLink,
+  CharacterLink,
+} from "@/components/links"
+import DetailButtons from "@/components/DetailButtons"
+import { CS } from "@/services"
+
+interface CharacterDetailProperties {
+  character: Character
+  onDelete: (characterId: string) => void
+  onEdit: (character: Character) => void
+}
+
+export default function CharacterDetail({
+  character: initialCharacter,
+  onDelete,
+  onEdit,
+}: CharacterDetailProperties) {
+  const { client } = useClient()
+  const { campaignData } = useCampaign()
+  const [error, setError] = useState<string | null>(null)
+  const [character, setCharacter] = useState<Character>(initialCharacter)
+
+  useEffect(() => {
+    if (
+      campaignData?.character &&
+      campaignData.character.id === initialCharacter.id
+    ) {
+      console.log(
+        "Updating character from campaign data:",
+        campaignData.character
+      )
+      setCharacter(campaignData.character)
+    }
+  }, [campaignData, initialCharacter])
+
+  const handleDelete = async () => {
+    if (!character?.id) return
+    if (
+      !confirm(
+        `Are you sure you want to delete the character: ${character.name}?`
+      )
+    )
+      return
+
+    try {
+      await client.deleteCharacter(character)
+      onDelete(character.id)
+      setError(null)
+    } catch (error_) {
+      setError(
+        error_ instanceof Error ? error_.message : "Failed to delete character"
+      )
+      console.error("Delete character error:", error_)
+    }
+  }
+
+  const handleEdit = () => {
+    onEdit(character)
+  }
+
+  // Format created_at timestamp for display
+  const formattedCreatedAt = character.created_at
+    ? new Date(character.created_at).toLocaleString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      })
+    : "Unknown"
+
+  return (
+    <Card sx={{ mb: 2, bgcolor: "#424242" }}>
+      {character.image_url && (
+        <CardMedia
+          component="img"
+          height="140"
+          image={character.image_url}
+          alt={character.name}
+          sx={{ objectFit: "cover" }}
+        />
+      )}
+      <CardContent sx={{ p: "1rem" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h6" sx={{ color: "#ffffff" }}>
+            <CharacterLink character={character} disablePopup={true} />
+          </Typography>
+          <DetailButtons
+            name="Character"
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </Box>
+        <Typography
+          component="div"
+          variant="caption"
+          sx={{ textTransform: "uppercase" }}
+        >
+          {CS.type(character) && (
+            <TypeLink characterType={CS.type(character)} />
+          )}
+          {CS.archetype(character) && (
+            <>
+              {" - "}
+              <ArchetypeLink archetype={CS.archetype(character)} />
+            </>
+          )}
+          {CS.faction(character) && (
+            <>
+              {" - "}
+              <FactionLink faction={CS.faction(character) as Faction} />
+            </>
+          )}
+        </Typography>
+        <CharacterDescription character={character} />
+        <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
+          Created: {formattedCreatedAt}
+        </Typography>
+        {error && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {error}
+          </Alert>
+        )}
+      </CardContent>
+    </Card>
+  )
+}

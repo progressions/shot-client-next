@@ -74,7 +74,7 @@ export default function PartyDetail({
         <CardMedia
           component="img"
           height="140"
-          image={party.image_url}
+          image={`${party.image_url}?tr=w-900,h-300,fo-face,z-0.5`}
           alt={party.name}
           sx={{ objectFit: "cover" }}
         />

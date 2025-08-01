@@ -4,8 +4,9 @@ import type { PopupProps, Faction } from "@/types"
 import { defaultFaction } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
-import FactionAvatar from "@/components/avatars/FactionAvatar"
+import { FactionAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
+import { FactionLink } from "@/components/links"
 
 export default function FactionPopup({ id }: PopupProps) {
   const { user, client } = useClient()
@@ -51,7 +52,9 @@ export default function FactionPopup({ id }: PopupProps) {
     <Box className={styles.mentionPopup}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
         <FactionAvatar faction={faction} disablePopup={true} />
-        <Typography>{faction.name}</Typography>
+        <Typography>
+          <FactionLink faction={faction} disablePopup={true} />
+        </Typography>
       </Stack>
       <Typography variant="caption" sx={{ textTransform: "uppercase" }}>
         {subhead}

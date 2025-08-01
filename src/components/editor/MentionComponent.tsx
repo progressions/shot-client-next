@@ -26,20 +26,15 @@ export default function MentionComponent({ node }: NodeViewProps) {
   const [anchorElement, setAnchorElement] = useState<HTMLElement | null>(null)
   const timeoutReference = useRef<NodeJS.Timeout | null>(null)
 
-  const handleMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.preventDefault()
     if (timeoutReference.current) {
       clearTimeout(timeoutReference.current)
     }
     setAnchorElement(event.currentTarget)
   }
 
-  const handleMouseLeave = () => {
-    timeoutReference.current = setTimeout(() => {
-      setAnchorElement(null)
-    }, 200) // Delay to allow moving to popover
-  }
-
-  const handlePopoverMouseEnter = () => {
+  const handlePopoverClick = () => {
     if (timeoutReference.current) {
       clearTimeout(timeoutReference.current)
     }
@@ -96,8 +91,7 @@ export default function MentionComponent({ node }: NodeViewProps) {
             target="_blank"
             rel="noopener noreferrer"
             sx={{ display: "inline-flex" }}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
+            onClick={handleClick}
           >
             <Chip
               label={`${mentionSuggestionChar}${displayLabel}`}
@@ -125,7 +119,7 @@ export default function MentionComponent({ node }: NodeViewProps) {
             }}
             disableRestoreFocus
             sx={{ pointerEvents: "auto" }}
-            onMouseEnter={handlePopoverMouseEnter}
+            onClick={handlePopoverClick}
             onMouseLeave={handlePopoverMouseLeave}
           >
             {popupContent}

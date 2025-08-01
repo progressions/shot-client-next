@@ -122,7 +122,7 @@ export function formReducer<T extends Record<string, unknown>>(
         ...state,
         edited: true,
         disabled: false,
-        loading: false,
+        // loading: false,
         saving: false,
         data: {
           ...state.data,

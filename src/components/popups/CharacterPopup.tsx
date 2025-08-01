@@ -3,11 +3,10 @@ import styles from "@/components/editor/Editor.module.scss"
 import type { PopupProps, Faction, Character } from "@/types"
 import { defaultCharacter } from "@/types"
 import { useState, useEffect } from "react"
-import CharacterAvatar from "@/components/avatars/CharacterAvatar"
+import { CharacterAvatar } from "@/components/avatars"
 import CS from "@/services/CharacterService"
 import GamemasterOnly from "@/components/GamemasterOnly"
 import { RichTextRenderer } from "@/components/editor"
-import ReactDOMServer from "react-dom/server"
 import { useClient } from "@/contexts"
 import {
   CharacterLink,
@@ -44,30 +43,12 @@ export default function CharacterPopup({ id }: PopupProps) {
   }, [user, id, client])
 
   if (!user?.id) {
-    return null // Use null instead of <></> for consistency
+    return null
   }
 
   const description = CS.isPC(character)
     ? CS.melodramaticHook(character)
     : CS.description(character)
-
-  const charType = CS.type(character) ? (
-    <TypeLink characterType={CS.type(character)} />
-  ) : null
-  const charArchetype = CS.archetype(character) ? (
-    <ArchetypeLink archetype={CS.archetype(character)} />
-  ) : null
-  const factionName = CS.faction(character) ? (
-    <FactionLink faction={CS.faction(character) as Faction} />
-  ) : null
-
-  const subheadHtml = [
-    charType ? ReactDOMServer.renderToStaticMarkup(charType) : null,
-    charArchetype ? ReactDOMServer.renderToStaticMarkup(charArchetype) : null,
-    factionName ? ReactDOMServer.renderToStaticMarkup(factionName) : null,
-  ]
-    .filter(Boolean)
-    .join(" - ")
 
   if (!character?.id) {
     return <Typography variant="body2">Loading...</Typography>
@@ -78,7 +59,7 @@ export default function CharacterPopup({ id }: PopupProps) {
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
         <CharacterAvatar character={character} disablePopup={true} />
         <Typography>
-          <CharacterLink character={character} />
+          <CharacterLink character={character} disablePopup={true} />
         </Typography>
       </Stack>
       <Typography
@@ -87,7 +68,19 @@ export default function CharacterPopup({ id }: PopupProps) {
         className={styles.popupSubhead}
         sx={{ textTransform: "uppercase" }}
       >
-        <RichTextRenderer html={subheadHtml} />
+        {CS.type(character) && <TypeLink characterType={CS.type(character)} />}
+        {CS.archetype(character) && (
+          <>
+            {" - "}
+            <ArchetypeLink archetype={CS.archetype(character)} />
+          </>
+        )}
+        {CS.faction(character) && (
+          <>
+            {" - "}
+            <FactionLink faction={CS.faction(character) as Faction} />
+          </>
+        )}
       </Typography>
       <Box mt={1}>
         <RichTextRenderer html={description} />

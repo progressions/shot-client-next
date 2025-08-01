@@ -174,7 +174,7 @@ export default function JunctureForm({
           <Typography sx={{ mb: 2 }}>
             A <InfoLink href="/juncture" info="Juncture" /> belongs to a certain{" "}
             <InfoLink href="/factions" info="Faction" /> that controls the most
-            powerful <InfoLink href="/sites" info="Feng Shuite Sites" />.
+            powerful <InfoLink href="/sites" info="Feng Shui Sites" />.
           </Typography>
           <FactionAutocomplete
             value={faction_id || ""}

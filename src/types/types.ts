@@ -41,6 +41,12 @@ type EntityReturnValue =
   | ActionValues
   | SkillValues
 
+export type ImagePosition = {
+  context: string
+  x_position: number
+  y_position: number
+}
+
 export type BaseEntity = {
   [key: string]: EntityReturnValue
   id: string
@@ -48,6 +54,7 @@ export type BaseEntity = {
   image_url: string
   created_at: string
   updated_at: string
+  image_positions: ImagePosition[]
 }
 
 export type Entity =

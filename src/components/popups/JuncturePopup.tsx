@@ -5,6 +5,7 @@ import { defaultJuncture } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
 import { useClient } from "@/contexts"
+import { JunctureLink } from "@/components/links"
 
 export default function JuncturePopup({ id }: PopupProps) {
   const { user, client } = useClient()
@@ -51,7 +52,9 @@ export default function JuncturePopup({ id }: PopupProps) {
   return (
     <Box className={styles.mentionPopup}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
-        <Typography>{juncture.name}</Typography>
+        <Typography>
+          <JunctureLink juncture={juncture} disablePopup={true} />
+        </Typography>
       </Stack>
       <Typography variant="caption" sx={{ textTransform: "uppercase" }}>
         {subhead}

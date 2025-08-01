@@ -18,6 +18,7 @@ export default function VehicleBadge({
 }: VehicleBadgeProperties) {
   return (
     <Badge
+      name="vehicle"
       entity={vehicle}
       size={size}
       sx={sx}

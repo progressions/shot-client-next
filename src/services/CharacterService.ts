@@ -11,7 +11,6 @@ import {
   defaultJuncture,
   defaultFaction,
   defaultCharacter,
-  DescriptionValues,
   DescriptionKeys,
 } from "@/types"
 import SharedService from "@/services/SharedService"
@@ -328,11 +327,32 @@ const CharacterService = {
     return []
   },
 
-  descriptionValue: function (
-    character: Character,
-    key: keyof DescriptionValues
-  ): string {
-    return character.description[key] || ""
+  age: function (character: Character): string {
+    return this.descriptionValue(character, DescriptionKeys.Age)
+  },
+
+  height: function (character: Character): string {
+    return this.descriptionValue(character, DescriptionKeys.Height)
+  },
+
+  weight: function (character: Character): string {
+    return this.descriptionValue(character, DescriptionKeys.Weight)
+  },
+
+  hairColor: function (character: Character): string {
+    return this.descriptionValue(character, DescriptionKeys.HairColor)
+  },
+
+  eyeColor: function (character: Character): string {
+    return this.descriptionValue(character, DescriptionKeys.EyeColor)
+  },
+
+  styleOfDress: function (character: Character): string {
+    return this.descriptionValue(character, DescriptionKeys.StyleOfDress)
+  },
+
+  appearance: function (character: Character): string {
+    return this.descriptionValue(character, DescriptionKeys.Appearance)
   },
 
   description: function (character: Character): string {

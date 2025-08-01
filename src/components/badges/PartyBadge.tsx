@@ -14,7 +14,12 @@ export default function PartyBadge({
   size = "md",
 }: PartyBadgeProperties) {
   return (
-    <Badge entity={party} size={size} title={<PartyLink party={party} />}>
+    <Badge
+      name="party"
+      entity={party}
+      size={size}
+      title={<PartyLink party={party} />}
+    >
       {party.faction && (
         <span>
           <FactionLink faction={party.faction} />
