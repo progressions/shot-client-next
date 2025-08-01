@@ -31,7 +31,13 @@ async function fetchCrumbName(pathnames: string[], client: Client): Promise<Reac
     return null
   }
 
-  const id = pathnames.at(-1)
+  // Handle routes like /characters/[id]/edit
+  let id = pathnames.at(-1)
+  const isAction = ["edit", "create", "import", "generate"].includes(id ?? "")
+  if (isAction && pathnames.length > 1) {
+    id = pathnames.at(-2) // Use second-to-last segment as ID
+  }
+
   if (!id || id === pathnames[0]) return null
 
   if (pathnames[0] === "weapons") {
@@ -114,6 +120,10 @@ export default async function Breadcrumbs({}: BreadcrumbsProps) {
     return null
   }
 
+  // Handle routes like /characters/[id]/edit
+  const isAction = ["edit", "create", "import", "generate"].includes(pathnames.at(-1) ?? "")
+  const displayPathnames = isAction && pathnames.length > 1 ? pathnames.slice(0, -1) : pathnames
+
   const crumbName = await fetchCrumbName(pathnames, client).catch(error => {
     console.error("Error fetching breadcrumb name:", error)
     return null
@@ -123,10 +133,10 @@ export default async function Breadcrumbs({}: BreadcrumbsProps) {
     const items: BreadcrumbItem[] = [{ label: "Home", path: "/" }]
     let currentPath = ""
 
-    for (const [index, segment] of pathnames.entries()) {
+    for (const [index, segment] of displayPathnames.entries()) {
       currentPath += `/${segment}`
       let label = labelMap[segment] || segment.charAt(0).toUpperCase() + segment.slice(1)
-      if (index === pathnames.length - 1 && crumbName) {
+      if (index === displayPathnames.length - 1 && crumbName) {
         label = crumbName
       }
       items.push({ label, path: currentPath })
