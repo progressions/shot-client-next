@@ -75,7 +75,6 @@ export default function ActionValue({
         schticks: undefined,
         sites: undefined,
       }
-      console.log("updatedCharacter:", updatedCharacter)
       setCharacter(updatedCharacter)
       try {
         await updateCharacter(updatedCharacter)
