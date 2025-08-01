@@ -1,8 +1,9 @@
 "use client"
+
 import type { Character } from "@/types"
 import { useState, useEffect } from "react"
-import { Box, Stack, Typography, FormControl, FormHelperText } from "@mui/material"
-import { TextField } from "@/components/ui"
+import { Stack, Typography, FormControl, FormHelperText } from "@mui/material"
+import { NumberField } from "@/components/ui"
 import { ActionValueLink } from "@/components/links"
 import { useToast } from "@/contexts"
 
@@ -32,36 +33,32 @@ export default function ActionValue({
     setInputValue(value?.toString() || "")
   }, [value])
 
-  const minWidthMap = {
-    small: { xs: "4rem", sm: "5rem" },
-    large: { xs: "5rem", sm: "6rem" },
-  }
-
-  const fontSizeMap = {
-    small: { xs: "1.5rem", sm: "2rem" },
-    large: { xs: "2rem", sm: "3rem" },
-  }
-
   const validateValue = (val: string): string => {
     if (!val.trim()) {
       return `${name} is required`
     }
+    if (isNaN(Number(val))) {
+      return `${name} must be a number`
+    }
     return ""
   }
 
-  const handleValueChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value
     setInputValue(newValue)
     setValueError("") // Clear client-side error while typing
     setServerError("") // Clear server-side error while typing
-    const error = validateValue(newValue)
+  }
+
+  const handleValueBlur = async () => {
+    const error = validateValue(inputValue)
     setValueError(error)
     if (!error) {
       const updatedCharacter = {
         ...character,
         action_values: {
           ...character.action_values,
-          [name]: parseInt(newValue, 10) || null
+          [name]: parseInt(inputValue, 10) || null
         },
         parties: undefined,
         schticks: undefined,
@@ -79,7 +76,7 @@ export default function ActionValue({
   }
 
   return (
-    <Stack direction="column" sx={{ alignItems: "flex-start", gap: 0.5 }}>
+    <Stack direction="column" sx={{ alignItems: "flex-start", gap: 0.5, width: 130 }}>
       <FormControl error={!!valueError || !!serverError} sx={{ width: "110px" }}>
         <Typography
           variant="body2"
@@ -89,31 +86,19 @@ export default function ActionValue({
             fontSize: "1rem",
             textAlign: "left",
             height: "2rem",
+            mt: 1,
             lineHeight: "1.5rem"
           }}
         >
           <ActionValueLink name={name} />
         </Typography>
-        <TextField
+        <NumberField
           name={name}
           value={inputValue}
-          onChange={handleValueChange}
+          size={size}
           error={!!valueError || !!serverError}
-          type="text"
-          InputProps={{
-            sx: {
-              width: "110px",
-              fontSize: fontSizeMap[size],
-              border: "1px solid #ffffff",
-              borderRadius: 1,
-              px: 1,
-              "& input": {
-                textAlign: "center",
-                WebkitAppearance: "none",
-                MozAppearance: "textfield"
-              }
-            }
-          }}
+          onChange={handleValueChange}
+          onBlur={handleValueBlur}
         />
         {(valueError || serverError) && (
           <FormHelperText sx={{ mt: -0.5, textAlign: "left" }}>

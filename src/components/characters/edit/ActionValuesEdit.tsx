@@ -24,8 +24,8 @@ export default function ActionValues({
         direction="row"
         sx={{
           flexWrap: "wrap",
-          columnGap: { xs: 1, sm: 2 },
-          rowGap: { xs: 1, sm: 1.5 },
+          columnGap: 2,
+          rowGap: 3,
           mb: 3,
         }}
       >
