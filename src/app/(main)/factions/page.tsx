@@ -56,15 +56,17 @@ export default async function FactionsPage({
     redirect("/factions?page=1&sort=created_at&order=desc")
   }
 
-  return <>
-    <Breadcrumbs />
-    <Suspense fallback={<CircularProgress />}>
-      <Factions
-        initialFactions={factions}
-        initialMeta={meta}
-        initialSort={sort}
-        initialOrder={order}
-      />
-    </Suspense>
-  </>
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <Factions
+          initialFactions={factions}
+          initialMeta={meta}
+          initialSort={sort}
+          initialOrder={order}
+        />
+      </Suspense>
+    </>
+  )
 }

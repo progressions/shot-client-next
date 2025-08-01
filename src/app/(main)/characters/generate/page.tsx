@@ -8,10 +8,12 @@ export const metadata = {
 }
 
 export default async function CharacterGeneratePage() {
-  return <>
-    <Breadcrumbs />
-    <Suspense fallback={<CircularProgress />}>
-      <GeneratePage />
-    </Suspense>
-  </>
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <GeneratePage />
+      </Suspense>
+    </>
+  )
 }

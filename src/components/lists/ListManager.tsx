@@ -44,7 +44,7 @@ export default function ListManager({
   description,
   collection,
   collection_ids,
-  manage = true
+  manage = true,
 }: ListManagerProperties) {
   const { formState, dispatchForm } = useForm<FormStateData>({
     id: null,
@@ -217,20 +217,21 @@ export default function ListManager({
 
   const autocomplete = autocompleteMap[collection]
 
-  if (!manage) return (
-    <>
-      <Box sx={{ my: 4 }}>
-        <BadgeList
-          items={items}
-          open={open}
-          handleDelete={handleDelete}
-          collection={collection}
-          meta={meta}
-          handlePageChange={handlePageChange}
-        />
-      </Box>
-    </>
-  )
+  if (!manage)
+    return (
+      <>
+        <Box sx={{ my: 4 }}>
+          <BadgeList
+            items={items}
+            open={open}
+            handleDelete={handleDelete}
+            collection={collection}
+            meta={meta}
+            handlePageChange={handlePageChange}
+          />
+        </Box>
+      </>
+    )
 
   return (
     <>

@@ -22,10 +22,12 @@ export default async function PartyPage({ params }: PartyPageProperties) {
     return <Typography>Party not found</Typography>
   }
 
-  return <>
-    <Breadcrumbs />
-    <Suspense fallback={<CircularProgress />}>
-      <PartyPageClient party={party} />
-    </Suspense>
-  </>
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <PartyPageClient party={party} />
+      </Suspense>
+    </>
+  )
 }

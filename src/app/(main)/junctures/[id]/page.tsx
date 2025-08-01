@@ -22,10 +22,12 @@ export default async function JuncturePage({ params }: JuncturePageProperties) {
     return <Typography>Juncture not found</Typography>
   }
 
-  return <>
-    <Breadcrumbs />
-    <Suspense fallback={<CircularProgress />}>
-      <JuncturePageClient juncture={juncture} />
-    </Suspense>
-  </>
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <JuncturePageClient juncture={juncture} />
+      </Suspense>
+    </>
+  )
 }

@@ -45,16 +45,18 @@ export default async function HomePage() {
   })
   const parties = partiesResponse.data?.parties || []
 
-  return <>
-    <Breadcrumbs />
-    <Suspense fallback={<CircularProgress />}>
-      <Dashboard
-        user={user}
-        campaign={campaign}
-        fights={fights}
-        characters={characters}
-        parties={parties}
-      />
-    </Suspense>
-  </>
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <Dashboard
+          user={user}
+          campaign={campaign}
+          fights={fights}
+          characters={characters}
+          parties={parties}
+        />
+      </Suspense>
+    </>
+  )
 }

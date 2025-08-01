@@ -22,10 +22,12 @@ export default async function SitePage({ params }: SitePageProperties) {
     return <Typography>Site not found</Typography>
   }
 
-  return <>
-    <Breadcrumbs />
-    <Suspense fallback={<CircularProgress />}>
-      <SitePageClient site={site} />
-    </Suspense>
-  </>
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <SitePageClient site={site} />
+      </Suspense>
+    </>
+  )
 }

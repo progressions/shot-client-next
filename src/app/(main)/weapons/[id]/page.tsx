@@ -22,10 +22,12 @@ export default async function WeaponPage({ params }: WeaponPageProperties) {
     return <Typography>Weapon not found</Typography>
   }
 
-  return <>
-    <Breadcrumbs />
-    <Suspense fallback={<CircularProgress />}>
-      <WeaponPageClient weapon={weapon} />
-    </Suspense>
-  </>
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <WeaponPageClient weapon={weapon} />
+      </Suspense>
+    </>
+  )
 }

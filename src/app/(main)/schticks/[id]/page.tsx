@@ -22,10 +22,12 @@ export default async function SchtickPage({ params }: SchtickPageProperties) {
     return <Typography>Schtick not found</Typography>
   }
 
-  return <>
-    <Breadcrumbs />
-    <Suspense fallback={<CircularProgress />}>
-      <SchtickPageClient schtick={schtick} />
-    </Suspense>
-  </>
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <SchtickPageClient schtick={schtick} />
+      </Suspense>
+    </>
+  )
 }

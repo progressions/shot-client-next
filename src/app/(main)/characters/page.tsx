@@ -14,7 +14,9 @@ type CharactersPageProperties = {
   searchParams: Promise<{ page?: string; sort?: string; order?: string }>
 }
 
-export default async function CharactersPage({ searchParams }: CharactersPageProperties) {
+export default async function CharactersPage({
+  searchParams,
+}: CharactersPageProperties) {
   const client = await getServerClient()
   const user = await getUser()
 

@@ -8,10 +8,12 @@ export const metadata = {
 }
 
 export default async function CharacterImportPage() {
-  return <>
-    <Breadcrumbs />
-    <Suspense fallback={<CircularProgress />}>
-      <ImportPage />
-    </Suspense>
-  </>
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <ImportPage />
+      </Suspense>
+    </>
+  )
 }

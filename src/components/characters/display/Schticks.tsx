@@ -10,7 +10,10 @@ type SchticksProperties = {
   manage?: boolean
 }
 
-export default function Schticks({ character, manage = true }: SchticksProperties) {
+export default function Schticks({
+  character,
+  manage = true,
+}: SchticksProperties) {
   const { client } = useClient()
 
   async function update(characterId: string, formData: FormData) {

@@ -25,9 +25,14 @@ interface BreadcrumbItem {
 
 interface BreadcrumbsProps {}
 
-async function fetchCrumbName(pathnames: string[], client: Client): Promise<React.ReactNode | null> {
+async function fetchCrumbName(
+  pathnames: string[],
+  client: Client
+): Promise<React.ReactNode | null> {
   if (!pathnames || pathnames.length === 0) {
-    console.warn("fetchCrumbName: pathnames is empty or undefined", { pathnames })
+    console.warn("fetchCrumbName: pathnames is empty or undefined", {
+      pathnames,
+    })
     return null
   }
 
@@ -121,8 +126,11 @@ export default async function Breadcrumbs({}: BreadcrumbsProps) {
   }
 
   // Handle routes like /characters/[id]/edit
-  const isAction = ["edit", "create", "import", "generate"].includes(pathnames.at(-1) ?? "")
-  const displayPathnames = isAction && pathnames.length > 1 ? pathnames.slice(0, -1) : pathnames
+  const isAction = ["edit", "create", "import", "generate"].includes(
+    pathnames.at(-1) ?? ""
+  )
+  const displayPathnames =
+    isAction && pathnames.length > 1 ? pathnames.slice(0, -1) : pathnames
 
   const crumbName = await fetchCrumbName(pathnames, client).catch(error => {
     console.error("Error fetching breadcrumb name:", error)
@@ -135,7 +143,8 @@ export default async function Breadcrumbs({}: BreadcrumbsProps) {
 
     for (const [index, segment] of displayPathnames.entries()) {
       currentPath += `/${segment}`
-      let label = labelMap[segment] || segment.charAt(0).toUpperCase() + segment.slice(1)
+      let label =
+        labelMap[segment] || segment.charAt(0).toUpperCase() + segment.slice(1)
       if (index === displayPathnames.length - 1 && crumbName) {
         label = crumbName
       }
@@ -162,7 +171,12 @@ export default async function Breadcrumbs({}: BreadcrumbsProps) {
             {item.label}
           </Typography>
         ) : (
-          <Link key={item.path} href={item.path} passHref style={{ textDecoration: "none" }}>
+          <Link
+            key={item.path}
+            href={item.path}
+            passHref
+            style={{ textDecoration: "none" }}
+          >
             <Typography
               component="span"
               color="#fff"

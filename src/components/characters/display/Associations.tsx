@@ -8,7 +8,10 @@ type AssociationsProps = {
   omit: ("archetype" | "juncture" | "wealth")[]
 }
 
-export default function Associations({ character, omit = [] }: AssociationsProps) {
+export default function Associations({
+  character,
+  omit = [],
+}: AssociationsProps) {
   return (
     <Stack
       direction="column"
@@ -19,7 +22,7 @@ export default function Associations({ character, omit = [] }: AssociationsProps
         flexWrap: "wrap",
       }}
     >
-      { !omit.includes("archetype") && (
+      {!omit.includes("archetype") && (
         <Typography
           variant="body1"
           sx={{
@@ -36,7 +39,7 @@ export default function Associations({ character, omit = [] }: AssociationsProps
           )}
         </Typography>
       )}
-      { !omit.includes("juncture") && (
+      {!omit.includes("juncture") && (
         <Typography
           variant="body1"
           sx={{
@@ -53,7 +56,7 @@ export default function Associations({ character, omit = [] }: AssociationsProps
           )}
         </Typography>
       )}
-      { !omit.includes("wealth") && (
+      {!omit.includes("wealth") && (
         <Typography
           variant="body1"
           sx={{

@@ -25,10 +25,12 @@ export default async function UserPage({ params }: UserPageProperties) {
     return <Typography>User not found</Typography>
   }
 
-  return <>
-    <Breadcrumbs />
-    <Suspense fallback={<CircularProgress />}>
-      <UserPageClient user={user} />
-    </Suspense>
-  </>
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <UserPageClient user={user} />
+      </Suspense>
+    </>
+  )
 }

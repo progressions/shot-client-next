@@ -16,13 +16,20 @@ export default async function CharacterCreatePage() {
     redirect("/login")
   }
 
-  const response = await client.getCharacters({ is_template: true, sort: "name", order: "asc", per_page: 50 })
+  const response = await client.getCharacters({
+    is_template: true,
+    sort: "name",
+    order: "asc",
+    per_page: 50,
+  })
   const { characters } = response.data
 
-  return <>
-    <Breadcrumbs />
-    <Suspense fallback={<CircularProgress />}>
-      <CreatePage templates={characters} />
-    </Suspense>
-  </>
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <CreatePage templates={characters} />
+      </Suspense>
+    </>
+  )
 }

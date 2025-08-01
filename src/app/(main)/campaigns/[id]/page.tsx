@@ -22,10 +22,12 @@ export default async function CampaignPage({ params }: CampaignPageProperties) {
     return <Typography>Campaign not found</Typography>
   }
 
-  return <>
-    <Breadcrumbs />
-    <Suspense fallback={<CircularProgress />}>
-      <CampaignPageClient campaign={campaign} />
-    </Suspense>
-  </>
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <CampaignPageClient campaign={campaign} />
+      </Suspense>
+    </>
+  )
 }

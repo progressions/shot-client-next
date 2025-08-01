@@ -22,10 +22,12 @@ export default async function FactionPage({ params }: FactionPageProperties) {
     return <Typography>Faction not found</Typography>
   }
 
-  return <>
-    <Breadcrumbs />
-    <Suspense fallback={<CircularProgress />}>
-      <FactionPageClient faction={faction} />
-    </Suspense>
-  </>
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <FactionPageClient faction={faction} />
+      </Suspense>
+    </>
+  )
 }

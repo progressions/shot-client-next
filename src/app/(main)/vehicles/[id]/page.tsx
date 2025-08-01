@@ -1,5 +1,12 @@
 import { redirect } from "next/navigation"
-import { CircularProgress, Stack, Container, Typography, Box, Avatar } from "@mui/material"
+import {
+  CircularProgress,
+  Stack,
+  Container,
+  Typography,
+  Box,
+  Avatar,
+} from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import type { Vehicle } from "@/types"
 import type { Metadata } from "next"

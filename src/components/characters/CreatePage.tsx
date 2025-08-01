@@ -17,7 +17,9 @@ export default function CreatePage({ templates: templates }: CreatePageProps) {
   const router = useRouter()
   const { client } = useClient()
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<Character | null>(null)
+  const [selectedTemplate, setSelectedTemplate] = useState<Character | null>(
+    null
+  )
 
   if (!templates?.length) return null
 
@@ -30,7 +32,7 @@ export default function CreatePage({ templates: templates }: CreatePageProps) {
     [templates]
   )
 
-  const handleSelect = (item) => {
+  const handleSelect = item => {
     const template = templates.find(t => t.id === item.id)
     if (template) {
       setSelectedTemplate(template)
@@ -78,7 +80,8 @@ export default function CreatePage({ templates: templates }: CreatePageProps) {
         title="Confirm Character Creation"
       >
         <Typography>
-          Create a character based on the "{selectedTemplate?.name || ""}" archetype?
+          Create a character based on the "{selectedTemplate?.name || ""}"
+          archetype?
         </Typography>
       </ConfirmDialog>
     </Box>

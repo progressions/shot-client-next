@@ -1,7 +1,13 @@
 "use client"
 
 import React from "react"
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material"
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material"
 
 interface ConfirmDialogProps {
   open: boolean
@@ -11,7 +17,13 @@ interface ConfirmDialogProps {
   children: React.ReactNode
 }
 
-export function ConfirmDialog({ open, onClose, onConfirm, title, children }: ConfirmDialogProps) {
+export function ConfirmDialog({
+  open,
+  onClose,
+  onConfirm,
+  title,
+  children,
+}: ConfirmDialogProps) {
   return (
     <Dialog
       open={open}

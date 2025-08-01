@@ -75,11 +75,12 @@ export default async function CharacterPage({
     return <CharacterNotFound />
   }
 
-  return <>
-    <Breadcrumbs />
-    <Suspense fallback={<CircularProgress />}>
-      <EditCharacter character={character} />
-    </Suspense>
-  </>
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <EditCharacter character={character} />
+      </Suspense>
+    </>
+  )
 }
-
