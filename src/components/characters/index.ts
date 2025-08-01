@@ -21,3 +21,4 @@ export { default as CharacterFilter } from "@/components/characters/CharacterFil
 export { default as CharacterManager } from "@/components/characters/CharacterManager"
 export { default as CharacterDetail } from "@/components/characters/CharacterDetail"
 export { default as CharacterDescription } from "@/components/characters/CharacterDescription"
+export { default as CharacterSpeedDial } from "@/components/characters/CharacterSpeedDial"

@@ -1,21 +1,29 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material"
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
 import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/Delete"
 import { SystemStyleObject, Theme } from "@mui/system"
+import type { MouseEvent } from "react"
 
 type Action = {
   [key: string]: unknown
   icon: React.ReactNode
   name: string
-  onClick?: () => void
+  onClick?: (event: MouseEvent<HTMLElement>) => void
+  preventClose?: boolean
 }
 
-type SpeedDialMenu = {
+type SpeedDialMenuProps = {
   onEdit?: () => void
   onDelete?: () => void
   actions?: Action[]
   sx?: SystemStyleObject<Theme>
+  open: boolean
+  onOpen: () => void
+  onClose: () => void
 }
 
 export function SpeedDialMenu({
@@ -23,13 +31,46 @@ export function SpeedDialMenu({
   onDelete,
   actions: initialActions,
   sx = {},
-}: SpeedDialMenu) {
+  open,
+  onOpen,
+  onClose,
+}: SpeedDialMenuProps) {
+  const [persist, setPersist] = useState(false)
+
+  // Reset persist when SpeedDial is closed externally
+  useEffect(() => {
+    if (!open) {
+      setPersist(false)
+    }
+  }, [open])
+
   const defaultActions = [
     { icon: <EditIcon />, name: "Edit", onClick: onEdit },
     { icon: <DeleteIcon />, name: "Delete", onClick: onDelete },
   ]
 
+  console.log("persist", persist)
+
   const actions = initialActions || defaultActions
+
+  const handleActionClick = (action: Action) => (event: MouseEvent<HTMLElement>) => {
+    if (action.preventClose) {
+      event.stopPropagation()
+      setPersist(true)
+    } else {
+      setPersist(false)
+      onClose()
+    }
+    if (action.onClick) {
+      action.onClick(event)
+    }
+  }
+
+  const handleClose = () => {
+    if (!persist) {
+      onClose()
+    }
+  }
 
   return (
     <SpeedDial
@@ -47,13 +88,16 @@ export function SpeedDialMenu({
       }}
       icon={<SpeedDialIcon openIcon={<MoreHorizIcon />} />}
       direction="down"
+      open={open}
+      onOpen={onOpen}
+      onClose={handleClose}
     >
       {actions.map(action => (
         <SpeedDialAction
           key={action.name}
           icon={action.icon}
           tooltipTitle={action.name}
-          onClick={action.onClick}
+          onClick={handleActionClick(action)}
         />
       ))}
     </SpeedDial>
