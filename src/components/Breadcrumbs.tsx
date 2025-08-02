@@ -23,8 +23,6 @@ interface BreadcrumbItem {
   path: string
 }
 
-interface BreadcrumbsProps {}
-
 async function fetchCrumbName(
   pathnames: string[],
   client: Client
@@ -95,7 +93,7 @@ async function fetchCrumbName(
   return null
 }
 
-export default async function Breadcrumbs({}: BreadcrumbsProps) {
+export default async function Breadcrumbs() {
   const labelMap: { [key: string]: string } = {
     characters: "Characters",
     vehicles: "Vehicles",

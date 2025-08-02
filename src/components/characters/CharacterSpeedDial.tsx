@@ -42,7 +42,6 @@ export default function CharacterSpeedDial({
   const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null)
   const exportMenuOpen = Boolean(exportAnchorEl)
   const [speedDialOpen, setSpeedDialOpen] = useState(false)
-  const [editOpen, setEditOpen] = useState(false)
   const [exportingPdf, setExportingPdf] = useState(false)
   const [persist, setPersist] = useState(false)
 
@@ -150,8 +149,7 @@ Action Values: ${JSON.stringify(character.actionValues, null, 2)}
       icon: <EditIcon />,
       name: "Edit",
       onClick: () => {
-        setEditOpen(true)
-        setSpeedDialOpen(false)
+        router.push(`/characters/${character.id}/edit`)
       },
     },
     {

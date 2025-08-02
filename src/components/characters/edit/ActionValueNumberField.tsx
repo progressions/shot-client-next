@@ -33,7 +33,7 @@ export default function ActionValue({
     if (value?.toString() !== value) {
       setValue(value?.toString() || "")
     }
-  }, [value, value])
+  }, [value])
 
   const validateValue = (val: string): string => {
     const trimmedVal = val.trim()

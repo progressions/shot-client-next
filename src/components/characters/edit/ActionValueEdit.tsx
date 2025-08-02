@@ -7,7 +7,6 @@ import { ActionValueNumberField } from "@/components/characters"
 
 type ActionValueProps = {
   name: string
-  value: number | null
   size: "small" | "large"
   character: Character
   setCharacter: (character: Character) => void
@@ -16,7 +15,6 @@ type ActionValueProps = {
 
 export default function ActionValue({
   name,
-  value: initialValue,
   size = "large",
   character,
   setCharacter,

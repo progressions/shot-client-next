@@ -116,10 +116,9 @@ export function PositionableImage({
       setCurrentY(response.data.y_position)
       setIsRepositioning(false)
       toastSuccess("Image position saved successfully")
-      // setSnackbarMessage("Image position saved successfully")
-    } catch (_error) {
+    } catch (err: unknown) {
+      console.error("Failed to save image position:", err)
       toastError("Failed to save image position")
-      // setSnackbarMessage("Failed to save image position")
     } finally {
       setIsSaving(false)
     }

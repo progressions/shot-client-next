@@ -66,7 +66,7 @@ const CharacterService = {
       ...character,
       action_values: {
         ...character.action_values,
-        [attackName]: value,
+        [attackName]: newValue,
       },
     }
   },
@@ -93,7 +93,7 @@ const CharacterService = {
       ...character,
       action_values: {
         ...character.action_values,
-        Fortune: value,
+        Fortune: newValue,
       },
     }
   },

@@ -27,7 +27,7 @@ export default function EditCharacter({
 }: EditCharacterProps) {
   const { campaignData } = useCampaign()
   const { client } = useClient()
-  const { toastSuccess, toastError } = useToast()
+  const { toastError } = useToast()
   const [character, setCharacter] = useState<Character>(initialCharacter)
 
   useEffect(() => {
