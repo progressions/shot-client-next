@@ -74,21 +74,13 @@ export default function ActionValue({
     } as React.FocusEvent<HTMLInputElement>)
   }
 
-  const debounce = (fn: () => Promise<void>, delay: number) => {
-    let timeout: NodeJS.Timeout
-    return () => {
-      clearTimeout(timeout)
-      timeout = setTimeout(fn, delay)
-    }
-  }
-
-  const handleValueBlur = async e => {
-    console.log("Blur: value =", e.target.value)
-    const error = validateValue(e.target.value)
-    setValue(e.target.value)
+  const handleValueBlur = async (event) => {
+    console.log("Blur: value =", event.target.value)
+    const error = validateValue(event.target.value)
+    setValue(event.target.value)
     setValueError(error)
     if (!error) {
-      const numericValue = Number(e.target.value.trim())
+      const numericValue = Number(event.target.value.trim())
       console.log("Blur: numericValue =", numericValue)
       const updatedCharacter = CS.updateActionValue(
         character,
@@ -107,8 +99,6 @@ export default function ActionValue({
     }
   }
 
-  const debouncedHandleValueBlur = debounce(handleValueBlur, 100)
-
   return (
     <FormControl error={!!valueError || !!serverError} sx={{ width: "110px" }}>
       <NumberField
@@ -117,7 +107,7 @@ export default function ActionValue({
         size={size}
         error={!!valueError || !!serverError}
         onChange={handleValueChange}
-        onBlur={debouncedHandleValueBlur}
+        onBlur={handleValueBlur}
       />
       {(valueError || serverError) && (
         <FormHelperText sx={{ mt: -0.5, textAlign: "left" }}>

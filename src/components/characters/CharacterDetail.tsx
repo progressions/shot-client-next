@@ -83,7 +83,7 @@ export default function CharacterDetail({
 
   return (
     <Card sx={{ mb: 2, bgcolor: "#424242" }}>
-      <PositionableImage entity={character} pageContext="index" size={200} />
+      <PositionableImage entity={character} pageContext="index" height={200} />
       <CardContent sx={{ p: "1rem" }}>
         <Box
           sx={{
