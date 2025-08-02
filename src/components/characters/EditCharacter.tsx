@@ -83,8 +83,8 @@ export default function EditCharacter({
       }}
     >
       <CharacterSpeedDial
+        editing={true}
         character={memoizedCharacter}
-        client={client}
         setCharacter={setCharacter}
       />
       <NameEditor

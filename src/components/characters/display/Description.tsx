@@ -31,40 +31,38 @@ export default function Description({ character }: DescriptionProps) {
         sx={{
           backgroundColor: "background.paper",
           p: 2,
-          mb: 2,
+          my: 2,
           borderRadius: 1,
         }}
       >
-        <RichTextRenderer html={CS.description(character)} />
+        <RichTextRenderer html={CS.description(character) || "No description available."} />
       </Box>
       <Stack
         direction="row"
         spacing={2}
-        sx={{ mb: 2 }}
+        sx={{ my: 2 }}
         justifyContent="space-between"
       >
-        <Typography>Age: {CS.age(character)}</Typography>
-        <Typography>Height: {CS.height(character)}</Typography>
-        <Typography>Weight: {CS.weight(character)}</Typography>
-        <Typography>Hair Color: {CS.hairColor(character)}</Typography>
-        <Typography>Eye Color: {CS.eyeColor(character)}</Typography>
+        <Typography>Age: {CS.age(character) || "Unknown"}</Typography>
+        <Typography>Height: {CS.height(character) || "Unknown"}</Typography>
+        <Typography>Weight: {CS.weight(character) || "Unknown"}</Typography>
+        <Typography>Hair Color: {CS.hairColor(character) || "Unknown"}</Typography>
+        <Typography>Eye Color: {CS.eyeColor(character) || "Unknown"}</Typography>
       </Stack>
-      {CS.styleOfDress(character) && (
-        <Box>
-          <Typography variant="h6">Style of Dress</Typography>
-          <Box
-            sx={{
-              backgroundColor: "background.paper",
-              p: 2,
-              mb: 2,
-              borderRadius: 1,
-            }}
-          >
-            <RichTextRenderer html={CS.styleOfDress(character)} />
-          </Box>
+      <Box>
+        <Typography variant="h6">Style of Dress</Typography>
+        <Box
+          sx={{
+            backgroundColor: "background.paper",
+            p: 2,
+            mb: 2,
+            borderRadius: 1,
+          }}
+        >
+          <RichTextRenderer html={CS.styleOfDress(character) || "No information available."} />
         </Box>
-      )}
-      {CS.melodramaticHook(character) && (
+      </Box>
+      {CS.isPC(character) && (
         <Box>
           <Typography variant="h6">Melodramatic Hook</Typography>
           <Box
@@ -75,25 +73,23 @@ export default function Description({ character }: DescriptionProps) {
               borderRadius: 1,
             }}
           >
-            <RichTextRenderer html={CS.melodramaticHook(character)} />
+            <RichTextRenderer html={CS.melodramaticHook(character) || "No information available."} />
           </Box>
         </Box>
       )}
-      {CS.background(character) && (
-        <Box>
-          <Typography variant="h6">Background</Typography>
-          <Box
-            sx={{
-              backgroundColor: "background.paper",
-              p: 2,
-              mb: 2,
-              borderRadius: 1,
-            }}
-          >
-            <RichTextRenderer html={CS.background(character)} />
-          </Box>
+      <Box>
+        <Typography variant="h6">Background</Typography>
+        <Box
+          sx={{
+            backgroundColor: "background.paper",
+            p: 2,
+            mb: 2,
+            borderRadius: 1,
+          }}
+        >
+          <RichTextRenderer html={CS.background(character) || "No information available."} />
         </Box>
-      )}
+      </Box>
     </Box>
   )
 }
