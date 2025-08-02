@@ -7,7 +7,6 @@ import {
   ToastProvider,
 } from "@/contexts"
 import { getUser } from "@/lib/getServerClient"
-import Breadcrumbs from "@/components/Breadcrumbs"
 import "@/styles/global.scss"
 import { Container } from "@mui/material"
 import PopupToast from "@/components/PopupToast"

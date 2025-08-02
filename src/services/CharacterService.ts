@@ -42,17 +42,26 @@ const CharacterService = {
 
   /* Writer functions, change the state */
 
-  changeAttack: function (character: Character, mainOrSecondary, attackName: string): Character {
+  changeAttack: function (
+    character: Character,
+    mainOrSecondary,
+    attackName: string
+  ): Character {
     return {
       ...character,
       action_values: {
         ...character.action_values,
         [mainOrSecondary]: attackName,
-      }
+      },
     }
   },
 
-  changeAttackValue: function (character: Character, attackName: string, value: number): Character {
+  changeAttackValue: function (
+    character: Character,
+    attackName: string,
+    value: number
+  ): Character {
+    const newValue = parseInt(`${value}`, 10)
     return {
       ...character,
       action_values: {
@@ -62,7 +71,10 @@ const CharacterService = {
     }
   },
 
-  changeFortuneType: function (character: Character, fortuneType: string): Character {
+  changeFortuneType: function (
+    character: Character,
+    fortuneType: string
+  ): Character {
     return {
       ...character,
       action_values: {
@@ -72,7 +84,11 @@ const CharacterService = {
     }
   },
 
-  changeFortuneValue: function (character: Character, value: number): Character {
+  changeFortuneValue: function (
+    character: Character,
+    value: number
+  ): Character {
+    const newValue = parseInt(`${value}`, 10)
     return {
       ...character,
       action_values: {

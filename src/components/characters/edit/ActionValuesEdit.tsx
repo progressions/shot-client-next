@@ -3,7 +3,11 @@
 import type { Character } from "@/types"
 import { Box, Stack } from "@mui/material"
 import { CS } from "@/services"
-import { FortuneValueEdit, AttackValueEdit, ActionValueEdit as ActionValue } from "@/components/characters"
+import {
+  FortuneValueEdit,
+  AttackValueEdit,
+  ActionValueEdit as ActionValue,
+} from "@/components/characters"
 
 type ActionValuesProps = {
   character: Character

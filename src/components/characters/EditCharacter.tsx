@@ -43,19 +43,23 @@ export default function EditCharacter({
     }
   }, [campaignData, initialCharacter])
 
-  const updateCharacter = async (updatedCharacter: Character) => {
+  const updateCharacter = async updatedCharacter => {
     try {
+      console.log("Updating character:", updatedCharacter)
+      setCharacter(updatedCharacter)
+
       const formData = new FormData()
       const characterData = {
         ...updatedCharacter,
         schticks: undefined,
         parties: undefined,
         sites: undefined,
+        weapons: undefined,
       }
       formData.append("character", JSON.stringify(characterData))
       const response = await client.updateCharacter(character.id, formData)
+      console.log("just updated character", response.data)
       setCharacter(response.data)
-      toastSuccess("Character updated successfully")
     } catch (error) {
       const nameErrors = error.response?.data?.errors?.name
       const errorMessage =
@@ -121,3 +125,41 @@ export default function EditCharacter({
     </Box>
   )
 }
+
+/*
+export default function EditCharacter({
+  character: initialCharacter,
+}: EditCharacterProps) {
+  const { client } = useClient()
+  const [character, setCharacter] = useState(initialCharacter)
+  const [value, setValue] = useState<number | null>(CS.defense(initialCharacter))
+
+  const updateCharacter = async (updatedCharacter) => {
+    console.log("Updating character:", updatedCharacter)
+    setCharacter(updatedCharacter)
+
+    const formData = new FormData()
+    const characterData = {
+      ...updatedCharacter,
+      schticks: undefined,
+      parties: undefined,
+      sites: undefined,
+      weapons: undefined
+    }
+    formData.append("character", JSON.stringify(characterData))
+    const response = await client.updateCharacter(character.id, formData)
+    console.log("just updated character", response.data)
+    setCharacter(response.data)
+  }
+
+  return (
+    <ActionValueEdit
+      name="Defense"
+      value={value}
+      character={character}
+      setCharacter={setCharacter}
+      updateCharacter={updateCharacter}
+    />
+  )
+}
+*/

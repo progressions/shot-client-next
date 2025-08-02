@@ -1,18 +1,10 @@
 import { redirect } from "next/navigation"
-import {
-  CircularProgress,
-  Stack,
-  Container,
-  Typography,
-  Box,
-  Avatar,
-} from "@mui/material"
+import { Stack, Container, Typography, Box, Avatar } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import type { Vehicle } from "@/types"
 import type { Metadata } from "next"
 import { VehicleName } from "@/components/vehicles"
 import { VS } from "@/services"
-import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
 // Component for vehicle not found

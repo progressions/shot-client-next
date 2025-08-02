@@ -2,9 +2,16 @@
 
 import type { Character } from "@/types"
 import { useState, useEffect } from "react"
-import { Stack, FormControl, FormHelperText, Select, MenuItem } from "@mui/material"
+import {
+  Stack,
+  FormControl,
+  FormHelperText,
+  Select,
+  MenuItem,
+} from "@mui/material"
 import { NumberField } from "@/components/ui"
 import { CS } from "@/services"
+import { ActionValueNumberField } from "@/components/characters"
 
 type FortuneValueEditProps = {
   name: string
@@ -62,7 +69,9 @@ export default function FortuneValueEdit({
     setServerError("") // Clear server-side error while typing
   }
 
-  const handleFortuneNameChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleFortuneNameChange = (
+    event: React.ChangeEvent<{ value: unknown }>
+  ) => {
     const newName = event.target.value as string
     setSelectedName(newName)
     setServerError("") // Clear server-side error
@@ -72,10 +81,19 @@ export default function FortuneValueEdit({
     const error = validateValue(inputValue)
     setValueError(error)
     if (!error) {
-      const updatedCharacter = CS.changeFortuneValue(character, selectedName, inputValue)
+      const updatedCharacter = CS.changeFortuneValue(
+        character,
+        selectedName,
+        inputValue
+      )
       setCharacter(updatedCharacter)
       try {
-        await updateCharacter({ ...updatedCharacter, sites: undefined, schticks: undefined, parties: undefined })
+        await updateCharacter({
+          ...updatedCharacter,
+          sites: undefined,
+          schticks: undefined,
+          parties: undefined,
+        })
       } catch (error) {
         setServerError(error.message)
       }
@@ -89,7 +107,12 @@ export default function FortuneValueEdit({
       const updatedCharacter = CS.changeFortuneType(character, selectedName)
       setCharacter(updatedCharacter)
       try {
-        await updateCharacter({ ...updatedCharacter, sites: undefined, schticks: undefined, parties: undefined })
+        await updateCharacter({
+          ...updatedCharacter,
+          sites: undefined,
+          schticks: undefined,
+          parties: undefined,
+        })
       } catch (error) {
         setServerError(error.message)
       }
@@ -98,7 +121,6 @@ export default function FortuneValueEdit({
 
   return (
     <Stack direction="column" sx={{ alignItems: "flex-start", gap: 0.5 }}>
-      <FormControl error={!!valueError || !!serverError} sx={{ width: "120px" }}>
         <Select
           value={selectedName}
           onChange={handleFortuneNameChange}
@@ -112,8 +134,8 @@ export default function FortuneValueEdit({
             mb: 1,
             "& .MuiSelect-select": {
               padding: "0 24px 0 8px",
-              textAlign: "left"
-            }
+              textAlign: "left",
+            },
           }}
           MenuProps={{
             PaperProps: {
@@ -123,32 +145,25 @@ export default function FortuneValueEdit({
                   fontSize: "1rem",
                   lineHeight: "1.5rem",
                   textAlign: "left",
-                  width: "140px"
-                }
-              }
-            }
+                  width: "140px",
+                },
+              },
+            },
           }}
         >
-          {fortuneOptions.map((option) => (
+          {fortuneOptions.map(option => (
             <MenuItem key={option} value={option}>
               {option}
             </MenuItem>
           ))}
         </Select>
-        <NumberField
+        <ActionValueNumberField
           name={name}
-          value={inputValue}
           size={size}
-          error={!!valueError || !!serverError}
-          onChange={handleValueChange}
-          onBlur={handleValueBlur}
+          character={character}
+          setCharacter={setCharacter}
+          updateCharacter={updateCharacter}
         />
-        {(valueError || serverError) && (
-          <FormHelperText sx={{ mt: -0.5, textAlign: "left" }}>
-            {valueError || serverError}
-          </FormHelperText>
-        )}
-      </FormControl>
     </Stack>
   )
 }

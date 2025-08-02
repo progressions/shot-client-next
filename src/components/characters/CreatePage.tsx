@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useState, useEffect, useMemo } from "react"
+import { useState, useMemo } from "react"
 import { Box, Typography } from "@mui/material"
 import { HeroTitle, Carousel } from "@/components/ui"
 import { Template, SpeedDial } from "@/components/characters"
@@ -20,8 +20,6 @@ export default function CreatePage({ templates: templates }: CreatePageProps) {
   const [selectedTemplate, setSelectedTemplate] = useState<Character | null>(
     null
   )
-
-  if (!templates?.length) return null
 
   const items = useMemo(
     () =>
@@ -65,6 +63,8 @@ export default function CreatePage({ templates: templates }: CreatePageProps) {
     }
   }
 
+  if (!templates?.length) return null
+
   return (
     <Box sx={{ position: "relative" }}>
       <SpeedDial />
@@ -80,8 +80,8 @@ export default function CreatePage({ templates: templates }: CreatePageProps) {
         title="Confirm Character Creation"
       >
         <Typography>
-          Create a character based on the "{selectedTemplate?.name || ""}"
-          archetype?
+          Create a character based on the &quot;{selectedTemplate?.name || ""}
+          &quot; archetype?
         </Typography>
       </ConfirmDialog>
     </Box>

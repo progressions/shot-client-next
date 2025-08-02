@@ -1,4 +1,5 @@
 "use client"
+
 import { useState } from "react"
 import { Box, Stack, IconButton } from "@mui/material"
 import { TextField } from "@/components/ui"
@@ -7,8 +8,9 @@ import RemoveIcon from "@mui/icons-material/Remove"
 
 type NumberFieldProps = {
   name: string
-  value: string
+  value: number | null
   size: "small" | "large"
+  width: string
   error: boolean
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   onBlur: (event: React.FocusEvent<HTMLInputElement>) => void
@@ -17,7 +19,8 @@ type NumberFieldProps = {
 export function NumberField({
   name,
   value,
-  size,
+  size = "large",
+  width = "140px",
   error,
   onChange,
   onBlur,
@@ -31,50 +34,62 @@ export function NumberField({
   }
 
   const handleIncrement = () => {
-    const currentValue = parseInt(value, 10) || 0
-    const newValue = (currentValue + 1).toString()
+    const currentValue = Number(value) || 0
+    const newValue = currentValue + 1
+    console.log(
+      "Increment: currentValue =",
+      currentValue,
+      "newValue =",
+      newValue
+    )
     onChange({
-      target: { name, value: newValue },
+      target: { name, value: newValue.toString() },
     } as React.ChangeEvent<HTMLInputElement>)
   }
 
   const handleDecrement = () => {
-    const currentValue = parseInt(value, 10) || 0
-    const newValue = (currentValue - 1).toString()
+    const currentValue = Number(value) || 0
+    const newValue = currentValue - 1
+    console.log(
+      "Decrement: currentValue =",
+      currentValue,
+      "newValue =",
+      newValue
+    )
     onChange({
-      target: { name, value: newValue },
+      target: { name, value: newValue.toString() },
     } as React.ChangeEvent<HTMLInputElement>)
   }
 
   return (
     <Box
-      sx={{ position: "relative", width: "140px" }}
+      sx={{ position: "relative", width }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <TextField
         name={name}
-        value={value}
+        value={value?.toString() ?? ""}
         onChange={onChange}
-        onBlur={(event) => {
+        onBlur={event => {
           setIsFocused(false)
           onBlur(event)
         }}
         onFocus={() => setIsFocused(true)}
         error={error}
-        type="text"
+        type="text" // Changed to number for better UX
         InputProps={{
           sx: {
-            width: "140px",
+            width,
             fontSize: fontSizeMap[size],
             border: "1px solid #ffffff",
             borderRadius: 1,
             px: 1,
             "& input": {
               textAlign: "center",
-              paddingRight: "10px" // Reserve space for buttons
-            }
-          }
+              paddingRight: "10px",
+            },
+          },
         }}
       />
       <Stack
@@ -86,7 +101,7 @@ export function NumberField({
           right: "0",
           gap: 0,
           justifyContent: "space-between",
-          display: isFocused || isHovered ? "flex" : "none"
+          display: isFocused || isHovered ? "flex" : "none",
         }}
       >
         <IconButton
@@ -97,7 +112,7 @@ export function NumberField({
             backgroundColor: "#ffffff",
             borderRadius: "2px",
             height: "50%",
-            "&:hover": { backgroundColor: "#e0e0e0" }
+            "&:hover": { backgroundColor: "#e0e0e0" },
           }}
         >
           <AddIcon sx={{ fontSize: "0.75rem" }} />
@@ -110,7 +125,7 @@ export function NumberField({
             backgroundColor: "#ffffff",
             borderRadius: "2px",
             height: "50%",
-            "&:hover": { backgroundColor: "#e0e0e0" }
+            "&:hover": { backgroundColor: "#e0e0e0" },
           }}
         >
           <RemoveIcon sx={{ fontSize: "0.75rem" }} />

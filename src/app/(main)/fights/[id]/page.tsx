@@ -22,10 +22,12 @@ export default async function FightPage({ params }: FightPageProperties) {
     return <Typography>Fight not found</Typography>
   }
 
-  return <>
-    <Breadcrumbs />
-    <Suspense fallback={<CircularProgress />}
-      <FightPageClient fight={fight} />
-    </Suspense>
-  </>
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <FightPageClient fight={fight} />
+      </Suspense>
+    </>
+  )
 }
