@@ -12,7 +12,7 @@ export default function ActionValue({
   value,
   size = "large",
 }: ActionValueProps) {
-  if (!name || !value) {
+  if (!name) {
     return null
   }
   const minWidthMap = {

@@ -30,6 +30,14 @@ export default function ActionValue({
   const [serverError, setServerError] = useState<string>("")
 
   useEffect(() => {
+    if (character.action_values[name] !== undefined) {
+      setValue(character.action_values[name].toString())
+    } else {
+      setValue("")
+    }
+  }, [character.action_values, name])
+
+  useEffect(() => {
     if (value?.toString() !== value) {
       setValue(value?.toString() || "")
     }

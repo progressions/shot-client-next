@@ -30,3 +30,4 @@ export { default as ActionValueEdit } from "@/components/characters/edit/ActionV
 export { default as AttackValueEdit } from "@/components/characters/edit/AttackValueEdit"
 export { default as FortuneValueEdit } from "@/components/characters/edit/FortuneValueEdit"
 export { default as ActionValueNumberField } from "@/components/characters/edit/ActionValueNumberField"
+export { default as AttackNameSelect } from "@/components/characters/edit/AttackNameSelect"
