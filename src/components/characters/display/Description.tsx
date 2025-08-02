@@ -35,7 +35,9 @@ export default function Description({ character }: DescriptionProps) {
           borderRadius: 1,
         }}
       >
-        <RichTextRenderer html={CS.description(character) || "No description available."} />
+        <RichTextRenderer
+          html={CS.description(character) || "No description available."}
+        />
       </Box>
       <Stack
         direction="row"
@@ -46,8 +48,12 @@ export default function Description({ character }: DescriptionProps) {
         <Typography>Age: {CS.age(character) || "Unknown"}</Typography>
         <Typography>Height: {CS.height(character) || "Unknown"}</Typography>
         <Typography>Weight: {CS.weight(character) || "Unknown"}</Typography>
-        <Typography>Hair Color: {CS.hairColor(character) || "Unknown"}</Typography>
-        <Typography>Eye Color: {CS.eyeColor(character) || "Unknown"}</Typography>
+        <Typography>
+          Hair Color: {CS.hairColor(character) || "Unknown"}
+        </Typography>
+        <Typography>
+          Eye Color: {CS.eyeColor(character) || "Unknown"}
+        </Typography>
       </Stack>
       <Box>
         <Typography variant="h6">Style of Dress</Typography>
@@ -59,7 +65,9 @@ export default function Description({ character }: DescriptionProps) {
             borderRadius: 1,
           }}
         >
-          <RichTextRenderer html={CS.styleOfDress(character) || "No information available."} />
+          <RichTextRenderer
+            html={CS.styleOfDress(character) || "No information available."}
+          />
         </Box>
       </Box>
       {CS.isPC(character) && (
@@ -73,7 +81,11 @@ export default function Description({ character }: DescriptionProps) {
               borderRadius: 1,
             }}
           >
-            <RichTextRenderer html={CS.melodramaticHook(character) || "No information available."} />
+            <RichTextRenderer
+              html={
+                CS.melodramaticHook(character) || "No information available."
+              }
+            />
           </Box>
         </Box>
       )}
@@ -87,7 +99,9 @@ export default function Description({ character }: DescriptionProps) {
             borderRadius: 1,
           }}
         >
-          <RichTextRenderer html={CS.background(character) || "No information available."} />
+          <RichTextRenderer
+            html={CS.background(character) || "No information available."}
+          />
         </Box>
       </Box>
     </Box>

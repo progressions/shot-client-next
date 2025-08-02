@@ -16,7 +16,7 @@ import type {
   Character,
   CharacterJson,
 } from "@/types/types"
-import { FormActions, useForm } from "@/reducers/formState"
+import { FormActions, useForm } from "@/reducers"
 import { AxiosError } from "axios"
 import { Editor } from "@/components/editor"
 import { SaveButton, SaveCancelButtons } from "@/components/ui"
@@ -32,7 +32,7 @@ type FormStateData = {
   character: Character | null
 }
 
-export default function UploadForm() {
+export default function GeneratePage() {
   const { client } = useClient()
   const theme = useTheme()
   const consumer = client.consumer()
@@ -56,7 +56,6 @@ export default function UploadForm() {
   }, [subscription])
 
   async function handleSubmit() {
-    console.log("submitting")
     dispatchForm({ type: FormActions.UPDATE, name: "character", value: null })
     dispatchForm({ type: FormActions.SUBMIT })
     setPending(true)

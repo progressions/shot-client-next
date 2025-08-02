@@ -106,6 +106,30 @@ class Client {
     return this.post(this.api.ai(), { ai: parameters })
   }
 
+  async generateAiImages(parameters: {
+    entity: Entity
+  }): Promise<AxiosResponse<string[]>> {
+    const { entity } = parameters
+    return this.post(this.apiV2.aiImages(), {
+      entity_class: entity.entity_class,
+      entity_id: entity.id,
+    })
+  }
+
+  async attachImage(parameters: {
+    entity: Entity
+    imageUrl: string
+  }): Promise<AxiosResponse<Entity>> {
+    const { entity, imageUrl } = parameters
+    return this.post(`${this.apiV2.aiImages()}/attach`, {
+      ai_image: {
+        entity_class: entity.entity_class,
+        entity_id: entity.id,
+        image_url: imageUrl,
+      },
+    })
+  }
+
   async getSuggestions(
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}

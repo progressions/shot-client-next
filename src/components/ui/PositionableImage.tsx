@@ -3,7 +3,8 @@
 import type { Entity } from "@/types"
 import { Box } from "@mui/material"
 import { useState, useEffect, useRef } from "react"
-import { RepositionButton, SaveButton, CancelButton } from "@/components/ui"
+import { MiniButton, SaveButton, CancelButton } from "@/components/ui"
+import { GenerateImageDialog } from "@/components/generate"
 import { useToast, useClient } from "@/contexts"
 
 type PositionableImageProps = {
@@ -24,6 +25,7 @@ export function PositionableImage({
   const [boxWidth, setBoxWidth] = useState(0)
   const [isRepositioning, setIsRepositioning] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false)
   const { toastSuccess, toastError } = useToast()
   const context = `${isMobile ? "mobile" : "desktop"}_${pageContext}`
   const position = entity.image_positions?.find(
@@ -119,6 +121,20 @@ export function PositionableImage({
     }
   }
 
+  const handleGenerateImage = (event: React.MouseEvent) => {
+    event.preventDefault()
+    setIsGenerateDialogOpen(true)
+  }
+
+  const handleGenerateDialogClose = () => {
+    setIsGenerateDialogOpen(false)
+  }
+
+  const handleGenerateDialogConfirm = () => {
+    console.log("Generate image confirmed for entity:", entity.name)
+    setIsGenerateDialogOpen(false)
+  }
+
   return (
     <Box
       sx={{
@@ -128,7 +144,7 @@ export function PositionableImage({
         position: "relative",
         mb: 2,
         mx: "auto",
-        "&:hover .reposition-button": {
+        "&:hover .action-button": {
           opacity: 1,
         },
       }}
@@ -147,13 +163,17 @@ export function PositionableImage({
             objectFit: "cover",
             display: "block",
             transform: `translate(${currentX}px, ${currentY}px)`,
-            cursor: isRepositioning ? (isDragging ? "move" : "grab") : "default",
+            cursor: isRepositioning
+              ? isDragging
+                ? "move"
+                : "grab"
+              : "default",
             userSelect: "none",
             touchAction: isRepositioning ? "none" : "auto",
           }}
         />
       )}
-      {isRepositioning && entity.image_url ? (
+      {isRepositioning && entity.image_url && (
         <Box
           sx={{
             position: "absolute",
@@ -171,21 +191,69 @@ export function PositionableImage({
             disabled={isSaving}
           />
         </Box>
-      ) : (
-        <RepositionButton
-          className="reposition-button"
-          variant="contained"
-          size="mini"
+      )}
+      {!isRepositioning && entity.image_url && (
+        <Box
           sx={{
             position: "absolute",
             bottom: 8,
             right: 8,
+            display: "flex",
+            flexDirection: "row",
+            gap: 1,
+          }}
+        >
+          <MiniButton
+            className="action-button"
+            variant="contained"
+            size="mini"
+            sx={{
+              opacity: 0,
+              transition: "opacity 0.2s",
+            }}
+            onClick={handleGenerateImage}
+          >
+            Generate
+          </MiniButton>
+          <MiniButton
+            className="action-button"
+            variant="contained"
+            size="mini"
+            sx={{
+              opacity: 0,
+              transition: "opacity 0.2s",
+            }}
+            onClick={() => setIsRepositioning(true)}
+          >
+            Reposition
+          </MiniButton>
+        </Box>
+      )}
+      {!isRepositioning && !entity.image_url && (
+        <MiniButton
+          className="action-button"
+          variant="contained"
+          size="mini"
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
             opacity: 0,
             transition: "opacity 0.2s",
           }}
-          onClick={() => setIsRepositioning(true)}
-        />
+          onClick={handleGenerateImage}
+        >
+          Generate Image
+        </MiniButton>
       )}
+      <GenerateImageDialog
+        open={isGenerateDialogOpen}
+        onClose={handleGenerateDialogClose}
+        onConfirm={handleGenerateDialogConfirm}
+        title="Generate Image"
+        entity={entity}
+      />
     </Box>
   )
 }

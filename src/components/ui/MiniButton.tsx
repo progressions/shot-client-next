@@ -3,19 +3,21 @@
 import { Button } from "@mui/material"
 import { SystemStyleObject, Theme } from "@mui/system"
 
-type RepositionButtonProps = {
+type MiniButtonProps = {
   onClick: () => void
   className?: string
   size?: "mini" | "small" | "medium" | "large"
   sx?: SystemStyleObject<Theme>
+  children?: React.ReactNode
 }
 
-export function RepositionButton({
+export function MiniButton({
   onClick,
   className,
   size,
   sx: initialSx,
-}: RepositionButtonProps) {
+  children,
+}: MiniButtonProps) {
   const sx =
     size === "mini"
       ? {
@@ -36,7 +38,7 @@ export function RepositionButton({
       }}
       onClick={onClick}
     >
-      Reposition
+      {children}
     </Button>
   )
 }
