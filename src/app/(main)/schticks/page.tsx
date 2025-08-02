@@ -1,9 +1,10 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
-import { CircularProgress, Box } from "@mui/material"
+import { CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Schticks } from "@/components/schticks"
 import type { SchticksResponse } from "@/types"
+import Breadcrumbs from "@/components/Breadcrumbs"
 
 export const metadata = {
   title: "Schticks - Chi War",
@@ -56,7 +57,8 @@ export default async function SchticksPage({
   }
 
   return (
-    <Box sx={{ justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+    <>
+      <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
         <Schticks
           initialSchticks={schticks}
@@ -65,6 +67,6 @@ export default async function SchticksPage({
           initialOrder={order}
         />
       </Suspense>
-    </Box>
+    </>
   )
 }

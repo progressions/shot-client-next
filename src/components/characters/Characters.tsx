@@ -147,6 +147,7 @@ export default function Characters({
       )
     }
   }, [
+    meta.current_page,
     client,
     campaignData,
     dispatchForm,

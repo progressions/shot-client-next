@@ -54,9 +54,7 @@ export function PositionableImage({
     return () => window.removeEventListener("resize", updateBoxWidth)
   }, [])
 
-  if (!entity.image_url) return null
-
-  const boxHeight = height || 300
+  const boxHeight = entity.image_url ? height : 100
 
   const handleDragStart = (
     e: React.MouseEvent<HTMLImageElement> | React.TouchEvent<HTMLImageElement>
@@ -72,7 +70,6 @@ export function PositionableImage({
     const { naturalWidth, naturalHeight } = imgRef.current
     const scaledWidth = boxWidth
     const scaledHeight = (naturalHeight / naturalWidth) * boxWidth
-
     const handleMove = (e: MouseEvent | TouchEvent) => {
       if ("touches" in e) e.preventDefault()
       const clientX = "touches" in e ? e.touches[0].clientX : e.clientX
@@ -86,7 +83,6 @@ export function PositionableImage({
       setCurrentX(Math.max(-maxX, Math.min(maxX, newX)))
       setCurrentY(Math.max(-maxY, Math.min(maxY, newY)))
     }
-
     const handleEnd = () => {
       setIsDragging(false)
       document.removeEventListener("mousemove", handleMove as EventListener)
@@ -94,7 +90,6 @@ export function PositionableImage({
       document.removeEventListener("mouseup", handleEnd)
       document.removeEventListener("touchend", handleEnd)
     }
-
     document.addEventListener("mousemove", handleMove as EventListener)
     document.addEventListener("touchmove", handleMove as EventListener, {
       passive: false,
@@ -116,10 +111,9 @@ export function PositionableImage({
       setCurrentY(response.data.y_position)
       setIsRepositioning(false)
       toastSuccess("Image position saved successfully")
-      // setSnackbarMessage("Image position saved successfully")
-    } catch (_error) {
+    } catch (err: unknown) {
+      console.error("Failed to save image position:", err)
       toastError("Failed to save image position")
-      // setSnackbarMessage("Failed to save image position")
     } finally {
       setIsSaving(false)
     }
@@ -139,25 +133,27 @@ export function PositionableImage({
         },
       }}
     >
-      <Box
-        ref={imgRef}
-        component="img"
-        src={entity.image_url}
-        alt={entity.name}
-        onMouseDown={handleDragStart}
-        onTouchStart={handleDragStart}
-        sx={{
-          width: "100%",
-          height: "auto",
-          objectFit: "cover",
-          display: "block",
-          transform: `translate(${currentX}px, ${currentY}px)`,
-          cursor: isRepositioning ? (isDragging ? "move" : "grab") : "default",
-          userSelect: "none",
-          touchAction: isRepositioning ? "none" : "auto",
-        }}
-      />
-      {isRepositioning ? (
+      {entity.image_url && (
+        <Box
+          ref={imgRef}
+          component="img"
+          src={entity.image_url}
+          alt={entity.name}
+          onMouseDown={handleDragStart}
+          onTouchStart={handleDragStart}
+          sx={{
+            width: "100%",
+            height: "auto",
+            objectFit: "cover",
+            display: "block",
+            transform: `translate(${currentX}px, ${currentY}px)`,
+            cursor: isRepositioning ? (isDragging ? "move" : "grab") : "default",
+            userSelect: "none",
+            touchAction: isRepositioning ? "none" : "auto",
+          }}
+        />
+      )}
+      {isRepositioning && entity.image_url ? (
         <Box
           sx={{
             position: "absolute",

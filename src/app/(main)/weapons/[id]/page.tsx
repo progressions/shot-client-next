@@ -1,7 +1,9 @@
-import { Typography } from "@mui/material"
+import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Weapon } from "@/types"
 import { WeaponPageClient } from "@/components/weapons"
+import { Suspense } from "react"
+import Breadcrumbs from "@/components/Breadcrumbs"
 
 type WeaponPageProperties = {
   params: Promise<{ id: string }>
@@ -20,5 +22,12 @@ export default async function WeaponPage({ params }: WeaponPageProperties) {
     return <Typography>Weapon not found</Typography>
   }
 
-  return <WeaponPageClient weapon={weapon} />
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <WeaponPageClient weapon={weapon} />
+      </Suspense>
+    </>
+  )
 }

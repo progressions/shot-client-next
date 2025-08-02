@@ -1,7 +1,9 @@
-import { Typography } from "@mui/material"
+import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Schtick } from "@/types"
 import { SchtickPageClient } from "@/components/schticks"
+import { Suspense } from "react"
+import Breadcrumbs from "@/components/Breadcrumbs"
 
 type SchtickPageProperties = {
   params: Promise<{ id: string }>
@@ -20,5 +22,12 @@ export default async function SchtickPage({ params }: SchtickPageProperties) {
     return <Typography>Schtick not found</Typography>
   }
 
-  return <SchtickPageClient schtick={schtick} />
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <SchtickPageClient schtick={schtick} />
+      </Suspense>
+    </>
+  )
 }

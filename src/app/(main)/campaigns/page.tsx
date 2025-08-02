@@ -1,9 +1,10 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
-import { CircularProgress, Box } from "@mui/material"
+import { CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Campaigns } from "@/components/campaigns"
 import type { CampaignsResponse } from "@/types"
+import Breadcrumbs from "@/components/Breadcrumbs"
 
 export const metadata = {
   title: "Campaigns - Chi War",
@@ -58,7 +59,8 @@ export default async function CampaignsPage({
   }
 
   return (
-    <Box sx={{ justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+    <>
+      <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
         <Campaigns
           initialCampaigns={campaigns}
@@ -67,6 +69,6 @@ export default async function CampaignsPage({
           initialOrder={order}
         />
       </Suspense>
-    </Box>
+    </>
   )
 }

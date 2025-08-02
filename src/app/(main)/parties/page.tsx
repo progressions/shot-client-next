@@ -1,9 +1,10 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
-import { CircularProgress, Box } from "@mui/material"
+import { CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Parties } from "@/components/parties"
 import type { PartiesResponse } from "@/types"
+import Breadcrumbs from "@/components/Breadcrumbs"
 
 export const metadata = {
   title: "Parties - Chi War",
@@ -63,7 +64,8 @@ export default async function PartiesPage({
   }
 
   return (
-    <Box sx={{ justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+    <>
+      <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
         <Parties
           initialParties={parties}
@@ -73,6 +75,6 @@ export default async function PartiesPage({
           initialOrder={order}
         />
       </Suspense>
-    </Box>
+    </>
   )
 }

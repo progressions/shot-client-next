@@ -7,7 +7,6 @@ type SkillsProps = {
 }
 
 export default function Skills({ character }: SkillsProps) {
-  if (!character.user) return null
   const skillValues = CS.knownSkills(character)
 
   if (skillValues.length === 0) return null

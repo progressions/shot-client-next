@@ -1,8 +1,10 @@
 import { redirect } from "next/navigation"
-import { Typography } from "@mui/material"
+import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { User } from "@/types"
 import { UserPageClient } from "@/components/users"
+import { Suspense } from "react"
+import Breadcrumbs from "@/components/Breadcrumbs"
 
 type UserPageProperties = {
   params: Promise<{ id: string }>
@@ -23,5 +25,12 @@ export default async function UserPage({ params }: UserPageProperties) {
     return <Typography>User not found</Typography>
   }
 
-  return <UserPageClient user={user} />
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <UserPageClient user={user} />
+      </Suspense>
+    </>
+  )
 }

@@ -1,7 +1,9 @@
-import { Typography } from "@mui/material"
+import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Juncture } from "@/types"
 import { JuncturePageClient } from "@/components/junctures"
+import { Suspense } from "react"
+import Breadcrumbs from "@/components/Breadcrumbs"
 
 type JuncturePageProperties = {
   params: Promise<{ id: string }>
@@ -20,5 +22,12 @@ export default async function JuncturePage({ params }: JuncturePageProperties) {
     return <Typography>Juncture not found</Typography>
   }
 
-  return <JuncturePageClient juncture={juncture} />
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <JuncturePageClient juncture={juncture} />
+      </Suspense>
+    </>
+  )
 }

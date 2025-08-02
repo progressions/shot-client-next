@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Campaign } from "@/types"
 import { Dashboard } from "@/components/dashboard"
+import Breadcrumbs from "@/components/Breadcrumbs"
 
 export const metadata = {
   title: "Chi War",
@@ -45,14 +46,17 @@ export default async function HomePage() {
   const parties = partiesResponse.data?.parties || []
 
   return (
-    <Suspense fallback={<CircularProgress />}>
-      <Dashboard
-        user={user}
-        campaign={campaign}
-        fights={fights}
-        characters={characters}
-        parties={parties}
-      />
-    </Suspense>
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <Dashboard
+          user={user}
+          campaign={campaign}
+          fights={fights}
+          characters={characters}
+          parties={parties}
+        />
+      </Suspense>
+    </>
   )
 }

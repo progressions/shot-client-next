@@ -32,7 +32,7 @@ export default function CharactersMobile({
   dispatchForm,
   onPageChange,
 }: CharactersMobileProps) {
-  const { toastSuccess, toastError } = useToast()
+  const { toastSuccess } = useToast()
   const theme = useTheme()
   const {
     characters,
@@ -88,7 +88,7 @@ export default function CharactersMobile({
     fetchCharacters(1, sort, newOrder)
   }
 
-  const handleDelete = async (characterId: string) => {
+  const handleDelete = async () => {
     toastSuccess("Character deleted successfully")
   }
 

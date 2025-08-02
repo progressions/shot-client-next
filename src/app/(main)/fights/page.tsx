@@ -1,10 +1,11 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
-import { CircularProgress, Box } from "@mui/material"
+import { CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Fights } from "@/components/fights"
 import type { FightsResponse } from "@/types"
+import Breadcrumbs from "@/components/Breadcrumbs"
 
 export const metadata = {
   title: "Fights - Chi War",
@@ -62,7 +63,8 @@ export default async function FightsPage({
   const initialIsMobile = /mobile/i.test(userAgent)
 
   return (
-    <Box sx={{ justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+    <>
+      <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
         <Fights
           initialFights={fights}
@@ -72,6 +74,6 @@ export default async function FightsPage({
           initialIsMobile={initialIsMobile}
         />
       </Suspense>
-    </Box>
+    </>
   )
 }

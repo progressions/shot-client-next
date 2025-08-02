@@ -7,7 +7,6 @@ import {
   ToastProvider,
 } from "@/contexts"
 import { getUser } from "@/lib/getServerClient"
-import Breadcrumbs from "@/components/Breadcrumbs"
 import "@/styles/global.scss"
 import { Container } from "@mui/material"
 import PopupToast from "@/components/PopupToast"
@@ -32,7 +31,6 @@ export default async function RootLayout({
                     maxWidth="md"
                     sx={{ paddingTop: 2, paddingBottom: 2 }}
                   >
-                    <Breadcrumbs />
                     {children}
                     <PopupToast />
                   </Container>

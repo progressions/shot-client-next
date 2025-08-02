@@ -33,6 +33,7 @@ type ListManagerProperties = {
   update: (id: string, formData: FormData) => Promise<void>
   collection: string
   collection_ids: string
+  manage?: boolean
 }
 
 export default function ListManager({
@@ -43,6 +44,7 @@ export default function ListManager({
   description,
   collection,
   collection_ids,
+  manage = true,
 }: ListManagerProperties) {
   const { formState, dispatchForm } = useForm<FormStateData>({
     id: null,
@@ -214,6 +216,22 @@ export default function ListManager({
   }
 
   const autocomplete = autocompleteMap[collection]
+
+  if (!manage)
+    return (
+      <>
+        <Box sx={{ my: 4 }}>
+          <BadgeList
+            items={items}
+            open={open}
+            handleDelete={handleDelete}
+            collection={collection}
+            meta={meta}
+            handlePageChange={handlePageChange}
+          />
+        </Box>
+      </>
+    )
 
   return (
     <>

@@ -1,7 +1,9 @@
-import { Typography } from "@mui/material"
+import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Campaign } from "@/types"
 import { CampaignPageClient } from "@/components/campaigns"
+import Breadcrumbs from "@/components/Breadcrumbs"
+import { Suspense } from "react"
 
 type CampaignPageProperties = {
   params: Promise<{ id: string }>
@@ -20,5 +22,12 @@ export default async function CampaignPage({ params }: CampaignPageProperties) {
     return <Typography>Campaign not found</Typography>
   }
 
-  return <CampaignPageClient campaign={campaign} />
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <CampaignPageClient campaign={campaign} />
+      </Suspense>
+    </>
+  )
 }

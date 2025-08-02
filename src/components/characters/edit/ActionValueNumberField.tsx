@@ -1,0 +1,129 @@
+"use client"
+
+import type { Character } from "@/types"
+import { useState, useEffect } from "react"
+import { FormControl, FormHelperText } from "@mui/material"
+import { NumberField } from "@/components/ui"
+import { useToast } from "@/contexts"
+import { CS } from "@/services"
+
+type ActionValueProps = {
+  name: string
+  size: "small" | "large"
+  character: Character
+  setCharacter: (character: Character) => void
+  updateCharacter: (updatedCharacter: Character) => Promise<void>
+}
+
+export default function ActionValue({
+  name,
+  size = "large",
+  character,
+  setCharacter,
+  updateCharacter,
+}: ActionValueProps) {
+  const { toastSuccess, toastError } = useToast()
+  const [value, setValue] = useState<string>(
+    character.action_values[name]?.toString() || ""
+  )
+  const [valueError, setValueError] = useState<string>("")
+  const [serverError, setServerError] = useState<string>("")
+
+  useEffect(() => {
+    if (character.action_values[name] !== undefined) {
+      setValue(character.action_values[name].toString())
+    } else {
+      setValue("")
+    }
+  }, [character.action_values, name])
+
+  useEffect(() => {
+    if (value?.toString() !== value) {
+      setValue(value?.toString() || "")
+    }
+  }, [value])
+
+  const validateValue = (val: string): string => {
+    const trimmedVal = val.trim()
+    if (!trimmedVal) {
+      return `${name} is required`
+    }
+    const num = Number(trimmedVal)
+    if (isNaN(num)) {
+      return `${name} must be a number`
+    }
+    if (!Number.isInteger(num)) {
+      return `${name} must be an integer`
+    }
+    if (num < 0) {
+      return `${name} cannot be negative`
+    }
+    return ""
+  }
+
+  const handleValueChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newValue = event.target.value
+    console.log("Setting new value", name, newValue)
+    setValue(newValue)
+    setValueError("")
+    setServerError("")
+    await handleValueBlur({
+      target: { value: newValue },
+    } as React.FocusEvent<HTMLInputElement>)
+  }
+
+  const debounce = (fn: () => Promise<void>, delay: number) => {
+    let timeout: NodeJS.Timeout
+    return () => {
+      clearTimeout(timeout)
+      timeout = setTimeout(fn, delay)
+    }
+  }
+
+  const handleValueBlur = async e => {
+    console.log("Blur: value =", e.target.value)
+    const error = validateValue(e.target.value)
+    setValue(e.target.value)
+    setValueError(error)
+    if (!error) {
+      const numericValue = Number(e.target.value.trim())
+      console.log("Blur: numericValue =", numericValue)
+      const updatedCharacter = CS.updateActionValue(
+        character,
+        name,
+        numericValue
+      )
+      console.log("updatedCharacter", updatedCharacter.action_values)
+      setCharacter(updatedCharacter)
+      try {
+        await updateCharacter(updatedCharacter)
+        toastSuccess("Character updated successfully")
+      } catch (error: unknown) {
+        setServerError(error.message)
+        toastError(`Error updating character: ${error.message}`)
+      }
+    }
+  }
+
+  const debouncedHandleValueBlur = debounce(handleValueBlur, 100)
+
+  return (
+    <FormControl error={!!valueError || !!serverError} sx={{ width: "110px" }}>
+      <NumberField
+        name={name}
+        value={value ? Number(value) : null}
+        size={size}
+        error={!!valueError || !!serverError}
+        onChange={handleValueChange}
+        onBlur={debouncedHandleValueBlur}
+      />
+      {(valueError || serverError) && (
+        <FormHelperText sx={{ mt: -0.5, textAlign: "left" }}>
+          {valueError || serverError}
+        </FormHelperText>
+      )}
+    </FormControl>
+  )
+}

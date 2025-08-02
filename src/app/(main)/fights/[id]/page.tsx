@@ -1,7 +1,9 @@
-import { Typography } from "@mui/material"
+import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Fight } from "@/types"
 import { FightPageClient } from "@/components/fights"
+import { Suspense } from "react"
+import Breadcrumbs from "@/components/Breadcrumbs"
 
 type FightPageProperties = {
   params: Promise<{ id: string }>
@@ -20,5 +22,12 @@ export default async function FightPage({ params }: FightPageProperties) {
     return <Typography>Fight not found</Typography>
   }
 
-  return <FightPageClient fight={fight} />
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <FightPageClient fight={fight} />
+      </Suspense>
+    </>
+  )
 }

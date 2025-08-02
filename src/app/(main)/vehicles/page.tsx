@@ -1,9 +1,10 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
-import { CircularProgress, Box } from "@mui/material"
+import { CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Vehicles } from "@/components/vehicles"
+import Breadcrumbs from "@/components/Breadcrumbs"
 
 export const metadata = {
   title: "Vehicles - Chi War",
@@ -58,14 +59,8 @@ export default async function VehiclesPage({
   const initialIsMobile = /mobile/i.test(userAgent)
 
   return (
-    <Box
-      sx={{
-        justifyContent: "space-between",
-        alignItems: "center",
-        mb: 2,
-        position: "relative",
-      }}
-    >
+    <>
+      <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
         <Vehicles
           initialVehicles={vehicles}
@@ -75,6 +70,6 @@ export default async function VehiclesPage({
           initialIsMobile={initialIsMobile} // Pass mobile detection result
         />
       </Suspense>
-    </Box>
+    </>
   )
 }

@@ -4,11 +4,24 @@ import { ActionValueLink } from "@/components/links"
 type ActionValueProps = {
   name: string
   value: number | string
+  size: "small" | "large"
 }
 
-export default function ActionValue({ name, value }: ActionValueProps) {
-  if (!name || !value) {
+export default function ActionValue({
+  name,
+  value,
+  size = "large",
+}: ActionValueProps) {
+  if (!name) {
     return null
+  }
+  const minWidthMap = {
+    small: { xs: "4rem", sm: "5rem" },
+    large: { xs: "5rem", sm: "6rem" },
+  }
+  const fontSizeMap = {
+    small: { xs: "1.5rem", sm: "2rem" },
+    large: { xs: "2rem", sm: "3rem" },
   }
   return (
     <Stack direction="column">
@@ -18,8 +31,8 @@ export default function ActionValue({ name, value }: ActionValueProps) {
       <Box
         sx={{
           textAlign: "center",
-          minWidth: { xs: "5rem", sm: "6rem" },
-          fontSize: { xs: "2rem", sm: "3rem" },
+          minWidth: minWidthMap[size],
+          fontSize: fontSizeMap[size],
           border: "1px solid #ffffff",
           borderRadius: 1,
           p: 1,

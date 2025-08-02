@@ -3,10 +3,9 @@ import { CircularProgress, Container, Typography, Box } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import type { Character } from "@/types"
 import type { Metadata } from "next"
-import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
-
-import { CharacterPageClient } from "@/components/characters"
+import { Suspense } from "react"
+import { EditCharacter } from "@/components/characters"
 
 // Component for character not found
 function CharacterNotFound() {
@@ -80,7 +79,7 @@ export default async function CharacterPage({
     <>
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <CharacterPageClient character={character} />
+        <EditCharacter character={character} />
       </Suspense>
     </>
   )

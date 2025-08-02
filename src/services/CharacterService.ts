@@ -42,6 +42,62 @@ const CharacterService = {
 
   /* Writer functions, change the state */
 
+  changeAttack: function (
+    character: Character,
+    mainOrSecondary,
+    attackName: string
+  ): Character {
+    return {
+      ...character,
+      action_values: {
+        ...character.action_values,
+        [mainOrSecondary]: attackName,
+      },
+    }
+  },
+
+  changeAttackValue: function (
+    character: Character,
+    attackName: string,
+    value: number
+  ): Character {
+    const newValue = parseInt(`${value}`, 10)
+    return {
+      ...character,
+      action_values: {
+        ...character.action_values,
+        [attackName]: newValue,
+      },
+    }
+  },
+
+  changeFortuneType: function (
+    character: Character,
+    fortuneType: string
+  ): Character {
+    return {
+      ...character,
+      action_values: {
+        ...character.action_values,
+        FortuneType: fortuneType,
+      },
+    }
+  },
+
+  changeFortuneValue: function (
+    character: Character,
+    value: number
+  ): Character {
+    const newValue = parseInt(`${value}`, 10)
+    return {
+      ...character,
+      action_values: {
+        ...character.action_values,
+        Fortune: newValue,
+      },
+    }
+  },
+
   // Take a Smackdown, reduced by Toughness
   takeSmackdown: function (
     character: Character,

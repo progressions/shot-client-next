@@ -1,7 +1,9 @@
-import { Typography } from "@mui/material"
+import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Site } from "@/types"
 import { SitePageClient } from "@/components/sites"
+import { Suspense } from "react"
+import Breadcrumbs from "@/components/Breadcrumbs"
 
 type SitePageProperties = {
   params: Promise<{ id: string }>
@@ -20,5 +22,12 @@ export default async function SitePage({ params }: SitePageProperties) {
     return <Typography>Site not found</Typography>
   }
 
-  return <SitePageClient site={site} />
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <SitePageClient site={site} />
+      </Suspense>
+    </>
+  )
 }

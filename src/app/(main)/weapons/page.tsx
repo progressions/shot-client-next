@@ -1,9 +1,10 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
-import { CircularProgress, Box } from "@mui/material"
+import { CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Weapons } from "@/components/weapons"
 import type { WeaponsResponse } from "@/types"
+import Breadcrumbs from "@/components/Breadcrumbs"
 
 export const metadata = {
   title: "Weapons - Chi War",
@@ -56,7 +57,8 @@ export default async function WeaponsPage({
   }
 
   return (
-    <Box sx={{ justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+    <>
+      <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
         <Weapons
           initialWeapons={weapons}
@@ -65,6 +67,6 @@ export default async function WeaponsPage({
           initialOrder={order}
         />
       </Suspense>
-    </Box>
+    </>
   )
 }

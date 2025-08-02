@@ -1,9 +1,10 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
-import { CircularProgress, Box } from "@mui/material"
+import { CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Sites } from "@/components/sites"
 import type { SitesResponse } from "@/types"
+import Breadcrumbs from "@/components/Breadcrumbs"
 
 export const metadata = {
   title: "Feng Shui Sites - Chi War",
@@ -63,7 +64,8 @@ export default async function SitesPage({
   }
 
   return (
-    <Box sx={{ justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+    <>
+      <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
         <Sites
           initialSites={sites}
@@ -73,6 +75,6 @@ export default async function SitesPage({
           initialOrder={order}
         />
       </Suspense>
-    </Box>
+    </>
   )
 }

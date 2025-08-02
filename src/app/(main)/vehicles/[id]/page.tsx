@@ -5,6 +5,7 @@ import type { Vehicle } from "@/types"
 import type { Metadata } from "next"
 import { VehicleName } from "@/components/vehicles"
 import { VS } from "@/services"
+import Breadcrumbs from "@/components/Breadcrumbs"
 
 // Component for vehicle not found
 function VehicleNotFound() {
@@ -76,7 +77,8 @@ export default async function VehiclePage({
   }
 
   return (
-    <Box sx={{ bgcolor: "#424242", p: { xs: 2, sm: 3 }, borderRadius: 1 }}>
+    <>
+      <Breadcrumbs />
       <Stack
         direction="row"
         sx={{ alignItems: "center", mb: 2, gap: { xs: 1, sm: 2 } }}
@@ -208,6 +210,6 @@ export default async function VehiclePage({
           </Box>
         </Stack>
       </Stack>
-    </Box>
+    </>
   )
 }

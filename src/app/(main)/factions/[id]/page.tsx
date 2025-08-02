@@ -1,7 +1,9 @@
-import { Typography } from "@mui/material"
+import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Faction } from "@/types"
 import { FactionPageClient } from "@/components/factions"
+import Breadcrumbs from "@/components/Breadcrumbs"
+import { Suspense } from "react"
 
 type FactionPageProperties = {
   params: Promise<{ id: string }>
@@ -20,5 +22,12 @@ export default async function FactionPage({ params }: FactionPageProperties) {
     return <Typography>Faction not found</Typography>
   }
 
-  return <FactionPageClient faction={faction} />
+  return (
+    <>
+      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <FactionPageClient faction={faction} />
+      </Suspense>
+    </>
+  )
 }

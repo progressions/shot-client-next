@@ -1,9 +1,10 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
-import { CircularProgress, Box } from "@mui/material"
+import { CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Junctures } from "@/components/junctures"
 import type { JuncturesResponse } from "@/types"
+import Breadcrumbs from "@/components/Breadcrumbs"
 
 export const metadata = {
   title: "Junctures - Chi War",
@@ -63,7 +64,8 @@ export default async function JuncturesPage({
   }
 
   return (
-    <Box sx={{ justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+    <>
+      <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
         <Junctures
           initialJunctures={junctures}
@@ -73,6 +75,6 @@ export default async function JuncturesPage({
           initialOrder={order}
         />
       </Suspense>
-    </Box>
+    </>
   )
 }
