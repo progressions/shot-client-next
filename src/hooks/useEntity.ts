@@ -59,8 +59,9 @@ export function useEntity(entity: entity, setEntity: (entity: Entity) => void) {
       await client[createFunction](formData)
       toastSuccess(`${entityClass} created successfully`)
     } catch (error) {
-      console.error("Error creating entity:", error)
+      console.error("Error creating entity:", error.response.data.errors)
       toastError(`Error creating ${name}.`)
+      throw error
     }
   }
 

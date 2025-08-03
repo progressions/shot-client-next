@@ -19,7 +19,7 @@ type FormStateData = Fight & {
 interface FightFormProperties {
   open: boolean
   onClose: () => void
-  onSave: (formData: FormData, fightData: Fight) => Promise<void>
+  setFight: (fight: Fight) => void
 }
 
 export default function FightForm({

@@ -236,7 +236,6 @@ export const defaultSchtick: Schtick = {
   campaign_id: "",
   category: "",
   path: "",
-  schtick_id: "",
   prerequisite: {
     id: "",
     name: "",

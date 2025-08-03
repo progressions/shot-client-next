@@ -170,7 +170,7 @@ export const Icon: React.FC<IconProps> = ({ keyword, ...props }) => {
       "& .MuiSvgIcon-root": {
         // Target nested SVG icons within Box
         color,
-        fontSize: 24,
+        fontSize: 20,
         "&:hover": {
           color: hoverColor,
         },

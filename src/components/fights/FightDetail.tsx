@@ -9,20 +9,20 @@ import { FightLink, CharacterLink } from "@/components/links"
 import DetailButtons from "@/components/DetailButtons"
 import { PositionableImage } from "@/components/ui"
 import { Icon } from "@/lib"
+import { useRouter } from "next/navigation"
 
 interface FightDetailProperties {
   fight: Fight
   onDelete: (fightId: string) => void
-  onEdit: (fight: Fight) => void
   isMobile?: boolean
 }
 
 export default function FightDetail({
   fight: initialFight,
   onDelete,
-  onEdit,
   isMobile = false,
 }: FightDetailProperties) {
+  const router = useRouter()
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
@@ -53,7 +53,7 @@ export default function FightDetail({
   }
 
   const handleEdit = () => {
-    onEdit(fight)
+    router.push(`/fights/${fight.id}`)
   }
 
   // Format created_at timestamp for display
