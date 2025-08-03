@@ -3,6 +3,7 @@
 import type { Juncture } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
+import { useState, useEffect } from "react"
 
 type JuncturesAutocompleteProperties = {
   value: string
@@ -20,25 +21,51 @@ export default function JuncturesAutocomplete({
   allowNone = true,
 }: JuncturesAutocompleteProperties) {
   const { client } = useClient()
+  const [junctures, setJunctures] = useState<Juncture[]>([])
+
+  useEffect(() => {
+    const fetchJunctures = async () => {
+      try {
+        const response = await client.getJunctures({
+          per_page: 200,
+          page: 1,
+          sort: "name",
+          order: "asc",
+        })
+        setJunctures(response.data.junctures || [])
+      } catch (error) {
+        console.error("Error fetching junctures:", error)
+      }
+    }
+
+    fetchJunctures().catch(error => {
+      console.error("Error in useEffect fetchJunctures:", error)
+    })
+  }, [client])
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
     if (options) {
-      const filteredOptions = options.filter(option =>
-        option.label.toLowerCase().includes(inputValue.toLowerCase())
-      )
+      const filteredOptions = options
+        .filter(option =>
+          option.label.toLowerCase().includes(inputValue.toLowerCase())
+        )
+        .filter(option => !exclude.includes(option.value))
 
       return filteredOptions
     }
-    try {
-      const response = await client.getJunctures({ search: inputValue })
-      return response.data.junctures.map((juncture: Juncture) => ({
-        label: juncture.name || "",
-        value: juncture.id || "",
+    return junctures
+      .filter(juncture =>
+        juncture.name.toLowerCase().includes(inputValue.toLowerCase())
+      )
+      .map(juncture => ({
+        label: juncture.name,
+        value: juncture.id,
       }))
-    } catch (error) {
-      console.error("Error fetching options:", error)
-      return []
-    }
+  }
+
+  const handleChange = (selectedOption: Option | null) => {
+    const juncture = junctures.find(s => s.id === selectedOption)
+    onChange(juncture)
   }
 
   return (
@@ -46,7 +73,7 @@ export default function JuncturesAutocomplete({
       label="Juncture"
       value={value}
       fetchOptions={fetchOptions}
-      onChange={onChange}
+      onChange={handleChange}
       exclude={exclude}
       allowNone={allowNone}
     />

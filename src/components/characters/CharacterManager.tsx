@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Button, Stack, Typography } from "@mui/material"
+import { Box, Button, Stack } from "@mui/material"
 import PersonAddIcon from "@mui/icons-material/PersonAdd"
 import type { Entity } from "@/types"
 
@@ -9,42 +9,73 @@ import { FormActions, useForm } from "@/reducers"
 import { paginateArray } from "@/lib"
 import { BadgeList } from "@/components/lists"
 import { CharacterFilter } from "@/components/characters"
+import { useClient } from "@/contexts"
+import { useEffect } from "react"
+import { ManageButton, SectionHeader } from "@/components/ui"
 
 type FormStateData = {
   page: number
   open: boolean
   id?: string | null
-}
-
-type CharacterManagerProperties = {
-  entity: Entity
-  name: string
-  title: string
-  description: React.ReactNode
-  update: (id: string, formData: FormData) => Promise<void>
-  characters: Character[]
+  characters: string[]
   character_ids: string[]
 }
 
+type CharacterManagerProperties = {
+  icon: React.ReactNode
+  name: string
+  title: string
+  entity: Entity
+  description: React.ReactNode
+  update: (id: string, formData: FormData) => Promise<void>
+}
+
 export default function CharacterManager({
-  entity,
+  icon,
   name,
-  update,
   title,
+  entity,
   description,
-  characters = [],
-  character_ids,
+  update,
 }: CharacterManagerProperties) {
+  const { client } = useClient()
+
   const { formState, dispatchForm } = useForm<FormStateData>({
     id: null,
     page: 1,
     open: false,
+    characters: entity.characters || [],
+    character_ids: entity.character_ids || [],
   })
-  const { page, id, open } = formState.data
+  const { characters, character_ids, page, id, open } = formState.data
   const { items, meta } = paginateArray<Entity>(characters, page, 5)
   const isStringArray = (value: unknown): value is string[] => {
     return Array.isArray(value) && value.every(item => typeof item === "string")
   }
+
+  useEffect(() => {
+    const fetchCharacters = async () => {
+      try {
+        const response = await client.getCharacters({
+          [`${name}_id`]: entity.id,
+          per_page: 100,
+          sort: "name",
+          order: "asc",
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "characters",
+          value: response.data.characters || [],
+        })
+      } catch (error) {
+        console.error("Error fetching characters:", error)
+      }
+    }
+
+    fetchCharacters().catch(error => {
+      console.error("Failed to fetch characters:", error)
+    })
+  }, [entity, name, client, dispatchForm])
 
   const handleAddMember = async () => {
     if (!id) return
@@ -55,14 +86,17 @@ export default function CharacterManager({
     }
 
     try {
-      const formData = new FormData()
+      const updatedIds = [...character_ids, id]
       const entityData = {
         ...entity,
-        character_ids: [...character_ids, id],
+        character_ids: updatedIds,
       }
-      formData.append(name.toLowerCase(), JSON.stringify(entityData))
-      formData.set(name.toLowerCase(), JSON.stringify(entityData))
-      await update(entity.id, formData)
+      await update(entityData)
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "character_ids",
+        value: updatedIds,
+      })
 
       dispatchForm({ type: FormActions.UPDATE, name: "id", value: null })
     } catch (error) {
@@ -78,7 +112,6 @@ export default function CharacterManager({
     }
 
     try {
-      const formData = new FormData()
       let found = false
       const updatedIds = character_ids.filter((id: string) => {
         if (id === item.id && !found) {
@@ -88,8 +121,12 @@ export default function CharacterManager({
         return true
       })
       const entityData = { ...entity, character_ids: updatedIds }
-      formData.append(name.toLowerCase(), JSON.stringify(entityData))
-      await update(entity.id, formData)
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "character_ids",
+        value: updatedIds,
+      })
+      await update(entityData)
     } catch (error) {
       console.error("Error removing entity member:", error)
       alert("Failed to remove.")
@@ -107,73 +144,41 @@ export default function CharacterManager({
     dispatchForm({ type: FormActions.UPDATE, name: "id", value })
   }
 
+  const actionButton = <ManageButton open={open} dispatchForm={dispatchForm} />
+
   return (
     <>
-      <Box sx={{ my: 4 }}>
+      <Box sx={{ my: 4, width: "100%" }}>
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "row",
-            gap: { xs: 1, sm: 1.5 },
             alignItems: "center",
             justifyContent: "space-between",
             mb: 2,
           }}
         >
-          <Typography variant="h5">{title}</Typography>
-          {open && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() =>
-                dispatchForm({
-                  type: FormActions.UPDATE,
-                  name: "open",
-                  value: false,
-                })
-              }
-              size="small"
-              sx={{ px: 1.5 }}
-            >
-              Close
-            </Button>
-          )}
-          {!open && (
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              onClick={() =>
-                dispatchForm({
-                  type: FormActions.UPDATE,
-                  name: "open",
-                  value: true,
-                })
-              }
-              sx={{ px: 1.5 }}
-            >
-              Manage
-            </Button>
-          )}
+          <SectionHeader title={title} icon={icon} actions={actionButton}>
+            {description}
+          </SectionHeader>
         </Box>
-        <Typography gutterBottom>{description}</Typography>
 
         {open && (
           <Stack
             direction="row"
             spacing={1}
-            sx={{ my: 2, alignItems: "center" }}
+            sx={{ my: 2, alignItems: { xs: "flex-end", sm: "center" } }}
           >
             <CharacterFilter setCharacterId={setCharacterId} />
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={handleAddMember}
-              size="small"
-              sx={{ height: "2.5rem", px: 2 }}
-            >
-              <PersonAddIcon />
-            </Button>
+            <Box sx={{ pb: { xs: 1, sm: 0 } }}>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={handleAddMember}
+                size="small"
+                sx={{ height: "2.5rem", px: 2 }}
+              >
+                <PersonAddIcon />
+              </Button>
+            </Box>
           </Stack>
         )}
         <BadgeList

@@ -6,12 +6,14 @@ import { PositionableImage } from "@/components/ui"
 
 type HeroImageProps = {
   entity: Entity
+  setEntity: (entity: Entity) => void
   pageContext: "index" | "entity"
   positionable?: boolean
 }
 
 export function HeroImage({
   entity,
+  setEntity,
   pageContext = "entity",
   positionable = true,
 }: HeroImageProps) {
@@ -19,12 +21,28 @@ export function HeroImage({
     return (
       <PositionableImage
         entity={entity}
+        setEntity={setEntity}
         pageContext={pageContext}
         height={500}
       />
     )
   }
 
+  if (!entity.image_url) {
+    return (
+      <Box
+        sx={{
+          border: "1px dashed",
+          width: "100%",
+          height: "300px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          mb: 2,
+        }}
+      ></Box>
+    )
+  }
   return (
     <Box
       component="img"

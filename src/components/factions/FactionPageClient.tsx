@@ -96,7 +96,7 @@ export default function FactionPageClient({
       >
         <Typography variant="h4">{faction.name}</Typography>
       </Box>
-      <HeroImage entity={faction} />
+      <HeroImage entity={faction} setEntity={setFaction} />
       <Box sx={{ p: 2, backgroundColor: "#2e2e2e", borderRadius: 1, my: 2 }}>
         <RichTextRenderer
           key={faction.description}

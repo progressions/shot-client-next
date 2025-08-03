@@ -1,5 +1,6 @@
 "use client"
 
+import { FaCarCrash } from "react-icons/fa"
 import type { Fight } from "@/types"
 import { useClient } from "@/contexts"
 import { InfoLink } from "@/components/links"
@@ -28,6 +29,7 @@ export default function VehiclesList({
 
   return (
     <ListManager
+      icon={<FaCarCrash size="24" />}
       entity={fight}
       name="Fight"
       collection="vehicles"

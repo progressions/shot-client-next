@@ -93,7 +93,7 @@ export default function JuncturePageClient({
       >
         <Typography variant="h4">{juncture.name}</Typography>
       </Box>
-      <HeroImage entity={juncture} />
+      <HeroImage entity={juncture} setEntity={setJuncture} />
       <Box sx={{ p: 2, backgroundColor: "#2e2e2e", borderRadius: 1, my: 2 }}>
         <RichTextRenderer
           key={juncture.description}

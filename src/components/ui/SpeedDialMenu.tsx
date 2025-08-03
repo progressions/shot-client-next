@@ -45,11 +45,16 @@ export function SpeedDialMenu({
   }, [open])
 
   const defaultActions = [
-    { icon: <EditIcon />, name: "Edit", onClick: onEdit },
     { icon: <DeleteIcon />, name: "Delete", onClick: onDelete },
   ]
-
-  console.log("persist", persist)
+  if (onEdit) {
+    defaultActions.unshift({
+      icon: <EditIcon />,
+      name: "Edit",
+      onClick: onEdit,
+      preventClose: true, // Prevent closing when editing
+    })
+  }
 
   const actions = initialActions || defaultActions
 

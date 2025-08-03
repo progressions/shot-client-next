@@ -1,5 +1,4 @@
 "use client"
-
 import { useEffect, useMemo, useRef } from "react"
 import {
   Autocomplete as MuiAutocomplete,
@@ -21,6 +20,7 @@ interface AutocompleteProperties {
   value: string | null
   exclude?: string[]
   allowNone?: boolean
+  freeSolo?: boolean
 }
 
 const StyledAutocomplete = styled(MuiAutocomplete)(({ theme }) => ({
@@ -58,6 +58,7 @@ export function Autocomplete({
   onChange,
   value,
   allowNone = true,
+  freeSolo = false,
   exclude = [],
 }: AutocompleteProperties) {
   const { formState, dispatchForm } = useForm<FormStateData>({
@@ -66,7 +67,6 @@ export function Autocomplete({
   const { loading } = formState
   const { options } = formState.data
   const inputReference = useRef("")
-
   const noneOption: Option = useMemo(
     () => ({ label: "None", value: NONE_VALUE }),
     []
@@ -103,15 +103,44 @@ export function Autocomplete({
     <StyledAutocomplete
       sx={{ width: "100%" }}
       getOptionLabel={(option: Option) => option.label}
-      filterOptions={x => x}
+      filterOptions={(options, { inputValue }) => {
+        if (
+          freeSolo &&
+          inputValue &&
+          !options.some(
+            opt => opt.label.toLowerCase() === inputValue.toLowerCase()
+          )
+        ) {
+          return [
+            { label: `Create "${inputValue}"`, value: inputValue },
+            ...options,
+          ]
+        }
+        return options
+      }}
       options={displayOptions}
       autoComplete
       includeInputInList
       filterSelectedOptions
       value={selectedOption}
       noOptionsText="No options"
-      onChange={(_event: React.SyntheticEvent, newValue: Option | null) => {
-        if (newValue?.value === NONE_VALUE || newValue === null) {
+      freeSolo={freeSolo}
+      onChange={(
+        _event: React.SyntheticEvent,
+        newValue: Option | string | null
+      ) => {
+        if (typeof newValue === "string") {
+          // Handle free text input when freeSolo is true
+          if (freeSolo) {
+            const newOption = { label: newValue, value: newValue }
+            dispatchForm({
+              type: FormActions.UPDATE,
+              name: "options",
+              value: [...options, newOption],
+            })
+            onChange(newValue)
+          }
+        } else if (newValue?.value === NONE_VALUE || newValue === null) {
           onChange(null)
         } else {
           onChange(newValue?.value || null)
@@ -120,8 +149,6 @@ export function Autocomplete({
       onInputChange={(_event, newInputValue, reason) => {
         inputReference.current = newInputValue
         if (reason === "input" || reason === "clear") {
-          // dispatchForm({ type: FormActions.SUBMIT })
-
           fetchOptions(newInputValue).then(newOptions => {
             if (inputReference.current === newInputValue) {
               dispatchForm({

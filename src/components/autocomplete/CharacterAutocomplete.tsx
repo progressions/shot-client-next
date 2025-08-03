@@ -3,6 +3,7 @@
 import type { Character } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
+import { useState, useEffect } from "react"
 
 type CharacterAutocompleteProperties = {
   value: string
@@ -20,32 +21,52 @@ export default function CharacterAutocomplete({
   onChange,
 }: CharacterAutocompleteProperties) {
   const { client } = useClient()
+  const [characters, setCharacters] = useState<Character[]>([])
+
+  useEffect(() => {
+    const fetchCharacters = async () => {
+      try {
+        const response = await client.getCharacters({
+          per_page: 200,
+          page: 1,
+          sort: "name",
+          order: "asc",
+        })
+        setCharacters(response.data.characters || [])
+      } catch (error) {
+        console.error("Error fetching characters:", error)
+      }
+    }
+
+    fetchCharacters().catch(error => {
+      console.error("Error in useEffect fetchCharacters:", error)
+    })
+  }, [client])
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
     if (options) {
-      const filteredOptions = options.filter(option =>
-        option.label.toLowerCase().includes(inputValue.toLowerCase())
-      )
+      const filteredOptions = options
+        .filter(option =>
+          option.label.toLowerCase().includes(inputValue.toLowerCase())
+        )
+        .filter(option => !exclude.includes(option.value))
 
       return filteredOptions
     }
-    try {
-      const response = await client.getCharacterNames({
-        search: inputValue,
-        per_page: 120,
-        sort: "name",
-        order: "asc",
-      })
-      return response.data.characters
-        .map((character: Character) => ({
-          label: character.name || "",
-          value: character.id || "",
-        }))
-        .filter(option => !exclude.includes(option.value))
-    } catch (error) {
-      console.error("Error fetching options:", error)
-      return []
-    }
+    return characters
+      .filter(character =>
+        character.name.toLowerCase().includes(inputValue.toLowerCase())
+      )
+      .map(character => ({
+        label: character.name,
+        value: character.id,
+      }))
+  }
+
+  const handleChange = (selectedOption: Option | null) => {
+    const character = characters.find(s => s.id === selectedOption)
+    console.log("About to call onChange with character:", character)
+    onChange(character)
   }
 
   return (
@@ -53,7 +74,7 @@ export default function CharacterAutocomplete({
       value={value}
       label="Character"
       fetchOptions={fetchOptions}
-      onChange={onChange}
+      onChange={handleChange}
       allowNone={allowNone}
       exclude={exclude}
     />

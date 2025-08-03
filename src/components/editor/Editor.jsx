@@ -106,7 +106,7 @@ function Editor({ name, value, onChange }) {
   const onChangeContent = useCallback(
     event => {
       const { value } = event.target
-      console.log("onChangeContent value:", value)
+      console.log("Editor onChangeContent value:", value)
       contentReference.current = value
       debouncedOnChange(event)
     },
@@ -122,7 +122,7 @@ function Editor({ name, value, onChange }) {
           value: html,
         },
       }
-      console.log("saveOnBlur event:", event)
+      console.log("Editor saveOnBlur event:", event)
       onChange(event)
     },
     [name, onChange]

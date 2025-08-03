@@ -88,7 +88,7 @@ export default function SitePageClient({
       >
         <Typography variant="h4">{site.name}</Typography>
       </Box>
-      <HeroImage entity={site} />
+      <HeroImage entity={site} setEntity={setSite} />
       {site.faction && (
         <Typography variant="h6">
           Belongs to <FactionLink faction={site.faction} />

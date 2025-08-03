@@ -3,19 +3,28 @@
 import type { Entity } from "@/types"
 import { Box } from "@mui/material"
 import { useState, useEffect, useRef } from "react"
-import { MiniButton, SaveButton, CancelButton } from "@/components/ui"
-import { GenerateImageDialog } from "@/components/generate"
+import {
+  UploadButton,
+  ImageBox,
+  GenerateImageButton,
+  GenerateButton,
+  RepositionButton,
+  SaveCancelMiniButtons,
+} from "@/components/ui"
+import { GenerateImageDialog, UploadImageDialog } from "@/components/generate"
 import { useToast, useClient } from "@/contexts"
 
 type PositionableImageProps = {
   entity: Entity
-  pageContext: "index" | "entity"
+  setEntity?: (entity: Entity) => void
+  pageContext: "index" | "entity" | "edit"
   height?: number
   isMobile?: boolean
 }
 
 export function PositionableImage({
   entity,
+  setEntity,
   pageContext = "entity",
   height,
   isMobile = false,
@@ -25,7 +34,10 @@ export function PositionableImage({
   const [boxWidth, setBoxWidth] = useState(0)
   const [isRepositioning, setIsRepositioning] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+
   const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false)
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
+
   const { toastSuccess, toastError } = useToast()
   const context = `${isMobile ? "mobile" : "desktop"}_${pageContext}`
   const position = entity.image_positions?.find(
@@ -131,8 +143,20 @@ export function PositionableImage({
   }
 
   const handleGenerateDialogConfirm = () => {
-    console.log("Generate image confirmed for entity:", entity.name)
     setIsGenerateDialogOpen(false)
+  }
+
+  const handleUploadImage = (event: React.MouseEvent) => {
+    event.preventDefault()
+    setIsUploadDialogOpen(true)
+  }
+
+  const handleUploadDialogClose = () => {
+    setIsUploadDialogOpen(false)
+  }
+
+  const handleUploadDialogConfirm = () => {
+    setIsUploadDialogOpen(false)
   }
 
   return (
@@ -149,48 +173,21 @@ export function PositionableImage({
         },
       }}
     >
-      {entity.image_url && (
-        <Box
-          ref={imgRef}
-          component="img"
-          src={entity.image_url}
-          alt={entity.name}
-          onMouseDown={handleDragStart}
-          onTouchStart={handleDragStart}
-          sx={{
-            width: "100%",
-            height: "auto",
-            objectFit: "cover",
-            display: "block",
-            transform: `translate(${currentX}px, ${currentY}px)`,
-            cursor: isRepositioning
-              ? isDragging
-                ? "move"
-                : "grab"
-              : "default",
-            userSelect: "none",
-            touchAction: isRepositioning ? "none" : "auto",
-          }}
-        />
-      )}
+      <ImageBox
+        entity={entity}
+        imgRef={imgRef}
+        handleDragStart={handleDragStart}
+        isRepositioning={isRepositioning}
+        currentX={currentX}
+        currentY={currentY}
+        isDragging={isDragging}
+      />
       {isRepositioning && entity.image_url && (
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: 8,
-            right: 8,
-            display: "flex",
-            gap: 1,
-          }}
-        >
-          <SaveButton size="mini" onClick={handleSave} disabled={isSaving} />
-          <CancelButton
-            variant="contained"
-            size="mini"
-            onClick={() => setIsRepositioning(false)}
-            disabled={isSaving}
-          />
-        </Box>
+        <SaveCancelMiniButtons
+          onSave={handleSave}
+          onCancel={() => setIsRepositioning(false)}
+          isSaving={isSaving}
+        />
       )}
       {!isRepositioning && entity.image_url && (
         <Box
@@ -203,49 +200,16 @@ export function PositionableImage({
             gap: 1,
           }}
         >
-          <MiniButton
-            className="action-button"
-            variant="contained"
-            size="mini"
-            sx={{
-              opacity: 0,
-              transition: "opacity 0.2s",
-            }}
-            onClick={handleGenerateImage}
-          >
-            Generate
-          </MiniButton>
-          <MiniButton
-            className="action-button"
-            variant="contained"
-            size="mini"
-            sx={{
-              opacity: 0,
-              transition: "opacity 0.2s",
-            }}
-            onClick={() => setIsRepositioning(true)}
-          >
-            Reposition
-          </MiniButton>
+          <UploadButton onClick={handleUploadImage} />
+          <GenerateButton onClick={handleGenerateImage} />
+          <RepositionButton onClick={() => setIsRepositioning(true)} />
         </Box>
       )}
       {!isRepositioning && !entity.image_url && (
-        <MiniButton
-          className="action-button"
-          variant="contained"
-          size="mini"
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            opacity: 0,
-            transition: "opacity 0.2s",
-          }}
-          onClick={handleGenerateImage}
-        >
-          Generate Image
-        </MiniButton>
+        <>
+          <UploadButton onClick={handleUploadImage} />
+          <GenerateImageButton onClick={handleGenerateImage} />
+        </>
       )}
       <GenerateImageDialog
         open={isGenerateDialogOpen}
@@ -253,6 +217,14 @@ export function PositionableImage({
         onConfirm={handleGenerateDialogConfirm}
         title="Generate Image"
         entity={entity}
+      />
+      <UploadImageDialog
+        open={isUploadDialogOpen}
+        onClose={handleUploadDialogClose}
+        onConfirm={handleUploadDialogConfirm}
+        title="Upload Image"
+        entity={entity}
+        setEntity={setEntity}
       />
     </Box>
   )

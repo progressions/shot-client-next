@@ -1,34 +1,50 @@
 "use client"
 
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd"
+import BoltIcon from "@mui/icons-material/Bolt"
 import type { Character } from "@/types"
 import { useToast, useClient, useCampaign } from "@/contexts"
 import { useState, useEffect, useMemo } from "react"
-import { Box, Stack } from "@mui/material"
-import { CharacterSpeedDial, NameEditor } from "@/components/characters"
+import { useMediaQuery, Box, Stack } from "@mui/material"
+import { useTheme } from "@mui/material/styles"
 import { CS } from "@/services"
+import { SectionHeader, PositionableImage } from "@/components/ui"
 import {
+  CharacterSpeedDial,
+  NameEditor,
   Owner,
-  Associations,
   ActionValuesEdit,
-  Skills,
   Weapons,
   Description,
   Schticks,
   Parties,
   Sites,
+  EditType,
+  EditArchetype,
+  EditJuncture,
+  EditWealth,
+  SkillsManager,
 } from "@/components/characters"
 
 type EditCharacterProps = {
   character: Character
+  initialIsMobile?: boolean
 }
 
 export default function EditCharacter({
   character: initialCharacter,
+  initialIsMobile = false,
 }: EditCharacterProps) {
   const { campaignData } = useCampaign()
   const { client } = useClient()
-  const { toastError } = useToast()
+  const { toastSuccess, toastError } = useToast()
+  const theme = useTheme()
+  const smallScreen = useMediaQuery(theme.breakpoints.down("sm"))
+  const isMobile = initialIsMobile || smallScreen
+
   const [character, setCharacter] = useState<Character>(initialCharacter)
+
+  console.log("character length", JSON.stringify(character).length)
 
   useEffect(() => {
     document.title = character.name ? `${character.name} - Chi War` : "Chi War"
@@ -45,7 +61,6 @@ export default function EditCharacter({
 
   const updateCharacter = async updatedCharacter => {
     try {
-      console.log("Updating character:", updatedCharacter)
       setCharacter(updatedCharacter)
 
       const formData = new FormData()
@@ -58,8 +73,8 @@ export default function EditCharacter({
       }
       formData.append("character", JSON.stringify(characterData))
       const response = await client.updateCharacter(character.id, formData)
-      console.log("just updated character", response.data)
       setCharacter(response.data)
+      toastSuccess("Character updated successfully")
     } catch (error) {
       const nameErrors = error.response?.data?.errors?.name
       const errorMessage =
@@ -87,36 +102,75 @@ export default function EditCharacter({
         character={memoizedCharacter}
         setCharacter={setCharacter}
       />
+      <PositionableImage
+        entity={memoizedCharacter}
+        pageContext="edit"
+        height={400}
+        isMobile={isMobile}
+        setEntity={setCharacter}
+      />
       <NameEditor
         character={memoizedCharacter}
         setCharacter={setCharacter}
         updateCharacter={updateCharacter}
       />
       <Owner character={memoizedCharacter} />
+      <SectionHeader title="Action Values" icon={<BoltIcon />}>
+        Action Values are the core stats of your Character, used to resolve
+        actions and challenges in the game.
+      </SectionHeader>
       <ActionValuesEdit
         character={memoizedCharacter}
         setCharacter={setCharacter}
         updateCharacter={updateCharacter}
       />
+
+      <SectionHeader title="Personal Details" icon={<AssignmentIndIcon />}>
+        Personal details about your character, such as their type, archetype,
+        juncture, and wealth.
+      </SectionHeader>
+      <Stack direction="row" spacing={2} sx={{ my: 2 }}>
+        <EditType
+          character={memoizedCharacter}
+          updateCharacter={updateCharacter}
+        />
+        <EditArchetype
+          character={memoizedCharacter}
+          updateCharacter={updateCharacter}
+        />
+      </Stack>
+      <Stack direction="row" spacing={2} sx={{ my: 2 }}>
+        <EditJuncture
+          character={memoizedCharacter}
+          updateCharacter={updateCharacter}
+        />
+        <EditWealth
+          character={memoizedCharacter}
+          updateCharacter={updateCharacter}
+        />
+      </Stack>
+
+      <SkillsManager
+        character={memoizedCharacter}
+        updateCharacter={updateCharacter}
+      />
+
+      <Description
+        character={memoizedCharacter}
+        updateCharacter={updateCharacter}
+      />
+
+      <Weapons
+        character={memoizedCharacter}
+        setCharacter={setCharacter}
+        updateCharacter={updateCharacter}
+      />
       {!CS.isMook(memoizedCharacter) && (
-        <Stack
-          direction={{ xs: "column", md: "row" }}
-          sx={{
-            gap: { xs: 1, md: 2 },
-            "& > *": {
-              flex: { md: 1 },
-              width: { xs: "100%", md: "50%" },
-            },
-          }}
-        >
-          <Associations character={memoizedCharacter} />
-          <Skills character={memoizedCharacter} />
-        </Stack>
-      )}
-      <Description character={memoizedCharacter} />
-      <Weapons character={memoizedCharacter} />
-      {!CS.isMook(memoizedCharacter) && (
-        <Schticks character={memoizedCharacter} setCharacter={setCharacter} />
+        <Schticks
+          character={memoizedCharacter}
+          setCharacter={setCharacter}
+          updateCharacter={updateCharacter}
+        />
       )}
       <Parties character={memoizedCharacter} setCharacter={setCharacter} />
       {!CS.isMook(memoizedCharacter) && (
@@ -125,41 +179,3 @@ export default function EditCharacter({
     </Box>
   )
 }
-
-/*
-export default function EditCharacter({
-  character: initialCharacter,
-}: EditCharacterProps) {
-  const { client } = useClient()
-  const [character, setCharacter] = useState(initialCharacter)
-  const [value, setValue] = useState<number | null>(CS.defense(initialCharacter))
-
-  const updateCharacter = async (updatedCharacter) => {
-    console.log("Updating character:", updatedCharacter)
-    setCharacter(updatedCharacter)
-
-    const formData = new FormData()
-    const characterData = {
-      ...updatedCharacter,
-      schticks: undefined,
-      parties: undefined,
-      sites: undefined,
-      weapons: undefined
-    }
-    formData.append("character", JSON.stringify(characterData))
-    const response = await client.updateCharacter(character.id, formData)
-    console.log("just updated character", response.data)
-    setCharacter(response.data)
-  }
-
-  return (
-    <ActionValueEdit
-      name="Defense"
-      value={value}
-      character={character}
-      setCharacter={setCharacter}
-      updateCharacter={updateCharacter}
-    />
-  )
-}
-*/

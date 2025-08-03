@@ -18,11 +18,7 @@ import {
 } from "@mui/material"
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
-import {
-  SchtickDetail,
-  CreateSchtickForm,
-  EditSchtickForm,
-} from "@/components/schticks"
+import { SchtickDetail, CreateSchtickForm } from "@/components/schticks"
 import type { Schtick, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
@@ -159,25 +155,6 @@ export default function Schticks({
     })
     if (selectedSchtick?.id === schtickId) setSelectedSchtick(null)
     router.refresh()
-  }
-
-  const handleEditSchtick = (schtick: Schtick) => {
-    setSelectedSchtick(schtick)
-  }
-
-  const handleCloseEditSchtick = () => {
-    setSelectedSchtick(null)
-  }
-
-  const handleSaveEditSchtick = (updatedSchtick: Schtick) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "schticks",
-      value: schticks.map(f =>
-        f.id === updatedSchtick.id ? updatedSchtick : f
-      ),
-    })
-    setSelectedSchtick(null)
   }
 
   const handlePageChange = async (
@@ -320,7 +297,6 @@ export default function Schticks({
               key={schtick.id}
               schtick={schtick}
               onDelete={handleDeleteSchtick}
-              onEdit={handleEditSchtick}
             />
           ))
         )}
@@ -339,14 +315,6 @@ export default function Schticks({
         onClose={handleCloseCreateDrawer}
         onSave={handleSaveSchtick}
       />
-      {selectedSchtick && (
-        <EditSchtickForm
-          open={!!selectedSchtick}
-          onClose={handleCloseEditSchtick}
-          onSave={handleSaveEditSchtick}
-          schtick={selectedSchtick}
-        />
-      )}
     </Box>
   )
 }

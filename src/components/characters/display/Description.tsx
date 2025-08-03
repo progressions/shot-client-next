@@ -1,108 +1,155 @@
-import { Typography, Stack, Box } from "@mui/material"
+"use client"
+
+import { GiDramaMasks } from "react-icons/gi"
+import { GiClothes } from "react-icons/gi"
+import Person2Icon from "@mui/icons-material/Person2"
+import AutoStoriesIcon from "@mui/icons-material/AutoStories"
+import { Stack, Box } from "@mui/material"
 import type { Character } from "@/types"
 import { CS } from "@/services"
-import { RichTextRenderer } from "@/components/editor"
+import { EditableRichText, SectionHeader } from "@/components/ui"
+import { DescriptionValue } from "@/components/characters"
 
 type DescriptionProps = {
   character: Character
+  updateCharacter: (character: Character) => Promise<void>
 }
 
-export default function Description({ character }: DescriptionProps) {
+export default function Description({
+  character,
+  updateCharacter,
+}: DescriptionProps) {
+  const handleChange = async event => {
+    console.log("Description changed:", event.target.name, event.target.value)
+    const updatedCharacter = CS.changeDescriptionValue(
+      character,
+      event.target.name,
+      event.target.value
+    )
+    await updateCharacter(updatedCharacter)
+  }
+
   if (CS.isMook(character)) {
     return (
       <Box>
-        <Box
-          sx={{
-            backgroundColor: "background.paper",
-            p: 2,
-            mb: 2,
-            borderRadius: 1,
-          }}
-        >
-          <RichTextRenderer html={CS.description(character)} />
-        </Box>
+        <SectionHeader title="Appearance" icon={<Person2Icon />} sx={{ mt: 4 }}>
+          A brief description of your character, including their background,
+          personality, and notable traits.
+        </SectionHeader>
+        <EditableRichText
+          name="Appearance"
+          html={CS.description(character)}
+          editable={true}
+          onChange={handleChange}
+          fallback="No description available."
+        />
       </Box>
     )
   }
 
   return (
     <Box>
-      <Box
-        sx={{
-          backgroundColor: "background.paper",
-          p: 2,
-          my: 2,
-          borderRadius: 1,
-        }}
-      >
-        <RichTextRenderer
-          html={CS.description(character) || "No description available."}
-        />
-      </Box>
+      <SectionHeader title="Appearance" icon={<Person2Icon />} sx={{ mt: 4 }}>
+        A brief description of your character, including their background,
+        personality, and notable traits.
+      </SectionHeader>
+      <EditableRichText
+        name="Appearance"
+        html={CS.description(character)}
+        editable={true}
+        onChange={handleChange}
+        fallback="No description available."
+      />
       <Stack
         direction="row"
         spacing={2}
         sx={{ my: 2 }}
         justifyContent="space-between"
       >
-        <Typography>Age: {CS.age(character) || "Unknown"}</Typography>
-        <Typography>Height: {CS.height(character) || "Unknown"}</Typography>
-        <Typography>Weight: {CS.weight(character) || "Unknown"}</Typography>
-        <Typography>
-          Hair Color: {CS.hairColor(character) || "Unknown"}
-        </Typography>
-        <Typography>
-          Eye Color: {CS.eyeColor(character) || "Unknown"}
-        </Typography>
+        <DescriptionValue
+          name="Age"
+          value={CS.age(character)}
+          character={character}
+          updateCharacter={updateCharacter}
+        />
+        <DescriptionValue
+          name="Height"
+          value={CS.height(character)}
+          character={character}
+          updateCharacter={updateCharacter}
+        />
+        <DescriptionValue
+          name="Weight"
+          value={CS.weight(character)}
+          character={character}
+          updateCharacter={updateCharacter}
+        />
+        <DescriptionValue
+          name="Hair Color"
+          value={CS.hairColor(character)}
+          character={character}
+          updateCharacter={updateCharacter}
+        />
+        <DescriptionValue
+          name="Eye Color"
+          value={CS.eyeColor(character)}
+          character={character}
+          updateCharacter={updateCharacter}
+        />
       </Stack>
       <Box>
-        <Typography variant="h6">Style of Dress</Typography>
-        <Box
-          sx={{
-            backgroundColor: "background.paper",
-            p: 2,
-            mb: 2,
-            borderRadius: 1,
-          }}
+        <SectionHeader
+          title="Style of Dress"
+          icon={<GiClothes size={24} />}
+          sx={{ mt: 4 }}
         >
-          <RichTextRenderer
-            html={CS.styleOfDress(character) || "No information available."}
-          />
-        </Box>
+          A brief description of your character&rsquo;s style of dress,
+          including any notable fashion choices or accessories.
+        </SectionHeader>
+        <EditableRichText
+          name="Style of Dress"
+          html={CS.styleOfDress(character)}
+          editable={true}
+          onChange={handleChange}
+          fallback="No fashion details available."
+        />
       </Box>
       {CS.isPC(character) && (
         <Box>
-          <Typography variant="h6">Melodramatic Hook</Typography>
-          <Box
-            sx={{
-              backgroundColor: "background.paper",
-              p: 2,
-              mb: 2,
-              borderRadius: 1,
-            }}
+          <SectionHeader
+            title="Melodramatic Hook"
+            icon={<GiDramaMasks size={24} />}
+            sx={{ mt: 4 }}
           >
-            <RichTextRenderer
-              html={
-                CS.melodramaticHook(character) || "No information available."
-              }
-            />
-          </Box>
+            A melodramatic hook is a brief, dramatic statement that captures the
+            essence of your character&rsquo;s story or personality.
+          </SectionHeader>
+          <EditableRichText
+            name="Melodramatic Hook"
+            html={CS.melodramaticHook(character)}
+            editable={true}
+            onChange={handleChange}
+            fallback="No details available."
+          />
         </Box>
       )}
       <Box>
-        <Typography variant="h6">Background</Typography>
-        <Box
-          sx={{
-            backgroundColor: "background.paper",
-            p: 2,
-            mb: 2,
-            borderRadius: 1,
-          }}
+        <SectionHeader
+          title="Background"
+          icon={<AutoStoriesIcon />}
+          sx={{ mt: 4 }}
         >
-          <RichTextRenderer
-            html={CS.background(character) || "No information available."}
-          />
-        </Box>
+          A brief description of your character&rsquo;s background, including
+          their history, upbringing, and any significant events that shaped
+          them.
+        </SectionHeader>
+        <EditableRichText
+          name="Background"
+          html={CS.background(character)}
+          editable={true}
+          onChange={handleChange}
+          fallback="No background details available."
+        />
       </Box>
     </Box>
   )

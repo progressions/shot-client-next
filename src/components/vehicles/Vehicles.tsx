@@ -1,34 +1,13 @@
 "use client"
-
 import { useRouter } from "next/navigation"
 import { useMemo, useEffect, useCallback, useState } from "react"
-import {
-  Pagination,
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-  useMediaQuery,
-} from "@mui/material"
-import { GridView, ViewList } from "@mui/icons-material"
-import Link from "next/link"
+import { Box } from "@mui/material"
 import type { Vehicle, PaginationMeta } from "@/types"
-import { useCampaign, useClient } from "@/contexts"
-import { useTheme } from "@mui/material/styles"
-import {
-  VehiclesMobile,
-  VehicleFilter,
-  SpeedDial,
-  VehicleName,
-} from "@/components/vehicles"
-import { CS } from "@/services"
+import { useCampaign, useClient, useLocalStorage } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
 import { HeroTitle } from "@/components/ui"
 import { queryParams } from "@/lib"
-import { actions as initialActions } from "@/components/vehicles/SpeedDial"
+import { VehiclesView, VehiclesMenu } from "@/components/vehicles"
 
 interface VehiclesProperties {
   initialVehicles: Vehicle[]
@@ -39,13 +18,6 @@ interface VehiclesProperties {
 }
 
 type ValidSort = "name" | "type" | "created_at" | "updated_at"
-const _validSorts: readonly ValidSort[] = [
-  "name",
-  "type",
-  "created_at",
-  "updated_at",
-]
-
 type ValidOrder = "asc" | "desc"
 
 type FormStateData = {
@@ -67,15 +39,12 @@ export default function Vehicles({
 }: VehiclesProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
+  const { saveLocally, getLocally } = useLocalStorage()
   const router = useRouter()
-  const theme = useTheme()
-  const smallScreen = useMediaQuery(theme.breakpoints.down("sm"))
-  const isMobile = initialIsMobile || smallScreen
-
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
-    isMobile ? "mobile" : "table"
+    (getLocally("vehicleViewMode") as "table" | "mobile") ||
+      (initialIsMobile ? "mobile" : "table")
   )
-
   const { formState, dispatchForm } = useForm<FormStateData>({
     vehicles: initialVehicles,
     meta: initialMeta,
@@ -85,8 +54,7 @@ export default function Vehicles({
     archetype: "",
     faction_id: "",
   })
-
-  const { vehicles, meta, sort, order, vehicle_type, archetype, faction_id } =
+  const { meta, sort, order, vehicle_type, archetype, faction_id } =
     formState.data
 
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
@@ -168,6 +136,10 @@ export default function Vehicles({
     fetchVehicles(1, sort, order, vehicle_type, faction_id, archetype)
   }, [vehicle_type, archetype, faction_id, fetchVehicles, order, router, sort])
 
+  useEffect(() => {
+    saveLocally("vehicleViewMode", viewMode)
+  }, [viewMode, saveLocally])
+
   const handlePageChange = (
     _event: React.ChangeEvent<unknown>,
     page: number
@@ -219,35 +191,9 @@ export default function Vehicles({
     fetchVehicles(1, newSort, newOrder)
   }
 
-  const handleToggleView = () => {
-    setViewMode(viewMode === "table" ? "mobile" : "table")
-  }
-
-  const formatDate = (date: string) => {
-    if (viewMode === "mobile") {
-      const d = new Date(date)
-      return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear().toString().slice(-2)}`
-    }
-    return new Date(date).toLocaleString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    })
-  }
-
-  const actions = [
-    {
-      icon: viewMode === "table" ? <GridView /> : <ViewList />,
-      name:
-        viewMode === "table" ? "Switch to Mobile View" : "Switch to Table View",
-      onClick: handleToggleView,
-    },
-    ...initialActions,
-  ]
-
   return (
     <>
-      <SpeedDial actions={actions} />
+      <VehiclesMenu viewMode={viewMode} setViewMode={setViewMode} />
       <Box
         sx={{
           display: "flex",
@@ -258,180 +204,15 @@ export default function Vehicles({
       >
         <HeroTitle>Vehicles</HeroTitle>
       </Box>
-      <Box sx={{ width: "100%", mb: 2 }}>
-        {viewMode === "mobile" ? (
-          <VehiclesMobile
-            formState={formState}
-            dispatchForm={dispatchForm}
-            onPageChange={handlePageChange}
-            onSortChange={handleSortChange}
-            onOrderChange={() => handleSortChange(sort as ValidSort)}
-            initialIsMobile={initialIsMobile}
-          />
-        ) : (
-          <>
-            <VehicleFilter dispatch={dispatchForm} includeVehicles={false} />
-            <Box sx={{ bgcolor: "#424242", borderRadius: 1 }}>
-              <Table
-                sx={{
-                  maxWidth: { xs: "400px", sm: "100%" },
-                  tableLayout: "fixed",
-                }}
-              >
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ color: "#ffffff" }}>
-                      <TableSortLabel
-                        active={sort === "name"}
-                        direction={
-                          sort === "name" ? (order as ValidOrder) : "asc"
-                        }
-                        onClick={() => handleSortChange("name")}
-                        sx={{
-                          color: "#ffffff",
-                          "&.Mui-active": { color: "#ffffff" },
-                          "& .MuiTableSortLabel-icon": {
-                            color: "#ffffff !important",
-                          },
-                        }}
-                      >
-                        Name
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        color: "#ffffff",
-                        width: { xs: "65px", sm: "150px" },
-                      }}
-                    >
-                      <TableSortLabel
-                        active={sort === "type"}
-                        direction={
-                          sort === "type" ? (order as ValidOrder) : "asc"
-                        }
-                        onClick={() => handleSortChange("type")}
-                        sx={{
-                          color: "#ffffff",
-                          "&.Mui-active": { color: "#ffffff" },
-                          "& .MuiTableSortLabel-icon": {
-                            color: "#ffffff !important",
-                          },
-                        }}
-                      >
-                        Type
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        color: "#ffffff",
-                        width: { xs: "65px", sm: "150px" },
-                      }}
-                    >
-                      <TableSortLabel
-                        active={sort === "created_at"}
-                        direction={
-                          sort === "created_at" ? (order as ValidOrder) : "asc"
-                        }
-                        onClick={() => handleSortChange("created_at")}
-                        sx={{
-                          color: "#ffffff",
-                          "&.Mui-active": { color: "#ffffff" },
-                          "& .MuiTableSortLabel-icon": {
-                            color: "#ffffff !important",
-                          },
-                        }}
-                      >
-                        Created
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        color: "#ffffff",
-                        width: { xs: "60px", sm: "100px" },
-                        textAlign: "center",
-                        padding: { xs: "8px 4px", sm: "16px 8px" },
-                      }}
-                    >
-                      Active
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {vehicles.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={4} sx={{ color: "#ffffff" }}>
-                        No vehicles available
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    vehicles.map(vehicle => (
-                      <TableRow
-                        key={vehicle.id}
-                        sx={{ "&:hover": { bgcolor: "#616161" } }}
-                      >
-                        <TableCell
-                          sx={{
-                            color: "#ffffff",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          <Link
-                            href={`/vehicles/${vehicle.id}`}
-                            style={{
-                              color: "#ffffff",
-                              textDecoration: "underline",
-                            }}
-                          >
-                            <VehicleName vehicle={vehicle} />
-                          </Link>
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            color: "#ffffff",
-                            width: { xs: "65px", sm: "150px" },
-                          }}
-                        >
-                          {CS.type(vehicle)}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            color: "#ffffff",
-                            width: { xs: "65px", sm: "150px" },
-                          }}
-                        >
-                          {formatDate(vehicle.created_at || "")}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            color: "#ffffff",
-                            width: { xs: "60px", sm: "100px" },
-                            textAlign: "center",
-                            padding: { xs: "8px 4px", sm: "16px 8px" },
-                          }}
-                        >
-                          {vehicle.active ? "Yes" : "No"}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </Box>
-            <Pagination
-              count={meta.total_pages}
-              page={meta.current_page}
-              onChange={handlePageChange}
-              variant="outlined"
-              color="primary"
-              shape="rounded"
-              size="large"
-              sx={{ mt: 2 }}
-            />
-          </>
-        )}
-      </Box>
+      <VehiclesView
+        viewMode={viewMode}
+        formState={formState}
+        dispatchForm={dispatchForm}
+        onPageChange={handlePageChange}
+        onSortChange={handleSortChange}
+        onOrderChange={() => handleSortChange(sort as ValidSort)}
+        initialIsMobile={initialIsMobile}
+      />
     </>
   )
 }

@@ -3,6 +3,7 @@
 import type { Weapon } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
+import { useState, useEffect } from "react"
 
 type WeaponsAutocompleteProperties = {
   value: string
@@ -20,6 +21,27 @@ export default function WeaponsAutocomplete({
   allowNone = true,
 }: WeaponsAutocompleteProperties) {
   const { client } = useClient()
+  const [weapons, setWeapons] = useState<Weapon[]>([])
+
+  useEffect(() => {
+    const fetchWeapons = async () => {
+      try {
+        const response = await client.getWeapons({
+          per_page: 200,
+          page: 1,
+          sort: "name",
+          order: "asc",
+        })
+        setWeapons(response.data.weapons || [])
+      } catch (error) {
+        console.error("Error fetching weapons:", error)
+      }
+    }
+
+    fetchWeapons().catch(error => {
+      console.error("Error in useEffect fetchWeapons:", error)
+    })
+  }, [client])
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
     if (options) {
@@ -31,16 +53,20 @@ export default function WeaponsAutocomplete({
 
       return filteredOptions
     }
-    try {
-      const response = await client.getWeapons({ search: inputValue })
-      return response.data.weapons.map((weapon: Weapon) => ({
-        label: weapon.name || "",
-        value: weapon.id || "",
+    return weapons
+      .filter(weapon =>
+        weapon.name.toLowerCase().includes(inputValue.toLowerCase())
+      )
+      .map(weapon => ({
+        label: weapon.name,
+        value: weapon.id,
       }))
-    } catch (error) {
-      console.error("Error fetching options:", error)
-      return []
-    }
+  }
+
+  const handleChange = (selectedOption: Option | null) => {
+    console.log("selectedOption", selectedOption)
+    const weapon = weapons.find(s => s.id === selectedOption)
+    onChange(weapon)
   }
 
   return (
@@ -48,7 +74,7 @@ export default function WeaponsAutocomplete({
       label="Weapon"
       value={value}
       fetchOptions={fetchOptions}
-      onChange={onChange}
+      onChange={handleChange}
       exclude={exclude}
       allowNone={allowNone}
     />

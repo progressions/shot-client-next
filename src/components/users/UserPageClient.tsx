@@ -71,7 +71,7 @@ export default function UserPageClient({
       >
         <Typography variant="h4">{user.name}</Typography>
       </Box>
-      <HeroImage entity={user} />
+      <HeroImage entity={user} setEntity={setUser} />
       <Box sx={{ p: 2, backgroundColor: "#2e2e2e", borderRadius: 1, my: 2 }}>
         <RichTextRenderer
           key={user.description}

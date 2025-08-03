@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Button, Stack, Typography } from "@mui/material"
+import { Box, Button, Stack } from "@mui/material"
 import PersonAddIcon from "@mui/icons-material/PersonAdd"
 import type { Entity } from "@/types"
 
@@ -18,14 +18,18 @@ import {
 } from "@/components/autocomplete"
 import { paginateArray } from "@/lib"
 import { BadgeList } from "@/components/lists"
+import { ManageButton, SectionHeader } from "@/components/ui"
 
 type FormStateData = {
   page: number
   open: boolean
   id?: string | null
+  selectedEntity?: Entity | null
+  collectionItems?: Entity[]
 }
 
 type ListManagerProperties = {
+  icon: React.ReactNode
   entity: Entity
   name: string
   title: string
@@ -37,6 +41,7 @@ type ListManagerProperties = {
 }
 
 export default function ListManager({
+  icon,
   entity,
   name,
   update,
@@ -47,16 +52,20 @@ export default function ListManager({
   manage = true,
 }: ListManagerProperties) {
   const { formState, dispatchForm } = useForm<FormStateData>({
+    collectionItems: entity[collection] || ([] as Entity[]),
+    selectedEntity: null,
     id: null,
     page: 1,
     open: false,
   })
-  const { page, id, open } = formState.data
-  const { items, meta } = paginateArray<Entity>(
-    (entity[collection] as Entity[]) || [],
-    page,
-    5
-  )
+  const { collectionItems, page, id, open } = formState.data
+  const sortedItems = collectionItems.sort((a, b) => {
+    if (a.name && b.name) {
+      return a.name.localeCompare(b.name)
+    }
+    return 0
+  })
+  const { items, meta } = paginateArray<Entity>(sortedItems || [], page, 5)
   const entityCollection = entity[collection_ids] || ([] as string[])
 
   const isStringArray = (value: unknown): value is string[] => {
@@ -86,10 +95,15 @@ export default function ListManager({
       formData.set(name.toLowerCase(), JSON.stringify(entityData))
       await update(entity.id, formData)
 
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "collectionItems",
+        value: [...collectionItems, formState.data.selectedEntity],
+      })
       dispatchForm({ type: FormActions.UPDATE, name: "id", value: null })
     } catch (error) {
       console.error("Error adding member:", error)
-      alert("Failed to add character. Please try again.")
+      alert("Failed to add. Please try again.")
     }
   }
 
@@ -105,6 +119,12 @@ export default function ListManager({
       const entityData = { ...entity, [collection_ids]: updatedIds }
       formData.append(name.toLowerCase(), JSON.stringify(entityData))
       await update(entity.id, formData)
+
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "collectionItems",
+        value: collectionItems.filter((i: Entity) => i.id !== item.id),
+      })
     } catch (error) {
       console.error("Error removing entity member:", error)
       alert("Failed to remove.")
@@ -119,7 +139,8 @@ export default function ListManager({
   }
 
   const handleAutocompleteChange = (value: string | null) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "id", value })
+    dispatchForm({ type: FormActions.UPDATE, name: "id", value: value.id })
+    dispatchForm({ type: FormActions.UPDATE, name: "selectedEntity", value })
   }
 
   const ids = entity[collection_ids] || ([] as string[])
@@ -233,6 +254,8 @@ export default function ListManager({
       </>
     )
 
+  const actionButton = <ManageButton open={open} dispatchForm={dispatchForm} />
+
   return (
     <>
       <Box sx={{ my: 4 }}>
@@ -246,49 +269,17 @@ export default function ListManager({
             mb: 2,
           }}
         >
-          <Typography variant="h5">{title}</Typography>
-          {open && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() =>
-                dispatchForm({
-                  type: FormActions.UPDATE,
-                  name: "open",
-                  value: false,
-                })
-              }
-              size="small"
-              sx={{ px: 1.5 }}
-            >
-              Close
-            </Button>
-          )}
-          {!open && (
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              onClick={() =>
-                dispatchForm({
-                  type: FormActions.UPDATE,
-                  name: "open",
-                  value: true,
-                })
-              }
-              sx={{ px: 1.5 }}
-            >
-              Manage
-            </Button>
-          )}
-        </Box>
-        <Typography gutterBottom>{description}</Typography>
-        {open && (
-          <Stack
-            direction="row"
-            spacing={1}
-            sx={{ my: 2, alignItems: "center" }}
+          <SectionHeader
+            title={title}
+            icon={icon}
+            actions={actionButton}
+            sx={{ width: "100%" }}
           >
+            {description}
+          </SectionHeader>
+        </Box>
+        {open && (
+          <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
             {autocomplete}
             <Button
               variant="contained"

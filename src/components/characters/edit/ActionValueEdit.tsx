@@ -4,6 +4,7 @@ import type { Character } from "@/types"
 import { Stack, Typography } from "@mui/material"
 import { ActionValueLink } from "@/components/links"
 import { ActionValueNumberField } from "@/components/characters"
+import { SystemStyleObject, Theme } from "@mui/system"
 
 type ActionValueProps = {
   name: string
@@ -11,6 +12,7 @@ type ActionValueProps = {
   character: Character
   setCharacter: (character: Character) => void
   updateCharacter: (updatedCharacter: Character) => Promise<void>
+  sx?: SystemStyleObject<Theme>
 }
 
 export default function ActionValue({
@@ -19,22 +21,23 @@ export default function ActionValue({
   character,
   setCharacter,
   updateCharacter,
+  sx,
 }: ActionValueProps) {
   return (
     <Stack
       direction="column"
-      sx={{ alignItems: "flex-start", gap: 0.5, width: 130 }}
+      sx={{ alignItems: "flex-start", gap: 0.5, width: 110 }}
     >
       <Typography
         variant="body2"
         sx={{
-          width: "110px",
           color: "#ffffff",
           fontSize: "1rem",
           textAlign: "left",
           height: "2rem",
           mt: 1,
           lineHeight: "1.5rem",
+          ...sx,
         }}
       >
         <ActionValueLink name={name} />
@@ -42,6 +45,7 @@ export default function ActionValue({
       <ActionValueNumberField
         name={name}
         size={size}
+        width="120px"
         character={character}
         setCharacter={setCharacter}
         updateCharacter={updateCharacter}

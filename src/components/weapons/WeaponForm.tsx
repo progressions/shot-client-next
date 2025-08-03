@@ -143,8 +143,6 @@ export default function WeaponForm({
     dispatchForm({ type: FormActions.UPDATE, name: "category", value })
   }
 
-  console.log("weapon", formState.data)
-
   return (
     <Drawer
       anchor={isMobile ? "bottom" : "right"}

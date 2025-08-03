@@ -65,7 +65,8 @@ const config = [
       "drizzle/enforce-delete-with-where": "off",
       "import/no-unresolved": "error",
       "import/named": "error",
-      "import/no-extraneous-dependencies": "error"
+      "import/no-extraneous-dependencies": "error",
+      "@typescript-eslint/no-explicit-any": "error",
     },
   },
 ]

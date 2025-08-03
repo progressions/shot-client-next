@@ -98,6 +98,28 @@ const CharacterService = {
     }
   },
 
+  changeAppearance: function (character: Character, value: string): Character {
+    return this.changeDescriptionValue(
+      character,
+      DescriptionKeys.Appearance,
+      value
+    )
+  },
+
+  changeDescriptionValue: function (
+    character: Character,
+    key: DescriptionKeys,
+    value: string
+  ): Character {
+    return {
+      ...character,
+      description: {
+        ...character.description,
+        [key]: value,
+      },
+    }
+  },
+
   // Take a Smackdown, reduced by Toughness
   takeSmackdown: function (
     character: Character,

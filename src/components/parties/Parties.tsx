@@ -18,11 +18,7 @@ import {
 } from "@mui/material"
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
-import {
-  PartyDetail,
-  CreatePartyForm,
-  EditPartyForm,
-} from "@/components/parties"
+import { PartyDetail, PartyForm } from "@/components/parties"
 import type { Party, Faction, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
@@ -179,23 +175,6 @@ export default function Parties({
     })
     if (selectedParty?.id === partyId) setSelectedParty(null)
     router.refresh()
-  }
-
-  const handleEditParty = (party: Party) => {
-    setSelectedParty(party)
-  }
-
-  const handleCloseEditParty = () => {
-    setSelectedParty(null)
-  }
-
-  const handleSaveEditParty = (updatedParty: Party) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "parties",
-      value: parties.map(f => (f.id === updatedParty.id ? updatedParty : f)),
-    })
-    setSelectedParty(null)
   }
 
   const handlePageChange = async (
@@ -375,7 +354,6 @@ export default function Parties({
               key={party.id}
               party={party}
               onDelete={handleDeleteParty}
-              onEdit={handleEditParty}
             />
           ))
         )}
@@ -389,19 +367,11 @@ export default function Parties({
         shape="rounded"
         size="large"
       />
-      <CreatePartyForm
+      <PartyForm
         open={drawerOpen}
         onClose={handleCloseCreateDrawer}
-        onSave={handleSaveParty}
+        setParty={handleSaveParty}
       />
-      {selectedParty && (
-        <EditPartyForm
-          open={!!selectedParty}
-          onClose={handleCloseEditParty}
-          onSave={handleSaveEditParty}
-          party={selectedParty}
-        />
-      )}
     </Box>
   )
 }

@@ -5,3 +5,8 @@ export { default as VehicleDescription } from "@/components/vehicles/VehicleDesc
 export { default as VehicleDetail } from "@/components/vehicles/VehicleDetail"
 export { default as VehicleFilter } from "@/components/vehicles/VehicleFilter"
 export { default as SpeedDial } from "@/components/vehicles/SpeedDial"
+export { default as VehiclesView } from "@/components/vehicles/table/VehiclesView"
+export { default as VehiclesTableHeader } from "@/components/vehicles/table/VehiclesTableHeader"
+export { default as VehiclesTableBody } from "@/components/vehicles/table/VehiclesTableBody"
+export { default as VehiclesPagination } from "@/components/vehicles/table/VehiclesPagination"
+export { default as VehiclesMenu } from "@/components/vehicles/table/VehiclesMenu"

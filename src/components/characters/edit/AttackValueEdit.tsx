@@ -28,7 +28,10 @@ export default function AttackValueEdit({
   const [selectedName, setSelectedName] = useState<string>(name || "")
 
   return (
-    <Stack direction="column" sx={{ alignItems: "flex-start", gap: 0.5 }}>
+    <Stack
+      direction="column"
+      sx={{ alignItems: "flex-start", gap: 0.5, width: 130 }}
+    >
       <AttackNameSelect
         attack={attack}
         name={name}

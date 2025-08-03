@@ -3,6 +3,7 @@
 import type { Site } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
+import { useState, useEffect } from "react"
 
 type SitesAutocompleteProperties = {
   value: string
@@ -20,6 +21,27 @@ export default function SitesAutocomplete({
   allowNone = true,
 }: SitesAutocompleteProperties) {
   const { client } = useClient()
+  const [sites, setSites] = useState<Site[]>([])
+
+  useEffect(() => {
+    const fetchSites = async () => {
+      try {
+        const response = await client.getSites({
+          per_page: 200,
+          page: 1,
+          sort: "name",
+          order: "asc",
+        })
+        setSites(response.data.sites || [])
+      } catch (error) {
+        console.error("Error fetching sites:", error)
+      }
+    }
+
+    fetchSites().catch(error => {
+      console.error("Error in useEffect fetchSites:", error)
+    })
+  }, [client])
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
     if (options) {
@@ -31,16 +53,19 @@ export default function SitesAutocomplete({
 
       return filteredOptions
     }
-    try {
-      const response = await client.getSites({ search: inputValue })
-      return response.data.sites.map((site: Site) => ({
-        label: site.name || "",
-        value: site.id || "",
+    return sites
+      .filter(site =>
+        site.name.toLowerCase().includes(inputValue.toLowerCase())
+      )
+      .map(site => ({
+        label: site.name,
+        value: site.id,
       }))
-    } catch (error) {
-      console.error("Error fetching options:", error)
-      return []
-    }
+  }
+
+  const handleChange = (selectedOption: Option | null) => {
+    const site = sites.find(s => s.id === selectedOption)
+    onChange(site)
   }
 
   return (
@@ -48,7 +73,7 @@ export default function SitesAutocomplete({
       label="Site"
       value={value}
       fetchOptions={fetchOptions}
-      onChange={onChange}
+      onChange={handleChange}
       exclude={exclude}
       allowNone={allowNone}
     />

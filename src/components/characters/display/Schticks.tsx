@@ -1,45 +1,41 @@
 "use client"
 
+import { Box } from "@mui/material"
+import { VscGithubAction } from "react-icons/vsc"
 import type { Character } from "@/types"
-import { useClient } from "@/contexts"
 import { InfoLink } from "@/components/links"
-import { ListManager } from "@/components/lists"
+import { SchtickManager } from "@/components/schticks"
 
 type SchticksProperties = {
-  character: Character
-  manage?: boolean
+  character: Pick<Character, "id" | "user" | "schtick_ids">
+  setCharacter: (character: Character) => void
 }
 
 export default function Schticks({
   character,
-  manage = true,
+  setCharacter,
+  updateCharacter,
 }: SchticksProperties) {
-  const { client } = useClient()
-
-  async function update(characterId: string, formData: FormData) {
-    try {
-      await client.updateCharacter(characterId, formData)
-    } catch (error) {
-      console.error("Error updating character:", error)
-      throw error
-    }
-  }
-
+  const iconBox = (
+    <Box sx={{ pt: 1, fontSize: "1.4rem" }}>
+      <VscGithubAction />
+    </Box>
+  )
   return (
-    <ListManager
-      entity={character}
-      name="Character"
-      collection="schticks"
-      collection_ids="schtick_ids"
+    <SchtickManager
+      icon={iconBox}
+      name="character"
       title="Schticks"
       description={
         <>
-          <InfoLink href="/schticks" info="Schticks" /> are special abilities or{" "}
-          powers your character can use.
+          <InfoLink href="/schticks" info="Schticks" /> are special abilities or
+          powers, such as <InfoLink info="Martial Arts" /> techniques or{" "}
+          <InfoLink info="Magic" /> spells.
         </>
       }
-      update={update}
-      manage={manage}
+      entity={character}
+      update={updateCharacter}
+      setEntity={setCharacter}
     />
   )
 }

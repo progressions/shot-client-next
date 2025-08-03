@@ -6,13 +6,16 @@ import { FormControl, FormHelperText } from "@mui/material"
 import { NumberField } from "@/components/ui"
 import { useToast } from "@/contexts"
 import { CS } from "@/services"
+import { SystemStyleObject, Theme } from "@mui/system"
 
 type ActionValueProps = {
   name: string
   size: "small" | "large"
+  width?: string
   character: Character
   setCharacter: (character: Character) => void
   updateCharacter: (updatedCharacter: Character) => Promise<void>
+  sx?: SystemStyleObject<Theme>
 }
 
 export default function ActionValue({
@@ -21,6 +24,8 @@ export default function ActionValue({
   character,
   setCharacter,
   updateCharacter,
+  width = "140px",
+  sx = {},
 }: ActionValueProps) {
   const { toastSuccess, toastError } = useToast()
   const [value, setValue] = useState<string>(
@@ -74,7 +79,7 @@ export default function ActionValue({
     } as React.FocusEvent<HTMLInputElement>)
   }
 
-  const handleValueBlur = async (event) => {
+  const handleValueBlur = async event => {
     console.log("Blur: value =", event.target.value)
     const error = validateValue(event.target.value)
     setValue(event.target.value)
@@ -100,7 +105,7 @@ export default function ActionValue({
   }
 
   return (
-    <FormControl error={!!valueError || !!serverError} sx={{ width: "110px" }}>
+    <FormControl error={!!valueError || !!serverError}>
       <NumberField
         name={name}
         value={value ? Number(value) : null}
@@ -108,6 +113,8 @@ export default function ActionValue({
         error={!!valueError || !!serverError}
         onChange={handleValueChange}
         onBlur={handleValueBlur}
+        width={width}
+        sx={sx}
       />
       {(valueError || serverError) && (
         <FormHelperText sx={{ mt: -0.5, textAlign: "left" }}>

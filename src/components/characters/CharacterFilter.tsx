@@ -22,7 +22,7 @@ type FormStateData = {
 }
 
 type CharacterFilterProps = {
-  setChararacterId: (id: string | null) => void
+  setCharacterId: (id: string | null) => void
   dispatch: React.Dispatch<FormStateData>
   includeTypes?: boolean
   includeArchetypes?: boolean
@@ -129,9 +129,13 @@ export default function CharacterFilter({
     fetchCharacters,
   ])
 
-  const handleCharacterChange = (value: string | null) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "character_id", value })
-    setCharacterId(value)
+  const handleCharacterChange = (character: Character | null) => {
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "character_id",
+      value: character.id,
+    })
+    setCharacterId(character.id)
   }
 
   const handleFactionChange = (value: string | null) => {

@@ -1,14 +1,21 @@
 "use client"
 
+import { VscGithubAction } from "react-icons/vsc"
 import { redirect } from "next/navigation"
 import { useState, useEffect } from "react"
-import { Alert, Stack, Chip, Typography, Box } from "@mui/material"
+import { Alert, Stack, Chip, Box } from "@mui/material"
 import type { Weapon } from "@/types"
-import { RichTextRenderer } from "@/components/editor"
 import { useCampaign } from "@/contexts"
-import { EditWeaponForm } from "@/components/weapons"
+import { Stats, EditJunctureCategory } from "@/components/weapons"
 import { useClient } from "@/contexts"
-import { HeroImage, SpeedDialMenu } from "@/components/ui"
+import {
+  SectionHeader,
+  EditableRichText,
+  HeroImage,
+  SpeedDialMenu,
+} from "@/components/ui"
+import { useEntity } from "@/hooks"
+import { NameEditor } from "@/components/entities"
 
 interface WeaponPageClientProperties {
   weapon: Weapon
@@ -46,8 +53,8 @@ export default function WeaponPageClient({
   const { campaignData } = useCampaign()
   const { client } = useClient()
   const [weapon, setWeapon] = useState<Weapon>(initialWeapon)
-  const [editOpen, setEditOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { update: updateWeapon } = useEntity<Weapon>("weapon", setWeapon)
 
   useEffect(() => {
     document.title = weapon.name ? `${weapon.name} - Chi War` : "Chi War"
@@ -58,10 +65,6 @@ export default function WeaponPageClient({
       setWeapon(campaignData.weapon)
     }
   }, [campaignData, initialWeapon])
-
-  const handleSave = async () => {
-    setEditOpen(false)
-  }
 
   const handleDelete = async () => {
     if (!weapon?.id) return
@@ -78,6 +81,16 @@ export default function WeaponPageClient({
     }
   }
 
+  console.log("weapon", weapon)
+
+  const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const updatedWeapon = {
+      ...weapon,
+      [event.target.name]: event.target.value,
+    }
+    await updateWeapon(updatedWeapon)
+  }
+
   const junctureColor = junctureColors[weapon.juncture] || junctureColors.Modern
 
   return (
@@ -87,7 +100,7 @@ export default function WeaponPageClient({
         position: "relative",
       }}
     >
-      <SpeedDialMenu onEdit={() => setEditOpen(true)} onDelete={handleDelete} />
+      <SpeedDialMenu onDelete={handleDelete} />
       <Box
         sx={{
           display: "flex",
@@ -97,12 +110,13 @@ export default function WeaponPageClient({
           position: "relative",
         }}
       >
-        <Typography variant="h4" sx={{ mb: 1 }}>
-          {weapon.name} ({weapon.damage}/{weapon.concealment || "-"}/
-          {weapon.reload_value || "-"})
-        </Typography>
+        <NameEditor
+          entity={weapon}
+          setEntity={setWeapon}
+          updateEntity={updateWeapon}
+        />
       </Box>
-      <HeroImage entity={weapon} />
+      <HeroImage entity={weapon} setEntity={setWeapon} />
       <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
         {weapon.juncture && (
           <Chip
@@ -115,25 +129,38 @@ export default function WeaponPageClient({
           <Chip
             size="medium"
             sx={{ backgroundColor: junctureColor.main }}
-            label={`Path: ${weapon.category}`}
+            label={`${weapon.category}`}
           />
         )}
         <Chip size="medium" label={`Damage ${weapon.damage}`} />
-        <Chip size="medium" label={`Concealment ${weapon.concealment}`} />
-        <Chip size="medium" label={`Reload ${weapon.reload_value}`} />
+        <Chip
+          size="medium"
+          label={`Concealment ${weapon.concealment || " - "}`}
+        />
+        <Chip size="medium" label={`Reload ${weapon.reload_value || " - "}`} />
+        <Chip
+          size="medium"
+          label={`Mook Bonus ${weapon.mook_bonus || " - "}`}
+        />
+        {weapon.kachunk && <Chip size="medium" label={"Kachunk!"} />}
       </Stack>
-      <RichTextRenderer
-        key={weapon.description}
-        html={weapon.description || ""}
-        sx={{ mb: 2 }}
-      />
-
-      <EditWeaponForm
-        key={JSON.stringify(weapon)}
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        onSave={handleSave}
+      <Stats
         weapon={weapon}
+        setWeapon={setWeapon}
+        updateWeapon={updateWeapon}
+      />
+      <SectionHeader title="Description" icon={<VscGithubAction size="24" />} />
+      <EditableRichText
+        name="description"
+        html={weapon.description}
+        editable={true}
+        onChange={handleChange}
+        fallback="No description available."
+      />
+      <EditJunctureCategory
+        weapon={weapon}
+        setWeapon={setWeapon}
+        updateWeapon={updateWeapon}
       />
       {error && (
         <Alert severity="error" sx={{ mt: 2 }}>

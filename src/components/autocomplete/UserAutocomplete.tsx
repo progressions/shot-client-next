@@ -3,6 +3,7 @@
 import type { User } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
+import { useEffect, useState } from "react"
 
 type UserAutocompleteProperties = {
   value: string
@@ -20,6 +21,27 @@ export default function UserAutocomplete({
   allowNone = true,
 }: UserAutocompleteProperties) {
   const { client } = useClient()
+  const [users, setUsers] = useState<User[]>([])
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await client.getUsers({
+          per_page: 200,
+          page: 1,
+          sort: "name",
+          order: "asc",
+        })
+        setUsers(response.data.users || [])
+      } catch (error) {
+        console.error("Error fetching users:", error)
+      }
+    }
+
+    fetchUsers().catch(error => {
+      console.error("Error in useEffect fetchUsers:", error)
+    })
+  }, [client])
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
     if (options) {
@@ -31,32 +53,27 @@ export default function UserAutocomplete({
 
       return filteredOptions
     }
-    try {
-      const response = await client.getUsers({
-        search: inputValue,
-        per_page: 120,
-        sort: "name",
-        order: "asc",
-      })
-      const { users } = response.data
-      return users
-        .map((user: User) => ({
-          label: user.name || user.email,
-          value: user.id || "",
-        }))
-        .filter(option => !exclude.includes(option.value))
-    } catch (error) {
-      console.error("Error fetching options:", error)
-      return []
-    }
+    return users
+      .filter(user =>
+        user.name.toLowerCase().includes(inputValue.toLowerCase())
+      )
+      .map(user => ({
+        label: user.name,
+        value: user.id,
+      }))
+  }
+
+  const handleChange = (selectedOption: Option | null) => {
+    const user = users.find(s => s.id === selectedOption)
+    onChange(user)
   }
 
   return (
     <Autocomplete
-      value={value}
       label="User"
+      value={value}
       fetchOptions={fetchOptions}
-      onChange={onChange}
+      onChange={handleChange}
       exclude={exclude}
       allowNone={allowNone}
     />

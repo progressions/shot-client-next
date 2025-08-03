@@ -3,6 +3,7 @@
 import type { Vehicle } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
+import { useEffect, useState } from "react"
 
 type VehicleAutocompleteProperties = {
   value: string
@@ -20,6 +21,27 @@ export default function VehicleAutocomplete({
   allowNone = true,
 }: VehicleAutocompleteProperties) {
   const { client } = useClient()
+  const [vehicles, setVehicles] = useState<Vehicle[]>([])
+
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        const response = await client.getVehicles({
+          per_page: 200,
+          page: 1,
+          sort: "name",
+          order: "asc",
+        })
+        setVehicles(response.data.vehicles || [])
+      } catch (error) {
+        console.error("Error fetching vehicles:", error)
+      }
+    }
+
+    fetchVehicles().catch(error => {
+      console.error("Error in useEffect fetchVehicles:", error)
+    })
+  }, [client])
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
     if (options) {
@@ -31,31 +53,27 @@ export default function VehicleAutocomplete({
 
       return filteredOptions
     }
-    try {
-      const response = await client.getVehicles({
-        search: inputValue,
-        per_page: 120,
-        sort: "name",
-        order: "asc",
-      })
-      return response.data.vehicles
-        .map((vehicle: Vehicle) => ({
-          label: vehicle.name || "",
-          value: vehicle.id || "",
-        }))
-        .filter(option => !exclude.includes(option.value))
-    } catch (error) {
-      console.error("Error fetching options:", error)
-      return []
-    }
+    return vehicles
+      .filter(vehicle =>
+        vehicle.name.toLowerCase().includes(inputValue.toLowerCase())
+      )
+      .map(vehicle => ({
+        label: vehicle.name,
+        value: vehicle.id,
+      }))
+  }
+
+  const handleChange = (selectedOption: Option | null) => {
+    const vehicle = vehicles.find(s => s.id === selectedOption)
+    onChange(vehicle)
   }
 
   return (
     <Autocomplete
-      value={value}
       label="Vehicle"
+      value={value}
       fetchOptions={fetchOptions}
-      onChange={onChange}
+      onChange={handleChange}
       exclude={exclude}
       allowNone={allowNone}
     />

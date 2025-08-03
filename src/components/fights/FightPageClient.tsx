@@ -1,15 +1,22 @@
 "use client"
 
-import { redirect } from "next/navigation"
+import { GiSwordman } from "react-icons/gi"
+import { GiSpikyExplosion } from "react-icons/gi"
 import { useState, useEffect } from "react"
-import { Stack, Alert, Typography, Box } from "@mui/material"
+import { Stack, Box } from "@mui/material"
 import type { Fight } from "@/types"
-import { RichTextRenderer } from "@/components/editor"
-import { useClient, useCampaign } from "@/contexts"
-import { VehiclesList, EditFightForm } from "@/components/fights"
-import { HeroImage, SpeedDialMenu } from "@/components/ui"
+import {
+  HeroImage,
+  SpeedDialMenu,
+  SectionHeader,
+  EditableRichText,
+} from "@/components/ui"
+import { useCampaign } from "@/contexts"
+import { VehiclesList } from "@/components/fights"
 import { CharacterManager } from "@/components/characters"
 import { InfoLink } from "@/components/links"
+import { NameEditor } from "@/components/entities"
+import { useEntity } from "@/hooks"
 
 interface FightPageClientProperties {
   fight: Fight
@@ -19,11 +26,12 @@ export default function FightPageClient({
   fight: initialFight,
 }: FightPageClientProperties) {
   const { campaignData } = useCampaign()
-  const { client } = useClient()
-
   const [fight, setFight] = useState<Fight>(initialFight)
-  const [editOpen, setEditOpen] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const {
+    updateEntity: updateFight,
+    deleteEntity,
+    handleChange,
+  } = useEntity(fight, setFight)
 
   useEffect(() => {
     document.title = fight.name ? `${fight.name} - Chi War` : "Chi War"
@@ -35,39 +43,6 @@ export default function FightPageClient({
     }
   }, [campaignData, initialFight])
 
-  const handleSave = async () => {
-    setEditOpen(false)
-  }
-
-  async function updateFight(fightId: string, formData: FormData) {
-    try {
-      const response = await client.updateFight(fightId, formData)
-      setFight(response.data)
-    } catch (error) {
-      console.error("Error updating fight:", error)
-      throw error
-    }
-  }
-
-  const handleDelete = async () => {
-    if (!fight?.id) return
-    if (!confirm(`Are you sure you want to delete the fight: ${fight.name}?`))
-      return
-
-    try {
-      await client.deleteFight(fight)
-      handleMenuClose()
-      redirect("/fights")
-    } catch (error_) {
-      console.error("Failed to delete fight:", error_)
-      setError("Failed to delete fight.")
-    }
-  }
-
-  const replaceFight = (fight: Fight) => {
-    setFight(fight)
-  }
-
   return (
     <Box
       sx={{
@@ -75,7 +50,7 @@ export default function FightPageClient({
         position: "relative",
       }}
     >
-      <SpeedDialMenu onEdit={() => setEditOpen(true)} onDelete={handleDelete} />
+      <SpeedDialMenu onDelete={deleteEntity} />
       <Box
         sx={{
           display: "flex",
@@ -84,18 +59,27 @@ export default function FightPageClient({
           mb: 1,
         }}
       >
-        <Typography variant="h4">{fight.name}</Typography>
-      </Box>
-      <HeroImage entity={fight} />
-      <Box sx={{ p: 2, backgroundColor: "#2e2e2e", borderRadius: 1, my: 2 }}>
-        <RichTextRenderer
-          key={fight.description}
-          html={fight.description || ""}
-          sx={{ mb: 2 }}
+        <NameEditor
+          entity={fight}
+          setEntity={setFight}
+          updateEntity={updateFight}
         />
       </Box>
+      <HeroImage entity={fight} setEntity={setFight} />
+      <SectionHeader title="Description" icon={<GiSpikyExplosion size="24" />}>
+        A brief description of the nature of the fight. What are the stakes?
+        Where is it located?
+      </SectionHeader>
+      <EditableRichText
+        name="description"
+        html={fight.description}
+        editable={true}
+        onChange={handleChange}
+        fallback="No description available."
+      />
       <Stack direction="column" spacing={2}>
         <CharacterManager
+          icon={<GiSwordman size="24" />}
           name="fight"
           title="Fighters"
           description={
@@ -107,26 +91,10 @@ export default function FightPageClient({
             </>
           }
           entity={fight}
-          characters={fight.actors}
-          character_ids={fight.character_ids}
           update={updateFight}
-          setEntity={replaceFight}
         />
-        <VehiclesList fight={fight} setFight={replaceFight} />
+        <VehiclesList fight={fight} setFight={setFight} />
       </Stack>
-
-      <EditFightForm
-        key={JSON.stringify(fight)}
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        onSave={handleSave}
-        fight={fight}
-      />
-      {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
-      )}
     </Box>
   )
 }

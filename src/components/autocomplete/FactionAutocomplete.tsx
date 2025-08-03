@@ -3,6 +3,7 @@
 import type { Faction } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
+import { useState, useEffect } from "react"
 
 type FactionAutocompleteProperties = {
   value: string
@@ -20,25 +21,52 @@ export default function FactionAutocomplete({
   allowNone = true,
 }: FactionAutocompleteProperties) {
   const { client } = useClient()
+  const [factions, setFactions] = useState<Faction[]>([])
+
+  useEffect(() => {
+    const fetchFactions = async () => {
+      try {
+        const response = await client.getFactions({
+          autocomplete: true,
+          per_page: 200,
+          page: 1,
+          sort: "name",
+          order: "asc",
+        })
+        setFactions(response.data.factions || [])
+      } catch (error) {
+        console.error("Error fetching factions:", error)
+      }
+    }
+
+    fetchFactions().catch(error => {
+      console.error("Error in useEffect fetchFactions:", error)
+    })
+  }, [client])
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
     if (options) {
-      const filteredOptions = options.filter(option =>
-        option.label.toLowerCase().includes(inputValue.toLowerCase())
-      )
+      const filteredOptions = options
+        .filter(option =>
+          option.label.toLowerCase().includes(inputValue.toLowerCase())
+        )
+        .filter(option => !exclude.includes(option.value))
 
       return filteredOptions
     }
-    try {
-      const response = await client.getFactions({ search: inputValue })
-      return response.data.factions.map((faction: Faction) => ({
-        label: faction.name || "",
-        value: faction.id || "",
+    return factions
+      .filter(faction =>
+        faction.name.toLowerCase().includes(inputValue.toLowerCase())
+      )
+      .map(faction => ({
+        label: faction.name,
+        value: faction.id,
       }))
-    } catch (error) {
-      console.error("Error fetching options:", error)
-      return []
-    }
+  }
+
+  const handleChange = (selectedOption: Option | null) => {
+    const faction = factions.find(s => s.id === selectedOption)
+    onChange(faction)
   }
 
   return (
@@ -46,7 +74,7 @@ export default function FactionAutocomplete({
       label="Faction"
       value={value}
       fetchOptions={fetchOptions}
-      onChange={onChange}
+      onChange={handleChange}
       exclude={exclude}
       allowNone={allowNone}
     />

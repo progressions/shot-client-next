@@ -9,10 +9,10 @@ import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
+import { useEntity } from "@/hooks"
+import { defaultFight } from "@/types"
 
-type FormStateData = {
-  name: string
-  description: string
+type FormStateData = Fight & {
   image?: File | null
 }
 
@@ -20,22 +20,19 @@ interface FightFormProperties {
   open: boolean
   onClose: () => void
   onSave: (formData: FormData, fightData: Fight) => Promise<void>
-  initialFormData: FormStateData
-  title: string
 }
 
 export default function FightForm({
   open,
   onClose,
-  onSave,
-  initialFormData,
-  title,
+  setFight,
 }: FightFormProperties) {
   const { formState, dispatchForm, initialFormState } =
-    useForm<FormStateData>(initialFormData)
+    useForm<FormStateData>(defaultFight)
   const { disabled, error, data } = formState
   const { name, description, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const { createEntity } = useEntity<Fight>(defaultFight, setFight)
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
@@ -78,20 +75,13 @@ export default function FightForm({
       dispatchForm({ type: FormActions.ERROR, payload: "Name is required" })
       return
     }
-
     dispatchForm({ type: FormActions.SUBMIT })
     try {
-      const formData = new FormData()
-      const fightData = { name, description } as Fight
-      formData.append("fight", JSON.stringify(fightData))
-      if (image) {
-        formData.append("image", image)
-      }
-      await onSave(formData, fightData)
+      await createEntity(data, image)
     } catch (error_: unknown) {
       const errorMessage = "An error occurred."
       dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
-      console.error(`${title} error:`, error_)
+      console.error(error_)
     } finally {
       handleClose()
     }
@@ -102,6 +92,7 @@ export default function FightForm({
     setImagePreview(null)
     onClose()
   }
+  const previewImage = imagePreview || data.image_url || null
 
   return (
     <Drawer
@@ -109,7 +100,7 @@ export default function FightForm({
       open={open}
       onClose={handleClose}
     >
-      <HeroImage entity={formState.data} positionable={false} />
+      <HeroImage entity={{ image_url: previewImage }} positionable={false} />
       <Box
         component="form"
         onSubmit={handleSubmit}
@@ -120,7 +111,7 @@ export default function FightForm({
         }}
       >
         <Typography variant="h5" sx={{ mb: 2, color: "#ffffff" }}>
-          {title}
+          New Fight
         </Typography>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -166,7 +157,6 @@ export default function FightForm({
             Update Image
           </Typography>
         </Box>
-        {imagePreview && <HeroImage entity={{ image_url: imagePreview }} />}
         <Box sx={{ display: "flex", gap: "1rem", mt: 3 }}>
           <SaveButton type="submit" disabled={disabled}>
             Save

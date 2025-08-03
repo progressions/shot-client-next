@@ -1,8 +1,6 @@
 "use client"
 
-import VisibilityIcon from "@mui/icons-material/Visibility"
 import FileDownloadIcon from "@mui/icons-material/FileDownload"
-import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/Delete"
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
 import {
@@ -30,14 +28,12 @@ type Action = {
 }
 
 type CharacterSpeedDialProps = {
-  editing: boolean
   character: Character
   sx?: SystemStyleObject<Theme>
 }
 
 export default function CharacterSpeedDial({
   character,
-  editing,
   sx = {},
 }: CharacterSpeedDialProps) {
   const { client } = useClient()
@@ -147,24 +143,7 @@ Action Values: ${JSON.stringify(character.actionValues, null, 2)}
     setExportAnchorEl(null)
   }
 
-  const editOrView = !editing
-    ? {
-        icon: <EditIcon />,
-        name: "Edit",
-        onClick: () => {
-          router.push(`/characters/${character.id}/edit`)
-        },
-      }
-    : {
-        icon: <VisibilityIcon />,
-        name: "View",
-        onClick: () => {
-          router.push(`/characters/${character.id}`)
-        },
-      }
-
   const actions = [
-    editOrView,
     {
       icon: <FileDownloadIcon />,
       name: "Export",

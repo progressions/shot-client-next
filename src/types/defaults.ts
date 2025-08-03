@@ -22,6 +22,7 @@ import type {
 } from "@/types"
 
 export const defaultFaction: Faction = {
+  entity_class: "Faction",
   id: "",
   name: "",
   description: "",
@@ -42,6 +43,7 @@ export const defaultFaction: Faction = {
 }
 
 export const defaultCharacter: Person = {
+  entity_class: "Person",
   id: "",
   name: "",
   category: "character",
@@ -104,6 +106,7 @@ export const defaultCharacter: Person = {
 } as Person
 
 export const defaultVehicle: Vehicle = {
+  entity_class: "Vehicle",
   id: "",
   name: "",
   active: true,
@@ -157,6 +160,7 @@ export const defaultVehicle: Vehicle = {
 } as Vehicle
 
 export const defaultFight: Fight = {
+  entity_class: "Fight",
   id: "",
   name: "",
   description: "",
@@ -174,6 +178,7 @@ export const defaultFight: Fight = {
 }
 
 export const defaultUser: User = {
+  entity_class: "User",
   id: "",
   email: "",
   name: "",
@@ -200,6 +205,7 @@ export const defaultToast: Toast = {
 }
 
 export const defaultCampaign: Campaign = {
+  entity_class: "Campaign",
   id: "",
   name: "",
   description: "",
@@ -223,6 +229,7 @@ export const defaultCharacterEffect: CharacterEffect = {
 }
 
 export const defaultSchtick: Schtick = {
+  entity_class: "Schtick",
   id: "",
   name: "",
   description: "",
@@ -245,6 +252,7 @@ export const defaultAdvancement: Advancement = {
 }
 
 export const defaultJuncture: Juncture = {
+  entity_class: "Juncture",
   id: "",
   name: "",
   description: "",
@@ -258,6 +266,7 @@ export const defaultJuncture: Juncture = {
 }
 
 export const defaultSite: Site = {
+  entity_class: "Site",
   id: "",
   name: "",
   description: "",
@@ -271,6 +280,7 @@ export const defaultSite: Site = {
 }
 
 export const defaultParty: Party = {
+  entity_class: "Party",
   id: "",
   name: "",
   description: "",
@@ -287,6 +297,7 @@ export const defaultParty: Party = {
 }
 
 export const defaultWeapon: Weapon = {
+  entity_class: "Weapon",
   id: "",
   name: "",
   description: "",

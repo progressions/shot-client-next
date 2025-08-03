@@ -18,11 +18,7 @@ import {
 } from "@mui/material"
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
-import {
-  WeaponDetail,
-  CreateWeaponForm,
-  EditWeaponForm,
-} from "@/components/weapons"
+import { WeaponDetail, CreateWeaponForm } from "@/components/weapons"
 import type { Weapon, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
@@ -164,23 +160,6 @@ export default function Weapons({
     })
     if (selectedWeapon?.id === weaponId) setSelectedWeapon(null)
     router.refresh()
-  }
-
-  const handleEditWeapon = (weapon: Weapon) => {
-    setSelectedWeapon(weapon)
-  }
-
-  const handleCloseEditWeapon = () => {
-    setSelectedWeapon(null)
-  }
-
-  const handleSaveEditWeapon = (updatedWeapon: Weapon) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "weapons",
-      value: weapons.map(f => (f.id === updatedWeapon.id ? updatedWeapon : f)),
-    })
-    setSelectedWeapon(null)
   }
 
   const handlePageChange = async (
@@ -325,7 +304,6 @@ export default function Weapons({
               key={weapon.id}
               weapon={weapon}
               onDelete={handleDeleteWeapon}
-              onEdit={handleEditWeapon}
             />
           ))
         )}
@@ -344,14 +322,6 @@ export default function Weapons({
         onClose={handleCloseCreateDrawer}
         onSave={handleSaveWeapon}
       />
-      {selectedWeapon && (
-        <EditWeaponForm
-          open={!!selectedWeapon}
-          onClose={handleCloseEditWeapon}
-          onSave={handleSaveEditWeapon}
-          weapon={selectedWeapon}
-        />
-      )}
     </Box>
   )
 }

@@ -11,12 +11,15 @@ function paginateArray<T>(
   per_page: number
 ): PaginatedResult<T> {
   // Ensure page and per_page are positive numbers
-  const currentPage = Math.max(1, page)
   const itemsPerPage = Math.max(1, per_page)
-
-  // Calculate pagination values
   const totalCount = items.length
   const totalPages = Math.ceil(totalCount / itemsPerPage)
+
+  // If requested page would return no items, use page 1
+  const currentPage =
+    totalPages > 0 && page > totalPages ? 1 : Math.max(1, page)
+
+  // Calculate pagination values
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
 

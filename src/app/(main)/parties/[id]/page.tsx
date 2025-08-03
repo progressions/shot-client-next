@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation"
 import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Party } from "@/types"
@@ -15,11 +16,13 @@ export default async function PartyPage({ params }: PartyPageProperties) {
   const user = await getUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
-  const response = await client.getParty({ id })
-  const party: Party = response.data
-
-  if (!party?.id) {
-    return <Typography>Party not found</Typography>
+  let party: Party
+  try {
+    const response = await client.getParty({ id })
+    party = response.data
+  } catch (error) {
+    console.error("Error fetching party:", error)
+    redirect("/parties")
   }
 
   return (

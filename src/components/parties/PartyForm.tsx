@@ -12,6 +12,7 @@ import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
 import { FactionAutocomplete } from "@/components/autocomplete"
 import { InfoLink } from "@/components/links"
+import { useEntity } from "@/hooks"
 
 type FormStateData = Party & {
   [key: string]: unknown
@@ -21,23 +22,20 @@ type FormStateData = Party & {
 interface PartyFormProperties {
   open: boolean
   onClose: () => void
-  onSave: (formData: FormData, partyData: Party) => Promise<void>
-  initialFormData: FormStateData
-  title: string
+  setParty: (party: Party) => void
 }
 
 export default function PartyForm({
   open,
   onClose,
-  onSave,
-  initialFormData,
-  title,
+  setParty,
 }: PartyFormProperties) {
   const { formState, dispatchForm, initialFormState } =
-    useForm<FormStateData>(initialFormData)
+    useForm<FormStateData>(defaultParty)
   const { disabled, error, data } = formState
   const { name, description, faction_id, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const { createEntity } = useEntity<Party>(defaultParty, setParty)
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
@@ -83,18 +81,7 @@ export default function PartyForm({
 
     dispatchForm({ type: FormActions.SUBMIT })
     try {
-      const formData = new FormData()
-      const partyData = {
-        ...defaultParty,
-        name,
-        description,
-        faction_id,
-      } as Party
-      formData.append("party", JSON.stringify(partyData))
-      if (image) {
-        formData.append("image", image)
-      }
-      await onSave(formData, partyData)
+      await createEntity(data, image)
     } catch (error_: unknown) {
       const errorMessage = "An error occurred."
       dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
@@ -114,13 +101,15 @@ export default function PartyForm({
     dispatchForm({ type: FormActions.UPDATE, name: "faction_id", value })
   }
 
+  const previewImage = imagePreview || data.image_url || null
+
   return (
     <Drawer
       anchor={isMobile ? "bottom" : "right"}
       open={open}
       onClose={handleClose}
     >
-      <HeroImage entity={formState.data} />
+      <HeroImage entity={{ image_url: previewImage }} positionable={false} />
       <Box
         component="form"
         onSubmit={handleSubmit}
@@ -131,7 +120,7 @@ export default function PartyForm({
         }}
       >
         <Typography variant="h5" sx={{ mb: 2, color: "#ffffff" }}>
-          {title}
+          New Party
         </Typography>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -195,7 +184,6 @@ export default function PartyForm({
             Update Image
           </Typography>
         </Box>
-        {imagePreview && <HeroImage entity={{ image_url: imagePreview }} />}
         <Box sx={{ display: "flex", gap: "1rem", mt: 3 }}>
           <SaveButton type="submit" disabled={disabled}>
             Save

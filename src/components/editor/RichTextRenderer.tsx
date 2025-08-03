@@ -56,11 +56,5 @@ export default function RichTextRenderer({ html }: RichTextRendererProperties) {
     return null
   }
 
-  return (
-    <div className={styles.displayContainer}>
-      {" "}
-      {/* Add a custom class for display styling if needed */}
-      <EditorContent editor={editor} />
-    </div>
-  )
+  return <EditorContent editor={editor} />
 }

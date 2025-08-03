@@ -3,6 +3,7 @@
 import type { Party } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
+import { useState, useEffect } from "react"
 
 type PartyAutocompleteProperties = {
   value: string
@@ -20,29 +21,46 @@ export default function PartyAutocomplete({
   allowNone = true,
 }: PartyAutocompleteProperties) {
   const { client } = useClient()
+  const [parties, setParties] = useState<Party[]>([])
 
-  console.log("exclude:", exclude)
+  useEffect(() => {
+    const fetchParties = async () => {
+      try {
+        const response = await client.getParties({
+          per_page: 100,
+          page: 1,
+          sort: "name",
+          order: "asc",
+        })
+        setParties(response.data.parties || [])
+      } catch (error) {
+        console.error("Error fetching parties:", error)
+      }
+    }
+    fetchParties().catch(error => {
+      console.error("Error in useEffect fetchParties:", error)
+    })
+  }, [client])
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
     if (options) {
-      const filteredOptions = options.filter(option =>
-        option.label.toLowerCase().includes(inputValue.toLowerCase())
-      )
+      const filteredOptions = options
+        .filter(option =>
+          option.label.toLowerCase().includes(inputValue.toLowerCase())
+        )
+        .filter(option => !exclude.includes(option.value))
 
       return filteredOptions
     }
-    try {
-      const response = await client.getParties({ search: inputValue })
-      return response.data.parties
-        .map((party: Party) => ({
-          label: party.name || "",
-          value: party.id || "",
-        }))
-        .filter(option => !exclude.includes(option.value))
-    } catch (error) {
-      console.error("Error fetching options:", error)
-      return []
-    }
+    return parties.map(party => ({
+      label: party.name,
+      value: party.id,
+    }))
+  }
+
+  const handleChange = (selectedOption: Option | null) => {
+    const party = parties.find(s => s.id === selectedOption)
+    onChange(party)
   }
 
   return (
@@ -50,7 +68,7 @@ export default function PartyAutocomplete({
       label="Party"
       value={value}
       fetchOptions={fetchOptions}
-      onChange={onChange}
+      onChange={handleChange}
       exclude={exclude}
       allowNone={allowNone}
     />

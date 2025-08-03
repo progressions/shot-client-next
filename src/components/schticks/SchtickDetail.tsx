@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import {
   Card,
   CardContent,
@@ -22,14 +23,13 @@ import DetailButtons from "@/components/DetailButtons"
 interface SchtickDetailProperties {
   schtick: Schtick
   onDelete: (schtickId: string) => void
-  onEdit: (schtick: Schtick) => void
 }
 
 export default function SchtickDetail({
   schtick: initialSchtick,
   onDelete,
-  onEdit,
 }: SchtickDetailProperties) {
+  const router = useRouter()
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
@@ -70,7 +70,7 @@ export default function SchtickDetail({
   }
 
   const handleEdit = () => {
-    onEdit(schtick)
+    router.push(`/schticks/${schtick.id}`, { target: "_blank" })
   }
 
   // Format created_at timestamp for display

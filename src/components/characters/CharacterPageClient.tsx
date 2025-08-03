@@ -1,11 +1,15 @@
 "use client"
 
+import AllInboxIcon from "@mui/icons-material/AllInbox"
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd"
+import BoltIcon from "@mui/icons-material/Bolt"
 import type { Character } from "@/types"
 import { useClient, useCampaign } from "@/contexts"
 import { useState, useEffect } from "react"
 import { Box, Stack } from "@mui/material"
 import { CharacterSpeedDial } from "@/components/characters"
 import { CS } from "@/services"
+import { SectionHeader } from "@/components/ui"
 import {
   Header,
   Owner,
@@ -57,6 +61,10 @@ export default function CharacterPageClient({
       />
       <Header character={character} />
       <Owner character={character} />
+      <SectionHeader title="Action Values" icon={<BoltIcon />}>
+        Action Values are the core stats of your Character, used to resolve
+        actions and challenges in the game.
+      </SectionHeader>
       <ActionValues character={character} />
       {!CS.isMook(character) && (
         <Stack
@@ -69,7 +77,16 @@ export default function CharacterPageClient({
             },
           }}
         >
+          <SectionHeader title="Personal Details" icon={<AssignmentIndIcon />}>
+            Personal details about your character, such as their type,
+            archetype, juncture, and wealth.
+          </SectionHeader>
           <Associations character={character} />
+
+          <SectionHeader title="Skills" icon={<AllInboxIcon />}>
+            Skills are what your character can do. They are used to resolve
+            actions and challenges in the game.
+          </SectionHeader>
           <Skills character={character} />
         </Stack>
       )}

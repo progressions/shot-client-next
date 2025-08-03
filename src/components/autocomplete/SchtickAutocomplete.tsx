@@ -3,9 +3,10 @@
 import type { Schtick } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
+import { useState, useEffect } from "react"
 
-type SchticksAutocompleteProperties = {
-  value: string
+interface SchticksAutocompleteProperties {
+  value: string | null // Updated to match Autocomplete's prop
   onChange: (value: string | null) => void
   options?: Option[]
   exclude?: string[]
@@ -20,6 +21,26 @@ export default function SchticksAutocomplete({
   allowNone = true,
 }: SchticksAutocompleteProperties) {
   const { client } = useClient()
+  const [schticks, setSchticks] = useState<Schtick[]>([])
+
+  useEffect(() => {
+    const fetchSchticks = async () => {
+      try {
+        const response = await client.getSchticks({
+          per_page: 200,
+          page: 1,
+          sort: "name",
+          order: "asc",
+        })
+        setSchticks(response.data.schticks || [])
+      } catch (error) {
+        console.error("Error fetching schticks:", error)
+      }
+    }
+    fetchSchticks().catch(error => {
+      console.error("Error in useEffect fetchSchticks:", error)
+    })
+  }, [client])
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
     if (options) {
@@ -28,19 +49,22 @@ export default function SchticksAutocomplete({
           option.label.toLowerCase().includes(inputValue.toLowerCase())
         )
         .filter(option => !exclude.includes(option.value))
-
       return filteredOptions
     }
-    try {
-      const response = await client.getSchticks({ search: inputValue })
-      return response.data.schticks.map((schtick: Schtick) => ({
-        label: schtick.name || "",
-        value: schtick.id || "",
+    return schticks
+      .filter(schtick =>
+        schtick.name.toLowerCase().includes(inputValue.toLowerCase())
+      )
+      .map(schtick => ({
+        label: `${schtick.name} (${schtick.category})`, // Include category in label
+        value: schtick.id.toString(), // Ensure value is string and unique
+        key: schtick.id.toString(), // Explicit key for uniqueness
       }))
-    } catch (error) {
-      console.error("Error fetching options:", error)
-      return []
-    }
+  }
+
+  const handleChange = (selectedOption: Option | null) => {
+    const schtick = schticks.find(s => s.id === selectedOption)
+    onChange(schtick)
   }
 
   return (
@@ -48,7 +72,7 @@ export default function SchticksAutocomplete({
       label="Schtick"
       value={value}
       fetchOptions={fetchOptions}
-      onChange={onChange}
+      onChange={handleChange}
       exclude={exclude}
       allowNone={allowNone}
     />

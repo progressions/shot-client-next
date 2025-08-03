@@ -1,31 +1,41 @@
-import { Box, Stack, Typography } from "@mui/material"
-import type { Weapon, Character } from "@/types"
-import { WeaponLink } from "@/components/links"
+"use client"
 
-type WeaponsProps = {
-  character: Character
+import { FaGun } from "react-icons/fa6"
+import { Box } from "@mui/material"
+import type { Character } from "@/types"
+import { InfoLink } from "@/components/links"
+import { WeaponManager } from "@/components/weapons"
+
+type WeaponsProperties = {
+  character: Pick<Character, "id" | "user" | "weapon_ids">
+  setCharacter: (character: Character) => void
 }
 
-export default function Weapons({ character }: WeaponsProps) {
-  if (!character.user) return null
-
-  if (character.weapons.length === 0) return null
-
-  return (
-    <Box>
-      <Typography variant="h6" mt={2}>
-        Weapons
-      </Typography>
-      <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
-        (Damage/Concealment/Reload)
-      </Typography>
-      <Stack direction="column" mt={2}>
-        {character.weapons.map((weapon: Weapon, index: number) => (
-          <Typography key={index} variant="body1" sx={{ color: "#ffffff" }}>
-            <WeaponLink weapon={weapon} />
-          </Typography>
-        ))}
-      </Stack>
+export default function Weapons({
+  character,
+  setCharacter,
+  updateCharacter,
+}: WeaponsProperties) {
+  const iconBox = (
+    <Box sx={{ pt: 1, fontSize: "1.4rem" }}>
+      <FaGun />
     </Box>
+  )
+  return (
+    <WeaponManager
+      icon={iconBox}
+      name="character"
+      title="Weapons"
+      description={
+        <>
+          <InfoLink href="/weapons" info="Weapons" /> are special abilities or
+          powers, such as <InfoLink info="Martial Arts" /> techniques or{" "}
+          <InfoLink info="Magic" /> spells.
+        </>
+      }
+      entity={character}
+      update={updateCharacter}
+      setEntity={setCharacter}
+    />
   )
 }

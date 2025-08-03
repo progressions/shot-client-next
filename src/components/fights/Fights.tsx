@@ -19,11 +19,7 @@ import {
 } from "@mui/material"
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
-import {
-  FightDetail,
-  CreateFightForm,
-  EditFightForm,
-} from "@/components/fights"
+import { FightDetail, FightForm } from "@/components/fights"
 import type { Fight, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
@@ -158,23 +154,6 @@ export default function Fights({
     })
     if (selectedFight?.id === fightId) setSelectedFight(null)
     router.refresh()
-  }
-
-  const handleEditFight = (fight: Fight) => {
-    setSelectedFight(fight)
-  }
-
-  const handleCloseEditFight = () => {
-    setSelectedFight(null)
-  }
-
-  const handleSaveEditFight = (updatedFight: Fight) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "fights",
-      value: fights.map(f => (f.id === updatedFight.id ? updatedFight : f)),
-    })
-    setSelectedFight(null)
   }
 
   const handlePageChange = async (
@@ -317,7 +296,6 @@ export default function Fights({
               key={fight.id}
               fight={fight}
               onDelete={handleDeleteFight}
-              onEdit={handleEditFight}
               isMobile={isMobile}
             />
           ))
@@ -332,19 +310,11 @@ export default function Fights({
         shape="rounded"
         size="large"
       />
-      <CreateFightForm
+      <FightForm
         open={drawerOpen}
         onClose={handleCloseCreateDrawer}
-        onSave={handleSaveFight}
+        setFight={handleSaveFight}
       />
-      {selectedFight && (
-        <EditFightForm
-          open={!!selectedFight}
-          onClose={handleCloseEditFight}
-          onSave={handleSaveEditFight}
-          fight={selectedFight}
-        />
-      )}
     </Box>
   )
 }

@@ -106,6 +106,11 @@ const theme = createTheme({
           "& .MuiInputLabel-root": {
             color: "#b0bec5",
           },
+          "& .MuiOutlinedInput-root": {
+            "&:hover fieldset": {
+              borderColor: "#90caf9",
+            },
+          },
         },
       },
       defaultProps: {

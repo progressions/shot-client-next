@@ -1,17 +1,22 @@
 "use client"
 
-import { redirect } from "next/navigation"
+import { VscGithubAction } from "react-icons/vsc"
+import { GiSwordman } from "react-icons/gi"
 import { useState, useEffect } from "react"
-import { Stack, Alert, Typography, Box } from "@mui/material"
+import { Stack, Box } from "@mui/material"
 import type { Party } from "@/types"
-import { RichTextRenderer } from "@/components/editor"
 import { useCampaign } from "@/contexts"
-import { EditPartyForm } from "@/components/parties"
-import { useClient } from "@/contexts"
-import { FactionLink } from "@/components/links"
-import { HeroImage, SpeedDialMenu } from "@/components/ui"
+import {
+  HeroImage,
+  SpeedDialMenu,
+  SectionHeader,
+  EditableRichText,
+} from "@/components/ui"
 import { CharacterManager } from "@/components/characters"
 import { InfoLink } from "@/components/links"
+import { NameEditor } from "@/components/entities"
+import { useEntity } from "@/hooks"
+import { FactionAutocomplete } from "@/components/autocomplete"
 
 interface PartyPageClientProperties {
   party: Party
@@ -21,11 +26,13 @@ export default function PartyPageClient({
   party: initialParty,
 }: PartyPageClientProperties) {
   const { campaignData } = useCampaign()
-  const { client } = useClient()
 
   const [party, setParty] = useState<Party>(initialParty)
-  const [editOpen, setEditOpen] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const {
+    updateEntity: updateParty,
+    deleteEntity: deleteParty,
+    handleChange,
+  } = useEntity(party, setParty)
 
   useEffect(() => {
     document.title = party.name ? `${party.name} - Chi War` : "Chi War"
@@ -37,39 +44,6 @@ export default function PartyPageClient({
     }
   }, [campaignData, initialParty])
 
-  async function updateParty(partyId: string, formData: FormData) {
-    try {
-      const response = await client.updateParty(partyId, formData)
-      setParty(response.data)
-    } catch (error) {
-      console.error("Error updating party:", error)
-      throw error
-    }
-  }
-
-  const replaceParty = (party: Party) => {
-    setParty(party)
-  }
-
-  const handleSave = async () => {
-    setEditOpen(false)
-  }
-
-  const handleDelete = async () => {
-    if (!party?.id) return
-    if (!confirm(`Are you sure you want to delete the party: ${party.name}?`))
-      return
-
-    try {
-      await client.deleteParty(party)
-      handleMenuClose()
-      redirect("/parties")
-    } catch (error_) {
-      console.error("Failed to delete party:", error_)
-      setError("Failed to delete party.")
-    }
-  }
-
   return (
     <Box
       sx={{
@@ -77,7 +51,7 @@ export default function PartyPageClient({
         position: "relative",
       }}
     >
-      <SpeedDialMenu onEdit={() => setEditOpen(true)} onDelete={handleDelete} />
+      <SpeedDialMenu onDelete={deleteParty} />
       <Box
         sx={{
           display: "flex",
@@ -86,24 +60,46 @@ export default function PartyPageClient({
           mb: 1,
         }}
       >
-        <Typography variant="h4">{party.name}</Typography>
+        <NameEditor
+          entity={party}
+          setEntity={setParty}
+          updateEntity={updateParty}
+        />
       </Box>
-      <HeroImage entity={party} />
-      {party.faction && (
-        <Typography variant="h6">
-          Belongs to <FactionLink faction={party.faction} />
-        </Typography>
-      )}
-      <Box sx={{ p: 2, backgroundColor: "#2e2e2e", borderRadius: 1, my: 2 }}>
-        <RichTextRenderer
-          key={party.description}
-          html={party.description || ""}
-          sx={{ mb: 2 }}
+      <HeroImage entity={party} setEntity={setParty} />
+      <Box sx={{ mb: 2 }}>
+        <SectionHeader title="Faction" icon={<VscGithubAction size="24" />}>
+          A Party belongs to a Faction, which governs its aims and objectives.
+        </SectionHeader>
+        <Box sx={{ mt: 4 }}>
+          <FactionAutocomplete
+            value={party.faction_id}
+            onChange={faction =>
+              handleChange({
+                target: { name: "faction_id", value: faction?.id || "" },
+              })
+            }
+            allowNone={true}
+          />
+        </Box>
+      </Box>
+      <Box>
+        <SectionHeader
+          title="Description"
+          icon={<VscGithubAction size="24" />}
+        />
+        <EditableRichText
+          name="description"
+          html={party.description}
+          editable={true}
+          onChange={handleChange}
+          fallback="No description available."
         />
       </Box>
 
       <Stack direction="column" spacing={2}>
         <CharacterManager
+          icon={<GiSwordman size="24" />}
           name="party"
           title="Party Members"
           description={
@@ -114,25 +110,10 @@ export default function PartyPageClient({
             </>
           }
           entity={party}
-          characters={party.characters}
-          character_ids={party.character_ids}
           update={updateParty}
-          setEntity={replaceParty}
+          setEntity={setParty}
         />
       </Stack>
-
-      <EditPartyForm
-        key={JSON.stringify(party)}
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        onSave={handleSave}
-        party={party}
-      />
-      {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
-      )}
     </Box>
   )
 }

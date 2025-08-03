@@ -5,6 +5,7 @@ import { Box, Stack, IconButton } from "@mui/material"
 import { TextField } from "@/components/ui"
 import AddIcon from "@mui/icons-material/Add"
 import RemoveIcon from "@mui/icons-material/Remove"
+import { SystemStyleObject, Theme } from "@mui/system"
 
 type NumberFieldProps = {
   name: string
@@ -14,6 +15,7 @@ type NumberFieldProps = {
   error: boolean
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   onBlur: (event: React.FocusEvent<HTMLInputElement>) => void
+  sx?: SystemStyleObject<Theme>
 }
 
 export function NumberField({
@@ -24,6 +26,7 @@ export function NumberField({
   error,
   onChange,
   onBlur,
+  sx = {},
 }: NumberFieldProps) {
   const [isFocused, setIsFocused] = useState<boolean>(false)
   const [isHovered, setIsHovered] = useState<boolean>(false)
@@ -77,18 +80,19 @@ export function NumberField({
         }}
         onFocus={() => setIsFocused(true)}
         error={error}
-        type="text" // Changed to number for better UX
+        type="text"
         InputProps={{
           sx: {
             width,
             fontSize: fontSizeMap[size],
-            border: "1px solid #ffffff",
             borderRadius: 1,
+            fontWeight: 600,
             px: 1,
             "& input": {
               textAlign: "center",
               paddingRight: "10px",
             },
+            ...sx,
           },
         }}
       />

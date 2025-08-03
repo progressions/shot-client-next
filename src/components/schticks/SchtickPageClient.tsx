@@ -1,14 +1,20 @@
 "use client"
 
+import { VscGithubAction } from "react-icons/vsc"
 import { redirect } from "next/navigation"
 import { useState, useEffect } from "react"
-import { Alert, Typography, Box } from "@mui/material"
+import { Alert, Box } from "@mui/material"
 import type { Schtick } from "@/types"
-import { RichTextRenderer } from "@/components/editor"
-import { useCampaign } from "@/contexts"
-import { CategoryPath, EditSchtickForm } from "@/components/schticks"
-import { useClient } from "@/contexts"
-import { HeroImage, SpeedDialMenu } from "@/components/ui"
+import { useClient, useCampaign } from "@/contexts"
+import { EditCategoryPath, CategoryPath } from "@/components/schticks"
+import {
+  EditableRichText,
+  HeroImage,
+  SpeedDialMenu,
+  SectionHeader,
+} from "@/components/ui"
+import { NameEditor } from "@/components/entities"
+import { useEntity } from "@/hooks"
 
 interface SchtickPageClientProperties {
   schtick: Schtick
@@ -21,8 +27,8 @@ export default function SchtickPageClient({
   const { client } = useClient()
 
   const [schtick, setSchtick] = useState<Schtick>(initialSchtick)
-  const [editOpen, setEditOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { update: updateSchtick } = useEntity("schtick", setSchtick)
 
   useEffect(() => {
     document.title = schtick.name ? `${schtick.name} - Chi War` : "Chi War"
@@ -36,10 +42,6 @@ export default function SchtickPageClient({
       setSchtick(campaignData.schtick)
     }
   }, [campaignData, initialSchtick])
-
-  const handleSave = async () => {
-    setEditOpen(false)
-  }
 
   const handleDelete = async () => {
     if (!schtick?.id) return
@@ -58,6 +60,14 @@ export default function SchtickPageClient({
     }
   }
 
+  const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const updatedSchtick = {
+      ...schtick,
+      [event.target.name]: event.target.value,
+    }
+    await updateSchtick(updatedSchtick)
+  }
+
   return (
     <Box
       sx={{
@@ -65,7 +75,7 @@ export default function SchtickPageClient({
         position: "relative",
       }}
     >
-      <SpeedDialMenu onEdit={() => setEditOpen(true)} onDelete={handleDelete} />
+      <SpeedDialMenu onDelete={handleDelete} />
       <Box
         sx={{
           display: "flex",
@@ -74,25 +84,31 @@ export default function SchtickPageClient({
           mb: 1,
         }}
       >
-        <Typography variant="h4">{schtick.name}</Typography>
-      </Box>
-      <CategoryPath schtick={schtick} />
-      <HeroImage entity={schtick} />
-      <Box sx={{ p: 2, backgroundColor: "#2e2e2e", borderRadius: 1, my: 2 }}>
-        <RichTextRenderer
-          key={schtick.description}
-          html={schtick.description || ""}
-          sx={{ mb: 2 }}
+        <NameEditor
+          entity={schtick}
+          setEntity={setSchtick}
+          updateEntity={updateSchtick}
         />
       </Box>
-
-      <EditSchtickForm
-        key={JSON.stringify(schtick)}
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        onSave={handleSave}
+      <CategoryPath schtick={schtick} />
+      <HeroImage entity={schtick} setEntity={setSchtick} />
+      <EditCategoryPath
         schtick={schtick}
+        setSchtick={setSchtick}
+        updateSchtick={updateSchtick}
       />
+      <SectionHeader title="Description" icon={<VscGithubAction size="24" />}>
+        A description of the schtick, including whether it costs a Shot or Chi{" "}
+        to activate, who it affects, and what its effects are.
+      </SectionHeader>
+      <EditableRichText
+        name="description"
+        html={schtick.description}
+        editable={true}
+        onChange={handleChange}
+        fallback="No description available."
+      />
+
       {error && (
         <Alert severity="error" sx={{ mt: 2 }}>
           {error}

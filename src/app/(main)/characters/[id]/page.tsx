@@ -3,10 +3,10 @@ import { CircularProgress, Container, Typography, Box } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import type { Character } from "@/types"
 import type { Metadata } from "next"
-import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
-
-import { CharacterPageClient } from "@/components/characters"
+import { Suspense } from "react"
+import { EditCharacter } from "@/components/characters"
+import { headers } from "next/headers"
 
 // Component for character not found
 function CharacterNotFound() {
@@ -76,11 +76,19 @@ export default async function CharacterPage({
     return <CharacterNotFound />
   }
 
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
   return (
     <>
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <CharacterPageClient character={character} />
+        <EditCharacter
+          character={character}
+          initialIsMobile={initialIsMobile}
+        />
       </Suspense>
     </>
   )
