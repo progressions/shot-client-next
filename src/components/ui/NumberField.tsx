@@ -1,5 +1,4 @@
 "use client"
-
 import { useState } from "react"
 import { Box, Stack, IconButton } from "@mui/material"
 import { TextField } from "@/components/ui"
@@ -67,7 +66,14 @@ export function NumberField({
 
   return (
     <Box
-      sx={{ position: "relative", width }}
+      sx={{
+        border: `1px solid ${theme.palette.divider}`,
+        "&:hover": { border: `1px solid ${theme.palette.primary.main}` },
+        borderRadius: 1,
+        position: "relative",
+        width,
+        overflow: "hidden",
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -91,7 +97,16 @@ export function NumberField({
             px: 1,
             "& input": {
               textAlign: "center",
-              paddingRight: "10px",
+              paddingRight: "30px",
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              border: "none", // Remove default border
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              border: "none", // Remove hover border
+            },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              border: "none", // Remove focused border
             },
             ...sx,
           },
@@ -103,10 +118,12 @@ export function NumberField({
           position: "absolute",
           top: "0",
           bottom: "0",
-          right: "0",
+          right: isFocused || isHovered ? "0" : "-30px",
           gap: 0,
           justifyContent: "space-between",
-          display: isFocused || isHovered ? "flex" : "none",
+          transition: "right 0.3s ease-in-out",
+          opacity: isFocused || isHovered ? 1 : 0,
+          pointerEvents: isFocused || isHovered ? "auto" : "none",
         }}
       >
         <IconButton
@@ -115,7 +132,7 @@ export function NumberField({
             padding: "0",
             color: theme.palette.text.primary,
             backgroundColor: theme.palette.background.paper,
-            borderRadius: "2px",
+            borderRadius: "0px 6px 0px 0px",
             height: "50%",
             "&:hover": { backgroundColor: theme.palette.action.hover },
           }}
@@ -128,7 +145,7 @@ export function NumberField({
             padding: "0",
             color: theme.palette.text.primary,
             backgroundColor: theme.palette.background.paper,
-            borderRadius: "2px",
+            borderRadius: "0px 0px 6px 0px",
             height: "50%",
             "&:hover": { backgroundColor: theme.palette.action.hover },
           }}

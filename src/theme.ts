@@ -28,6 +28,10 @@ const theme = createTheme({
     ...themeOptions.palette,
     ...customThemeOptions.palette,
   },
+  components: {
+    ...themeOptions.components,
+    ...customThemeOptions.components, // Ensure customThemeOptions components are merged
+  },
 })
 
 export default theme
