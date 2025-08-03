@@ -1,15 +1,22 @@
 "use client"
-
 import { useEffect, useCallback, useMemo, useRef } from "react"
 import dynamic from "next/dynamic"
 import CustomMention from "@/components/editor/CustomMention"
 import StarterKit from "@tiptap/starter-kit"
 import { EditorProvider } from "@tiptap/react"
 import { useClient } from "@/contexts"
+import { Box, useTheme } from "@mui/material"
 import styles from "@/components/editor/Editor.module.scss"
 import suggestion from "./suggestion.js"
 
-function Editor({ name, value, onChange }) {
+type EditorProps = {
+  name: string
+  value: string
+  onChange: (event: { target: { name: string; value: string } }) => void
+}
+
+export function Editor({ name, value, onChange }: EditorProps) {
+  const theme = useTheme()
   const { user, client } = useClient()
   const editorReference = useRef(null)
   const contentReference = useRef(value || "")
@@ -57,8 +64,6 @@ function Editor({ name, value, onChange }) {
     [onChange]
   )
 
-  if (!user?.id) return <></>
-
   const preprocessContent = html => {
     if (!html) return ""
     let processed = html.replaceAll(/<li><p>(.*?)<\/p><\/li>/g, "<li>$1</li>")
@@ -75,22 +80,6 @@ function Editor({ name, value, onChange }) {
     )
     console.log("Editor processedValue:", processed)
     return processed
-  }
-
-  const getUrl = (className, id) => {
-    const urlMap = {
-      Character: `/characters/${id}`,
-      Vehicle: `/vehicles/${id}`,
-      Site: `/sites/${id}`,
-      Party: `/parties/${id}`,
-      Faction: `/factions/${id}`,
-      Schtick: `/schticks/${id}`,
-      Weapon: `/weapons/${id}`,
-      Juncture: `/junctures/${id}`,
-      Type: `/`,
-      Archetype: `/`,
-    }
-    return urlMap[className] || ""
   }
 
   const extensions = [
@@ -130,8 +119,23 @@ function Editor({ name, value, onChange }) {
 
   const processedValue = useMemo(() => preprocessContent(value), [value])
 
+  if (!user?.id) return <></>
+
   return (
-    <div className={styles.editorContainer}>
+    <Box
+      sx={{
+        width: "100%",
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: 1,
+        "&:hover": {
+          borderColor: theme.palette.primary.main,
+        },
+        transition: theme.transitions.create("border-color", {
+          duration: theme.transitions.duration.short,
+          easing: theme.transitions.easing.easeOut,
+        }),
+      }}
+    >
       <EditorProvider
         ref={editorReference}
         name={name}
@@ -158,7 +162,7 @@ function Editor({ name, value, onChange }) {
           }
         }}
       />
-    </div>
+    </Box>
   )
 }
 

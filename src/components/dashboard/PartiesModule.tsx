@@ -2,6 +2,8 @@ import { Stack, Box, Typography } from "@mui/material"
 import Link from "next/link"
 import { PartyBadge } from "@/components/badges"
 import type { Party } from "@/types"
+import { ModuleHeader } from "@/components/dashboard"
+import { Icon } from "@/lib"
 
 type PartiesModuleProperties = {
   parties: Party[]
@@ -18,9 +20,7 @@ export default function PartiesModule({ parties }: PartiesModuleProperties) {
         backgroundColor: "#2d2d2d",
       }}
     >
-      <Typography variant="h6" gutterBottom>
-        Your Parties
-      </Typography>
+      <ModuleHeader title="Your Parties" icon={<Icon keyword="Parties" />} />
       <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
         {parties.map(party => (
           <PartyBadge key={party.id} party={party} size="sm" />

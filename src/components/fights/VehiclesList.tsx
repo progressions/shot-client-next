@@ -1,10 +1,10 @@
 "use client"
 
-import { FaCarCrash } from "react-icons/fa"
 import type { Fight } from "@/types"
 import { useClient } from "@/contexts"
 import { InfoLink } from "@/components/links"
 import { ListManager } from "@/components/lists"
+import { Icon } from "@/lib"
 
 type VehiclesListProperties = {
   fight: Fight
@@ -29,7 +29,7 @@ export default function VehiclesList({
 
   return (
     <ListManager
-      icon={<FaCarCrash size="24" />}
+      icon={<Icon keyword="Vehicles" size="24" />}
       entity={fight}
       name="Fight"
       collection="vehicles"

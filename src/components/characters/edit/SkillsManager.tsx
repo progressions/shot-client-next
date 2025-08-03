@@ -1,6 +1,6 @@
 "use client"
+
 import DeleteIcon from "@mui/icons-material/Delete"
-import AllInboxIcon from "@mui/icons-material/AllInbox"
 import { Stack, Box, IconButton, Typography, Grid } from "@mui/material"
 import {
   type Option,
@@ -13,6 +13,7 @@ import {
 import type { Character, SkillValue } from "@/types"
 import { CS } from "@/services"
 import { FormActions, useForm } from "@/reducers"
+import { Icon } from "@/lib"
 
 type FormStateData = {
   characterSkills: SkillValue[]
@@ -154,7 +155,7 @@ export default function SkillsManager({
     <>
       <SectionHeader
         title="Skills"
-        icon={<AllInboxIcon />}
+        icon={<Icon keyword="Skills" size="24" />}
         actions={actionButton}
       >
         Skills are what your character can do. They are used to resolve actions

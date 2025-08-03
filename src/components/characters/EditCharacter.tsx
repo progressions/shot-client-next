@@ -1,7 +1,5 @@
 "use client"
 
-import AssignmentIndIcon from "@mui/icons-material/AssignmentInd"
-import BoltIcon from "@mui/icons-material/Bolt"
 import type { Character } from "@/types"
 import { useToast, useClient, useCampaign } from "@/contexts"
 import { useState, useEffect, useMemo } from "react"
@@ -25,6 +23,7 @@ import {
   EditWealth,
   SkillsManager,
 } from "@/components/characters"
+import { Icon } from "@/lib"
 
 type EditCharacterProps = {
   character: Character
@@ -115,7 +114,10 @@ export default function EditCharacter({
         updateCharacter={updateCharacter}
       />
       <Owner character={memoizedCharacter} />
-      <SectionHeader title="Action Values" icon={<BoltIcon />}>
+      <SectionHeader
+        title="Action Values"
+        icon={<Icon keyword="Action Values" />}
+      >
         Action Values are the core stats of your Character, used to resolve
         actions and challenges in the game.
       </SectionHeader>
@@ -125,7 +127,10 @@ export default function EditCharacter({
         updateCharacter={updateCharacter}
       />
 
-      <SectionHeader title="Personal Details" icon={<AssignmentIndIcon />}>
+      <SectionHeader
+        title="Personal Details"
+        icon={<Icon keyword="Personal Details" />}
+      >
         Personal details about your character, such as their type, archetype,
         juncture, and wealth.
       </SectionHeader>

@@ -1,14 +1,11 @@
 "use client"
 
-import { GiDramaMasks } from "react-icons/gi"
-import { GiClothes } from "react-icons/gi"
-import Person2Icon from "@mui/icons-material/Person2"
-import AutoStoriesIcon from "@mui/icons-material/AutoStories"
 import { Stack, Box } from "@mui/material"
 import type { Character } from "@/types"
 import { CS } from "@/services"
 import { EditableRichText, SectionHeader } from "@/components/ui"
 import { DescriptionValue } from "@/components/characters"
+import { Icon } from "@/lib"
 
 type DescriptionProps = {
   character: Character
@@ -20,7 +17,6 @@ export default function Description({
   updateCharacter,
 }: DescriptionProps) {
   const handleChange = async event => {
-    console.log("Description changed:", event.target.name, event.target.value)
     const updatedCharacter = CS.changeDescriptionValue(
       character,
       event.target.name,
@@ -32,7 +28,11 @@ export default function Description({
   if (CS.isMook(character)) {
     return (
       <Box>
-        <SectionHeader title="Appearance" icon={<Person2Icon />} sx={{ mt: 4 }}>
+        <SectionHeader
+          title="Appearance"
+          icon={<Icon keyword="Appearance" />}
+          sx={{ mt: 4 }}
+        >
           A brief description of your character, including their background,
           personality, and notable traits.
         </SectionHeader>
@@ -49,7 +49,11 @@ export default function Description({
 
   return (
     <Box>
-      <SectionHeader title="Appearance" icon={<Person2Icon />} sx={{ mt: 4 }}>
+      <SectionHeader
+        title="Appearance"
+        icon={<Icon keyword="Appearance" size="28" />}
+        sx={{ mt: 4 }}
+      >
         A brief description of your character, including their background,
         personality, and notable traits.
       </SectionHeader>
@@ -100,7 +104,7 @@ export default function Description({
       <Box>
         <SectionHeader
           title="Style of Dress"
-          icon={<GiClothes size={24} />}
+          icon={<Icon keyword="Dress" />}
           sx={{ mt: 4 }}
         >
           A brief description of your character&rsquo;s style of dress,
@@ -118,7 +122,7 @@ export default function Description({
         <Box>
           <SectionHeader
             title="Melodramatic Hook"
-            icon={<GiDramaMasks size={24} />}
+            icon={<Icon keyword="Melodramatic Hook" />}
             sx={{ mt: 4 }}
           >
             A melodramatic hook is a brief, dramatic statement that captures the
@@ -136,7 +140,7 @@ export default function Description({
       <Box>
         <SectionHeader
           title="Background"
-          icon={<AutoStoriesIcon />}
+          icon={<Icon keyword="Background" />}
           sx={{ mt: 4 }}
         >
           A brief description of your character&rsquo;s background, including

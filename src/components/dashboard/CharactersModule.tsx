@@ -2,6 +2,8 @@ import { Stack, Box, Typography } from "@mui/material"
 import Link from "next/link"
 import type { Character } from "@/types"
 import { CharacterBadge } from "@/components/badges"
+import { Icon } from "@/lib"
+import { ModuleHeader } from "@/components/dashboard"
 
 type CharactersModuleProperties = {
   characters: Character[]
@@ -20,9 +22,10 @@ export default function CharactersModule({
         backgroundColor: "#2d2d2d",
       }}
     >
-      <Typography variant="h6" gutterBottom>
-        Your Characters
-      </Typography>
+      <ModuleHeader
+        title="Your Characters"
+        icon={<Icon keyword="Characters" />}
+      />
       <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
         {characters.map(character => (
           <CharacterBadge key={character.id} character={character} size="sm" />

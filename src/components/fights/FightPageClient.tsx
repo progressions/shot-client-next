@@ -1,7 +1,5 @@
 "use client"
 
-import { GiSwordman } from "react-icons/gi"
-import { GiSpikyExplosion } from "react-icons/gi"
 import { useState, useEffect } from "react"
 import { Stack, Box } from "@mui/material"
 import type { Fight } from "@/types"
@@ -17,6 +15,7 @@ import { CharacterManager } from "@/components/characters"
 import { InfoLink } from "@/components/links"
 import { NameEditor } from "@/components/entities"
 import { useEntity } from "@/hooks"
+import { Icon } from "@/lib"
 
 interface FightPageClientProperties {
   fight: Fight
@@ -66,7 +65,7 @@ export default function FightPageClient({
         />
       </Box>
       <HeroImage entity={fight} setEntity={setFight} />
-      <SectionHeader title="Description" icon={<GiSpikyExplosion size="24" />}>
+      <SectionHeader title="Description" icon={<Icon keyword="Description" />}>
         A brief description of the nature of the fight. What are the stakes?
         Where is it located?
       </SectionHeader>
@@ -79,7 +78,7 @@ export default function FightPageClient({
       />
       <Stack direction="column" spacing={2}>
         <CharacterManager
-          icon={<GiSwordman size="24" />}
+          icon={<Icon keyword="Fighters" size="24" />}
           name="fight"
           title="Fighters"
           description={

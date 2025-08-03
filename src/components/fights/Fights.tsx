@@ -24,6 +24,8 @@ import type { Fight, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
 import type { SelectChangeEvent } from "@mui/material"
+import { MainHeader } from "@/components/ui"
+import { Icon } from "@/lib"
 
 interface FightsProperties {
   initialFights: Fight[]
@@ -197,15 +199,7 @@ export default function Fights({
   return (
     <Box>
       <Stack spacing={2} sx={{ mb: 4 }}>
-        <Typography
-          variant="h4"
-          sx={{
-            color: "#ffffff",
-            fontSize: { xs: "1.5rem", sm: "2.125rem" },
-          }}
-        >
-          Fights
-        </Typography>
+        <MainHeader title="Fights" icon={<Icon keyword="Fights" size="28" />} />
         <Box
           sx={{
             display: "flex",

@@ -2,6 +2,8 @@ import type { Fight } from "@/types"
 import { Stack, Box, Typography } from "@mui/material"
 import { FightBadge } from "@/components/badges"
 import Link from "next/link"
+import { Icon } from "@/lib"
+import { ModuleHeader } from "@/components/dashboard"
 
 type FightsModuleProperties = {
   fights: Fight[]
@@ -18,9 +20,7 @@ export default function FightsModule({ fights }: FightsModuleProperties) {
         backgroundColor: "#2d2d2d",
       }}
     >
-      <Typography variant="h6" gutterBottom>
-        Your Fights
-      </Typography>
+      <ModuleHeader title="Your Fights" icon={<Icon keyword="Fights" />} />
       <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
         {fights.map(fight => (
           <FightBadge key={fight.id} fight={fight} size="sm" />

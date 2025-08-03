@@ -1,13 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardContent, Box, Alert, Typography } from "@mui/material"
+import { Stack, Card, CardContent, Box, Alert, Typography } from "@mui/material"
 import type { Fight } from "@/types"
 import { FightDescription } from "@/components/fights"
 import { useCampaign, useClient } from "@/contexts"
 import { FightLink, CharacterLink } from "@/components/links"
 import DetailButtons from "@/components/DetailButtons"
 import { PositionableImage } from "@/components/ui"
+import { Icon } from "@/lib"
 
 interface FightDetailProperties {
   fight: Fight
@@ -95,16 +96,19 @@ export default function FightDetail({
           />
         </Box>
         <FightDescription fight={fight} />
-        <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
-          {fight.actors && fight.actors.length > 0
-            ? fight.actors.map((actor, index) => (
-                <span key={`${actor.id}-${index}`}>
-                  <CharacterLink character={actor} />
-                  {index < fight.actors.length - 1 && ", "}
-                </span>
-              ))
-            : null}
-        </Typography>
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 2 }}>
+          <Icon keyword="Characters" />{" "}
+          <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
+            {fight.actors && fight.actors.length > 0
+              ? fight.actors.map((actor, index) => (
+                  <span key={`${actor.id}-${index}`}>
+                    <CharacterLink character={actor} />
+                    {index < fight.actors.length - 1 && ", "}
+                  </span>
+                ))
+              : "No fighters yet!"}
+          </Typography>
+        </Stack>
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
           Created: {formattedCreatedAt}
         </Typography>

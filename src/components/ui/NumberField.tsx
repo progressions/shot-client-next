@@ -6,6 +6,7 @@ import { TextField } from "@/components/ui"
 import AddIcon from "@mui/icons-material/Add"
 import RemoveIcon from "@mui/icons-material/Remove"
 import { SystemStyleObject, Theme } from "@mui/system"
+import { useTheme } from "@mui/material/styles"
 
 type NumberFieldProps = {
   name: string
@@ -28,9 +29,9 @@ export function NumberField({
   onBlur,
   sx = {},
 }: NumberFieldProps) {
+  const theme = useTheme()
   const [isFocused, setIsFocused] = useState<boolean>(false)
   const [isHovered, setIsHovered] = useState<boolean>(false)
-
   const fontSizeMap = {
     small: { xs: "1.5rem", sm: "2rem" },
     large: { xs: "2rem", sm: "3rem" },
@@ -112,11 +113,11 @@ export function NumberField({
           onClick={handleIncrement}
           sx={{
             padding: "0",
-            color: "#000000",
-            backgroundColor: "#ffffff",
+            color: theme.palette.text.primary,
+            backgroundColor: theme.palette.background.paper,
             borderRadius: "2px",
             height: "50%",
-            "&:hover": { backgroundColor: "#e0e0e0" },
+            "&:hover": { backgroundColor: theme.palette.action.hover },
           }}
         >
           <AddIcon sx={{ fontSize: "0.75rem" }} />
@@ -125,11 +126,11 @@ export function NumberField({
           onClick={handleDecrement}
           sx={{
             padding: "0",
-            color: "#000000",
-            backgroundColor: "#ffffff",
+            color: theme.palette.text.primary,
+            backgroundColor: theme.palette.background.paper,
             borderRadius: "2px",
             height: "50%",
-            "&:hover": { backgroundColor: "#e0e0e0" },
+            "&:hover": { backgroundColor: theme.palette.action.hover },
           }}
         >
           <RemoveIcon sx={{ fontSize: "0.75rem" }} />

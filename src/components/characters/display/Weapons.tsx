@@ -1,10 +1,9 @@
 "use client"
 
-import { FaGun } from "react-icons/fa6"
-import { Box } from "@mui/material"
 import type { Character } from "@/types"
 import { InfoLink } from "@/components/links"
 import { WeaponManager } from "@/components/weapons"
+import { Icon } from "@/lib"
 
 type WeaponsProperties = {
   character: Pick<Character, "id" | "user" | "weapon_ids">
@@ -16,14 +15,9 @@ export default function Weapons({
   setCharacter,
   updateCharacter,
 }: WeaponsProperties) {
-  const iconBox = (
-    <Box sx={{ pt: 1, fontSize: "1.4rem" }}>
-      <FaGun />
-    </Box>
-  )
   return (
     <WeaponManager
-      icon={iconBox}
+      icon={<Icon keyword="Weapons" />}
       name="character"
       title="Weapons"
       description={

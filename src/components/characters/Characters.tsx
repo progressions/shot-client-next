@@ -5,9 +5,10 @@ import { Box } from "@mui/material"
 import type { Character, PaginationMeta } from "@/types"
 import { useCampaign, useClient, useLocalStorage } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
-import { HeroTitle } from "@/components/ui"
+import { MainHeader } from "@/components/ui"
 import { queryParams } from "@/lib"
 import { CharactersView, CharactersMenu } from "@/components/characters"
+import { Icon } from "@/lib"
 
 interface CharactersProperties {
   initialCharacters: Character[]
@@ -210,7 +211,10 @@ export default function Characters({
           mb: 2,
         }}
       >
-        <HeroTitle>Characters</HeroTitle>
+        <MainHeader
+          title="Characters"
+          icon={<Icon keyword="Characters" size="28" />}
+        />
       </Box>
       <CharactersView
         viewMode={viewMode}

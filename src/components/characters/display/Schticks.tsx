@@ -1,10 +1,9 @@
 "use client"
 
-import { Box } from "@mui/material"
-import { VscGithubAction } from "react-icons/vsc"
 import type { Character } from "@/types"
 import { InfoLink } from "@/components/links"
 import { SchtickManager } from "@/components/schticks"
+import { Icon } from "@/lib"
 
 type SchticksProperties = {
   character: Pick<Character, "id" | "user" | "schtick_ids">
@@ -16,14 +15,9 @@ export default function Schticks({
   setCharacter,
   updateCharacter,
 }: SchticksProperties) {
-  const iconBox = (
-    <Box sx={{ pt: 1, fontSize: "1.4rem" }}>
-      <VscGithubAction />
-    </Box>
-  )
   return (
     <SchtickManager
-      icon={iconBox}
+      icon={<Icon keyword="Schticks" />}
       name="character"
       title="Schticks"
       description={
