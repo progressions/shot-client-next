@@ -1,4 +1,5 @@
 import { CircularProgress, Typography } from "@mui/material"
+import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Fight } from "@/types"
 import { FightPageClient } from "@/components/fights"
@@ -22,11 +23,16 @@ export default async function FightPage({ params }: FightPageProperties) {
     return <Typography>Fight not found</Typography>
   }
 
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
   return (
     <>
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <FightPageClient fight={fight} />
+        <FightPageClient fight={fight} initialIsMobile={initialIsMobile} />
       </Suspense>
     </>
   )

@@ -91,6 +91,7 @@ export function Autocomplete({
     )
     return allowNone ? [noneOption, ...filteredOptions] : filteredOptions
   }, [options, noneOption, allowNone, exclude])
+
   const selectedOption = useMemo(() => {
     if (value === null) {
       return noneOption

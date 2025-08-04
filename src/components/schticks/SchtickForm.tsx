@@ -31,12 +31,6 @@ import {
 } from "@/components/autocomplete"
 import { useClient } from "@/contexts"
 import { useEntity } from "@/hooks"
-import type { AxiosError } from "axios"
-
-// Define the shape of server error responses
-interface ServerErrorResponse {
-  errors: Partial<Record<keyof FormStateData, string[]>>
-}
 
 // Extend form state to include field-specific errors
 type FormStateData = Schtick & {
@@ -47,23 +41,21 @@ type FormStateData = Schtick & {
 interface SchtickFormProperties {
   open: boolean
   onClose: () => void
-  setSchtick: (schtick: Schtick) => void
 }
 
-export default function SchtickForm({
-  open,
-  onClose,
-  setSchtick,
-}: SchtickFormProperties) {
+export default function SchtickForm({ open, onClose }: SchtickFormProperties) {
   const { client } = useClient()
   const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
     ...defaultSchtick,
     errors: {},
   })
-  const { disabled, error, data } = formState
+  const { disabled, data } = formState
   const { name, description, category, path, image, errors = {} } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const { createEntity } = useEntity<Schtick>(defaultSchtick, setSchtick)
+  const { createEntity, handleFormErrors } = useEntity<Schtick>(
+    defaultSchtick,
+    dispatchForm
+  )
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
@@ -96,34 +88,6 @@ export default function SchtickForm({
       }
       dispatchForm({ type: FormActions.UPDATE, name: "image", value: file })
     }
-  }
-
-  const handleFormErrors = (error: unknown) => {
-    const axiosError = error as AxiosError<ServerErrorResponse>
-    if (axiosError.response?.status === 422) {
-      const serverErrors = axiosError.response.data.errors
-      const formattedErrors: FormStateData["errors"] = {}
-      Object.entries(serverErrors).forEach(([field, messages]) => {
-        if (messages && messages.length > 0) {
-          formattedErrors[field as keyof FormStateData] = messages[0]
-        }
-      })
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "errors",
-        value: formattedErrors,
-      })
-      dispatchForm({
-        type: FormActions.ERROR,
-        payload: "Please correct the errors in the form",
-      })
-    } else {
-      dispatchForm({
-        type: FormActions.ERROR,
-        payload: "An unexpected error occurred",
-      })
-    }
-    console.error("SchtickForm", error)
   }
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -208,9 +172,9 @@ export default function SchtickForm({
         <Typography variant="h5" sx={{ mb: 2, color: "#ffffff" }}>
           New Schtick
         </Typography>
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
+        {status && (
+          <Alert severity={status.severity} sx={{ mb: 2 }}>
+            {status.message}
           </Alert>
         )}
         <FormControl fullWidth margin="normal" error={!!errors.name}>

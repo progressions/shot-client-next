@@ -10,6 +10,7 @@ type WeaponJunctureAutocompleteProperties = {
   options?: Option[]
   exclude?: string[]
   allowNone?: boolean
+  disabled?: boolean
 }
 
 export default function WeaponJunctureAutocomplete({
@@ -18,6 +19,7 @@ export default function WeaponJunctureAutocomplete({
   options,
   allowNone = true,
   exclude = [],
+  disabled = false,
 }: WeaponJunctureAutocompleteProperties) {
   const { client } = useClient()
 
@@ -51,6 +53,7 @@ export default function WeaponJunctureAutocomplete({
       onChange={onChange}
       allowNone={allowNone}
       exclude={exclude}
+      disabled={disabled}
     />
   )
 }

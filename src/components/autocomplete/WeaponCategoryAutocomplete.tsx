@@ -10,6 +10,7 @@ type WeaponCategoryAutocompleteProperties = {
   options?: Option[]
   exclude?: string[]
   allowNone?: boolean
+  disabled?: boolean
 }
 
 export default function WeaponCategoryAutocomplete({
@@ -18,6 +19,7 @@ export default function WeaponCategoryAutocomplete({
   options,
   allowNone = true,
   exclude = [],
+  disabled = false,
 }: WeaponCategoryAutocompleteProperties) {
   const { client } = useClient()
 
@@ -51,6 +53,7 @@ export default function WeaponCategoryAutocomplete({
       onChange={onChange}
       allowNone={allowNone}
       exclude={exclude}
+      disabled={disabled}
     />
   )
 }

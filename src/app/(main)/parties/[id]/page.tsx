@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation"
+import { headers } from "next/headers"
 import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Party } from "@/types"
@@ -25,11 +26,16 @@ export default async function PartyPage({ params }: PartyPageProperties) {
     redirect("/parties")
   }
 
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
   return (
     <>
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <PartyPageClient party={party} />
+        <PartyPageClient party={party} initialIsMobile={initialIsMobile} />
       </Suspense>
     </>
   )

@@ -1,13 +1,14 @@
 import type { Schtick } from "@/types"
-import { Stack, Typography, Chip } from "@mui/material"
+import { Typography, Chip } from "@mui/material"
+import { Chipset } from "@/components/ui"
 
-type CategoryPathProps = {
+type SchtickChipsProps = {
   schtick: Schtick
 }
 
-export default function CategoryPath({ schtick }: CategoryPathProps) {
+export default function SchtickChips({ schtick }: SchtickChipsProps) {
   return (
-    <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+    <Chipset>
       <Typography variant="h6" sx={{ mb: 1 }}>
         <Chip
           size="medium"
@@ -20,6 +21,6 @@ export default function CategoryPath({ schtick }: CategoryPathProps) {
           <Chip size="medium" label={`Path: ${schtick.path}`} />
         </Typography>
       )}
-    </Stack>
+    </Chipset>
   )
 }

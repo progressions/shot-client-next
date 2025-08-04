@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { Box, CircularProgress } from "@mui/material"
@@ -74,7 +75,7 @@ export default async function VehiclesPage({
           initialMeta={meta}
           initialSort={sort}
           initialOrder={order}
-          initialIsMobile={initialIsMobile} // Pass mobile detection result
+          initialIsMobile={initialIsMobile}
         />
       </Suspense>
     </Box>

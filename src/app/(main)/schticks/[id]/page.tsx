@@ -1,4 +1,5 @@
 import { CircularProgress, Typography } from "@mui/material"
+import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Schtick } from "@/types"
 import { SchtickPageClient } from "@/components/schticks"
@@ -22,11 +23,19 @@ export default async function SchtickPage({ params }: SchtickPageProperties) {
     return <Typography>Schtick not found</Typography>
   }
 
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
   return (
     <>
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <SchtickPageClient schtick={schtick} />
+        <SchtickPageClient
+          schtick={schtick}
+          initialIsMobile={initialIsMobile}
+        />
       </Suspense>
     </>
   )

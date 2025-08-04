@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
+import { headers } from "next/headers"
 import { CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Weapons } from "@/components/weapons"
@@ -56,6 +57,11 @@ export default async function WeaponsPage({
     redirect("/weapons?page=1&sort=created_at&order=desc")
   }
 
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
   return (
     <>
       <Breadcrumbs />
@@ -65,6 +71,7 @@ export default async function WeaponsPage({
           initialMeta={meta}
           initialSort={sort}
           initialOrder={order}
+          initialIsMobile={initialIsMobile}
         />
       </Suspense>
     </>

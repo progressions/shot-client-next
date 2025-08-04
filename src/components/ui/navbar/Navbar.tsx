@@ -7,9 +7,9 @@ import { useClient } from "@/contexts"
 import { logoutAction } from "@/lib/actions"
 import { UserActions } from "@/reducers"
 import { Button } from "@/components/ui"
-import { MainMenu } from "@/components/navbar"
+import { MainMenu } from "@/components/ui/navbar"
 
-export default function Navbar() {
+export function Navbar() {
   const { jwt, user, dispatchCurrentUser } = useClient()
   const router = useRouter()
 

@@ -1,4 +1,5 @@
 import { CircularProgress } from "@mui/material"
+import { headers } from "next/headers"
 import { CreatePage } from "@/components/characters"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Suspense } from "react"
@@ -24,11 +25,16 @@ export default async function CharacterCreatePage() {
   })
   const { characters } = response.data
 
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
   return (
     <>
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <CreatePage templates={characters} />
+        <CreatePage templates={characters} initialIsMobile={initialIsMobile} />
       </Suspense>
     </>
   )

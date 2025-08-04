@@ -131,6 +131,10 @@ export interface Fight extends BaseEntity {
   actors: Character[]
   fight_events?: FightEvent[]
   image_url: string
+  started_at: string | null
+  ended_at: string | null
+  season: number | null
+  session: number | null
 }
 
 export interface User extends BaseEntity {

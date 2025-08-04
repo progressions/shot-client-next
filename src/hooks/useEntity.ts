@@ -2,8 +2,12 @@ import { useToast, useClient } from "@/contexts"
 import type { Entity } from "@/types"
 import pluralize from "pluralize"
 import { redirect } from "next/navigation"
+import { FormActions } from "@/reducers"
 
-export function useEntity(entity: entity, setEntity: (entity: Entity) => void) {
+export function useEntity(
+  entity: entity,
+  dispatchForm: React.Dispatch<FormActions>
+) {
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
   const entityClass = entity.entity_class
@@ -15,17 +19,28 @@ export function useEntity(entity: entity, setEntity: (entity: Entity) => void) {
   const createFunction = `create${entityClass}`
 
   const updateEntity = async (updatedEntity: Entity) => {
+    dispatchForm({ type: FormActions.EDIT, name: "saving", value: true })
     try {
-      setEntity(updatedEntity)
+      dispatchForm({
+        type: FormActions.EDIT,
+        name: "data",
+        value: updatedEntity,
+      })
       const formData = new FormData()
       const entityData = {
         ...updatedEntity,
       }
       formData.append(name, JSON.stringify(entityData))
       const response = await client[updateFunction](updatedEntity.id, formData)
-      setEntity(response.data)
+      dispatchForm({
+        type: FormActions.EDIT,
+        name: "data",
+        value: response.data,
+      })
+      dispatchForm({ type: FormActions.SUCCESS })
       toastSuccess(`${entityClass} updated successfully`)
     } catch (error) {
+      handleFormErrors(error)
       toastError(`Error updating ${name}.`)
       console.error("Error updating entity:", error)
       throw error
@@ -65,7 +80,9 @@ export function useEntity(entity: entity, setEntity: (entity: Entity) => void) {
     }
   }
 
-  const handleChangeAndSave = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeAndSave = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const updatedEntity = {
       ...entity,
       [event.target.name]: event.target.value,
@@ -73,5 +90,40 @@ export function useEntity(entity: entity, setEntity: (entity: Entity) => void) {
     await updateEntity(updatedEntity)
   }
 
-  return { updateEntity, deleteEntity, createEntity, handleChangeAndSave }
+  const handleFormErrors = (error: unknown) => {
+    const axiosError = error as AxiosError<ServerErrorResponse>
+    if (axiosError.response?.status === 422) {
+      const serverErrors = axiosError.response.data.errors
+      const formattedErrors: FormStateData["errors"] = {}
+      Object.entries(serverErrors).forEach(([field, messages]) => {
+        if (messages && messages.length > 0) {
+          formattedErrors[field as keyof FormStateData] = messages[0]
+        }
+      })
+      dispatchForm({
+        type: FormActions.ERRORS,
+        payload: formattedErrors,
+      })
+      dispatchForm({
+        type: FormActions.STATUS,
+        severity: "error",
+        message: "Please correct the errors in the form",
+      })
+    } else {
+      dispatchForm({
+        type: FormActions.STATUS,
+        severity: "error",
+        message: "An unexpected error occurred",
+      })
+    }
+    console.error(error)
+  }
+
+  return {
+    updateEntity,
+    deleteEntity,
+    createEntity,
+    handleChangeAndSave,
+    handleFormErrors,
+  }
 }

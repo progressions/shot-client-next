@@ -4,6 +4,9 @@ import type { Character } from "@/types"
 import { InfoLink } from "@/components/links"
 import { SchtickManager } from "@/components/schticks"
 import { Icon } from "@/lib"
+import { ListManager } from "@/components/lists"
+import { useState, useEffect } from "react"
+import { useClient } from "@/contexts"
 
 type SchticksProperties = {
   character: Pick<Character, "id" | "user" | "schtick_ids">
@@ -15,10 +18,36 @@ export default function Schticks({
   setCharacter,
   updateCharacter,
 }: SchticksProperties) {
+  const { client } = useClient()
+  const [schticks, setSchticks] = useState([])
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    const fetchSchticks = async () => {
+      try {
+        const response = await client.getSchticks({
+          character_id: character.id,
+          per_page: 100,
+          sort: "name",
+          order: "asc",
+        })
+        setSchticks(response.data.schticks || [])
+        setLoaded(true)
+      } catch (error) {
+        console.error("Error fetching schticks:", error)
+      }
+    }
+
+    fetchSchticks()
+  }, [client, character.id])
+
+  if (!loaded) return
+
   return (
-    <SchtickManager
+    <ListManager
       icon={<Icon keyword="Schticks" />}
-      name="character"
+      entity={{ ...character, schticks }}
+      name="schticks"
       title="Schticks"
       description={
         <>
@@ -27,9 +56,10 @@ export default function Schticks({
           <InfoLink info="Magic" /> spells.
         </>
       }
-      entity={character}
       update={updateCharacter}
-      setEntity={setCharacter}
+      collection="schticks"
+      collection_ids="schtick_ids"
+      manage={true}
     />
   )
 }

@@ -11,10 +11,10 @@ import {
   SpeedDialMenu,
   SectionHeader,
   EditableRichText,
+  NameEditor,
 } from "@/components/ui"
 import { CharacterManager } from "@/components/characters"
 import { InfoLink } from "@/components/links"
-import { NameEditor } from "@/components/entities"
 import { useEntity } from "@/hooks"
 import { FactionAutocomplete } from "@/components/autocomplete"
 

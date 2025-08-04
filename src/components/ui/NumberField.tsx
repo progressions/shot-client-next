@@ -22,7 +22,7 @@ export function NumberField({
   name,
   value,
   size = "large",
-  width = "140px",
+  width,
   error,
   onChange,
   onBlur,
@@ -32,8 +32,16 @@ export function NumberField({
   const [isFocused, setIsFocused] = useState<boolean>(false)
   const [isHovered, setIsHovered] = useState<boolean>(false)
   const fontSizeMap = {
-    small: { xs: "1.5rem", sm: "2rem" },
+    small: { xs: "1rem", sm: "1.5rem" },
     large: { xs: "2rem", sm: "3rem" },
+  }
+  const paddingMap = {
+    small: { xs: "0.5rem", sm: "1rem" },
+    large: { xs: "1.5rem", sm: "2rem" },
+  }
+  const widthMap = {
+    small: { xs: "60px", sm: "80px" },
+    large: { xs: "100px", sm: "140px" },
   }
 
   const handleIncrement = () => {
@@ -71,7 +79,7 @@ export function NumberField({
         "&:hover": { border: `1px solid ${theme.palette.primary.main}` },
         borderRadius: 1,
         position: "relative",
-        width,
+        width: width || widthMap[size],
         overflow: "hidden",
       }}
       onMouseEnter={() => setIsHovered(true)}
@@ -90,14 +98,14 @@ export function NumberField({
         type="text"
         InputProps={{
           sx: {
-            width,
+            width: width || widthMap[size],
             fontSize: fontSizeMap[size],
             borderRadius: 1,
             fontWeight: 600,
             px: 1,
             "& input": {
               textAlign: "center",
-              paddingRight: "30px",
+              paddingRight: `${paddingMap[size]}`,
             },
             "& .MuiOutlinedInput-notchedOutline": {
               border: "none", // Remove default border

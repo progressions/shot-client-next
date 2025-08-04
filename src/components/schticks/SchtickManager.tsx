@@ -9,9 +9,10 @@ import { FormActions, useForm } from "@/reducers"
 import { paginateArray } from "@/lib"
 import { BadgeList } from "@/components/lists"
 import { SchtickFilter } from "@/components/schticks"
+import { ManageButton, SectionHeader } from "@/components/ui"
 import { useClient } from "@/contexts"
 import { useEffect } from "react"
-import { ManageButton, SectionHeader } from "@/components/ui"
+import { useListManager } from "@/hooks"
 
 type FormStateData = {
   page: number
@@ -23,6 +24,7 @@ type FormStateData = {
 
 type SchtickManagerProperties = {
   entity: Entity
+  name: string
   title: string
   description: React.ReactNode
   update: (id: string, formData: FormData) => Promise<void>
@@ -73,7 +75,7 @@ export default function SchtickManager({
     fetchSchticks().catch(error => {
       console.error("Failed to fetch schticks:", error)
     })
-  }, [entity.id, client, dispatchForm])
+  }, [entity, client, dispatchForm])
 
   const handleAddMember = async () => {
     if (!id) return
@@ -128,6 +130,7 @@ export default function SchtickManager({
   }
 
   const setSchtickId = (value: string | null) => {
+    console.log("Setting schtick ID:", value)
     dispatchForm({ type: FormActions.UPDATE, name: "id", value })
   }
   const actionButton = <ManageButton open={open} dispatchForm={dispatchForm} />

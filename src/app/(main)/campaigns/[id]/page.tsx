@@ -1,4 +1,5 @@
 import { CircularProgress, Typography } from "@mui/material"
+import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Campaign } from "@/types"
 import { CampaignPageClient } from "@/components/campaigns"
@@ -22,11 +23,19 @@ export default async function CampaignPage({ params }: CampaignPageProperties) {
     return <Typography>Campaign not found</Typography>
   }
 
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
   return (
     <>
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <CampaignPageClient campaign={campaign} />
+        <CampaignPageClient
+          campaign={campaign}
+          initialIsMobile={initialIsMobile}
+        />
       </Suspense>
     </>
   )

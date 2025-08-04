@@ -2,7 +2,6 @@
 import type { SchtickCategory } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
-import { Divider, ListSubheader } from "@mui/material"
 import { styled, lighten, darken } from "@mui/system"
 
 type SchtickCategoryAutocompleteProperties = {

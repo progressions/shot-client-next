@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Stack, Card, CardContent, Box, Alert, Typography } from "@mui/material"
+import { Stack, Card, CardContent, Box, Typography } from "@mui/material"
 import type { Fight } from "@/types"
-import { FightDescription } from "@/components/fights"
-import { useCampaign, useClient } from "@/contexts"
+import { FightChips, FightDescription } from "@/components/fights"
+import { useToast, useCampaign, useClient } from "@/contexts"
 import { FightLink, CharacterLink } from "@/components/links"
 import DetailButtons from "@/components/DetailButtons"
 import { PositionableImage } from "@/components/ui"
@@ -24,8 +24,8 @@ export default function FightDetail({
 }: FightDetailProperties) {
   const router = useRouter()
   const { client } = useClient()
+  const { toastSuccess, toastError } = useToast()
   const { campaignData } = useCampaign()
-  const [error, setError] = useState<string | null>(null)
   const [fight, setFight] = useState<Fight>(initialFight)
 
   useEffect(() => {
@@ -43,12 +43,10 @@ export default function FightDetail({
     try {
       await client.deleteFight(fight)
       onDelete(fight.id)
-      setError(null)
+      toastSuccess(`Fight "${fight.name}" deleted successfully!`)
     } catch (error_) {
-      setError(
-        error_ instanceof Error ? error_.message : "Failed to delete fight"
-      )
       console.error("Delete fight error:", error_)
+      toastError("Failed to delete fight.")
     }
   }
 
@@ -56,29 +54,36 @@ export default function FightDetail({
     router.push(`/fights/${fight.id}`)
   }
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    })
+  }
+
   // Format created_at timestamp for display
-  const formattedCreatedAt = fight.created_at
-    ? new Date(fight.created_at).toLocaleString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true,
-      })
+  const formattedStartedAt = fight.started_at
+    ? formatDate(fight.started_at)
+    : "Unstarted"
+  const formattedEndedAt = fight.ended_at
+    ? formatDate(fight.ended_at)
     : "Unknown"
 
   return (
     <Card sx={{ mb: 2, bgcolor: "#424242" }}>
-      {fight.image_url && (
-        <PositionableImage
-          entity={fight}
-          pageContext="index"
-          height="200"
-          isMobile={isMobile}
-        />
-      )}
+      <PositionableImage
+        entity={fight}
+        pageContext="index"
+        height="200"
+        isMobile={isMobile}
+      />
       <CardContent sx={{ p: "1rem" }}>
+        <FightChips fight={fight} />
         <Box
           sx={{
             display: "flex",
@@ -110,12 +115,17 @@ export default function FightDetail({
           </Typography>
         </Stack>
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
-          Created: {formattedCreatedAt}
+          Started: {formattedStartedAt}
         </Typography>
-        {error && (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {error}
-          </Alert>
+        {fight.started_at && !fight.ended_at && (
+          <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
+            Ongoing since: {formattedStartedAt}
+          </Typography>
+        )}
+        {fight.ended_at && (
+          <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
+            Ended: {formattedEndedAt}
+          </Typography>
         )}
       </CardContent>
     </Card>

@@ -1,4 +1,5 @@
 import { CircularProgress, Typography } from "@mui/material"
+import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Weapon } from "@/types"
 import { WeaponPageClient } from "@/components/weapons"
@@ -22,11 +23,16 @@ export default async function WeaponPage({ params }: WeaponPageProperties) {
     return <Typography>Weapon not found</Typography>
   }
 
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
   return (
     <>
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <WeaponPageClient weapon={weapon} />
+        <WeaponPageClient weapon={weapon} initialIsMobile={initialIsMobile} />
       </Suspense>
     </>
   )

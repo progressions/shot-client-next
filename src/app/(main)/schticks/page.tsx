@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
@@ -56,6 +57,11 @@ export default async function SchticksPage({
     redirect("/schticks?page=1&sort=created_at&order=desc")
   }
 
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
   return (
     <>
       <Breadcrumbs />
@@ -65,6 +71,7 @@ export default async function SchticksPage({
           initialMeta={meta}
           initialSort={sort}
           initialOrder={order}
+          initialIsMobile={initialIsMobile}
         />
       </Suspense>
     </>

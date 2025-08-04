@@ -345,3 +345,8 @@ export interface FightChannelMessage {
   fight?: "updated" | Fight
   users?: Viewer[]
 }
+
+// Define the shape of server error responses
+export interface ServerErrorResponse {
+  errors: Partial<Record<keyof FormStateData, string[]>>
+}

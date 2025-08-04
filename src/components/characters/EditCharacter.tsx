@@ -6,10 +6,9 @@ import { useState, useEffect, useMemo } from "react"
 import { useMediaQuery, Box, Stack } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import { CS } from "@/services"
-import { SectionHeader, PositionableImage } from "@/components/ui"
+import { NameEditor, SectionHeader, PositionableImage } from "@/components/ui"
 import {
   CharacterSpeedDial,
-  NameEditor,
   Owner,
   ActionValuesEdit,
   Weapons,
@@ -43,7 +42,7 @@ export default function EditCharacter({
 
   const [character, setCharacter] = useState<Character>(initialCharacter)
 
-  console.log("character length", JSON.stringify(character).length)
+  // console.log("character length", JSON.stringify(character).length)
 
   useEffect(() => {
     document.title = character.name ? `${character.name} - Chi War` : "Chi War"
@@ -74,15 +73,10 @@ export default function EditCharacter({
       const response = await client.updateCharacter(character.id, formData)
       setCharacter(response.data)
       toastSuccess("Character updated successfully")
+
+      return response.data
     } catch (error) {
-      const nameErrors = error.response?.data?.errors?.name
-      const errorMessage =
-        Array.isArray(nameErrors) && nameErrors.length > 0
-          ? nameErrors[0]
-          : "Failed to update character"
-      toastError(`Error updating character: ${errorMessage}`)
-      console.error("Error updating character:", errorMessage)
-      throw new Error(errorMessage) // Rethrow to let NameEditor handle serverError
+      console.error("Error updating character:", error)
     }
   }
 
@@ -109,9 +103,9 @@ export default function EditCharacter({
         setEntity={setCharacter}
       />
       <NameEditor
-        character={memoizedCharacter}
-        setCharacter={setCharacter}
-        updateCharacter={updateCharacter}
+        entity={memoizedCharacter}
+        setEntity={setCharacter}
+        updateEntity={updateCharacter}
       />
       <Owner character={memoizedCharacter} />
       <SectionHeader

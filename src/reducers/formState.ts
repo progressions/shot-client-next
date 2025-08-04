@@ -9,6 +9,8 @@ export enum FormActions {
   DISABLE = "disable",
   LOADING = "loading",
   ERROR = "error",
+  ERRORS = "errors",
+  STATUS = "status",
   SUCCESS = "success",
   UPDATE = "update",
   RESET = "reset",
@@ -47,7 +49,19 @@ interface LoadingAction {
 
 interface ErrorAction {
   type: FormActions.ERROR
+  name: string
+  value: string | null
+}
+
+interface ErrorsAction {
+  type: FormActions.ERRORS
   payload: string | null
+}
+
+interface StatusAction {
+  type: FormActions.STATUS
+  severity: string
+  message: unknown
 }
 
 interface SuccessAction {
@@ -66,7 +80,8 @@ export interface FormStateType<T> {
   saving: boolean
   disabled: boolean
   open: boolean
-  error: string | null
+  errors: { [key: string]: string }
+  status: { severity: string; message: string } | null
   success: string | null
   data: T
 }
@@ -79,6 +94,8 @@ export type FormStateAction<T> =
   | DisableAction
   | LoadingAction
   | ErrorAction
+  | ErrorsAction
+  | StatusAction
   | SuccessAction
   | ResetAction<T>
 
@@ -91,9 +108,10 @@ export function initializeFormState<T extends Record<string, unknown>>(
     saving: false,
     disabled: true,
     open: false,
-    error: null,
+    errors: {},
     success: null,
-    data: data ?? ({} as T),
+    status: {},
+    data: data // ?? ({} as T),
   }
 }
 
@@ -124,7 +142,6 @@ export function formReducer<T extends Record<string, unknown>>(
         ...state,
         edited: true,
         disabled: false,
-        // loading: false,
         saving: false,
         data: {
           ...state.data,
@@ -156,8 +173,30 @@ export function formReducer<T extends Record<string, unknown>>(
         disabled: true,
         saving: false,
         loading: false,
-        error: action.payload,
+        errors: {
+          ...state.errors,
+          [action.name]: action.value,
+        },
         success: null,
+      }
+    }
+    case FormActions.ERRORS: {
+      return {
+        ...state,
+        disabled: true,
+        saving: false,
+        loading: false,
+        errors: action.payload,
+        success: null,
+      }
+    }
+    case FormActions.STATUS: {
+      return {
+        ...state,
+        status: {
+          severity: action.severity,
+          message: action.message as string,
+        },
       }
     }
     case FormActions.SUCCESS: {
@@ -166,17 +205,22 @@ export function formReducer<T extends Record<string, unknown>>(
         disabled: false,
         saving: false,
         loading: false,
-        error: null,
+        errors: {},
+        status: {
+          severity: "success",
+          message: action.payload || "Operation successful",
+        },
         success: action.payload,
       }
     }
     case FormActions.SUBMIT: {
       return {
         ...state,
-        error: null,
+        errors: {},
         success: null,
         edited: false,
         saving: true,
+        status: {},
       }
     }
     case FormActions.RESET: {

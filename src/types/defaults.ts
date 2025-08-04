@@ -175,6 +175,10 @@ export const defaultFight: Fight = {
   image_url: "",
   created_at: "",
   updated_at: "",
+  started_at: "",
+  ended_at: "",
+  season: null,
+  session: null,
 }
 
 export const defaultUser: User = {

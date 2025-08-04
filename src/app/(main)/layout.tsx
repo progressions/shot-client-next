@@ -1,11 +1,11 @@
 import ThemeRegistry from "@/components/ThemeRegistry"
-import { Navbar } from "@/components/navbar"
 import {
   CampaignProvider,
   ClientProvider,
   LocalStorageProvider,
   ToastProvider,
 } from "@/contexts"
+import { Navbar, Footer } from "@/components/ui"
 import { getUser } from "@/lib/getServerClient"
 import "@/styles/global.scss"
 import { Container } from "@mui/material"
@@ -33,6 +33,7 @@ export default async function RootLayout({
                   >
                     {children}
                     <PopupToast />
+                    <Footer />
                   </Container>
                 </ToastProvider>
               </CampaignProvider>

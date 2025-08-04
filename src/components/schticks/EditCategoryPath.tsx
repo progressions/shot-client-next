@@ -1,6 +1,5 @@
 "use client"
 import {
-  Alert,
   Stack,
   FormControl,
   FormHelperText,
@@ -16,46 +15,39 @@ import {
 } from "@/components/autocomplete"
 import { useClient } from "@/contexts"
 import type { Schtick, SchtickPath } from "@/types"
-import { useEffect, useCallback } from "react"
-import { FormActions, useForm } from "@/reducers"
-import type { AxiosError } from "axios"
-
-interface ServerErrorResponse {
-  errors: Partial<Record<keyof FormStateData, string[]>>
-}
+import { useCallback } from "react"
+import { FormStateType, FormActions, useForm } from "@/reducers"
 
 type FormStateData = {
   category: string | null
   path: string | null
-  errors: Partial<Record<"category" | "path", string>>
   isPathsLoading: boolean
 }
 
 interface EditCategoryPathProps {
   schtick: Schtick
   updateSchtick: (data: Partial<Schtick>) => Promise<void>
+  state: FormStateType<FormStateData>
 }
 
 export default function EditCategoryPath({
   schtick,
   updateEntity: updateSchtick,
+  state,
 }: EditCategoryPathProps) {
   const { client } = useClient()
-  const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
+
+  // local state
+  const { formState, dispatchForm } = useForm<FormStateData>({
     category: schtick.category || null,
     path: schtick.path || null,
     errors: {},
     isPathsLoading: false,
   })
-  const { data, disabled, error } = formState
-  const { category, path, errors, isPathsLoading } = data
+  const { category, path, isPathsLoading } = formState.data
 
-  useEffect(() => {
-    dispatchForm({
-      type: FormActions.RESET,
-      payload: initialFormState,
-    })
-  }, [schtick, dispatchForm])
+  // external state for errors
+  const { saving, errors } = state
 
   const fetchPaths = useCallback(
     async (inputValue: string): Promise<Option[]> => {
@@ -88,114 +80,18 @@ export default function EditCategoryPath({
   )
 
   const handleCategoryChange = async (value: string | null) => {
-    console.log("handleCategoryChange called with value:", value)
     dispatchForm({ type: FormActions.UPDATE, name: "category", value })
     dispatchForm({ type: FormActions.UPDATE, name: "path", value: null })
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "errors",
-      value: { ...errors, category: undefined, path: undefined },
-    })
     dispatchForm({ type: FormActions.SUBMIT })
-    try {
-      await updateSchtick({ ...schtick, category: value, path: null })
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "errors",
-        value: {},
-      })
-    } catch (error) {
-      const axiosError = error as AxiosError<ServerErrorResponse>
-      console.log("Axios error in handleCategoryChange:", {
-        status: axiosError.status,
-        responseStatus: axiosError.response?.status,
-      })
-      if (axiosError.response?.status === 422) {
-        const serverErrors = axiosError.response?.data?.errors || {}
-        console.log("Server errors:", serverErrors)
-        const formattedErrors: FormStateData["errors"] = {}
-        Object.entries(serverErrors).forEach(([field, messages]) => {
-          if (messages && messages.length > 0) {
-            formattedErrors[field as keyof FormStateData] = messages[0]
-          }
-        })
-        console.log("Formatted errors:", formattedErrors)
-        dispatchForm({
-          type: FormActions.UPDATE,
-          name: "errors",
-          value: formattedErrors,
-        })
-        dispatchForm({
-          type: FormActions.ERROR,
-          payload: "Please correct the errors in the form",
-        })
-        console.log("formState after dispatch:", formState)
-      } else {
-        console.log("error status:", axiosError.status)
-        dispatchForm({
-          type: FormActions.ERROR,
-          payload: "An unexpected error occurred",
-        })
-      }
-      console.error("EditCategoryPath", error)
-    } finally {
-      dispatchForm({ type: FormActions.SUBMIT })
-    }
+    await updateSchtick({ ...schtick, category: value, path: null })
+    dispatchForm({ type: FormActions.SUCCESS })
   }
 
   const handlePathChange = async (value: string | null) => {
-    console.log("handlePathChange called with value:", value)
     dispatchForm({ type: FormActions.UPDATE, name: "path", value })
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "errors",
-      value: { ...errors, path: undefined },
-    })
     dispatchForm({ type: FormActions.SUBMIT })
-    try {
-      await updateSchtick({ ...schtick, path: value })
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "errors",
-        value: {},
-      })
-    } catch (error) {
-      const axiosError = error as AxiosError<ServerErrorResponse>
-      console.log("Axios error in handlePathChange:", {
-        status: axiosError.status,
-        responseStatus: axiosError.response?.status,
-      })
-      if (axiosError.response?.status === 422) {
-        const serverErrors = axiosError.response?.data?.errors || {}
-        console.log("Server errors:", serverErrors)
-        const formattedErrors: FormStateData["errors"] = {}
-        Object.entries(serverErrors).forEach(([field, messages]) => {
-          if (messages && messages.length > 0) {
-            formattedErrors[field as keyof FormStateData] = messages[0]
-          }
-        })
-        console.log("Formatted errors:", formattedErrors)
-        dispatchForm({
-          type: FormActions.UPDATE,
-          name: "errors",
-          value: formattedErrors,
-        })
-        dispatchForm({
-          type: FormActions.ERROR,
-          payload: "Please correct the errors in the form",
-        })
-        console.log("formState after dispatch:", formState)
-      } else {
-        console.log("error status:", axiosError.status)
-        dispatchForm({
-          type: FormActions.ERROR,
-          payload: "An unexpected error occurred",
-        })
-      }
-      console.error("EditCategoryPath", error)
-    } finally {
-      dispatchForm({ type: FormActions.SUBMIT })
-    }
+    await updateSchtick({ ...schtick, path: value })
+    dispatchForm({ type: FormActions.SUCCESS })
   }
 
   return (
@@ -206,17 +102,13 @@ export default function EditCategoryPath({
         the style of the Schtick and determines future{" "}
         <InfoLink info="Advancement" /> choices.
       </SectionHeader>
-      {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
-      )}
       <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
         <FormControl fullWidth error={!!errors.category}>
           <SchtickCategoryAutocomplete
             value={category || ""}
             onChange={handleCategoryChange}
             allowNone={false}
+            disabled={saving}
           />
           {errors.category && (
             <FormHelperText>{errors.category}</FormHelperText>
@@ -235,6 +127,7 @@ export default function EditCategoryPath({
               value={path || ""}
               onChange={handlePathChange}
               fetchOptions={fetchPaths}
+              disabled={saving}
               allowNone={false}
             />
           ) : (

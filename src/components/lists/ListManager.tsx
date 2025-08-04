@@ -3,6 +3,7 @@
 import { Box, Button, Stack } from "@mui/material"
 import PersonAddIcon from "@mui/icons-material/PersonAdd"
 import type { Entity } from "@/types"
+import { useState, useEffect } from "react"
 
 import { FormActions, useForm } from "@/reducers"
 import {
@@ -16,6 +17,7 @@ import {
   FactionAutocomplete,
   SchtickAutocomplete,
 } from "@/components/autocomplete"
+import { SchtickFilter } from "@/components/schticks"
 import { paginateArray } from "@/lib"
 import { BadgeList } from "@/components/lists"
 import { ManageButton, SectionHeader } from "@/components/ui"
@@ -23,9 +25,9 @@ import { ManageButton, SectionHeader } from "@/components/ui"
 type FormStateData = {
   page: number
   open: boolean
-  id?: string | null
-  selectedEntity?: Entity | null
-  collectionItems?: Entity[]
+  id: string | null
+  selectedEntity: Entity | null
+  collectionItems: Entity[]
 }
 
 type ListManagerProperties = {
@@ -51,14 +53,22 @@ export default function ListManager({
   collection_ids,
   manage = true,
 }: ListManagerProperties) {
-  const { formState, dispatchForm } = useForm<FormStateData>({
-    collectionItems: entity[collection] || ([] as Entity[]),
+    console.log("entity", entity)
+    console.log("entity[collection_ids]", entity[collection_ids])
+    //********
+    // collectionItems: the set of items, such as Schtick[], from 'character.schticks'
+    // selectedEntity: the entity selected from the autocomplete, such as Schtick
+    // id: the id of the selected entity, such as Schtick.id
+  const initialData = {
+    collectionItems: entity[collection] || [],
+    collectionIds: entity[collection_ids] || [],
     selectedEntity: null,
-    id: null,
     page: 1,
     open: false,
-  })
-  const { collectionItems, page, id, open } = formState.data
+  }
+  const { formState, dispatchForm, initialFormState } = useForm<FormStateData>(initialData)
+  const { selectedEntity, collectionIds, collectionItems, page, open } = formState.data
+  const id = selectedEntity ? selectedEntity.id : null
   const sortedItems = collectionItems.sort((a, b) => {
     if (a.name && b.name) {
       return a.name.localeCompare(b.name)
@@ -66,7 +76,6 @@ export default function ListManager({
     return 0
   })
   const { items, meta } = paginateArray<Entity>(sortedItems || [], page, 5)
-  const entityCollection = entity[collection_ids] || ([] as string[])
 
   const isStringArray = (value: unknown): value is string[] => {
     return Array.isArray(value) && value.every(item => typeof item === "string")
@@ -75,32 +84,26 @@ export default function ListManager({
   const handleAddMember = async () => {
     if (!id) return
 
-    if (!isStringArray(entityCollection)) {
-      alert("Invalid collection data.")
-      return
-    }
-
-    if (entityCollection.includes(id)) {
+    if (collectionIds.includes(id)) {
       alert("already a member.")
       return
     }
 
     try {
-      const formData = new FormData()
       const entityData = {
         ...entity,
-        [collection_ids]: [...entityCollection, id],
+        [collection_ids]: [...collectionIds, id],
       }
-      formData.append(name.toLowerCase(), JSON.stringify(entityData))
-      formData.set(name.toLowerCase(), JSON.stringify(entityData))
-      await update(entity.id, formData)
+      await update(entityData)
 
+      const updatedCollection = [...entity[collection], formState.data.selectedEntity]
       dispatchForm({
         type: FormActions.UPDATE,
         name: "collectionItems",
-        value: [...collectionItems, formState.data.selectedEntity],
+        value: updatedCollection,
       })
-      dispatchForm({ type: FormActions.UPDATE, name: "id", value: null })
+      dispatchForm({ type: FormActions.UPDATE, name: "collectionIds", value: [...collectionIds, id] })
+      dispatchForm({ type: FormActions.UPDATE, name: "selectedEntity", value: null })
     } catch (error) {
       console.error("Error adding member:", error)
       alert("Failed to add. Please try again.")
@@ -108,23 +111,29 @@ export default function ListManager({
   }
 
   const handleDelete = async (item: Entity) => {
-    if (!isStringArray(entityCollection)) {
+    console.log("collectionIds", collectionIds)
+    if (!isStringArray(collectionIds)) {
       alert("Invalid collection data.")
       return
     }
 
     try {
       const formData = new FormData()
-      const updatedIds = entityCollection.filter((id: string) => id !== item.id)
+      const updatedIds = collectionIds.filter((id: string) => id !== item.id)
       const entityData = { ...entity, [collection_ids]: updatedIds }
-      formData.append(name.toLowerCase(), JSON.stringify(entityData))
-      await update(entity.id, formData)
+      await update(entityData)
 
       dispatchForm({
         type: FormActions.UPDATE,
         name: "collectionItems",
         value: collectionItems.filter((i: Entity) => i.id !== item.id),
       })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "collectionIds",
+          value: updatedIds,
+        })
+      dispatchForm({ type: FormActions.UPDATE, name: "selectedEntity", value: null })
     } catch (error) {
       console.error("Error removing entity member:", error)
       alert("Failed to remove.")
@@ -138,19 +147,16 @@ export default function ListManager({
     dispatchForm({ type: FormActions.UPDATE, name: "page", value })
   }
 
-  const handleAutocompleteChange = (value: string | null) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "id", value: value.id })
-    dispatchForm({ type: FormActions.UPDATE, name: "selectedEntity", value })
+  const handleAutocompleteChange = (entity: Entity | null) => {
+    dispatchForm({ type: FormActions.UPDATE, name: "selectedEntity", value: entity })
   }
-
-  const ids = entity[collection_ids] || ([] as string[])
 
   const autocompleteMap: Record<string, React.ReactNode> = {
     actors: (
       <CharacterAutocomplete
         value={id || ""}
         onChange={handleAutocompleteChange}
-        exclude={ids as string[]}
+        exclude={collectionIds}
         allowNone={false}
       />
     ),
@@ -158,7 +164,7 @@ export default function ListManager({
       <CharacterAutocomplete
         value={id || ""}
         onChange={handleAutocompleteChange}
-        exclude={ids as string[]}
+        exclude={collectionIds}
         allowNone={false}
       />
     ),
@@ -166,7 +172,7 @@ export default function ListManager({
       <VehicleAutocomplete
         value={id || ""}
         onChange={handleAutocompleteChange}
-        exclude={ids as string[]}
+        exclude={collectionIds}
         allowNone={false}
       />
     ),
@@ -174,7 +180,7 @@ export default function ListManager({
       <PartyAutocomplete
         value={id || ""}
         onChange={handleAutocompleteChange}
-        exclude={ids as string[]}
+        exclude={collectionIds}
         allowNone={false}
       />
     ),
@@ -182,7 +188,7 @@ export default function ListManager({
       <JunctureAutocomplete
         value={id || ""}
         onChange={handleAutocompleteChange}
-        exclude={ids as string[]}
+        exclude={collectionIds}
         allowNone={false}
       />
     ),
@@ -190,7 +196,7 @@ export default function ListManager({
       <SiteAutocomplete
         value={id || ""}
         onChange={handleAutocompleteChange}
-        exclude={ids as string[]}
+        exclude={collectionIds}
         allowNone={false}
       />
     ),
@@ -198,7 +204,7 @@ export default function ListManager({
       <WeaponAutocomplete
         value={id || ""}
         onChange={handleAutocompleteChange}
-        exclude={ids as string[]}
+        exclude={collectionIds}
         allowNone={false}
       />
     ),
@@ -206,23 +212,20 @@ export default function ListManager({
       <FactionAutocomplete
         value={id || ""}
         onChange={handleAutocompleteChange}
-        exclude={ids as string[]}
+        exclude={collectionIds}
         allowNone={false}
       />
     ),
     schticks: (
-      <SchtickAutocomplete
-        value={id || ""}
-        onChange={handleAutocompleteChange}
-        exclude={ids as string[]}
-        allowNone={false}
+      <SchtickFilter
+        setEntity={handleAutocompleteChange}
       />
     ),
     players: (
       <UserAutocomplete
         value={id || ""}
         onChange={handleAutocompleteChange}
-        exclude={ids as string[]}
+        exclude={collectionIds}
         allowNone={false}
       />
     ),
@@ -230,7 +233,7 @@ export default function ListManager({
       <UserAutocomplete
         value={id || ""}
         onChange={handleAutocompleteChange}
-        exclude={ids as string[]}
+        exclude={collectionIds}
         allowNone={false}
       />
     ),
@@ -255,6 +258,7 @@ export default function ListManager({
     )
 
   const actionButton = <ManageButton open={open} dispatchForm={dispatchForm} />
+
 
   return (
     <>

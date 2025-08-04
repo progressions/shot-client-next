@@ -6,7 +6,6 @@ import {
   Chip,
   Card,
   CardContent,
-  CardMedia,
   Box,
   Alert,
   Typography,
@@ -17,17 +16,18 @@ import { WeaponName } from "@/components/weapons"
 import { useCampaign, useClient } from "@/contexts"
 import { RichTextRenderer } from "@/components/editor"
 import DetailButtons from "@/components/DetailButtons"
+import { PositionableImage } from "@/components/ui"
 
 interface WeaponDetailProperties {
   weapon: Weapon
   onDelete: (weaponId: string) => void
-  onEdit: (weapon: Weapon) => void
+  isMobile?: boolean
 }
 
 export default function WeaponDetail({
   weapon: initialWeapon,
   onDelete,
-  onEdit,
+  isMobile = false,
 }: WeaponDetailProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
@@ -57,21 +57,14 @@ export default function WeaponDetail({
     }
   }
 
-  const handleEdit = () => {
-    onEdit(weapon)
-  }
-
   return (
     <Card sx={{ mb: 2, bgcolor: "#424242" }}>
-      {weapon.image_url && (
-        <CardMedia
-          component="img"
-          height="140"
-          image={weapon.image_url}
-          alt={weapon.name}
-          sx={{ objectFit: "cover" }}
-        />
-      )}
+      <PositionableImage
+        entity={weapon}
+        pageContext="index"
+        height="200"
+        isMobile={isMobile}
+      />
       <CardContent sx={{ p: "1rem" }}>
         <Box
           sx={{
@@ -87,11 +80,7 @@ export default function WeaponDetail({
             ({weapon.damage}/{weapon.concealment || "-"}/
             {weapon.reload_value || "-"})
           </Typography>
-          <DetailButtons
-            name="Weapon"
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
+          <DetailButtons name="Weapon" onDelete={handleDelete} />
         </Box>
         <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
           {weapon.juncture && (

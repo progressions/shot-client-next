@@ -2,8 +2,23 @@
 
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
-import { HeroImage, TextField, SaveButton, CancelButton } from "@/components/ui"
+import {
+  FormControl,
+  FormHelperText,
+  Drawer,
+  Box,
+  Typography,
+  Alert,
+  IconButton,
+  Stack,
+} from "@mui/material"
+import {
+  NumberField,
+  HeroImage,
+  TextField,
+  SaveButton,
+  CancelButton,
+} from "@/components/ui"
 import type { EditorChangeEvent, Fight } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
@@ -14,26 +29,26 @@ import { defaultFight } from "@/types"
 
 type FormStateData = Fight & {
   image?: File | null
+  errors?: Partial<Record<keyof Omit<FormStateData, "errors">, string>>
 }
 
 interface FightFormProperties {
   open: boolean
   onClose: () => void
-  setFight: (fight: Fight) => void
 }
 
-export default function FightForm({
-  open,
-  onClose,
-  setFight,
-}: FightFormProperties) {
-  const { formState, dispatchForm, initialFormState } =
-    useForm<FormStateData>(defaultFight)
+export default function FightForm({ open, onClose }: FightFormProperties) {
+  const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
+    ...defaultFight,
+    errors: {},
+  })
   const { disabled, error, data } = formState
-  const { name, description, image } = data
+  const { name, description, image, errors = {} } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const { createEntity } = useEntity<Fight>(defaultFight, setFight)
-
+  const { createEntity, handleFormErrors } = useEntity<Fight>(
+    defaultFight,
+    dispatchForm
+  )
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
@@ -78,12 +93,9 @@ export default function FightForm({
     dispatchForm({ type: FormActions.SUBMIT })
     try {
       await createEntity(data, image)
-    } catch (error_: unknown) {
-      const errorMessage = "An error occurred."
-      dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
-      console.error(error_)
-    } finally {
       handleClose()
+    } catch (error) {
+      handleFormErrors(error)
     }
   }
 
@@ -92,6 +104,7 @@ export default function FightForm({
     setImagePreview(null)
     onClose()
   }
+
   const previewImage = imagePreview || data.image_url || null
 
   return (
@@ -118,31 +131,100 @@ export default function FightForm({
             {error}
           </Alert>
         )}
-        <TextField
-          label="Name"
-          value={name}
-          onChange={e =>
-            dispatchForm({
-              type: FormActions.UPDATE,
-              name: "name",
-              value: e.target.value,
-            })
-          }
-          margin="normal"
-          required
-          autoFocus
-        />
-        <Editor
-          name="description"
-          value={description}
-          onChange={(e: EditorChangeEvent) => {
-            dispatchForm({
-              type: FormActions.UPDATE,
-              name: "description",
-              value: e.target.value,
-            })
-          }}
-        />
+        <FormControl fullWidth margin="normal" error={!!errors.name}>
+          <TextField
+            label="Name"
+            value={name}
+            onChange={e =>
+              dispatchForm({
+                type: FormActions.UPDATE,
+                name: "name",
+                value: e.target.value,
+              })
+            }
+            margin="normal"
+            required
+            autoFocus
+          />
+          {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
+        </FormControl>
+        <FormControl fullWidth margin="normal" error={!!errors.description}>
+          <Typography variant="subtitle1" sx={{ fontSize: "0.75rem" }}>
+            Description
+          </Typography>
+          <Editor
+            name="description"
+            value={description}
+            onChange={(e: EditorChangeEvent) => {
+              dispatchForm({
+                type: FormActions.UPDATE,
+                name: "description",
+                value: e.target.value,
+              })
+            }}
+          />
+          {errors.description && (
+            <FormHelperText>{errors.description}</FormHelperText>
+          )}
+        </FormControl>
+        <Stack direction="row" spacing={2} sx={{ mt: 2, flexWrap: "wrap" }}>
+          <FormControl margin="normal" error={!!errors.season}>
+            <Typography variant="subtitle1" sx={{ fontSize: "0.75rem" }}>
+              Season
+            </Typography>
+            <NumberField
+              label="Season"
+              value={data.season || ""}
+              onChange={e =>
+                dispatchForm({
+                  type: FormActions.UPDATE,
+                  name: "season",
+                  value: e.target.value,
+                })
+              }
+              onBlur={e =>
+                dispatchForm({
+                  type: FormActions.UPDATE,
+                  name: "season",
+                  value: e.target.value,
+                })
+              }
+              required
+              margin="normal"
+              size="small"
+            />
+            {errors.season && <FormHelperText>{errors.season}</FormHelperText>}
+          </FormControl>
+          <FormControl margin="normal" error={!!errors.session}>
+            <Typography variant="subtitle1" sx={{ fontSize: "0.75rem" }}>
+              Session
+            </Typography>
+            <NumberField
+              label="Session"
+              value={data.session || ""}
+              onChange={e =>
+                dispatchForm({
+                  type: FormActions.UPDATE,
+                  name: "session",
+                  value: e.target.value,
+                })
+              }
+              onBlur={e =>
+                dispatchForm({
+                  type: FormActions.UPDATE,
+                  name: "session",
+                  value: e.target.value,
+                })
+              }
+              required
+              margin="normal"
+              size="small"
+            />
+            {errors.session && (
+              <FormHelperText>{errors.session}</FormHelperText>
+            )}
+          </FormControl>
+        </Stack>
         <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: "1rem" }}>
           <IconButton component="label">
             <AddPhotoAlternateIcon sx={{ color: "#ffffff" }} />

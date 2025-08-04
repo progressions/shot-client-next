@@ -1,38 +1,54 @@
 "use client"
 
-import { VscGithubAction } from "react-icons/vsc"
-import { redirect } from "next/navigation"
-import { useState, useEffect } from "react"
-import { Alert, Box } from "@mui/material"
+import { useEffect } from "react"
+import { FormControl, FormHelperText, Box } from "@mui/material"
 import type { Schtick } from "@/types"
-import { useClient, useCampaign } from "@/contexts"
-import { EditCategoryPath, CategoryPath } from "@/components/schticks"
+import { useCampaign } from "@/contexts"
+import { EditCategoryPath, SchtickChips } from "@/components/schticks"
 import {
+  Alert,
   EditableRichText,
   HeroImage,
   SpeedDialMenu,
   SectionHeader,
+  NameEditor,
 } from "@/components/ui"
-import { NameEditor } from "@/components/entities"
 import { useEntity } from "@/hooks"
 import { InfoLink } from "@/components/links"
 import { Icon } from "@/lib"
+import { FormActions, useForm } from "@/reducers"
 
 interface SchtickPageClientProperties {
   schtick: Schtick
+}
+
+type FormStateData = Schtick & {
+  image?: File | null
 }
 
 export default function SchtickPageClient({
   schtick: initialSchtick,
 }: SchtickPageClientProperties) {
   const { campaignData } = useCampaign()
-  const { client } = useClient()
+  const { formState, dispatchForm } = useForm<FormStateData>({
+    ...initialSchtick,
+    image: null,
+  })
+  const { status, errors } = formState
+  const schtick = formState.data
 
-  const [schtick, setSchtick] = useState<Schtick>(initialSchtick)
   const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
     schtick,
-    setSchtick
+    dispatchForm
   )
+
+  const setSchtick = (schtick: Schtick) => {
+    dispatchForm({
+      type: FormActions.EDIT,
+      name: "data",
+      value: schtick,
+    })
+  }
 
   useEffect(() => {
     document.title = schtick.name ? `${schtick.name} - Chi War` : "Chi War"
@@ -43,9 +59,13 @@ export default function SchtickPageClient({
       campaignData?.schtick &&
       campaignData.schtick.id === initialSchtick.id
     ) {
-      setSchtick(campaignData.schtick)
+      dispatchForm({
+        type: FormActions.EDIT,
+        name: "data",
+        value: campaignData.schtick,
+      })
     }
-  }, [campaignData, initialSchtick])
+  }, [campaignData, initialSchtick, dispatchForm])
 
   return (
     <Box
@@ -55,32 +75,28 @@ export default function SchtickPageClient({
       }}
     >
       <SpeedDialMenu onDelete={deleteEntity} />
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          mb: 1,
-        }}
-      >
+      <HeroImage entity={schtick} setEntity={setSchtick} />
+      <Alert status={status} />
+      <FormControl fullWidth margin="normal" error={!!errors.name}>
         <NameEditor
           entity={schtick}
           setEntity={setSchtick}
           updateEntity={updateEntity}
         />
-      </Box>
-      <HeroImage entity={schtick} setEntity={setSchtick} />
-      <CategoryPath schtick={schtick} />
+        {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
+      </FormControl>
+      <SchtickChips schtick={schtick} />
 
       <EditCategoryPath
         schtick={schtick}
-        setSchtick={setSchtick}
         updateEntity={updateEntity}
+        state={formState}
       />
       <SectionHeader title="Description" icon={<Icon keyword="Schtick" />}>
-        A description of the Schtick, including whether it costs a {" "}
-        <InfoLink info="Shot" />or <InfoLink info="Chi" />{" "}
-        to activate, who it affects, and what its effects are.
+        A description of the Schtick, including whether it costs a{" "}
+        <InfoLink info="Shot" />
+        or <InfoLink info="Chi" /> to activate, who it affects, and what its
+        effects are.
       </SectionHeader>
       <EditableRichText
         name="description"

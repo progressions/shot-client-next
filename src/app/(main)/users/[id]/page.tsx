@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation"
+import { headers } from "next/headers"
 import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { User } from "@/types"
@@ -25,11 +26,16 @@ export default async function UserPage({ params }: UserPageProperties) {
     return <Typography>User not found</Typography>
   }
 
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
   return (
     <>
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <UserPageClient user={user} />
+        <UserPageClient user={user} initialIsMobile={initialIsMobile} />
       </Suspense>
     </>
   )

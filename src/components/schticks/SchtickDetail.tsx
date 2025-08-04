@@ -13,7 +13,7 @@ import {
 import type { Schtick } from "@/types"
 import Link from "next/link"
 import {
-  CategoryPath,
+  SchtickChips,
   SchtickName,
   SchtickDescription,
 } from "@/components/schticks"
@@ -115,7 +115,7 @@ export default function SchtickDetail({
             onDelete={handleDelete}
           />
         </Box>
-        <CategoryPath schtick={schtick} />
+        <SchtickChips schtick={schtick} />
         <SchtickDescription schtick={schtick} />
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
           Created: {formattedCreatedAt}

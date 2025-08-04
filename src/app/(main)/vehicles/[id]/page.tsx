@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation"
+import { headers } from "next/headers"
 import { Stack, Container, Typography, Box, Avatar } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import type { Vehicle } from "@/types"
@@ -75,6 +76,11 @@ export default async function VehiclePage({
   if (!vehicle?.id) {
     return <VehicleNotFound />
   }
+
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
 
   return (
     <>

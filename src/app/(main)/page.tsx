@@ -1,4 +1,5 @@
 import { CircularProgress } from "@mui/material"
+import { headers } from "next/headers"
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
 import { getServerClient, getUser } from "@/lib/getServerClient"
@@ -45,6 +46,11 @@ export default async function HomePage() {
   })
   const parties = partiesResponse.data?.parties || []
 
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
   return (
     <>
       <Breadcrumbs />
@@ -55,6 +61,7 @@ export default async function HomePage() {
           fights={fights}
           characters={characters}
           parties={parties}
+          initialIsMobile={initialIsMobile}
         />
       </Suspense>
     </>

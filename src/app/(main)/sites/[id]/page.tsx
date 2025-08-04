@@ -1,4 +1,5 @@
 import { CircularProgress, Typography } from "@mui/material"
+import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Site } from "@/types"
 import { SitePageClient } from "@/components/sites"
@@ -22,11 +23,16 @@ export default async function SitePage({ params }: SitePageProperties) {
     return <Typography>Site not found</Typography>
   }
 
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
   return (
     <>
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <SitePageClient site={site} />
+        <SitePageClient site={site} initialIsMobile={initialIsMobile} />
       </Suspense>
     </>
   )

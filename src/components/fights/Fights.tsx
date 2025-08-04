@@ -2,8 +2,9 @@
 
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useMediaQuery, useTheme } from "@mui/material"
 import {
+  useMediaQuery,
+  useTheme,
   Pagination,
   Box,
   Button,

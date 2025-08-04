@@ -3,7 +3,7 @@
 import { Stack, Box } from "@mui/material"
 import { FormActions, useForm } from "@/reducers"
 import { useClient } from "@/contexts"
-import { SchtickAutocomplete } from "@/components/autocomplete"
+import { SchtickCategoryAutocomplete, SchtickPathAutocomplete, SchtickAutocomplete } from "@/components/autocomplete"
 import { Autocomplete } from "@/components/ui"
 import type { Schtick } from "@/types"
 import { useCallback, useEffect } from "react"
@@ -18,7 +18,7 @@ type FormStateData = {
 }
 
 type SchtickFilterProps = {
-  setSchtickId: (id: string | null) => void
+  setEntity: (schtick: Schtick) => void
   dispatch: React.Dispatch<FormStateData>
   omit: string[]
 }
@@ -27,6 +27,7 @@ export default function SchtickFilter({
   setSchtickId,
   dispatch,
   omit = [],
+    setEntity,
 }: SchtickFilterProps) {
   const { client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
@@ -110,7 +111,7 @@ export default function SchtickFilter({
       name: "schtick_id",
       value: schtick.id,
     })
-    setSchtickId(schtick.id)
+    setEntity(schtick)
   }
 
   const handleCategoryChange = (value: string | null) => {
@@ -153,7 +154,7 @@ export default function SchtickFilter({
         sx={{ width: "100%" }}
       >
         {!omit.includes("category") && (
-          <Autocomplete
+          <SchtickCategoryAutocomplete
             label="Category"
             value={category || ""}
             fetchOptions={fetchCategories}
@@ -162,7 +163,7 @@ export default function SchtickFilter({
           />
         )}
         {!omit.includes("path") && (
-          <Autocomplete
+          <SchtickPathAutocomplete
             label="Path"
             value={path || ""}
             fetchOptions={fetchPaths}
@@ -173,7 +174,7 @@ export default function SchtickFilter({
         {!omit.includes("schtick") && (
           <SchtickAutocomplete
             options={schticks.map(schtick => ({
-              label: schtick.name || "",
+              label: `${schtick.name} (${schtick.category || ""})`,
               value: schtick.id || "",
             }))}
             value={schtick_id || ""}

@@ -3,6 +3,8 @@
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import {
+  useMediaQuery,
+  useTheme,
   Pagination,
   Box,
   Button,
@@ -29,6 +31,7 @@ interface WeaponsProperties {
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
+  initialIsMobile?: boolean
 }
 
 type FormStateData = {
@@ -43,6 +46,7 @@ export default function Weapons({
   initialMeta,
   initialSort,
   initialOrder,
+  initialIsMobile,
 }: WeaponsProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
@@ -57,6 +61,11 @@ export default function Weapons({
   const [sort, setSort] = useState<string>(initialSort)
   const [order, setOrder] = useState<string>(initialOrder)
   const router = useRouter()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"), {
+    noSsr: true,
+    defaultMatches: initialIsMobile ?? false,
+  })
 
   type ValidSort =
     | "created_at"
@@ -90,14 +99,12 @@ export default function Weapons({
           name: "meta",
           value: response.data.meta,
         })
-        dispatchForm({ type: FormActions.ERROR, payload: null })
+        dispatchForm({ type: FormActions.SUCCESS })
       } catch (error_: unknown) {
         dispatchForm({
-          type: FormActions.ERROR,
-          payload:
-            error_ instanceof Error
-              ? error_.message
-              : "Failed to fetch weapons",
+          type: FormActions.STATUS,
+          severity: "error",
+          message: "Failed to fetch weapons",
         })
         console.error("Fetch weapons error:", error_)
       }

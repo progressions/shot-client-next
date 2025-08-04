@@ -6,7 +6,6 @@ import { useState, useEffect, useRef } from "react"
 import {
   UploadButton,
   ImageBox,
-  GenerateImageButton,
   GenerateButton,
   RepositionButton,
   SaveCancelMiniButtons,
@@ -162,6 +161,7 @@ export function PositionableImage({
   return (
     <Box
       sx={{
+        border: entity.image_url ? "none" : "1px dashed",
         width: "100%",
         height: `${boxHeight}px`,
         overflow: "hidden",
@@ -206,10 +206,19 @@ export function PositionableImage({
         </Box>
       )}
       {!isRepositioning && !entity.image_url && (
-        <>
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: 8,
+            right: 8,
+            display: "flex",
+            flexDirection: "row",
+            gap: 1,
+          }}
+        >
           <UploadButton onClick={handleUploadImage} />
-          <GenerateImageButton onClick={handleGenerateImage} />
-        </>
+          <GenerateButton onClick={handleGenerateImage} />
+        </Box>
       )}
       <GenerateImageDialog
         open={isGenerateDialogOpen}
