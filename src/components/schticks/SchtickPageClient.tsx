@@ -15,6 +15,8 @@ import {
 } from "@/components/ui"
 import { NameEditor } from "@/components/entities"
 import { useEntity } from "@/hooks"
+import { InfoLink } from "@/components/links"
+import { Icon } from "@/lib"
 
 interface SchtickPageClientProperties {
   schtick: Schtick
@@ -27,8 +29,7 @@ export default function SchtickPageClient({
   const { client } = useClient()
 
   const [schtick, setSchtick] = useState<Schtick>(initialSchtick)
-  const [error, setError] = useState<string | null>(null)
-  const { updateEntity, handleDelete, handleChange } = useEntity(
+  const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
     schtick,
     setSchtick
   )
@@ -53,7 +54,7 @@ export default function SchtickPageClient({
         position: "relative",
       }}
     >
-      <SpeedDialMenu onDelete={handleDelete} />
+      <SpeedDialMenu onDelete={deleteEntity} />
       <Box
         sx={{
           display: "flex",
@@ -70,28 +71,24 @@ export default function SchtickPageClient({
       </Box>
       <HeroImage entity={schtick} setEntity={setSchtick} />
       <CategoryPath schtick={schtick} />
+
       <EditCategoryPath
         schtick={schtick}
         setSchtick={setSchtick}
         updateEntity={updateEntity}
       />
-      <SectionHeader title="Description" icon={<VscGithubAction size="24" />}>
-        A description of the schtick, including whether it costs a Shot or Chi{" "}
+      <SectionHeader title="Description" icon={<Icon keyword="Schtick" />}>
+        A description of the Schtick, including whether it costs a {" "}
+        <InfoLink info="Shot" />or <InfoLink info="Chi" />{" "}
         to activate, who it affects, and what its effects are.
       </SectionHeader>
       <EditableRichText
         name="description"
         html={schtick.description}
         editable={true}
-        onChange={handleChange}
+        onChange={handleChangeAndSave}
         fallback="No description available."
       />
-
-      {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
-      )}
     </Box>
   )
 }

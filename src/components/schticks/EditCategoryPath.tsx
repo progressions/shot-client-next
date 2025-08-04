@@ -38,7 +38,7 @@ interface EditCategoryPathProps {
 
 export default function EditCategoryPath({
   schtick,
-  updateSchtick,
+  updateEntity: updateSchtick,
 }: EditCategoryPathProps) {
   const { client } = useClient()
   const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
@@ -47,7 +47,6 @@ export default function EditCategoryPath({
     errors: {},
     isPathsLoading: false,
   })
-  console.log("formState", formState)
   const { data, disabled, error } = formState
   const { category, path, errors, isPathsLoading } = data
 

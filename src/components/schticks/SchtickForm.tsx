@@ -98,6 +98,34 @@ export default function SchtickForm({
     }
   }
 
+  const handleFormErrors = (error: unknown) => {
+    const axiosError = error as AxiosError<ServerErrorResponse>
+    if (axiosError.response?.status === 422) {
+      const serverErrors = axiosError.response.data.errors
+      const formattedErrors: FormStateData["errors"] = {}
+      Object.entries(serverErrors).forEach(([field, messages]) => {
+        if (messages && messages.length > 0) {
+          formattedErrors[field as keyof FormStateData] = messages[0]
+        }
+      })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "errors",
+        value: formattedErrors,
+      })
+      dispatchForm({
+        type: FormActions.ERROR,
+        payload: "Please correct the errors in the form",
+      })
+    } else {
+      dispatchForm({
+        type: FormActions.ERROR,
+        payload: "An unexpected error occurred",
+      })
+    }
+    console.error("SchtickForm", error)
+  }
+
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()
     if (disabled) return
@@ -110,31 +138,7 @@ export default function SchtickForm({
       await createEntity(data, image)
       handleClose()
     } catch (error) {
-      const axiosError = error as AxiosError<ServerErrorResponse>
-      if (axiosError.response?.status === 422) {
-        const serverErrors = axiosError.response.data.errors
-        const formattedErrors: FormStateData["errors"] = {}
-        Object.entries(serverErrors).forEach(([field, messages]) => {
-          if (messages && messages.length > 0) {
-            formattedErrors[field as keyof FormStateData] = messages[0]
-          }
-        })
-        dispatchForm({
-          type: FormActions.UPDATE,
-          name: "errors",
-          value: formattedErrors,
-        })
-        dispatchForm({
-          type: FormActions.ERROR,
-          payload: "Please correct the errors in the form",
-        })
-      } else {
-        dispatchForm({
-          type: FormActions.ERROR,
-          payload: "An unexpected error occurred",
-        })
-      }
-      console.error("SchtickForm", error)
+      handleFormErrors(error)
     }
   }
 
@@ -211,20 +215,19 @@ export default function SchtickForm({
         )}
         <FormControl fullWidth margin="normal" error={!!errors.name}>
           <TextField
-            name="name"
             label="Name"
             value={name}
             onChange={e => {
               dispatchForm({
                 type: FormActions.UPDATE,
-                name: e.target.name,
+                name: "name",
                 value: e.target.value,
               })
               if (errors.name) {
                 dispatchForm({
                   type: FormActions.UPDATE,
                   name: "errors",
-                  value: { ...errors, [e.target.name]: undefined },
+                  value: { ...errors, name: undefined },
                 })
               }
             }}
@@ -240,14 +243,14 @@ export default function SchtickForm({
             onChange={(e: EditorChangeEvent) => {
               dispatchForm({
                 type: FormActions.UPDATE,
-                name: e.target.name,
+                name: "description",
                 value: e.target.value,
               })
               if (errors.description) {
                 dispatchForm({
                   type: FormActions.UPDATE,
                   name: "errors",
-                  value: { ...errors, [e.target.name]: undefined },
+                  value: { ...errors, description: undefined },
                 })
               }
             }}
