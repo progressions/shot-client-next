@@ -5,15 +5,20 @@ import {
   TextField,
   styled,
   CircularProgress,
+  Divider,
+  ListSubheader,
+  AutocompleteProps as MuiAutocompleteProps,
 } from "@mui/material"
 import { FormActions, useForm } from "@/reducers"
 
 export interface Option {
   label: string
   value: string
+  group?: string
+  isDivider?: boolean
 }
 
-interface AutocompleteProperties {
+interface AutocompleteProperties extends Partial<MuiAutocompleteProps<Option, false, false, boolean>> {
   label: string
   fetchOptions: (query: string) => Promise<Option[]>
   onChange: (value: string | null) => void
@@ -46,6 +51,13 @@ const StyledAutocomplete = styled(MuiAutocomplete)(({ theme }) => ({
   },
 })) as typeof MuiAutocomplete
 
+const StyledListSubheader = styled(ListSubheader)(({ theme }) => ({
+  fontWeight: 600,
+  backgroundColor: theme.palette.background.paper,
+  paddingTop: theme.spacing(1),
+  paddingBottom: theme.spacing(1),
+}))
+
 type FormStateData = {
   options: Option[]
 }
@@ -60,6 +72,7 @@ export function Autocomplete({
   allowNone = true,
   freeSolo = false,
   exclude = [],
+  ...muiProps
 }: AutocompleteProperties) {
   const { formState, dispatchForm } = useForm<FormStateData>({
     options: [],
@@ -71,14 +84,12 @@ export function Autocomplete({
     () => ({ label: "None", value: NONE_VALUE }),
     []
   )
-
   const displayOptions = useMemo(() => {
     const filteredOptions = options.filter(
-      option => !exclude.includes(option.value)
+      option => !exclude.includes(option.value) || option.isDivider
     )
     return allowNone ? [noneOption, ...filteredOptions] : filteredOptions
   }, [options, noneOption, allowNone, exclude])
-
   const selectedOption = useMemo(() => {
     if (value === null) {
       return noneOption
@@ -186,7 +197,20 @@ export function Autocomplete({
           }}
         />
       )}
+      renderGroup={(params) => (
+        params.group === "" ? (
+          <Divider key={params.key} />
+        ) : (
+          <li key={params.key}>
+            <StyledListSubheader>
+              {params.group}
+            </StyledListSubheader>
+            {params.children}
+          </li>
+        )
+      )}
       loading={loading}
+      {...muiProps}
     />
   )
 }

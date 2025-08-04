@@ -28,7 +28,7 @@ export default function SchtickPageClient({
 
   const [schtick, setSchtick] = useState<Schtick>(initialSchtick)
   const [error, setError] = useState<string | null>(null)
-  const { update: updateSchtick } = useEntity("schtick", setSchtick)
+  const { updateEntity: updateSchtick, handleDelete, handleChange } = useEntity(schtick, setSchtick)
 
   useEffect(() => {
     document.title = schtick.name ? `${schtick.name} - Chi War` : "Chi War"
@@ -42,31 +42,6 @@ export default function SchtickPageClient({
       setSchtick(campaignData.schtick)
     }
   }, [campaignData, initialSchtick])
-
-  const handleDelete = async () => {
-    if (!schtick?.id) return
-    if (
-      !confirm(`Are you sure you want to delete the schtick: ${schtick.name}?`)
-    )
-      return
-
-    try {
-      await client.deleteSchtick(schtick)
-      handleMenuClose()
-      redirect("/schticks")
-    } catch (error_) {
-      console.error("Failed to delete schtick:", error_)
-      setError("Failed to delete schtick.")
-    }
-  }
-
-  const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const updatedSchtick = {
-      ...schtick,
-      [event.target.name]: event.target.value,
-    }
-    await updateSchtick(updatedSchtick)
-  }
 
   return (
     <Box
@@ -90,8 +65,8 @@ export default function SchtickPageClient({
           updateEntity={updateSchtick}
         />
       </Box>
-      <CategoryPath schtick={schtick} />
       <HeroImage entity={schtick} setEntity={setSchtick} />
+      <CategoryPath schtick={schtick} />
       <EditCategoryPath
         schtick={schtick}
         setSchtick={setSchtick}

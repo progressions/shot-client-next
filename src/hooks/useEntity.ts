@@ -28,7 +28,7 @@ export function useEntity(entity: entity, setEntity: (entity: Entity) => void) {
     } catch (error) {
       toastError(`Error updating ${name}.`)
       console.error("Error updating entity:", error)
-      throw new Error(error)
+      throw error
     }
   }
 
