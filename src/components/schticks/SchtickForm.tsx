@@ -63,7 +63,7 @@ export default function SchtickForm({
   const { disabled, error, data } = formState
   const { name, description, category, path, image, errors = {} } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const { createEntity, handleChange } = useEntity<Schtick>(defaultSchtick, setSchtick)
+  const { createEntity } = useEntity<Schtick>(defaultSchtick, setSchtick)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 

@@ -65,7 +65,7 @@ export function useEntity(entity: entity, setEntity: (entity: Entity) => void) {
     }
   }
 
-  const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeAndSave = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const updatedEntity = {
       ...entity,
       [event.target.name]: event.target.value,
@@ -73,5 +73,5 @@ export function useEntity(entity: entity, setEntity: (entity: Entity) => void) {
     await updateEntity(updatedEntity)
   }
 
-  return { updateEntity, deleteEntity, createEntity, handleChange }
+  return { updateEntity, deleteEntity, createEntity, handleChangeAndSave }
 }
