@@ -63,7 +63,7 @@ export default function SchtickForm({
   const { disabled, error, data } = formState
   const { name, description, category, path, image, errors = {} } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const { createEntity } = useEntity<Schtick>(defaultSchtick, setSchtick)
+  const { createEntity, handleChange } = useEntity<Schtick>(defaultSchtick, setSchtick)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
@@ -211,19 +211,20 @@ export default function SchtickForm({
         )}
         <FormControl fullWidth margin="normal" error={!!errors.name}>
           <TextField
+            name="name"
             label="Name"
             value={name}
             onChange={e => {
               dispatchForm({
                 type: FormActions.UPDATE,
-                name: "name",
+                name: e.target.name,
                 value: e.target.value,
               })
               if (errors.name) {
                 dispatchForm({
                   type: FormActions.UPDATE,
                   name: "errors",
-                  value: { ...errors, name: undefined },
+                  value: { ...errors, [e.target.name]: undefined },
                 })
               }
             }}
@@ -239,14 +240,14 @@ export default function SchtickForm({
             onChange={(e: EditorChangeEvent) => {
               dispatchForm({
                 type: FormActions.UPDATE,
-                name: "description",
+                name: e.target.name,
                 value: e.target.value,
               })
               if (errors.description) {
                 dispatchForm({
                   type: FormActions.UPDATE,
                   name: "errors",
-                  value: { ...errors, description: undefined },
+                  value: { ...errors, [e.target.name]: undefined },
                 })
               }
             }}

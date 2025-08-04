@@ -28,7 +28,10 @@ export default function SchtickPageClient({
 
   const [schtick, setSchtick] = useState<Schtick>(initialSchtick)
   const [error, setError] = useState<string | null>(null)
-  const { updateEntity: updateSchtick, handleDelete, handleChange } = useEntity(schtick, setSchtick)
+  const { updateEntity, handleDelete, handleChange } = useEntity(
+    schtick,
+    setSchtick
+  )
 
   useEffect(() => {
     document.title = schtick.name ? `${schtick.name} - Chi War` : "Chi War"
@@ -62,7 +65,7 @@ export default function SchtickPageClient({
         <NameEditor
           entity={schtick}
           setEntity={setSchtick}
-          updateEntity={updateSchtick}
+          updateEntity={updateEntity}
         />
       </Box>
       <HeroImage entity={schtick} setEntity={setSchtick} />
@@ -70,7 +73,7 @@ export default function SchtickPageClient({
       <EditCategoryPath
         schtick={schtick}
         setSchtick={setSchtick}
-        updateSchtick={updateSchtick}
+        updateEntity={updateEntity}
       />
       <SectionHeader title="Description" icon={<VscGithubAction size="24" />}>
         A description of the schtick, including whether it costs a Shot or Chi{" "}

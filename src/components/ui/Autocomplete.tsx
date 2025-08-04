@@ -18,7 +18,8 @@ export interface Option {
   isDivider?: boolean
 }
 
-interface AutocompleteProperties extends Partial<MuiAutocompleteProps<Option, false, false, boolean>> {
+interface AutocompleteProperties
+  extends Partial<MuiAutocompleteProps<Option, false, false, boolean>> {
   label: string
   fetchOptions: (query: string) => Promise<Option[]>
   onChange: (value: string | null) => void
@@ -197,18 +198,16 @@ export function Autocomplete({
           }}
         />
       )}
-      renderGroup={(params) => (
+      renderGroup={params =>
         params.group === "" ? (
           <Divider key={params.key} />
         ) : (
           <li key={params.key}>
-            <StyledListSubheader>
-              {params.group}
-            </StyledListSubheader>
+            <StyledListSubheader>{params.group}</StyledListSubheader>
             {params.children}
           </li>
         )
-      )}
+      }
       loading={loading}
       {...muiProps}
     />

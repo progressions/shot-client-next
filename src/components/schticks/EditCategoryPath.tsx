@@ -60,7 +60,11 @@ export default function EditCategoryPath({
 
   const fetchPaths = useCallback(
     async (inputValue: string): Promise<Option[]> => {
-      dispatchForm({ type: FormActions.EDIT, name: "isPathsLoading", value: true })
+      dispatchForm({
+        type: FormActions.EDIT,
+        name: "isPathsLoading",
+        value: true,
+      })
       try {
         const response = await client.getSchtickPaths({
           search: inputValue,
@@ -74,7 +78,11 @@ export default function EditCategoryPath({
         console.error("Error fetching options:", error)
         return []
       } finally {
-        dispatchForm({ type: FormActions.EDIT, name: "isPathsLoading", value: false })
+        dispatchForm({
+          type: FormActions.EDIT,
+          name: "isPathsLoading",
+          value: false,
+        })
       }
     },
     [category, client, dispatchForm]
@@ -99,7 +107,10 @@ export default function EditCategoryPath({
       })
     } catch (error) {
       const axiosError = error as AxiosError<ServerErrorResponse>
-      console.log("Axios error in handleCategoryChange:", { status: axiosError.status, responseStatus: axiosError.response?.status })
+      console.log("Axios error in handleCategoryChange:", {
+        status: axiosError.status,
+        responseStatus: axiosError.response?.status,
+      })
       if (axiosError.response?.status === 422) {
         const serverErrors = axiosError.response?.data?.errors || {}
         console.log("Server errors:", serverErrors)
@@ -151,7 +162,10 @@ export default function EditCategoryPath({
       })
     } catch (error) {
       const axiosError = error as AxiosError<ServerErrorResponse>
-      console.log("Axios error in handlePathChange:", { status: axiosError.status, responseStatus: axiosError.response?.status })
+      console.log("Axios error in handlePathChange:", {
+        status: axiosError.status,
+        responseStatus: axiosError.response?.status,
+      })
       if (axiosError.response?.status === 422) {
         const serverErrors = axiosError.response?.data?.errors || {}
         console.log("Server errors:", serverErrors)
@@ -205,7 +219,9 @@ export default function EditCategoryPath({
             onChange={handleCategoryChange}
             allowNone={false}
           />
-          {errors.category && <FormHelperText>{errors.category}</FormHelperText>}
+          {errors.category && (
+            <FormHelperText>{errors.category}</FormHelperText>
+          )}
         </FormControl>
         <FormControl fullWidth error={!!errors.path}>
           {isPathsLoading ? (
