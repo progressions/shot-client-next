@@ -1,4 +1,5 @@
 "use client"
+import { useRouter } from "next/navigation"
 import type { Fight } from "@/types"
 import { Button } from "@/components/ui"
 import { Box, Typography } from "@mui/material"
@@ -56,7 +57,8 @@ interface JoinFightButtonProps {
   onClick: () => void
 }
 
-export const JoinFightButton = ({ fight, onClick }: JoinFightButtonProps) => {
+export const JoinFightButton = ({ fight }: JoinFightButtonProps) => {
+  const router = useRouter()
   const [isShimmering, setIsShimmering] = useState(true)
 
   useEffect(() => {
@@ -66,12 +68,17 @@ export const JoinFightButton = ({ fight, onClick }: JoinFightButtonProps) => {
     return () => clearTimeout(timer)
   }, [])
 
+  const handleClick = () => {
+    setIsShimmering(false)
+    router.push(`/fights/${fight.id}/play`, { target: "_blank" })
+  }
+
   if (!fight.started_at || fight.ended_at) return null
 
   return (
     <StyledBox className={isShimmering ? "shimmer" : ""}>
       <Typography gutterBottom>This fight is happening now!</Typography>
-      <StyledButton variant="contained" onClick={onClick}>
+      <StyledButton variant="contained" onClick={handleClick}>
         Join Fight!
       </StyledButton>
     </StyledBox>

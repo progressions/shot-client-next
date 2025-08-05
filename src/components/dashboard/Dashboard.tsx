@@ -39,8 +39,10 @@ export default function Dashboard({
       <Typography variant="h6" color="#fff" gutterBottom>
         Welcome, <UserName user={user} />
       </Typography>
-      { fight.started_at && !fight.ended_at && <PlayFightBanner fight={fight} />}
-      { !(fight.started_at && !fight.ended_at) && <CampaignBanner campaign={campaign} /> }
+      {fight.started_at && !fight.ended_at && <PlayFightBanner fight={fight} />}
+      {!(fight.started_at && !fight.ended_at) && (
+        <CampaignBanner campaign={campaign} />
+      )}
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 2 }}>
         <FightsModule fights={fights} />
         <CharactersModule characters={characters} />

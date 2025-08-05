@@ -6,7 +6,12 @@ import { useState, useEffect, useMemo } from "react"
 import { useMediaQuery, Box, Stack } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import { CS } from "@/services"
-import { Icon, NameEditor, SectionHeader, PositionableImage } from "@/components/ui"
+import {
+  Icon,
+  NameEditor,
+  SectionHeader,
+  PositionableImage,
+} from "@/components/ui"
 import {
   CharacterSpeedDial,
   Owner,

@@ -1,11 +1,19 @@
 "use client"
 
 import { useCallback, useEffect } from "react"
-import { FormControl, FormHelperText, Stack, Typography, Box } from "@mui/material"
+import { FormControl, FormHelperText, Stack, Box } from "@mui/material"
 import type { Site } from "@/types"
-import { RichTextRenderer } from "@/components/editor"
 import { useCampaign } from "@/contexts"
-import { Icon, InfoLink, FactionLink, Alert, NameEditor, EditableRichText, SectionHeader, HeroImage, SpeedDialMenu } from "@/components/ui"
+import {
+  Icon,
+  InfoLink,
+  Alert,
+  NameEditor,
+  EditableRichText,
+  SectionHeader,
+  HeroImage,
+  SpeedDialMenu,
+} from "@/components/ui"
 import { CharacterManager } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
@@ -27,7 +35,10 @@ export default function SitePageClient({
   const { status, errors } = formState
   const site = formState.data
 
-  const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(site, dispatchForm)
+  const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
+    site,
+    dispatchForm
+  )
 
   const setSite = useCallback(
     (site: Site) => {
@@ -50,18 +61,6 @@ export default function SitePageClient({
     }
   }, [campaignData, initialSite, setSite])
 
-  const handleFactionChange = async (value: string | null) => {
-    if (!value) return
-
-    const updatedSite = {
-      ...site,
-      faction: value,
-      faction_id: value.id,
-    }
-    setFaction(value)
-    updateEntity(updatedSite)
-  }
-
   return (
     <Box
       sx={{
@@ -73,33 +72,40 @@ export default function SitePageClient({
       <HeroImage entity={site} setEntity={setSite} />
       <Alert status={status} />
       <FormControl fullWidth margin="normal" error={!!errors.name}>
-      <NameEditor entity={site} setEntity={setSite} editable={true} />
+        <NameEditor entity={site} setEntity={setSite} editable={true} />
         {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
       </FormControl>
-      <Box sx={{mb: 4}}>
-        <SectionHeader title="Faction" icon={<Icon keyword="Factions" />} sx={{mb: 2}}>
-          The <InfoLink href="/factions" info="Faction" /> that controls this <InfoLink href="/sites" info="Feng Shui Site" />, which grants them{" "}
+      <Box sx={{ mb: 4 }}>
+        <SectionHeader
+          title="Faction"
+          icon={<Icon keyword="Factions" />}
+          sx={{ mb: 2 }}
+        >
+          The <InfoLink href="/factions" info="Faction" /> that controls this{" "}
+          <InfoLink href="/sites" info="Feng Shui Site" />, which grants them{" "}
           access to its <InfoLink info="Chi" /> and other benefits.
         </SectionHeader>
-        <Box sx={{width: 400}}>
-        <EditFaction
-          entity={site}
-          updateEntity={updateEntity}
+        <Box sx={{ width: 400 }}>
+          <EditFaction entity={site} updateEntity={updateEntity} />
+        </Box>
+      </Box>
+      <Box sx={{ mb: 2 }}>
+        <SectionHeader
+          title="Description"
+          icon={<Icon keyword="Description" />}
+          sx={{ mb: 2 }}
+        >
+          Description of this <InfoLink href="/sites" info="Feng Shui Site" />,
+          including its history, significance, and any notable features.
+        </SectionHeader>
+        <EditableRichText
+          name="Description"
+          html={site.description}
+          editable={true}
+          onChange={handleChangeAndSave}
+          fallback="No description available."
         />
       </Box>
-      </Box>
-      <Box sx={{mb: 2}}>
-      <SectionHeader title="Description" icon={<Icon keyword="Description" />} sx={{mb: 2}}>
-        Description of this <InfoLink href="/sites" info="Feng Shui Site" />, including its history, significance, and any notable features.
-      </SectionHeader>
-      <EditableRichText
-        name="Description"
-        html={site.description}
-        editable={true}
-        onChange={handleChangeAndSave}
-        fallback="No description available."
-      />
-    </Box>
       <Stack direction="column" spacing={2}>
         <CharacterManager
           icon={<Icon keyword="Characters" size="24" />}

@@ -6,7 +6,12 @@ import type { Fight } from "@/types"
 import { FightChips, FightDescription } from "@/components/fights"
 import { useToast, useCampaign, useClient } from "@/contexts"
 import DetailButtons from "@/components/DetailButtons"
-import { Icon, InfoLink, FightLink, CharacterLink, PositionableImage } from "@/components/ui"
+import {
+  Icon,
+  FightLink,
+  CharacterLink,
+  PositionableImage,
+} from "@/components/ui"
 import { useRouter } from "next/navigation"
 
 interface FightDetailProperties {

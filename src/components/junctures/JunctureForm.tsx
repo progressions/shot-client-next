@@ -3,7 +3,13 @@
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
-import { InfoLink, HeroImage, TextField, SaveButton, CancelButton } from "@/components/ui"
+import {
+  InfoLink,
+  HeroImage,
+  TextField,
+  SaveButton,
+  CancelButton,
+} from "@/components/ui"
 import type { EditorChangeEvent, Juncture } from "@/types"
 import { defaultJuncture } from "@/types"
 import { FormActions, useForm } from "@/reducers"

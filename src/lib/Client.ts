@@ -1,6 +1,7 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios"
 import { Api, ApiV2, queryParams } from "@/lib"
 import type {
+  Encounter,
   ImagePosition,
   NotionPage,
   Location,
@@ -73,6 +74,10 @@ class Client {
     const websocketUrl = this.api.cable(this.jwt)
     this.consumerInstance = createConsumer(websocketUrl)
     return this.consumerInstance
+  }
+
+  async getEncounter(fight?: Fight | ID): Promise<AxiosResponse<Encounter>> {
+    return this.get(this.api.encounters(fight), {}, { cache: "no-store" })
   }
 
   async createImagePosition(

@@ -10,7 +10,10 @@ type SitesModuleProperties = {
   size?: "small" | "medium" | "large"
 }
 
-export default function SitesModule({ sites, size="medium" }: SitesModuleProperties) {
+export default function SitesModule({
+  sites,
+  size = "medium",
+}: SitesModuleProperties) {
   const sizeMap = {
     small: "sm",
     medium: "md",
