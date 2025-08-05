@@ -77,7 +77,7 @@ class Client {
   }
 
   async getEncounter(fight?: Fight | ID): Promise<AxiosResponse<Encounter>> {
-    return this.get(this.api.encounters(fight), {}, { cache: "no-store" })
+    return this.get(this.apiV2.encounters(fight), {}, { cache: "no-store" })
   }
 
   async createImagePosition(
