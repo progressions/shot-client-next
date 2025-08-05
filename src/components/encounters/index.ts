@@ -4,3 +4,5 @@ export { default as ShotDetailItem } from "@/components/encounters/ShotListDetai
 export { default as Character } from "@/components/encounters/Character"
 export { default as Vehicle } from "@/components/encounters/Vehicle"
 export { default as ShotCounter } from "@/components/encounters/ShotCounter"
+export { default as Wounds } from "@/components/encounters/Wounds"
+export { default as ActionValues } from "@/components/encounters/ActionValues"

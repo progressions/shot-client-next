@@ -1,15 +1,16 @@
 import { Box, Typography } from "@mui/material"
-import type { ShotDetails } from "@/types"
+import type { Character } from "@/types"
 import { CS } from "@/services"
+import { ActionValues } from "@/components/encounters"
 
 interface CharacterProps {
-  detail: ShotDetails
+  character: Character
 }
 
-export default function Character({ detail }: CharacterProps) {
+export default function Character({ character }: CharacterProps) {
   return (
-    <>
-      hello
-    </>
+    <Box component="span">
+      <ActionValues character={character} />
+    </Box>
   )
 }

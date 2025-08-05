@@ -1,3 +1,5 @@
+"use client"
+
 import { Link, Avatar } from "@mui/material"
 import { RefObject, useRef } from "react"
 import type { Vehicle } from "@/types"

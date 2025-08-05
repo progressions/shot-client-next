@@ -70,7 +70,7 @@ export default function Encounter({
       <HeroImage
         entity={encounter}
         setEntity={setEncounter}
-        pageContext="play"
+        pageContext="encounter"
         height={200}
       />
       <FightChips fight={encounter} />
