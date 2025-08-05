@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Box, Typography, Alert, Container } from "@mui/material"
+import { Stack, Box, Typography, Alert, Container } from "@mui/material"
 import { Button, TextField } from "@/components/ui"
 import Cookies from "js-cookie"
 import { useClient } from "@/contexts"
@@ -70,7 +70,8 @@ export default function LoginPage() {
         >
           Login to Chi War
         </Typography>
-        <Box
+        <Stack
+          direction="column"
           component="form"
           onSubmit={handleSubmit}
           sx={{ mt: 1, width: "100%" }}
@@ -99,7 +100,7 @@ export default function LoginPage() {
               {error}
             </Alert>
           )}
-        </Box>
+        </Stack>
       </Box>
     </Container>
   )
