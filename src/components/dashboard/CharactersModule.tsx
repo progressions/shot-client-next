@@ -28,7 +28,7 @@ export default function CharactersModule({
       />
       <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
         {characters.map(character => (
-          <CharacterBadge key={character.id} character={character} size="sm" />
+          <CharacterBadge key={character.id} character={character} size="md" />
         ))}
       </Stack>
       <Typography variant="body2">

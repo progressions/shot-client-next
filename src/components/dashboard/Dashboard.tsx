@@ -1,13 +1,14 @@
 "use client"
 
 import { Stack, Box, Typography } from "@mui/material"
-import { Party, User, Fight, Character, Campaign } from "@/types"
+import { Site, Party, User, Fight, Character, Campaign } from "@/types"
 import { UserName } from "@/components/users"
 import {
   PartiesModule,
   CharactersModule,
   FightsModule,
   CampaignBanner,
+  PlayersModule,
 } from "@/components/dashboard"
 
 interface DashboardProperties {
@@ -16,6 +17,8 @@ interface DashboardProperties {
   fights: Fight[]
   characters: Character[]
   parties: Party[]
+  players: User[]
+  sites: Site[]
 }
 
 export default function Dashboard({
@@ -24,6 +27,8 @@ export default function Dashboard({
   fights,
   characters,
   parties,
+  players,
+  sites,
 }: DashboardProperties) {
   return (
     <Box>
@@ -34,7 +39,10 @@ export default function Dashboard({
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 2 }}>
         <FightsModule fights={fights} />
         <CharactersModule characters={characters} />
+      </Stack>
+      <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 2 }}>
         <PartiesModule parties={parties} />
+        <PlayersModule players={players} />
       </Stack>
     </Box>
   )

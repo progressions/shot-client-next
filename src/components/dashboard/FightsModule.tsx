@@ -23,7 +23,7 @@ export default function FightsModule({ fights }: FightsModuleProperties) {
       <ModuleHeader title="Your Fights" icon={<Icon keyword="Fights" />} />
       <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
         {fights.map(fight => (
-          <FightBadge key={fight.id} fight={fight} size="sm" />
+          <FightBadge key={fight.id} fight={fight} size="md" />
         ))}
       </Stack>
       <Typography variant="body2">

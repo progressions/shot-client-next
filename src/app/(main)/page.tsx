@@ -26,6 +26,7 @@ export default async function HomePage() {
 
   const fightsResponse = await client.getFights({
     user_id: searchUserId,
+    unended: true,
     per_page: 5,
     sort: "created_at",
     order: "desc",
@@ -43,8 +44,25 @@ export default async function HomePage() {
   const partiesResponse = await client.getParties({
     user_id: searchUserId,
     per_page: 5,
+    sort: "created_at",
+    order: "desc",
   })
   const parties = partiesResponse.data?.parties || []
+
+  const sitesResponse = await client.getSites({
+    user_id: searchUserId,
+    per_page: 5,
+    sort: "created_at",
+    order: "desc",
+  })
+  const sites = sitesResponse.data?.sites || []
+
+  const usersResponse = await client.getUsers({
+    per_page: 5,
+    sort: "created_at",
+    order: "desc",
+  })
+  const players = usersResponse.data?.users || []
 
   // Detect mobile device on the server
   const headersState = await headers()
@@ -61,6 +79,8 @@ export default async function HomePage() {
           fights={fights}
           characters={characters}
           parties={parties}
+          sites={sites}
+          players={players}
           initialIsMobile={initialIsMobile}
         />
       </Suspense>
