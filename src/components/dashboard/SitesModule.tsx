@@ -1,22 +1,23 @@
+import type { Site } from "@/types"
 import { Stack, Box, Typography } from "@mui/material"
+import { SiteBadge } from "@/components/badges"
 import Link from "next/link"
-import { PartyBadge } from "@/components/badges"
-import type { Party } from "@/types"
-import { ModuleHeader } from "@/components/dashboard"
 import { Icon } from "@/components/ui"
+import { ModuleHeader } from "@/components/dashboard"
 
-type PartiesModuleProperties = {
-  parties: Party[]
-  size: "small" | "medium" | "large"
+type SitesModuleProperties = {
+  sites: Site[]
+  size?: "small" | "medium" | "large"
 }
 
-export default function PartiesModule({ parties, size = "medium" }: PartiesModuleProperties) {
+export default function SitesModule({ sites, size="medium" }: SitesModuleProperties) {
   const sizeMap = {
     small: "sm",
     medium: "md",
     large: "lg",
   }
   const abbrevSize = sizeMap[size] || "md"
+
   return (
     <Box
       sx={{
@@ -27,18 +28,18 @@ export default function PartiesModule({ parties, size = "medium" }: PartiesModul
         backgroundColor: "#2d2d2d",
       }}
     >
-      <ModuleHeader title="Your Parties" icon={<Icon keyword="Parties" />} />
+      <ModuleHeader title="Your Sites" icon={<Icon keyword="Sites" />} />
       <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
-        {parties.map(party => (
-          <PartyBadge key={party.id} party={party} size={abbrevSize} />
+        {sites.map(site => (
+          <SiteBadge key={site.id} site={site} size={abbrevSize} />
         ))}
       </Stack>
       <Typography variant="body2">
         <Link
-          href="/parties"
+          href="/sites"
           style={{ color: "#fff", textDecoration: "underline" }}
         >
-          All parties
+          All sites
         </Link>
       </Typography>
     </Box>

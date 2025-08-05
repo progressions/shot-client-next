@@ -7,9 +7,16 @@ import { ModuleHeader } from "@/components/dashboard"
 
 type FightsModuleProperties = {
   fights: Fight[]
+  size: "small" | "medium" | "large"
 }
 
-export default function FightsModule({ fights }: FightsModuleProperties) {
+export default function FightsModule({ fights, size = "medium" }: FightsModuleProperties) {
+    const sizeMap = {
+      small: "sm",
+      medium: "md",
+      large: "lg",
+    }
+  const abbrevSize = sizeMap[size] || "md"
   return (
     <Box
       sx={{
@@ -23,7 +30,7 @@ export default function FightsModule({ fights }: FightsModuleProperties) {
       <ModuleHeader title="Your Fights" icon={<Icon keyword="Fights" />} />
       <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
         {fights.map(fight => (
-          <FightBadge key={fight.id} fight={fight} size="md" />
+          <FightBadge key={fight.id} fight={fight} size={abbrevSize} />
         ))}
       </Stack>
       <Typography variant="body2">

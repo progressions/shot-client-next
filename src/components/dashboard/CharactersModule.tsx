@@ -7,11 +7,19 @@ import { ModuleHeader } from "@/components/dashboard"
 
 type CharactersModuleProperties = {
   characters: Character[]
+  size?: "small" | "medium" | "large"
 }
 
 export default function CharactersModule({
   characters,
+  size = "medium",
 }: CharactersModuleProperties) {
+    const sizeMap = {
+      small: "sm",
+      medium: "md",
+      large: "lg",
+    }
+  const abbrevSize = sizeMap[size] || "md"
   return (
     <Box
       sx={{
@@ -28,7 +36,7 @@ export default function CharactersModule({
       />
       <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
         {characters.map(character => (
-          <CharacterBadge key={character.id} character={character} size="md" />
+          <CharacterBadge key={character.id} character={character} size={abbrevSize} />
         ))}
       </Stack>
       <Typography variant="body2">

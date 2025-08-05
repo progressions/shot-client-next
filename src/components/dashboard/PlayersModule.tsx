@@ -5,9 +5,17 @@ import { UserName } from "@/components/users"
 
 type PlayersModuleProperties = {
   players: User[]
+  size?: "small" | "medium" | "large"
 }
 
-export default function PlayersModule({ players }: PlayersModuleProperties) {
+export default function PlayersModule({ players, size = "medium" }: PlayersModuleProperties) {
+  const sizeMap = {
+    small: "sm",
+    medium: "md",
+    large: "lg",
+  }
+  const abbrevSize = sizeMap[size] || "md"
+  
   return (
     <Box
       sx={{
@@ -32,7 +40,7 @@ export default function PlayersModule({ players }: PlayersModuleProperties) {
               href={`/users/${player.id}`}
               style={{ color: "#fff", textDecoration: "none" }}
             >
-              <UserName user={player} />
+              <UserName user={player} size={abbrevSize} />
             </Link>
           </Typography>
         </Box>
