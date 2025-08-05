@@ -1,25 +1,20 @@
-import { BaseEntity } from "@/types"
+import { Character, BaseEntity } from "@/types"
 
-export interface ShotDetails {
+interface Encounter extends BaseEntity {
   id: string
-  name: string
-  entity_class: "Character" | "Vehicle"
-  color: string | null
-  count: number
-  impairments: number
-  action_values: Record<string, number>
-}
-
-export interface Shot {
-  shot: number
-  shot_details: ShotDetails[]
-}
-
-export interface Encounter extends BaseEntity {
-  id: string
+  entity_class: string
   name: string
   sequence: number
   description: string | null
-  shots: Shot[]
+  shots: [number, ShotDetail[]][]
+}
+
+interface ShotDetail {
+  id: string
+  name: string
   entity_class: string
+  action_values: object
+  color: string | null
+  count: number
+  impairments: number
 }

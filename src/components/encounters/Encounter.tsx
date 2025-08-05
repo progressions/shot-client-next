@@ -13,7 +13,7 @@ import { FightChips } from "@/components/fights"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import { Encounter } from "@/types"
-import { ShotList } from "@/components/encounters"
+import { ShotCounter } from "@/components/encounters"
 
 interface EncounterProperties {
   encounter: Encounter
@@ -57,6 +57,8 @@ export default function Encounter({
     })
   }
 
+  console.log("encounter", encounter)
+
   return (
     <Box
       sx={{
@@ -93,7 +95,7 @@ export default function Encounter({
           <FormHelperText>{errors.description}</FormHelperText>
         )}
       </FormControl>
-      <ShotList shots={encounter.shots} />
+      <ShotCounter encounter={encounter} />
     </Box>
   )
 }

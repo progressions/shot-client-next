@@ -1,18 +1,28 @@
-import { Box, Typography, List } from "@mui/material"
+import { Box, Typography, List, ListItem } from "@mui/material"
 import type { Shot } from "@/types"
-import { Character, ShotDetailItem } from "@/components/encounters"
+import { ShotDetailItem } from "@/components/encounters"
 
 interface ShotListProps {
-  shots: Shot[]
+  shots: Shot[] | undefined
 }
 
 export default function ShotList({ shots }: ShotListProps) {
+  if (!shots) {
+    return (
+      <Box sx={{ mt: 2 }}>
+        <Typography variant="body2" color="text.secondary">
+          No shots available.
+        </Typography>
+      </Box>
+    )
+  }
+
   return (
     <Box sx={{ mt: 2 }}>
       {shots.length > 0 ? (
         <List>
           {shots.map((shot: Shot) => (
-            <Box key={shot.shot} sx={{ mb: 2 }}>
+            <ListItem key={shot.id} sx={{ display: "block", mb: 2 }}>
               <Typography
                 variant="subtitle1"
                 color="primary.main"
@@ -28,10 +38,8 @@ export default function ShotList({ shots }: ShotListProps) {
               >
                 {shot.shot}
               </Typography>
-              {shot.shot_details.map((detail) => (
-                <ShotDetailItem key={detail.id} detail={detail} />
-              ))}
-            </Box>
+              <ShotDetailItem detail={shot.shot_details} />
+            </ListItem>
           ))}
         </List>
       ) : (
