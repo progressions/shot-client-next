@@ -19,13 +19,14 @@ import {
   SpeedDialMenu,
   SectionHeader,
   EditableRichText,
+  InfoLink,
+  Icon,
 } from "@/components/ui"
 import { useCampaign } from "@/contexts"
-import { FightChips, VehiclesList } from "@/components/fights"
+import { FightChips } from "@/components/fights"
+import { VehicleManager } from "@/components/vehicles"
 import { CharacterManager } from "@/components/characters"
-import { InfoLink } from "@/components/links"
 import { useEntity } from "@/hooks"
-import { Icon } from "@/lib"
 import { FormActions, useForm } from "@/reducers"
 
 type FormStateData = Fight & {
@@ -176,7 +177,7 @@ export default function FightPageClient({
       <Stack direction="column" spacing={2}>
         <CharacterManager
           icon={<Icon keyword="Fighters" size="24" />}
-          name="fight"
+          entity={fight}
           title="Fighters"
           description={
             <>
@@ -186,10 +187,22 @@ export default function FightPageClient({
               <InfoLink href="/sites" info="Feng Shui Site" />.
             </>
           }
-          entity={fight}
-          update={updateEntity}
+          updateEntity={updateEntity}
         />
-        <VehiclesList fight={fight} setFight={setFight} />
+        <VehicleManager
+          icon={<Icon keyword="Vehicles" size="24" />}
+          entity={fight}
+          title="Vehicles"
+          description={
+            <>
+              A <InfoLink href="/fights" info="Fight" /> is a battle between{" "}
+              <InfoLink href="/characters" info="Characters" />, with the stakes{" "}
+              often involving control of a{" "}
+              <InfoLink href="/sites" info="Feng Shui Site" />.
+            </>
+          }
+          updateEntity={updateEntity}
+        />
       </Stack>
     </Box>
   )

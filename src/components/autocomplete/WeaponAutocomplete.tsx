@@ -64,7 +64,6 @@ export default function WeaponsAutocomplete({
   }
 
   const handleChange = (selectedOption: Option | null) => {
-    console.log("selectedOption", selectedOption)
     const weapon = weapons.find(s => s.id === selectedOption)
     onChange(weapon)
   }

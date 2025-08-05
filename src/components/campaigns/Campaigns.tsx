@@ -27,7 +27,7 @@ import type { Campaign, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
 import type { SelectChangeEvent } from "@mui/material"
-import { InfoLink } from "@/components/links"
+import { InfoLink } from "@/components/ui"
 
 interface CampaignsProperties {
   initialCampaigns: Campaign[]

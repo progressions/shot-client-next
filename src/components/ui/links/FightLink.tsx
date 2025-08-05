@@ -29,23 +29,35 @@ export default function FightLink({
 
   const open = Boolean(anchorEl)
 
+  function seasonLabel(fight) {
+    if (fight.season && fight.session) {
+      // turn session into a two-digit number
+      const session = fight.session.toString().padStart(2, "0")
+      return ` (${fight.season}-${session})`
+    }
+    return fight.name
+  }
+
   return (
     <>
-      <Link
-        href={`/fights/${fight.id}`}
-        target="_blank"
-        data-mention-id={fight.id}
-        data-mention-class-name="Fight"
-        data-mention-data={data ? JSON.stringify(data) : undefined}
-        style={{
-          fontWeight: "bold",
-          textDecoration: "underline",
-          color: "#fff",
-        }}
-        onClick={!disablePopup ? handleClick : undefined}
-      >
-        <FightName fight={fight} />
-      </Link>
+      <Box component="span">
+        <Link
+          href={`/fights/${fight.id}`}
+          target="_blank"
+          data-mention-id={fight.id}
+          data-mention-class-name="Fight"
+          data-mention-data={data ? JSON.stringify(data) : undefined}
+          style={{
+            fontWeight: "bold",
+            textDecoration: "underline",
+            color: "#fff",
+          }}
+          onClick={!disablePopup ? handleClick : undefined}
+        >
+          <FightName fight={fight} />
+        </Link>{" "}
+        {seasonLabel(fight)}
+      </Box>
       <Popover
         open={open}
         anchorEl={anchorEl}

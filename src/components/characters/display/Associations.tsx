@@ -1,7 +1,7 @@
 import type { Character } from "@/types"
 import { Stack, Typography } from "@mui/material"
 import { CS } from "@/services"
-import { ArchetypeLink, JunctureLink, WealthLink } from "@/components/links"
+import { ArchetypeLink, JunctureLink, WealthLink } from "@/components/ui"
 
 type AssociationsProps = {
   character: Character

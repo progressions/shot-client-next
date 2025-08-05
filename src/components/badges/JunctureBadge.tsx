@@ -1,7 +1,7 @@
 "use client"
 
 import type { Juncture } from "@/types"
-import { CharacterLink, FactionLink, JunctureLink } from "@/components/links"
+import { CharacterLink, FactionLink, JunctureLink } from "@/components/ui"
 import { Badge } from "@/components/badges"
 
 type JunctureBadgeProperties = {

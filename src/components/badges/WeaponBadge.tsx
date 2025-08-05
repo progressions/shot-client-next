@@ -1,7 +1,7 @@
 "use client"
 
 import type { Weapon } from "@/types"
-import { WeaponLink } from "@/components/links"
+import { WeaponLink } from "@/components/ui"
 import { Badge } from "@/components/badges"
 
 type WeaponBadgeProperties = {

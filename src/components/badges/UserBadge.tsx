@@ -1,7 +1,7 @@
 "use client"
 
 import type { User } from "@/types"
-import { UserLink } from "@/components/links"
+import { UserLink } from "@/components/ui"
 import { Badge } from "@/components/badges"
 import { SystemStyleObject, Theme } from "@mui/system"
 

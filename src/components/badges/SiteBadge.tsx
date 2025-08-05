@@ -1,7 +1,7 @@
 "use client"
 
 import type { Site } from "@/types"
-import { CharacterLink, FactionLink, SiteLink } from "@/components/links"
+import { CharacterLink, FactionLink, SiteLink } from "@/components/ui"
 import { Badge } from "@/components/badges"
 
 type SiteBadgeProperties = {

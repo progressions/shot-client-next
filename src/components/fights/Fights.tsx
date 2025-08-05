@@ -25,8 +25,7 @@ import type { Fight, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
 import type { SelectChangeEvent } from "@mui/material"
-import { MainHeader } from "@/components/ui"
-import { Icon } from "@/lib"
+import { Icon, MainHeader } from "@/components/ui"
 
 interface FightsProperties {
   initialFights: Fight[]

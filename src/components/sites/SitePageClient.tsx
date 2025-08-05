@@ -1,31 +1,44 @@
 "use client"
 
-import { redirect } from "next/navigation"
-import { useState, useEffect } from "react"
-import { Stack, Alert, Typography, Box } from "@mui/material"
+import { useCallback, useEffect } from "react"
+import { FormControl, FormHelperText, Stack, Typography, Box } from "@mui/material"
 import type { Site } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import { useCampaign } from "@/contexts"
-import { EditSiteForm } from "@/components/sites"
-import { useClient } from "@/contexts"
-import { FactionLink } from "@/components/links"
-import { HeroImage, SpeedDialMenu } from "@/components/ui"
+import { Icon, InfoLink, FactionLink, Alert, NameEditor, EditableRichText, SectionHeader, HeroImage, SpeedDialMenu } from "@/components/ui"
 import { CharacterManager } from "@/components/characters"
-import { InfoLink } from "@/components/links"
+import { useEntity } from "@/hooks"
+import { FormActions, useForm } from "@/reducers"
+import { EditFaction } from "@/components/sites"
 
 interface SitePageClientProperties {
   site: Site
+}
+
+type FormStateData = Site & {
+  image?: File | null
 }
 
 export default function SitePageClient({
   site: initialSite,
 }: SitePageClientProperties) {
   const { campaignData } = useCampaign()
-  const { client } = useClient()
+  const { formState, dispatchForm } = useForm<FormStateData>(initialSite)
+  const { status, errors } = formState
+  const site = formState.data
 
-  const [site, setSite] = useState<Site>(initialSite)
-  const [editOpen, setEditOpen] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(site, dispatchForm)
+
+  const setSite = useCallback(
+    (site: Site) => {
+      dispatchForm({
+        type: FormActions.EDIT,
+        name: "data",
+        value: site,
+      })
+    },
+    [dispatchForm]
+  )
 
   useEffect(() => {
     document.title = site.name ? `${site.name} - Chi War` : "Chi War"
@@ -35,39 +48,18 @@ export default function SitePageClient({
     if (campaignData?.site && campaignData.site.id === initialSite.id) {
       setSite(campaignData.site)
     }
-  }, [campaignData, initialSite])
+  }, [campaignData, initialSite, setSite])
 
-  async function updateSite(siteId: string, formData: FormData) {
-    try {
-      const response = await client.updateSite(siteId, formData)
-      setSite(response.data)
-    } catch (error) {
-      console.error("Error updating site:", error)
-      throw error
+  const handleFactionChange = async (value: string | null) => {
+    if (!value) return
+
+    const updatedSite = {
+      ...site,
+      faction: value,
+      faction_id: value.id,
     }
-  }
-
-  const handleSave = async () => {
-    setEditOpen(false)
-  }
-
-  const handleDelete = async () => {
-    if (!site?.id) return
-    if (!confirm(`Are you sure you want to delete the site: ${site.name}?`))
-      return
-
-    try {
-      await client.deleteSite(site)
-      handleMenuClose()
-      redirect("/sites")
-    } catch (error_) {
-      console.error("Failed to delete site:", error_)
-      setError("Failed to delete site.")
-    }
-  }
-
-  const replaceSite = (updatedSite: Site) => {
-    setSite(updatedSite)
+    setFaction(value)
+    updateEntity(updatedSite)
   }
 
   return (
@@ -77,33 +69,41 @@ export default function SitePageClient({
         position: "relative",
       }}
     >
-      <SpeedDialMenu onEdit={() => setEditOpen(true)} onDelete={handleDelete} />
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          mb: 1,
-        }}
-      >
-        <Typography variant="h4">{site.name}</Typography>
-      </Box>
+      <SpeedDialMenu onDelete={deleteEntity} />
       <HeroImage entity={site} setEntity={setSite} />
-      {site.faction && (
-        <Typography variant="h6">
-          Belongs to <FactionLink faction={site.faction} />
-        </Typography>
-      )}
-      <Box sx={{ p: 2, backgroundColor: "#2e2e2e", borderRadius: 1, my: 2 }}>
-        <RichTextRenderer
-          key={site.description}
-          html={site.description || ""}
-          sx={{ mb: 2 }}
+      <Alert status={status} />
+      <FormControl fullWidth margin="normal" error={!!errors.name}>
+      <NameEditor entity={site} setEntity={setSite} editable={true} />
+        {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
+      </FormControl>
+      <Box sx={{mb: 4}}>
+        <SectionHeader title="Faction" icon={<Icon keyword="Factions" />} sx={{mb: 2}}>
+          The <InfoLink href="/factions" info="Faction" /> that controls this <InfoLink href="/sites" info="Feng Shui Site" />, which grants them{" "}
+          access to its <InfoLink info="Chi" /> and other benefits.
+        </SectionHeader>
+        <Box sx={{width: 400}}>
+        <EditFaction
+          entity={site}
+          updateEntity={updateEntity}
         />
       </Box>
+      </Box>
+      <Box sx={{mb: 2}}>
+      <SectionHeader title="Description" icon={<Icon keyword="Description" />} sx={{mb: 2}}>
+        Description of this <InfoLink href="/sites" info="Feng Shui Site" />, including its history, significance, and any notable features.
+      </SectionHeader>
+      <EditableRichText
+        name="Description"
+        html={site.description}
+        editable={true}
+        onChange={handleChangeAndSave}
+        fallback="No description available."
+      />
+    </Box>
       <Stack direction="column" spacing={2}>
         <CharacterManager
-          name="site"
+          icon={<Icon keyword="Characters" size="24" />}
+          entity={site}
           title="Attuned Characters"
           description={
             <>
@@ -112,26 +112,9 @@ export default function SitePageClient({
               those <InfoLink info="Attuned" /> to it.{" "}
             </>
           }
-          entity={site}
-          characters={site.characters}
-          character_ids={site.character_ids}
-          update={updateSite}
-          setEntity={replaceSite}
+          updateEntity={updateEntity}
         />
       </Stack>
-
-      <EditSiteForm
-        key={JSON.stringify(site)}
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        onSave={handleSave}
-        site={site}
-      />
-      {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
-      )}
     </Box>
   )
 }

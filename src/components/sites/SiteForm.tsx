@@ -3,7 +3,7 @@
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
-import { HeroImage, TextField, SaveButton, CancelButton } from "@/components/ui"
+import { InfoLink, HeroImage, TextField, SaveButton, CancelButton } from "@/components/ui"
 import type { EditorChangeEvent, Site } from "@/types"
 import { defaultSite } from "@/types"
 import { FormActions, useForm } from "@/reducers"
@@ -11,7 +11,6 @@ import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
 import { FactionAutocomplete } from "@/components/autocomplete"
-import { InfoLink } from "@/components/links"
 
 type FormStateData = Site & {
   [key: string]: unknown

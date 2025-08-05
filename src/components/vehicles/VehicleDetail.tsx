@@ -11,7 +11,7 @@ import {
 } from "@mui/material"
 import type { Vehicle } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
-import { FactionLink, VehicleLink } from "@/components/links"
+import { FactionLink, VehicleLink } from "@/components/ui"
 import DetailButtons from "@/components/DetailButtons"
 import { CS } from "@/services"
 import { VehicleDescription } from "@/components/vehicles"

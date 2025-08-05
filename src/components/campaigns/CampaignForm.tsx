@@ -3,14 +3,13 @@
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
-import { HeroImage, TextField, SaveButton, CancelButton } from "@/components/ui"
+import { InfoLink, HeroImage, TextField, SaveButton, CancelButton } from "@/components/ui"
 import type { EditorChangeEvent, Campaign } from "@/types"
 import { defaultCampaign } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
-import { InfoLink } from "@/components/links"
 
 type FormStateData = Campaign & {
   [key: string]: unknown

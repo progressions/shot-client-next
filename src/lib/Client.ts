@@ -1115,8 +1115,11 @@ class Client {
     )
   }
 
-  async deleteWeapon(weapon: Weapon): Promise<AxiosResponse<void>> {
-    return this.delete(this.apiV2.weapons(weapon))
+  async deleteWeapon(
+    weapon: Weapon,
+    params = {}
+  ): Promise<AxiosResponse<void>> {
+    return this.delete(`${this.apiV2.weapons(weapon)}`, params)
   }
 
   async deleteWeaponImage(weapon: Weapon): Promise<AxiosResponse<void>> {
@@ -1226,10 +1229,14 @@ class Client {
     return await axios(config)
   }
 
-  async delete<T>(url: string): Promise<AxiosResponse<T>> {
+  async delete<T>(
+    url: string,
+    parameters: Parameters_ = {}
+  ): Promise<AxiosResponse<T>> {
     return await axios({
       url: url,
       method: "DELETE",
+      params: parameters,
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",

@@ -1,9 +1,8 @@
 "use client"
 
-import type { Entity } from "@/types"
 import { ListManager } from "@/components/ui"
 
-type CharacterManagerProperties = {
+type VehicleManagerProperties = {
   icon: React.ReactNode
   title: string
   entity: Entity
@@ -11,13 +10,13 @@ type CharacterManagerProperties = {
   updateEntity: (entity: Entity) => Promise<void>
 }
 
-export default function CharacterManager({
+export default function VehicleManager({
   icon,
   entity,
   title,
   description,
   updateEntity,
-}: CharacterManagerProperties) {
+}: VehicleManagerProperties) {
   return (
     <ListManager
       icon={icon}
@@ -25,8 +24,8 @@ export default function CharacterManager({
       title={title}
       description={description}
       updateEntity={updateEntity}
-      collection="characters"
-      collection_ids="character_ids"
+      collection="vehicles"
+      collection_ids="vehicle_ids"
       manage={true}
     />
   )

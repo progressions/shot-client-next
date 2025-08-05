@@ -10,7 +10,7 @@ interface FightNameProperties {
 
 export default function FightName({ fight }: FightNameProperties) {
   const { campaignData } = useCampaign()
-  const [displayName, setDisplayName] = useState(fight.name)
+  const [displayName, setDisplayName] = useState(fight.name || "")
 
   useEffect(() => {
     if (campaignData && "fight" in campaignData) {

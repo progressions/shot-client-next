@@ -7,8 +7,7 @@ import {
   CircularProgress,
   Typography,
 } from "@mui/material"
-import { SectionHeader } from "@/components/ui"
-import { InfoLink } from "@/components/links"
+import { InfoLink, SectionHeader } from "@/components/ui"
 import {
   SchtickCategoryAutocomplete,
   SchtickPathAutocomplete,

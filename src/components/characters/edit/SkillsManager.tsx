@@ -9,11 +9,11 @@ import {
   Autocomplete,
   SectionHeader,
   ManageButton,
+  Icon,
 } from "@/components/ui"
 import type { Character, SkillValue } from "@/types"
 import { CS } from "@/services"
 import { FormActions, useForm } from "@/reducers"
-import { Icon } from "@/lib"
 
 type FormStateData = {
   characterSkills: SkillValue[]

@@ -13,7 +13,7 @@ import {
   ArchetypeLink,
   TypeLink,
   FactionLink,
-} from "@/components/links"
+} from "@/components/ui"
 
 export default function CharacterPopup({ id }: PopupProps) {
   const { user, client } = useClient()

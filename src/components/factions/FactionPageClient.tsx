@@ -1,35 +1,43 @@
 "use client"
 
-import { redirect } from "next/navigation"
-import { useState, useEffect } from "react"
-import { Stack, Alert, Typography, Box } from "@mui/material"
+import { useEffect } from "react"
+import { Stack, Box } from "@mui/material"
 import type { Faction } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import { useCampaign } from "@/contexts"
-import {
-  JuncturesList,
-  SitesList,
-  PartiesList,
-  EditFactionForm,
-} from "@/components/factions"
-import { useClient } from "@/contexts"
-import { HeroImage, SpeedDialMenu } from "@/components/ui"
+import { JuncturesList, SitesList, PartiesList } from "@/components/factions"
+import { InfoLink, NameEditor, HeroImage, SpeedDialMenu } from "@/components/ui"
 import { CharacterManager } from "@/components/characters"
-import { InfoLink } from "@/components/links"
+import { useEntity } from "@/hooks"
+import { FormActions, useForm } from "@/reducers"
 
 interface FactionPageClientProperties {
   faction: Faction
+}
+
+type FormStateData = Faction & {
+  image?: File | null
 }
 
 export default function FactionPageClient({
   faction: initialFaction,
 }: FactionPageClientProperties) {
   const { campaignData } = useCampaign()
-  const { client } = useClient()
+  const { formState, dispatchForm } = useForm<FormStateData>(initialFaction)
+  const faction = formState.data
 
-  const [faction, setFaction] = useState<Faction>(initialFaction)
-  const [editOpen, setEditOpen] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { updateEntity, deleteEntity } = useEntity(faction, dispatchForm)
+
+  const setFaction = useCallback(
+    (faction: Faction) => {
+      dispatchForm({
+        type: FormActions.EDIT,
+        name: "data",
+        value: faction,
+      })
+    },
+    [dispatchForm]
+  )
 
   useEffect(() => {
     document.title = faction.name ? `${faction.name} - Chi War` : "Chi War"
@@ -42,41 +50,7 @@ export default function FactionPageClient({
     ) {
       setFaction(campaignData.faction)
     }
-  }, [campaignData, initialFaction])
-
-  async function updateFaction(factionId: string, formData: FormData) {
-    try {
-      const response = await client.updateFaction(factionId, formData)
-      setFaction(response.data)
-    } catch (error) {
-      console.error("Error updating faction:", error)
-      throw error
-    }
-  }
-
-  const handleSave = async () => {
-    setEditOpen(false)
-  }
-
-  const handleDelete = async () => {
-    if (!faction?.id) return
-    if (
-      !confirm(`Are you sure you want to delete the faction: ${faction.name}?`)
-    )
-      return
-
-    try {
-      await client.deleteFaction(faction)
-      redirect("/factions")
-    } catch (error_) {
-      console.error("Failed to delete faction:", error_)
-      setError("Failed to delete faction.")
-    }
-  }
-
-  const replaceFaction = (faction: Faction) => {
-    setFaction(faction)
-  }
+  }, [campaignData, initialFaction, setFaction])
 
   return (
     <Box
@@ -85,7 +59,8 @@ export default function FactionPageClient({
         position: "relative",
       }}
     >
-      <SpeedDialMenu onEdit={() => setEditOpen(true)} onDelete={handleDelete} />
+      <SpeedDialMenu onDelete={deleteEntity} />
+      <HeroImage entity={faction} setEntity={setFaction} />
       <Box
         sx={{
           display: "flex",
@@ -94,9 +69,12 @@ export default function FactionPageClient({
           mb: 1,
         }}
       >
-        <Typography variant="h4">{faction.name}</Typography>
+        <NameEditor
+          entity={faction}
+          setEntity={setFaction}
+          updateEntity={updateEntity}
+        />
       </Box>
-      <HeroImage entity={faction} setEntity={setFaction} />
       <Box sx={{ p: 2, backgroundColor: "#2e2e2e", borderRadius: 1, my: 2 }}>
         <RichTextRenderer
           key={faction.description}
@@ -109,6 +87,7 @@ export default function FactionPageClient({
         <CharacterManager
           name="faction"
           title="Attuned Characters"
+          entity={faction}
           description={
             <>
               A <InfoLink href="/factions" info="Faction" /> recruits{" "}
@@ -117,29 +96,12 @@ export default function FactionPageClient({
               <InfoLink info="Chi War" />.
             </>
           }
-          entity={faction}
-          characters={faction.characters}
-          character_ids={faction.character_ids}
-          update={updateFaction}
-          setEntity={replaceFaction}
+          updateEntity={updateEntity}
         />
-        <PartiesList faction={faction} setFaction={replaceFaction} />
-        <SitesList faction={faction} setFaction={replaceFaction} />
-        <JuncturesList faction={faction} setFaction={replaceFaction} />
+        <PartiesList entity={faction} updateEntity={updateEntity} />
+        <SitesList entity={faction} updateEntity={updateEntity} />
+        <JuncturesList entity={faction} updateEntity={updateEntity} />
       </Stack>
-
-      <EditFactionForm
-        key={JSON.stringify(faction)}
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        onSave={handleSave}
-        faction={faction}
-      />
-      {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
-      )}
     </Box>
   )
 }

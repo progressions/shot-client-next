@@ -5,7 +5,7 @@ import { defaultJuncture } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
 import { useClient } from "@/contexts"
-import { JunctureLink } from "@/components/links"
+import { JunctureLink } from "@/components/ui"
 
 export default function JuncturePopup({ id }: PopupProps) {
   const { user, client } = useClient()

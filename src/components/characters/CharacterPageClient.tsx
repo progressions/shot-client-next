@@ -4,9 +4,8 @@ import type { Character } from "@/types"
 import { useClient, useCampaign } from "@/contexts"
 import { useState, useEffect } from "react"
 import { Box, Stack } from "@mui/material"
-import { CharacterSpeedDial } from "@/components/characters"
 import { CS } from "@/services"
-import { SectionHeader } from "@/components/ui"
+import { Icon, SectionHeader } from "@/components/ui"
 import {
   Header,
   Owner,
@@ -18,8 +17,8 @@ import {
   Schticks,
   Parties,
   Sites,
+  CharacterSpeedDial,
 } from "@/components/characters"
-import { Icon } from "@/lib"
 
 type CharacterPageClientProps = {
   character: Character
@@ -100,9 +99,7 @@ export default function CharacterPageClient({
         <Schticks character={character} setCharacter={setCharacter} />
       )}
       <Parties character={character} setCharacter={setCharacter} />
-      {!CS.isMook(character) && (
-        <Sites character={character} setCharacter={setCharacter} />
-      )}
+      <Sites character={character} setCharacter={setCharacter} />
     </Box>
   )
 }

@@ -115,9 +115,6 @@ export default async function Breadcrumbs() {
   const pathname = headersState.get("x-pathname") || ""
   const pathnames = pathname.split("/").filter(Boolean)
 
-  // Debugging
-  console.log("Breadcrumbs: processing path", { pathname, pathnames })
-
   if (!pathnames || pathnames.length === 0) {
     console.log("Breadcrumbs: empty pathnames, likely root route", { pathname })
     return null

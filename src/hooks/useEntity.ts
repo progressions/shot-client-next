@@ -14,9 +14,23 @@ export function useEntity(
   const name = entity.entity_class.toLowerCase()
 
   const pluralName = pluralize(name)
+  const getFunction = `get${entityClass}`
   const updateFunction = `update${entityClass}`
   const deleteFunction = `delete${entityClass}`
   const createFunction = `create${entityClass}`
+
+  const getEntities = async (params?: Record<string, unknown>) => {
+    dispatchForm({ type: FormActions.EDIT, name: "loading", value: true })
+    try {
+      const response = await client[getFunction](params)
+      return response.data
+    } catch (error) {
+      console.error(`Error fetching ${pluralName}:`, error)
+      toastError(`Error fetching ${pluralName}.`)
+      throw error
+    }
+    dispatchForm({ type: FormActions.EDIT, name: "loading", value: false })
+  }
 
   const updateEntity = async (updatedEntity: Entity) => {
     dispatchForm({ type: FormActions.EDIT, name: "saving", value: true })
@@ -120,6 +134,7 @@ export function useEntity(
   }
 
   return {
+    getEntities,
     updateEntity,
     deleteEntity,
     createEntity,

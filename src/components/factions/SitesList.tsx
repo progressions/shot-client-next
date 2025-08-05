@@ -1,35 +1,20 @@
 "use client"
 
 import type { Faction } from "@/types"
-import { useClient } from "@/contexts"
-import { InfoLink } from "@/components/links"
-import { ListManager } from "@/components/lists"
+import { InfoLink, ListManager } from "@/components/ui"
 
 type SitesListProperties = {
-  faction: Faction
-  setFaction: (faction: Faction) => void
+  entity: Faction
+  updateEntity: (faction: Faction) => void
 }
 
 export default function SitesList({
-  faction,
-  setFaction,
+  entity,
+  updateEntity,
 }: SitesListProperties) {
-  const { client } = useClient()
-
-  async function update(factionId: string, formData: FormData) {
-    try {
-      const response = await client.updateFaction(factionId, formData)
-      setFaction(response.data)
-    } catch (error) {
-      console.error("Error updating faction:", error)
-      throw error
-    }
-  }
-
   return (
     <ListManager
-      entity={faction}
-      name="Faction"
+      entity={entity}
       collection="sites"
       collection_ids="site_ids"
       title="Feng Shui Sites"
@@ -40,7 +25,7 @@ export default function SitesList({
           <InfoLink href="/chi" info="Chi" /> to its members.
         </>
       }
-      update={update}
+      updateEntity={updateEntity}
     />
   )
 }

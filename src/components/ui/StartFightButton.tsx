@@ -14,7 +14,7 @@ const StyledButton = styled(Button)({
   backgroundColor: "#d32f2f",
   color: "#ffffff",
   "&:hover": {
-    backgroundColor: "#b71c1c"
+    backgroundColor: "#b71c1c",
   },
   zIndex: 2,
 })
@@ -36,18 +36,19 @@ const StyledBox = styled(Box)(({ theme }) => ({
       left: "-100%",
       width: "100%",
       height: "100%",
-      background: "linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.4), transparent)",
-      animation: "shimmer 2s infinite"
-    }
+      background:
+        "linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.4), transparent)",
+      animation: "shimmer 2s infinite",
+    },
   },
   "@keyframes shimmer": {
     "0%": {
-      transform: "translateX(-100%)"
+      transform: "translateX(-100%)",
     },
     "100%": {
-      transform: "translateX(100%)"
-    }
-  }
+      transform: "translateX(100%)",
+    },
+  },
 }))
 
 interface StartFightButtonProps {

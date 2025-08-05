@@ -22,7 +22,7 @@ type FormStateData = {
 }
 
 type VehicleFilterProps = {
-  setChararacterId: (id: string | null) => void
+  setEntity: (vehicle: Vehicle) => void
   dispatch: React.Dispatch<FormStateData>
   includeTypes?: boolean
   includeArchetypes?: boolean
@@ -31,7 +31,7 @@ type VehicleFilterProps = {
 }
 
 export default function VehicleFilter({
-  setVehicleId,
+  setEntity,
   dispatch,
   includeVehicles = true,
   includeTypes = true,
@@ -129,9 +129,13 @@ export default function VehicleFilter({
     fetchVehicles,
   ])
 
-  const handleVehicleChange = (value: string | null) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "vehicle_id", value })
-    setVehicleId(value)
+  const handleVehicleChange = (vehicle: Vehicle | null) => {
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "vehicle_id",
+      value: vehicle.id,
+    })
+    setEntity(vehicle)
   }
 
   const handleFactionChange = (value: string | null) => {

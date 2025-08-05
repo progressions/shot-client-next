@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from "@mui/material"
-import { ActionValueLink } from "@/components/links"
+import { ActionValueLink } from "@/components/ui"
 
 type ActionValueProps = {
   name: string

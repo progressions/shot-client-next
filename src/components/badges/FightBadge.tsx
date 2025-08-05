@@ -1,7 +1,7 @@
 "use client"
 
 import type { Fight } from "@/types"
-import { CharacterLink, FightLink } from "@/components/links"
+import { CharacterLink, FightLink } from "@/components/ui"
 import { Badge } from "@/components/badges"
 
 type FightBadgeProperties = {

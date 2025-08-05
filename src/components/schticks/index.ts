@@ -6,6 +6,5 @@ export { default as CreateSchtickForm } from "@/components/schticks/CreateSchtic
 export { default as SchtickForm } from "@/components/schticks/SchtickForm"
 export { default as SchtickPageClient } from "@/components/schticks/SchtickPageClient"
 export { default as SchtickChips } from "@/components/schticks/SchtickChips"
-export { default as SchtickManager } from "@/components/schticks/SchtickManager"
 export { default as SchtickFilter } from "@/components/schticks/SchtickFilter"
 export { default as EditCategoryPath } from "@/components/schticks/EditCategoryPath"

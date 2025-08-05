@@ -12,10 +12,10 @@ import {
   SpeedDialMenu,
   SectionHeader,
   NameEditor,
+  InfoLink,
+  Icon,
 } from "@/components/ui"
 import { useEntity } from "@/hooks"
-import { InfoLink } from "@/components/links"
-import { Icon } from "@/lib"
 import { FormActions, useForm } from "@/reducers"
 
 interface SchtickPageClientProperties {

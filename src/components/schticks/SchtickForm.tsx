@@ -17,6 +17,7 @@ import {
   TextField,
   SaveButton,
   CancelButton,
+  InfoLink,
 } from "@/components/ui"
 import type { SchtickPath, EditorChangeEvent, Schtick } from "@/types"
 import { defaultSchtick } from "@/types"
@@ -24,7 +25,6 @@ import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
-import { InfoLink } from "@/components/links"
 import {
   SchtickCategoryAutocomplete,
   SchtickPathAutocomplete,

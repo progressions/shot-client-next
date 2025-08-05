@@ -1,8 +1,6 @@
 "use client"
 
-import { VscGithubAction } from "react-icons/vsc"
-import { GiSwordman } from "react-icons/gi"
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import { Stack, Box } from "@mui/material"
 import type { Party } from "@/types"
 import { useCampaign } from "@/contexts"
@@ -12,27 +10,44 @@ import {
   SectionHeader,
   EditableRichText,
   NameEditor,
+  InfoLink,
+  Icon,
 } from "@/components/ui"
 import { CharacterManager } from "@/components/characters"
-import { InfoLink } from "@/components/links"
 import { useEntity } from "@/hooks"
 import { FactionAutocomplete } from "@/components/autocomplete"
+import { FormActions, useForm } from "@/reducers"
 
 interface PartyPageClientProperties {
   party: Party
+}
+
+type FormStateData = Party & {
+  image?: File | null
 }
 
 export default function PartyPageClient({
   party: initialParty,
 }: PartyPageClientProperties) {
   const { campaignData } = useCampaign()
+  const { formState, dispatchForm } = useForm<FormStateData>(initialParty)
+  const party = formState.data
 
-  const [party, setParty] = useState<Party>(initialParty)
-  const {
-    updateEntity: updateParty,
-    deleteEntity: deleteParty,
-    handleChange,
-  } = useEntity(party, setParty)
+  const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
+    party,
+    dispatchForm
+  )
+
+  const setParty = useCallback(
+    (party: Party) => {
+      dispatchForm({
+        type: FormActions.EDIT,
+        name: "data",
+        value: party,
+      })
+    },
+    [dispatchForm]
+  )
 
   useEffect(() => {
     document.title = party.name ? `${party.name} - Chi War` : "Chi War"
@@ -42,7 +57,7 @@ export default function PartyPageClient({
     if (campaignData?.party && campaignData.party.id === initialParty.id) {
       setParty(campaignData.party)
     }
-  }, [campaignData, initialParty])
+  }, [campaignData, initialParty, setParty])
 
   return (
     <Box
@@ -51,7 +66,8 @@ export default function PartyPageClient({
         position: "relative",
       }}
     >
-      <SpeedDialMenu onDelete={deleteParty} />
+      <SpeedDialMenu onDelete={deleteEntity} />
+      <HeroImage entity={party} setEntity={setParty} />
       <Box
         sx={{
           display: "flex",
@@ -63,19 +79,18 @@ export default function PartyPageClient({
         <NameEditor
           entity={party}
           setEntity={setParty}
-          updateEntity={updateParty}
+          updateEntity={updateEntity}
         />
       </Box>
-      <HeroImage entity={party} setEntity={setParty} />
       <Box sx={{ mb: 2 }}>
-        <SectionHeader title="Faction" icon={<VscGithubAction size="24" />}>
+        <SectionHeader title="Faction" icon={<Icon keyword="Factions" />}>
           A Party belongs to a Faction, which governs its aims and objectives.
         </SectionHeader>
-        <Box sx={{ mt: 4 }}>
+        <Box sx={{ width: 400, mt: 3, mb: 4 }}>
           <FactionAutocomplete
             value={party.faction_id}
             onChange={faction =>
-              handleChange({
+              handleChangeAndSave({
                 target: { name: "faction_id", value: faction?.id || "" },
               })
             }
@@ -86,22 +101,23 @@ export default function PartyPageClient({
       <Box>
         <SectionHeader
           title="Description"
-          icon={<VscGithubAction size="24" />}
+          icon={<Icon keyword="Description" />}
         />
         <EditableRichText
           name="description"
           html={party.description}
           editable={true}
-          onChange={handleChange}
+          onChange={handleChangeAndSave}
           fallback="No description available."
         />
       </Box>
 
       <Stack direction="column" spacing={2}>
         <CharacterManager
-          icon={<GiSwordman size="24" />}
+          icon={<Icon keyword="Fighters" />}
           name="party"
           title="Party Members"
+          entity={party}
           description={
             <>
               A <InfoLink href="/parties" info="Party" /> consists of{" "}
@@ -109,9 +125,7 @@ export default function PartyPageClient({
               together for a <InfoLink href="/factions" info="Faction" />.
             </>
           }
-          entity={party}
-          update={updateParty}
-          setEntity={setParty}
+          updateEntity={updateEntity}
         />
       </Stack>
     </Box>

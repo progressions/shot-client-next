@@ -5,10 +5,9 @@ import { Box } from "@mui/material"
 import type { Character, PaginationMeta } from "@/types"
 import { useCampaign, useClient, useLocalStorage } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
-import { MainHeader } from "@/components/ui"
+import { Icon, MainHeader } from "@/components/ui"
 import { queryParams } from "@/lib"
 import { CharactersView, CharactersMenu } from "@/components/characters"
-import { Icon } from "@/lib"
 
 interface CharactersProperties {
   initialCharacters: Character[]

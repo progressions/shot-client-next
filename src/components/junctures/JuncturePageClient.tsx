@@ -8,9 +8,8 @@ import { RichTextRenderer } from "@/components/editor"
 import { useCampaign } from "@/contexts"
 import { EditJunctureForm } from "@/components/junctures"
 import { useClient } from "@/contexts"
-import { HeroImage, SpeedDialMenu } from "@/components/ui"
+import { InfoLink, HeroImage, SpeedDialMenu } from "@/components/ui"
 import { CharacterManager } from "@/components/characters"
-import { InfoLink } from "@/components/links"
 
 interface JuncturePageClientProperties {
   juncture: Juncture

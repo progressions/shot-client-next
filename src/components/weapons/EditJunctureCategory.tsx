@@ -1,15 +1,13 @@
 "use client"
 
 import { FormControl, FormHelperText, Stack } from "@mui/material"
-import { SectionHeader } from "@/components/ui"
-import { InfoLink } from "@/components/links"
+import { Icon, InfoLink, SectionHeader } from "@/components/ui"
 import {
   WeaponCategoryAutocomplete,
   WeaponJunctureAutocomplete,
 } from "@/components/autocomplete"
 import type { Weapon } from "@/types"
 import { useState } from "react"
-import { Icon } from "@/lib"
 import type { FormStateType } from "@/reducers"
 
 type EditJunctureCategoryProps = {

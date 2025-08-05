@@ -18,13 +18,13 @@ type FormStateData = {
 }
 
 type WeaponFilterProps = {
-  setWeaponId: (id: string | null) => void
+  setEntity: (weapon: Weapon) => void
   dispatch: React.Dispatch<FormStateData>
   omit: string[]
 }
 
 export default function WeaponFilter({
-  setWeaponId,
+  setEntity,
   dispatch,
   omit = [],
 }: WeaponFilterProps) {
@@ -112,7 +112,7 @@ export default function WeaponFilter({
       name: "weapon_id",
       value: weapon.id,
     })
-    setWeaponId(weapon.id)
+    setEntity(weapon)
   }
 
   const handleCategoryChange = (value: string | null) => {

@@ -5,10 +5,8 @@ import { Stack, Card, CardContent, Box, Typography } from "@mui/material"
 import type { Fight } from "@/types"
 import { FightChips, FightDescription } from "@/components/fights"
 import { useToast, useCampaign, useClient } from "@/contexts"
-import { FightLink, CharacterLink } from "@/components/links"
 import DetailButtons from "@/components/DetailButtons"
-import { PositionableImage } from "@/components/ui"
-import { Icon } from "@/lib"
+import { Icon, InfoLink, FightLink, CharacterLink, PositionableImage } from "@/components/ui"
 import { useRouter } from "next/navigation"
 
 interface FightDetailProperties {

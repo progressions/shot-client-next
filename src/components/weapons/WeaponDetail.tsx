@@ -13,7 +13,7 @@ import {
 import type { Weapon } from "@/types"
 import Link from "next/link"
 import { WeaponName } from "@/components/weapons"
-import { useCampaign, useClient } from "@/contexts"
+import { useToast, useCampaign, useClient } from "@/contexts"
 import { RichTextRenderer } from "@/components/editor"
 import DetailButtons from "@/components/DetailButtons"
 import { PositionableImage } from "@/components/ui"
@@ -30,6 +30,7 @@ export default function WeaponDetail({
   isMobile = false,
 }: WeaponDetailProperties) {
   const { client } = useClient()
+  const { toastSuccess, toastError } = useToast()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
   const [weapon, setWeapon] = useState<Weapon>(initialWeapon)
@@ -49,12 +50,31 @@ export default function WeaponDetail({
       await client.deleteWeapon(weapon)
       onDelete(weapon.id)
       setError(null)
-    } catch (error_) {
-      setError(
-        error_ instanceof Error ? error_.message : "Failed to delete weapon"
-      )
-      console.error("Delete weapon error:", error_)
+      toastSuccess("Weapon deleted successfully.")
+    } catch (error: AxiosError) {
+      if (error.response?.data?.errors?.carries) {
+        if (
+          confirm(
+            "This weapon is carried by one or more characters. Do you want to delete it anyway?"
+          )
+        ) {
+          try {
+            await client.deleteWeapon(weapon, { force: true })
+            onDelete(weapon.id)
+            setError(null)
+            toastSuccess("Weapon deleted successfully.")
+          } catch (forceError: unknown) {
+            console.error(forceError)
+            setError("Failed to delete weapon.")
+            toastError("Failed to delete weapon.")
+          }
+        }
+      }
+
+      console.error("Delete weapon error:", error)
     }
+    setError("Failed to delete weapon.")
+    toastError("Failed to delete weapon.")
   }
 
   return (

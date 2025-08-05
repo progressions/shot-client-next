@@ -6,7 +6,6 @@ export { default as CreateWeaponForm } from "@/components/weapons/CreateWeaponFo
 export { default as WeaponForm } from "@/components/weapons/WeaponForm"
 export { default as WeaponPageClient } from "@/components/weapons/WeaponPageClient"
 export { default as WeaponFilter } from "@/components/weapons/WeaponFilter"
-export { default as WeaponManager } from "@/components/weapons/WeaponManager"
 export { default as EditJunctureCategory } from "@/components/weapons/EditJunctureCategory"
 export { default as Stats } from "@/components/weapons/Stats"
 export { default as WeaponChips } from "@/components/weapons/WeaponChips"

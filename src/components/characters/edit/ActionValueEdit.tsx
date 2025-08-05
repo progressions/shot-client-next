@@ -2,7 +2,7 @@
 
 import type { Character } from "@/types"
 import { Stack, Typography } from "@mui/material"
-import { ActionValueLink } from "@/components/links"
+import { ActionValueLink } from "@/components/ui"
 import { ActionValueNumberField } from "@/components/characters"
 import { SystemStyleObject, Theme } from "@mui/system"
 

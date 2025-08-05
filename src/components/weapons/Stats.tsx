@@ -10,8 +10,7 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@mui/material"
-import { SectionHeader, TextField } from "@/components/ui"
-import { InfoLink } from "@/components/links"
+import { InfoLink, SectionHeader, TextField } from "@/components/ui"
 import type { Weapon } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 

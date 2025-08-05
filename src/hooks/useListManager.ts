@@ -7,10 +7,19 @@ type UseListManagerProps<T extends Entity> = {
   update: (entity: T) => Promise<void>
   collectionKey: keyof T & string
   formState: { id?: string | null; itemIds: string[] }
-  dispatchForm: UseFormReturn<{ id?: string | null; itemIds: string[] }>["dispatchForm"]
+  dispatchForm: UseFormReturn<{
+    id?: string | null
+    itemIds: string[]
+  }>["dispatchForm"]
 }
 
-export function useListManager<T extends Entity>({ entity, update, collectionKey, formState, dispatchForm }: UseListManagerProps<T>) {
+export function useListManager<T extends Entity>({
+  entity,
+  update,
+  collectionKey,
+  formState,
+  dispatchForm,
+}: UseListManagerProps<T>) {
   const isStringArray = (value: unknown): value is string[] => {
     return Array.isArray(value) && value.every(item => typeof item === "string")
   }
@@ -20,7 +29,10 @@ export function useListManager<T extends Entity>({ entity, update, collectionKey
     try {
       const entityData = {
         ...entity,
-        [`${collectionKey}_ids`]: [...formState[`${collectionKey}_ids`], formState.id],
+        [`${collectionKey}_ids`]: [
+          ...formState[`${collectionKey}_ids`],
+          formState.id,
+        ],
       }
       await update(entityData)
       dispatchForm({ type: FormActions.UPDATE, name: "id", value: null })

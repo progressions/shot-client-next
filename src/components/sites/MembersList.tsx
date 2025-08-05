@@ -2,8 +2,7 @@
 
 import type { Site } from "@/types"
 import { useClient } from "@/contexts"
-import { InfoLink } from "@/components/links"
-import { ListManager } from "@/components/lists"
+import { InfoLink, ListManager } from "@/components/ui"
 
 type MembersListProperties = {
   site: Site
@@ -37,7 +36,7 @@ export default function MembersList({ site, setSite }: MembersListProperties) {
           <InfoLink info="Attuned" /> to it.{" "}
         </>
       }
-      update={update}
+      updateEntity={update}
     />
   )
 }

@@ -2,8 +2,7 @@
 
 import type { Campaign } from "@/types"
 import { useClient } from "@/contexts"
-import { InfoLink } from "@/components/links"
-import { ListManager } from "@/components/lists"
+import { InfoLink, ListManager } from "@/components/ui"
 
 type MembersListProperties = {
   campaign: Campaign
@@ -40,7 +39,7 @@ export default function MembersList({
           the <InfoLink info="Chi War" />.
         </>
       }
-      update={update}
+      updateEntity={update}
     />
   )
 }

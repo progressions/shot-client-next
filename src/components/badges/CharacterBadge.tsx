@@ -6,7 +6,7 @@ import {
   TypeLink,
   FactionLink,
   CharacterLink,
-} from "@/components/links"
+} from "@/components/ui"
 import { CS } from "@/services"
 import { Badge } from "@/components/badges"
 import { SystemStyleObject, Theme } from "@mui/system"

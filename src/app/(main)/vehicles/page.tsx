@@ -1,5 +1,4 @@
 import { Suspense } from "react"
-import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { Box, CircularProgress } from "@mui/material"

@@ -13,7 +13,7 @@ import type { Juncture } from "@/types"
 import Link from "next/link"
 import { JunctureName, JunctureDescription } from "@/components/junctures"
 import { useCampaign, useClient } from "@/contexts"
-import { CharacterLink, FactionLink } from "@/components/links"
+import { CharacterLink, FactionLink } from "@/components/ui"
 import DetailButtons from "@/components/DetailButtons"
 
 interface JunctureDetailProperties {

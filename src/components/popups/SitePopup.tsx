@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
 import { SiteAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
-import { SiteLink } from "@/components/links"
+import { SiteLink } from "@/components/ui"
 
 export default function SitePopup({ id }: PopupProps) {
   const { user, client } = useClient()

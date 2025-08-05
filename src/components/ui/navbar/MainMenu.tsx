@@ -6,7 +6,7 @@ import MenuIcon from "@mui/icons-material/Menu"
 import Link from "next/link"
 import { useClient } from "@/contexts"
 
-export default function HamburgerMenu() {
+export function MainMenu() {
   const { user } = useClient()
   const [anchorElement, setAnchorElement] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorElement)

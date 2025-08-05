@@ -3,8 +3,11 @@
 import { Stack, Box } from "@mui/material"
 import { FormActions, useForm } from "@/reducers"
 import { useClient } from "@/contexts"
-import { SchtickCategoryAutocomplete, SchtickPathAutocomplete, SchtickAutocomplete } from "@/components/autocomplete"
-import { Autocomplete } from "@/components/ui"
+import {
+  SchtickCategoryAutocomplete,
+  SchtickPathAutocomplete,
+  SchtickAutocomplete,
+} from "@/components/autocomplete"
 import type { Schtick } from "@/types"
 import { useCallback, useEffect } from "react"
 
@@ -17,29 +20,34 @@ type FormStateData = {
   path: string | null
 }
 
+// I need a way from the outside to re-set the selected schtick
+// once you've added it.
+
 type SchtickFilterProps = {
+  value?: string | null
   setEntity: (schtick: Schtick) => void
   dispatch: React.Dispatch<FormStateData>
   omit: string[]
+  exclude: string[]
 }
 
 export default function SchtickFilter({
-  setSchtickId,
+  value,
   dispatch,
   omit = [],
-    setEntity,
+  exclude = [],
+  setEntity,
 }: SchtickFilterProps) {
   const { client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     schticks: [],
-    schtick_id: null,
+    schtick_id: value,
     categories: [],
     category: null,
     paths: [],
     path: null,
   })
-  const { schticks, schtick_id, categories, category, paths, path } =
-    formState.data
+  const { schticks, categories, category, paths, path } = formState.data
 
   const fetchSchticks = useCallback(async () => {
     try {
@@ -109,7 +117,7 @@ export default function SchtickFilter({
     dispatchForm({
       type: FormActions.UPDATE,
       name: "schtick_id",
-      value: schtick.id,
+      value: schtick?.id,
     })
     setEntity(schtick)
   }
@@ -177,9 +185,10 @@ export default function SchtickFilter({
               label: `${schtick.name} (${schtick.category || ""})`,
               value: schtick.id || "",
             }))}
-            value={schtick_id || ""}
+            value={value || ""}
             onChange={handleSchtickChange}
             allowNone={false}
+            exclude={exclude}
           />
         )}
       </Stack>

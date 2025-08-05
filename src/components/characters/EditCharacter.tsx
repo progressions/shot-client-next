@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo } from "react"
 import { useMediaQuery, Box, Stack } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import { CS } from "@/services"
-import { NameEditor, SectionHeader, PositionableImage } from "@/components/ui"
+import { Icon, NameEditor, SectionHeader, PositionableImage } from "@/components/ui"
 import {
   CharacterSpeedDial,
   Owner,
@@ -20,9 +20,9 @@ import {
   EditArchetype,
   EditJuncture,
   EditWealth,
+  EditFaction,
   SkillsManager,
 } from "@/components/characters"
-import { Icon } from "@/lib"
 
 type EditCharacterProps = {
   character: Character
@@ -35,7 +35,7 @@ export default function EditCharacter({
 }: EditCharacterProps) {
   const { campaignData } = useCampaign()
   const { client } = useClient()
-  const { toastSuccess, toastError } = useToast()
+  const { toastSuccess } = useToast()
   const theme = useTheme()
   const smallScreen = useMediaQuery(theme.breakpoints.down("sm"))
   const isMobile = initialIsMobile || smallScreen
@@ -139,6 +139,10 @@ export default function EditCharacter({
         />
       </Stack>
       <Stack direction="row" spacing={2} sx={{ my: 2 }}>
+        <EditFaction
+          entity={memoizedCharacter}
+          updateEntity={updateCharacter}
+        />
         <EditJuncture
           character={memoizedCharacter}
           updateCharacter={updateCharacter}
@@ -171,9 +175,17 @@ export default function EditCharacter({
           updateCharacter={updateCharacter}
         />
       )}
-      <Parties character={memoizedCharacter} setCharacter={setCharacter} />
+      <Parties
+        character={memoizedCharacter}
+        setCharacter={setCharacter}
+        updateCharacter={updateCharacter}
+      />
       {!CS.isMook(memoizedCharacter) && (
-        <Sites character={memoizedCharacter} setCharacter={setCharacter} />
+        <Sites
+          character={memoizedCharacter}
+          setCharacter={setCharacter}
+          updateCharacter={updateCharacter}
+        />
       )}
     </Box>
   )

@@ -4,5 +4,4 @@ export { default as FightDescription } from "@/components/fights/FightDescriptio
 export { default as FightDetail } from "@/components/fights/FightDetail"
 export { default as FightPageClient } from "@/components/fights/FightPageClient"
 export { default as FightForm } from "@/components/fights/FightForm"
-export { default as VehiclesList } from "@/components/fights/VehiclesList"
 export { default as FightChips } from "@/components/fights/FightChips"

@@ -2,7 +2,7 @@ import { Stack, Box, Typography } from "@mui/material"
 import Link from "next/link"
 import type { Character } from "@/types"
 import { CharacterBadge } from "@/components/badges"
-import { Icon } from "@/lib"
+import { Icon } from "@/components/ui"
 import { ModuleHeader } from "@/components/dashboard"
 
 type CharactersModuleProperties = {

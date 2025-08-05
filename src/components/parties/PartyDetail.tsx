@@ -13,7 +13,7 @@ import type { Party } from "@/types"
 import Link from "next/link"
 import { PartyName, PartyDescription } from "@/components/parties"
 import { useCampaign, useClient } from "@/contexts"
-import { CharacterLink, FactionLink } from "@/components/links"
+import { CharacterLink, FactionLink } from "@/components/ui"
 import DetailButtons from "@/components/DetailButtons"
 
 interface PartyDetailProperties {

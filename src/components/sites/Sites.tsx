@@ -23,7 +23,7 @@ import type { Site, Faction, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
 import type { SelectChangeEvent } from "@mui/material"
-import { InfoLink } from "@/components/links"
+import { InfoLink } from "@/components/ui"
 import { FactionAutocomplete } from "@/components/autocomplete"
 
 interface SitesProperties {

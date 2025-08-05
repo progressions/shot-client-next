@@ -111,7 +111,7 @@ export function initializeFormState<T extends Record<string, unknown>>(
     errors: {},
     success: null,
     status: {},
-    data: data // ?? ({} as T),
+    data: data, // ?? ({} as T),
   }
 }
 

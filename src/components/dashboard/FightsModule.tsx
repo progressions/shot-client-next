@@ -2,7 +2,7 @@ import type { Fight } from "@/types"
 import { Stack, Box, Typography } from "@mui/material"
 import { FightBadge } from "@/components/badges"
 import Link from "next/link"
-import { Icon } from "@/lib"
+import { Icon } from "@/components/ui"
 import { ModuleHeader } from "@/components/dashboard"
 
 type FightsModuleProperties = {

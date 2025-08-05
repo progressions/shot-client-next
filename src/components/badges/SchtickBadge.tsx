@@ -1,7 +1,7 @@
 "use client"
 
 import type { Schtick } from "@/types"
-import { SchtickLink } from "@/components/links"
+import { SchtickLink } from "@/components/ui"
 import { Badge } from "@/components/badges"
 
 type SchtickBadgeProperties = {

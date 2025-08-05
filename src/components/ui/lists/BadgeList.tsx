@@ -1,5 +1,8 @@
+"use client"
+
 import { Stack, Box, IconButton, Pagination } from "@mui/material"
 import type { PaginationMeta, Entity } from "@/types"
+import { useState } from "react"
 import DeleteIcon from "@mui/icons-material/Delete"
 import {
   CharacterBadge,
@@ -39,7 +42,7 @@ const badgeMap: Record<string, (thing: Entity) => React.ReactNode> = {
   players: (thing: Entity) => <UserBadge user={thing as User} />,
 }
 
-export default function BadgeList({
+export function BadgeList({
   items,
   open,
   collection,
@@ -47,7 +50,14 @@ export default function BadgeList({
   handlePageChange,
   handleDelete,
 }: BadgeListProps) {
+  const [saving, setSaving] = useState(false)
   const badge = badgeMap[collection]
+
+  const deleteMember = async (item: Entity) => {
+    setSaving(true)
+    await handleDelete(item)
+    setSaving(false)
+  }
 
   if (!meta) return
   return (
@@ -68,8 +78,9 @@ export default function BadgeList({
           {open && (
             <Box>
               <IconButton
-                color="inherit"
-                onClick={() => handleDelete(item)}
+                color="error"
+                onClick={() => deleteMember(item)}
+                disabled={saving}
                 sx={{ ml: 1 }}
               >
                 <DeleteIcon />
@@ -79,6 +90,7 @@ export default function BadgeList({
         </Stack>
       ))}
       <Pagination
+        disabled={saving}
         count={meta.total_pages || 1}
         page={meta.current_page || 1}
         onChange={handlePageChange}

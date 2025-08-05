@@ -3,9 +3,8 @@
 import { Stack, Box } from "@mui/material"
 import type { Character } from "@/types"
 import { CS } from "@/services"
-import { EditableRichText, SectionHeader } from "@/components/ui"
+import { Icon, EditableRichText, SectionHeader } from "@/components/ui"
 import { DescriptionValue } from "@/components/characters"
-import { Icon } from "@/lib"
 
 type DescriptionProps = {
   character: Character

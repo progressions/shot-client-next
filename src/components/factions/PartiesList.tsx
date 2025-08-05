@@ -1,35 +1,20 @@
 "use client"
 
 import type { Faction } from "@/types"
-import { useClient } from "@/contexts"
-import { InfoLink } from "@/components/links"
-import { ListManager } from "@/components/lists"
+import { InfoLink, ListManager } from "@/components/ui"
 
 type PartiesListProperties = {
-  faction: Faction
-  setFaction: (faction: Faction) => void
+  entity: Faction
+  updateEntity: (entity: Faction) => Promise<void>
 }
 
 export default function PartiesList({
-  faction,
-  setFaction,
+  entity,
+  updateEntity,
 }: PartiesListProperties) {
-  const { client } = useClient()
-
-  async function update(factionId: string, formData: FormData) {
-    try {
-      const response = await client.updateFaction(factionId, formData)
-      setFaction(response.data)
-    } catch (error) {
-      console.error("Error updating faction:", error)
-      throw error
-    }
-  }
-
   return (
     <ListManager
-      entity={faction}
-      name="Faction"
+      entity={entity}
       collection="parties"
       collection_ids="party_ids"
       title="Parties"
@@ -41,7 +26,7 @@ export default function PartiesList({
           <InfoLink info="Chi War" />.
         </>
       }
-      update={update}
+      updateEntity={updateEntity}
     />
   )
 }

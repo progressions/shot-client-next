@@ -13,7 +13,7 @@ import type { Site } from "@/types"
 import Link from "next/link"
 import { SiteDescription } from "@/components/sites"
 import { useCampaign, useClient } from "@/contexts"
-import { FactionLink, CharacterLink } from "@/components/links"
+import { FactionLink, CharacterLink } from "@/components/ui"
 import DetailButtons from "@/components/DetailButtons"
 
 interface SiteDetailProperties {

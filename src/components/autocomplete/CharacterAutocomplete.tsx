@@ -5,7 +5,7 @@ import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
 import { useState, useEffect } from "react"
 
-type CharacterAutocompleteProperties = {
+type CharactersAutocompleteProperties = {
   value: string
   onChange: (value: string | null) => void
   options?: Option[]
@@ -13,13 +13,13 @@ type CharacterAutocompleteProperties = {
   allowNone?: boolean
 }
 
-export default function CharacterAutocomplete({
-  options,
+export default function CharactersAutocomplete({
   value,
+  onChange,
+  options,
   exclude = [],
   allowNone = true,
-  onChange,
-}: CharacterAutocompleteProperties) {
+}: CharactersAutocompleteProperties) {
   const { client } = useClient()
   const [characters, setCharacters] = useState<Character[]>([])
 
@@ -32,6 +32,7 @@ export default function CharacterAutocomplete({
           sort: "name",
           order: "asc",
         })
+        console.log("Fetched characters:", response.data.characters)
         setCharacters(response.data.characters || [])
       } catch (error) {
         console.error("Error fetching characters:", error)
@@ -65,18 +66,17 @@ export default function CharacterAutocomplete({
 
   const handleChange = (selectedOption: Option | null) => {
     const character = characters.find(s => s.id === selectedOption)
-    console.log("About to call onChange with character:", character)
     onChange(character)
   }
 
   return (
     <Autocomplete
-      value={value}
       label="Character"
+      value={value}
       fetchOptions={fetchOptions}
       onChange={handleChange}
-      allowNone={allowNone}
       exclude={exclude}
+      allowNone={allowNone}
     />
   )
 }

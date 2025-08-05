@@ -3,7 +3,7 @@ import { Avatar, Stack, Typography } from "@mui/material"
 import { HeroImage } from "@/components/ui"
 import { CS } from "@/services"
 import { CharacterName } from "@/components/characters"
-import { TypeLink, FactionLink } from "@/components/links"
+import { TypeLink, FactionLink } from "@/components/ui"
 
 type HeaderProps = {
   character: Character

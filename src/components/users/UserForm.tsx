@@ -10,13 +10,12 @@ import {
   Alert,
   IconButton,
 } from "@mui/material"
-import { HeroImage, TextField, SaveButton, CancelButton } from "@/components/ui"
+import { InfoLink, HeroImage, TextField, SaveButton, CancelButton } from "@/components/ui"
 import type { User } from "@/types"
 import { defaultUser } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
-import { InfoLink } from "@/components/links"
 
 type FormStateData = User & {
   [key: string]: unknown

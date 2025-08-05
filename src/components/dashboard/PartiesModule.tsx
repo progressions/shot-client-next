@@ -3,7 +3,7 @@ import Link from "next/link"
 import { PartyBadge } from "@/components/badges"
 import type { Party } from "@/types"
 import { ModuleHeader } from "@/components/dashboard"
-import { Icon } from "@/lib"
+import { Icon } from "@/components/ui"
 
 type PartiesModuleProperties = {
   parties: Party[]

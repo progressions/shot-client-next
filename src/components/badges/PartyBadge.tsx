@@ -1,7 +1,7 @@
 "use client"
 
 import type { Party } from "@/types"
-import { CharacterLink, FactionLink, PartyLink } from "@/components/links"
+import { CharacterLink, FactionLink, PartyLink } from "@/components/ui"
 import { Badge } from "@/components/badges"
 
 type PartyBadgeProperties = {

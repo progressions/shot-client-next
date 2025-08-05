@@ -5,7 +5,7 @@ import { defaultSchtick } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
 import { useClient } from "@/contexts"
-import { SchtickLink } from "@/components/links"
+import { SchtickLink } from "@/components/ui"
 
 export default function SchtickPopup({ id }: PopupProps) {
   const { user, client } = useClient()

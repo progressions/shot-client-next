@@ -1,6 +1,6 @@
 import { Box } from "@mui/material"
 import type { Character } from "@/types"
-import { UserLink } from "@/components/links"
+import { UserLink } from "@/components/ui"
 
 type OwnerProps = {
   character: Character

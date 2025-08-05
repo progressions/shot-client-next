@@ -1,35 +1,22 @@
 "use client"
 
 import type { Faction } from "@/types"
-import { useClient } from "@/contexts"
-import { InfoLink } from "@/components/links"
-import { ListManager } from "@/components/lists"
+import { Icon, InfoLink, ListManager } from "@/components/ui"
 
 type JuncturesListProperties = {
-  faction: Faction
-  setFaction: (faction: Faction) => void
+  entity: Faction
+  updateEntity: (entity: Faction) => Promise<void>
 }
 
 export default function JuncturesList({
-  faction,
-  setFaction,
+  entity,
+  updateEntity,
 }: JuncturesListProperties) {
-  const { client } = useClient()
-
-  async function update(factionId: string, formData: FormData) {
-    try {
-      const response = await client.updateFaction(factionId, formData)
-      setFaction(response.data)
-    } catch (error) {
-      console.error("Error updating faction:", error)
-      throw error
-    }
-  }
-
   return (
     <ListManager
-      entity={faction}
-      name="Faction"
+      icon={<Icon keyword="Junctures" />}
+      entity={entity}
+      name="junctures"
       collection="junctures"
       collection_ids="juncture_ids"
       title="Junctures"
@@ -42,7 +29,7 @@ export default function JuncturesList({
           whether it&rsquo;s friendly or hostile to <InfoLink info="Magic" />.
         </>
       }
-      update={update}
+      updateEntity={updateEntity}
     />
   )
 }

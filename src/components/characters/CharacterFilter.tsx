@@ -22,7 +22,7 @@ type FormStateData = {
 }
 
 type CharacterFilterProps = {
-  setCharacterId: (id: string | null) => void
+  setEntity(character: Character): void
   dispatch: React.Dispatch<FormStateData>
   includeTypes?: boolean
   includeArchetypes?: boolean
@@ -31,7 +31,7 @@ type CharacterFilterProps = {
 }
 
 export default function CharacterFilter({
-  setCharacterId,
+  setEntity,
   dispatch,
   includeCharacters = true,
   includeTypes = true,
@@ -130,24 +130,37 @@ export default function CharacterFilter({
   ])
 
   const handleCharacterChange = (character: Character | null) => {
+    console.log(
+      "CharacterFilter about to call handleCharacterChange with:",
+      character
+    )
     dispatchForm({
       type: FormActions.UPDATE,
       name: "character_id",
-      value: character.id,
+      value: character?.id,
     })
-    setCharacterId(character.id)
+    setEntity(character)
   }
 
   const handleFactionChange = (value: string | null) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "faction_id", value })
+    console.log("faction change value", value)
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "faction_id",
+      value: value?.id,
+    })
   }
 
   const handleArchetypeChange = (value: string | null) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "archetype", value })
+    dispatchForm({ type: FormActions.UPDATE, name: "archetype", value: value })
   }
 
   const handleTypeChange = (value: string | null) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "character_type", value })
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "character_type",
+      value: value,
+    })
   }
 
   const fetchArchetypes = async () => {

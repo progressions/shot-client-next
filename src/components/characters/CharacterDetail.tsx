@@ -10,10 +10,10 @@ import {
   ArchetypeLink,
   FactionLink,
   CharacterLink,
-} from "@/components/links"
+  PositionableImage,
+} from "@/components/ui"
 import DetailButtons from "@/components/DetailButtons"
 import { CS } from "@/services"
-import { PositionableImage } from "@/components/ui"
 
 interface CharacterDetailProperties {
   character: Character
