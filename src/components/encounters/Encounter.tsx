@@ -1,5 +1,4 @@
 "use client"
-
 import { useEffect } from "react"
 import { FormControl, FormHelperText, Box } from "@mui/material"
 import {
@@ -13,8 +12,8 @@ import { useCampaign } from "@/contexts"
 import { FightChips } from "@/components/fights"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
-
-type FormStateData = Encounter
+import { Encounter } from "@/types"
+import { ShotList } from "@/components/encounters"
 
 interface EncounterProperties {
   encounter: Encounter
@@ -24,12 +23,14 @@ export default function Encounter({
   encounter: initialEncounter,
 }: EncounterProperties) {
   const { campaignData } = useCampaign()
-  const { formState, dispatchForm } = useForm<FormStateData>(initialEncounter)
+  const { formState, dispatchForm } = useForm<Encounter>(initialEncounter)
   const { errors, status, data: encounter } = formState
   const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
     encounter,
     dispatchForm
   )
+
+  console.log("encounter", encounter)
 
   useEffect(() => {
     document.title = encounter.name ? `${encounter.name} - Chi War` : "Chi War"
@@ -80,20 +81,19 @@ export default function Encounter({
         />
         {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
       </FormControl>
-      <Box>
-        <FormControl fullWidth margin="normal" error={!!errors.description}>
-          <EditableRichText
-            name="description"
-            html={encounter.description}
-            editable={true}
-            onChange={handleChangeAndSave}
-            fallback="No description available."
-          />
-          {errors.description && (
-            <FormHelperText>{errors.description}</FormHelperText>
-          )}
-        </FormControl>
-      </Box>
+      <FormControl fullWidth margin="normal" error={!!errors.description}>
+        <EditableRichText
+          name="description"
+          html={encounter.description}
+          editable={true}
+          onChange={handleChangeAndSave}
+          fallback="No description available."
+        />
+        {errors.description && (
+          <FormHelperText>{errors.description}</FormHelperText>
+        )}
+      </FormControl>
+      <ShotList shots={encounter.shots} />
     </Box>
   )
 }

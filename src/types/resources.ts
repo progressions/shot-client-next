@@ -113,25 +113,6 @@ export interface Schtick extends BaseEntity {
   updated_at: string
 }
 
-export interface Encounter extends BaseEntity {
-  id: string
-  active: boolean
-  name: string
-  description?: string
-  gamemaster?: User
-  sequence: number
-  effects: Effect[]
-  characters?: Character[]
-  created_at: string
-  updated_at: string
-  characters: Character[]
-  image_url: string
-  started_at: string | null
-  ended_at: string | null
-  season: number | null
-  session: number | null
-}
-
 export interface Fight extends BaseEntity {
   id: string
   active: boolean
