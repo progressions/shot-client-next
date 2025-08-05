@@ -3,10 +3,11 @@ import { BaseEntity } from "@/types"
 export interface ShotDetails {
   id: string
   name: string
-  entity_class: "Character"
+  entity_class: "Character" | "Vehicle"
   color: string | null
   count: number
   impairments: number
+  action_values: Record<string, number>
 }
 
 export interface Shot {

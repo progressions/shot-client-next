@@ -1,44 +1,24 @@
-import { ListItem, ListItemText, Box, Typography } from "@mui/material"
-import { ShotDetails } from "@/types/encounter"
+import { ListItemText, ListItem } from "@mui/material"
+import type { ShotDetails } from "@/types"
+import { Character, Vehicle } from "@/components/encounters"
 
 interface ShotDetailItemProps {
   detail: ShotDetails
 }
 
 export default function ShotDetailItem({ detail }: ShotDetailItemProps) {
+  const componentMap: Record<string, (detail: ShotDetails) => JSX.Element> = {
+    Character: (detail) => <Character detail={detail} />,
+    Vehicle: (detail) => <Vehicle detail={detail} />,
+  }
+
+  const SelectedComponent = componentMap[detail.entity_class] || (() => <></>)
+
   return (
     <ListItem sx={{ py: 0.5 }}>
       <ListItemText
         primary={detail.name}
-        secondary={
-          <>
-            <Typography variant="body2" component="span">
-              Count: {detail.count} | Impairments: {detail.impairments}
-              {Object.keys(detail.action_values).length > 0 && (
-                <>
-                  {" | Action Values: "}
-                  {Object.entries(detail.action_values)
-                    .map(([key, value]) => `${key}: ${value}`)
-                    .join(", ")}
-                </>
-              )}
-            </Typography>
-            {detail.color && (
-              <Box
-                component="span"
-                sx={{
-                  ml: 1,
-                  display: "inline-block",
-                  width: 12,
-                  height: 12,
-                  bgcolor: detail.color,
-                  borderRadius: "50%",
-                  verticalAlign: "middle",
-                }}
-              />
-            )}
-          </>
-        }
+        secondary={<SelectedComponent detail={detail} />}
       />
     </ListItem>
   )
