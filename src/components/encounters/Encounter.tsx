@@ -16,7 +16,7 @@ import { ShotCounter } from "@/components/encounters"
 import { useEncounter } from "@/contexts"
 
 export const transition = {
-  duration: 1.5,
+  duration: 0.5,
   ease: "easeInOut",
 }
 

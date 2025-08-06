@@ -1,13 +1,7 @@
-import { motion } from "motion/react"
-import type { Character, Vehicle } from "@/types"
+import type { Character, Shot, Vehicle } from "@/types"
 import { ListSubheader, Box } from "@mui/material"
-import {
-  CharacterDetail,
-  VehicleDetail,
-  Character,
-  Vehicle,
-} from "@/components/encounters"
-import { transition } from "@/components/encounters/Encounter"
+import { AnimatePresence } from "motion/react"
+import { CharacterDetail, VehicleDetail } from "@/components/encounters"
 
 type ShotDetailProps = {
   shot: Shot
@@ -16,13 +10,9 @@ type ShotDetailProps = {
 export default function ShotDetail({ shot }: ShotDetailProps) {
   return (
     <Box>
-      <motion.div
-        key={`shot-${shot.shot}`}
-        layout
-        layoutId={`shot-${shot.shot}`}
-        transition={transition}
-        >
+      <AnimatePresence>
       <ListSubheader
+        key={`${shot.shot}-header`}
         sx={{
           textAlign: "right",
           fontSize: "1.5rem",
@@ -33,19 +23,24 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
       >
         {shot.shot}
       </ListSubheader>
-    </motion.div>
-      {shot.characters.map((character: Character) => (
-        <CharacterDetail
-          key={`${shot.shot}-character-${character.id}`}
-          character={character}
-        />
-      ))}
-      {shot.vehicles.map((vehicle: Vehicle) => (
-        <VehicleDetail
-          key={`${shot.shot}-vehicle-${vehicle.id}`}
-          vehicle={vehicle}
-        />
-      ))}
+    </AnimatePresence>
+      <AnimatePresence>
+
+        {shot.characters.map((character: Character) => (
+          <CharacterDetail
+            key={`${shot.shot}-character-${character.id}`}
+            character={character}
+          />
+        ))}
+      </AnimatePresence>
+      <AnimatePresence>
+        {shot.vehicles.map((vehicle: Vehicle) => (
+          <VehicleDetail
+            key={`${shot.shot}-vehicle-${vehicle.id}`}
+            vehicle={vehicle}
+          />
+        ))}
+      </AnimatePresence>
     </Box>
   )
 }
