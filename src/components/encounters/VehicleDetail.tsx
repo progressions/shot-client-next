@@ -6,7 +6,7 @@ import {
   ChaseConditionPoints,
   Vehicle,
 } from "@/components/encounters"
-import { transition } from "@/components/encounters/Encounter"
+import { encounterTransition } from "@/contexts"
 
 type VehicleDetailProps = {
   vehicle: Vehicle
@@ -18,7 +18,7 @@ export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
       key={vehicle.shot_id}
       layout
       layoutId={`vehicle-${vehicle.id}`}
-      transition={transition}
+      transition={encounterTransition}
     >
       <ListItem sx={{ alignItems: "flex-start" }}>
         <ListItemIcon>

@@ -5,6 +5,11 @@ import { FormStateType, FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
 import { useEntity } from "@/hooks"
 
+export const encounterTransition = {
+  duration: 0.5,
+  ease: "easeInOut",
+}
+
 const EncounterContext = createContext<EncounterContextType | undefined>(
   undefined
 )
