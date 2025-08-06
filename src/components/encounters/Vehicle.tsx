@@ -23,7 +23,7 @@ export default function Vehicle({ shot, vehicle }: VehicleProps) {
       >
         <VehicleActionValues vehicle={vehicle} />
       </Stack>
-      <Actions vehicle={vehicle} />
+      <Actions entity={vehicle} />
     </Stack>
   )
 }

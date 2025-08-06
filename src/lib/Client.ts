@@ -480,13 +480,13 @@ class Client {
     return this.post(`${this.api.characters(null, character)}/sync`)
   }
 
-  async actCharacter(
+  async spendShots(
     fight: Fight,
-    character: Character,
+    entity: Entity,
     shots: number
-  ): Promise<AxiosResponse<Character>> {
+  ): Promise<AxiosResponse<Encounter>> {
     return this.patch(`${this.apiV2.encounters()}/${fight.id}/act`, {
-      shot_id: character.shot_id,
+      shot_id: entity.shot_id,
       shots: shots,
     })
   }

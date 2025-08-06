@@ -1,5 +1,15 @@
 import { Character, BaseEntity } from "@/types"
 
+export type EncounterVehicle = Vehicle & {
+  shot_id: string
+  current_shot: number | string
+}
+
+export type EncounterCharacter = Character & {
+  shot_id: string
+  current_shot: number | string
+}
+
 export type Encounter = BaseEntity & {
   sequence: number
   description: string | null

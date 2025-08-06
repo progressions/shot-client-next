@@ -23,7 +23,7 @@ export default function Character({ shot, character }: CharacterProps) {
       >
         <ActionValues character={character} />
       </Stack>
-      <Actions character={character} />
+      <Actions entity={character} />
     </Stack>
   )
 }

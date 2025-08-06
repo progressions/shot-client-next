@@ -9,6 +9,11 @@ import { Encounter } from "@/types"
 import { ShotCounter } from "@/components/encounters"
 import { useEncounter } from "@/contexts"
 
+export const transition = {
+  duration: 1.5,
+  ease: "easeInOut",
+}
+
 export default function Encounter() {
   const { campaignData } = useCampaign()
   const {

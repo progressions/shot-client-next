@@ -6,6 +6,7 @@ import {
   ChaseConditionPoints,
   Vehicle,
 } from "@/components/encounters"
+import { transition } from "@/components/encounters/Encounter"
 
 type VehicleDetailProps = {
   vehicle: Vehicle
@@ -13,7 +14,13 @@ type VehicleDetailProps = {
 
 export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
   return (
-    <motion.div key={vehicle.shot_id} layout>
+    <motion.div
+      key={vehicle.shot_id}
+      layout
+      layout
+      layoutId={`vehicle-${vehicle.id}`}
+      transition={transition}
+    >
       <ListItem sx={{ alignItems: "flex-start" }}>
         <ListItemIcon>
           <ChaseConditionPoints vehicle={vehicle} />
