@@ -20,7 +20,6 @@ export default function Wounds({ character }: WoundsProps) {
         backgroundColor: theme.palette.divider,
         width: { xs: "3.5rem", md: "4.5rem" },
         textAlign: "center",
-        mr: 2,
         py: 1,
         borderRadius: "8px",
         alignItems: "center",

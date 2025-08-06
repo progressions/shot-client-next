@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Link } from "@mui/material"
+import { Link } from "@mui/material"
 import { useState, MouseEvent } from "react"
 import { Popup } from "@/components/popups"
 import { Icon } from "@/components/ui"
@@ -20,7 +20,7 @@ export default function InfoLink({
   keyword = info,
   href,
   disablePopup = false,
-    disableIcon = false
+  disableIcon = false,
 }: InfoLinkProperties) {
   const [anchorEl, setAnchorEl] = useState<HTMLAnchorElement | null>(null)
 
@@ -51,7 +51,7 @@ export default function InfoLink({
         }}
         onClick={!disablePopup ? handleClick : undefined}
       >
-        { !disableIcon && <Icon keyword={keyword} size={16} sx={{mr: 0.5}} /> }
+        {!disableIcon && <Icon keyword={keyword} size={16} sx={{ mr: 0.5 }} />}
         {info}
       </Link>
       <Popup

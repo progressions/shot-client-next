@@ -1,4 +1,4 @@
-import type { Encounter, Character } from "@/types"
+import type { Encounter, Character, Vehicle } from "@/types"
 import {
   ListItemIcon,
   ListItemText,
@@ -7,10 +7,15 @@ import {
   ListSubheader,
   Box,
 } from "@mui/material"
-import { CharacterAvatar } from "@/components/avatars"
 import { useForm } from "@/reducers"
-import { CharacterLink } from "@/components/ui"
-import { Wounds, Character } from "@/components/encounters"
+import {
+  VehicleHeader,
+  CharacterHeader,
+  Wounds,
+  ChaseConditionPoints,
+  Character,
+  Vehicle,
+} from "@/components/encounters"
 
 type ShotCounterProps = {
   encounter: Encounter
@@ -27,8 +32,8 @@ export default function ShotCounter({
 
   return (
     <List>
-      {encounter.shots.map(([shot, characters], index) => (
-        <Box key={`${shot}-${index}`}>
+      {encounter.shots.map((shot, index) => (
+        <Box key={`${shot.shot}-${index}`}>
           <ListSubheader
             sx={{
               textAlign: "right",
@@ -39,19 +44,35 @@ export default function ShotCounter({
             }}
             key={index}
           >
-            {shot}
+            {shot.shot}
           </ListSubheader>
-          {characters.map((character: Character) => (
-            <ListItem key={`${shot}-${character.id}`}>
-              <ListItemIcon sx={{ display: { xs: "none", md: "flex" } }}>
-                <CharacterAvatar character={character} />
-              </ListItemIcon>
+          {shot.characters.map((character: Character) => (
+            <ListItem
+              key={`${shot.shot}-${character.id}`}
+              sx={{ alignItems: "flex-start" }}
+            >
               <ListItemIcon>
                 <Wounds character={character} />
               </ListItemIcon>
               <ListItemText
-                primary={<CharacterLink character={character} />}
+                sx={{ ml: 2 }}
+                primary={<CharacterHeader character={character} />}
                 secondary={<Character character={character} />}
+              />
+            </ListItem>
+          ))}
+          {shot.vehicles.map((vehicle: Vehicle) => (
+            <ListItem
+              key={`${shot.shot}-vehicle-${vehicle.id}`}
+              sx={{ alignItems: "flex-start" }}
+            >
+              <ListItemIcon>
+                <ChaseConditionPoints vehicle={vehicle} />
+              </ListItemIcon>
+              <ListItemText
+                sx={{ ml: 2 }}
+                primary={<VehicleHeader vehicle={vehicle} />}
+                secondary={<Vehicle vehicle={vehicle} />}
               />
             </ListItem>
           ))}

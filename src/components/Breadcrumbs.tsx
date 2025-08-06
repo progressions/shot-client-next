@@ -78,6 +78,10 @@ async function fetchCrumbName(
     const response = await client.getFight({ id })
     return <FightName fight={response.data} />
   }
+  if (pathnames[0] === "encounters") {
+    const response = await client.getFight({ id })
+    return <FightName fight={response.data} />
+  }
   if (pathnames[0] === "sites") {
     const response = await client.getSite({ id })
     return <SiteName site={response.data} />

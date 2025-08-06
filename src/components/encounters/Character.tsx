@@ -1,15 +1,14 @@
-import { IconButton, Stack, Box, Typography } from "@mui/material"
-import type { Character } from "@/types"
-import { CS } from "@/services"
-import { ActionValues } from "@/components/encounters"
-import { Icon } from "@/components/ui"
+import { Stack } from "@mui/material"
+import type { Shot, Character } from "@/types"
+import { Actions, ActionValues } from "@/components/encounters"
 import { useEncounter } from "@/contexts"
 
 interface CharacterProps {
+  shot: Shot
   character: Character
 }
 
-export default function Character({ character }: CharacterProps) {
+export default function Character({ shot, character }: CharacterProps) {
   const { encounterState } = useEncounter()
 
   const handleClick = () => {}
@@ -22,25 +21,9 @@ export default function Character({ character }: CharacterProps) {
         spacing={1}
         sx={{ flexGrow: 1 }}
       >
-        <Typography
-          variant="caption"
-          sx={{ textTransform: "lowercase", fontVariant: "small-caps" }}
-        >
-          {CS.archetype(character)}{" "}
-          {CS.faction(character)?.name && (
-            <>
-              {" - "}
-              {CS.faction(character)?.name}
-            </>
-          )}
-        </Typography>
         <ActionValues character={character} />
       </Stack>
-      <Box component="span" sx={{ display: "flex", alignItems: "center" }}>
-        <IconButton>
-          <Icon keyword="Actions" size={24} />
-        </IconButton>
-      </Box>
+      <Actions character={character} />
     </Stack>
   )
 }

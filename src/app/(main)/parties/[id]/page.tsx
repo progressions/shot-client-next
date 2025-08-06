@@ -1,7 +1,6 @@
 import { headers } from "next/headers"
 import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
-import type { Party } from "@/types"
 import { NotFound, PartyPageClient } from "@/components/parties"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
@@ -20,19 +19,20 @@ export default async function PartyPage({ params }: PartyPageProperties) {
     const response = await client.getParty({ id })
     const party = response.data
 
-  // Detect mobile device on the server
-  const headersState = await headers()
-  const userAgent = headersState.get("user-agent") || ""
-  const initialIsMobile = /mobile/i.test(userAgent)
+    // Detect mobile device on the server
+    const headersState = await headers()
+    const userAgent = headersState.get("user-agent") || ""
+    const initialIsMobile = /mobile/i.test(userAgent)
 
-  return (
-    <>
-      <Breadcrumbs />
-      <Suspense fallback={<CircularProgress />}>
-        <PartyPageClient party={party} initialIsMobile={initialIsMobile} />
-      </Suspense>
-    </>
-  ) } catch (error) {
+    return (
+      <>
+        <Breadcrumbs />
+        <Suspense fallback={<CircularProgress />}>
+          <PartyPageClient party={party} initialIsMobile={initialIsMobile} />
+        </Suspense>
+      </>
+    )
+  } catch (error) {
     console.error(error)
     return <NotFound />
   }

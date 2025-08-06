@@ -21,7 +21,6 @@ import GroupIcon from "@mui/icons-material/Group"
 import FlagIcon from "@mui/icons-material/Flag"
 import DescriptionIcon from "@mui/icons-material/Description"
 import BuildIcon from "@mui/icons-material/Build"
-import { GiCharacter } from "react-icons/gi"
 
 // Define the keyword type
 type Keyword =

@@ -44,6 +44,7 @@ export function EncounterProvider({
     encounter,
     dispatchEncounter
   )
+  const currentShot = entity?.shots?.[0]?.shot
 
   useEffect(() => {
     async function fetchAssociations() {
@@ -56,8 +57,8 @@ export function EncounterProvider({
         // Collect unique weapon_ids and schtick_ids
         const weaponIds = new Set<string>()
         const schtickIds = new Set<string>()
-        encounter.shots.forEach(([_, characters]) => {
-          characters.forEach(character => {
+        encounter.shots.forEach(shot => {
+          shot.characters.forEach(character => {
             character.weapon_ids?.forEach(id => weaponIds.add(id))
             character.schtick_ids?.forEach(id => schtickIds.add(id))
           })
@@ -141,6 +142,7 @@ export function EncounterProvider({
         updateEncounter: updateEntity,
         deleteEncounter: deleteEntity,
         changeAndSaveEncounter: handleChangeAndSave,
+        currentShot,
       }}
     >
       {children}

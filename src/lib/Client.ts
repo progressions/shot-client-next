@@ -481,20 +481,14 @@ class Client {
   }
 
   async actCharacter(
-    character: Character,
     fight: Fight,
+    character: Character,
     shots: number
   ): Promise<AxiosResponse<Character>> {
-    return this.patch(
-      this.api.actCharacter(fight, { id: character.id } as Character),
-      {
-        character: {
-          id: character.id,
-          shot_id: character.shot_id,
-        } as Character,
-        shots: shots,
-      }
-    )
+    return this.patch(`${this.apiV2.encounters()}/${fight.id}/act`, {
+      shot_id: character.shot_id,
+      shots: shots,
+    })
   }
 
   async hideCharacter(
