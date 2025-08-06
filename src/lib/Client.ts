@@ -483,11 +483,13 @@ class Client {
   async spendShots(
     fight: Fight,
     entity: Entity,
-    shots: number
+    shots: number,
+    actionId?: string
   ): Promise<AxiosResponse<Encounter>> {
     return this.patch(`${this.apiV2.encounters()}/${fight.id}/act`, {
       shot_id: entity.shot_id,
       shots: shots,
+      action_id: actionId,
     })
   }
 
