@@ -8,7 +8,6 @@ import {
   HeroImage,
   EditableRichText,
 } from "@/components/ui"
-import { useCampaign } from "@/contexts"
 import { FightChips } from "@/components/fights"
 import { FormActions } from "@/reducers"
 import { Encounter } from "@/types"
@@ -16,7 +15,6 @@ import { ShotCounter } from "@/components/encounters"
 import { useEncounter } from "@/contexts"
 
 export default function Encounter() {
-  const { campaignData } = useCampaign()
   const {
     dispatchEncounter,
     encounterState,

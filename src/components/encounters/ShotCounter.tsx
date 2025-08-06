@@ -1,4 +1,3 @@
-import type { Encounter } from "@/types"
 import { AppBar, Toolbar, Typography, List } from "@mui/material"
 import { ShotDetail } from "@/components/encounters"
 import { useEncounter } from "@/contexts"
