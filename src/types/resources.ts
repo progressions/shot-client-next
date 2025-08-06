@@ -1,7 +1,6 @@
 import {
   BaseEntity,
   Advancement,
-  ShotType,
   FightEvent,
   Character,
   Invitation,

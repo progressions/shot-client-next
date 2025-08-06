@@ -17,7 +17,6 @@ export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
     <motion.div
       key={vehicle.shot_id}
       layout
-      layout
       layoutId={`vehicle-${vehicle.id}`}
       transition={transition}
     >
