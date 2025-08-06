@@ -41,8 +41,8 @@ export default function PartyPageClient({
   const setParty = useCallback(
     (party: Party) => {
       dispatchForm({
-        type: FormActions.EDIT,
-        name: "data",
+        type: FormActions.UPDATE,
+        name: "entity",
         value: party,
       })
     },

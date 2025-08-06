@@ -43,8 +43,8 @@ export default function SitePageClient({
   const setSite = useCallback(
     (site: Site) => {
       dispatchForm({
-        type: FormActions.EDIT,
-        name: "data",
+        type: FormActions.UPDATE,
+        name: "entity",
         value: site,
       })
     },

@@ -44,8 +44,8 @@ export default function SchtickPageClient({
 
   const setSchtick = (schtick: Schtick) => {
     dispatchForm({
-      type: FormActions.EDIT,
-      name: "data",
+      type: FormActions.UPDATE,
+      name: "entity",
       value: schtick,
     })
   }
@@ -60,8 +60,8 @@ export default function SchtickPageClient({
       campaignData.schtick.id === initialSchtick.id
     ) {
       dispatchForm({
-        type: FormActions.EDIT,
-        name: "data",
+        type: FormActions.UPDATE,
+        name: "entity",
         value: campaignData.schtick,
       })
     }

@@ -51,8 +51,8 @@ export default function WeaponPageClient({
   useEffect(() => {
     if (campaignData?.weapon && campaignData.weapon.id === initialWeapon.id) {
       dispatchForm({
-        type: FormActions.EDIT,
-        name: "data",
+        type: FormActions.UPDATE,
+        name: "entity",
         value: campaignData.weapon,
       })
     }
@@ -74,8 +74,8 @@ export default function WeaponPageClient({
 
   const setWeapon = (updatedWeapon: Weapon) => {
     dispatchForm({
-      type: FormActions.EDIT,
-      name: "data",
+      type: FormActions.UPDATE,
+      name: "entity",
       value: updatedWeapon,
     })
   }

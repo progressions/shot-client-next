@@ -18,9 +18,8 @@ import { useEncounter } from "@/contexts"
 
 export default function Encounter() {
   const { campaignData } = useCampaign()
-  const { dispatchEncounter, encounterState, encounter } = useEncounter()
+  const { dispatchEncounter, encounterState, encounter, updateEntity, deleteEntity, handleChangeAndSave } = useEncounter()
   const { saving, errors, status } = encounterState
-  const { deleteEntity, updateEntity, handleChangeAndSave } = useEntity(encounter, dispatchEncounter)
 
   console.log("encounter", encounter)
 

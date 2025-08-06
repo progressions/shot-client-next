@@ -58,15 +58,15 @@ export default function FightPageClient({
   useEffect(() => {
     if (campaignData?.fight && campaignData.fight.id === initialFight.id) {
       dispatchForm({
-        type: FormActions.EDIT,
-        name: "data",
+        type: FormActions.UPDATE,
+        name: "entity",
         value: campaignData.fight,
       })
     }
   }, [campaignData, initialFight, dispatchForm])
 
   const setFight = (updatedFight: Fight) => {
-    dispatchForm({ type: FormActions.EDIT, name: "data", value: updatedFight })
+    dispatchForm({ type: FormActions.UPDATE, name: "entity", value: updatedFight })
   }
 
   const handleStartFight = () => {
@@ -74,7 +74,7 @@ export default function FightPageClient({
       ...fight,
       started_at: new Date().toISOString(),
     }
-    dispatchForm({ type: FormActions.EDIT, name: "data", value: updatedFight })
+    dispatchForm({ type: FormActions.UPDATE, name: "entity", value: updatedFight })
     updateEntity(updatedFight)
   }
 

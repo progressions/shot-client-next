@@ -31,8 +31,8 @@ export default function FactionPageClient({
   const setFaction = useCallback(
     (faction: Faction) => {
       dispatchForm({
-        type: FormActions.EDIT,
-        name: "data",
+        type: FormActions.UPDATE,
+        name: "entity",
         value: faction,
       })
     },

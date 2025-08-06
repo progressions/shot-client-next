@@ -5,6 +5,7 @@ import type { Encounter, Weapon, Schtick } from "@/types"
 import { CS } from "@/services"
 import { FormActions, useForm } from "@/reducers"
 import { useClient } from "@/contexts"
+import { useEntity } from "@/hooks"
 
 interface EncounterContextType {
   encounter: Encounter | null
@@ -37,6 +38,7 @@ export function EncounterProvider({
   })
   const { loading, error, data } = encounterState
   const { entity, weapons, schticks } = data
+  const { deleteEntity, updateEntity, handleChangeAndSave } = useEntity(encounter, dispatchEncounter)
 
   useEffect(() => {
     async function fetchAssociations() {
@@ -92,7 +94,7 @@ export function EncounterProvider({
   }, [encounter, dispatchEncounter])
 
   return (
-    <EncounterContext.Provider value={{ encounterState, dispatchEncounter, encounter: entity, weapons, schticks, loading, error }}>
+    <EncounterContext.Provider value={{ encounterState, dispatchEncounter, encounter: entity, weapons, schticks, loading, error, deletEntity, updateEntity, handleChangeAndSave }}>
       {children}
     </EncounterContext.Provider>
   )
