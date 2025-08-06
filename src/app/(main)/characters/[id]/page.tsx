@@ -50,7 +50,7 @@ export default async function CharacterPage({
 
   try {
     const response = await client.getCharacter({ id })
-    character = response.data
+    const character = response.data
 
     // Detect mobile device on the server
     const headersState = await headers()

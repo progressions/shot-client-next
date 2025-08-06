@@ -73,7 +73,7 @@ const categoryMap: Record<Keyword, Category> = {
   "Personal Detail": "Details",
   Dress: "Details",
   "Melodramatic Hook": "Details",
-  Background: "Detail",
+  Background: "Details",
   Skill: "Utility",
   Vehicle: "Utility",
   Action: "Interface",
@@ -197,24 +197,29 @@ export const Icon: React.FC<IconProps> = ({ size, keyword, ...props }) => {
       hoverColor: theme.palette.primary.dark,
     },
   }
-  const { color, hoverColor } = colorMap[category]
-  // Clone the icon element to apply category-based colors and additional props
-  return React.cloneElement(iconElement, {
-    ...props,
-    sx: {
-      color,
-      fontSize: size ? size : 24, // Default size is 24 if not provided
-      "& .MuiSvgIcon-root": {
-        // Target nested SVG icons within Box
+  try {
+    const { color, hoverColor } = colorMap[category]
+    // Clone the icon element to apply category-based colors and additional props
+    return React.cloneElement(iconElement, {
+      ...props,
+      sx: {
         color,
-        fontSize: size ? size : 24,
-        "&:hover": {
-          color: hoverColor,
+        fontSize: size ? size : 24, // Default size is 24 if not provided
+        "& .MuiSvgIcon-root": {
+          // Target nested SVG icons within Box
+          color,
+          fontSize: size ? size : 24,
+          "&:hover": {
+            color: hoverColor,
+          },
         },
+        ...props.sx,
       },
-      ...props.sx,
-    },
-  })
+    })
+  } catch (error) {
+    console.error("Error rendering icon:", error)
+    return null
+  }
 }
 
 // Export categoryMap for use in parent components

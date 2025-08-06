@@ -11,6 +11,7 @@ type InfoLinkProperties = {
   data?: string | object
   href?: string
   disablePopup?: boolean
+  disableIcon?: boolean
 }
 
 export default function InfoLink({
@@ -19,6 +20,7 @@ export default function InfoLink({
   keyword = info,
   href,
   disablePopup = false,
+    disableIcon = false
 }: InfoLinkProperties) {
   const [anchorEl, setAnchorEl] = useState<HTMLAnchorElement | null>(null)
 
@@ -49,7 +51,8 @@ export default function InfoLink({
         }}
         onClick={!disablePopup ? handleClick : undefined}
       >
-        <Icon keyword={keyword} size={16} sx={{mr: 0.5}} />{info}
+        { !disableIcon && <Icon keyword={keyword} size={16} sx={{mr: 0.5}} /> }
+        {info}
       </Link>
       <Popup
         handleClose={handleClose}
