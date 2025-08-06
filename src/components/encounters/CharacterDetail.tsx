@@ -16,7 +16,10 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
       key={character.id}
       layout
       layoutId={`character-${character.id}`}
-      transition={{ duration: 0.75 }}
+      transition={{
+        duration: 2,
+        ease: "easeInOut"
+      }}
     >
       <ListItem sx={{ alignItems: "flex-start" }}>
         <ListItemIcon>
