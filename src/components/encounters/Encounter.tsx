@@ -38,17 +38,6 @@ export default function Encounter() {
     document.title = encounter.name ? `${encounter.name} - Chi War` : "Chi War"
   }, [encounter.name])
 
-  useEffect(() => {
-    console.log("campaignData", campaignData)
-    if (campaignData?.encounter && campaignData.encounter.id === encounter.id) {
-      dispatchEncounter({
-        type: FormActions.UPDATE,
-        name: "entity",
-        value: campaignData.encounter,
-      })
-    }
-  }, [campaignData, encounter, dispatchEncounter])
-
   const setEncounter = (updatedEncounter: Encounter) => {
     dispatchEncounter({
       type: FormActions.UPDATE,
