@@ -1,5 +1,6 @@
 import React from "react"
 import { Box, useTheme } from "@mui/material"
+import BoltIcon from '@mui/icons-material/Bolt'
 import { FaBolt } from "react-icons/fa"
 import { VscGithubAction } from "react-icons/vsc"
 import { FaGun } from "react-icons/fa6"
@@ -38,9 +39,10 @@ type Keyword =
   | "Melodramatic Hook"
   | "Background"
   | "Weapons"
+  | "Actions"
 
 // Define category type
-type Category = "Combat" | "Characters" | "Affiliations" | "Details" | "Utility"
+type Category = "Combat" | "Characters" | "Affiliations" | "Details" | "Utility" | "Interface"
 
 // Map keywords to categories
 const categoryMap: Record<Keyword, Category> = {
@@ -62,6 +64,7 @@ const categoryMap: Record<Keyword, Category> = {
   Background: "Details",
   Skills: "Utility",
   Vehicles: "Utility",
+  Actions: "Interface",
 }
 
 // Map keywords to JSX icon elements
@@ -127,6 +130,11 @@ const iconMap: Record<Keyword, React.ReactElement> = {
       <FaGun />
     </Box>
   ),
+  Actions: (
+    <Box component="span">
+      <BoltIcon sx={{fontSize: 36, "& .MuiSvgIcon-root": { fontSize: 36 }}} />
+    </Box>
+  ),
 }
 
 interface IconProps extends SvgIconProps {
@@ -157,6 +165,10 @@ export const Icon: React.FC<IconProps> = ({ keyword, ...props }) => {
       hoverColor: theme.palette.custom.purple.light,
     },
     Utility: {
+      color: theme.palette.primary.main,
+      hoverColor: theme.palette.primary.dark,
+    },
+    Interface: {
       color: theme.palette.primary.main,
       hoverColor: theme.palette.primary.dark,
     },
