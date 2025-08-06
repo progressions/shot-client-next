@@ -1,18 +1,12 @@
 import { Stack } from "@mui/material"
-import type { Shot, Vehicle } from "@/types"
+import type { Vehicle } from "@/types"
 import { Actions, VehicleActionValues } from "@/components/encounters"
-import { useEncounter } from "@/contexts"
 
 interface VehicleProps {
-  shot: Shot
   vehicle: Vehicle
 }
 
-export default function Vehicle({ shot, vehicle }: VehicleProps) {
-  const { encounterState } = useEncounter()
-
-  const handleClick = () => {}
-
+export default function Vehicle({ vehicle }: VehicleProps) {
   return (
     <Stack component="span" direction="row" spacing={1}>
       <Stack

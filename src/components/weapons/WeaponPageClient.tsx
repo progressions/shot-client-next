@@ -6,7 +6,7 @@ import { FormControl, FormHelperText, Alert, Box } from "@mui/material"
 import type { Weapon } from "@/types"
 import { useCampaign } from "@/contexts"
 import { WeaponChips, Stats, EditJunctureCategory } from "@/components/weapons"
-import { useToast, useClient } from "@/contexts"
+import { useToast } from "@/contexts"
 import {
   SectionHeader,
   EditableRichText,
@@ -55,13 +55,12 @@ export default function WeaponPageClient({
   weapon: initialWeapon,
 }: WeaponPageClientProperties) {
   const { campaignData } = useCampaign()
-  const { client } = useClient()
-  const { toastSuccess, toastError } = useToast()
+  const { toastError } = useToast()
   const { formState, dispatchForm } = useForm<FormStateData>({
     ...initialWeapon,
     image: null,
   })
-  const { status, saving, errors = {} } = formState
+  const { status, errors = {} } = formState
   const weapon = formState.data
   const { deleteEntity, updateEntity, handleChangeAndSave } = useEntity<Weapon>(
     weapon,
@@ -94,12 +93,8 @@ export default function WeaponPageClient({
         ) {
           try {
             await deleteEntity({ force: true })
-            // onDelete(weapon.id)
-            // setError(null)
-            // toastSuccess("Weapon deleted successfully.")
           } catch (forceError: unknown) {
             console.error(forceError)
-            // setError("Failed to delete weapon.")
             toastError("Failed to delete weapon.")
           }
         }
@@ -107,7 +102,6 @@ export default function WeaponPageClient({
 
       console.error("Delete weapon error:", error)
     }
-    // setError("Failed to delete weapon.")
     toastError("Failed to delete weapon.")
   }
 

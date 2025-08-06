@@ -2,7 +2,6 @@ import { motion } from "motion/react"
 import type { Character } from "@/types"
 import { ListItemIcon, ListItemText, ListItem } from "@mui/material"
 import { CharacterHeader, Wounds, Character } from "@/components/encounters"
-import { useEncounter } from "@/contexts"
 import { transition } from "@/components/encounters/Encounter"
 
 type CharacterDetailProps = {
@@ -10,8 +9,6 @@ type CharacterDetailProps = {
 }
 
 export default function CharacterDetail({ character }: CharacterDetailProps) {
-  const { encounter, encounterState, dispatchEncounter } = useEncounter()
-
   return (
     <motion.div
       key={character.id}

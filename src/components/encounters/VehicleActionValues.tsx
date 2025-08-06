@@ -7,7 +7,9 @@ interface VehicleActionValuesProps {
   vehicle: Vehicle
 }
 
-export default function VehicleActionValues({ vehicle }: ActionValuesProps) {
+export default function VehicleActionValues({
+  vehicle,
+}: VehicleActionValuesProps) {
   return (
     <Stack
       component="span"

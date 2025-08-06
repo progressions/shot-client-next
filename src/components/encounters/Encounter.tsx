@@ -1,7 +1,13 @@
 "use client"
 import { useEffect } from "react"
 import { FormControl, FormHelperText, Box } from "@mui/material"
-import { Alert, NameEditor, HeroImage, EditableRichText } from "@/components/ui"
+import {
+  SpeedDialMenu,
+  Alert,
+  NameEditor,
+  HeroImage,
+  EditableRichText,
+} from "@/components/ui"
 import { useCampaign } from "@/contexts"
 import { FightChips } from "@/components/fights"
 import { FormActions } from "@/reducers"
@@ -24,7 +30,7 @@ export default function Encounter() {
     deleteEncounter,
     changeAndSaveEncounter,
   } = useEncounter()
-  const { saving, errors, status } = encounterState
+  const { errors, status } = encounterState
 
   console.log("encounter", encounter)
 
@@ -57,6 +63,7 @@ export default function Encounter() {
         position: "relative",
       }}
     >
+      <SpeedDialMenu onDelete={deleteEncounter} />
       <HeroImage
         entity={encounter}
         setEntity={setEncounter}

@@ -1,18 +1,12 @@
 import { Stack } from "@mui/material"
-import type { Shot, Character } from "@/types"
+import type { Character } from "@/types"
 import { Actions, ActionValues } from "@/components/encounters"
-import { useEncounter } from "@/contexts"
 
 interface CharacterProps {
-  shot: Shot
   character: Character
 }
 
-export default function Character({ shot, character }: CharacterProps) {
-  const { encounterState } = useEncounter()
-
-  const handleClick = () => {}
-
+export default function Character({ character }: CharacterProps) {
   return (
     <Stack component="span" direction="row" spacing={1}>
       <Stack
