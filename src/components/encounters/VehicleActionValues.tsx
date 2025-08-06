@@ -1,6 +1,6 @@
 import type { Vehicle } from "@/types"
 import { VS } from "@/services"
-import { Stack, Box } from "@mui/material"
+import { Stack } from "@mui/material"
 import { AV } from "@/components/ui/"
 
 interface VehicleActionValuesProps {
