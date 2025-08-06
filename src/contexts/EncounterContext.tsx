@@ -94,7 +94,7 @@ export function EncounterProvider({
   }, [encounter, dispatchEncounter])
 
   return (
-    <EncounterContext.Provider value={{ encounterState, dispatchEncounter, encounter: entity, weapons, schticks, loading, error, deletEntity, updateEntity, handleChangeAndSave }}>
+    <EncounterContext.Provider value={{ encounterState, dispatchEncounter, encounter: entity, weapons, schticks, loading, error, deleteEntity, updateEntity, handleChangeAndSave }}>
       {children}
     </EncounterContext.Provider>
   )
