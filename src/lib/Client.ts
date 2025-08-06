@@ -970,18 +970,26 @@ class Client {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<WeaponsResponse>> {
-    return this.post(`${this.apiV2.weapons()}/batch`, {
-      ...parameters,
-    }, cacheOptions)
+    return this.post(
+      `${this.apiV2.weapons()}/batch`,
+      {
+        ...parameters,
+      },
+      cacheOptions
+    )
   }
 
   async getSchticksBatch(
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<SchticksResponse>> {
-    return this.post(`${this.apiV2.schticks()}/batch`, {
-      ...parameters,
-    }, cacheOptions)
+    return this.post(
+      `${this.apiV2.schticks()}/batch`,
+      {
+        ...parameters,
+      },
+      cacheOptions
+    )
   }
 
   async getSchtickPaths(

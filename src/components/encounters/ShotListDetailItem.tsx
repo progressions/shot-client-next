@@ -1,7 +1,6 @@
 import { ListItemText, ListItem } from "@mui/material"
 import type { ShotDetails } from "@/types"
-import { Character, Vehicle } from "@/components/encounters"
-import { CharacterLink, VehicleLink } from "@/components/ui"
+import { Character } from "@/components/encounters"
 
 interface ShotDetailItemProps {
   detail: ShotDetails

@@ -1,4 +1,4 @@
-import { Character, BaseEntity } from "@/types"
+import { BaseEntity } from "@/types"
 
 interface Encounter extends BaseEntity {
   id: string

@@ -66,7 +66,11 @@ export default function FightPageClient({
   }, [campaignData, initialFight, dispatchForm])
 
   const setFight = (updatedFight: Fight) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "entity", value: updatedFight })
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "entity",
+      value: updatedFight,
+    })
   }
 
   const handleStartFight = () => {
@@ -74,7 +78,11 @@ export default function FightPageClient({
       ...fight,
       started_at: new Date().toISOString(),
     }
-    dispatchForm({ type: FormActions.UPDATE, name: "entity", value: updatedFight })
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "entity",
+      value: updatedFight,
+    })
     updateEntity(updatedFight)
   }
 

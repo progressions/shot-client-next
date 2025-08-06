@@ -23,7 +23,9 @@ class ApiV2 {
   }
 
   encounters(fight?: Fight | ID): string {
-    return fight?.id ? `${this.api()}/encounters/${fight.id}` : `${this.api()}/encounters`
+    return fight?.id
+      ? `${this.api()}/encounters/${fight.id}`
+      : `${this.api()}/encounters`
   }
 
   characters(character?: Character | ID): string {

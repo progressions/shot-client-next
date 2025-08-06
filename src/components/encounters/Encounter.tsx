@@ -1,24 +1,24 @@
 "use client"
 import { useEffect } from "react"
 import { FormControl, FormHelperText, Box } from "@mui/material"
-import {
-  Alert,
-  NameEditor,
-  HeroImage,
-  SpeedDialMenu,
-  EditableRichText,
-} from "@/components/ui"
+import { Alert, NameEditor, HeroImage, EditableRichText } from "@/components/ui"
 import { useCampaign } from "@/contexts"
 import { FightChips } from "@/components/fights"
-import { useEntity } from "@/hooks"
-import { FormActions, useForm } from "@/reducers"
+import { FormActions } from "@/reducers"
 import { Encounter } from "@/types"
 import { ShotCounter } from "@/components/encounters"
 import { useEncounter } from "@/contexts"
 
 export default function Encounter() {
   const { campaignData } = useCampaign()
-  const { dispatchEncounter, encounterState, encounter, updateEntity, deleteEntity, handleChangeAndSave } = useEncounter()
+  const {
+    dispatchEncounter,
+    encounterState,
+    encounter,
+    updateEncounter,
+    deleteEncounter,
+    changeAndSaveEncounter,
+  } = useEncounter()
   const { saving, errors, status } = encounterState
 
   console.log("encounter", encounter)
@@ -28,10 +28,7 @@ export default function Encounter() {
   }, [encounter.name])
 
   useEffect(() => {
-    if (
-      campaignData?.encounter &&
-      campaignData.encounter.id === encounter.id
-    ) {
+    if (campaignData?.encounter && campaignData.encounter.id === encounter.id) {
       dispatchEncounter({
         type: FormActions.UPDATE,
         name: "entity",
@@ -67,7 +64,7 @@ export default function Encounter() {
         <NameEditor
           entity={encounter}
           setEntity={setEncounter}
-          updateEntity={updateEntity}
+          updateEntity={updateEncounter}
         />
         {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
       </FormControl>
@@ -76,7 +73,7 @@ export default function Encounter() {
           name="description"
           html={encounter.description}
           editable={true}
-          onChange={handleChangeAndSave}
+          onChange={changeAndSaveEncounter}
           fallback="No description available."
         />
         {errors.description && (

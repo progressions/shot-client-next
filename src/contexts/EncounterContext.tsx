@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useEffect } from "react"
 import type { Encounter, Weapon, Schtick } from "@/types"
-import { CS } from "@/services"
 import { FormActions, useForm } from "@/reducers"
 import { useClient } from "@/contexts"
 import { useEntity } from "@/hooks"
@@ -15,7 +14,9 @@ interface EncounterContextType {
   error: string | null
 }
 
-const EncounterContext = createContext<EncounterContextType | undefined>(undefined)
+const EncounterContext = createContext<EncounterContextType | undefined>(
+  undefined
+)
 
 type FormStateData = {
   entity: Encounter | null
@@ -31,18 +32,26 @@ export function EncounterProvider({
   children: React.ReactNode
 }) {
   const { client } = useClient()
-  const { formState: encounterState, dispatchForm: dispatchEncounter } = useForm<FormStateData>({
-    entity: encounter,
-    weapons: {},
-    schticks: {},
-  })
+  const { formState: encounterState, dispatchForm: dispatchEncounter } =
+    useForm<FormStateData>({
+      entity: encounter,
+      weapons: {},
+      schticks: {},
+    })
   const { loading, error, data } = encounterState
   const { entity, weapons, schticks } = data
-  const { deleteEntity, updateEntity, handleChangeAndSave } = useEntity(encounter, dispatchEncounter)
+  const { deleteEntity, updateEntity, handleChangeAndSave } = useEntity(
+    encounter,
+    dispatchEncounter
+  )
 
   useEffect(() => {
     async function fetchAssociations() {
-      dispatchEncounter({ type: FormActions.EDIT, name: "loading", value: true })
+      dispatchEncounter({
+        type: FormActions.EDIT,
+        name: "loading",
+        value: true,
+      })
       try {
         // Collect unique weapon_ids and schtick_ids
         const weaponIds = new Set<string>()
@@ -56,10 +65,16 @@ export function EncounterProvider({
 
         const [weaponsResponse, schticksResponse] = await Promise.all([
           weaponIds.size > 0
-            ? client.getWeaponsBatch({ per_page: 1000, ids: Array.from(weaponIds).join(",") })
+            ? client.getWeaponsBatch({
+                per_page: 1000,
+                ids: Array.from(weaponIds).join(","),
+              })
             : Promise.resolve({ data: [] }),
           schtickIds.size > 0
-            ? client.getSchticksBatch({ per_page: 1000, ids: Array.from(schtickIds).join(",") })
+            ? client.getSchticksBatch({
+                per_page: 1000,
+                ids: Array.from(schtickIds).join(","),
+              })
             : Promise.resolve({ data: [] }),
         ])
 
@@ -79,14 +94,34 @@ export function EncounterProvider({
           {}
         )
 
-        dispatchEncounter({ type: FormActions.UPDATE, name: "weapons", value: weaponsMap })
-        dispatchEncounter({ type: FormActions.UPDATE, name: "schticks", value: schticksMap })
-        dispatchEncounter({ type: FormActions.EDIT, name: "error", value: null })
+        dispatchEncounter({
+          type: FormActions.UPDATE,
+          name: "weapons",
+          value: weaponsMap,
+        })
+        dispatchEncounter({
+          type: FormActions.UPDATE,
+          name: "schticks",
+          value: schticksMap,
+        })
+        dispatchEncounter({
+          type: FormActions.EDIT,
+          name: "error",
+          value: null,
+        })
       } catch (err) {
         console.error("Failed to load associations", err)
-        dispatchEncounter({ type: FormActions.EDIT, name: "error", value: "Failed to load associations" })
+        dispatchEncounter({
+          type: FormActions.EDIT,
+          name: "error",
+          value: "Failed to load associations",
+        })
       } finally {
-        dispatchEncounter({ type: FormActions.EDIT, name: "loading", value: false })
+        dispatchEncounter({
+          type: FormActions.EDIT,
+          name: "loading",
+          value: false,
+        })
       }
     }
 
@@ -94,7 +129,20 @@ export function EncounterProvider({
   }, [encounter, dispatchEncounter])
 
   return (
-    <EncounterContext.Provider value={{ encounterState, dispatchEncounter, encounter: entity, weapons, schticks, loading, error, deleteEntity, updateEntity, handleChangeAndSave }}>
+    <EncounterContext.Provider
+      value={{
+        encounterState,
+        dispatchEncounter,
+        encounter: entity,
+        weapons,
+        schticks,
+        loading,
+        error,
+        updateEncounter: updateEntity,
+        deleteEncounter: deleteEntity,
+        changeAndSaveEncounter: handleChangeAndSave,
+      }}
+    >
       {children}
     </EncounterContext.Provider>
   )

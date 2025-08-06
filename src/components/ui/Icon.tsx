@@ -1,6 +1,6 @@
 import React from "react"
 import { Box, useTheme } from "@mui/material"
-import BoltIcon from '@mui/icons-material/Bolt'
+import BoltIcon from "@mui/icons-material/Bolt"
 import { FaBolt } from "react-icons/fa"
 import { VscGithubAction } from "react-icons/vsc"
 import { FaGun } from "react-icons/fa6"
@@ -42,7 +42,13 @@ type Keyword =
   | "Actions"
 
 // Define category type
-type Category = "Combat" | "Characters" | "Affiliations" | "Details" | "Utility" | "Interface"
+type Category =
+  | "Combat"
+  | "Characters"
+  | "Affiliations"
+  | "Details"
+  | "Utility"
+  | "Interface"
 
 // Map keywords to categories
 const categoryMap: Record<Keyword, Category> = {
@@ -132,17 +138,18 @@ const iconMap: Record<Keyword, React.ReactElement> = {
   ),
   Actions: (
     <Box component="span">
-      <BoltIcon sx={{fontSize: 36, "& .MuiSvgIcon-root": { fontSize: 36 }}} />
+      <BoltIcon sx={{ fontSize: 36, "& .MuiSvgIcon-root": { fontSize: 36 } }} />
     </Box>
   ),
 }
 
 interface IconProps extends SvgIconProps {
   keyword: Keyword
+  size?: number
 }
 
 // Reusable Icon component that renders the icon with category-based colors
-export const Icon: React.FC<IconProps> = ({ keyword, ...props }) => {
+export const Icon: React.FC<IconProps> = ({ size, keyword, ...props }) => {
   const theme = useTheme()
   const iconElement = iconMap[keyword]
   if (!iconElement) return null
@@ -179,11 +186,11 @@ export const Icon: React.FC<IconProps> = ({ keyword, ...props }) => {
     ...props,
     sx: {
       color,
-      fontSize: 24, // Default size to match iconMap sizes
+      fontSize: size ? size : 24, // Default size is 24 if not provided
       "& .MuiSvgIcon-root": {
         // Target nested SVG icons within Box
         color,
-        fontSize: 20,
+        fontSize: size ? size : 24,
         "&:hover": {
           color: hoverColor,
         },
