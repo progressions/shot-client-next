@@ -242,18 +242,17 @@ export default function Junctures({
     await fetchJunctures(1, sort, newOrder, faction_id)
   }
 
-  const handleFactionChange = async (value: string | null) => {
-    const newFactionId = value
+  const handleFactionChange = async (faction: Faction | null) => {
     dispatchForm({
       type: FormActions.UPDATE,
       name: "faction_id",
-      value: newFactionId,
+      value: faction?.id,
     })
     router.push(
-      `/junctures?page=1&sort=${sort}&order=${order}&faction_id=${newFactionId}`,
+      `/junctures?page=1&sort=${sort}&order=${order}&faction_id=${faction?.id || ""}`,
       { scroll: false }
     )
-    await fetchJunctures(1, sort, order, newFactionId)
+    await fetchJunctures(1, sort, order, faction?.id)
   }
 
   const factionOptions = useMemo(() => {

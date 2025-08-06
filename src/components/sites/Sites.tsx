@@ -226,18 +226,17 @@ export default function Sites({
     await fetchSites(1, sort, newOrder, faction_id)
   }
 
-  const handleFactionChange = async (value: string | null) => {
-    const newFactionId = value
+  const handleFactionChange = async (faction: Faction | null) => {
     dispatchForm({
       type: FormActions.UPDATE,
       name: "faction_id",
-      value: newFactionId,
+      value: faction?.id,
     })
     router.push(
-      `/sites?page=1&sort=${sort}&order=${order}&faction_id=${newFactionId}`,
+      `/sites?page=1&sort=${sort}&order=${order}&faction_id=${faction?.id || ""}`,
       { scroll: false }
     )
-    await fetchSites(1, sort, order, newFactionId)
+    await fetchSites(1, sort, order, faction?.id)
   }
 
   const factionOptions = useMemo(() => {
