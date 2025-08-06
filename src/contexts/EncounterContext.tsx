@@ -1,10 +1,10 @@
 "use client"
-
 import { createContext, useContext, useEffect } from "react"
 import type { Encounter, Weapon, Schtick } from "@/types"
 import { FormStateType, FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
 import { useEntity } from "@/hooks"
+
 const EncounterContext = createContext<EncounterContextType | undefined>(
   undefined
 )
@@ -57,7 +57,7 @@ export function EncounterProvider({
     if (campaignData?.encounter && campaignData.encounter.id === encounter.id) {
       dispatchEncounter({
         type: FormActions.UPDATE,
-        name: "entity",
+        name: "encounter",
         value: campaignData.encounter,
       })
     }

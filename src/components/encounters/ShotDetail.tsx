@@ -11,21 +11,20 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
   return (
     <Box>
       <AnimatePresence>
-      <ListSubheader
-        key={`${shot.shot}-header`}
-        sx={{
-          textAlign: "right",
-          fontSize: "1.5rem",
-          fontWeight: "bold",
-          width: "100%",
-          borderRadius: "8px 8px 1px 1px",
-        }}
-      >
-        {shot.shot}
-      </ListSubheader>
-    </AnimatePresence>
+        <ListSubheader
+          key={`${shot.shot}-header`}
+          sx={{
+            textAlign: "right",
+            fontSize: "1.5rem",
+            fontWeight: "bold",
+            width: "100%",
+            borderRadius: "8px 8px 1px 1px",
+          }}
+        >
+          {shot.shot}
+        </ListSubheader>
+      </AnimatePresence>
       <AnimatePresence>
-
         {shot.characters.map((character: Character) => (
           <CharacterDetail
             key={`${shot.shot}-character-${character.id}`}
