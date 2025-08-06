@@ -6,7 +6,7 @@ import { useCampaign, useClient } from "@/contexts"
 import { useEntity } from "@/hooks"
 
 export const encounterTransition = {
-  duration: 0.5,
+  duration: 1,
   ease: "easeInOut",
 }
 
