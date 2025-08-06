@@ -23,7 +23,7 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
           <ListSubheader
             sx={{
               position: "sticky",
-              top: "52px",
+              top: "56px",
               textAlign: "right",
               fontSize: "1.5rem",
               fontWeight: "bold",
