@@ -16,10 +16,9 @@ export default async function CampaignPage({ params }: CampaignPageProperties) {
   const user = await getUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
-    try {
+  try {
     const response = await client.getCampaign({ id })
     const campaign: Campaign = response.data
-
 
     // Detect mobile device on the server
     const headersState = await headers()
@@ -37,8 +36,8 @@ export default async function CampaignPage({ params }: CampaignPageProperties) {
         </Suspense>
       </>
     )
-    } catch (error) {
-      console.error(error)
-      return <Typography>Campaign not found</Typography>
-    }
+  } catch (error) {
+    console.error(error)
+    return <Typography>Campaign not found</Typography>
   }
+}

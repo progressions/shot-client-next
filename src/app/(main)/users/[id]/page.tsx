@@ -17,27 +17,27 @@ export default async function UserPage({ params }: UserPageProperties) {
   const currentUser = await getUser()
   if (!client || !currentUser) return <Typography>Not logged in</Typography>
 
-    try {
-  const response = await client.getUser({ id })
-  const user: User = response.data
+  try {
+    const response = await client.getUser({ id })
+    const user: User = response.data
 
-  if (!currentUser.admin) redirect("/")
+    if (!currentUser.admin) redirect("/")
 
-  // Detect mobile device on the server
-  const headersState = await headers()
-  const userAgent = headersState.get("user-agent") || ""
-  const initialIsMobile = /mobile/i.test(userAgent)
+    // Detect mobile device on the server
+    const headersState = await headers()
+    const userAgent = headersState.get("user-agent") || ""
+    const initialIsMobile = /mobile/i.test(userAgent)
 
-  return (
-    <>
-      <Breadcrumbs />
-      <Suspense fallback={<CircularProgress />}>
-        <UserPageClient user={user} initialIsMobile={initialIsMobile} />
-      </Suspense>
-    </>
-  ) } catch (error) {
+    return (
+      <>
+        <Breadcrumbs />
+        <Suspense fallback={<CircularProgress />}>
+          <UserPageClient user={user} initialIsMobile={initialIsMobile} />
+        </Suspense>
+      </>
+    )
+  } catch (error) {
     console.error(error)
     return <Typography>User not found</Typography>
   }
-
 }

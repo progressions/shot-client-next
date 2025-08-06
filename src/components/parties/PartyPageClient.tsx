@@ -15,7 +15,6 @@ import {
 } from "@/components/ui"
 import { CharacterManager } from "@/components/characters"
 import { useEntity } from "@/hooks"
-import { FactionAutocomplete } from "@/components/autocomplete"
 import { EditFaction } from "@/components/factions"
 import { FormActions, useForm } from "@/reducers"
 

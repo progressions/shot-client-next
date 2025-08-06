@@ -19,25 +19,29 @@ export default async function EncounterPage({
   const user = await getUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
-    try {
-  const response = await client.getEncounter({ id })
-  const encounter: Encounter = response.data
+  try {
+    const response = await client.getEncounter({ id })
+    const encounter: Encounter = response.data
 
-  // Detect mobile device on the server
-  const headersState = await headers()
-  const userAgent = headersState.get("user-agent") || ""
-  const initialIsMobile = /mobile/i.test(userAgent)
+    // Detect mobile device on the server
+    const headersState = await headers()
+    const userAgent = headersState.get("user-agent") || ""
+    const initialIsMobile = /mobile/i.test(userAgent)
 
-  return (
-    <>
-      <Breadcrumbs />
-      <Suspense fallback={<CircularProgress />}>
-        <EncounterProvider encounter={encounter}>
-          <Encounter encounter={encounter} initialIsMobile={initialIsMobile} />
-        </EncounterProvider>
-      </Suspense>
-    </>
-  ) }catch (error) {
+    return (
+      <>
+        <Breadcrumbs />
+        <Suspense fallback={<CircularProgress />}>
+          <EncounterProvider encounter={encounter}>
+            <Encounter
+              encounter={encounter}
+              initialIsMobile={initialIsMobile}
+            />
+          </EncounterProvider>
+        </Suspense>
+      </>
+    )
+  } catch (error) {
     console.error(error)
     return <Typography>Encounter not found</Typography>
   }

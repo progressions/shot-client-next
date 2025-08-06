@@ -9,7 +9,8 @@ export default function NotFound() {
           Character Not Found
         </Typography>
         <Typography variant="body1" sx={{ color: "#ffffff" }}>
-          The <InfoLink href="/characters" info="Character" /> you’re looking for does not exist or is not accessible.
+          The <InfoLink href="/characters" info="Character" /> you’re looking
+          for does not exist or is not accessible.
         </Typography>
       </Box>
     </Container>

@@ -8,7 +8,8 @@ type WeaponChipsProps = {
 }
 
 export default function WeaponChips({ weapon }: WeaponChipsProps) {
-  const junctureColor = junctureColors[weapon.juncture || "Modern"] || junctureColors.Modern
+  const junctureColor =
+    junctureColors[weapon.juncture || "Modern"] || junctureColors.Modern
 
   return (
     <Chipset>

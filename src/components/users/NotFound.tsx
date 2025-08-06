@@ -9,7 +9,8 @@ export default function NotFound() {
           User Not Found
         </Typography>
         <Typography variant="body1" sx={{ color: "#ffffff" }}>
-          The <InfoLink href="/users" info="User" /> you’re looking for does not exist or is not accessible.
+          The <InfoLink href="/users" info="User" /> you’re looking for does not
+          exist or is not accessible.
         </Typography>
       </Box>
     </Container>

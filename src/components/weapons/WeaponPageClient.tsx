@@ -1,7 +1,6 @@
 "use client"
 
 import { VscGithubAction } from "react-icons/vsc"
-import { redirect } from "next/navigation"
 import { useEffect } from "react"
 import { FormControl, FormHelperText, Alert, Box } from "@mui/material"
 import type { Weapon } from "@/types"

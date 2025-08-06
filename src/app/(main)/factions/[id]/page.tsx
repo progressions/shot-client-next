@@ -35,8 +35,9 @@ export default async function FactionPage({ params }: FactionPageProperties) {
           />
         </Suspense>
       </>
-    ) } catch (error) {
-      console.error(error)
-      return <Typography>Faction not found</Typography>
-    }
+    )
+  } catch (error) {
+    console.error(error)
+    return <Typography>Faction not found</Typography>
+  }
 }

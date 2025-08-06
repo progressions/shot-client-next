@@ -9,7 +9,8 @@ export default function NotFound() {
           Party Not Found
         </Typography>
         <Typography variant="body1" sx={{ color: "#ffffff" }}>
-          The <InfoLink href="/parties" info="Party" /> you’re looking for does not exist or is not accessible.
+          The <InfoLink href="/parties" info="Party" /> you’re looking for does
+          not exist or is not accessible.
         </Typography>
       </Box>
     </Container>

@@ -9,7 +9,8 @@ export default function NotFound() {
           Site Not Found
         </Typography>
         <Typography variant="body1" sx={{ color: "#ffffff" }}>
-          The <InfoLink href="/sites" info="Feng Shui Site" /> you’re looking for does not exist or is not accessible.
+          The <InfoLink href="/sites" info="Feng Shui Site" /> you’re looking
+          for does not exist or is not accessible.
         </Typography>
       </Box>
     </Container>

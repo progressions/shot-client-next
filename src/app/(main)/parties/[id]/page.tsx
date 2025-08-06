@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"

@@ -16,26 +16,27 @@ export default async function SchtickPage({ params }: SchtickPageProperties) {
   const user = await getUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
-    try {
-  const response = await client.getSchtick({ id })
-  const schtick: Schtick = response.data
+  try {
+    const response = await client.getSchtick({ id })
+    const schtick: Schtick = response.data
 
-  // Detect mobile device on the server
-  const headersState = await headers()
-  const userAgent = headersState.get("user-agent") || ""
-  const initialIsMobile = /mobile/i.test(userAgent)
+    // Detect mobile device on the server
+    const headersState = await headers()
+    const userAgent = headersState.get("user-agent") || ""
+    const initialIsMobile = /mobile/i.test(userAgent)
 
-  return (
-    <>
-      <Breadcrumbs />
-      <Suspense fallback={<CircularProgress />}>
-        <SchtickPageClient
-          schtick={schtick}
-          initialIsMobile={initialIsMobile}
-        />
-      </Suspense>
-    </>
-  ) } catch (error) {
+    return (
+      <>
+        <Breadcrumbs />
+        <Suspense fallback={<CircularProgress />}>
+          <SchtickPageClient
+            schtick={schtick}
+            initialIsMobile={initialIsMobile}
+          />
+        </Suspense>
+      </>
+    )
+  } catch (error) {
     console.error(error)
     return <Typography>Schtick not found</Typography>
   }
