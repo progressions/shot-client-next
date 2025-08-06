@@ -5,24 +5,8 @@ import type { Character } from "@/types"
 import type { Metadata } from "next"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import { Suspense } from "react"
-import { EditCharacter } from "@/components/characters"
+import { NotFound, EditCharacter } from "@/components/characters"
 import { headers } from "next/headers"
-
-// Component for character not found
-function CharacterNotFound() {
-  return (
-    <Container maxWidth="md" sx={{ mt: 4 }}>
-      <Box sx={{ bgcolor: "#424242", p: 2, borderRadius: 1 }}>
-        <Typography variant="h4" sx={{ color: "#ffffff", mb: 2 }}>
-          Character Not Found
-        </Typography>
-        <Typography variant="body1" sx={{ color: "#ffffff" }}>
-          The character you’re looking for does not exist or is not accessible.
-        </Typography>
-      </Box>
-    </Container>
-  )
-}
 
 // Dynamically generate metadata for the page title
 export async function generateMetadata({
@@ -73,7 +57,7 @@ export default async function CharacterPage({
   }
 
   if (!character?.id) {
-    return <CharacterNotFound />
+    return <NotFound />
   }
 
   // Detect mobile device on the server

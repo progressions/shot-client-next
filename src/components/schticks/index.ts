@@ -8,3 +8,4 @@ export { default as SchtickPageClient } from "@/components/schticks/SchtickPageC
 export { default as SchtickChips } from "@/components/schticks/SchtickChips"
 export { default as SchtickFilter } from "@/components/schticks/SchtickFilter"
 export { default as EditCategoryPath } from "@/components/schticks/EditCategoryPath"
+export { default as NotFound } from "@/components/schticks/NotFound"
