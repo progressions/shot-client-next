@@ -1,6 +1,7 @@
+import type { Character, Encounter } from "@/types"
 import { Box, IconButton } from "@mui/material"
 import { useClient, useEncounter } from "@/contexts"
-import { type Character } from "@/types"
+import { FormActions } from "@/reducers"
 import { Icon } from "@/components/ui"
 
 type ActionsProps = {
@@ -9,15 +10,23 @@ type ActionsProps = {
 
 export default function Actions({ character }: ActionsProps) {
   const { client } = useClient()
-  const { encounter } = useEncounter()
+  const { encounter, dispatchEncounter } = useEncounter()
 
   const spendShots = async () => {
-    console.log("character", character)
-    const response = await client.actCharacter(encounter, character, 3)
-    if (response.error) {
-      console.error("Error acting character:", response.error)
-    } else {
-      console.log("Character acted successfully:", response.data)
+    try {
+      const response = await client.actCharacter(encounter, character, 3)
+      if (response.data) {
+        const updatedEncounter: Encounter = response.data
+        dispatchEncounter({
+          type: FormActions.UPDATE,
+          name: "encounter",
+          value: updatedEncounter,
+        })
+      } else {
+        console.error("Error acting character: No data in response")
+      }
+    } catch (err) {
+      console.error("Error acting character:", err)
     }
   }
 

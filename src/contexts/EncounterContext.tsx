@@ -12,6 +12,12 @@ interface EncounterContextType {
   schticks: { [id: string]: Schtick }
   loading: boolean
   error: string | null
+  encounterState: any
+  dispatchEncounter: (action: any) => void
+  updateEncounter: (entity: any) => void
+  deleteEncounter: () => void
+  changeAndSaveEncounter: (field: string, value: any) => void
+  currentShot: number | undefined
 }
 
 const EncounterContext = createContext<EncounterContextType | undefined>(
@@ -19,7 +25,7 @@ const EncounterContext = createContext<EncounterContextType | undefined>(
 )
 
 type FormStateData = {
-  entity: Encounter | null
+  encounter: Encounter | null
   weapons: { [id: string]: Weapon }
   schticks: { [id: string]: Schtick }
 }
@@ -34,17 +40,17 @@ export function EncounterProvider({
   const { client } = useClient()
   const { formState: encounterState, dispatchForm: dispatchEncounter } =
     useForm<FormStateData>({
-      entity: encounter,
+      encounter,
       weapons: {},
       schticks: {},
     })
   const { loading, error, data } = encounterState
-  const { entity, weapons, schticks } = data
+  const { encounter: contextEncounter, weapons, schticks } = data
   const { deleteEntity, updateEntity, handleChangeAndSave } = useEntity(
     encounter,
     dispatchEncounter
   )
-  const currentShot = entity?.shots?.[0]?.shot
+  const currentShot = contextEncounter?.shots?.[0]?.shot
 
   useEffect(() => {
     async function fetchAssociations() {
@@ -54,7 +60,6 @@ export function EncounterProvider({
         value: true,
       })
       try {
-        // Collect unique weapon_ids and schtick_ids
         const weaponIds = new Set<string>()
         const schtickIds = new Set<string>()
         encounter.shots.forEach(shot => {
@@ -63,7 +68,6 @@ export function EncounterProvider({
             character.schtick_ids?.forEach(id => schtickIds.add(id))
           })
         })
-
         const [weaponsResponse, schticksResponse] = await Promise.all([
           weaponIds.size > 0
             ? client.getWeaponsBatch({
@@ -78,8 +82,6 @@ export function EncounterProvider({
               })
             : Promise.resolve({ data: [] }),
         ])
-
-        // Map to object for O(1) lookup
         const weaponsMap = weaponsResponse.data.weapons.reduce(
           (acc: { [id: string]: Weapon }, weapon: Weapon) => ({
             ...acc,
@@ -94,7 +96,6 @@ export function EncounterProvider({
           }),
           {}
         )
-
         dispatchEncounter({
           type: FormActions.UPDATE,
           name: "weapons",
@@ -125,7 +126,6 @@ export function EncounterProvider({
         })
       }
     }
-
     fetchAssociations()
   }, [client, encounter, dispatchEncounter])
 
@@ -134,7 +134,7 @@ export function EncounterProvider({
       value={{
         encounterState,
         dispatchEncounter,
-        encounter: entity,
+        encounter: contextEncounter,
         weapons,
         schticks,
         loading,

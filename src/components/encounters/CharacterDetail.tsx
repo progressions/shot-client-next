@@ -12,7 +12,12 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
   const { encounter, encounterState, dispatchEncounter } = useEncounter()
 
   return (
-    <motion.div key={character.shot_id} layout>
+    <motion.div
+      key={character.id}
+      layout
+      layoutId={`character-${character.id}`}
+      transition={{ duration: 0.75 }}
+    >
       <ListItem sx={{ alignItems: "flex-start" }}>
         <ListItemIcon>
           <Wounds character={character} />
