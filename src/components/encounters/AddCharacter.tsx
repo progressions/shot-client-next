@@ -38,8 +38,7 @@ export default function AddCharacter({
         alignItems="center"
         spacing={1}
       >
-        <CharacterFilter setEntity={setEntity} />
-        <AddButton onClick={handleAdd} disabled={!entity} />
+        <CharacterFilter entity={entity} setEntity={setEntity} handleAddCharacter={handleAdd} />
       </Stack>
     </DialogBox>
   )
