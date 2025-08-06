@@ -1,5 +1,8 @@
 import React from "react"
+import pluralize from "pluralize"
 import { Box, useTheme } from "@mui/material"
+import { IoIosClock } from "react-icons/io"
+import { GiMagicGate } from "react-icons/gi"
 import BoltIcon from "@mui/icons-material/Bolt"
 import { FaBolt } from "react-icons/fa"
 import { VscGithubAction } from "react-icons/vsc"
@@ -22,24 +25,26 @@ import { GiCharacter } from "react-icons/gi"
 
 // Define the keyword type
 type Keyword =
-  | "Fights"
-  | "Fighters"
+  | "Fight"
+  | "Fighter"
   | "Character"
-  | "Characters"
-  | "Parties"
-  | "Factions"
-  | "Schticks"
+  | "Party"
+  | "Faction"
+  | "Schtick"
+  | "Site"
+  | "Feng Shui Site"
   | "Description"
   | "Appearance"
-  | "Skills"
-  | "Vehicles"
-  | "Personal Details"
-  | "Action Values"
+  | "Skill"
+  | "Vehicle"
+  | "Personal Detail"
+  | "Action Value"
   | "Dress"
   | "Melodramatic Hook"
   | "Background"
-  | "Weapons"
-  | "Actions"
+  | "Weapon"
+  | "Action"
+  | "Juncture"
 
 // Define category type
 type Category =
@@ -52,91 +57,102 @@ type Category =
 
 // Map keywords to categories
 const categoryMap: Record<Keyword, Category> = {
-  Fights: "Combat",
-  Fighters: "Combat",
-  Schticks: "Combat",
-  "Action Values": "Combat",
-  Weapons: "Combat",
+  Fight: "Combat",
+  Fighter: "Combat",
+  Schtick: "Combat",
+  "Action Value": "Combat",
+  Weapon: "Combat",
+  Site: "Affiliations",
+  "Feng Shui Site": "Affiliations",
   Character: "Characters",
-  Characters: "Characters",
-  Parties: "Affiliations",
-  Factions: "Affiliations",
-  Junctures: "Affiliations",
+  Party: "Affiliations",
+  Faction: "Affiliations",
+  Juncture: "Affiliations",
   Description: "Details",
   Appearance: "Details",
-  "Personal Details": "Details",
+  "Personal Detail": "Details",
   Dress: "Details",
   "Melodramatic Hook": "Details",
-  Background: "Details",
-  Skills: "Utility",
-  Vehicles: "Utility",
-  Actions: "Interface",
+  Background: "Detail",
+  Skill: "Utility",
+  Vehicle: "Utility",
+  Action: "Interface",
 }
 
 // Map keywords to JSX icon elements
 const iconMap: Record<Keyword, React.ReactElement> = {
-  Fights: (
-    <Box>
+  Juncture: (
+    <Box component="span">
+      <IoIosClock />
+    </Box>
+  ),
+  Site: (
+    <Box component="span">
+      <GiMagicGate />
+    </Box>
+  ),
+  "Feng Shui Site": (
+    <Box component="span">
+      <GiMagicGate />
+    </Box>
+  ),
+  Fight: (
+    <Box component="span">
       <GiSpikyExplosion />
     </Box>
   ),
-  Fighters: (
-    <Box>
+  Fighter: (
+    <Box component="span">
       <GiSwordman />
     </Box>
   ),
   Character: (
-    <Box>
+    <Box component="span">
       <IoPeopleSharp />
     </Box>
   ),
-  Characters: (
-    <Box>
-      <GiCharacter />
-    </Box>
-  ),
-  Parties: <GroupIcon />,
-  Factions: <FlagIcon />,
-  Schticks: (
-    <Box>
+  Party: <GroupIcon />,
+  Faction: <FlagIcon />,
+  Schtick: (
+    <Box component="span">
       <VscGithubAction />
     </Box>
   ),
   Description: <DescriptionIcon />,
   Appearance: (
-    <Box>
+    <Box component="span">
       <MdFaceRetouchingNatural />
     </Box>
   ),
-  Skills: <BuildIcon />,
-  Vehicles: (
-    <Box>
+  Skill: <BuildIcon />,
+  Vehicle: (
+    <Box component="span">
       <FaCarCrash />
     </Box>
   ),
-  "Personal Details": <AssignmentIndIcon />,
-  "Action Values": (
-    <Box>
+  "Personal Detail": <AssignmentIndIcon />,
+  "Action Value": (
+    <Box component="span">
       <FaBolt />
     </Box>
   ),
   Dress: (
-    <Box>
+    <Box component="span">
       <GiClothes />
     </Box>
   ),
   "Melodramatic Hook": (
-    <Box>
+    <Box component="span">
       <GiDramaMasks />
     </Box>
   ),
   Background: <AutoStoriesIcon />,
-  Weapons: (
-    <Box>
+  Weapon: (
+    <Box component="span">
       <FaGun />
     </Box>
   ),
-  Actions: (
+  Action: (
     <Box component="span">
       <BoltIcon sx={{ fontSize: 36, "& .MuiSvgIcon-root": { fontSize: 36 } }} />
     </Box>
@@ -151,9 +167,10 @@ interface IconProps extends SvgIconProps {
 // Reusable Icon component that renders the icon with category-based colors
 export const Icon: React.FC<IconProps> = ({ size, keyword, ...props }) => {
   const theme = useTheme()
-  const iconElement = iconMap[keyword]
+  const singularKeyword = pluralize.singular(keyword) as Keyword
+  const iconElement = iconMap[singularKeyword]
   if (!iconElement) return null
-  const category = categoryMap[keyword]
+  const category = categoryMap[singularKeyword]
   const colorMap: Record<Category, { color: string; hoverColor: string }> = {
     Combat: {
       color: theme.palette.error.main,
