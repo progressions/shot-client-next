@@ -9,3 +9,4 @@ export { default as FactionPageClient } from "@/components/factions/FactionPageC
 export { default as SitesList } from "@/components/factions/SitesList"
 export { default as PartiesList } from "@/components/factions/PartiesList"
 export { default as JuncturesList } from "@/components/factions/JuncturesList"
+export { default as EditFaction } from "@/components/factions/EditFaction"

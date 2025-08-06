@@ -120,6 +120,7 @@ export function useEntity(
       ...entity,
       [event.target.name]: event.target.value,
     }
+    console.log("updatedEntity.faction_id", updatedEntity.faction_id)
     await updateEntity(updatedEntity)
   }
 

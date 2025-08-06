@@ -41,4 +41,3 @@ export { default as EditJuncture } from "@/components/characters/edit/EditJunctu
 export { default as EditWealth } from "@/components/characters/edit/EditWealth"
 export { default as SkillsManager } from "@/components/characters/edit/SkillsManager"
 export { default as DescriptionValue } from "@/components/characters/edit/DescriptionValue"
-export { default as EditFaction } from "@/components/characters/edit/EditFaction"

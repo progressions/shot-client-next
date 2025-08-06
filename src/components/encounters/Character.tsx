@@ -12,8 +12,7 @@ interface CharacterProps {
 export default function Character({ character }: CharacterProps) {
   const { encounterState } = useEncounter()
 
-  const handleClick = () => {
-  }
+  const handleClick = () => {}
 
   return (
     <Stack component="span" direction="row" spacing={1}>

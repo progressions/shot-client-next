@@ -25,9 +25,9 @@ import {
   EditArchetype,
   EditJuncture,
   EditWealth,
-  EditFaction,
   SkillsManager,
 } from "@/components/characters"
+import { EditFaction } from "@/components/factions"
 
 type EditCharacterProps = {
   character: Character

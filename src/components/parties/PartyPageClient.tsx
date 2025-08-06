@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useCallback, useEffect } from "react"
 import { Stack, Box } from "@mui/material"
 import type { Party } from "@/types"
 import { useCampaign } from "@/contexts"
