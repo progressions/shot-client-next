@@ -14,9 +14,9 @@ export default function Wounds({ character }: WoundsProps) {
   const wounds = CS.wounds(character)
 
   return (
-    <Stack direction="column" sx={{ backgroundColor: theme.palette.divider, width: { xs: "4.5rem", md: "5.5rem" }, textAlign: "center", mr: 2, py: 1, borderRadius: "8px", alignItems: "center" }}>
-      <Box sx={{fontSize: { xs: "1.5rem", md: "2rem" }, fontWeight: 800}}>{wounds}</Box>
-      <Box sx={{fontSize: { xs: "0.75rem", md: "1rem"}}}>Wounds</Box>
+    <Stack direction="column" sx={{ backgroundColor: theme.palette.divider, width: { xs: "3.5rem", md: "4.5rem" }, textAlign: "center", mr: 2, py: 1, borderRadius: "8px", alignItems: "center" }}>
+      <Box sx={{fontSize: { xs: "1.5rem", md: "1.75rem" }, fontWeight: 800}}>{wounds}</Box>
+      <Box sx={{fontSize: { xs: "0.75rem", md: "0.75rem"}}}>Wounds</Box>
     </Stack>
   )
 }

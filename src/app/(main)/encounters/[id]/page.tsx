@@ -1,4 +1,5 @@
 import { CircularProgress, Typography } from "@mui/material"
+import { EncounterProvider } from "@/contexts"
 import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Encounter } from "@/types"
@@ -34,7 +35,9 @@ export default async function EncounterPage({
     <>
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <Encounter encounter={encounter} initialIsMobile={initialIsMobile} />
+        <EncounterProvider encounter={encounter}>
+          <Encounter encounter={encounter} initialIsMobile={initialIsMobile} />
+        </EncounterProvider>
       </Suspense>
     </>
   )

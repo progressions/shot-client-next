@@ -14,23 +14,19 @@ import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import { Encounter } from "@/types"
 import { ShotCounter } from "@/components/encounters"
+import { useEncounter } from "@/contexts"
 
-interface EncounterProperties {
-  encounter: Encounter
-}
-
-export default function Encounter({
-  encounter: initialEncounter,
-}: EncounterProperties) {
+export default function Encounter() {
   const { campaignData } = useCampaign()
-  const { formState, dispatchForm } = useForm<Encounter>(initialEncounter)
-  const { errors, status, data: encounter } = formState
-  const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
-    encounter,
-    dispatchForm
-  )
+  const { dispatchEncounter, encounterState, encounter, weapons, schticks } = useEncounter()
+  const { saving, errors, status } = encounterState
 
   console.log("encounter", encounter)
+  console.log("weapons", weapons)
+
+  const deleteEntity = () => {}
+  const updateEntity = () => {}
+  const handleChangeAndSave = () => {}
 
   useEffect(() => {
     document.title = encounter.name ? `${encounter.name} - Chi War` : "Chi War"
@@ -39,25 +35,23 @@ export default function Encounter({
   useEffect(() => {
     if (
       campaignData?.encounter &&
-      campaignData.encounter.id === initialEncounter.id
+      campaignData.encounter.id === encounter.id
     ) {
-      dispatchForm({
+      dispatchEncounter({
         type: FormActions.EDIT,
         name: "data",
         value: campaignData.encounter,
       })
     }
-  }, [campaignData, initialEncounter, dispatchForm])
+  }, [campaignData, encounter, dispatchEncounter])
 
   const setEncounter = (updatedEncounter: Encounter) => {
-    dispatchForm({
+    dispatchEncounter({
       type: FormActions.EDIT,
       name: "data",
       value: updatedEncounter,
     })
   }
-
-  console.log("encounter", encounter)
 
   return (
     <Box
@@ -66,7 +60,6 @@ export default function Encounter({
         position: "relative",
       }}
     >
-      <SpeedDialMenu onDelete={deleteEntity} />
       <HeroImage
         entity={encounter}
         setEntity={setEncounter}

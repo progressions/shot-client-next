@@ -966,6 +966,24 @@ class Client {
     return this.delete(this.apiV2.factions(faction))
   }
 
+  async getWeaponsBatch(
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<WeaponsResponse>> {
+    return this.post(`${this.apiV2.weapons()}/batch`, {
+      ...parameters,
+    }, cacheOptions)
+  }
+
+  async getSchticksBatch(
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<SchticksResponse>> {
+    return this.post(`${this.apiV2.schticks()}/batch`, {
+      ...parameters,
+    }, cacheOptions)
+  }
+
   async getSchtickPaths(
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
