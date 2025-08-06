@@ -124,7 +124,7 @@ export default function WeaponPageClient({
       />
       <EditJunctureCategory
         weapon={weapon}
-        updateEntity={updateEntity}
+        updateWeapon={updateEntity}
         state={formState}
       />
     </Box>
