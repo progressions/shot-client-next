@@ -3,7 +3,7 @@ import { Stack, Container, Typography, Box, Avatar } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import type { Vehicle } from "@/types"
 import type { Metadata } from "next"
-import { VehicleName } from "@/components/vehicles"
+import { NotFound, VehicleName } from "@/components/vehicles"
 import { VS } from "@/services"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -63,18 +63,10 @@ export default async function VehiclePage({
 
   const { id } = await params
 
-  let vehicle: Vehicle | null = null
   try {
     const response = await client.getVehicle({ id })
-    vehicle = response.data
+    const vehicle = response.data
     console.log("vehicle data:", vehicle)
-  } catch (error) {
-    console.error("Fetch vehicle error:", error)
-  }
-
-  if (!vehicle?.id) {
-    return <VehicleNotFound />
-  }
 
   // Detect mobile device on the server
   // const headersState = await headers()
@@ -216,5 +208,8 @@ export default async function VehiclePage({
         </Stack>
       </Stack>
     </>
-  )
+  ) } catch (error) {
+    console.error("Fetch vehicle error:", error)
+    return <NotFound />
+  }
 }

@@ -2,7 +2,7 @@ import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Site } from "@/types"
-import { SitePageClient } from "@/components/sites"
+import { NotFound, SitePageClient } from "@/components/sites"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -35,6 +35,6 @@ export default async function SitePage({ params }: SitePageProperties) {
     )
   } catch (error) {
     console.error(error)
-    return <Typography>Site not found</Typography>
+    return <NotFound />
   }
 }

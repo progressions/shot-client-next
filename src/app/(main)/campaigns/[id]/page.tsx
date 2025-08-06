@@ -2,7 +2,7 @@ import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Campaign } from "@/types"
-import { CampaignPageClient } from "@/components/campaigns"
+import { NotFound, CampaignPageClient } from "@/components/campaigns"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import { Suspense } from "react"
 
@@ -38,6 +38,6 @@ export default async function CampaignPage({ params }: CampaignPageProperties) {
     )
   } catch (error) {
     console.error(error)
-    return <Typography>Campaign not found</Typography>
+    return <NotFound />
   }
 }

@@ -2,7 +2,7 @@ import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Juncture } from "@/types"
-import { JuncturePageClient } from "@/components/junctures"
+import { NotFound, JuncturePageClient } from "@/components/junctures"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -38,6 +38,6 @@ export default async function JuncturePage({ params }: JuncturePageProperties) {
     )
   } catch (error) {
     console.error(error)
-    return <Typography>Juncture not found</Typography>
+    return <NotFound />
   }
 }

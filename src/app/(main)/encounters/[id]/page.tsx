@@ -3,7 +3,7 @@ import { EncounterProvider } from "@/contexts"
 import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Encounter } from "@/types"
-import { Encounter } from "@/components/encounters"
+import { NotFound, Encounter } from "@/components/encounters"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -43,6 +43,6 @@ export default async function EncounterPage({
     )
   } catch (error) {
     console.error(error)
-    return <Typography>Encounter not found</Typography>
+    return <NotFound />
   }
 }

@@ -3,7 +3,7 @@ import { headers } from "next/headers"
 import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { User } from "@/types"
-import { UserPageClient } from "@/components/users"
+import { NotFound, UserPageClient } from "@/components/users"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -38,6 +38,6 @@ export default async function UserPage({ params }: UserPageProperties) {
     )
   } catch (error) {
     console.error(error)
-    return <Typography>User not found</Typography>
+    return <NotFound />
   }
 }

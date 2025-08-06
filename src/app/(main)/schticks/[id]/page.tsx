@@ -2,7 +2,7 @@ import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Schtick } from "@/types"
-import { SchtickPageClient } from "@/components/schticks"
+import { NotFound, SchtickPageClient } from "@/components/schticks"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -38,6 +38,6 @@ export default async function SchtickPage({ params }: SchtickPageProperties) {
     )
   } catch (error) {
     console.error(error)
-    return <Typography>Schtick not found</Typography>
+    return <NotFound />
   }
 }

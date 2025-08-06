@@ -2,7 +2,7 @@ import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Weapon } from "@/types"
-import { WeaponPageClient } from "@/components/weapons"
+import { NotFound, WeaponPageClient } from "@/components/weapons"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -35,6 +35,6 @@ export default async function WeaponPage({ params }: WeaponPageProperties) {
     )
   } catch (error) {
     console.error(error)
-    return <Typography>Weapon not found</Typography>
+    return <NotFound />
   }
 }

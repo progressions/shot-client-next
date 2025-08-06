@@ -2,7 +2,7 @@ import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Faction } from "@/types"
-import { FactionPageClient } from "@/components/factions"
+import { NotFound, FactionPageClient } from "@/components/factions"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import { Suspense } from "react"
 
@@ -38,6 +38,6 @@ export default async function FactionPage({ params }: FactionPageProperties) {
     )
   } catch (error) {
     console.error(error)
-    return <Typography>Faction not found</Typography>
+    return <NotFound />
   }
 }

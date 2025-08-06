@@ -2,7 +2,7 @@ import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Fight } from "@/types"
-import { FightPageClient } from "@/components/fights"
+import { NotFound, FightPageClient } from "@/components/fights"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -35,6 +35,6 @@ export default async function FightPage({ params }: FightPageProperties) {
     )
   } catch (error) {
     console.error(error)
-    return <Typography>Fight not found</Typography>
+    return <NotFound />
   }
 }
