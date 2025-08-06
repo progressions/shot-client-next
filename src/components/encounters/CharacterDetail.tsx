@@ -1,4 +1,4 @@
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 import type { Character } from "@/types"
 import { ListItemIcon, ListItemText, ListItem } from "@mui/material"
 import { CharacterHeader, Wounds, Character } from "@/components/encounters"

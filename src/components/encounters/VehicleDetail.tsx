@@ -1,4 +1,4 @@
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 import type { Vehicle } from "@/types"
 import { ListItemIcon, ListItemText, ListItem } from "@mui/material"
 import {
