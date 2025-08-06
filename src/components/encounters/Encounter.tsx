@@ -39,6 +39,7 @@ export default function Encounter() {
   }, [encounter.name])
 
   useEffect(() => {
+    console.log("campaignData", campaignData)
     if (campaignData?.encounter && campaignData.encounter.id === encounter.id) {
       dispatchEncounter({
         type: FormActions.UPDATE,

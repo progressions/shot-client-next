@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect } from "react"
 import type { Encounter, Weapon, Schtick } from "@/types"
 import { FormStateType, FormActions, useForm } from "@/reducers"
-import { useClient } from "@/contexts"
+import { useCampaign, useClient } from "@/contexts"
 import { useEntity } from "@/hooks"
 const EncounterContext = createContext<EncounterContextType | undefined>(
   undefined
@@ -37,6 +37,7 @@ export function EncounterProvider({
   children: React.ReactNode
 }) {
   const { client } = useClient()
+  const { campaignData } = useCampaign()
   const { formState: encounterState, dispatchForm: dispatchEncounter } =
     useForm<FormStateData>({
       encounter,
@@ -50,6 +51,17 @@ export function EncounterProvider({
     dispatchEncounter
   )
   const currentShot = contextEncounter?.shots?.[0]?.shot
+
+  useEffect(() => {
+    console.log("Received campaignData.encounter", campaignData?.encounter)
+    if (campaignData?.encounter && campaignData.encounter.id === encounter.id) {
+      dispatchEncounter({
+        type: FormActions.UPDATE,
+        name: "entity",
+        value: campaignData.encounter,
+      })
+    }
+  }, [campaignData, contextEncounter, dispatchEncounter])
 
   useEffect(() => {
     async function fetchAssociations() {
