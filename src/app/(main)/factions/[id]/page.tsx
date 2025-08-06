@@ -16,27 +16,27 @@ export default async function FactionPage({ params }: FactionPageProperties) {
   const user = await getUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
-  const response = await client.getFaction({ id })
-  const faction: Faction = response.data
+  try {
+    const response = await client.getFaction({ id })
+    const faction: Faction = response.data
 
-  if (!faction?.id) {
-    return <Typography>Faction not found</Typography>
-  }
+    // Detect mobile device on the server
+    const headersState = await headers()
+    const userAgent = headersState.get("user-agent") || ""
+    const initialIsMobile = /mobile/i.test(userAgent)
 
-  // Detect mobile device on the server
-  const headersState = await headers()
-  const userAgent = headersState.get("user-agent") || ""
-  const initialIsMobile = /mobile/i.test(userAgent)
-
-  return (
-    <>
-      <Breadcrumbs />
-      <Suspense fallback={<CircularProgress />}>
-        <FactionPageClient
-          faction={faction}
-          initialIsMobile={initialIsMobile}
-        />
-      </Suspense>
-    </>
-  )
+    return (
+      <>
+        <Breadcrumbs />
+        <Suspense fallback={<CircularProgress />}>
+          <FactionPageClient
+            faction={faction}
+            initialIsMobile={initialIsMobile}
+          />
+        </Suspense>
+      </>
+    ) } catch (error) {
+      console.error(error)
+      return <Typography>Faction not found</Typography>
+    }
 }

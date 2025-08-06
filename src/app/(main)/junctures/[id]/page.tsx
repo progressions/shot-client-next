@@ -16,12 +16,9 @@ export default async function JuncturePage({ params }: JuncturePageProperties) {
   const user = await getUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
+    try {
   const response = await client.getJuncture({ id })
   const juncture: Juncture = response.data
-
-  if (!juncture?.id) {
-    return <Typography>Juncture not found</Typography>
-  }
 
   // Detect mobile device on the server
   const headersState = await headers()
@@ -38,5 +35,8 @@ export default async function JuncturePage({ params }: JuncturePageProperties) {
         />
       </Suspense>
     </>
-  )
+  ) } catch (error) {
+    console.error(error)
+    return <Typography>Juncture not found</Typography>
+  }
 }

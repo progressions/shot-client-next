@@ -23,7 +23,7 @@ export default async function PartyPage({ params }: PartyPageProperties) {
     party = response.data
   } catch (error) {
     console.error("Error fetching party:", error)
-    redirect("/parties")
+    return <Typography>Party not found</Typography>
   }
 
   // Detect mobile device on the server

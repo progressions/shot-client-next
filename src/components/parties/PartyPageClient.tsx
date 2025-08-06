@@ -16,6 +16,7 @@ import {
 import { CharacterManager } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { FactionAutocomplete } from "@/components/autocomplete"
+import { EditFaction } from "@/components/factions"
 import { FormActions, useForm } from "@/reducers"
 
 interface PartyPageClientProperties {
@@ -86,16 +87,8 @@ export default function PartyPageClient({
         <SectionHeader title="Faction" icon={<Icon keyword="Factions" />}>
           A Party belongs to a Faction, which governs its aims and objectives.
         </SectionHeader>
-        <Box sx={{ width: 400, mt: 3, mb: 4 }}>
-          <FactionAutocomplete
-            value={party.faction_id}
-            onChange={faction =>
-              handleChangeAndSave({
-                target: { name: "faction_id", value: faction?.id || "" },
-              })
-            }
-            allowNone={true}
-          />
+        <Box sx={{ width: 400 }}>
+          <EditFaction entity={party} updateEntity={updateEntity} />
         </Box>
       </Box>
       <Box>

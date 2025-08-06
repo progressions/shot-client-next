@@ -126,7 +126,7 @@ export function EncounterProvider({
     }
 
     fetchAssociations()
-  }, [encounter, dispatchEncounter])
+  }, [client, encounter, dispatchEncounter])
 
   return (
     <EncounterContext.Provider

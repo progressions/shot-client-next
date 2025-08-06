@@ -16,12 +16,9 @@ export default async function SitePage({ params }: SitePageProperties) {
   const user = await getUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
+    try {
   const response = await client.getSite({ id })
   const site: Site = response.data
-
-  if (!site?.id) {
-    return <Typography>Site not found</Typography>
-  }
 
   // Detect mobile device on the server
   const headersState = await headers()
@@ -35,5 +32,8 @@ export default async function SitePage({ params }: SitePageProperties) {
         <SitePageClient site={site} initialIsMobile={initialIsMobile} />
       </Suspense>
     </>
-  )
+  ) } catch (error) {
+    console.error(error)
+    return <Typography>Site not found</Typography>
+  }
 }

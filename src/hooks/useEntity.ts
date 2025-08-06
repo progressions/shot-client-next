@@ -80,17 +80,18 @@ export function useEntity(
     }
   }
 
-  const deleteEntity = async () => {
+  const deleteEntity = async (params = {}) => {
     if (!entity?.id) return
     if (!confirm(`Are you sure you want to delete the entity: ${entity.name}?`))
       return
 
     try {
-      await client[deleteFunction](entity)
+      await client[deleteFunction](entity, params)
       redirect(`/${pluralName}`)
-    } catch (error_) {
-      console.error("Failed to delete entity:", error_)
+    } catch (error) {
+      console.error("Failed to delete entity:", error)
       toastError("Failed to delete entity.")
+      throw error
     }
   }
 

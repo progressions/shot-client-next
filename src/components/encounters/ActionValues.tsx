@@ -7,8 +7,6 @@ interface ActionValuesProps {
 }
 
 export default function ActionValues({ character }: ActionValuesProps) {
-  const actionValues = CS.actionValues(character)
-
   return (
     <Box component="span" sx={{ fontSize: { xs: "0.75rem", md: "1rem" } }}>
       <Stack component="span" direction="row" spacing={1}>

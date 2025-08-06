@@ -17,14 +17,11 @@ export default async function UserPage({ params }: UserPageProperties) {
   const currentUser = await getUser()
   if (!client || !currentUser) return <Typography>Not logged in</Typography>
 
+    try {
   const response = await client.getUser({ id })
   const user: User = response.data
 
   if (!currentUser.admin) redirect("/")
-
-  if (!user?.id) {
-    return <Typography>User not found</Typography>
-  }
 
   // Detect mobile device on the server
   const headersState = await headers()
@@ -38,5 +35,9 @@ export default async function UserPage({ params }: UserPageProperties) {
         <UserPageClient user={user} initialIsMobile={initialIsMobile} />
       </Suspense>
     </>
-  )
+  ) } catch (error) {
+    console.error(error)
+    return <Typography>User not found</Typography>
+  }
+
 }

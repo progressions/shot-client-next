@@ -16,12 +16,9 @@ export default async function FightPage({ params }: FightPageProperties) {
   const user = await getUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
+    try {
   const response = await client.getFight({ id })
   const fight: Fight = response.data
-
-  if (!fight?.id) {
-    return <Typography>Fight not found</Typography>
-  }
 
   // Detect mobile device on the server
   const headersState = await headers()
@@ -35,5 +32,8 @@ export default async function FightPage({ params }: FightPageProperties) {
         <FightPageClient fight={fight} initialIsMobile={initialIsMobile} />
       </Suspense>
     </>
-  )
+  ) } catch (error) {
+    console.error(error)
+    return <Typography>Fight not found</Typography>
+  }
 }

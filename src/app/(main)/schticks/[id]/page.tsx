@@ -16,12 +16,9 @@ export default async function SchtickPage({ params }: SchtickPageProperties) {
   const user = await getUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
+    try {
   const response = await client.getSchtick({ id })
   const schtick: Schtick = response.data
-
-  if (!schtick?.id) {
-    return <Typography>Schtick not found</Typography>
-  }
 
   // Detect mobile device on the server
   const headersState = await headers()
@@ -38,5 +35,8 @@ export default async function SchtickPage({ params }: SchtickPageProperties) {
         />
       </Suspense>
     </>
-  )
+  ) } catch (error) {
+    console.error(error)
+    return <Typography>Schtick not found</Typography>
+  }
 }

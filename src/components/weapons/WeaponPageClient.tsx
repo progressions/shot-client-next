@@ -7,7 +7,7 @@ import { FormControl, FormHelperText, Alert, Box } from "@mui/material"
 import type { Weapon } from "@/types"
 import { useCampaign } from "@/contexts"
 import { WeaponChips, Stats, EditJunctureCategory } from "@/components/weapons"
-import { useClient } from "@/contexts"
+import { useToast, useClient } from "@/contexts"
 import {
   SectionHeader,
   EditableRichText,
@@ -17,6 +17,32 @@ import {
 } from "@/components/ui"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
+
+export const junctureColors: Record<
+  string,
+  { main: string; rgb: string; contrastText: string }
+> = {
+  Past: {
+    main: "#6D28D9",
+    rgb: "rgb(109, 40, 217)",
+    contrastText: "#FFFFFF",
+  },
+  Modern: {
+    main: "#047857",
+    rgb: "rgb(4, 120, 87)",
+    contrastText: "#FFFFFF",
+  },
+  Ancient: {
+    main: "#B45309",
+    rgb: "rgb(180, 83, 9)",
+    contrastText: "#FFFFFF",
+  },
+  Future: {
+    main: "#1E40AF",
+    rgb: "rgb(30, 64, 175)",
+    contrastText: "#FFFFFF",
+  },
+}
 
 interface WeaponPageClientProperties {
   weapon: Weapon
@@ -31,18 +57,17 @@ export default function WeaponPageClient({
 }: WeaponPageClientProperties) {
   const { campaignData } = useCampaign()
   const { client } = useClient()
+  const { toastSuccess, toastError } = useToast()
   const { formState, dispatchForm } = useForm<FormStateData>({
     ...initialWeapon,
     image: null,
   })
   const { status, saving, errors = {} } = formState
   const weapon = formState.data
-  const { updateEntity, handleChangeAndSave } = useEntity<Weapon>(
+  const { deleteEntity, updateEntity, handleChangeAndSave } = useEntity<Weapon>(
     weapon,
     dispatchForm
   )
-
-  console.log("saving", saving)
 
   useEffect(() => {
     document.title = weapon.name ? `${weapon.name} - Chi War` : "Chi War"
@@ -59,17 +84,32 @@ export default function WeaponPageClient({
   }, [campaignData, initialWeapon, dispatchForm])
 
   const handleDelete = async () => {
-    if (!weapon?.id) return
-    if (!confirm(`Are you sure you want to delete the weapon: ${weapon.name}?`))
-      return
-
     try {
-      await client.deleteWeapon(weapon)
-      handleMenuClose()
-      redirect("/parties")
-    } catch (error_) {
-      console.error("Failed to delete weapon:", error_)
+      await deleteEntity()
+    } catch (error: AxiosError) {
+      if (error.response?.data?.errors?.carries) {
+        if (
+          confirm(
+            "This weapon is carried by one or more characters. Do you want to delete it anyway?"
+          )
+        ) {
+          try {
+            await deleteEntity({ force: true })
+            // onDelete(weapon.id)
+            // setError(null)
+            // toastSuccess("Weapon deleted successfully.")
+          } catch (forceError: unknown) {
+            console.error(forceError)
+            // setError("Failed to delete weapon.")
+            toastError("Failed to delete weapon.")
+          }
+        }
+      }
+
+      console.error("Delete weapon error:", error)
     }
+    // setError("Failed to delete weapon.")
+    toastError("Failed to delete weapon.")
   }
 
   const setWeapon = (updatedWeapon: Weapon) => {

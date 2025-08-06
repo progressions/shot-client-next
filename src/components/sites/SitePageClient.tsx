@@ -72,7 +72,7 @@ export default function SitePageClient({
       <HeroImage entity={site} setEntity={setSite} />
       <Alert status={status} />
       <FormControl fullWidth margin="normal" error={!!errors.name}>
-        <NameEditor entity={site} setEntity={setSite} editable={true} />
+        <NameEditor entity={site} setEntity={setSite} updateEntity={updateEntity} />
         {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
       </FormControl>
       <Box sx={{ mb: 4 }}>
