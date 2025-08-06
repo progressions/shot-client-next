@@ -1,5 +1,5 @@
-import { AppBar, Toolbar, Typography, List } from "@mui/material"
-import { ShotDetail } from "@/components/encounters"
+import { List } from "@mui/material"
+import { MenuBar, ShotDetail } from "@/components/encounters"
 import { useEncounter } from "@/contexts"
 
 export default function ShotCounter() {
@@ -7,11 +7,7 @@ export default function ShotCounter() {
 
   return (
     <>
-      <AppBar position="sticky" sx={{ top: 0, zIndex: 1100 }}>
-        <Toolbar>
-          <Typography variant="h6">Menu</Typography>
-        </Toolbar>
-      </AppBar>
+      <MenuBar />
       <List>
         {encounter.shots.map((shot, index) => (
           <ShotDetail key={`${shot.shot}-${index}`} shot={shot} />

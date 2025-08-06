@@ -33,7 +33,7 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
               backgroundColor: "background.paper", // Ensure visibility
             }}
           >
-            {shot.shot}
+            {shot.shot === null ? "Hidden" : `${shot.shot || "0"}`}
           </ListSubheader>
           {shot.characters.map((character: Character) => (
             <CharacterDetail

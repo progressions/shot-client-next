@@ -1,5 +1,7 @@
 import React from "react"
 import pluralize from "pluralize"
+import PersonAddIcon from "@mui/icons-material/PersonAdd"
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar"
 import { Box, useTheme } from "@mui/material"
 import { IoIosClock } from "react-icons/io"
 import { GiMagicGate } from "react-icons/gi"
@@ -44,6 +46,8 @@ type Keyword =
   | "Weapon"
   | "Action"
   | "Juncture"
+  | "Add Character"
+  | "Add Vehicle"
 
 // Define category type
 type Category =
@@ -76,6 +80,8 @@ const categoryMap: Record<Keyword, Category> = {
   Skill: "Utility",
   Vehicle: "Utility",
   Action: "Interface",
+  "Add Character": "Utility",
+  "Add Vehicle": "Utility",
 }
 
 // Map keywords to JSX icon elements
@@ -156,6 +162,16 @@ const iconMap: Record<Keyword, React.ReactElement> = {
       <BoltIcon sx={{ fontSize: 36, "& .MuiSvgIcon-root": { fontSize: 36 } }} />
     </Box>
   ),
+  "Add Character": (
+    <Box component="span">
+      <PersonAddIcon />
+    </Box>
+  ),
+  "Add Vehicle": (
+    <Box component="span">
+      <DirectionsCarIcon />
+    </Box>
+  ),
 }
 
 interface IconProps extends SvgIconProps {
@@ -202,11 +218,11 @@ export const Icon: React.FC<IconProps> = ({ size, keyword, ...props }) => {
     return React.cloneElement(iconElement, {
       ...props,
       sx: {
-        color,
+        color: props.color ? props.color : color, // Use provided color or category color
         fontSize: size ? size : 24, // Default size is 24 if not provided
         "& .MuiSvgIcon-root": {
           // Target nested SVG icons within Box
-          color,
+          color: props.color ? props.color : color,
           fontSize: size ? size : 24,
           "&:hover": {
             color: hoverColor,
