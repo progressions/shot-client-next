@@ -1,5 +1,4 @@
 "use client"
-
 import {
   useMemo,
   useEffect,
@@ -9,7 +8,7 @@ import {
   useCallback,
 } from "react"
 import { Subscription } from "@rails/actioncable"
-
+import isEqual from "lodash/isEqual"
 import type { CampaignCableData, Campaign } from "@/types"
 import { defaultCampaign } from "@/types"
 import { useClient, useLocalStorage } from "@/contexts"
@@ -40,16 +39,11 @@ export function CampaignProvider({ children }: CampaignProviderProperties) {
   const { user, client } = useClient()
   const { saveLocally, getLocally } = useLocalStorage()
   const consumer = useMemo(() => client.consumer(), [client])
-
   const [campaign, setCampaign] = useState<Campaign | null>(defaultCampaign)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
-  const [campaignData, setCampaignData] = useState<CampaignCableData | null>(
-    null
-  )
+  const [campaignData, setCampaignData] = useState<CampaignCableData | null>(null)
 
-  const setCurrentCampaign = async (
-    camp: Campaign | null
-  ): Promise<Campaign | null> => {
+  const setCurrentCampaign = async (camp: Campaign | null): Promise<Campaign | null> => {
     try {
       const response = await client.setCurrentCampaign(camp)
       const { data } = response || {}
@@ -62,8 +56,8 @@ export function CampaignProvider({ children }: CampaignProviderProperties) {
       return data
     } catch (error) {
       console.error(error)
+      return null
     }
-    return null
   }
 
   const getCurrentCampaign = useCallback(async (): Promise<Campaign | null> => {
@@ -83,19 +77,17 @@ export function CampaignProvider({ children }: CampaignProviderProperties) {
       return data
     } catch (error) {
       console.error(error)
+      return null
     }
-    return null
-  }, [client, user, setCampaign, getLocally])
+  }, [client, user?.id, getLocally])
 
   useEffect(() => {
     if (!user?.id) return
-
     getCurrentCampaign()
-  }, [user, getCurrentCampaign])
+  }, [user?.id, getCurrentCampaign])
 
   useEffect(() => {
     if (!user?.id || !campaign?.id) return
-
     console.log("about to subscribe to CampaignChannel", campaign.id)
     const sub = consumer.subscriptions.create(
       { channel: "CampaignChannel", id: campaign.id },
@@ -103,34 +95,43 @@ export function CampaignProvider({ children }: CampaignProviderProperties) {
         connected: () => console.log("Connected to CampaignChannel"),
         disconnected: () => console.log("Disconnected from CampaignChannel"),
         received: (data: CampaignCableData) => {
-          console.log("CampaignChannel data", data)
-          setCampaignData(data)
+          console.log("CampaignChannel data", {
+            encounterId: data?.encounter?.id,
+            shotCount: data?.encounter?.shots?.length,
+            updatedAt: data?.encounter?.updated_at,
+          })
+          if (data && !isEqual(data, campaignData)) {
+            setCampaignData(data)
+          } else {
+            console.log("Skipped redundant CampaignChannel data")
+          }
         },
       }
     )
-
     setSubscription(sub)
-
     return () => {
       sub.unsubscribe()
     }
-  }, [user, campaign, consumer])
+  }, [user?.id, campaign?.id, consumer, campaignData])
 
-  return (
-    <CampaignContext.Provider
-      value={{
-        campaign,
-        setCurrentCampaign,
-        getCurrentCampaign,
-        subscription,
-        campaignData,
-      }}
-    >
-      {children}
-    </CampaignContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      campaign,
+      setCurrentCampaign,
+      getCurrentCampaign,
+      subscription,
+      campaignData,
+    }),
+    [campaign, setCurrentCampaign, getCurrentCampaign, subscription, campaignData]
   )
+
+  return <CampaignContext.Provider value={contextValue}>{children}</CampaignContext.Provider>
 }
 
 export function useCampaign() {
-  return useContext(CampaignContext)
+  const context = useContext(CampaignContext)
+  if (!context) {
+    throw new Error("useCampaign must be used within a CampaignProvider")
+  }
+  return context
 }
