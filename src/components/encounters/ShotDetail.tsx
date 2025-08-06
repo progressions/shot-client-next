@@ -1,3 +1,4 @@
+import { motion } from "motion/react"
 import type { Character, Vehicle } from "@/types"
 import { ListSubheader, Box } from "@mui/material"
 import {
@@ -6,6 +7,7 @@ import {
   Character,
   Vehicle,
 } from "@/components/encounters"
+import { transition } from "@/components/encounters/Encounter"
 
 type ShotDetailProps = {
   shot: Shot
@@ -14,6 +16,12 @@ type ShotDetailProps = {
 export default function ShotDetail({ shot }: ShotDetailProps) {
   return (
     <Box>
+      <motion.div
+        key={`shot-${shot.shot}`}
+        layout
+        layoutId={`shot-${shot.shot}`}
+        transition={transition}
+        >
       <ListSubheader
         sx={{
           textAlign: "right",
@@ -25,6 +33,7 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
       >
         {shot.shot}
       </ListSubheader>
+    </motion.div>
       {shot.characters.map((character: Character) => (
         <CharacterDetail
           key={`${shot.shot}-character-${character.id}`}
