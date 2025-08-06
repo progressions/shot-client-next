@@ -18,15 +18,11 @@ import { useEncounter } from "@/contexts"
 
 export default function Encounter() {
   const { campaignData } = useCampaign()
-  const { dispatchEncounter, encounterState, encounter, weapons, schticks } = useEncounter()
+  const { dispatchEncounter, encounterState, encounter } = useEncounter()
   const { saving, errors, status } = encounterState
+  const { deleteEntity, updateEntity, handleChangeAndSave } = useEntity(encounter, dispatchEncounter)
 
   console.log("encounter", encounter)
-  console.log("weapons", weapons)
-
-  const deleteEntity = () => {}
-  const updateEntity = () => {}
-  const handleChangeAndSave = () => {}
 
   useEffect(() => {
     document.title = encounter.name ? `${encounter.name} - Chi War` : "Chi War"
@@ -38,8 +34,8 @@ export default function Encounter() {
       campaignData.encounter.id === encounter.id
     ) {
       dispatchEncounter({
-        type: FormActions.EDIT,
-        name: "data",
+        type: FormActions.UPDATE,
+        name: "entity",
         value: campaignData.encounter,
       })
     }
@@ -47,8 +43,8 @@ export default function Encounter() {
 
   const setEncounter = (updatedEncounter: Encounter) => {
     dispatchEncounter({
-      type: FormActions.EDIT,
-      name: "data",
+      type: FormActions.UPDATE,
+      name: "entity",
       value: updatedEncounter,
     })
   }

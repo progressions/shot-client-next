@@ -17,7 +17,7 @@ interface EncounterContextType {
 const EncounterContext = createContext<EncounterContextType | undefined>(undefined)
 
 type FormStateData = {
-  encounter: Encounter | null
+  entity: Encounter | null
   weapons: { [id: string]: Weapon }
   schticks: { [id: string]: Schtick }
 }
@@ -31,12 +31,12 @@ export function EncounterProvider({
 }) {
   const { client } = useClient()
   const { formState: encounterState, dispatchForm: dispatchEncounter } = useForm<FormStateData>({
-    encounter,
+    entity: encounter,
     weapons: {},
     schticks: {},
   })
   const { loading, error, data } = encounterState
-  const { encounter: contextEncounter, weapons, schticks } = data
+  const { entity, weapons, schticks } = data
 
   useEffect(() => {
     async function fetchAssociations() {
@@ -92,7 +92,7 @@ export function EncounterProvider({
   }, [encounter, dispatchEncounter])
 
   return (
-    <EncounterContext.Provider value={{ encounterState, dispatchEncounter, encounter: contextEncounter, weapons, schticks, loading, error }}>
+    <EncounterContext.Provider value={{ encounterState, dispatchEncounter, encounter: entity, weapons, schticks, loading, error }}>
       {children}
     </EncounterContext.Provider>
   )

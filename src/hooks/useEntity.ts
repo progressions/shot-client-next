@@ -4,6 +4,25 @@ import pluralize from "pluralize"
 import { redirect } from "next/navigation"
 import { FormActions } from "@/reducers"
 
+/*********
+ * expects a formState with the following structure:
+ *
+ * {
+ *   data: {
+ *     entity: Entity,
+ *     ...
+ *   },
+ *   loading: boolean,
+ *   errors: Record<string, string>,
+ *   status: {
+ *     severity: "error" | "success",
+ *     message: string
+ *   }
+ *    ...
+ *  }
+ *
+ *********/
+
 export function useEntity(
   entity: entity,
   dispatchForm: React.Dispatch<FormActions>
@@ -36,8 +55,8 @@ export function useEntity(
     dispatchForm({ type: FormActions.EDIT, name: "saving", value: true })
     try {
       dispatchForm({
-        type: FormActions.EDIT,
-        name: "data",
+        type: FormActions.UPDATE,
+        name: "entity",
         value: updatedEntity,
       })
       const formData = new FormData()
@@ -47,8 +66,8 @@ export function useEntity(
       formData.append(name, JSON.stringify(entityData))
       const response = await client[updateFunction](updatedEntity.id, formData)
       dispatchForm({
-        type: FormActions.EDIT,
-        name: "data",
+        type: FormActions.UPDATE,
+        name: "entity",
         value: response.data,
       })
       dispatchForm({ type: FormActions.SUCCESS })
