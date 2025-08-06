@@ -2,24 +2,9 @@
 
 import { createContext, useContext, useEffect } from "react"
 import type { Encounter, Weapon, Schtick } from "@/types"
-import { FormActions, useForm } from "@/reducers"
+import { FormStateType, FormActions, useForm } from "@/reducers"
 import { useClient } from "@/contexts"
 import { useEntity } from "@/hooks"
-
-interface EncounterContextType {
-  encounter: Encounter | null
-  weapons: { [id: string]: Weapon }
-  schticks: { [id: string]: Schtick }
-  loading: boolean
-  error: string | null
-  encounterState: any
-  dispatchEncounter: (action: any) => void
-  updateEncounter: (entity: any) => void
-  deleteEncounter: () => void
-  changeAndSaveEncounter: (field: string, value: any) => void
-  currentShot: number | undefined
-}
-
 const EncounterContext = createContext<EncounterContextType | undefined>(
   undefined
 )
@@ -28,6 +13,20 @@ type FormStateData = {
   encounter: Encounter | null
   weapons: { [id: string]: Weapon }
   schticks: { [id: string]: Schtick }
+}
+
+interface EncounterContextType {
+  encounter: Encounter | null
+  weapons: { [id: string]: Weapon }
+  schticks: { [id: string]: Schtick }
+  loading: boolean
+  error: string | null
+  encounterState: FormStateType<FormStateData>
+  dispatchEncounter: React.Dispatch<FormActions>
+  updateEncounter: (entity: Encounter) => void
+  deleteEncounter: () => void
+  changeAndSaveEncounter: (event: React.ChangeEvent<HTMLInputElement>) => void
+  currentShot: number | undefined
 }
 
 export function EncounterProvider({
