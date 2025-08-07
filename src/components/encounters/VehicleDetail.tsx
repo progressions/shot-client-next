@@ -15,9 +15,9 @@ type VehicleDetailProps = {
 export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
   return (
     <motion.div
-      key={vehicle.shot_id}
+      key={`${vehicle.id}-${vehicle.shot_id}`}
       layout
-      layoutId={`vehicle-${vehicle.id}`}
+      layoutId={`vehicle-${vehicle.id}-${vehicle.shot_id}`}
       transition={encounterTransition}
     >
       <ListItem sx={{ alignItems: "flex-start" }}>
