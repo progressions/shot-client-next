@@ -11,9 +11,9 @@ type CharacterDetailProps = {
 export default function CharacterDetail({ character }: CharacterDetailProps) {
   return (
     <motion.div
-      key={character.id}
+      key={`${character.id}-${character.shot_id}`}
       layout
-      layoutId={`character-${character.id}`}
+      layoutId={`character-${character.id}-${character.shot_id}`}
       transition={encounterTransition}
     >
       <ListItem sx={{ alignItems: "flex-start" }}>
