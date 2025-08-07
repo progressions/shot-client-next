@@ -46,7 +46,7 @@ export default function CharacterFilter({
     archetype: null,
     characters: [],
     factions: [],
-    selectedChild: null,
+    selectedChild: value,
   })
   const {
     character_type,
@@ -140,7 +140,7 @@ export default function CharacterFilter({
       name: "selectedChild",
       value: character,
     })
-    setSelectedChild(character)
+    setSelectedChild?.(character)
   }
 
   const handleFactionChange = (value: string | null) => {
@@ -254,7 +254,7 @@ export default function CharacterFilter({
             allowNone={false}
           />
         )}
-        <AddButton onClick={handleAddMember} disabled={!selectedChild} />
+        {!omit.includes("add") && <AddButton onClick={handleAddMember} disabled={!selectedChild} />}
       </Stack>
     </Box>
   )
