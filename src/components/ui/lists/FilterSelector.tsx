@@ -68,10 +68,7 @@ export function FilterSelector({
       />
     ),
     schticks: (
-      <SchtickFilter
-        setEntity={setSelectedChild}
-        exclude={collectionIds}
-      />
+      <SchtickFilter setEntity={setSelectedChild} exclude={collectionIds} />
     ),
     players: (
       <UserAutocomplete

@@ -1,6 +1,5 @@
 "use client"
 
-import PersonAddIcon from "@mui/icons-material/PersonAdd"
 import { Box, Stack } from "@mui/material"
 import pluralize from "pluralize"
 import { useCallback, useEffect } from "react"
@@ -10,7 +9,6 @@ import { FormActions, useForm } from "@/reducers"
 import {
   FilterSelector,
   BadgeList,
-  Button,
   ManageButton,
   SectionHeader,
   AddButton,
@@ -237,7 +235,7 @@ export function ListManager({
               collectionIds={collectionIds}
               collectionName={collectionName}
             />
-            { !["characters"].includes(collectionName) && (
+            {!["characters"].includes(collectionName) && (
               <AddButton onClick={handleAddMember} disabled={!selectedChild} />
             )}
           </Stack>

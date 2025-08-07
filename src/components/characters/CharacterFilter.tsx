@@ -254,7 +254,7 @@ export default function CharacterFilter({
             allowNone={false}
           />
         )}
-      <AddButton onClick={handleAddMember} disabled={!selectedChild} />
+        <AddButton onClick={handleAddMember} disabled={!selectedChild} />
       </Stack>
     </Box>
   )
