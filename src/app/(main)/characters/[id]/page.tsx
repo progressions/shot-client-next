@@ -1,28 +1,12 @@
 import { redirect } from "next/navigation"
-import { CircularProgress, Container, Typography, Box } from "@mui/material"
+import { CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import type { Character } from "@/types"
 import type { Metadata } from "next"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import { Suspense } from "react"
-import { EditCharacter } from "@/components/characters"
+import { NotFound, EditCharacter } from "@/components/characters"
 import { headers } from "next/headers"
-
-// Component for character not found
-function CharacterNotFound() {
-  return (
-    <Container maxWidth="md" sx={{ mt: 4 }}>
-      <Box sx={{ bgcolor: "#424242", p: 2, borderRadius: 1 }}>
-        <Typography variant="h4" sx={{ color: "#ffffff", mb: 2 }}>
-          Character Not Found
-        </Typography>
-        <Typography variant="body1" sx={{ color: "#ffffff" }}>
-          The character you’re looking for does not exist or is not accessible.
-        </Typography>
-      </Box>
-    </Container>
-  )
-}
 
 // Dynamically generate metadata for the page title
 export async function generateMetadata({
@@ -64,32 +48,28 @@ export default async function CharacterPage({
 
   const { id } = await params
 
-  let character: Character | null = null
   try {
     const response = await client.getCharacter({ id })
-    character = response.data
+    const character = response.data
+
+    // Detect mobile device on the server
+    const headersState = await headers()
+    const userAgent = headersState.get("user-agent") || ""
+    const initialIsMobile = /mobile/i.test(userAgent)
+
+    return (
+      <>
+        <Breadcrumbs />
+        <Suspense fallback={<CircularProgress />}>
+          <EditCharacter
+            character={character}
+            initialIsMobile={initialIsMobile}
+          />
+        </Suspense>
+      </>
+    )
   } catch (error) {
-    console.error("Fetch character error:", error)
+    console.error(error)
+    return <NotFound />
   }
-
-  if (!character?.id) {
-    return <CharacterNotFound />
-  }
-
-  // Detect mobile device on the server
-  const headersState = await headers()
-  const userAgent = headersState.get("user-agent") || ""
-  const initialIsMobile = /mobile/i.test(userAgent)
-
-  return (
-    <>
-      <Breadcrumbs />
-      <Suspense fallback={<CircularProgress />}>
-        <EditCharacter
-          character={character}
-          initialIsMobile={initialIsMobile}
-        />
-      </Suspense>
-    </>
-  )
 }

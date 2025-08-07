@@ -1,7 +1,6 @@
 import {
   BaseEntity,
   Advancement,
-  ShotType,
   FightEvent,
   Character,
   Invitation,
@@ -123,7 +122,6 @@ export interface Fight extends BaseEntity {
   effects: Effect[]
   characters?: Character[]
   vehicles?: Vehicle[]
-  shot_order: ShotType[]
   character_effects: CharacterEffects
   vehicle_effects: CharacterEffects
   created_at: string
@@ -206,7 +204,6 @@ export interface Vehicle extends BaseEntity {
   id: string
   name: string
   active: boolean
-  current_shot?: number | string
   impairments: number
   color: string
   action_values: ActionValues | VehicleActionValues
@@ -241,7 +238,6 @@ export interface Person extends BaseEntity {
   id: string
   name: string
   active: boolean
-  current_shot?: number | string
   impairments: number
   color: string
   faction_id: string | null
@@ -260,7 +256,6 @@ export interface Person extends BaseEntity {
   new?: boolean
   category: CharacterCategory
   count: number
-  shot_id: string
   driver?: Character
   location?: string
   image_url: string

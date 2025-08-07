@@ -4,6 +4,25 @@ import pluralize from "pluralize"
 import { redirect } from "next/navigation"
 import { FormActions } from "@/reducers"
 
+/*********
+ * expects a formState with the following structure:
+ *
+ * {
+ *   data: {
+ *     entity: Entity,
+ *     ...
+ *   },
+ *   loading: boolean,
+ *   errors: Record<string, string>,
+ *   status: {
+ *     severity: "error" | "success",
+ *     message: string
+ *   }
+ *    ...
+ *  }
+ *
+ *********/
+
 export function useEntity(
   entity: entity,
   dispatchForm: React.Dispatch<FormActions>
@@ -36,8 +55,8 @@ export function useEntity(
     dispatchForm({ type: FormActions.EDIT, name: "saving", value: true })
     try {
       dispatchForm({
-        type: FormActions.EDIT,
-        name: "data",
+        type: FormActions.UPDATE,
+        name: "entity",
         value: updatedEntity,
       })
       const formData = new FormData()
@@ -47,8 +66,8 @@ export function useEntity(
       formData.append(name, JSON.stringify(entityData))
       const response = await client[updateFunction](updatedEntity.id, formData)
       dispatchForm({
-        type: FormActions.EDIT,
-        name: "data",
+        type: FormActions.UPDATE,
+        name: "entity",
         value: response.data,
       })
       dispatchForm({ type: FormActions.SUCCESS })
@@ -61,17 +80,18 @@ export function useEntity(
     }
   }
 
-  const deleteEntity = async () => {
+  const deleteEntity = async (params = {}) => {
     if (!entity?.id) return
     if (!confirm(`Are you sure you want to delete the entity: ${entity.name}?`))
       return
 
     try {
-      await client[deleteFunction](entity)
+      await client[deleteFunction](entity, params)
       redirect(`/${pluralName}`)
-    } catch (error_) {
-      console.error("Failed to delete entity:", error_)
+    } catch (error) {
+      console.error("Failed to delete entity:", error)
       toastError("Failed to delete entity.")
+      throw error
     }
   }
 
@@ -101,6 +121,7 @@ export function useEntity(
       ...entity,
       [event.target.name]: event.target.value,
     }
+    console.log("updatedEntity.faction_id", updatedEntity.faction_id)
     await updateEntity(updatedEntity)
   }
 

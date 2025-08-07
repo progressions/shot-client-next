@@ -3,19 +3,24 @@
 import { Link } from "@mui/material"
 import { useState, MouseEvent } from "react"
 import { Popup } from "@/components/popups"
+import { Icon } from "@/components/ui"
 
 type InfoLinkProperties = {
   info: string
+  keyword?: string
   data?: string | object
   href?: string
   disablePopup?: boolean
+  disableIcon?: boolean
 }
 
 export default function InfoLink({
   info,
   data,
+  keyword = info,
   href,
   disablePopup = false,
+  disableIcon = false,
 }: InfoLinkProperties) {
   const [anchorEl, setAnchorEl] = useState<HTMLAnchorElement | null>(null)
 
@@ -46,13 +51,14 @@ export default function InfoLink({
         }}
         onClick={!disablePopup ? handleClick : undefined}
       >
+        {!disableIcon && <Icon keyword={keyword} size={16} sx={{ mr: 0.5 }} />}
         {info}
       </Link>
       <Popup
         handleClose={handleClose}
         anchorEl={anchorEl}
         open={open}
-        keyword={info}
+        keyword={keyword}
       />
     </>
   )

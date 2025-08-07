@@ -10,7 +10,13 @@ import {
   Alert,
   IconButton,
 } from "@mui/material"
-import { InfoLink, HeroImage, TextField, SaveButton, CancelButton } from "@/components/ui"
+import {
+  InfoLink,
+  HeroImage,
+  TextField,
+  SaveButton,
+  CancelButton,
+} from "@/components/ui"
 import type { EditorChangeEvent, Weapon } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"

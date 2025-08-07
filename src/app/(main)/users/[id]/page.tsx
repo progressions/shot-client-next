@@ -3,7 +3,7 @@ import { headers } from "next/headers"
 import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { User } from "@/types"
-import { UserPageClient } from "@/components/users"
+import { NotFound, UserPageClient } from "@/components/users"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -17,26 +17,27 @@ export default async function UserPage({ params }: UserPageProperties) {
   const currentUser = await getUser()
   if (!client || !currentUser) return <Typography>Not logged in</Typography>
 
-  const response = await client.getUser({ id })
-  const user: User = response.data
+  try {
+    const response = await client.getUser({ id })
+    const user: User = response.data
 
-  if (!currentUser.admin) redirect("/")
+    if (!currentUser.admin) redirect("/")
 
-  if (!user?.id) {
-    return <Typography>User not found</Typography>
+    // Detect mobile device on the server
+    const headersState = await headers()
+    const userAgent = headersState.get("user-agent") || ""
+    const initialIsMobile = /mobile/i.test(userAgent)
+
+    return (
+      <>
+        <Breadcrumbs />
+        <Suspense fallback={<CircularProgress />}>
+          <UserPageClient user={user} initialIsMobile={initialIsMobile} />
+        </Suspense>
+      </>
+    )
+  } catch (error) {
+    console.error(error)
+    return <NotFound />
   }
-
-  // Detect mobile device on the server
-  const headersState = await headers()
-  const userAgent = headersState.get("user-agent") || ""
-  const initialIsMobile = /mobile/i.test(userAgent)
-
-  return (
-    <>
-      <Breadcrumbs />
-      <Suspense fallback={<CircularProgress />}>
-        <UserPageClient user={user} initialIsMobile={initialIsMobile} />
-      </Suspense>
-    </>
-  )
 }

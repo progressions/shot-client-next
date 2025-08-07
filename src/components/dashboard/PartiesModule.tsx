@@ -10,7 +10,10 @@ type PartiesModuleProperties = {
   size: "small" | "medium" | "large"
 }
 
-export default function PartiesModule({ parties, size = "medium" }: PartiesModuleProperties) {
+export default function PartiesModule({
+  parties,
+  size = "medium",
+}: PartiesModuleProperties) {
   const sizeMap = {
     small: "sm",
     medium: "md",

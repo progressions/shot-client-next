@@ -2,7 +2,7 @@ import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Weapon } from "@/types"
-import { WeaponPageClient } from "@/components/weapons"
+import { NotFound, WeaponPageClient } from "@/components/weapons"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -16,24 +16,25 @@ export default async function WeaponPage({ params }: WeaponPageProperties) {
   const user = await getUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
-  const response = await client.getWeapon({ id })
-  const weapon: Weapon = response.data
+  try {
+    const response = await client.getWeapon({ id })
+    const weapon: Weapon = response.data
 
-  if (!weapon?.id) {
-    return <Typography>Weapon not found</Typography>
+    // Detect mobile device on the server
+    const headersState = await headers()
+    const userAgent = headersState.get("user-agent") || ""
+    const initialIsMobile = /mobile/i.test(userAgent)
+
+    return (
+      <>
+        <Breadcrumbs />
+        <Suspense fallback={<CircularProgress />}>
+          <WeaponPageClient weapon={weapon} initialIsMobile={initialIsMobile} />
+        </Suspense>
+      </>
+    )
+  } catch (error) {
+    console.error(error)
+    return <NotFound />
   }
-
-  // Detect mobile device on the server
-  const headersState = await headers()
-  const userAgent = headersState.get("user-agent") || ""
-  const initialIsMobile = /mobile/i.test(userAgent)
-
-  return (
-    <>
-      <Breadcrumbs />
-      <Suspense fallback={<CircularProgress />}>
-        <WeaponPageClient weapon={weapon} initialIsMobile={initialIsMobile} />
-      </Suspense>
-    </>
-  )
 }

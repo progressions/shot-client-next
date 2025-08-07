@@ -10,12 +10,15 @@ type FightsModuleProperties = {
   size: "small" | "medium" | "large"
 }
 
-export default function FightsModule({ fights, size = "medium" }: FightsModuleProperties) {
-    const sizeMap = {
-      small: "sm",
-      medium: "md",
-      large: "lg",
-    }
+export default function FightsModule({
+  fights,
+  size = "medium",
+}: FightsModuleProperties) {
+  const sizeMap = {
+    small: "sm",
+    medium: "md",
+    large: "lg",
+  }
   const abbrevSize = sizeMap[size] || "md"
   return (
     <Box

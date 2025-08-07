@@ -1,8 +1,7 @@
 import { Box, Typography } from "@mui/material"
 import type { Fight } from "@/types"
 import { FightName } from "@/components/fights"
-import { UserName } from "@/components/users"
-import { JoinFightButton, StartFightButton } from "@/components/ui"
+import { JoinFightButton } from "@/components/ui"
 import { RichTextRenderer } from "@/components/editor"
 
 type FightProperties = {

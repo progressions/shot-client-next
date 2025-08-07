@@ -8,14 +8,17 @@ type PlayersModuleProperties = {
   size?: "small" | "medium" | "large"
 }
 
-export default function PlayersModule({ players, size = "medium" }: PlayersModuleProperties) {
+export default function PlayersModule({
+  players,
+  size = "medium",
+}: PlayersModuleProperties) {
   const sizeMap = {
     small: "sm",
     medium: "md",
     large: "lg",
   }
   const abbrevSize = sizeMap[size] || "md"
-  
+
   return (
     <Box
       sx={{

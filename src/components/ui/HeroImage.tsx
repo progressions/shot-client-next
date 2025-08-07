@@ -7,8 +7,9 @@ import { PositionableImage } from "@/components/ui"
 type HeroImageProps = {
   entity: Entity
   setEntity: (entity: Entity) => void
-  pageContext: "index" | "entity"
+  pageContext: "index" | "entity" | "play" | "edit"
   positionable?: boolean
+  height?: number
 }
 
 export function HeroImage({
@@ -16,6 +17,7 @@ export function HeroImage({
   setEntity,
   pageContext = "entity",
   positionable = true,
+  height = 300,
 }: HeroImageProps) {
   if (positionable) {
     return (
@@ -23,7 +25,7 @@ export function HeroImage({
         entity={entity}
         setEntity={setEntity}
         pageContext={pageContext}
-        height={500}
+        height={height}
       />
     )
   }
@@ -34,7 +36,7 @@ export function HeroImage({
         sx={{
           border: "1px dashed",
           width: "100%",
-          height: "300px",
+          height: `${height}px`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -50,7 +52,7 @@ export function HeroImage({
       alt={entity.name}
       sx={{
         width: "100%",
-        height: "300px",
+        height: `${height}px`,
         objectFit: "cover",
         objectPosition: "50% 20%",
         mb: 2,

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useCallback, useEffect } from "react"
 import { Stack, Box } from "@mui/material"
 import type { Faction } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
@@ -31,8 +31,8 @@ export default function FactionPageClient({
   const setFaction = useCallback(
     (faction: Faction) => {
       dispatchForm({
-        type: FormActions.EDIT,
-        name: "data",
+        type: FormActions.UPDATE,
+        name: "entity",
         value: faction,
       })
     },

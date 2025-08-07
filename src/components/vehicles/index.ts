@@ -11,3 +11,4 @@ export { default as VehiclesTableBody } from "@/components/vehicles/table/Vehicl
 export { default as VehiclesPagination } from "@/components/vehicles/table/VehiclesPagination"
 export { default as VehiclesMenu } from "@/components/vehicles/table/VehiclesMenu"
 export { default as VehicleManager } from "@/components/vehicles/VehicleManager"
+export { default as NotFound } from "@/components/vehicles/NotFound"

@@ -1,5 +1,11 @@
 import React from "react"
+import pluralize from "pluralize"
+import PersonAddIcon from "@mui/icons-material/PersonAdd"
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar"
 import { Box, useTheme } from "@mui/material"
+import { IoIosClock } from "react-icons/io"
+import { GiMagicGate } from "react-icons/gi"
+import BoltIcon from "@mui/icons-material/Bolt"
 import { FaBolt } from "react-icons/fa"
 import { VscGithubAction } from "react-icons/vsc"
 import { FaGun } from "react-icons/fa6"
@@ -17,128 +23,169 @@ import GroupIcon from "@mui/icons-material/Group"
 import FlagIcon from "@mui/icons-material/Flag"
 import DescriptionIcon from "@mui/icons-material/Description"
 import BuildIcon from "@mui/icons-material/Build"
-import { GiCharacter } from "react-icons/gi"
 
 // Define the keyword type
 type Keyword =
-  | "Fights"
-  | "Fighters"
+  | "Fight"
+  | "Fighter"
   | "Character"
-  | "Characters"
-  | "Parties"
-  | "Factions"
-  | "Schticks"
+  | "Party"
+  | "Faction"
+  | "Schtick"
+  | "Site"
+  | "Feng Shui Site"
   | "Description"
   | "Appearance"
-  | "Skills"
-  | "Vehicles"
-  | "Personal Details"
-  | "Action Values"
+  | "Skill"
+  | "Vehicle"
+  | "Personal Detail"
+  | "Action Value"
   | "Dress"
   | "Melodramatic Hook"
   | "Background"
-  | "Weapons"
+  | "Weapon"
+  | "Action"
+  | "Juncture"
+  | "Add Character"
+  | "Add Vehicle"
 
 // Define category type
-type Category = "Combat" | "Characters" | "Affiliations" | "Details" | "Utility"
+type Category =
+  | "Combat"
+  | "Characters"
+  | "Affiliations"
+  | "Details"
+  | "Utility"
+  | "Interface"
 
 // Map keywords to categories
 const categoryMap: Record<Keyword, Category> = {
-  Fights: "Combat",
-  Fighters: "Combat",
-  Schticks: "Combat",
-  "Action Values": "Combat",
-  Weapons: "Combat",
+  Fight: "Combat",
+  Fighter: "Combat",
+  Schtick: "Combat",
+  "Action Value": "Combat",
+  Weapon: "Combat",
+  Site: "Affiliations",
+  "Feng Shui Site": "Affiliations",
   Character: "Characters",
-  Characters: "Characters",
-  Parties: "Affiliations",
-  Factions: "Affiliations",
-  Junctures: "Affiliations",
+  Party: "Affiliations",
+  Faction: "Affiliations",
+  Juncture: "Affiliations",
   Description: "Details",
   Appearance: "Details",
-  "Personal Details": "Details",
+  "Personal Detail": "Details",
   Dress: "Details",
   "Melodramatic Hook": "Details",
   Background: "Details",
-  Skills: "Utility",
-  Vehicles: "Utility",
+  Skill: "Utility",
+  Vehicle: "Utility",
+  Action: "Interface",
+  "Add Character": "Utility",
+  "Add Vehicle": "Utility",
 }
 
 // Map keywords to JSX icon elements
 const iconMap: Record<Keyword, React.ReactElement> = {
-  Fights: (
-    <Box>
+  Juncture: (
+    <Box component="span">
+      <IoIosClock />
+    </Box>
+  ),
+  Site: (
+    <Box component="span">
+      <GiMagicGate />
+    </Box>
+  ),
+  "Feng Shui Site": (
+    <Box component="span">
+      <GiMagicGate />
+    </Box>
+  ),
+  Fight: (
+    <Box component="span">
       <GiSpikyExplosion />
     </Box>
   ),
-  Fighters: (
-    <Box>
+  Fighter: (
+    <Box component="span">
       <GiSwordman />
     </Box>
   ),
   Character: (
-    <Box>
+    <Box component="span">
       <IoPeopleSharp />
     </Box>
   ),
-  Characters: (
-    <Box>
-      <GiCharacter />
-    </Box>
-  ),
-  Parties: <GroupIcon />,
-  Factions: <FlagIcon />,
-  Schticks: (
-    <Box>
+  Party: <GroupIcon />,
+  Faction: <FlagIcon />,
+  Schtick: (
+    <Box component="span">
       <VscGithubAction />
     </Box>
   ),
   Description: <DescriptionIcon />,
   Appearance: (
-    <Box>
+    <Box component="span">
       <MdFaceRetouchingNatural />
     </Box>
   ),
-  Skills: <BuildIcon />,
-  Vehicles: (
-    <Box>
+  Skill: <BuildIcon />,
+  Vehicle: (
+    <Box component="span">
       <FaCarCrash />
     </Box>
   ),
-  "Personal Details": <AssignmentIndIcon />,
-  "Action Values": (
-    <Box>
+  "Personal Detail": <AssignmentIndIcon />,
+  "Action Value": (
+    <Box component="span">
       <FaBolt />
     </Box>
   ),
   Dress: (
-    <Box>
+    <Box component="span">
       <GiClothes />
     </Box>
   ),
   "Melodramatic Hook": (
-    <Box>
+    <Box component="span">
       <GiDramaMasks />
     </Box>
   ),
   Background: <AutoStoriesIcon />,
-  Weapons: (
-    <Box>
+  Weapon: (
+    <Box component="span">
       <FaGun />
+    </Box>
+  ),
+  Action: (
+    <Box component="span">
+      <BoltIcon sx={{ fontSize: 36, "& .MuiSvgIcon-root": { fontSize: 36 } }} />
+    </Box>
+  ),
+  "Add Character": (
+    <Box component="span">
+      <PersonAddIcon />
+    </Box>
+  ),
+  "Add Vehicle": (
+    <Box component="span">
+      <DirectionsCarIcon />
     </Box>
   ),
 }
 
 interface IconProps extends SvgIconProps {
   keyword: Keyword
+  size?: number
 }
 
 // Reusable Icon component that renders the icon with category-based colors
-export const Icon: React.FC<IconProps> = ({ keyword, ...props }) => {
+export const Icon: React.FC<IconProps> = ({ size, keyword, ...props }) => {
   const theme = useTheme()
-  const iconElement = iconMap[keyword]
+  const singularKeyword = pluralize.singular(keyword) as Keyword
+  const iconElement = iconMap[singularKeyword]
   if (!iconElement) return null
-  const category = categoryMap[keyword]
+  const category = categoryMap[singularKeyword]
   const colorMap: Record<Category, { color: string; hoverColor: string }> = {
     Combat: {
       color: theme.palette.error.main,
@@ -160,25 +207,34 @@ export const Icon: React.FC<IconProps> = ({ keyword, ...props }) => {
       color: theme.palette.primary.main,
       hoverColor: theme.palette.primary.dark,
     },
-  }
-  const { color, hoverColor } = colorMap[category]
-  // Clone the icon element to apply category-based colors and additional props
-  return React.cloneElement(iconElement, {
-    ...props,
-    sx: {
-      color,
-      fontSize: 24, // Default size to match iconMap sizes
-      "& .MuiSvgIcon-root": {
-        // Target nested SVG icons within Box
-        color,
-        fontSize: 20,
-        "&:hover": {
-          color: hoverColor,
-        },
-      },
-      ...props.sx,
+    Interface: {
+      color: theme.palette.primary.main,
+      hoverColor: theme.palette.primary.dark,
     },
-  })
+  }
+  try {
+    const { color, hoverColor } = colorMap[category]
+    // Clone the icon element to apply category-based colors and additional props
+    return React.cloneElement(iconElement, {
+      ...props,
+      sx: {
+        color: props.color ? props.color : color, // Use provided color or category color
+        fontSize: size ? size : 24, // Default size is 24 if not provided
+        "& .MuiSvgIcon-root": {
+          // Target nested SVG icons within Box
+          color: props.color ? props.color : color,
+          fontSize: size ? size : 24,
+          "&:hover": {
+            color: hoverColor,
+          },
+        },
+        ...props.sx,
+      },
+    })
+  } catch (error) {
+    console.error("Error rendering icon:", error)
+    return null
+  }
 }
 
 // Export categoryMap for use in parent components

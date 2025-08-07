@@ -5,7 +5,7 @@ import { useState } from "react"
 import { FactionAutocomplete } from "@/components/autocomplete"
 
 type EditFactionProps = {
-  type: string
+  entity: Entity
   updateEntity: (entity: Entity) => void
 }
 

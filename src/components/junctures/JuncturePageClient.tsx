@@ -1,29 +1,53 @@
 "use client"
 
-import { redirect } from "next/navigation"
-import { useState, useEffect } from "react"
-import { Stack, Alert, Typography, Box } from "@mui/material"
+import { useCallback, useEffect } from "react"
+import { Stack, Box } from "@mui/material"
 import type { Juncture } from "@/types"
-import { RichTextRenderer } from "@/components/editor"
 import { useCampaign } from "@/contexts"
-import { EditJunctureForm } from "@/components/junctures"
-import { useClient } from "@/contexts"
-import { InfoLink, HeroImage, SpeedDialMenu } from "@/components/ui"
+import {
+  HeroImage,
+  SpeedDialMenu,
+  SectionHeader,
+  EditableRichText,
+  NameEditor,
+  InfoLink,
+  Icon,
+} from "@/components/ui"
 import { CharacterManager } from "@/components/characters"
+import { useEntity } from "@/hooks"
+import { EditFaction } from "@/components/factions"
+import { FormActions, useForm } from "@/reducers"
 
 interface JuncturePageClientProperties {
   juncture: Juncture
+}
+
+type FormStateData = Juncture & {
+  image?: File | null
 }
 
 export default function JuncturePageClient({
   juncture: initialJuncture,
 }: JuncturePageClientProperties) {
   const { campaignData } = useCampaign()
-  const { client } = useClient()
+  const { formState, dispatchForm } = useForm<FormStateData>(initialJuncture)
+  const juncture = formState.data
 
-  const [juncture, setJuncture] = useState<Juncture>(initialJuncture)
-  const [editOpen, setEditOpen] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
+    juncture,
+    dispatchForm
+  )
+
+  const setJuncture = useCallback(
+    (juncture: Juncture) => {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "entity",
+        value: juncture,
+      })
+    },
+    [dispatchForm]
+  )
 
   useEffect(() => {
     document.title = juncture.name ? `${juncture.name} - Chi War` : "Chi War"
@@ -36,43 +60,9 @@ export default function JuncturePageClient({
     ) {
       setJuncture(campaignData.juncture)
     }
-  }, [campaignData, initialJuncture])
+  }, [campaignData, initialJuncture, setJuncture])
 
-  async function updateJuncture(junctureId: string, formData: FormData) {
-    try {
-      const response = await client.updateJuncture(junctureId, formData)
-      setJuncture(response.data)
-    } catch (error) {
-      console.error("Error updating juncture:", error)
-      throw error
-    }
-  }
-
-  const handleSave = async () => {
-    setEditOpen(false)
-  }
-
-  const handleDelete = async () => {
-    if (!juncture?.id) return
-    if (
-      !confirm(
-        `Are you sure you want to delete the juncture: ${juncture.name}?`
-      )
-    )
-      return
-
-    try {
-      await client.deleteJuncture(juncture)
-      redirect("/junctures")
-    } catch (error_) {
-      console.error("Failed to delete juncture:", error_)
-      setError("Failed to delete juncture.")
-    }
-  }
-
-  const replaceJuncture = (updatedJuncture: Juncture) => {
-    setJuncture(updatedJuncture)
-  }
+  console.log("juncture.faction_id", juncture.faction_id)
 
   return (
     <Box
@@ -81,7 +71,8 @@ export default function JuncturePageClient({
         position: "relative",
       }}
     >
-      <SpeedDialMenu onEdit={() => setEditOpen(true)} onDelete={handleDelete} />
+      <SpeedDialMenu onDelete={deleteEntity} />
+      <HeroImage entity={juncture} setEntity={setJuncture} />
       <Box
         sx={{
           display: "flex",
@@ -90,21 +81,42 @@ export default function JuncturePageClient({
           mb: 1,
         }}
       >
-        <Typography variant="h4">{juncture.name}</Typography>
+        <NameEditor
+          entity={juncture}
+          setEntity={setJuncture}
+          updateEntity={updateEntity}
+        />
       </Box>
-      <HeroImage entity={juncture} setEntity={setJuncture} />
-      <Box sx={{ p: 2, backgroundColor: "#2e2e2e", borderRadius: 1, my: 2 }}>
-        <RichTextRenderer
-          key={juncture.description}
-          html={juncture.description || ""}
-          sx={{ mb: 2 }}
+      <Box sx={{ mb: 2 }}>
+        <SectionHeader title="Faction" icon={<Icon keyword="Factions" />}>
+          A <InfoLink href="/junctures" info="Juncture" /> belongs to a{" "}
+          <InfoLink href="/factions" info="Faction" />, which controls its most
+          powerful <InfoLink href="/sites" info="Feng Shui Sites" />.
+        </SectionHeader>
+        <Box sx={{ width: 400, mt: 3, mb: 4 }}>
+          <EditFaction entity={juncture} updateEntity={updateEntity} />
+        </Box>
+      </Box>
+      <Box>
+        <SectionHeader
+          title="Description"
+          icon={<Icon keyword="Description" />}
+        />
+        <EditableRichText
+          name="description"
+          html={juncture.description}
+          editable={true}
+          onChange={handleChangeAndSave}
+          fallback="No description available."
         />
       </Box>
 
       <Stack direction="column" spacing={2}>
         <CharacterManager
+          icon={<Icon keyword="Fighters" />}
           name="juncture"
           title="Juncture Natives"
+          entity={juncture}
           description={
             <>
               <InfoLink href="/characters" info="Characters" /> born into a
@@ -114,26 +126,9 @@ export default function JuncturePageClient({
               shaping its outcomes.
             </>
           }
-          entity={juncture}
-          characters={juncture.characters}
-          character_ids={juncture.character_ids}
-          update={updateJuncture}
-          setEntity={replaceJuncture}
+          updateEntity={updateEntity}
         />
       </Stack>
-
-      <EditJunctureForm
-        key={JSON.stringify(juncture)}
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        onSave={handleSave}
-        juncture={juncture}
-      />
-      {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
-      )}
     </Box>
   )
 }

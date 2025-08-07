@@ -1,6 +1,7 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios"
 import { Api, ApiV2, queryParams } from "@/lib"
 import type {
+  Encounter,
   ImagePosition,
   NotionPage,
   Location,
@@ -73,6 +74,10 @@ class Client {
     const websocketUrl = this.api.cable(this.jwt)
     this.consumerInstance = createConsumer(websocketUrl)
     return this.consumerInstance
+  }
+
+  async getEncounter(fight?: Fight | ID): Promise<AxiosResponse<Encounter>> {
+    return this.get(this.apiV2.encounters(fight), {}, { cache: "no-store" })
   }
 
   async createImagePosition(
@@ -475,21 +480,17 @@ class Client {
     return this.post(`${this.api.characters(null, character)}/sync`)
   }
 
-  async actCharacter(
-    character: Character,
+  async spendShots(
     fight: Fight,
-    shots: number
-  ): Promise<AxiosResponse<Character>> {
-    return this.patch(
-      this.api.actCharacter(fight, { id: character.id } as Character),
-      {
-        character: {
-          id: character.id,
-          shot_id: character.shot_id,
-        } as Character,
-        shots: shots,
-      }
-    )
+    entity: Entity,
+    shots: number,
+    actionId?: string
+  ): Promise<AxiosResponse<Encounter>> {
+    return this.patch(`${this.apiV2.encounters()}/${fight.id}/act`, {
+      shot_id: entity.shot_id,
+      shots: shots,
+      action_id: actionId,
+    })
   }
 
   async hideCharacter(
@@ -959,6 +960,32 @@ class Client {
 
   async deleteFaction(faction: Faction | ID): Promise<AxiosResponse<void>> {
     return this.delete(this.apiV2.factions(faction))
+  }
+
+  async getWeaponsBatch(
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<WeaponsResponse>> {
+    return this.post(
+      `${this.apiV2.weapons()}/batch`,
+      {
+        ...parameters,
+      },
+      cacheOptions
+    )
+  }
+
+  async getSchticksBatch(
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<SchticksResponse>> {
+    return this.post(
+      `${this.apiV2.schticks()}/batch`,
+      {
+        ...parameters,
+      },
+      cacheOptions
+    )
   }
 
   async getSchtickPaths(
