@@ -104,7 +104,7 @@ export function CampaignProvider({ children }: CampaignProviderProperties) {
             shotCount: data?.encounter?.shots?.length,
             updatedAt: data?.encounter?.updated_at,
           })
-          if (data && !isEqual(data, campaignData)) {
+          if (data) {
             setCampaignData(data)
           } else {
             console.log("Skipped redundant CampaignChannel data")

@@ -29,8 +29,10 @@ import { CharacterManager } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
-type FormStateData = Fight & {
-  image?: File | null
+type FormStateData = {
+  entity: Fight & {
+    image?: File | null
+  }
 }
 
 interface FightPageClientProperties {
@@ -42,10 +44,11 @@ export default function FightPageClient({
 }: FightPageClientProperties) {
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
-    ...initialFight,
+    entity: initialFight,
     errors: {},
   })
-  const { errors, status, data: fight } = formState
+  const { errors, status, data } = formState
+  const fight = data.entity
   const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
     fight,
     dispatchForm
@@ -56,11 +59,13 @@ export default function FightPageClient({
   }, [fight.name])
 
   useEffect(() => {
+    console.log("got campaignData", campaignData)
     if (campaignData?.fight && campaignData.fight.id === initialFight.id) {
+      console.log("campaignData.fight", campaignData.fight)
       dispatchForm({
         type: FormActions.UPDATE,
         name: "entity",
-        value: campaignData.fight,
+        value: { ...campaignData.fight },
       })
     }
   }, [campaignData, initialFight, dispatchForm])
@@ -89,6 +94,8 @@ export default function FightPageClient({
   const handleJoinFight = () => {
     console.log("Join fight clicked")
   }
+
+  console.log("fight.image_url", fight.image_url)
 
   return (
     <Box

@@ -24,7 +24,7 @@ interface UploadImageDialogProps {
   onClose: () => void
   title: string
   entity: Entity
-  setEntity?(entity: Entity): void
+  setEntity?: (entity: Entity) => void
 }
 
 type FormStateData = {

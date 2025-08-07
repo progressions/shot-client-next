@@ -1,3 +1,5 @@
+"use client"
+
 import { useToast, useClient } from "@/contexts"
 import type { Entity } from "@/types"
 import pluralize from "pluralize"
@@ -24,7 +26,7 @@ import { FormActions } from "@/reducers"
  *********/
 
 export function useEntity(
-  entity: entity,
+  entity: Entity,
   dispatchForm: React.Dispatch<FormActions>
 ) {
   const { client } = useClient()
@@ -57,7 +59,7 @@ export function useEntity(
       dispatchForm({
         type: FormActions.UPDATE,
         name: "entity",
-        value: updatedEntity,
+        value: { ...updatedEntity },
       })
       const formData = new FormData()
       const entityData = {
