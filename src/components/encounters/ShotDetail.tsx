@@ -29,7 +29,7 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
           </ListSubheader>
           {shot.characters.map((character: Character) => (
             <CharacterDetail
-              key={`${shot.shot}-character-${character.id}`}
+              key={`fred-${shot.shot}-character-${character.shot_id}`}
               character={character}
             />
           ))}
