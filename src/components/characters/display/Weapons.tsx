@@ -15,7 +15,7 @@ export default function Weapons({
   return (
     <ListManager
       icon={<Icon keyword="Weapons" />}
-      entity={character}
+      parent={character}
       name="weapons"
       title="Weapons"
       description={
@@ -28,8 +28,8 @@ export default function Weapons({
           is average, and 12 and above is getting serious.
         </>
       }
-      updateEntity={updateCharacter}
-      collection="weapons"
+      updateParent={updateCharacter}
+      collectionName="weapons"
       collection_ids="weapon_ids"
       manage={true}
     />

@@ -14,8 +14,8 @@ export default function PartiesList({
 }: PartiesListProperties) {
   return (
     <ListManager
-      entity={entity}
-      collection="parties"
+      parent={entity}
+      collectionName="parties"
       collection_ids="party_ids"
       title="Parties"
       description={
@@ -26,7 +26,7 @@ export default function PartiesList({
           <InfoLink info="Chi War" />.
         </>
       }
-      updateEntity={updateEntity}
+      updateParent={updateEntity}
     />
   )
 }

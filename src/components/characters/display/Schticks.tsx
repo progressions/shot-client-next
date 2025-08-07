@@ -15,7 +15,7 @@ export default function Schticks({
   return (
     <ListManager
       icon={<Icon keyword="Schticks" />}
-      entity={character}
+      parent={character}
       name="schticks"
       title="Schticks"
       description={
@@ -25,8 +25,8 @@ export default function Schticks({
           <InfoLink info="Magic" /> spells.
         </>
       }
-      updateEntity={updateCharacter}
-      collection="schticks"
+      updateParent={updateCharacter}
+      collectionName="schticks"
       collection_ids="schtick_ids"
       manage={true}
     />

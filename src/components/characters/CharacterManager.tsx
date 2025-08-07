@@ -21,11 +21,11 @@ export default function CharacterManager({
   return (
     <ListManager
       icon={icon}
-      entity={entity}
+      parent={entity}
       title={title}
       description={description}
-      updateEntity={updateEntity}
-      collection="characters"
+      updateParent={updateEntity}
+      collectionName="characters"
       collection_ids="character_ids"
       manage={true}
     />

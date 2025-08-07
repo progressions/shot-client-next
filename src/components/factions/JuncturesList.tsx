@@ -15,9 +15,9 @@ export default function JuncturesList({
   return (
     <ListManager
       icon={<Icon keyword="Junctures" />}
-      entity={entity}
+      parent={entity}
       name="junctures"
-      collection="junctures"
+      collectionName="junctures"
       collection_ids="juncture_ids"
       title="Junctures"
       description={
@@ -29,7 +29,7 @@ export default function JuncturesList({
           whether it&rsquo;s friendly or hostile to <InfoLink info="Magic" />.
         </>
       }
-      updateEntity={updateEntity}
+      updateParent={updateEntity}
     />
   )
 }

@@ -17,7 +17,7 @@ export default function SitesList({
     <Box>
       <ListManager
         icon={<Icon keyword="Sites" />}
-        entity={character}
+        parent={character}
         name="Character"
         title="Feng Shui Sites"
         description={
@@ -27,8 +27,8 @@ export default function SitesList({
             <InfoLink href="/chi" info="Chi" />, increasing his power.
           </>
         }
-        updateEntity={updateCharacter}
-        collection="sites"
+        updateParent={updateCharacter}
+        collectionName="sites"
         collection_ids="site_ids"
         manage={true}
       />

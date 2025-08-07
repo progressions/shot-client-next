@@ -14,8 +14,8 @@ export default function SitesList({
 }: SitesListProperties) {
   return (
     <ListManager
-      entity={entity}
-      collection="sites"
+      parent={entity}
+      collectionName="sites"
       collection_ids="site_ids"
       title="Feng Shui Sites"
       description={
@@ -25,7 +25,7 @@ export default function SitesList({
           <InfoLink href="/chi" info="Chi" /> to its members.
         </>
       }
-      updateEntity={updateEntity}
+      updateParent={updateEntity}
     />
   )
 }

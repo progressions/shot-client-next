@@ -20,8 +20,8 @@ export default function FightBadge({
       size={size}
       title={<FightLink fight={fight} />}
     >
-      {fight.actors.length === 0 && "No fighters yet!"}
-      {fight.actors.slice(0, 3).map((character, index) => (
+      {fight.characters.length === 0 && "No fighters yet!"}
+      {fight.characters.slice(0, 3).map((character, index) => (
         <span key={`fight-actor-${character.id}-${index}`}>
           {index > 0 && ", "}
           <CharacterLink character={character} />

@@ -24,9 +24,9 @@ export default function MembersList({ site, setSite }: MembersListProperties) {
 
   return (
     <ListManager
-      entity={site}
+      parent={site}
       name="Site"
-      collection="characters"
+      collectionName="characters"
       collection_ids="character_ids"
       title="Site Members"
       description={
@@ -36,7 +36,7 @@ export default function MembersList({ site, setSite }: MembersListProperties) {
           <InfoLink info="Attuned" /> to it.{" "}
         </>
       }
-      updateEntity={update}
+      updateParent={update}
     />
   )
 }

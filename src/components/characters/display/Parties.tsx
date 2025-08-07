@@ -17,7 +17,7 @@ export default function Parties({
     <Box>
       <ListManager
         icon={<Icon keyword="Parties" />}
-        entity={character}
+        parent={character}
         name="Character"
         title="Parties"
         description={
@@ -28,8 +28,8 @@ export default function Parties({
             <InfoLink info="Chi War" />
           </>
         }
-        updateEntity={updateCharacter}
-        collection="parties"
+        updateParent={updateCharacter}
+        collectionName="parties"
         collection_ids="party_ids"
         manage={true}
       />

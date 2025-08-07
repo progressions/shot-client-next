@@ -27,9 +27,9 @@ export default function MembersList({
 
   return (
     <ListManager
-      entity={campaign}
+      parent={campaign}
       name="Campaign"
-      collection="players"
+      collectionName="players"
       collection_ids="player_ids"
       title="Campaign Members"
       description={
@@ -39,7 +39,7 @@ export default function MembersList({
           the <InfoLink info="Chi War" />.
         </>
       }
-      updateEntity={update}
+      updateParent={update}
     />
   )
 }

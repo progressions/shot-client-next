@@ -107,11 +107,11 @@ export default function FightDetail({
         <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 2 }}>
           <Icon keyword="Characters" />{" "}
           <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
-            {fight.actors && fight.actors.length > 0
-              ? fight.actors.map((actor, index) => (
+            {fight.characters && fight.characters.length > 0
+              ? fight.characters.map((actor, index) => (
                   <span key={`${actor.id}-${index}`}>
                     <CharacterLink character={actor} />
-                    {index < fight.actors.length - 1 && ", "}
+                    {index < fight.characters.length - 1 && ", "}
                   </span>
                 ))
               : "No fighters yet!"}

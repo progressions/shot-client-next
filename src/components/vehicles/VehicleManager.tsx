@@ -20,11 +20,11 @@ export default function VehicleManager({
   return (
     <ListManager
       icon={icon}
-      entity={entity}
+      parent={entity}
       title={title}
       description={description}
-      updateEntity={updateEntity}
-      collection="vehicles"
+      updateParent={updateEntity}
+      collectionName="vehicles"
       collection_ids="vehicle_ids"
       manage={true}
     />

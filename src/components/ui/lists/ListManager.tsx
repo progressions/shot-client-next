@@ -1,13 +1,5 @@
 "use client"
 
-import {
-  UserAutocomplete,
-  VehicleAutocomplete,
-  PartyAutocomplete,
-  JunctureAutocomplete,
-  SiteAutocomplete,
-  FactionAutocomplete,
-} from "@/components/autocomplete"
 import PersonAddIcon from "@mui/icons-material/PersonAdd"
 import { Box, Stack } from "@mui/material"
 import pluralize from "pluralize"
@@ -15,85 +7,77 @@ import { useCallback, useEffect } from "react"
 import type { Entity } from "@/types"
 import { useClient } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
-import { SchtickFilter } from "@/components/schticks"
-import { WeaponFilter } from "@/components/weapons"
-import { CharacterFilter } from "@/components/characters"
-import { BadgeList, Button, ManageButton, SectionHeader } from "@/components/ui"
+import { FilterSelector, BadgeList, Button, ManageButton, SectionHeader } from "@/components/ui"
 import { paginateArray } from "@/lib"
 
 type FormStateData = {
+  parentEntity: Entity  // the parent entity which owns the children being managed
   page: number
   open: boolean
-  selectedEntity: Entity | null
-  collectionItems: Entity[]
+  selectedChild: Entity | null
+  childItems: Entity[]
 }
 
 type ListManagerProperties = {
   icon: React.ReactNode
-  entity: Entity
+  parent: Entity
   title: string
   description: React.ReactNode
-  updateEntity: (id: string, formData: FormData) => Promise<void>
-  collection: string // plural, the property on the entity that holds the collection, e.g. "characters", "vehicles"
-  collection_ids: string[] // plural, the property on the entity that holds the ids of the collection, e.g. "character_ids", "vehicle_ids"
+  updateParent: (id: string, formData: FormData) => Promise<void>
+  collectionName: string // plural, the property on the entity that holds the collection, e.g. "characters", "vehicles"
   manage?: boolean
 }
 
 export function ListManager({
   icon,
-  entity: initialEntity,
+  parent: initialParent,
   title,
   description,
-  collection,
-  collection_ids,
+  collectionName,
   manage = true,
-  updateEntity,
+  updateParent,
 }: ListManagerProperties) {
   const { client } = useClient()
 
   //********
   //
-  // collectionItems: the set of items, such as Schtick[], from 'character.schticks'
-  // selectedEntity: the entity selected from the autocomplete, such as Schtick
+  // childItems: the set of items, such as Schtick[], from 'character.schticks'
+  // selectedChild: the entity selected from the autocomplete, such as Schtick
   // id: the id of the selected entity, such as Schtick.id
   //
   //********
   //
   const initialData = {
-    entity: initialEntity,
-    selectedEntity: null,
+    parentEntity: initialParent,
+    selectedChild: null,
     page: 1,
     open: false,
   }
   const { formState, dispatchForm } = useForm<FormStateData>(initialData)
-  const { entity, page, open, selectedEntity } = formState.data
-  const collectionItems = entity[collection] || []
-  const collectionIds = entity[collection_ids] || []
-  const { items, meta } = paginateArray<Entity>(collectionItems, page, 5)
-  const id = selectedEntity?.id
+  const { parentEntity, page, open, selectedChild } = formState.data
+  const childItems = parentEntity[collectionName] || []
+  const collectionIdsName = pluralize.singular(collectionName) + "_ids"
+  const collectionIds = parentEntity[collectionIdsName] || []
+  const { items, meta } = paginateArray<Entity>(childItems, page, 5)
+  const id = selectedChild?.id
 
-  const getFunc = `get${collection.charAt(0).toUpperCase() + collection.slice(1)}`
+  const getFunc = `get${collectionName.charAt(0).toUpperCase() + collectionName.slice(1)}`
   const singularEntityName = pluralize
-    .singular(entity.entity_class)
+    .singular(parentEntity.entity_class)
     .toLowerCase()
-  // const singularCollectionName = pluralize.singular(collection).toLowerCase()
-  // const collectionIdsName = pluralize.singular(collection_ids).toLowerCase()
+  // const singularCollectionName = pluralize.singular(collectionName).toLowerCase()
+  // const collectionIdsName = pluralize.singular(collectionIdsName).toLowerCase()
 
   const fetchCollection = useCallback(async () => {
     try {
-      console.log({
-        [`${singularEntityName}_id`]: entity.id,
-      })
-      console.log("fetching", collection, entity.id)
       const response = await client[getFunc]({
-        [`${singularEntityName}_id`]: entity.id,
+        [`${singularEntityName}_id`]: parentEntity.id,
         per_page: 100,
         sort: "name",
         order: "asc",
       })
-      console.log(`fetched ${collection}:`, response.data)
 
-      const newCollection = response.data[collection] || []
+      const newCollection = response.data[collectionName] || []
       const newCollectionIds =
         newCollection.map((item: Entity) => item.id) || []
 
@@ -105,104 +89,31 @@ export function ListManager({
 
       dispatchForm({
         type: FormActions.UPDATE,
-        name: "entity",
+        name: "parentEntity",
         value: {
-          ...entity,
-          [collection]: newCollection,
-          [collection_ids]: newCollectionIds,
+          ...parentEntity,
+          [collectionName]: newCollection,
+          [collectionIdsName]: newCollectionIds,
         },
       })
     } catch (error) {
-      console.error(`Error fetching ${collection}:`, error)
+      console.error(`Error fetching ${collectionName}:`, error)
     }
-  }, [entity, collection, client, getFunc, dispatchForm])
+  }, [parentEntity, collectionName, client, getFunc, dispatchForm])
 
   useEffect(() => {
     // when the component first loads, fetch the collection items from the
-    // server and store them in 'entity'
+    // server and store them in 'parentEntity'
     fetchCollection()
-  }, [entity.id, page])
+  }, [parentEntity.id, page])
 
-  // TODO: Characters list isn't working right
-
-  const handleAutocompleteChange = (entity: Entity | null) => {
-    console.log("ListManager handleAutocompleteChange", entity)
+  const handleAutocompleteChange = (child: Entity | null) => {
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "selectedEntity",
-      value: entity,
+      name: "selectedChild",
+      value: child,
     })
   }
-
-  const autocompleteMap: Record<string, React.ReactNode> = {
-    actors: <CharacterFilter setEntity={handleAutocompleteChange} />,
-    characters: <CharacterFilter setEntity={handleAutocompleteChange} />,
-    vehicles: (
-      <VehicleAutocomplete
-        value={id || ""}
-        onChange={handleAutocompleteChange}
-        exclude={collectionIds}
-        allowNone={false}
-      />
-    ),
-    parties: (
-      <PartyAutocomplete
-        value={id || ""}
-        onChange={handleAutocompleteChange}
-        exclude={collectionIds}
-        allowNone={false}
-      />
-    ),
-    junctures: (
-      <JunctureAutocomplete
-        value={id || ""}
-        onChange={handleAutocompleteChange}
-        exclude={collectionIds}
-        allowNone={false}
-      />
-    ),
-    sites: (
-      <SiteAutocomplete
-        value={id || ""}
-        onChange={handleAutocompleteChange}
-        exclude={collectionIds}
-        allowNone={false}
-      />
-    ),
-    weapons: <WeaponFilter setEntity={handleAutocompleteChange} />,
-    factions: (
-      <FactionAutocomplete
-        value={id || ""}
-        onChange={handleAutocompleteChange}
-        exclude={collectionIds}
-        allowNone={false}
-      />
-    ),
-    schticks: (
-      <SchtickFilter
-        setEntity={handleAutocompleteChange}
-        exclude={collectionIds}
-      />
-    ),
-    players: (
-      <UserAutocomplete
-        value={id || ""}
-        onChange={handleAutocompleteChange}
-        exclude={collectionIds}
-        allowNone={false}
-      />
-    ),
-    users: (
-      <UserAutocomplete
-        value={id || ""}
-        onChange={handleAutocompleteChange}
-        exclude={collectionIds}
-        allowNone={false}
-      />
-    ),
-  }
-
-  const autocomplete = autocompleteMap[collection]
 
   if (!manage)
     return (
@@ -212,7 +123,7 @@ export function ListManager({
             items={items}
             open={open}
             handleDelete={handleDelete}
-            collection={collection}
+            collection={collectionName}
             meta={meta}
             handlePageChange={handlePageChange}
           />
@@ -222,21 +133,20 @@ export function ListManager({
 
   const handleAddMember = async () => {
     const updatedEntity = {
-      ...entity,
-      [collection_ids]: [...collectionIds, selectedEntity.id],
+      ...parentEntity,
+      [collectionIdsName]: [...collectionIds, selectedChild.id],
     }
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "entity",
+      name: "parentEntity",
       value: updatedEntity,
     })
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "selectedEntity",
+      name: "selectedChild",
       value: null,
     })
-    console.log("about to call updateEntity", updatedEntity)
-    await updateEntity(updatedEntity)
+    await updateParent(updatedEntity)
     await fetchCollection()
   }
 
@@ -250,20 +160,20 @@ export function ListManager({
       return true
     })
     const updatedEntity = {
-      ...entity,
-      [collection_ids]: updatedCollectionIds,
+      ...parentEntity,
+      [collectionIdsName]: updatedCollectionIds,
     }
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "entity",
+      name: "parentEntity",
       value: updatedEntity,
     })
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "selectedEntity",
+      name: "selectedChild",
       value: null,
     })
-    await updateEntity(updatedEntity)
+    await updateParent(updatedEntity)
     await fetchCollection()
   }
 
@@ -274,7 +184,7 @@ export function ListManager({
     dispatchForm({ type: FormActions.UPDATE, name: "page", value })
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "selectedEntity",
+      name: "selectedChild",
       value: null,
     })
   }
@@ -310,14 +220,19 @@ export function ListManager({
             spacing={1}
             sx={{ my: 2, alignItems: { xs: "flex-end", sm: "center" } }}
           >
-            {autocomplete}
+            <FilterSelector
+              selectedChild={selectedChild}
+              handleAutocompleteChange={handleAutocompleteChange}
+              collectionIds={collectionIds}
+              collectionName={collectionName}
+            />
             <Box sx={{ pb: { xs: 1, sm: 0 } }}>
               <Button
                 variant="contained"
                 color="secondary"
                 onClick={handleAddMember}
                 size="small"
-                disabled={!selectedEntity}
+                disabled={!selectedChild}
                 sx={{ height: "2.5rem", px: 2 }}
               >
                 <PersonAddIcon />
@@ -328,7 +243,7 @@ export function ListManager({
         <BadgeList
           items={items}
           open={open}
-          collection={collection}
+          collection={collectionName}
           meta={meta}
           handlePageChange={handlePageChange}
           handleDelete={handleDelete}
