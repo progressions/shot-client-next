@@ -7,7 +7,7 @@ import {
   FactionAutocomplete,
   CharacterAutocomplete,
 } from "@/components/autocomplete"
-import { Autocomplete } from "@/components/ui"
+import { AddButton, Autocomplete } from "@/components/ui"
 import type { Character, Faction } from "@/types"
 import { useCallback, useEffect } from "react"
 
@@ -24,26 +24,22 @@ type FormStateData = {
 type CharacterFilterProps = {
   setEntity(character: Character): void
   dispatch: React.Dispatch<FormStateData>
-  includeTypes?: boolean
-  includeArchetypes?: boolean
-  includeCharacters?: boolean
-  includeArchetypes?: boolean
+  omit: string[]
+  handleAddCharacter: () => void
 }
 
 export default function CharacterFilter({
+  entity,
   setEntity,
   dispatch,
-  includeCharacters = true,
-  includeTypes = true,
-  includeArchetypes = true,
-  includeFactions = true,
+  omit = [],
+  handleAddCharacter,
 }: CharacterFilterProps) {
   const { client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     character_type: null,
     archetypes: [],
     archetype: null,
-    character_id: null,
     characters: [],
     factions: [],
   })
@@ -136,8 +132,8 @@ export default function CharacterFilter({
     )
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "character_id",
-      value: character?.id,
+      name: "entity",
+      value: character,
     })
     setEntity(character)
   }
@@ -186,6 +182,14 @@ export default function CharacterFilter({
     return Promise.resolve(characterTypes)
   }
 
+  const addCharacterAndClear = async () => {
+    console.log("about to add", entity)
+    if (!entity) return
+    await handleAddCharacter(entity)
+    dispatchForm({ type: FormActions.UPDATE, name: "entity", value: null })
+    setEntity?.(null)
+  }
+
   return (
     <Box
       sx={{
@@ -193,15 +197,16 @@ export default function CharacterFilter({
         width: "100%",
         display: "flex",
         flexDirection: "column",
-        gap: 2,
+        gap: 1,
       }}
     >
       <Stack
         direction={{ xs: "column", sm: "row" }}
-        spacing={2}
+        spacing={1}
         sx={{ width: "100%" }}
+        alignItems="center"
       >
-        {includeTypes && (
+        {!omit.includes("type") && (
           <Autocomplete
             label="Type"
             value={character_type || ""}
@@ -210,7 +215,7 @@ export default function CharacterFilter({
             allowNone={false}
           />
         )}
-        {includeArchetypes && (
+        {!omit.includes("archetype") && (
           <Autocomplete
             label="Archetype"
             value={archetype || ""}
@@ -219,7 +224,7 @@ export default function CharacterFilter({
             allowNone={false}
           />
         )}
-        {includeFactions && (
+        {!omit.includes("faction") && (
           <FactionAutocomplete
             options={factions.map(faction => ({
               label: faction.name || "",
@@ -230,17 +235,18 @@ export default function CharacterFilter({
             allowNone={false}
           />
         )}
-        {includeCharacters && (
+        {!omit.includes("character") && (
           <CharacterAutocomplete
             options={characters.map(character => ({
               label: character.name || "",
               value: character.id || "",
             }))}
-            value={character_id || ""}
+            value={entity?.id || ""}
             onChange={handleCharacterChange}
             allowNone={false}
           />
         )}
+        <AddButton onClick={addCharacterAndClear} disabled={!entity} />
       </Stack>
     </Box>
   )
