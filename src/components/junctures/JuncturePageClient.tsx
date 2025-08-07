@@ -22,8 +22,10 @@ interface JuncturePageClientProperties {
   juncture: Juncture
 }
 
-type FormStateData = Juncture & {
-  image?: File | null
+type FormStateData = {
+  entity: Juncture & {
+    image?: File | null
+  }
 }
 
 export default function JuncturePageClient({
@@ -31,7 +33,7 @@ export default function JuncturePageClient({
 }: JuncturePageClientProperties) {
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>(initialJuncture)
-  const juncture = formState.data
+  const juncture = formState.data.entity
 
   const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
     juncture,

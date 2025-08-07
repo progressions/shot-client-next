@@ -22,16 +22,18 @@ interface PartyPageClientProperties {
   party: Party
 }
 
-type FormStateData = Party & {
-  image?: File | null
+type FormStateData = {
+  entity: Party & {
+    image?: File | null
+  }
 }
 
 export default function PartyPageClient({
   party: initialParty,
 }: PartyPageClientProperties) {
   const { campaignData } = useCampaign()
-  const { formState, dispatchForm } = useForm<FormStateData>(initialParty)
-  const party = formState.data
+  const { formState, dispatchForm } = useForm<FormStateData>({ entity: initialParty })
+  const party = formState.data.entity
 
   const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
     party,

@@ -22,8 +22,10 @@ interface SchtickPageClientProperties {
   schtick: Schtick
 }
 
-type FormStateData = Schtick & {
-  image?: File | null
+type FormStateData = {
+  entity: Schtick & {
+    image?: File | null
+  }
 }
 
 export default function SchtickPageClient({
@@ -31,11 +33,10 @@ export default function SchtickPageClient({
 }: SchtickPageClientProperties) {
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
-    ...initialSchtick,
-    image: null,
+    entity: initialSchtick,
   })
   const { status, errors } = formState
-  const schtick = formState.data
+  const schtick = formState.data.entity
 
   const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
     schtick,

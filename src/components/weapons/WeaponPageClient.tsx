@@ -47,8 +47,10 @@ interface WeaponPageClientProperties {
   weapon: Weapon
 }
 
-type FormStateData = Weapon & {
-  image?: File | null
+type FormStateData = {
+  entity: Weapon & {
+    image?: File | null
+  }
 }
 
 export default function WeaponPageClient({
@@ -57,11 +59,10 @@ export default function WeaponPageClient({
   const { campaignData } = useCampaign()
   const { toastError } = useToast()
   const { formState, dispatchForm } = useForm<FormStateData>({
-    ...initialWeapon,
-    image: null,
+    entity: initialWeapon
   })
   const { status, errors = {} } = formState
-  const weapon = formState.data
+  const weapon = formState.data.entity
   const { deleteEntity, updateEntity, handleChangeAndSave } = useEntity<Weapon>(
     weapon,
     dispatchForm

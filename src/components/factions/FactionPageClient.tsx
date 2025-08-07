@@ -15,16 +15,18 @@ interface FactionPageClientProperties {
   faction: Faction
 }
 
-type FormStateData = Faction & {
-  image?: File | null
+type FormStateData = {
+  entity: Faction & {
+    image?: File | null
+  }
 }
 
 export default function FactionPageClient({
   faction: initialFaction,
 }: FactionPageClientProperties) {
   const { campaignData } = useCampaign()
-  const { formState, dispatchForm } = useForm<FormStateData>(initialFaction)
-  const faction = formState.data
+  const { formState, dispatchForm } = useForm<FormStateData>({ entity: initialFaction })
+  const faction = formState.data.entity
 
   const { updateEntity, deleteEntity } = useEntity(faction, dispatchForm)
 
