@@ -12,17 +12,24 @@ import {
 
 export function FilterSelector({
   selectedChild,
-  handleAutocompleteChange,
+  setSelectedChild,
+  handleAddMember,
   collectionIds,
   collectionName,
 }) {
   const autocompleteMap: Record<string, React.ReactNode> = {
-    actors: <CharacterFilter setEntity={handleAutocompleteChange} />,
-    characters: <CharacterFilter setEntity={handleAutocompleteChange} />,
+    characters: (
+      <CharacterFilter
+        value={selectedChild?.id || ""}
+        exclude={collectionIds}
+        setSelectedChild={setSelectedChild}
+        addMember={handleAddMember}
+      />
+    ),
     vehicles: (
       <VehicleAutocomplete
         value={selectedChild?.id || ""}
-        onChange={handleAutocompleteChange}
+        onChange={setSelectedChild}
         exclude={collectionIds}
         allowNone={false}
       />
@@ -30,7 +37,7 @@ export function FilterSelector({
     parties: (
       <PartyAutocomplete
         value={selectedChild?.id || ""}
-        onChange={handleAutocompleteChange}
+        onChange={setSelectedChild}
         exclude={collectionIds}
         allowNone={false}
       />
@@ -38,7 +45,7 @@ export function FilterSelector({
     junctures: (
       <JunctureAutocomplete
         value={selectedChild?.id || ""}
-        onChange={handleAutocompleteChange}
+        onChange={setSelectedChild}
         exclude={collectionIds}
         allowNone={false}
       />
@@ -46,30 +53,30 @@ export function FilterSelector({
     sites: (
       <SiteAutocomplete
         value={selectedChild?.id || ""}
-        onChange={handleAutocompleteChange}
+        onChange={setSelectedChild}
         exclude={collectionIds}
         allowNone={false}
       />
     ),
-    weapons: <WeaponFilter setEntity={handleAutocompleteChange} />,
+    weapons: <WeaponFilter setEntity={setSelectedChild} />,
     factions: (
       <FactionAutocomplete
         value={selectedChild?.id || ""}
-        onChange={handleAutocompleteChange}
+        onChange={setSelectedChild}
         exclude={collectionIds}
         allowNone={false}
       />
     ),
     schticks: (
       <SchtickFilter
-        setEntity={handleAutocompleteChange}
+        setEntity={setSelectedChild}
         exclude={collectionIds}
       />
     ),
     players: (
       <UserAutocomplete
         value={selectedChild?.id || ""}
-        onChange={handleAutocompleteChange}
+        onChange={setSelectedChild}
         exclude={collectionIds}
         allowNone={false}
       />
@@ -77,7 +84,7 @@ export function FilterSelector({
     users: (
       <UserAutocomplete
         value={selectedChild?.id || ""}
-        onChange={handleAutocompleteChange}
+        onChange={setSelectedChild}
         exclude={collectionIds}
         allowNone={false}
       />

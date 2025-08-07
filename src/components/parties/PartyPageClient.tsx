@@ -117,7 +117,7 @@ export default function PartyPageClient({
               together for a <InfoLink href="/factions" info="Faction" />.
             </>
           }
-          updateEntity={updateEntity}
+          updateParent={updateEntity}
         />
       </Stack>
     </Box>

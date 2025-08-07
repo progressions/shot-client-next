@@ -7,7 +7,7 @@ import {
   FactionAutocomplete,
   CharacterAutocomplete,
 } from "@/components/autocomplete"
-import { Autocomplete } from "@/components/ui"
+import { AddButton, Autocomplete } from "@/components/ui"
 import type { Character, Faction } from "@/types"
 import { useCallback, useEffect } from "react"
 
@@ -16,46 +16,51 @@ type FormStateData = {
   archetypes: string[]
   archetype: string | null
   characters: Character[]
-  character_id: string | null
   factions: Faction[]
   faction_id: string | null
+  selectedChild: Character | null
 }
 
+type OmitType = "type" | "archetype" | "faction" | "character"
+
 type CharacterFilterProps = {
-  setEntity(character: Character): void
+  // value is the ID of the selected character
+  value?: string | null
+  setSelectedChild: (character: Character) => void
+  addMember?: (character: Character) => void
   dispatch: React.Dispatch<FormStateData>
-  includeTypes?: boolean
-  includeArchetypes?: boolean
-  includeCharacters?: boolean
-  includeArchetypes?: boolean
+  omit: OmitType[]
 }
 
 export default function CharacterFilter({
-  setEntity,
+  value,
+  setSelectedChild,
+  addMember,
   dispatch,
-  includeCharacters = true,
-  includeTypes = true,
-  includeArchetypes = true,
-  includeFactions = true,
+  omit = [],
 }: CharacterFilterProps) {
   const { client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     character_type: null,
     archetypes: [],
     archetype: null,
-    character_id: null,
     characters: [],
     factions: [],
+    selectedChild: null,
   })
   const {
     character_type,
     archetypes,
     archetype,
     characters,
-    character_id,
     factions,
     faction_id,
+    selectedChild,
   } = formState.data
+
+  const character_id = selectedChild?.id
+
+  console.log("character_id", character_id)
 
   const fetchCharacters = useCallback(async () => {
     try {
@@ -124,22 +129,18 @@ export default function CharacterFilter({
     client,
     dispatchForm,
     character_type,
-    character_id,
+    selectedChild,
     faction_id,
     fetchCharacters,
   ])
 
   const handleCharacterChange = (character: Character | null) => {
-    console.log(
-      "CharacterFilter about to call handleCharacterChange with:",
-      character
-    )
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "character_id",
-      value: character?.id,
+      name: "selectedChild",
+      value: character,
     })
-    setEntity(character)
+    setSelectedChild(character)
   }
 
   const handleFactionChange = (value: string | null) => {
@@ -186,6 +187,17 @@ export default function CharacterFilter({
     return Promise.resolve(characterTypes)
   }
 
+  const handleAddMember = () => {
+    console.log("add", selectedChild)
+    addMember?.(selectedChild)
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "selectedChild",
+      value: null,
+    })
+    setSelectedChild(null)
+  }
+
   return (
     <Box
       sx={{
@@ -198,10 +210,11 @@ export default function CharacterFilter({
     >
       <Stack
         direction={{ xs: "column", sm: "row" }}
-        spacing={2}
+        spacing={1}
+        alignItems="center"
         sx={{ width: "100%" }}
       >
-        {includeTypes && (
+        {!omit.includes("type") && (
           <Autocomplete
             label="Type"
             value={character_type || ""}
@@ -210,7 +223,7 @@ export default function CharacterFilter({
             allowNone={false}
           />
         )}
-        {includeArchetypes && (
+        {!omit.includes("archetype") && (
           <Autocomplete
             label="Archetype"
             value={archetype || ""}
@@ -219,7 +232,7 @@ export default function CharacterFilter({
             allowNone={false}
           />
         )}
-        {includeFactions && (
+        {!omit.includes("faction") && (
           <FactionAutocomplete
             options={factions.map(faction => ({
               label: faction.name || "",
@@ -230,7 +243,7 @@ export default function CharacterFilter({
             allowNone={false}
           />
         )}
-        {includeCharacters && (
+        {!omit.includes("character") && (
           <CharacterAutocomplete
             options={characters.map(character => ({
               label: character.name || "",
@@ -241,6 +254,7 @@ export default function CharacterFilter({
             allowNone={false}
           />
         )}
+      <AddButton onClick={handleAddMember} disabled={!selectedChild} />
       </Stack>
     </Box>
   )

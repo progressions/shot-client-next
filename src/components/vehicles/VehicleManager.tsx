@@ -7,7 +7,7 @@ type VehicleManagerProperties = {
   title: string
   entity: Entity
   description: React.ReactNode
-  updateEntity: (entity: Entity) => Promise<void>
+  updateParent: (entity: Entity) => Promise<void>
 }
 
 export default function VehicleManager({
@@ -15,7 +15,7 @@ export default function VehicleManager({
   entity,
   title,
   description,
-  updateEntity,
+  updateParent,
 }: VehicleManagerProperties) {
   return (
     <ListManager
@@ -23,7 +23,7 @@ export default function VehicleManager({
       parent={entity}
       title={title}
       description={description}
-      updateParent={updateEntity}
+      updateParent={updateParent}
       collectionName="vehicles"
       collection_ids="vehicle_ids"
       manage={true}

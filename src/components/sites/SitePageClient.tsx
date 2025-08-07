@@ -122,7 +122,7 @@ export default function SitePageClient({
               those <InfoLink info="Attuned" /> to it.{" "}
             </>
           }
-          updateEntity={updateEntity}
+          updateParent={updateEntity}
         />
       </Stack>
     </Box>

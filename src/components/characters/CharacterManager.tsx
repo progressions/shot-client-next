@@ -1,5 +1,3 @@
-"use client"
-
 import type { Entity } from "@/types"
 import { ListManager } from "@/components/ui"
 
@@ -8,7 +6,7 @@ type CharacterManagerProperties = {
   title: string
   entity: Entity
   description: React.ReactNode
-  updateEntity: (entity: Entity) => Promise<void>
+  updateParent: (entity: Entity) => Promise<void>
 }
 
 export default function CharacterManager({
@@ -16,7 +14,7 @@ export default function CharacterManager({
   entity,
   title,
   description,
-  updateEntity,
+  updateParent,
 }: CharacterManagerProperties) {
   return (
     <ListManager
@@ -24,7 +22,7 @@ export default function CharacterManager({
       parent={entity}
       title={title}
       description={description}
-      updateParent={updateEntity}
+      updateParent={updateParent}
       collectionName="characters"
       collection_ids="character_ids"
       manage={true}

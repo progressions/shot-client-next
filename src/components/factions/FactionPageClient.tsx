@@ -96,7 +96,7 @@ export default function FactionPageClient({
               <InfoLink info="Chi War" />.
             </>
           }
-          updateEntity={updateEntity}
+          updateParent={updateEntity}
         />
         <PartiesList entity={faction} updateEntity={updateEntity} />
         <SitesList entity={faction} updateEntity={updateEntity} />

@@ -7,11 +7,18 @@ import { useCallback, useEffect } from "react"
 import type { Entity } from "@/types"
 import { useClient } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
-import { FilterSelector, BadgeList, Button, ManageButton, SectionHeader } from "@/components/ui"
+import {
+  FilterSelector,
+  BadgeList,
+  Button,
+  ManageButton,
+  SectionHeader,
+  AddButton,
+} from "@/components/ui"
 import { paginateArray } from "@/lib"
 
 type FormStateData = {
-  parentEntity: Entity  // the parent entity which owns the children being managed
+  parentEntity: Entity // the parent entity which owns the children being managed
   page: number
   open: boolean
   selectedChild: Entity | null
@@ -53,8 +60,9 @@ export function ListManager({
     page: 1,
     open: false,
   }
-  const { formState, dispatchForm } = useForm<FormStateData>(initialData)
-  const { parentEntity, page, open, selectedChild } = formState.data
+  const { formState: managerState, dispatchForm: dispatchManager } =
+    useForm<FormStateData>(initialData)
+  const { parentEntity, page, open, selectedChild } = managerState.data
   const childItems = parentEntity[collectionName] || []
   const collectionIdsName = pluralize.singular(collectionName) + "_ids"
   const collectionIds = parentEntity[collectionIdsName] || []
@@ -68,7 +76,7 @@ export function ListManager({
   // const singularCollectionName = pluralize.singular(collectionName).toLowerCase()
   // const collectionIdsName = pluralize.singular(collectionIdsName).toLowerCase()
 
-  const fetchCollection = useCallback(async () => {
+  const fetchChildren = useCallback(async () => {
     try {
       const response = await client[getFunc]({
         [`${singularEntityName}_id`]: parentEntity.id,
@@ -81,13 +89,13 @@ export function ListManager({
       const newCollectionIds =
         newCollection.map((item: Entity) => item.id) || []
 
-      dispatchForm({
+      dispatchManager({
         type: FormActions.UPDATE,
         name: "meta",
         value: response.data.meta,
       })
 
-      dispatchForm({
+      dispatchManager({
         type: FormActions.UPDATE,
         name: "parentEntity",
         value: {
@@ -99,16 +107,16 @@ export function ListManager({
     } catch (error) {
       console.error(`Error fetching ${collectionName}:`, error)
     }
-  }, [parentEntity, collectionName, client, getFunc, dispatchForm])
+  }, [parentEntity, collectionName, client, getFunc, dispatchManager])
 
   useEffect(() => {
     // when the component first loads, fetch the collection items from the
     // server and store them in 'parentEntity'
-    fetchCollection()
+    fetchChildren()
   }, [parentEntity.id, page])
 
   const handleAutocompleteChange = (child: Entity | null) => {
-    dispatchForm({
+    dispatchManager({
       type: FormActions.UPDATE,
       name: "selectedChild",
       value: child,
@@ -136,18 +144,18 @@ export function ListManager({
       ...parentEntity,
       [collectionIdsName]: [...collectionIds, selectedChild.id],
     }
-    dispatchForm({
+    dispatchManager({
       type: FormActions.UPDATE,
       name: "parentEntity",
       value: updatedEntity,
     })
-    dispatchForm({
+    dispatchManager({
       type: FormActions.UPDATE,
       name: "selectedChild",
       value: null,
     })
     await updateParent(updatedEntity)
-    await fetchCollection()
+    await fetchChildren()
   }
 
   const handleDelete = async (item: Entity) => {
@@ -163,33 +171,35 @@ export function ListManager({
       ...parentEntity,
       [collectionIdsName]: updatedCollectionIds,
     }
-    dispatchForm({
+    dispatchManager({
       type: FormActions.UPDATE,
       name: "parentEntity",
       value: updatedEntity,
     })
-    dispatchForm({
+    dispatchManager({
       type: FormActions.UPDATE,
       name: "selectedChild",
       value: null,
     })
     await updateParent(updatedEntity)
-    await fetchCollection()
+    await fetchChildren()
   }
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
     value: number
   ) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "page", value })
-    dispatchForm({
+    dispatchManager({ type: FormActions.UPDATE, name: "page", value })
+    dispatchManager({
       type: FormActions.UPDATE,
       name: "selectedChild",
       value: null,
     })
   }
 
-  const actionButton = <ManageButton open={open} dispatchForm={dispatchForm} />
+  const actionButton = (
+    <ManageButton open={open} dispatchForm={dispatchManager} />
+  )
 
   return (
     <>
@@ -222,22 +232,14 @@ export function ListManager({
           >
             <FilterSelector
               selectedChild={selectedChild}
-              handleAutocompleteChange={handleAutocompleteChange}
+              setSelectedChild={handleAutocompleteChange}
+              handleAddMember={handleAddMember}
               collectionIds={collectionIds}
               collectionName={collectionName}
             />
-            <Box sx={{ pb: { xs: 1, sm: 0 } }}>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleAddMember}
-                size="small"
-                disabled={!selectedChild}
-                sx={{ height: "2.5rem", px: 2 }}
-              >
-                <PersonAddIcon />
-              </Button>
-            </Box>
+            { !["characters"].includes(collectionName) && (
+              <AddButton onClick={handleAddMember} disabled={!selectedChild} />
+            )}
           </Stack>
         )}
         <BadgeList

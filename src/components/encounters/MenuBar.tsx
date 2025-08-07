@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react"
 import { AppBar, Toolbar, Typography, IconButton, Box } from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
 import { Icon } from "@/components/ui"
-import { type Entity } from "@/types"
 import { AddCharacter, AddVehicle } from "@/components/encounters"
 
 export default function MenuBar() {
@@ -19,10 +18,11 @@ export default function MenuBar() {
   useEffect(() => {
     if (open && panelRef.current) {
       const timer = setTimeout(() => {
-        const panelTop = panelRef.current.getBoundingClientRect().top + window.scrollY
+        const panelTop =
+          panelRef.current.getBoundingClientRect().top + window.scrollY
         window.scrollTo({
           top: panelTop - 64, // Offset for AppBar height (64px)
-          behavior: "smooth"
+          behavior: "smooth",
         })
       }, 300) // Match animation duration (0.3s)
       return () => clearTimeout(timer)
@@ -53,7 +53,11 @@ export default function MenuBar() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            style={{ overflow: "hidden", backgroundColor: theme.palette.divider, zIndex: 1099 }}
+            style={{
+              overflow: "hidden",
+              backgroundColor: theme.palette.divider,
+              zIndex: 1099,
+            }}
           >
             <Box sx={{ p: 2, border: "1px solid", borderColor: "grey.300" }}>
               {open === "character" && (

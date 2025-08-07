@@ -27,7 +27,6 @@ type BadgeListProps = {
 }
 
 const badgeMap: Record<string, (thing: Entity) => React.ReactNode> = {
-  actors: (thing: Entity) => <CharacterBadge character={thing as Character} />,
   characters: (thing: Entity) => (
     <CharacterBadge character={thing as Character} />
   ),

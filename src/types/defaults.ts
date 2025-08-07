@@ -167,7 +167,6 @@ export const defaultFight: Fight = {
   active: true,
   sequence: 0,
   effects: [],
-  actors: [],
   characters: [],
   shot_order: [],
   character_effects: {},

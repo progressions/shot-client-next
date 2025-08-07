@@ -195,7 +195,7 @@ export default function FightPageClient({
               <InfoLink href="/sites" info="Feng Shui Site" />.
             </>
           }
-          updateEntity={updateEntity}
+          updateParent={updateEntity}
         />
         <VehicleManager
           icon={<Icon keyword="Vehicles" size="24" />}
@@ -209,7 +209,7 @@ export default function FightPageClient({
               <InfoLink href="/sites" info="Feng Shui Site" />.
             </>
           }
-          updateEntity={updateEntity}
+          updateParent={updateEntity}
         />
       </Stack>
     </Box>

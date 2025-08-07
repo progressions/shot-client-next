@@ -126,7 +126,6 @@ export interface Fight extends BaseEntity {
   vehicle_effects: CharacterEffects
   created_at: string
   updated_at: string
-  actors: Character[]
   fight_events?: FightEvent[]
   image_url: string
   started_at: string | null

@@ -11,7 +11,9 @@ export const encounterTransition = {
   ease: "easeInOut",
 }
 
-const EncounterContext = createContext<EncounterContextType | undefined>(undefined)
+const EncounterContext = createContext<EncounterContextType | undefined>(
+  undefined
+)
 
 type FormStateData = {
   encounter: Encounter | null
@@ -47,14 +49,18 @@ export function EncounterProvider({
 }) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
-  const { formState: encounterState, dispatchForm: dispatchEncounter } = useForm<FormStateData>({
-    encounter,
-    weapons: {},
-    schticks: {},
-  })
+  const { formState: encounterState, dispatchForm: dispatchEncounter } =
+    useForm<FormStateData>({
+      encounter,
+      weapons: {},
+      schticks: {},
+    })
   const { loading, error, data } = encounterState
   const { encounter: contextEncounter, weapons, schticks } = data
-  const { deleteEntity, updateEntity, handleChangeAndSave } = useEntity(encounter, dispatchEncounter)
+  const { deleteEntity, updateEntity, handleChangeAndSave } = useEntity(
+    encounter,
+    dispatchEncounter
+  )
   const currentShot = contextEncounter?.shots?.[0]?.shot
   const [localAction, setLocalAction] = useState<string | null>(null)
 
@@ -67,9 +73,16 @@ export function EncounterProvider({
       const actionId = uuidv4()
       setLocalAction(actionId)
       try {
-        const response = await client.spendShots(contextEncounter, entity, shotCost, actionId)
+        const response = await client.spendShots(
+          contextEncounter,
+          entity,
+          shotCost,
+          actionId
+        )
         if (response.data) {
-          console.log("Server response received", { serverEncounter: response.data })
+          console.log("Server response received", {
+            serverEncounter: response.data,
+          })
           dispatchEncounter({
             type: FormActions.UPDATE,
             name: "encounter",

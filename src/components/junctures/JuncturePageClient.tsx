@@ -126,7 +126,7 @@ export default function JuncturePageClient({
               shaping its outcomes.
             </>
           }
-          updateEntity={updateEntity}
+          updateParent={updateEntity}
         />
       </Stack>
     </Box>

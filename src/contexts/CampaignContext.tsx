@@ -41,9 +41,13 @@ export function CampaignProvider({ children }: CampaignProviderProperties) {
   const consumer = useMemo(() => client.consumer(), [client])
   const [campaign, setCampaign] = useState<Campaign | null>(defaultCampaign)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
-  const [campaignData, setCampaignData] = useState<CampaignCableData | null>(null)
+  const [campaignData, setCampaignData] = useState<CampaignCableData | null>(
+    null
+  )
 
-  const setCurrentCampaign = async (camp: Campaign | null): Promise<Campaign | null> => {
+  const setCurrentCampaign = async (
+    camp: Campaign | null
+  ): Promise<Campaign | null> => {
     try {
       const response = await client.setCurrentCampaign(camp)
       const { data } = response || {}
@@ -122,10 +126,20 @@ export function CampaignProvider({ children }: CampaignProviderProperties) {
       subscription,
       campaignData,
     }),
-    [campaign, setCurrentCampaign, getCurrentCampaign, subscription, campaignData]
+    [
+      campaign,
+      setCurrentCampaign,
+      getCurrentCampaign,
+      subscription,
+      campaignData,
+    ]
   )
 
-  return <CampaignContext.Provider value={contextValue}>{children}</CampaignContext.Provider>
+  return (
+    <CampaignContext.Provider value={contextValue}>
+      {children}
+    </CampaignContext.Provider>
+  )
 }
 
 export function useCampaign() {
