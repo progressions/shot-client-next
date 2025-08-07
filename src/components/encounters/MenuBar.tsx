@@ -1,15 +1,33 @@
 "use client"
-
-import { useState } from "react"
-import { AppBar, Toolbar, Typography, IconButton } from "@mui/material"
+import { useTheme } from "@mui/material"
+import { useState, useRef, useEffect } from "react"
+import { AppBar, Toolbar, Typography, IconButton, Box } from "@mui/material"
+import { motion, AnimatePresence } from "framer-motion"
 import { Icon } from "@/components/ui"
 import { type Entity } from "@/types"
-import { AddVehicle, AddCharacter } from "@/components/encounters"
+import { AddCharacter, AddVehicle } from "@/components/encounters"
 
 export default function MenuBar() {
-  const [addCharacterOpen, setAddCharacterOpen] = useState(false)
-  const [addVehicleOpen, setAddVehicleOpen] = useState(false)
-  const [entity, setEntity] = useState<Entity | null>(null)
+  const theme = useTheme()
+  const [open, setOpen] = useState<"character" | "vehicle" | null>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  const toggleBox = (type: "character" | "vehicle") => {
+    setOpen(current => (current === type ? null : type))
+  }
+
+  useEffect(() => {
+    if (open && panelRef.current) {
+      const timer = setTimeout(() => {
+        const panelTop = panelRef.current.getBoundingClientRect().top + window.scrollY
+        window.scrollTo({
+          top: panelTop - 64, // Offset for AppBar height (64px)
+          behavior: "smooth"
+        })
+      }, 300) // Match animation duration (0.3s)
+      return () => clearTimeout(timer)
+    }
+  }, [open])
 
   return (
     <>
@@ -18,22 +36,42 @@ export default function MenuBar() {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Menu
           </Typography>
-          <IconButton color="inherit" onClick={() => setAddVehicleOpen(true)}>
+          <IconButton onClick={() => toggleBox("vehicle")}>
             <Icon keyword="Add Vehicle" color="white" />
           </IconButton>
-          <IconButton color="inherit" onClick={() => setAddCharacterOpen(true)}>
+          <IconButton onClick={() => toggleBox("character")}>
             <Icon keyword="Add Character" color="white" />
           </IconButton>
         </Toolbar>
       </AppBar>
-      <AddCharacter
-        open={addCharacterOpen}
-        onClose={() => setAddCharacterOpen(false)}
-      />
-      <AddVehicle
-        open={addVehicleOpen}
-        onClose={() => setAddVehicleOpen(false)}
-      />
+      <AnimatePresence mode="wait">
+        {open && (
+          <motion.div
+            ref={panelRef}
+            key={open}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            style={{ overflow: "hidden", backgroundColor: theme.palette.divider, zIndex: 1099 }}
+          >
+            <Box sx={{ p: 2, border: "1px solid", borderColor: "grey.300" }}>
+              {open === "character" && (
+                <AddCharacter
+                  open={open === "character"}
+                  onClose={() => setOpen(null)}
+                />
+              )}
+              {open === "vehicle" && (
+                <AddVehicle
+                  open={open === "vehicle"}
+                  onClose={() => setOpen(null)}
+                />
+              )}
+            </Box>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }

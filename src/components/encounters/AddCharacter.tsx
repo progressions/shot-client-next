@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Stack } from "@mui/material"
-import { AddButton, DialogBox } from "@/components/ui"
 import { CharacterFilter } from "@/components/characters"
 import { type Entity } from "@/types"
 import { useEncounter } from "@/contexts"
@@ -30,17 +29,17 @@ export default function AddCharacter({
   }
 
   return (
-    <DialogBox open={open} onClose={onClose}>
-      <Stack
-        sx={{ width: { xs: "100%", md: 740 } }}
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        spacing={1}
-      >
-        <CharacterFilter setEntity={setEntity} />
-        <AddButton onClick={handleAdd} disabled={!entity} />
-      </Stack>
-    </DialogBox>
+    <Stack
+      direction="row"
+      justifyContent="space-between"
+      alignItems="center"
+      spacing={1}
+    >
+      <CharacterFilter
+        entity={entity}
+        setEntity={setEntity}
+        handleAddCharacter={handleAdd}
+      />
+    </Stack>
   )
 }

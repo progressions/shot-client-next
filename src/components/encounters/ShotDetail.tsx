@@ -11,14 +11,6 @@ type ShotDetailProps = {
 
 export default function ShotDetail({ shot }: ShotDetailProps) {
   return (
-    <AnimatePresence>
-      <motion.div
-        key={`shot-${shot.shot}`}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.5, ease: "easeInOut" }}
-      >
         <Box>
           <ListSubheader
             sx={{
@@ -48,7 +40,5 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
             />
           ))}
         </Box>
-      </motion.div>
-    </AnimatePresence>
   )
 }
