@@ -1,3 +1,5 @@
+"use client"
+
 import { motion } from "motion/react"
 import type { Vehicle } from "@/types"
 import { ListItemIcon, ListItemText, ListItem } from "@mui/material"
