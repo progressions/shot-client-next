@@ -8,7 +8,6 @@ import {
   useCallback,
 } from "react"
 import { Subscription } from "@rails/actioncable"
-import isEqual from "lodash/isEqual"
 import type { CampaignCableData, Campaign } from "@/types"
 import { defaultCampaign } from "@/types"
 import { useClient, useLocalStorage } from "@/contexts"

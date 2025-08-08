@@ -1,4 +1,4 @@
-import { Skeleton, Box, Stack, CircularProgress } from "@mui/material"
+import { Skeleton, Box, CircularProgress } from "@mui/material"
 
 export default async function FightsModule() {
   return (

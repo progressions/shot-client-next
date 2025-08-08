@@ -3,7 +3,7 @@ import { headers } from "next/headers"
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
 import { getServerClient, getUser } from "@/lib/getServerClient"
-import type { Campaign, Party, Site, User } from "@/types"
+import type { Campaign } from "@/types"
 import { Dashboard } from "@/components/dashboard"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
