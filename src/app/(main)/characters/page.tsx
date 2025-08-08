@@ -1,56 +1,55 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
+import { headers } from "next/headers"
 import { CircularProgress, Box } from "@mui/material"
 import { Characters } from "@/components/characters"
-import { getUser, getServerClient } from "@/lib/getServerClient"
-import { headers } from "next/headers"
+import { getUser, getServerClient, getPageParameters } from "@/lib"
 import Breadcrumbs from "@/components/Breadcrumbs"
+import type { CharactersResponse } from "@/types"
 
 export const metadata = {
   title: "Characters - Chi War",
 }
 
-type CharactersPageProperties = {
-  searchParams: Promise<{ page?: string; sort?: string; order?: string }>
-}
-
 export default async function CharactersPage({
   searchParams,
-}: CharactersPageProperties) {
+}: {
+  searchParams: Promise<{ page?: string; sort?: string; order?: string }>
+}) {
   const client = await getServerClient()
   const user = await getUser()
-
   if (!client || !user) {
     redirect("/login")
   }
 
-  const parameters = await searchParams
-  const pageParameter = parameters.page
-  const page = pageParameter ? Number.parseInt(pageParameter, 10) : 1
+  // Validate parameters using getPageParameters
+  const { page, sort, order } = await getPageParameters(searchParams, {
+    validSorts: ["name", "created_at", "updated_at"],
+    defaultSort: "name",
+    defaultOrder: "asc",
+  })
 
-  if (isNaN(page) || page <= 0) {
+  // Redirect if page is invalid
+  if (page <= 0) {
     redirect("/characters?page=1&sort=name&order=asc")
   }
 
-  type ValidSort = "name" | "created_at" | "updated_at"
-  const validSorts: readonly ValidSort[] = ["name", "created_at", "updated_at"]
-  const sort =
-    parameters.sort && validSorts.includes(parameters.sort as ValidSort)
-      ? parameters.sort
-      : "name"
-
-  type ValidOrder = "asc" | "desc"
-  const validOrders: readonly ValidOrder[] = ["asc", "desc"]
-  const order =
-    parameters.order && validOrders.includes(parameters.order as ValidOrder)
-      ? parameters.order
-      : "asc"
-
-  const response = await client.getCharacters({ page, sort, order })
-  const { characters, meta } = response.data
-
-  if (page > meta.total_pages) {
-    redirect("/characters?page=1&sort=name&order=asc")
+  // Fetch characters for the requested page, sort, and order
+  let charactersResponse: CharactersResponse = {
+    characters: [],
+    meta: { current_page: page, total_pages: 1 },
+  }
+  try {
+    const response = await client.getCharacters({ page, sort, order })
+    if (!response.data) {
+      throw new Error("No data returned from getCharacters")
+    }
+    charactersResponse = response.data
+    if (page > charactersResponse.meta.total_pages) {
+      redirect("/characters?page=1&sort=name&order=asc")
+    }
+  } catch (error) {
+    console.error("Error fetching characters in CharactersPage:", error)
   }
 
   // Detect mobile device on the server
@@ -67,11 +66,13 @@ export default async function CharactersPage({
         position: "relative",
       }}
     >
-      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <Breadcrumbs />
+      </Suspense>
       <Suspense fallback={<CircularProgress />}>
         <Characters
-          initialCharacters={characters}
-          initialMeta={meta}
+          initialCharacters={charactersResponse.characters}
+          initialMeta={charactersResponse.meta}
           initialSort={sort}
           initialOrder={order}
           initialIsMobile={initialIsMobile}

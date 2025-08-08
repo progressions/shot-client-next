@@ -1,18 +1,13 @@
 "use client"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
 import {
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  IconButton,
-  Tooltip,
   Box,
   Pagination,
 } from "@mui/material"
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp"
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
 import type { SelectChangeEvent } from "@mui/material"
+import { FightFilter } from "@/components/fights"
+import { SortControls } from "@/components/ui"
 
 interface FightsControlsProps {
   sort: string
@@ -23,6 +18,7 @@ interface FightsControlsProps {
   onOrderChange: () => void
   onPageChange: (page: number) => void
   children: React.ReactNode
+  isMobile?: boolean
 }
 
 export default function FightsControls({
@@ -33,9 +29,17 @@ export default function FightsControls({
   onSortChange,
   onOrderChange,
   onPageChange,
+  dispatchForm,
   children,
+  isMobile = false,
 }: FightsControlsProps) {
   const router = useRouter()
+  const validSorts = ["name", "type", "created_at", "updated_at"] as const
+  const [showFilter, setShowFilter] = useState(false)
+
+  const handleToggleFilter = () => {
+    setShowFilter(!showFilter)
+  }
 
   const handleSortChange = (event: SelectChangeEvent<string>) => {
     const newSort = event.target.value
@@ -65,46 +69,23 @@ export default function FightsControls({
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          gap: 1,
-          alignItems: "center",
-        }}
-      >
-        <FormControl sx={{ minWidth: { xs: 80, sm: 100 } }}>
-          <InputLabel id="sort-label" sx={{ color: "#ffffff" }}>
-            Sort By
-          </InputLabel>
-          <Select
-            labelId="sort-label"
-            value={sort}
-            label="Sort By"
-            onChange={handleSortChange}
-            sx={{
-              color: "#ffffff",
-              "& .MuiSvgIcon-root": { color: "#ffffff" },
-            }}
-          >
-            <MenuItem value="created_at">Created At</MenuItem>
-            <MenuItem value="updated_at">Updated At</MenuItem>
-            <MenuItem value="name">Name</MenuItem>
-          </Select>
-        </FormControl>
-        <Tooltip title={order === "asc" ? "Sort Ascending" : "Sort Descending"}>
-          <IconButton
-            onClick={handleOrderChange}
-            sx={{ color: "#ffffff" }}
-            aria-label={order === "asc" ? "sort ascending" : "sort descending"}
-          >
-            {order === "asc" ? (
-              <KeyboardArrowUpIcon />
-            ) : (
-              <KeyboardArrowDownIcon />
-            )}
-          </IconButton>
-        </Tooltip>
+      <Box>
+        <SortControls
+          isMobile={isMobile}
+          handleSortChange={handleSortChange}
+          handleOrderChange={handleOrderChange}
+          validSorts={validSorts}
+          handleToggleFilter={handleToggleFilter}
+          sort={sort}
+          order={order}
+          showFilter={showFilter}
+        >
+          <FightFilter
+            dispatch={dispatchForm}
+            includeFights={false}
+            omit={["add"]}
+          />
+        </SortControls>
         <Pagination
           count={totalPages}
           page={page}

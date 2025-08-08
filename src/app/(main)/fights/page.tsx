@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
-import { CircularProgress } from "@mui/material"
+import { Box, CircularProgress } from "@mui/material"
 import { getUser, getServerClient, getPageParameters } from "@/lib"
 import { Fights } from "@/components/fights"
 import Breadcrumbs from "@/components/Breadcrumbs"
@@ -58,7 +58,14 @@ export default async function FightsPage({
   const initialIsMobile = /mobile/i.test(userAgent)
 
   return (
-    <>
+    <Box
+      sx={{
+        justifyContent: "space-between",
+        alignItems: "center",
+        mb: 2,
+        position: "relative",
+      }}
+    >
       <Suspense fallback={<CircularProgress />}>
         <Breadcrumbs />
       </Suspense>
@@ -71,6 +78,6 @@ export default async function FightsPage({
           initialIsMobile={initialIsMobile}
         />
       </Suspense>
-    </>
+    </Box>
   )
 }

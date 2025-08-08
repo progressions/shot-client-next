@@ -1,19 +1,12 @@
 "use client"
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import {
-  useMediaQuery,
-  useTheme,
-  Box,
-  Button,
-  Typography,
-  Alert,
-  Stack,
-} from "@mui/material"
-import { FightsControls, FightDetail, FightForm } from "@/components/fights"
+import { useMediaQuery, useTheme, Box } from "@mui/material"
+import { View, Menu } from "@/components/fights"
 import type { Fight, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
-import { useCampaign, useClient } from "@/contexts"
+import { useLocalStorage, useCampaign, useClient } from "@/contexts"
+import { Icon, MainHeader } from "@/components/ui"
 
 interface FightsProperties {
   initialFights: Fight[]
@@ -23,11 +16,16 @@ interface FightsProperties {
   initialIsMobile?: boolean
 }
 
+type ValidSort = "name" | "type" | "created_at" | "updated_at"
+type ValidOrder = "asc" | "desc"
+
 type FormStateData = {
   fights: Fight[]
   meta: PaginationMeta
   drawerOpen: boolean
   error: string | null
+  sort: string
+  order: string
 }
 
 export default function Fights({
@@ -39,11 +37,18 @@ export default function Fights({
 }: FightsProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
+  const { saveLocally, getLocally } = useLocalStorage()
+  const [viewMode, setViewMode] = useState<"table" | "mobile">(
+    (getLocally("fightViewMode") as "table" | "mobile") ||
+      (initialIsMobile ? "mobile" : "table")
+  )
   const { formState, dispatchForm } = useForm<FormStateData>({
     fights: initialFights,
     meta: initialMeta,
     drawerOpen: false,
     error: null,
+    sort: initialSort,
+    order: initialOrder,
   })
   const { meta, fights, drawerOpen, error } = formState.data
   const [selectedFight, setSelectedFight] = useState<Fight | null>(null)
@@ -172,64 +177,27 @@ export default function Fights({
   }
 
   return (
-    <Box>
-      <Stack spacing={2} sx={{ mb: 4 }}>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            gap: { xs: 1, sm: 1.5 },
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <FightsControls
-            sort={sort}
-            order={order}
-            page={meta.current_page}
-            totalPages={meta.total_pages}
-            onSortChange={handleSortChange}
-            onOrderChange={handleOrderChange}
-            onPageChange={handlePageChange}
-          >
-            <Box my={2}>
-              {fights.length === 0 ? (
-                <Typography variant="body1" sx={{ color: "#ffffff" }}>
-                  No fights available
-                </Typography>
-              ) : (
-                fights.map(fight => (
-                  <FightDetail
-                    key={fight.id}
-                    fight={fight}
-                    onDelete={handleDeleteFight}
-                    isMobile={isMobile}
-                  />
-                ))
-              )}
-            </Box>
-          </FightsControls>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenCreateDrawer}
-            sx={{ px: 2 }}
-            aria-label="create new fight"
-          >
-            New
-          </Button>
-        </Box>
-      </Stack>
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-      <FightForm
-        open={drawerOpen}
-        onClose={handleCloseCreateDrawer}
-        setFight={handleSaveFight}
+    <>
+      <Menu viewMode={viewMode} setViewMode={setViewMode} />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
+        <MainHeader title="Fights" icon={<Icon keyword="Fights" size="36" />} />
+      </Box>
+      <View
+        viewMode={viewMode}
+        formState={formState}
+        dispatchForm={dispatchForm}
+        onPageChange={handlePageChange}
+        onSortChange={handleSortChange}
+        onOrderChange={() => handleSortChange(sort as ValidSort)}
+        initialIsMobile={initialIsMobile}
       />
-    </Box>
+    </>
   )
 }

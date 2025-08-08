@@ -78,82 +78,26 @@ const categoryMap: Record<Keyword, Category> = {
 
 // Map keywords to JSX icon elements
 const iconMap: Record<Keyword, React.ReactElement> = {
-  Juncture: (
-    <Box component="span">
-      <IoIosClock />
-    </Box>
-  ),
-  Site: (
-    <Box component="span">
-      <GiMagicGate />
-    </Box>
-  ),
-  "Feng Shui Site": (
-    <Box component="span">
-      <GiMagicGate />
-    </Box>
-  ),
-  Fight: (
-    <Box component="span">
-      <GiSpikyExplosion />
-    </Box>
-  ),
-  Fighter: (
-    <Box component="span">
-      <GiSwordman />
-    </Box>
-  ),
-  Character: (
-    <Box component="span">
-      <IoPeopleSharp />
-    </Box>
-  ),
+  Juncture: <IoIosClock />,
+  Site: <GiMagicGate />,
+  "Feng Shui Site": <GiMagicGate />,
+  Fight: <GiSpikyExplosion />,
+  Fighter: <GiSwordman />,
+  Character: <IoPeopleSharp />,
   Party: <GroupIcon />,
   Faction: <FlagIcon />,
-  Schtick: (
-    <Box component="span">
-      <VscGithubAction />
-    </Box>
-  ),
+  Schtick: <VscGithubAction />,
   Description: <DescriptionIcon />,
-  Appearance: (
-    <Box component="span">
-      <MdFaceRetouchingNatural />
-    </Box>
-  ),
+  Appearance: <MdFaceRetouchingNatural />,
   Skill: <BuildIcon />,
-  Vehicle: (
-    <Box component="span">
-      <FaCarCrash />
-    </Box>
-  ),
+  Vehicle: <FaCarCrash />,
   "Personal Detail": <AssignmentIndIcon />,
-  "Action Value": (
-    <Box component="span">
-      <FaBolt />
-    </Box>
-  ),
-  Dress: (
-    <Box component="span">
-      <GiClothes />
-    </Box>
-  ),
-  "Melodramatic Hook": (
-    <Box component="span">
-      <GiDramaMasks />
-    </Box>
-  ),
+  "Action Value": <FaBolt />,
+  Dress: <GiClothes />,
+  "Melodramatic Hook": <GiDramaMasks />,
   Background: <AutoStoriesIcon />,
-  Weapon: (
-    <Box component="span">
-      <FaGun />
-    </Box>
-  ),
-  Action: (
-    <Box component="span">
-      <BoltIcon sx={{ fontSize: 36 }} />
-    </Box>
-  ),
+  Weapon: <FaGun />,
+  Action: <BoltIcon sx={{ fontSize: 36 }} />,
   "Add Character": (
     <Box component="span">
       <PersonAddIcon />
@@ -192,9 +136,13 @@ export const Icon: React.FC<IconProps> = ({
   try {
     return React.cloneElement(iconElement, {
       ...props,
+      size: size || 24,
+      color: color || defaultColor,
       sx: {
         color: color || defaultColor,
         fontSize: size || 24,
+        height: size || 24,
+        width: size || 24,
         "& .MuiSvgIcon-root": {
           color: color || defaultColor,
           fontSize: size || 24,

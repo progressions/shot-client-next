@@ -212,7 +212,7 @@ export default function Characters({
       >
         <MainHeader
           title="Characters"
-          icon={<Icon keyword="Characters" size="28" />}
+          icon={<Icon keyword="Characters" size="36" />}
         />
       </Box>
       <CharactersView

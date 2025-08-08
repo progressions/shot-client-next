@@ -2,14 +2,13 @@
 import { Box, Table } from "@mui/material"
 import { FormStateType, FormStateAction } from "@/reducers"
 import {
-  CharactersMobile,
-  CharactersTableHeader,
-  CharactersTableBody,
-  CharacterFilter,
-} from "@/components/characters"
-import { SortControls } from "@/components/ui"
+  FightsMobile,
+  FightsControls,
+  TableHeader,
+  TableBody,
+} from "@/components/fights"
 
-interface CharactersViewProps {
+interface FightsViewProps {
   viewMode: "table" | "mobile"
   formState: FormStateType<FormStateData>
   dispatchForm: (action: FormStateAction<FormStateData>) => void
@@ -21,16 +20,16 @@ interface CharactersViewProps {
 
 type ValidSort = "name" | "type" | "created_at" | "updated_at"
 type FormStateData = {
-  characters: Character[]
+  fights: Fight[]
   meta: PaginationMeta
   sort: string
   order: string
-  character_type: string
+  fight_type: string
   archetype: string
   faction_id: string
 }
 
-interface Character {
+interface Fight {
   id: string
   name: string
   type: string
@@ -43,7 +42,7 @@ interface PaginationMeta {
   total_pages: number
 }
 
-export default function CharactersView({
+export default function FightsView({
   viewMode,
   formState,
   dispatchForm,
@@ -51,8 +50,8 @@ export default function CharactersView({
   onSortChange,
   onOrderChange,
   initialIsMobile,
-}: CharactersViewProps) {
-  const { characters, meta, sort, order } = formState.data
+}: FightsViewProps) {
+  const { fights, meta, sort, order } = formState.data
 
   const formatDate = (date: string) => {
     if (viewMode === "mobile") {
@@ -68,23 +67,19 @@ export default function CharactersView({
 
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
-      <SortControls
-        route="/characters"
-        validSorts={["name", "type", "created_at", "updated_at"]}
+      <FightsControls
         sort={sort}
         order={order}
         page={meta.current_page}
         totalPages={meta.total_pages}
+        onSortChange={onSortChange}
+        onOrderChange={onOrderChange}
+        onPageChange={onPageChange}
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
-        filter={<CharacterFilter
-            dispatch={dispatchForm}
-            includeCharacters={false}
-            omit={["add"]}
-          />}
       >
         {viewMode === "mobile" ? (
-          <CharactersMobile
+          <FightsMobile
             formState={formState}
             dispatchForm={dispatchForm}
             onPageChange={onPageChange}
@@ -101,20 +96,17 @@ export default function CharactersView({
                   tableLayout: "fixed",
                 }}
               >
-                <CharactersTableHeader
+                <TableHeader
                   sort={sort}
                   order={order}
                   onSortChange={onSortChange}
                 />
-                <CharactersTableBody
-                  characters={characters}
-                  formatDate={formatDate}
-                />
+                <TableBody fights={fights} formatDate={formatDate} />
               </Table>
             </Box>
           </>
         )}
-      </SortControls>
+      </FightsControls>
     </Box>
   )
 }
