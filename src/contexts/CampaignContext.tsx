@@ -44,24 +44,25 @@ export function CampaignProvider({ children }: CampaignProviderProperties) {
     null
   )
 
-  const setCurrentCampaign = async (
-    camp: Campaign | null
-  ): Promise<Campaign | null> => {
-    try {
-      const response = await client.setCurrentCampaign(camp)
-      const { data } = response || {}
-      if (!data) {
-        console.error("Failed to set current campaign")
+  const setCurrentCampaign = useCallback(
+    async (camp: Campaign | null): Promise<Campaign | null> => {
+      try {
+        const response = await client.setCurrentCampaign(camp)
+        const { data } = response || {}
+        if (!data) {
+          console.error("Failed to set current campaign")
+          return null
+        }
+        setCampaign(data)
+        saveLocally(`currentCampaign-${user?.id}`, data)
+        return data
+      } catch (error) {
+        console.error(error)
         return null
       }
-      setCampaign(data)
-      saveLocally(`currentCampaign-${user?.id}`, data)
-      return data
-    } catch (error) {
-      console.error(error)
-      return null
-    }
-  }
+    },
+    [client, user?.id, saveLocally]
+  )
 
   const getCurrentCampaign = useCallback(async (): Promise<Campaign | null> => {
     try {

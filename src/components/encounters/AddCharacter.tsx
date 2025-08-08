@@ -6,15 +6,7 @@ import { CharacterFilter } from "@/components/characters"
 import { type Entity } from "@/types"
 import { useEncounter } from "@/contexts"
 
-type AddCharacterProps = {
-  open?: boolean
-  onClose?: () => void
-}
-
-export default function AddCharacter({
-  open = false,
-  onClose,
-}: AddCharacterProps) {
+export default function AddCharacter() {
   const { encounter, updateEncounter } = useEncounter()
   const [entity, setEntity] = useState<Entity | null>(null)
 

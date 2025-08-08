@@ -7,12 +7,7 @@ import { VehicleFilter } from "@/components/vehicles"
 import { type Entity } from "@/types"
 import { useEncounter } from "@/contexts"
 
-type AddVehicleProps = {
-  open?: boolean
-  onClose?: () => void
-}
-
-export default function AddVehicle({ open = false, onClose }: AddVehicleProps) {
+export default function AddVehicle() {
   const { encounter, updateEncounter } = useEncounter()
   const [entity, setEntity] = useState<Entity | null>(null)
 

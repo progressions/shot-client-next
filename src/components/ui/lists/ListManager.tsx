@@ -44,14 +44,6 @@ export function ListManager({
 }: ListManagerProperties) {
   const { client } = useClient()
 
-  //********
-  //
-  // childItems: the set of items, such as Schtick[], from 'character.schticks'
-  // selectedChild: the entity selected from the autocomplete, such as Schtick
-  // id: the id of the selected entity, such as Schtick.id
-  //
-  //********
-  //
   const initialData = {
     parentEntity: initialParent,
     selectedChild: null,
@@ -65,7 +57,6 @@ export function ListManager({
   const collectionIdsName = pluralize.singular(collectionName) + "_ids"
   const collectionIds = parentEntity[collectionIdsName] || []
   const { items, meta } = paginateArray<Entity>(childItems, page, 5)
-  const id = selectedChild?.id
 
   const getFunc = `get${collectionName.charAt(0).toUpperCase() + collectionName.slice(1)}`
   const singularEntityName = pluralize

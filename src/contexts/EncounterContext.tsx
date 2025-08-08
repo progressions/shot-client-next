@@ -116,7 +116,13 @@ export function EncounterProvider({
         value: campaignData.encounter,
       })
     }
-  }, [campaignData, contextEncounter, dispatchEncounter, localAction])
+  }, [
+    encounter?.id,
+    campaignData,
+    contextEncounter,
+    dispatchEncounter,
+    localAction,
+  ])
 
   useEffect(() => {
     async function fetchAssociations() {

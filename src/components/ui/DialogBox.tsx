@@ -1,16 +1,11 @@
-"use client"
-
-import { useRef } from "react"
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  useTheme,
 } from "@mui/material"
 import { ConfirmDialog } from "@/components/ui"
 import { FormActions, useForm } from "@/reducers"
-import { useToast, useClient } from "@/contexts"
 
 interface DialogBoxProps {
   open: boolean
@@ -27,21 +22,10 @@ export function DialogBox({
   children,
   actions,
 }: DialogBoxProps) {
-  const { client } = useClient()
-  const { toastSuccess, toastError } = useToast()
-  const theme = useTheme()
   const { formState, dispatchForm } = useForm<FormStateData>({
     isConfirmDialogOpen: false,
   })
-  const {
-    isDragging,
-    isConfirmDialogOpen,
-    hasUploaded,
-    image_urls,
-    uploadStatus,
-    uploadErrorMsg,
-  } = formState.data
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { isConfirmDialogOpen } = formState.data
 
   const handleClose = () => {
     if (hasUploaded) {

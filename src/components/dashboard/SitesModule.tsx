@@ -3,7 +3,7 @@ import { getServerClient } from "@/lib/getServerClient"
 import { SiteBadge } from "@/components/badges"
 import Link from "next/link"
 import { Icon } from "@/components/ui"
-import { ModuleHeader } from "@/components/dashboard"
+import { ErrorModule, ModuleHeader } from "@/components/dashboard"
 import type { Site } from "@/types"
 
 interface SitesModuleProps {
@@ -20,14 +20,25 @@ export default async function SitesModule({
     throw new Error("Failed to initialize client")
   }
 
-  const sitesResponse = await client.getSites({
-    user_id: userId,
-    per_page: 5,
-    sort: "created_at",
-    order: "desc",
-  })
-  const sites: Site[] = sitesResponse.data?.sites || []
-
+  let sites: Site[] = []
+  try {
+    const sitesResponse = await client.getSites({
+      user_id: userId,
+      per_page: 5,
+      sort: "created_at",
+      order: "desc",
+    })
+    sites = sitesResponse.data?.sites || []
+  } catch (error) {
+    console.error("Error fetching sites:", error)
+    return (
+      <ErrorModule
+        title="Your Sites"
+        message="Failed to load sites."
+        icon={<Icon keyword="Site" />}
+      />
+    )
+  }
   const sizeMap = {
     small: "sm",
     medium: "md",

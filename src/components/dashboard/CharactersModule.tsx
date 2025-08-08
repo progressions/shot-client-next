@@ -3,7 +3,7 @@ import { getServerClient } from "@/lib/getServerClient"
 import { CharacterBadge } from "@/components/badges"
 import Link from "next/link"
 import { Icon } from "@/components/ui"
-import { ModuleHeader } from "@/components/dashboard"
+import { ErrorModule, ModuleHeader } from "@/components/dashboard"
 import type { Character } from "@/types"
 
 interface CharactersModuleProps {
@@ -20,13 +20,25 @@ export default async function CharactersModule({
     throw new Error("Failed to initialize client")
   }
 
-  const charactersResponse = await client.getCharacters({
-    user_id: userId,
-    per_page: 5,
-    sort: "created_at",
-    order: "desc",
-  })
-  const characters: Character[] = charactersResponse.data?.characters || []
+  let characters: Character[] = []
+  try {
+    const charactersResponse = await client.getCharacters({
+      user_id: userId,
+      per_page: 5,
+      sort: "created_at",
+      order: "desc",
+    })
+    characters = charactersResponse.data?.characters || []
+  } catch (error) {
+    console.error("Error fetching characters:", error)
+    return (
+      <ErrorModule
+        title="Your Characters"
+        message="Failed to load characters."
+        icon={<Icon keyword="Character" />}
+      />
+    )
+  }
 
   const sizeMap = {
     small: "sm",

@@ -3,7 +3,7 @@ import { getServerClient } from "@/lib/getServerClient"
 import { FightBadge } from "@/components/badges"
 import Link from "next/link"
 import { Icon } from "@/components/ui"
-import { ModuleHeader } from "@/components/dashboard"
+import { ErrorModule, ModuleHeader } from "@/components/dashboard"
 import type { Fight } from "@/types"
 
 interface FightsModuleProps {
@@ -20,14 +20,26 @@ export default async function FightsModule({
     throw new Error("Failed to initialize client")
   }
 
-  const fightsResponse = await client.getFights({
-    user_id: userId,
-    unended: true,
-    per_page: 5,
-    sort: "created_at",
-    order: "desc",
-  })
-  const fights: Fight[] = fightsResponse.data?.fights || []
+  let fights: Fight[] = []
+  try {
+    const fightsResponse = await client.getFights({
+      user_id: userId,
+      unended: true,
+      per_page: 5,
+      sort: "created_at",
+      order: "desc",
+    })
+    fights = fightsResponse.data?.fights || []
+  } catch (error) {
+    console.error("Error fetching fights:", error)
+    return (
+      <ErrorModule
+        title="Your Fights"
+        message="Failed to load fights."
+        icon={<Icon keyword="Fights" />}
+      />
+    )
+  }
 
   const sizeMap = {
     small: "sm",

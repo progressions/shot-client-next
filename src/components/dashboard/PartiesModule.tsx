@@ -3,7 +3,7 @@ import { getServerClient } from "@/lib/getServerClient"
 import { PartyBadge } from "@/components/badges"
 import Link from "next/link"
 import { Icon } from "@/components/ui"
-import { ModuleHeader } from "@/components/dashboard"
+import { ErrorModule, ModuleHeader } from "@/components/dashboard"
 import type { Party } from "@/types"
 
 interface PartiesModuleProps {
@@ -20,13 +20,25 @@ export default async function PartiesModule({
     throw new Error("Failed to initialize client")
   }
 
-  const partiesResponse = await client.getParties({
-    user_id: userId,
-    per_page: 5,
-    sort: "created_at",
-    order: "desc",
-  })
-  const parties: Party[] = partiesResponse.data?.parties || []
+  let parties: Party[]
+  try {
+    const partiesResponse = await client.getParties({
+      user_id: userId,
+      per_page: 5,
+      sort: "created_at",
+      order: "desc",
+    })
+    parties = partiesResponse.data?.parties || []
+  } catch (error) {
+    console.error("Error fetching parties:", error)
+    return (
+      <ErrorModule
+        title="Your Parties"
+        message="Failed to load parties."
+        icon={<Icon keyword="Party" />}
+      />
+    )
+  }
 
   const sizeMap = {
     small: "sm",
