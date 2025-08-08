@@ -1,5 +1,5 @@
-import theme from "@/theme" // Adjust path to your theme file
-const palette = theme.palette
+import { themeOptions } from "@/theme" // Adjust path to your theme file
+import { customThemeOptions } from "@/customThemeOptions" // Adjust path to your customThemeOptions file
 
 export type Category =
   | "Combat"
@@ -10,10 +10,10 @@ export type Category =
   | "Interface"
 
 export const iconColorMap: Record<Category, { color: string; hoverColor: string }> = {
-  Combat: { color: palette.error.main, hoverColor: palette.error.dark }, // Using theme's error colors
-  Characters: { color: palette.secondary.main, hoverColor: palette.secondary.dark }, // Using #f50057
-  Affiliations: { color: palette.custom.gold.main, hoverColor: palette.custom.gold.light }, // From customThemeOptions
-  Details: { color: palette.custom.purple.main, hoverColor: palette.custom.purple.light }, // From customThemeOptions
-  Utility: { color: palette.primary.main, hoverColor: palette.primary.dark }, // Using #ff8f00
-  Interface: { color: palette.primary.main, hoverColor: palette.primary.dark }, // Using #ff8f00
+  Combat: { color: customThemeOptions.palette.error.main, hoverColor: customThemeOptions.palette.error.dark }, // #f44336, #d32f2f
+  Characters: { color: themeOptions.palette.secondary.main, hoverColor: themeOptions.palette.secondary.dark }, // #f50057, darker variant
+  Affiliations: { color: customThemeOptions.palette.custom.gold.main, hoverColor: customThemeOptions.palette.custom.gold.light }, // #ffd700, #ffea00
+  Details: { color: customThemeOptions.palette.custom.purple.main, hoverColor: customThemeOptions.palette.custom.purple.light }, // #ab47bc, #ce93d8
+  Utility: { color: themeOptions.palette.primary.main, hoverColor: themeOptions.palette.primary.dark }, // #ff8f00, darker variant
+  Interface: { color: themeOptions.palette.primary.main, hoverColor: themeOptions.palette.primary.dark }, // #ff8f00, darker variant
 }

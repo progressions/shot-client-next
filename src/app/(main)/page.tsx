@@ -22,29 +22,6 @@ export default async function HomePage() {
   const searchUserId =
     campaign && campaign.gamemaster?.id === user.id ? null : user.id
 
-  const partiesResponse = await client.getParties({
-    user_id: searchUserId,
-    per_page: 5,
-    sort: "created_at",
-    order: "desc",
-  })
-  const parties: Party[] = partiesResponse.data?.parties || []
-
-  const sitesResponse = await client.getSites({
-    user_id: searchUserId,
-    per_page: 5,
-    sort: "created_at",
-    order: "desc",
-  })
-  const sites: Site[] = sitesResponse.data?.sites || []
-
-  const usersResponse = await client.getUsers({
-    per_page: 5,
-    sort: "created_at",
-    order: "desc",
-  })
-  const players: User[] = usersResponse.data?.users || []
-
   // Detect mobile device on the server
   const headersState = await headers()
   const userAgent = headersState.get("user-agent") || ""
@@ -58,9 +35,6 @@ export default async function HomePage() {
           user={user}
           campaign={campaign}
           userId={searchUserId}
-          parties={parties}
-          sites={sites}
-          players={players}
           initialIsMobile={initialIsMobile}
         />
       </Suspense>
