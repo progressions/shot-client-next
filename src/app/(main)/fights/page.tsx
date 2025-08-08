@@ -35,16 +35,21 @@ export default async function FightsPage({
   }
 
   // Fetch fights for the requested page, sort, and order
-  let fightsResponse: FightsResponse
+  let fightsResponse: FightsResponse = {
+    fights: [],
+    meta: { current_page: page, total_pages: 1 },
+  }
   try {
     const response = await client.getFights({ page, sort, order })
-    fightsResponse = response.data || { fights: [], meta: { current_page: page, total_pages: 1 } }
+    if (!response.data) {
+      throw new Error("No data returned from getFights")
+    }
+    fightsResponse = response.data
     if (page > fightsResponse.meta.total_pages) {
       redirect("/fights?page=1&sort=created_at&order=desc")
     }
   } catch (error) {
     console.error("Error fetching fights in FightsPage:", error)
-    fightsResponse = { fights: [], meta: { current_page: page, total_pages: 1 } }
   }
 
   // Detect mobile device on the server

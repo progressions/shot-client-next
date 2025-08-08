@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation"
 import {
   useMediaQuery,
   useTheme,
-  Pagination,
   Box,
   Button,
   Typography,
@@ -12,7 +11,6 @@ import {
   Stack,
 } from "@mui/material"
 import { FightsControls, FightDetail, FightForm } from "@/components/fights"
-import { Icon, MainHeader } from "@/components/ui"
 import type { Fight, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts"
@@ -59,11 +57,11 @@ export default function Fights({
   })
 
   type ValidSort = "created_at" | "updated_at" | "name"
+  type ValidOrder = "asc" | "desc"
   const validSorts: readonly ValidSort[] = useMemo(
     () => ["created_at", "updated_at", "name"],
     []
   )
-  type ValidOrder = "asc" | "desc"
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
   const fetchFights = useCallback(
@@ -83,7 +81,7 @@ export default function Fights({
         dispatchForm({
           type: FormActions.UPDATE,
           name: "meta",
-          value: response.data.meta,
+          value: response.data.meta || { current_page: page, total_pages: 1 },
         })
         dispatchForm({ type: FormActions.ERROR, payload: null })
       } catch (error_: unknown) {
@@ -148,10 +146,7 @@ export default function Fights({
     router.refresh()
   }
 
-  const handlePageChange = async (
-    _event: React.ChangeEvent<unknown>,
-    page: number
-  ) => {
+  const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
       router.push(`/fights?page=1&sort=${sort}&order=${order}`, {
         scroll: false,
@@ -179,7 +174,6 @@ export default function Fights({
   return (
     <Box>
       <Stack spacing={2} sx={{ mb: 4 }}>
-        <MainHeader title="Fights" icon={<Icon keyword="Fights" size="28" />} />
         <Box
           sx={{
             display: "flex",
@@ -192,9 +186,29 @@ export default function Fights({
           <FightsControls
             sort={sort}
             order={order}
+            page={meta.current_page}
+            totalPages={meta.total_pages}
             onSortChange={handleSortChange}
             onOrderChange={handleOrderChange}
-          />
+            onPageChange={handlePageChange}
+          >
+            <Box my={2}>
+              {fights.length === 0 ? (
+                <Typography variant="body1" sx={{ color: "#ffffff" }}>
+                  No fights available
+                </Typography>
+              ) : (
+                fights.map(fight => (
+                  <FightDetail
+                    key={fight.id}
+                    fight={fight}
+                    onDelete={handleDeleteFight}
+                    isMobile={isMobile}
+                  />
+                ))
+              )}
+            </Box>
+          </FightsControls>
           <Button
             variant="contained"
             color="primary"
@@ -211,40 +225,6 @@ export default function Fights({
           {error}
         </Alert>
       )}
-      <Pagination
-        count={meta.total_pages}
-        page={meta.current_page}
-        onChange={handlePageChange}
-        variant="outlined"
-        color="primary"
-        shape="rounded"
-        size="large"
-      />
-      <Box my={2}>
-        {fights.length === 0 ? (
-          <Typography variant="body1" sx={{ color: "#ffffff" }}>
-            No fights available
-          </Typography>
-        ) : (
-          fights.map(fight => (
-            <FightDetail
-              key={fight.id}
-              fight={fight}
-              onDelete={handleDeleteFight}
-              isMobile={isMobile}
-            />
-          ))
-        )}
-      </Box>
-      <Pagination
-        count={meta.total_pages}
-        page={meta.current_page}
-        onChange={handlePageChange}
-        variant="outlined"
-        color="primary"
-        shape="rounded"
-        size="large"
-      />
       <FightForm
         open={drawerOpen}
         onClose={handleCloseCreateDrawer}
