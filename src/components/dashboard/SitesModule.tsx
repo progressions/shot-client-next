@@ -1,19 +1,33 @@
-import type { Site } from "@/types"
-import { Stack, Box, Typography } from "@mui/material"
+import { Box, Stack, Typography } from "@mui/material"
+import { getServerClient } from "@/lib/getServerClient"
 import { SiteBadge } from "@/components/badges"
 import Link from "next/link"
 import { Icon } from "@/components/ui"
 import { ModuleHeader } from "@/components/dashboard"
+import type { Site } from "@/types"
 
-type SitesModuleProperties = {
-  sites: Site[]
+interface SitesModuleProps {
+  userId: string | null
   size?: "small" | "medium" | "large"
 }
 
-export default function SitesModule({
-  sites,
+export default async function SitesModule({
+  userId,
   size = "medium",
-}: SitesModuleProperties) {
+}: SitesModuleProps) {
+  const client = await getServerClient()
+  if (!client) {
+    throw new Error("Failed to initialize client")
+  }
+
+  const sitesResponse = await client.getSites({
+    user_id: userId,
+    per_page: 5,
+    sort: "created_at",
+    order: "desc",
+  })
+  const sites: Site[] = sitesResponse.data?.sites || []
+
   const sizeMap = {
     small: "sm",
     medium: "md",
@@ -31,7 +45,7 @@ export default function SitesModule({
         backgroundColor: "#2d2d2d",
       }}
     >
-      <ModuleHeader title="Your Sites" icon={<Icon keyword="Sites" />} />
+      <ModuleHeader title="Your Sites" icon={<Icon keyword="Site" />} />
       <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
         {sites.map(site => (
           <SiteBadge key={site.id} site={site} size={abbrevSize} />

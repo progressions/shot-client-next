@@ -1,25 +1,41 @@
-import type { Fight } from "@/types"
-import { Stack, Box, Typography } from "@mui/material"
+import { Box, Stack, Typography } from "@mui/material"
+import { getServerClient } from "@/lib/getServerClient"
 import { FightBadge } from "@/components/badges"
 import Link from "next/link"
 import { Icon } from "@/components/ui"
 import { ModuleHeader } from "@/components/dashboard"
+import type { Fight } from "@/types"
 
-type FightsModuleProperties = {
-  fights: Fight[]
-  size: "small" | "medium" | "large"
+interface FightsModuleProps {
+  userId: string | null
+  size?: "small" | "medium" | "large"
 }
 
-export default function FightsModule({
-  fights,
+export default async function FightsModule({
+  userId,
   size = "medium",
-}: FightsModuleProperties) {
+}: FightsModuleProps) {
+  const client = await getServerClient()
+  if (!client) {
+    throw new Error("Failed to initialize client")
+  }
+
+  const fightsResponse = await client.getFights({
+    user_id: userId,
+    unended: true,
+    per_page: 5,
+    sort: "created_at",
+    order: "desc",
+  })
+  const fights: Fight[] = fightsResponse.data?.fights || []
+
   const sizeMap = {
     small: "sm",
     medium: "md",
     large: "lg",
   }
   const abbrevSize = sizeMap[size] || "md"
+
   return (
     <Box
       sx={{

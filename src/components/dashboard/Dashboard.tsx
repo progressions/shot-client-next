@@ -1,5 +1,3 @@
-"use client"
-
 import { Stack, Box, Typography } from "@mui/material"
 import { Site, Party, User, Fight, Character, Campaign } from "@/types"
 import { UserName } from "@/components/users"
@@ -32,15 +30,15 @@ export default function Dashboard({
   players,
   sites,
 }: DashboardProperties) {
-  const fight = fights[0]
+  const fight =  null // fights[0]
 
   return (
     <Box>
       <Typography variant="h6" color="#fff" gutterBottom>
         Welcome, <UserName user={user} />
       </Typography>
-      {fight.started_at && !fight.ended_at && <PlayFightBanner fight={fight} />}
-      {!(fight.started_at && !fight.ended_at) && (
+      {fight?.started_at && !fight?.ended_at && <PlayFightBanner fight={fight} />}
+      {!(fight?.started_at && !fight?.ended_at) && (
         <CampaignBanner campaign={campaign} />
       )}
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 2 }}>
@@ -50,7 +48,6 @@ export default function Dashboard({
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 2 }}>
         <PartiesModule parties={parties} size="small" />
         <SitesModule sites={sites} size="small" />
-        <PlayersModule players={players} size="small" />
       </Stack>
     </Box>
   )

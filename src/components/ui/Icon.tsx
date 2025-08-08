@@ -2,7 +2,7 @@ import React from "react"
 import pluralize from "pluralize"
 import PersonAddIcon from "@mui/icons-material/PersonAdd"
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar"
-import { Box, useTheme } from "@mui/material"
+import { Box } from "@mui/material"
 import { IoIosClock } from "react-icons/io"
 import { GiMagicGate } from "react-icons/gi"
 import BoltIcon from "@mui/icons-material/Bolt"
@@ -23,6 +23,7 @@ import GroupIcon from "@mui/icons-material/Group"
 import FlagIcon from "@mui/icons-material/Flag"
 import DescriptionIcon from "@mui/icons-material/Description"
 import BuildIcon from "@mui/icons-material/Build"
+import { iconColorMap, type Category } from "@/components/ui/iconColors"
 
 // Define the keyword type
 type Keyword =
@@ -48,15 +49,6 @@ type Keyword =
   | "Juncture"
   | "Add Character"
   | "Add Vehicle"
-
-// Define category type
-type Category =
-  | "Combat"
-  | "Characters"
-  | "Affiliations"
-  | "Details"
-  | "Utility"
-  | "Interface"
 
 // Map keywords to categories
 const categoryMap: Record<Keyword, Category> = {
@@ -159,7 +151,7 @@ const iconMap: Record<Keyword, React.ReactElement> = {
   ),
   Action: (
     <Box component="span">
-      <BoltIcon sx={{ fontSize: 36, "& .MuiSvgIcon-root": { fontSize: 36 } }} />
+      <BoltIcon sx={{ fontSize: 36 }} />
     </Box>
   ),
   "Add Character": (
@@ -177,55 +169,36 @@ const iconMap: Record<Keyword, React.ReactElement> = {
 interface IconProps extends SvgIconProps {
   keyword: Keyword
   size?: number
+  color?: string
+  hoverColor?: string
 }
 
 // Reusable Icon component that renders the icon with category-based colors
-export const Icon: React.FC<IconProps> = ({ size, keyword, ...props }) => {
-  const theme = useTheme()
+export const Icon: React.FC<IconProps> = ({
+  size,
+  keyword,
+  color,
+  hoverColor,
+  ...props
+}) => {
   const singularKeyword = pluralize.singular(keyword) as Keyword
   const iconElement = iconMap[singularKeyword]
   if (!iconElement) return null
   const category = categoryMap[singularKeyword]
-  const colorMap: Record<Category, { color: string; hoverColor: string }> = {
-    Combat: {
-      color: theme.palette.error.main,
-      hoverColor: theme.palette.error.dark,
-    },
-    Characters: {
-      color: theme.palette.secondary.main,
-      hoverColor: theme.palette.secondary.dark,
-    },
-    Affiliations: {
-      color: theme.palette.custom.gold.main,
-      hoverColor: theme.palette.custom.gold.light,
-    },
-    Details: {
-      color: theme.palette.custom.purple.main,
-      hoverColor: theme.palette.custom.purple.light,
-    },
-    Utility: {
-      color: theme.palette.primary.main,
-      hoverColor: theme.palette.primary.dark,
-    },
-    Interface: {
-      color: theme.palette.primary.main,
-      hoverColor: theme.palette.primary.dark,
-    },
-  }
+
+  const { color: defaultColor, hoverColor: defaultHoverColor } = iconColorMap[category]
+
   try {
-    const { color, hoverColor } = colorMap[category]
-    // Clone the icon element to apply category-based colors and additional props
     return React.cloneElement(iconElement, {
       ...props,
       sx: {
-        color: props.color ? props.color : color, // Use provided color or category color
-        fontSize: size ? size : 24, // Default size is 24 if not provided
+        color: color || defaultColor,
+        fontSize: size || 24,
         "& .MuiSvgIcon-root": {
-          // Target nested SVG icons within Box
-          color: props.color ? props.color : color,
-          fontSize: size ? size : 24,
+          color: color || defaultColor,
+          fontSize: size || 24,
           "&:hover": {
-            color: hoverColor,
+            color: hoverColor || defaultHoverColor,
           },
         },
         ...props.sx,
