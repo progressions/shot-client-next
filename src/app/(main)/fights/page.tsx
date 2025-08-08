@@ -2,9 +2,10 @@ import { Suspense } from "react"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { CircularProgress } from "@mui/material"
-import { getPageParameters } from "@/lib"
+import { getUser, getServerClient, getPageParameters } from "@/lib"
 import { Fights } from "@/components/fights"
 import Breadcrumbs from "@/components/Breadcrumbs"
+import type { FightsResponse } from "@/types"
 
 export const metadata = {
   title: "Fights - Chi War",
@@ -15,6 +16,12 @@ export default async function FightsPage({
 }: {
   searchParams: Promise<{ page?: string; sort?: string; order?: string }>
 }) {
+  const client = await getServerClient()
+  const user = await getUser()
+  if (!client || !user) {
+    redirect("/login")
+  }
+
   // Validate parameters using getPageParameters
   const { page, sort, order } = await getPageParameters(searchParams, {
     validSorts: ["created_at", "updated_at", "name"],
@@ -22,9 +29,22 @@ export default async function FightsPage({
     defaultOrder: "desc",
   })
 
-  // Redirect if page is invalid (e.g., exceeds total_pages will be checked in Fights)
+  // Redirect if page is invalid
   if (page <= 0) {
     redirect("/fights?page=1&sort=created_at&order=desc")
+  }
+
+  // Fetch fights for the requested page, sort, and order
+  let fightsResponse: FightsResponse
+  try {
+    const response = await client.getFights({ page, sort, order })
+    fightsResponse = response.data || { fights: [], meta: { current_page: page, total_pages: 1 } }
+    if (page > fightsResponse.meta.total_pages) {
+      redirect("/fights?page=1&sort=created_at&order=desc")
+    }
+  } catch (error) {
+    console.error("Error fetching fights in FightsPage:", error)
+    fightsResponse = { fights: [], meta: { current_page: page, total_pages: 1 } }
   }
 
   // Detect mobile device on the server
@@ -39,9 +59,10 @@ export default async function FightsPage({
       </Suspense>
       <Suspense fallback={<CircularProgress />}>
         <Fights
-          page={page}
-          sort={sort as "created_at" | "updated_at" | "name"}
-          order={order}
+          initialFights={fightsResponse.fights}
+          initialMeta={fightsResponse.meta}
+          initialSort={sort}
+          initialOrder={order}
           initialIsMobile={initialIsMobile}
         />
       </Suspense>
