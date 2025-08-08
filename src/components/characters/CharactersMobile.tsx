@@ -146,7 +146,11 @@ export default function CharactersMobile({
         </Button>
       </Box>
       {showFilter && (
-        <CharacterFilter dispatch={dispatchForm} includeCharacters={false} omit={["add"]} />
+        <CharacterFilter
+          dispatch={dispatchForm}
+          includeCharacters={false}
+          omit={["add"]}
+        />
       )}
       {characters.length === 0 && (
         <Typography sx={{ color: "#ffffff" }}>

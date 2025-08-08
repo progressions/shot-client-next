@@ -254,7 +254,9 @@ export default function CharacterFilter({
             allowNone={false}
           />
         )}
-        {!omit.includes("add") && <AddButton onClick={handleAddMember} disabled={!selectedChild} />}
+        {!omit.includes("add") && (
+          <AddButton onClick={handleAddMember} disabled={!selectedChild} />
+        )}
       </Stack>
     </Box>
   )

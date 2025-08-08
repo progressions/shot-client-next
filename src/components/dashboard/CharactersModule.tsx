@@ -45,10 +45,17 @@ export default async function CharactersModule({
         backgroundColor: "#2d2d2d",
       }}
     >
-      <ModuleHeader title="Your Characters" icon={<Icon keyword="Character" />} />
+      <ModuleHeader
+        title="Your Characters"
+        icon={<Icon keyword="Character" />}
+      />
       <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
         {characters.map(character => (
-          <CharacterBadge key={character.id} character={character} size={abbrevSize} />
+          <CharacterBadge
+            key={character.id}
+            character={character}
+            size={abbrevSize}
+          />
         ))}
       </Stack>
       <Typography variant="body2">

@@ -59,7 +59,7 @@ export default function WeaponPageClient({
   const { campaignData } = useCampaign()
   const { toastError } = useToast()
   const { formState, dispatchForm } = useForm<FormStateData>({
-    entity: initialWeapon
+    entity: initialWeapon,
   })
   const { status, errors = {} } = formState
   const weapon = formState.data.entity

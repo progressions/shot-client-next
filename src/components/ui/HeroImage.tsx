@@ -19,7 +19,7 @@ export function HeroImage({
   positionable = true,
   height = 300,
 }: HeroImageProps) {
-    console.log("HeroImage entity.image_url", entity.image_url)
+  console.log("HeroImage entity.image_url", entity.image_url)
   if (positionable) {
     return (
       <PositionableImage

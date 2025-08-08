@@ -186,7 +186,8 @@ export const Icon: React.FC<IconProps> = ({
   if (!iconElement) return null
   const category = categoryMap[singularKeyword]
 
-  const { color: defaultColor, hoverColor: defaultHoverColor } = iconColorMap[category]
+  const { color: defaultColor, hoverColor: defaultHoverColor } =
+    iconColorMap[category]
 
   try {
     return React.cloneElement(iconElement, {

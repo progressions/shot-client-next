@@ -32,7 +32,9 @@ export default function PartyPageClient({
   party: initialParty,
 }: PartyPageClientProperties) {
   const { campaignData } = useCampaign()
-  const { formState, dispatchForm } = useForm<FormStateData>({ entity: initialParty })
+  const { formState, dispatchForm } = useForm<FormStateData>({
+    entity: initialParty,
+  })
   const party = formState.data.entity
 
   const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(

@@ -33,7 +33,9 @@ export default function SitePageClient({
   site: initialSite,
 }: SitePageClientProperties) {
   const { campaignData } = useCampaign()
-  const { formState, dispatchForm } = useForm<FormStateData>({ entity: initialSite })
+  const { formState, dispatchForm } = useForm<FormStateData>({
+    entity: initialSite,
+  })
   const { status, errors } = formState
   const site = formState.data.entity
 

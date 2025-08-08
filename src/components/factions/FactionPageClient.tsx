@@ -25,7 +25,9 @@ export default function FactionPageClient({
   faction: initialFaction,
 }: FactionPageClientProperties) {
   const { campaignData } = useCampaign()
-  const { formState, dispatchForm } = useForm<FormStateData>({ entity: initialFaction })
+  const { formState, dispatchForm } = useForm<FormStateData>({
+    entity: initialFaction,
+  })
   const faction = formState.data.entity
 
   const { updateEntity, deleteEntity } = useEntity(faction, dispatchForm)

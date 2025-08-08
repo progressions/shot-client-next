@@ -78,7 +78,11 @@ export default function CharactersView({
         />
       ) : (
         <>
-          <CharacterFilter dispatch={dispatchForm} includeCharacters={false} omit={["add"]} />
+          <CharacterFilter
+            dispatch={dispatchForm}
+            includeCharacters={false}
+            omit={["add"]}
+          />
           <Box sx={{ bgcolor: "#424242", borderRadius: 1 }}>
             <Table
               sx={{
