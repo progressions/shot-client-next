@@ -1,4 +1,3 @@
-// components/Breadcrumbs.tsx
 import Link from "next/link"
 import { headers } from "next/headers"
 import { Breadcrumbs as MuiBreadcrumbs, Typography } from "@mui/material"
