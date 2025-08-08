@@ -1,7 +1,6 @@
 import { CircularProgress } from "@mui/material"
 import { headers } from "next/headers"
 import { Suspense } from "react"
-import { redirect } from "next/navigation"
 import { getServerClient } from "@/lib/getServerClient"
 import type { Campaign } from "@/types"
 import { Dashboard } from "@/components/dashboard"
@@ -23,10 +22,7 @@ export default async function HomePage() {
   return (
     <>
       <Suspense fallback={<CircularProgress />}>
-        <Dashboard
-          campaign={campaign}
-          initialIsMobile={initialIsMobile}
-        />
+        <Dashboard campaign={campaign} initialIsMobile={initialIsMobile} />
       </Suspense>
     </>
   )
