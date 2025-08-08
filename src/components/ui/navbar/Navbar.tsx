@@ -1,23 +1,12 @@
-"use client"
-
-import { useRouter } from "next/navigation"
 import { Box, AppBar, Toolbar, Typography, Avatar } from "@mui/material"
 import Link from "next/link"
-import { useClient } from "@/contexts"
+import { getUser } from "@/lib/getServerClient"
 import { logoutAction } from "@/lib/actions"
-import { UserActions } from "@/reducers"
 import { Button } from "@/components/ui"
 import { MainMenu } from "@/components/ui/navbar"
 
-export function Navbar() {
-  const { jwt, user, dispatchCurrentUser } = useClient()
-  const router = useRouter()
-
-  const handleLogout = async () => {
-    await logoutAction(jwt)
-    dispatchCurrentUser({ type: UserActions.RESET })
-    router.push("/login")
-  }
+export async function Navbar() {
+  const user = await getUser()
 
   return (
     <AppBar position="static" sx={{ bgcolor: "#1d1d1d" }}>
@@ -46,16 +35,18 @@ export function Navbar() {
         <Box
           sx={{ display: "flex", alignItems: "center", gap: { xs: 1, sm: 2 } }}
         >
-          {user.id ? (
+          {user?.id ? (
             <>
               <Avatar
                 src={user.image_url ?? undefined}
                 alt={user.name}
                 sx={{ width: 32, height: 32 }}
               />
-              <Button variant="outlined" color="error" onClick={handleLogout}>
-                Logout
-              </Button>
+              <form action={logoutAction}>
+                <Button type="submit" variant="outlined" color="error">
+                  Logout
+                </Button>
+              </form>
             </>
           ) : (
             <Button
