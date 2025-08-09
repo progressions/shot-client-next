@@ -4,7 +4,6 @@ import { Stack, Box } from "@mui/material"
 import { FormActions, useForm } from "@/reducers"
 import { useClient } from "@/contexts"
 import {
-  JunctureAutocomplete,
   WeaponAutocomplete,
 } from "@/components/autocomplete"
 import { AddButton, Autocomplete } from "@/components/ui"
@@ -88,8 +87,16 @@ export default function WeaponFilter({
       })
       if (dispatch) {
         dispatch({ type: FormActions.UPDATE, name: "weapons", value: weapons })
-        dispatch({ type: FormActions.UPDATE, name: "category", value: category })
-        dispatch({ type: FormActions.UPDATE, name: "juncture", value: juncture })
+        dispatch({
+          type: FormActions.UPDATE,
+          name: "category",
+          value: category,
+        })
+        dispatch({
+          type: FormActions.UPDATE,
+          name: "juncture",
+          value: juncture,
+        })
       }
     } catch (error) {
       console.error("Error fetching weapons:", error)
@@ -109,14 +116,7 @@ export default function WeaponFilter({
           value: false,
         })
       })
-  }, [
-    client,
-    dispatchForm,
-    weapon_type,
-    selectedChild,
-    juncture,
-    fetchWeapons,
-  ])
+  }, [client, dispatchForm, weapon_type, selectedChild, juncture, fetchWeapons])
 
   const handleWeaponChange = (weapon: Weapon | null) => {
     dispatchForm({
