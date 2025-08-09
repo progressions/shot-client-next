@@ -69,7 +69,6 @@ export default function WeaponFilter({
         sort: "name",
         order: "asc",
       })
-      console.log("WeaponFilter Fetched weapons:", response.data.weapons)
       dispatchForm({
         type: FormActions.UPDATE,
         name: "weapons",
@@ -128,7 +127,6 @@ export default function WeaponFilter({
   }
 
   const handleJunctureChange = (value: string | null) => {
-    console.log("handleJunctureChange value", value)
     dispatchForm({ type: FormActions.UPDATE, name: "juncture", value: value })
   }
 
@@ -161,7 +159,6 @@ export default function WeaponFilter({
   }
 
   const handleAddMember = () => {
-    console.log("add", selectedChild)
     addMember?.(selectedChild)
     dispatchForm({
       type: FormActions.UPDATE,

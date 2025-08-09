@@ -56,8 +56,6 @@ export default function List({
     formState.data
   const router = useRouter()
 
-  console.log("formState.data", formState.data)
-
   useEffect(() => {
     saveLocally("weaponViewMode", viewMode)
   }, [viewMode, saveLocally])
@@ -84,7 +82,6 @@ export default function List({
           category,
           juncture,
         })
-        console.log("Fetched weapons:", response.data.weapons)
         dispatchForm({
           type: FormActions.UPDATE,
           name: "weapons",
