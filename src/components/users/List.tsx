@@ -123,6 +123,18 @@ export default function List({
     }
   }, [client, campaignData, dispatchForm, fetchUsers, validSorts, validOrders])
 
+  useEffect(() => {
+    const url = `/users?${queryParams({
+      page: 1,
+      sort,
+      order,
+    })}`
+    router.push(url, {
+      scroll: false,
+    })
+    fetchUsers(1, sort, order)
+  }, [fetchUsers, order, router, sort])
+
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
   }

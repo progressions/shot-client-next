@@ -132,6 +132,18 @@ export default function List({
     validOrders,
   ])
 
+  useEffect(() => {
+    const url = `/junctures?${queryParams({
+      page: 1,
+      sort,
+      order,
+    })}`
+    router.push(url, {
+      scroll: false,
+    })
+    fetchJunctures(1, sort, order)
+  }, [fetchJunctures, order, router, sort])
+
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
   }

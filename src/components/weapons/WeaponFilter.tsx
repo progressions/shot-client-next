@@ -3,9 +3,7 @@
 import { Stack, Box } from "@mui/material"
 import { FormActions, useForm } from "@/reducers"
 import { useClient } from "@/contexts"
-import {
-  WeaponAutocomplete,
-} from "@/components/autocomplete"
+import { WeaponAutocomplete } from "@/components/autocomplete"
 import { AddButton, Autocomplete } from "@/components/ui"
 import type { Weapon, Juncture } from "@/types"
 import { useCallback, useEffect } from "react"

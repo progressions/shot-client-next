@@ -142,12 +142,7 @@ export default function List({
       scroll: false,
     })
     fetchFactions(1, sort, order)
-  }, [
-    fetchFactions,
-    order,
-    router,
-    sort,
-  ])
+  }, [fetchFactions, order, router, sort])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })

@@ -132,6 +132,18 @@ export default function List({
     validOrders,
   ])
 
+  useEffect(() => {
+    const url = `/schticks?${queryParams({
+      page: 1,
+      sort,
+      order,
+    })}`
+    router.push(url, {
+      scroll: false,
+    })
+    fetchSchticks(1, sort, order)
+  }, [fetchSchticks, order, router, sort])
+
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
   }

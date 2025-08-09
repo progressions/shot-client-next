@@ -119,6 +119,18 @@ export default function List({
     }
   }, [client, campaignData, dispatchForm, fetchFights, validSorts, validOrders])
 
+  useEffect(() => {
+    const url = `/fights?${queryParams({
+      page: 1,
+      sort,
+      order,
+    })}`
+    router.push(url, {
+      scroll: false,
+    })
+    fetchFights(1, sort, order)
+  }, [fetchFights, order, router, sort])
+
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
   }

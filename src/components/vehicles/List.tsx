@@ -128,6 +128,18 @@ export default function List({
     validOrders,
   ])
 
+  useEffect(() => {
+    const url = `/vehicles?${queryParams({
+      page: 1,
+      sort,
+      order,
+    })}`
+    router.push(url, {
+      scroll: false,
+    })
+    fetchVehicles(1, sort, order)
+  }, [fetchVehicles, order, router, sort])
+
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
   }

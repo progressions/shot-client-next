@@ -138,6 +138,18 @@ export default function List({
     validOrders,
   ])
 
+  useEffect(() => {
+    const url = `/campaigns?${queryParams({
+      page: 1,
+      sort,
+      order,
+    })}`
+    router.push(url, {
+      scroll: false,
+    })
+    fetchCampaigns(1, sort, order)
+  }, [fetchCampaigns, order, router, sort])
+
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
   }
