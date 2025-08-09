@@ -1,11 +1,7 @@
 "use client"
 import { Box, Table } from "@mui/material"
 import { FormStateType, FormStateAction } from "@/reducers"
-import {
-  VehiclesMobile,
-  TableHeader,
-  TableBody,
-} from "@/components/vehicles"
+import { VehiclesMobile, TableHeader, TableBody } from "@/components/vehicles"
 import { SortControls } from "@/components/ui"
 
 interface VehiclesViewProps {

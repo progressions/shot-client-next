@@ -23,7 +23,7 @@ export { default as CharacterDetail } from "@/components/characters/CharacterDet
 export { default as CharacterDescription } from "@/components/characters/CharacterDescription"
 export { default as CharacterSpeedDial } from "@/components/characters/CharacterSpeedDial"
 export { default as Template } from "@/components/characters/create/Template"
-export { default as EditCharacter } from "@/components/characters/EditCharacter"
+export { default as Show } from "@/components/characters/Show"
 export { default as ActionValuesEdit } from "@/components/characters/edit/ActionValuesEdit"
 export { default as ActionValueEdit } from "@/components/characters/edit/ActionValueEdit"
 export { default as AttackValueEdit } from "@/components/characters/edit/AttackValueEdit"

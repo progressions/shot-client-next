@@ -5,7 +5,7 @@ import type { Character } from "@/types"
 import type { Metadata } from "next"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import { Suspense } from "react"
-import { NotFound, EditCharacter } from "@/components/characters"
+import { NotFound, Show } from "@/components/characters"
 import { headers } from "next/headers"
 
 // Dynamically generate metadata for the page title
@@ -61,7 +61,7 @@ export default async function CharacterPage({
       <>
         <Breadcrumbs />
         <Suspense fallback={<CircularProgress />}>
-          <EditCharacter
+          <Show
             character={character}
             initialIsMobile={initialIsMobile}
           />

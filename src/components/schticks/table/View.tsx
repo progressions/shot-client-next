@@ -1,11 +1,7 @@
 "use client"
 import { Box, Table } from "@mui/material"
 import { FormStateType, FormStateAction } from "@/reducers"
-import {
-  SchticksMobile,
-  TableHeader,
-  TableBody,
-} from "@/components/schticks"
+import { SchticksMobile, TableHeader, TableBody } from "@/components/schticks"
 import { SortControls } from "@/components/ui"
 
 interface SchticksViewProps {

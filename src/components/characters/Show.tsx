@@ -29,15 +29,15 @@ import {
 } from "@/components/characters"
 import { EditFaction } from "@/components/factions"
 
-type EditCharacterProps = {
+type ShowProps = {
   character: Character
   initialIsMobile?: boolean
 }
 
-export default function EditCharacter({
+export default function Show({
   character: initialCharacter,
   initialIsMobile = false,
-}: EditCharacterProps) {
+}: ShowProps) {
   const { campaignData } = useCampaign()
   const { client } = useClient()
   const { toastSuccess } = useToast()

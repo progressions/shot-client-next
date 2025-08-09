@@ -52,7 +52,8 @@ export default function Weapons({
     sort: initialSort,
     order: initialOrder,
   })
-  const { meta, sort, order, weapons, category, juncture, drawerOpen } = formState.data
+  const { meta, sort, order, weapons, category, juncture, drawerOpen } =
+    formState.data
   const router = useRouter()
 
   console.log("formState.data", formState.data)
@@ -76,7 +77,13 @@ export default function Weapons({
       juncture: string | null = null
     ) => {
       try {
-        const response = await client.getWeapons({ page, sort, order, category, juncture })
+        const response = await client.getWeapons({
+          page,
+          sort,
+          order,
+          category,
+          juncture,
+        })
         console.log("Fetched weapons:", response.data.weapons)
         dispatchForm({
           type: FormActions.UPDATE,

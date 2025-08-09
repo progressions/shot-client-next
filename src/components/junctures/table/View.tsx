@@ -1,11 +1,7 @@
 "use client"
 import { Box, Table } from "@mui/material"
 import { FormStateType, FormStateAction } from "@/reducers"
-import {
-  JuncturesMobile,
-  TableHeader,
-  TableBody,
-} from "@/components/junctures"
+import { JuncturesMobile, TableHeader, TableBody } from "@/components/junctures"
 import { SortControls } from "@/components/ui"
 
 interface JuncturesViewProps {

@@ -1,11 +1,7 @@
 "use client"
 import { Box, Table } from "@mui/material"
 import { FormStateType, FormStateAction } from "@/reducers"
-import {
-  PartiesMobile,
-  TableHeader,
-  TableBody,
-} from "@/components/parties"
+import { PartiesMobile, TableHeader, TableBody } from "@/components/parties"
 import { SortControls } from "@/components/ui"
 
 interface PartiesViewProps {

@@ -77,12 +77,7 @@ export default function CharactersView({
         totalPages={meta.total_pages}
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
-        filter={
-          <CharacterFilter
-            dispatch={dispatchForm}
-            omit={["add"]}
-          />
-        }
+        filter={<CharacterFilter dispatch={dispatchForm} omit={["add"]} />}
       >
         {viewMode === "mobile" ? (
           <CharactersMobile
@@ -107,10 +102,7 @@ export default function CharactersView({
                   order={order}
                   onSortChange={onSortChange}
                 />
-                <TableBody
-                  characters={characters}
-                  formatDate={formatDate}
-                />
+                <TableBody characters={characters} formatDate={formatDate} />
               </Table>
             </Box>
           </>
