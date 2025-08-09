@@ -19,7 +19,7 @@ import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import { EditFaction } from "@/components/factions"
 
-interface SitePageClientProperties {
+interface ShowProperties {
   site: Site
 }
 
@@ -29,9 +29,7 @@ type FormStateData = {
   }
 }
 
-export default function SitePageClient({
-  site: initialSite,
-}: SitePageClientProperties) {
+export default function Show({ site: initialSite }: ShowProperties) {
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialSite,

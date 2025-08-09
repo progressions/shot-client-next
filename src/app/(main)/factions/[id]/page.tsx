@@ -2,7 +2,7 @@ import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Faction } from "@/types"
-import { NotFound, FactionPageClient } from "@/components/factions"
+import { NotFound, Show } from "@/components/factions"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import { Suspense } from "react"
 
@@ -29,10 +29,7 @@ export default async function FactionPage({ params }: FactionPageProperties) {
       <>
         <Breadcrumbs />
         <Suspense fallback={<CircularProgress />}>
-          <FactionPageClient
-            faction={faction}
-            initialIsMobile={initialIsMobile}
-          />
+          <Show faction={faction} initialIsMobile={initialIsMobile} />
         </Suspense>
       </>
     )

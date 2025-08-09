@@ -25,7 +25,7 @@ import { useCampaign, useClient } from "@/contexts"
 import type { SelectChangeEvent } from "@mui/material"
 import { InfoLink } from "@/components/ui"
 
-interface UsersProperties {
+interface ListProperties {
   initialUsers: User[]
   initialMeta: PaginationMeta
   initialSort: string
@@ -39,12 +39,12 @@ type FormStateData = {
   error: string | null
 }
 
-export default function Users({
+export default function List({
   initialUsers,
   initialMeta,
   initialSort,
   initialOrder,
-}: UsersProperties) {
+}: ListProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({

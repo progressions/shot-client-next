@@ -4,7 +4,7 @@ import { FormStateType, FormStateAction } from "@/reducers"
 import { SchticksMobile, TableHeader, TableBody } from "@/components/schticks"
 import { SortControls } from "@/components/ui"
 
-interface SchticksViewProps {
+interface ViewProps {
   viewMode: "table" | "mobile"
   formState: FormStateType<FormStateData>
   dispatchForm: (action: FormStateAction<FormStateData>) => void
@@ -38,7 +38,7 @@ interface PaginationMeta {
   total_pages: number
 }
 
-export default function SchticksView({
+export default function View({
   viewMode,
   formState,
   dispatchForm,
@@ -46,7 +46,7 @@ export default function SchticksView({
   onSortChange,
   onOrderChange,
   initialIsMobile,
-}: SchticksViewProps) {
+}: ViewProps) {
   const { schticks, meta, sort, order } = formState.data
 
   const formatDate = (date: string) => {

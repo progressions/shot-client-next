@@ -24,13 +24,11 @@ type FormStateData = {
   }
 }
 
-interface VehiclePageClientProperties {
+interface ShowProperties {
   vehicle: Vehicle
 }
 
-export default function VehiclePageClient({
-  vehicle: initialVehicle,
-}: VehiclePageClientProperties) {
+export default function Show({ vehicle: initialVehicle }: ShowProperties) {
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialVehicle,

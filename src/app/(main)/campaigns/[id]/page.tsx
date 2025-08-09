@@ -2,7 +2,7 @@ import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Campaign } from "@/types"
-import { NotFound, CampaignPageClient } from "@/components/campaigns"
+import { NotFound, Show } from "@/components/campaigns"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import { Suspense } from "react"
 
@@ -29,10 +29,7 @@ export default async function CampaignPage({ params }: CampaignPageProperties) {
       <>
         <Breadcrumbs />
         <Suspense fallback={<CircularProgress />}>
-          <CampaignPageClient
-            campaign={campaign}
-            initialIsMobile={initialIsMobile}
-          />
+          <Show campaign={campaign} initialIsMobile={initialIsMobile} />
         </Suspense>
       </>
     )

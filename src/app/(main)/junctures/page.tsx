@@ -3,7 +3,7 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { Box, CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
-import { Junctures } from "@/components/junctures"
+import { List } from "@/components/junctures"
 import type { JuncturesResponse } from "@/types"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -80,7 +80,7 @@ export default async function JuncturesPage({
     >
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <Junctures
+        <List
           initialJunctures={junctures}
           initialFactions={factions}
           initialMeta={meta}

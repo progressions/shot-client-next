@@ -2,10 +2,10 @@
 import { Box, Table } from "@mui/material"
 import { FormStateType, FormStateAction } from "@/reducers"
 import {
-  {{pascalCase (plural name)}}Mobile,
+  ListMobile,
   TableHeader,
   TableBody,
-  {{pascalCase (singular name)}}Filter
+  Filter
 } from "@/components/{{snakeCase (plural name)}}"
 import { SortControls } from "@/components/ui"
 
@@ -78,14 +78,14 @@ export default function {{pascalCase (plural name)}}View({
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
         onPageChange={onPageChange}
-        filter={<{{pascalCase (singular name)}}Filter
+        filter={<Filter
           dispatch={dispatchForm}
           include{{pascalCase (plural name)}}={false}
           omit={["add"]}
         />}
       >
         { viewMode === "mobile" ? (
-          <{{pascalCase (plural name)}}Mobile
+          <ListMobile
             formState={formState}
             dispatchForm={dispatchForm}
             onPageChange={onPageChange}

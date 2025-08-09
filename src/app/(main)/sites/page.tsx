@@ -3,7 +3,7 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { Box, CircularProgress } from "@mui/material"
 import { getServerClient } from "@/lib/getServerClient"
-import { Sites } from "@/components/sites"
+import { List } from "@/components/sites"
 import type { SitesResponse } from "@/types"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -76,7 +76,7 @@ export default async function SitesPage({
     >
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <Sites
+        <List
           initialSites={sites}
           initialFactions={factions}
           initialMeta={meta}

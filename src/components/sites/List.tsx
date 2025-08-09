@@ -2,15 +2,15 @@
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Box } from "@mui/material"
-import { View, Menu } from "@/components/junctures"
-import type { Juncture, PaginationMeta } from "@/types"
+import { View, Menu } from "@/components/sites"
+import type { Site, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useLocalStorage, useCampaign, useClient } from "@/contexts"
 import { queryParams } from "@/lib"
 import { Icon, MainHeader } from "@/components/ui"
 
-interface JuncturesProperties {
-  initialJunctures: Juncture[]
+interface ListProps {
+  initialSites: Site[]
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
@@ -20,39 +20,39 @@ interface JuncturesProperties {
 type ValidSort = "created_at" | "updated_at" | "name"
 type ValidOrder = "asc" | "desc"
 type FormStateData = {
-  junctures: Juncture[]
+  sites: Site[]
   meta: PaginationMeta
   drawerOpen: boolean
   sort: string
   order: string
 }
 
-export default function Junctures({
-  initialJunctures,
+export default function List({
+  initialSites,
   initialMeta,
   initialSort,
   initialOrder,
   initialIsMobile,
-}: JuncturesProperties) {
+}: ListProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { getLocally, saveLocally } = useLocalStorage()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
-    (getLocally("junctureViewMode") as "table" | "mobile") ||
+    (getLocally("siteViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
   )
   const { formState, dispatchForm } = useForm<FormStateData>({
-    junctures: initialJunctures,
+    sites: initialSites,
     meta: initialMeta,
     drawerOpen: false,
     sort: initialSort,
     order: initialOrder,
   })
-  const { meta, sort, order, junctures, drawerOpen } = formState.data
+  const { meta, sort, order, sites, drawerOpen } = formState.data
   const router = useRouter()
 
   useEffect(() => {
-    saveLocally("junctureViewMode", viewMode)
+    saveLocally("siteViewMode", viewMode)
   }, [viewMode, saveLocally])
 
   const validSorts: readonly ValidSort[] = useMemo(
@@ -61,19 +61,19 @@ export default function Junctures({
   )
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
-  const fetchJunctures = useCallback(
+  const fetchSites = useCallback(
     async (
       page: number = 1,
       sort: string = "created_at",
       order: string = "desc"
     ) => {
       try {
-        const response = await client.getJunctures({ page, sort, order })
-        console.log("Fetched junctures:", response.data.junctures)
+        const response = await client.getSites({ page, sort, order })
+        console.log("Fetched sites:", response.data.sites)
         dispatchForm({
           type: FormActions.UPDATE,
-          name: "junctures",
-          value: response.data.junctures,
+          name: "sites",
+          value: response.data.sites,
         })
         dispatchForm({
           type: FormActions.UPDATE,
@@ -83,11 +83,9 @@ export default function Junctures({
         dispatchForm({ type: FormActions.ERROR, payload: null })
       } catch (error: unknown) {
         const errorMessage =
-          error instanceof Error
-            ? error.message
-            : "Unable to fetch junctures data"
+          error instanceof Error ? error.message : "Unable to fetch sites data"
         dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
-        console.error("Fetch junctures error:", error)
+        console.error("Fetch sites error:", error)
       }
     },
     [client, dispatchForm]
@@ -96,7 +94,7 @@ export default function Junctures({
   useEffect(() => {
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
-    if (campaignData.junctures === "reload") {
+    if (campaignData.sites === "reload") {
       const parameters = new URLSearchParams(globalThis.location.search)
       const page = parameters.get("page")
         ? Number.parseInt(parameters.get("page")!, 10)
@@ -121,16 +119,9 @@ export default function Junctures({
         name: "order",
         value: currentOrder,
       })
-      fetchJunctures(page, currentSort, currentOrder)
+      fetchSites(page, currentSort, currentOrder)
     }
-  }, [
-    client,
-    campaignData,
-    dispatchForm,
-    fetchJunctures,
-    validSorts,
-    validOrders,
-  ])
+  }, [client, campaignData, dispatchForm, fetchSites, validSorts, validOrders])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -140,34 +131,34 @@ export default function Junctures({
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: false })
   }
 
-  const handleSave = async (newJuncture: Juncture) => {
+  const handleSave = async (newSite: Site) => {
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "junctures",
-      value: [newJuncture, ...junctures],
+      name: "sites",
+      value: [newSite, ...sites],
     })
   }
 
   const handleOrderChange = async () => {
     const newOrder = order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/junctures?page=1&sort=${sort}&order=${newOrder}`, {
+    router.push(`/sites?page=1&sort=${sort}&order=${newOrder}`, {
       scroll: false,
     })
-    await fetchJunctures(1, sort, newOrder)
+    await fetchSites(1, sort, newOrder)
   }
 
   const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
-      router.push(`/junctures?page=1&sort=${sort}&order=${order}`, {
+      router.push(`/sites?page=1&sort=${sort}&order=${order}`, {
         scroll: false,
       })
-      await fetchJunctures(1, sort, order)
+      await fetchSites(1, sort, order)
     } else {
-      router.push(`/junctures?page=${page}&sort=${sort}&order=${order}`, {
+      router.push(`/sites?page=${page}&sort=${sort}&order=${order}`, {
         scroll: false,
       })
-      await fetchJunctures(page, sort, order)
+      await fetchSites(page, sort, order)
     }
   }
 
@@ -175,7 +166,7 @@ export default function Junctures({
     const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    const url = `/junctures?${queryParams({
+    const url = `/sites?${queryParams({
       page: 1,
       sort: newSort,
       order: newOrder,
@@ -183,7 +174,7 @@ export default function Junctures({
     router.push(url, {
       scroll: false,
     })
-    fetchJunctures(1, newSort, newOrder)
+    fetchSites(1, newSort, newOrder)
   }
 
   return (
@@ -204,10 +195,7 @@ export default function Junctures({
           mb: 2,
         }}
       >
-        <MainHeader
-          title="Junctures"
-          icon={<Icon keyword="Junctures" size="36" />}
-        />
+        <MainHeader title="Sites" icon={<Icon keyword="Sites" size="36" />} />
       </Box>
       <View
         viewMode={viewMode}

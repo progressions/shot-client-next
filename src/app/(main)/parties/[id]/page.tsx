@@ -1,7 +1,7 @@
 import { headers } from "next/headers"
 import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
-import { NotFound, PartyPageClient } from "@/components/parties"
+import { NotFound, Show } from "@/components/parties"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -28,7 +28,7 @@ export default async function PartyPage({ params }: PartyPageProperties) {
       <>
         <Breadcrumbs />
         <Suspense fallback={<CircularProgress />}>
-          <PartyPageClient party={party} initialIsMobile={initialIsMobile} />
+          <Show party={party} initialIsMobile={initialIsMobile} />
         </Suspense>
       </>
     )

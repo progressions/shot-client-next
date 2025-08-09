@@ -35,13 +35,11 @@ type FormStateData = {
   }
 }
 
-interface FightPageClientProperties {
+interface ShowProperties {
   fight: Fight
 }
 
-export default function FightPageClient({
-  fight: initialFight,
-}: FightPageClientProperties) {
+export default function Show({ fight: initialFight }: ShowProperties) {
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialFight,

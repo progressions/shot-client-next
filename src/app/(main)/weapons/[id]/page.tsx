@@ -2,7 +2,7 @@ import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Weapon } from "@/types"
-import { NotFound, WeaponPageClient } from "@/components/weapons"
+import { NotFound, Show } from "@/components/weapons"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -29,7 +29,7 @@ export default async function WeaponPage({ params }: WeaponPageProperties) {
       <>
         <Breadcrumbs />
         <Suspense fallback={<CircularProgress />}>
-          <WeaponPageClient weapon={weapon} initialIsMobile={initialIsMobile} />
+          <Show weapon={weapon} initialIsMobile={initialIsMobile} />
         </Suspense>
       </>
     )

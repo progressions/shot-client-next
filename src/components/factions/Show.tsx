@@ -11,7 +11,7 @@ import { CharacterManager } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
-interface FactionPageClientProperties {
+interface ShowProperties {
   faction: Faction
 }
 
@@ -21,9 +21,7 @@ type FormStateData = {
   }
 }
 
-export default function FactionPageClient({
-  faction: initialFaction,
-}: FactionPageClientProperties) {
+export default function Show({ faction: initialFaction }: ShowProperties) {
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialFaction,

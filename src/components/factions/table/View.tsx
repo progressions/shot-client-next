@@ -4,7 +4,7 @@ import { FormStateType, FormStateAction } from "@/reducers"
 import { FactionsMobile, TableHeader, TableBody } from "@/components/factions"
 import { SortControls } from "@/components/ui"
 
-interface FactionsViewProps {
+interface ViewProps {
   viewMode: "table" | "mobile"
   formState: FormStateType<FormStateData>
   dispatchForm: (action: FormStateAction<FormStateData>) => void
@@ -38,7 +38,7 @@ interface PaginationMeta {
   total_pages: number
 }
 
-export default function FactionsView({
+export default function View({
   viewMode,
   formState,
   dispatchForm,
@@ -46,7 +46,7 @@ export default function FactionsView({
   onSortChange,
   onOrderChange,
   initialIsMobile,
-}: FactionsViewProps) {
+}: ViewProps) {
   const { factions, meta, sort, order } = formState.data
 
   const formatDate = (date: string) => {

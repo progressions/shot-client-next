@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { CircularProgress, Box } from "@mui/material"
-import { Characters } from "@/components/characters"
+import { List } from "@/components/characters"
 import { getServerClient, getPageParameters } from "@/lib"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import type { CharactersResponse } from "@/types"
@@ -66,7 +66,7 @@ export default async function CharactersPage({
         <Breadcrumbs />
       </Suspense>
       <Suspense fallback={<CircularProgress />}>
-        <Characters
+        <List
           initialCharacters={charactersResponse.characters}
           initialMeta={charactersResponse.meta}
           initialSort={sort}

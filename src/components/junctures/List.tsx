@@ -2,15 +2,15 @@
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Box } from "@mui/material"
-import { View, Menu } from "@/components/weapons"
-import type { Weapon, PaginationMeta } from "@/types"
+import { View, Menu } from "@/components/junctures"
+import type { Juncture, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useLocalStorage, useCampaign, useClient } from "@/contexts"
 import { queryParams } from "@/lib"
 import { Icon, MainHeader } from "@/components/ui"
 
-interface WeaponsProperties {
-  initialWeapons: Weapon[]
+interface ListProps {
+  initialJunctures: Juncture[]
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
@@ -20,46 +20,39 @@ interface WeaponsProperties {
 type ValidSort = "created_at" | "updated_at" | "name"
 type ValidOrder = "asc" | "desc"
 type FormStateData = {
-  weapons: Weapon[]
-  category: string | null
-  juncture: string | null
+  junctures: Juncture[]
   meta: PaginationMeta
   drawerOpen: boolean
   sort: string
   order: string
 }
 
-export default function Weapons({
-  initialWeapons,
+export default function List({
+  initialJunctures,
   initialMeta,
   initialSort,
   initialOrder,
   initialIsMobile,
-}: WeaponsProperties) {
+}: ListProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { getLocally, saveLocally } = useLocalStorage()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
-    (getLocally("weaponViewMode") as "table" | "mobile") ||
+    (getLocally("junctureViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
   )
   const { formState, dispatchForm } = useForm<FormStateData>({
-    weapons: initialWeapons,
-    category: null,
-    juncture: null,
+    junctures: initialJunctures,
     meta: initialMeta,
     drawerOpen: false,
     sort: initialSort,
     order: initialOrder,
   })
-  const { meta, sort, order, weapons, category, juncture, drawerOpen } =
-    formState.data
+  const { meta, sort, order, junctures, drawerOpen } = formState.data
   const router = useRouter()
 
-  console.log("formState.data", formState.data)
-
   useEffect(() => {
-    saveLocally("weaponViewMode", viewMode)
+    saveLocally("junctureViewMode", viewMode)
   }, [viewMode, saveLocally])
 
   const validSorts: readonly ValidSort[] = useMemo(
@@ -68,27 +61,19 @@ export default function Weapons({
   )
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
-  const fetchWeapons = useCallback(
+  const fetchJunctures = useCallback(
     async (
       page: number = 1,
       sort: string = "created_at",
-      order: string = "desc",
-      category: string | null = null,
-      juncture: string | null = null
+      order: string = "desc"
     ) => {
       try {
-        const response = await client.getWeapons({
-          page,
-          sort,
-          order,
-          category,
-          juncture,
-        })
-        console.log("Fetched weapons:", response.data.weapons)
+        const response = await client.getJunctures({ page, sort, order })
+        console.log("Fetched junctures:", response.data.junctures)
         dispatchForm({
           type: FormActions.UPDATE,
-          name: "weapons",
-          value: response.data.weapons,
+          name: "junctures",
+          value: response.data.junctures,
         })
         dispatchForm({
           type: FormActions.UPDATE,
@@ -100,18 +85,18 @@ export default function Weapons({
         const errorMessage =
           error instanceof Error
             ? error.message
-            : "Unable to fetch weapons data"
+            : "Unable to fetch junctures data"
         dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
-        console.error("Fetch weapons error:", error)
+        console.error("Fetch junctures error:", error)
       }
     },
-    [client, dispatchForm, category, juncture]
+    [client, dispatchForm]
   )
 
   useEffect(() => {
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
-    if (campaignData.weapons === "reload") {
+    if (campaignData.junctures === "reload") {
       const parameters = new URLSearchParams(globalThis.location.search)
       const page = parameters.get("page")
         ? Number.parseInt(parameters.get("page")!, 10)
@@ -136,17 +121,15 @@ export default function Weapons({
         name: "order",
         value: currentOrder,
       })
-      fetchWeapons(page, currentSort, currentOrder, category, juncture)
+      fetchJunctures(page, currentSort, currentOrder)
     }
   }, [
     client,
     campaignData,
     dispatchForm,
-    fetchWeapons,
+    fetchJunctures,
     validSorts,
     validOrders,
-    category,
-    juncture,
   ])
 
   const handleOpenCreateDrawer = () => {
@@ -157,34 +140,34 @@ export default function Weapons({
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: false })
   }
 
-  const handleSave = async (newWeapon: Weapon) => {
+  const handleSave = async (newJuncture: Juncture) => {
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "weapons",
-      value: [newWeapon, ...weapons],
+      name: "junctures",
+      value: [newJuncture, ...junctures],
     })
   }
 
   const handleOrderChange = async () => {
     const newOrder = order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/weapons?page=1&sort=${sort}&order=${newOrder}`, {
+    router.push(`/junctures?page=1&sort=${sort}&order=${newOrder}`, {
       scroll: false,
     })
-    await fetchWeapons(1, sort, newOrder)
+    await fetchJunctures(1, sort, newOrder)
   }
 
   const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
-      router.push(`/weapons?page=1&sort=${sort}&order=${order}`, {
+      router.push(`/junctures?page=1&sort=${sort}&order=${order}`, {
         scroll: false,
       })
-      await fetchWeapons(1, sort, order)
+      await fetchJunctures(1, sort, order)
     } else {
-      router.push(`/weapons?page=${page}&sort=${sort}&order=${order}`, {
+      router.push(`/junctures?page=${page}&sort=${sort}&order=${order}`, {
         scroll: false,
       })
-      await fetchWeapons(page, sort, order)
+      await fetchJunctures(page, sort, order)
     }
   }
 
@@ -192,7 +175,7 @@ export default function Weapons({
     const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    const url = `/weapons?${queryParams({
+    const url = `/junctures?${queryParams({
       page: 1,
       sort: newSort,
       order: newOrder,
@@ -200,7 +183,7 @@ export default function Weapons({
     router.push(url, {
       scroll: false,
     })
-    fetchWeapons(1, newSort, newOrder)
+    fetchJunctures(1, newSort, newOrder)
   }
 
   return (
@@ -222,8 +205,8 @@ export default function Weapons({
         }}
       >
         <MainHeader
-          title="Weapons"
-          icon={<Icon keyword="Weapons" size="36" />}
+          title="Junctures"
+          icon={<Icon keyword="Junctures" size="36" />}
         />
       </Box>
       <View

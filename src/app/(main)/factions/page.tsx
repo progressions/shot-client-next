@@ -3,7 +3,7 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { Box, CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
-import { Factions } from "@/components/factions"
+import { List } from "@/components/factions"
 import type { FactionsResponse } from "@/types"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -73,7 +73,7 @@ export default async function FactionsPage({
     >
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <Factions
+        <List
           initialFactions={factions}
           initialMeta={meta}
           initialSort={sort}

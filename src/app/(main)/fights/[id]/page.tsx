@@ -2,7 +2,7 @@ import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Fight } from "@/types"
-import { NotFound, FightPageClient } from "@/components/fights"
+import { NotFound, Show } from "@/components/fights"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -29,7 +29,7 @@ export default async function FightPage({ params }: FightPageProperties) {
       <>
         <Breadcrumbs />
         <Suspense fallback={<CircularProgress />}>
-          <FightPageClient fight={fight} initialIsMobile={initialIsMobile} />
+          <Show fight={fight} initialIsMobile={initialIsMobile} />
         </Suspense>
       </>
     )

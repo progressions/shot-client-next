@@ -2,15 +2,15 @@
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Box } from "@mui/material"
-import { View, Menu } from "@/components/schticks"
-import type { Schtick, PaginationMeta } from "@/types"
+import { View, Menu } from "@/components/weapons"
+import type { Weapon, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useLocalStorage, useCampaign, useClient } from "@/contexts"
 import { queryParams } from "@/lib"
 import { Icon, MainHeader } from "@/components/ui"
 
-interface SchticksProperties {
-  initialSchticks: Schtick[]
+interface List {
+  initialWeapons: Weapon[]
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
@@ -20,39 +20,46 @@ interface SchticksProperties {
 type ValidSort = "created_at" | "updated_at" | "name"
 type ValidOrder = "asc" | "desc"
 type FormStateData = {
-  schticks: Schtick[]
+  weapons: Weapon[]
+  category: string | null
+  juncture: string | null
   meta: PaginationMeta
   drawerOpen: boolean
   sort: string
   order: string
 }
 
-export default function Schticks({
-  initialSchticks,
+export default function List({
+  initialWeapons,
   initialMeta,
   initialSort,
   initialOrder,
   initialIsMobile,
-}: SchticksProperties) {
+}: List) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { getLocally, saveLocally } = useLocalStorage()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
-    (getLocally("schtickViewMode") as "table" | "mobile") ||
+    (getLocally("weaponViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
   )
   const { formState, dispatchForm } = useForm<FormStateData>({
-    schticks: initialSchticks,
+    weapons: initialWeapons,
+    category: null,
+    juncture: null,
     meta: initialMeta,
     drawerOpen: false,
     sort: initialSort,
     order: initialOrder,
   })
-  const { meta, sort, order, schticks, drawerOpen } = formState.data
+  const { meta, sort, order, weapons, category, juncture, drawerOpen } =
+    formState.data
   const router = useRouter()
 
+  console.log("formState.data", formState.data)
+
   useEffect(() => {
-    saveLocally("schtickViewMode", viewMode)
+    saveLocally("weaponViewMode", viewMode)
   }, [viewMode, saveLocally])
 
   const validSorts: readonly ValidSort[] = useMemo(
@@ -61,19 +68,27 @@ export default function Schticks({
   )
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
-  const fetchSchticks = useCallback(
+  const fetchWeapons = useCallback(
     async (
       page: number = 1,
       sort: string = "created_at",
-      order: string = "desc"
+      order: string = "desc",
+      category: string | null = null,
+      juncture: string | null = null
     ) => {
       try {
-        const response = await client.getSchticks({ page, sort, order })
-        console.log("Fetched schticks:", response.data.schticks)
+        const response = await client.getWeapons({
+          page,
+          sort,
+          order,
+          category,
+          juncture,
+        })
+        console.log("Fetched weapons:", response.data.weapons)
         dispatchForm({
           type: FormActions.UPDATE,
-          name: "schticks",
-          value: response.data.schticks,
+          name: "weapons",
+          value: response.data.weapons,
         })
         dispatchForm({
           type: FormActions.UPDATE,
@@ -85,9 +100,9 @@ export default function Schticks({
         const errorMessage =
           error instanceof Error
             ? error.message
-            : "Unable to fetch schticks data"
+            : "Unable to fetch weapons data"
         dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
-        console.error("Fetch schticks error:", error)
+        console.error("Fetch weapons error:", error)
       }
     },
     [client, dispatchForm]
@@ -96,7 +111,7 @@ export default function Schticks({
   useEffect(() => {
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
-    if (campaignData.schticks === "reload") {
+    if (campaignData.weapons === "reload") {
       const parameters = new URLSearchParams(globalThis.location.search)
       const page = parameters.get("page")
         ? Number.parseInt(parameters.get("page")!, 10)
@@ -121,15 +136,17 @@ export default function Schticks({
         name: "order",
         value: currentOrder,
       })
-      fetchSchticks(page, currentSort, currentOrder)
+      fetchWeapons(page, currentSort, currentOrder, category, juncture)
     }
   }, [
     client,
     campaignData,
     dispatchForm,
-    fetchSchticks,
+    fetchWeapons,
     validSorts,
     validOrders,
+    category,
+    juncture,
   ])
 
   const handleOpenCreateDrawer = () => {
@@ -140,34 +157,34 @@ export default function Schticks({
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: false })
   }
 
-  const handleSave = async (newSchtick: Schtick) => {
+  const handleSave = async (newWeapon: Weapon) => {
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "schticks",
-      value: [newSchtick, ...schticks],
+      name: "weapons",
+      value: [newWeapon, ...weapons],
     })
   }
 
   const handleOrderChange = async () => {
     const newOrder = order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/schticks?page=1&sort=${sort}&order=${newOrder}`, {
+    router.push(`/weapons?page=1&sort=${sort}&order=${newOrder}`, {
       scroll: false,
     })
-    await fetchSchticks(1, sort, newOrder)
+    await fetchWeapons(1, sort, newOrder)
   }
 
   const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
-      router.push(`/schticks?page=1&sort=${sort}&order=${order}`, {
+      router.push(`/weapons?page=1&sort=${sort}&order=${order}`, {
         scroll: false,
       })
-      await fetchSchticks(1, sort, order)
+      await fetchWeapons(1, sort, order)
     } else {
-      router.push(`/schticks?page=${page}&sort=${sort}&order=${order}`, {
+      router.push(`/weapons?page=${page}&sort=${sort}&order=${order}`, {
         scroll: false,
       })
-      await fetchSchticks(page, sort, order)
+      await fetchWeapons(page, sort, order)
     }
   }
 
@@ -175,7 +192,7 @@ export default function Schticks({
     const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    const url = `/schticks?${queryParams({
+    const url = `/weapons?${queryParams({
       page: 1,
       sort: newSort,
       order: newOrder,
@@ -183,7 +200,7 @@ export default function Schticks({
     router.push(url, {
       scroll: false,
     })
-    fetchSchticks(1, newSort, newOrder)
+    fetchWeapons(1, newSort, newOrder)
   }
 
   return (
@@ -205,8 +222,8 @@ export default function Schticks({
         }}
       >
         <MainHeader
-          title="Schticks"
-          icon={<Icon keyword="Schticks" size="36" />}
+          title="Weapons"
+          icon={<Icon keyword="Weapons" size="36" />}
         />
       </Box>
       <View

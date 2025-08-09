@@ -3,7 +3,7 @@ import { headers } from "next/headers"
 import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { User } from "@/types"
-import { NotFound, UserPageClient } from "@/components/users"
+import { NotFound, Show } from "@/components/users"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -32,7 +32,7 @@ export default async function UserPage({ params }: UserPageProperties) {
       <>
         <Breadcrumbs />
         <Suspense fallback={<CircularProgress />}>
-          <UserPageClient user={user} initialIsMobile={initialIsMobile} />
+          <Show user={user} initialIsMobile={initialIsMobile} />
         </Suspense>
       </>
     )

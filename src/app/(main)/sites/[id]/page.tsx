@@ -2,7 +2,7 @@ import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Site } from "@/types"
-import { NotFound, SitePageClient } from "@/components/sites"
+import { NotFound, Show } from "@/components/sites"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -29,7 +29,7 @@ export default async function SitePage({ params }: SitePageProperties) {
       <>
         <Breadcrumbs />
         <Suspense fallback={<CircularProgress />}>
-          <SitePageClient site={site} initialIsMobile={initialIsMobile} />
+          <Show site={site} initialIsMobile={initialIsMobile} />
         </Suspense>
       </>
     )

@@ -18,12 +18,12 @@ module.exports = function (plop) {
     actions: [
       {
         type: "add",
-        path: "src/components/{{snakeCase (plural name)}}/{{pascalCase (plural name)}}Mobile.tsx",
+        path: "src/components/{{snakeCase (plural name)}}/ListMobile.tsx",
         templateFile: "plop-templates/index/ComponentMobile.hbs"
       },
       {
         type: "add",
-        path: "src/components/{{snakeCase (plural name)}}/{{pascalCase (plural name)}}.tsx",
+        path: "src/components/{{snakeCase (plural name)}}/List.tsx",
         templateFile: "plop-templates/index/things.hbs"
       },
       {
@@ -43,18 +43,13 @@ module.exports = function (plop) {
       },
       {
         type: "add",
-        path: "src/components/{{snakeCase (plural name)}}/{{pascalCase (singular name)}}Form.tsx",
+        path: "src/components/{{snakeCase (plural name)}}/Form.tsx",
         templateFile: "plop-templates/index/form.hbs"
       },
       {
         type: "add",
-        path: "src/components/{{snakeCase (plural name)}}/Create{{pascalCase (singular name)}}Form.tsx",
+        path: "src/components/{{snakeCase (plural name)}}/CreateForm.tsx",
         templateFile: "plop-templates/index/createForm.hbs"
-      },
-      {
-        type: "add",
-        path: "src/components/{{snakeCase (plural name)}}/table/Pagination.tsx",
-        templateFile: "plop-templates/index/table/pagination.hbs"
       },
       {
         type: "add",

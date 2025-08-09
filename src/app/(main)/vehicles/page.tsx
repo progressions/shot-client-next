@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { CircularProgress, Box } from "@mui/material"
-import { Vehicles } from "@/components/vehicles"
+import { List } from "@/components/vehicles"
 import { getServerClient, getPageParameters } from "@/lib"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import type { VehiclesResponse } from "@/types"
@@ -70,7 +70,7 @@ export default async function VehiclesPage({
         <Breadcrumbs />
       </Suspense>
       <Suspense fallback={<CircularProgress />}>
-        <Vehicles
+        <List
           initialVehicles={vehiclesResponse.vehicles}
           initialMeta={vehiclesResponse.meta}
           initialSort={sort}

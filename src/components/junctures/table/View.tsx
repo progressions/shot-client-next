@@ -4,7 +4,7 @@ import { FormStateType, FormStateAction } from "@/reducers"
 import { JuncturesMobile, TableHeader, TableBody } from "@/components/junctures"
 import { SortControls } from "@/components/ui"
 
-interface JuncturesViewProps {
+interface ViewProps {
   viewMode: "table" | "mobile"
   formState: FormStateType<FormStateData>
   dispatchForm: (action: FormStateAction<FormStateData>) => void
@@ -38,7 +38,7 @@ interface PaginationMeta {
   total_pages: number
 }
 
-export default function JuncturesView({
+export default function View({
   viewMode,
   formState,
   dispatchForm,
@@ -46,7 +46,7 @@ export default function JuncturesView({
   onSortChange,
   onOrderChange,
   initialIsMobile,
-}: JuncturesViewProps) {
+}: ViewProps) {
   const { junctures, meta, sort, order } = formState.data
 
   const formatDate = (date: string) => {

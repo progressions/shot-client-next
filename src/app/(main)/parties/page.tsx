@@ -3,7 +3,7 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { Box, CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
-import { Parties } from "@/components/parties"
+import { List } from "@/components/parties"
 import type { PartiesResponse } from "@/types"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -80,7 +80,7 @@ export default async function PartiesPage({
     >
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <Parties
+        <List
           initialParties={parties}
           initialFactions={factions}
           initialMeta={meta}

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { Box, CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
-import { Weapons } from "@/components/weapons"
+import { List } from "@/components/weapons"
 import type { WeaponsResponse } from "@/types"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -73,7 +73,7 @@ export default async function WeaponsPage({
     >
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <Weapons
+        <List
           initialWeapons={weapons}
           initialMeta={meta}
           initialSort={sort}

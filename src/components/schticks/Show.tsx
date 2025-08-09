@@ -18,7 +18,7 @@ import {
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
-interface SchtickPageClientProperties {
+interface ShowProperties {
   schtick: Schtick
 }
 
@@ -28,9 +28,7 @@ type FormStateData = {
   }
 }
 
-export default function SchtickPageClient({
-  schtick: initialSchtick,
-}: SchtickPageClientProperties) {
+export default function Show({ schtick: initialSchtick }: ShowProperties) {
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialSchtick,

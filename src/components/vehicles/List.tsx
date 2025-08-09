@@ -2,15 +2,15 @@
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Box } from "@mui/material"
-import { View, Menu } from "@/components/parties"
-import type { Party, PaginationMeta } from "@/types"
+import { View, Menu } from "@/components/vehicles"
+import type { Vehicle, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useLocalStorage, useCampaign, useClient } from "@/contexts"
 import { queryParams } from "@/lib"
 import { Icon, MainHeader } from "@/components/ui"
 
-interface PartiesProperties {
-  initialParties: Party[]
+interface ListProps {
+  initialVehicles: Vehicle[]
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
@@ -20,40 +20,36 @@ interface PartiesProperties {
 type ValidSort = "created_at" | "updated_at" | "name"
 type ValidOrder = "asc" | "desc"
 type FormStateData = {
-  parties: Party[]
+  vehicles: Vehicle[]
   meta: PaginationMeta
   drawerOpen: boolean
   sort: string
   order: string
 }
 
-export default function Parties({
-  initialParties,
+export default function List({
+  initialVehicles,
   initialMeta,
   initialSort,
   initialOrder,
   initialIsMobile,
-}: PartiesProperties) {
+}: ListProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
-  const { getLocally, saveLocally } = useLocalStorage()
+  const { getLocally } = useLocalStorage()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
-    (getLocally("partyViewMode") as "table" | "mobile") ||
+    (getLocally("vehicleViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
   )
   const { formState, dispatchForm } = useForm<FormStateData>({
-    parties: initialParties,
+    vehicles: initialVehicles,
     meta: initialMeta,
     drawerOpen: false,
     sort: initialSort,
     order: initialOrder,
   })
-  const { meta, sort, order, parties, drawerOpen } = formState.data
+  const { meta, sort, order, vehicles, drawerOpen } = formState.data
   const router = useRouter()
-
-  useEffect(() => {
-    saveLocally("partyViewMode", viewMode)
-  }, [viewMode, saveLocally])
 
   const validSorts: readonly ValidSort[] = useMemo(
     () => ["created_at", "updated_at", "name"],
@@ -61,19 +57,19 @@ export default function Parties({
   )
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
-  const fetchParties = useCallback(
+  const fetchVehicles = useCallback(
     async (
       page: number = 1,
       sort: string = "created_at",
       order: string = "desc"
     ) => {
       try {
-        const response = await client.getParties({ page, sort, order })
-        console.log("Fetched parties:", response.data.parties)
+        const response = await client.getVehicles({ page, sort, order })
+        console.log("Fetched vehicles:", response.data.vehicles)
         dispatchForm({
           type: FormActions.UPDATE,
-          name: "parties",
-          value: response.data.parties,
+          name: "vehicles",
+          value: response.data.vehicles,
         })
         dispatchForm({
           type: FormActions.UPDATE,
@@ -85,9 +81,9 @@ export default function Parties({
         const errorMessage =
           error instanceof Error
             ? error.message
-            : "Unable to fetch parties data"
+            : "Unable to fetch vehicles data"
         dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
-        console.error("Fetch parties error:", error)
+        console.error("Fetch vehicles error:", error)
       }
     },
     [client, dispatchForm]
@@ -96,7 +92,7 @@ export default function Parties({
   useEffect(() => {
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
-    if (campaignData.parties === "reload") {
+    if (campaignData.vehicles === "reload") {
       const parameters = new URLSearchParams(globalThis.location.search)
       const page = parameters.get("page")
         ? Number.parseInt(parameters.get("page")!, 10)
@@ -121,13 +117,13 @@ export default function Parties({
         name: "order",
         value: currentOrder,
       })
-      fetchParties(page, currentSort, currentOrder)
+      fetchVehicles(page, currentSort, currentOrder)
     }
   }, [
     client,
     campaignData,
     dispatchForm,
-    fetchParties,
+    fetchVehicles,
     validSorts,
     validOrders,
   ])
@@ -140,34 +136,34 @@ export default function Parties({
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: false })
   }
 
-  const handleSave = async (newParty: Party) => {
+  const handleSave = async (newVehicle: Vehicle) => {
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "parties",
-      value: [newParty, ...parties],
+      name: "vehicles",
+      value: [newVehicle, ...vehicles],
     })
   }
 
   const handleOrderChange = async () => {
     const newOrder = order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/parties?page=1&sort=${sort}&order=${newOrder}`, {
+    router.push(`/vehicles?page=1&sort=${sort}&order=${newOrder}`, {
       scroll: false,
     })
-    await fetchParties(1, sort, newOrder)
+    await fetchVehicles(1, sort, newOrder)
   }
 
   const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
-      router.push(`/parties?page=1&sort=${sort}&order=${order}`, {
+      router.push(`/vehicles?page=1&sort=${sort}&order=${order}`, {
         scroll: false,
       })
-      await fetchParties(1, sort, order)
+      await fetchVehicles(1, sort, order)
     } else {
-      router.push(`/parties?page=${page}&sort=${sort}&order=${order}`, {
+      router.push(`/vehicles?page=${page}&sort=${sort}&order=${order}`, {
         scroll: false,
       })
-      await fetchParties(page, sort, order)
+      await fetchVehicles(page, sort, order)
     }
   }
 
@@ -175,7 +171,7 @@ export default function Parties({
     const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    const url = `/parties?${queryParams({
+    const url = `/vehicles?${queryParams({
       page: 1,
       sort: newSort,
       order: newOrder,
@@ -183,7 +179,7 @@ export default function Parties({
     router.push(url, {
       scroll: false,
     })
-    fetchParties(1, newSort, newOrder)
+    fetchVehicles(1, newSort, newOrder)
   }
 
   return (
@@ -205,8 +201,8 @@ export default function Parties({
         }}
       >
         <MainHeader
-          title="Parties"
-          icon={<Icon keyword="Parties" size="36" />}
+          title="Vehicles"
+          icon={<Icon keyword="Vehicles" size="36" />}
         />
       </Box>
       <View

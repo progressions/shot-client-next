@@ -2,7 +2,7 @@ import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Schtick } from "@/types"
-import { NotFound, SchtickPageClient } from "@/components/schticks"
+import { NotFound, Show } from "@/components/schticks"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -29,10 +29,7 @@ export default async function SchtickPage({ params }: SchtickPageProperties) {
       <>
         <Breadcrumbs />
         <Suspense fallback={<CircularProgress />}>
-          <SchtickPageClient
-            schtick={schtick}
-            initialIsMobile={initialIsMobile}
-          />
+          <Show schtick={schtick} initialIsMobile={initialIsMobile} />
         </Suspense>
       </>
     )

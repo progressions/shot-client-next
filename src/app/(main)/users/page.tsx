@@ -1,9 +1,9 @@
 import { Suspense } from "react"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
-import { CircularProgress } from "@mui/material"
+import { Box, CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
-import { Users } from "@/components/users"
+import { List } from "@/components/users"
 import type { UsersResponse } from "@/types"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -65,10 +65,17 @@ export default async function UsersPage({
   const initialIsMobile = /mobile/i.test(userAgent)
 
   return (
-    <>
+    <Box
+      sx={{
+        justifyContent: "space-between",
+        alignItems: "center",
+        mb: 2,
+        position: "relative",
+      }}
+    >
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <Users
+        <List
           initialUsers={users}
           initialMeta={meta}
           initialSort={sort}
@@ -76,6 +83,6 @@ export default async function UsersPage({
           initialIsMobile={initialIsMobile}
         />
       </Suspense>
-    </>
+    </Box>
   )
 }

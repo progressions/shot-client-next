@@ -1,7 +1,7 @@
 import type { Weapon } from "@/types"
 import { Chip } from "@mui/material"
 import { Chipset } from "@/components/ui"
-import { junctureColors } from "@/components/weapons/WeaponPageClient"
+import { junctureColors } from "@/components/weapons/Show"
 
 type WeaponChipsProps = {
   weapon: Weapon

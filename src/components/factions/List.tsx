@@ -2,57 +2,57 @@
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Box } from "@mui/material"
-import { View, Menu } from "@/components/fights"
-import type { Fight, PaginationMeta } from "@/types"
+import { View, Menu } from "@/components/factions"
+import type { Faction, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useLocalStorage, useCampaign, useClient } from "@/contexts"
 import { queryParams } from "@/lib"
 import { Icon, MainHeader } from "@/components/ui"
 
-interface FightsProperties {
-  initialFights: Fight[]
+interface ListProps {
+  initialFactions: Faction[]
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
   initialIsMobile?: boolean
 }
 
+type ValidSort = "created_at" | "updated_at" | "name"
 type ValidOrder = "asc" | "desc"
-
 type FormStateData = {
-  fights: Fight[]
+  factions: Faction[]
   meta: PaginationMeta
   drawerOpen: boolean
   sort: string
   order: string
 }
 
-export default function Fights({
-  initialFights,
+export default function List({
+  initialFactions,
   initialMeta,
   initialSort,
   initialOrder,
   initialIsMobile,
-}: FightsProperties) {
+}: ListProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { getLocally, saveLocally } = useLocalStorage()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
-    (getLocally("fightViewMode") as "table" | "mobile") ||
+    (getLocally("factionViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
   )
   const { formState, dispatchForm } = useForm<FormStateData>({
-    fights: initialFights,
+    factions: initialFactions,
     meta: initialMeta,
     drawerOpen: false,
     sort: initialSort,
     order: initialOrder,
   })
-  const { meta, sort, order, fights, drawerOpen } = formState.data
+  const { meta, sort, order, factions, drawerOpen } = formState.data
   const router = useRouter()
 
   useEffect(() => {
-    saveLocally("fightViewMode", viewMode)
+    saveLocally("factionViewMode", viewMode)
   }, [viewMode, saveLocally])
 
   const validSorts: readonly ValidSort[] = useMemo(
@@ -61,19 +61,19 @@ export default function Fights({
   )
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
-  const fetchFights = useCallback(
+  const fetchFactions = useCallback(
     async (
       page: number = 1,
       sort: string = "created_at",
       order: string = "desc"
     ) => {
       try {
-        const response = await client.getFights({ page, sort, order })
-        console.log("Fetched fights:", response.data.fights)
+        const response = await client.getFactions({ page, sort, order })
+        console.log("Fetched factions:", response.data.factions)
         dispatchForm({
           type: FormActions.UPDATE,
-          name: "fights",
-          value: response.data.fights,
+          name: "factions",
+          value: response.data.factions,
         })
         dispatchForm({
           type: FormActions.UPDATE,
@@ -81,13 +81,13 @@ export default function Fights({
           value: response.data.meta || { current_page: page, total_pages: 1 },
         })
         dispatchForm({ type: FormActions.ERROR, payload: null })
-      } catch (error_: unknown) {
-        dispatchForm({
-          type: FormActions.ERROR,
-          payload:
-            error_ instanceof Error ? error_.message : "Failed to fetch fights",
-        })
-        console.error("Fetch fights error:", error_)
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Unable to fetch factions data"
+        dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
+        console.error("Fetch factions error:", error)
       }
     },
     [client, dispatchForm]
@@ -96,7 +96,7 @@ export default function Fights({
   useEffect(() => {
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
-    if (campaignData.fights === "reload") {
+    if (campaignData.factions === "reload") {
       const parameters = new URLSearchParams(globalThis.location.search)
       const page = parameters.get("page")
         ? Number.parseInt(parameters.get("page")!, 10)
@@ -111,11 +111,26 @@ export default function Fights({
         orderParameter && validOrders.includes(orderParameter as ValidOrder)
           ? orderParameter
           : "desc"
-      setSort(currentSort)
-      setOrder(currentOrder)
-      fetchFights(page, currentSort, currentOrder)
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "sort",
+        value: currentSort,
+      })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "order",
+        value: currentOrder,
+      })
+      fetchFactions(page, currentSort, currentOrder)
     }
-  }, [client, campaignData, dispatchForm, fetchFights, validSorts, validOrders])
+  }, [
+    client,
+    campaignData,
+    dispatchForm,
+    fetchFactions,
+    validSorts,
+    validOrders,
+  ])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -125,33 +140,34 @@ export default function Fights({
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: false })
   }
 
-  const handleSaveFight = async (newFight: Fight) => {
+  const handleSave = async (newFaction: Faction) => {
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "fights",
-      value: [newFight, ...fights],
+      name: "factions",
+      value: [newFaction, ...factions],
     })
   }
 
   const handleOrderChange = async () => {
     const newOrder = order === "asc" ? "desc" : "asc"
-    setOrder(newOrder)
-    router.push(`/sites?page=1&sort=${sort}&order=${newOrder}`, {
+    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
+    router.push(`/factions?page=1&sort=${sort}&order=${newOrder}`, {
       scroll: false,
     })
-    await fetchSites(1, sort, newOrder, faction_id)
+    await fetchFactions(1, sort, newOrder)
   }
+
   const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
-      router.push(`/fights?page=1&sort=${sort}&order=${order}`, {
+      router.push(`/factions?page=1&sort=${sort}&order=${order}`, {
         scroll: false,
       })
-      await fetchFights(1, sort, order)
+      await fetchFactions(1, sort, order)
     } else {
-      router.push(`/fights?page=${page}&sort=${sort}&order=${order}`, {
+      router.push(`/factions?page=${page}&sort=${sort}&order=${order}`, {
         scroll: false,
       })
-      await fetchFights(page, sort, order)
+      await fetchFactions(page, sort, order)
     }
   }
 
@@ -159,7 +175,7 @@ export default function Fights({
     const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    const url = `/fights?${queryParams({
+    const url = `/factions?${queryParams({
       page: 1,
       sort: newSort,
       order: newOrder,
@@ -167,7 +183,7 @@ export default function Fights({
     router.push(url, {
       scroll: false,
     })
-    fetchFights(1, newSort, newOrder)
+    fetchFactions(1, newSort, newOrder)
   }
 
   return (
@@ -178,7 +194,7 @@ export default function Fights({
         drawerOpen={drawerOpen}
         handleOpenCreateDrawer={handleOpenCreateDrawer}
         handleCloseCreateDrawer={handleCloseCreateDrawer}
-        handleSaveFight={handleSaveFight}
+        handleSave={handleSave}
       />
       <Box
         sx={{
@@ -188,7 +204,10 @@ export default function Fights({
           mb: 2,
         }}
       >
-        <MainHeader title="Fights" icon={<Icon keyword="Fights" size="36" />} />
+        <MainHeader
+          title="Factions"
+          icon={<Icon keyword="Factions" size="36" />}
+        />
       </Box>
       <View
         viewMode={viewMode}

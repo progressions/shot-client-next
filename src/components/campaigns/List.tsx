@@ -29,7 +29,7 @@ import { useCampaign, useClient } from "@/contexts"
 import type { SelectChangeEvent } from "@mui/material"
 import { InfoLink } from "@/components/ui"
 
-interface CampaignsProperties {
+interface ListProps {
   initialCampaigns: Campaign[]
   initialMeta: PaginationMeta
   initialSort: string
@@ -43,12 +43,12 @@ type FormStateData = {
   error: string | null
 }
 
-export default function Campaigns({
+export default function List({
   initialCampaigns,
   initialMeta,
   initialSort,
   initialOrder,
-}: CampaignsProperties) {
+}: ListProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({

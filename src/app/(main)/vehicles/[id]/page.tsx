@@ -5,7 +5,7 @@ import type { Vehicle } from "@/types"
 import type { Metadata } from "next"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import { Suspense } from "react"
-import { NotFound, VehiclePageClient } from "@/components/vehicles"
+import { NotFound, Show } from "@/components/vehicles"
 import { headers } from "next/headers"
 
 // Dynamically generate metadata for the page title
@@ -63,10 +63,7 @@ export default async function VehiclePage({
       <>
         <Breadcrumbs />
         <Suspense fallback={<CircularProgress />}>
-          <VehiclePageClient
-            vehicle={vehicle}
-            initialIsMobile={initialIsMobile}
-          />
+          <Show vehicle={vehicle} initialIsMobile={initialIsMobile} />
         </Suspense>
       </>
     )

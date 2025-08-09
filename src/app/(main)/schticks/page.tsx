@@ -3,7 +3,7 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { Box, CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
-import { Schticks } from "@/components/schticks"
+import { List } from "@/components/schticks"
 import type { SchticksResponse } from "@/types"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -73,7 +73,7 @@ export default async function SchticksPage({
     >
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <Schticks
+        <List
           initialSchticks={schticks}
           initialMeta={meta}
           initialSort={sort}

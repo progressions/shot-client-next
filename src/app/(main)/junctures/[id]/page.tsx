@@ -2,7 +2,7 @@ import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
 import { getServerClient, getUser } from "@/lib/getServerClient"
 import type { Juncture } from "@/types"
-import { NotFound, JuncturePageClient } from "@/components/junctures"
+import { NotFound, Show } from "@/components/junctures"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -29,10 +29,7 @@ export default async function JuncturePage({ params }: JuncturePageProperties) {
       <>
         <Breadcrumbs />
         <Suspense fallback={<CircularProgress />}>
-          <JuncturePageClient
-            juncture={juncture}
-            initialIsMobile={initialIsMobile}
-          />
+          <Show juncture={juncture} initialIsMobile={initialIsMobile} />
         </Suspense>
       </>
     )

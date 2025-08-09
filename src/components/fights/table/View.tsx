@@ -8,7 +8,7 @@ import {
   TableBody,
 } from "@/components/fights"
 
-interface FightsViewProps {
+interface ViewProps {
   viewMode: "table" | "mobile"
   formState: FormStateType<FormStateData>
   dispatchForm: (action: FormStateAction<FormStateData>) => void
@@ -42,7 +42,7 @@ interface PaginationMeta {
   total_pages: number
 }
 
-export default function FightsView({
+export default function View({
   viewMode,
   formState,
   dispatchForm,
@@ -50,7 +50,7 @@ export default function FightsView({
   onSortChange,
   onOrderChange,
   initialIsMobile,
-}: FightsViewProps) {
+}: ViewProps) {
   const { fights, meta, sort, order } = formState.data
 
   const formatDate = (date: string) => {

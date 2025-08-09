@@ -61,10 +61,7 @@ export default async function CharacterPage({
       <>
         <Breadcrumbs />
         <Suspense fallback={<CircularProgress />}>
-          <Show
-            character={character}
-            initialIsMobile={initialIsMobile}
-          />
+          <Show character={character} initialIsMobile={initialIsMobile} />
         </Suspense>
       </>
     )

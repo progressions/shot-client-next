@@ -10,13 +10,11 @@ import { MembersList, EditCampaignForm } from "@/components/campaigns"
 import { useClient } from "@/contexts"
 import { HeroImage, SpeedDialMenu } from "@/components/ui"
 
-interface CampaignPageClientProperties {
+interface ShowProperties {
   campaign: Campaign
 }
 
-export default function CampaignPageClient({
-  campaign: initialCampaign,
-}: CampaignPageClientProperties) {
+export default function Show({ campaign: initialCampaign }: ShowProperties) {
   const { campaignData } = useCampaign()
   const { user, client } = useClient()
 

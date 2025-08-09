@@ -1,9 +1,9 @@
 import { Suspense } from "react"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
-import { CircularProgress } from "@mui/material"
+import { Box, CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
-import { Campaigns } from "@/components/campaigns"
+import { List } from "@/components/campaigns"
 import type { CampaignsResponse } from "@/types"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -65,10 +65,17 @@ export default async function CampaignsPage({
   const initialIsMobile = /mobile/i.test(userAgent)
 
   return (
-    <>
+    <Box
+      sx={{
+        justifyContent: "space-between",
+        alignItems: "center",
+        mb: 2,
+        position: "relative",
+      }}
+    >
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
-        <Campaigns
+        <List
           initialCampaigns={campaigns}
           initialMeta={meta}
           initialSort={sort}
@@ -76,6 +83,6 @@ export default async function CampaignsPage({
           initialIsMobile={initialIsMobile}
         />
       </Suspense>
-    </>
+    </Box>
   )
 }

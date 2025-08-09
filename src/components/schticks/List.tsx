@@ -2,15 +2,15 @@
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Box } from "@mui/material"
-import { View, Menu } from "@/components/vehicles"
-import type { Vehicle, PaginationMeta } from "@/types"
+import { View, Menu } from "@/components/schticks"
+import type { Schtick, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useLocalStorage, useCampaign, useClient } from "@/contexts"
 import { queryParams } from "@/lib"
 import { Icon, MainHeader } from "@/components/ui"
 
-interface VehiclesProperties {
-  initialVehicles: Vehicle[]
+interface ListProperties {
+  initialSchticks: Schtick[]
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
@@ -20,36 +20,40 @@ interface VehiclesProperties {
 type ValidSort = "created_at" | "updated_at" | "name"
 type ValidOrder = "asc" | "desc"
 type FormStateData = {
-  vehicles: Vehicle[]
+  schticks: Schtick[]
   meta: PaginationMeta
   drawerOpen: boolean
   sort: string
   order: string
 }
 
-export default function Vehicles({
-  initialVehicles,
+export default function List({
+  initialSchticks,
   initialMeta,
   initialSort,
   initialOrder,
   initialIsMobile,
-}: VehiclesProperties) {
+}: ListProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
-  const { getLocally } = useLocalStorage()
+  const { getLocally, saveLocally } = useLocalStorage()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
-    (getLocally("vehicleViewMode") as "table" | "mobile") ||
+    (getLocally("schtickViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
   )
   const { formState, dispatchForm } = useForm<FormStateData>({
-    vehicles: initialVehicles,
+    schticks: initialSchticks,
     meta: initialMeta,
     drawerOpen: false,
     sort: initialSort,
     order: initialOrder,
   })
-  const { meta, sort, order, vehicles, drawerOpen } = formState.data
+  const { meta, sort, order, schticks, drawerOpen } = formState.data
   const router = useRouter()
+
+  useEffect(() => {
+    saveLocally("schtickViewMode", viewMode)
+  }, [viewMode, saveLocally])
 
   const validSorts: readonly ValidSort[] = useMemo(
     () => ["created_at", "updated_at", "name"],
@@ -57,19 +61,19 @@ export default function Vehicles({
   )
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
-  const fetchVehicles = useCallback(
+  const fetchSchticks = useCallback(
     async (
       page: number = 1,
       sort: string = "created_at",
       order: string = "desc"
     ) => {
       try {
-        const response = await client.getVehicles({ page, sort, order })
-        console.log("Fetched vehicles:", response.data.vehicles)
+        const response = await client.getSchticks({ page, sort, order })
+        console.log("Fetched schticks:", response.data.schticks)
         dispatchForm({
           type: FormActions.UPDATE,
-          name: "vehicles",
-          value: response.data.vehicles,
+          name: "schticks",
+          value: response.data.schticks,
         })
         dispatchForm({
           type: FormActions.UPDATE,
@@ -81,9 +85,9 @@ export default function Vehicles({
         const errorMessage =
           error instanceof Error
             ? error.message
-            : "Unable to fetch vehicles data"
+            : "Unable to fetch schticks data"
         dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
-        console.error("Fetch vehicles error:", error)
+        console.error("Fetch schticks error:", error)
       }
     },
     [client, dispatchForm]
@@ -92,7 +96,7 @@ export default function Vehicles({
   useEffect(() => {
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
-    if (campaignData.vehicles === "reload") {
+    if (campaignData.schticks === "reload") {
       const parameters = new URLSearchParams(globalThis.location.search)
       const page = parameters.get("page")
         ? Number.parseInt(parameters.get("page")!, 10)
@@ -117,13 +121,13 @@ export default function Vehicles({
         name: "order",
         value: currentOrder,
       })
-      fetchVehicles(page, currentSort, currentOrder)
+      fetchSchticks(page, currentSort, currentOrder)
     }
   }, [
     client,
     campaignData,
     dispatchForm,
-    fetchVehicles,
+    fetchSchticks,
     validSorts,
     validOrders,
   ])
@@ -136,34 +140,34 @@ export default function Vehicles({
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: false })
   }
 
-  const handleSave = async (newVehicle: Vehicle) => {
+  const handleSave = async (newSchtick: Schtick) => {
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "vehicles",
-      value: [newVehicle, ...vehicles],
+      name: "schticks",
+      value: [newSchtick, ...schticks],
     })
   }
 
   const handleOrderChange = async () => {
     const newOrder = order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/vehicles?page=1&sort=${sort}&order=${newOrder}`, {
+    router.push(`/schticks?page=1&sort=${sort}&order=${newOrder}`, {
       scroll: false,
     })
-    await fetchVehicles(1, sort, newOrder)
+    await fetchSchticks(1, sort, newOrder)
   }
 
   const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
-      router.push(`/vehicles?page=1&sort=${sort}&order=${order}`, {
+      router.push(`/schticks?page=1&sort=${sort}&order=${order}`, {
         scroll: false,
       })
-      await fetchVehicles(1, sort, order)
+      await fetchSchticks(1, sort, order)
     } else {
-      router.push(`/vehicles?page=${page}&sort=${sort}&order=${order}`, {
+      router.push(`/schticks?page=${page}&sort=${sort}&order=${order}`, {
         scroll: false,
       })
-      await fetchVehicles(page, sort, order)
+      await fetchSchticks(page, sort, order)
     }
   }
 
@@ -171,7 +175,7 @@ export default function Vehicles({
     const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    const url = `/vehicles?${queryParams({
+    const url = `/schticks?${queryParams({
       page: 1,
       sort: newSort,
       order: newOrder,
@@ -179,7 +183,7 @@ export default function Vehicles({
     router.push(url, {
       scroll: false,
     })
-    fetchVehicles(1, newSort, newOrder)
+    fetchSchticks(1, newSort, newOrder)
   }
 
   return (
@@ -201,8 +205,8 @@ export default function Vehicles({
         }}
       >
         <MainHeader
-          title="Vehicles"
-          icon={<Icon keyword="Vehicles" size="36" />}
+          title="Schticks"
+          icon={<Icon keyword="Schticks" size="36" />}
         />
       </Box>
       <View

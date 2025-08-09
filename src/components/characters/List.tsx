@@ -9,7 +9,7 @@ import { Icon, MainHeader } from "@/components/ui"
 import { queryParams } from "@/lib"
 import { View, Menu } from "@/components/characters"
 
-interface CharactersProperties {
+interface ListProps {
   initialCharacters: Character[]
   initialMeta: PaginationMeta
   initialSort: string
@@ -30,13 +30,13 @@ type FormStateData = {
   faction_id: string
 }
 
-export default function Characters({
+export default function List({
   initialCharacters,
   initialMeta,
   initialSort,
   initialOrder,
   initialIsMobile,
-}: CharactersProperties) {
+}: ListProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { saveLocally, getLocally } = useLocalStorage()

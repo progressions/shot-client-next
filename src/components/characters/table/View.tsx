@@ -9,7 +9,7 @@ import {
 } from "@/components/characters"
 import { SortControls } from "@/components/ui"
 
-interface CharactersViewProps {
+interface ViewProps {
   viewMode: "table" | "mobile"
   formState: FormStateType<FormStateData>
   dispatchForm: (action: FormStateAction<FormStateData>) => void
@@ -43,7 +43,7 @@ interface PaginationMeta {
   total_pages: number
 }
 
-export default function CharactersView({
+export default function View({
   viewMode,
   formState,
   dispatchForm,
@@ -51,7 +51,7 @@ export default function CharactersView({
   onSortChange,
   onOrderChange,
   initialIsMobile,
-}: CharactersViewProps) {
+}: ViewProps) {
   const { characters, meta, sort, order } = formState.data
 
   const formatDate = (date: string) => {

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect } from "react"
 import { Stack, Box } from "@mui/material"
-import type { Juncture } from "@/types"
+import type { Party } from "@/types"
 import { useCampaign } from "@/contexts"
 import {
   HeroImage,
@@ -18,55 +18,48 @@ import { useEntity } from "@/hooks"
 import { EditFaction } from "@/components/factions"
 import { FormActions, useForm } from "@/reducers"
 
-interface JuncturePageClientProperties {
-  juncture: Juncture
+interface ShowProperties {
+  party: Party
 }
 
 type FormStateData = {
-  entity: Juncture & {
+  entity: Party & {
     image?: File | null
   }
 }
 
-export default function JuncturePageClient({
-  juncture: initialJuncture,
-}: JuncturePageClientProperties) {
+export default function Show({ party: initialParty }: ShowProperties) {
   const { campaignData } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
-    entity: initialJuncture,
+    entity: initialParty,
   })
-  const juncture = formState.data.entity
+  const party = formState.data.entity
 
   const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
-    juncture,
+    party,
     dispatchForm
   )
 
-  const setJuncture = useCallback(
-    (juncture: Juncture) => {
+  const setParty = useCallback(
+    (party: Party) => {
       dispatchForm({
         type: FormActions.UPDATE,
         name: "entity",
-        value: juncture,
+        value: party,
       })
     },
     [dispatchForm]
   )
 
   useEffect(() => {
-    document.title = juncture.name ? `${juncture.name} - Chi War` : "Chi War"
-  }, [juncture.name])
+    document.title = party.name ? `${party.name} - Chi War` : "Chi War"
+  }, [party.name])
 
   useEffect(() => {
-    if (
-      campaignData?.juncture &&
-      campaignData.juncture.id === initialJuncture.id
-    ) {
-      setJuncture(campaignData.juncture)
+    if (campaignData?.party && campaignData.party.id === initialParty.id) {
+      setParty(campaignData.party)
     }
-  }, [campaignData, initialJuncture, setJuncture])
-
-  console.log("juncture.faction_id", juncture.faction_id)
+  }, [campaignData, initialParty, setParty])
 
   return (
     <Box
@@ -76,7 +69,7 @@ export default function JuncturePageClient({
       }}
     >
       <SpeedDialMenu onDelete={deleteEntity} />
-      <HeroImage entity={juncture} setEntity={setJuncture} />
+      <HeroImage entity={party} setEntity={setParty} />
       <Box
         sx={{
           display: "flex",
@@ -86,19 +79,17 @@ export default function JuncturePageClient({
         }}
       >
         <NameEditor
-          entity={juncture}
-          setEntity={setJuncture}
+          entity={party}
+          setEntity={setParty}
           updateEntity={updateEntity}
         />
       </Box>
       <Box sx={{ mb: 2 }}>
         <SectionHeader title="Faction" icon={<Icon keyword="Factions" />}>
-          A <InfoLink href="/junctures" info="Juncture" /> belongs to a{" "}
-          <InfoLink href="/factions" info="Faction" />, which controls its most
-          powerful <InfoLink href="/sites" info="Feng Shui Sites" />.
+          A Party belongs to a Faction, which governs its aims and objectives.
         </SectionHeader>
-        <Box sx={{ width: 400, mt: 3, mb: 4 }}>
-          <EditFaction entity={juncture} updateEntity={updateEntity} />
+        <Box sx={{ width: 400 }}>
+          <EditFaction entity={party} updateEntity={updateEntity} />
         </Box>
       </Box>
       <Box>
@@ -108,7 +99,7 @@ export default function JuncturePageClient({
         />
         <EditableRichText
           name="description"
-          html={juncture.description}
+          html={party.description}
           editable={true}
           onChange={handleChangeAndSave}
           fallback="No description available."
@@ -118,16 +109,14 @@ export default function JuncturePageClient({
       <Stack direction="column" spacing={2}>
         <CharacterManager
           icon={<Icon keyword="Fighters" />}
-          name="juncture"
-          title="Juncture Natives"
-          entity={juncture}
+          name="party"
+          title="Party Members"
+          entity={party}
           description={
             <>
-              <InfoLink href="/characters" info="Characters" /> born into a
-              specific <InfoLink href="/junctures" info="Juncture" /> often
-              travel through the <InfoLink info="Netherworld" />, participating
-              in the <InfoLink info="Chi War" />, enaging in its conflicts and
-              shaping its outcomes.
+              A <InfoLink href="/parties" info="Party" /> consists of{" "}
+              <InfoLink href="/characters" info="Characters" /> who work
+              together for a <InfoLink href="/factions" info="Faction" />.
             </>
           }
           updateParent={updateEntity}

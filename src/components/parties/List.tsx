@@ -2,15 +2,15 @@
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Box } from "@mui/material"
-import { View, Menu } from "@/components/factions"
-import type { Faction, PaginationMeta } from "@/types"
+import { View, Menu } from "@/components/parties"
+import type { Party, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useLocalStorage, useCampaign, useClient } from "@/contexts"
 import { queryParams } from "@/lib"
 import { Icon, MainHeader } from "@/components/ui"
 
-interface FactionsProperties {
-  initialFactions: Faction[]
+interface ListProps {
+  initialParties: Party[]
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
@@ -20,39 +20,39 @@ interface FactionsProperties {
 type ValidSort = "created_at" | "updated_at" | "name"
 type ValidOrder = "asc" | "desc"
 type FormStateData = {
-  factions: Faction[]
+  parties: Party[]
   meta: PaginationMeta
   drawerOpen: boolean
   sort: string
   order: string
 }
 
-export default function Factions({
-  initialFactions,
+export default function List({
+  initialParties,
   initialMeta,
   initialSort,
   initialOrder,
   initialIsMobile,
-}: FactionsProperties) {
+}: ListProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { getLocally, saveLocally } = useLocalStorage()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
-    (getLocally("factionViewMode") as "table" | "mobile") ||
+    (getLocally("partyViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
   )
   const { formState, dispatchForm } = useForm<FormStateData>({
-    factions: initialFactions,
+    parties: initialParties,
     meta: initialMeta,
     drawerOpen: false,
     sort: initialSort,
     order: initialOrder,
   })
-  const { meta, sort, order, factions, drawerOpen } = formState.data
+  const { meta, sort, order, parties, drawerOpen } = formState.data
   const router = useRouter()
 
   useEffect(() => {
-    saveLocally("factionViewMode", viewMode)
+    saveLocally("partyViewMode", viewMode)
   }, [viewMode, saveLocally])
 
   const validSorts: readonly ValidSort[] = useMemo(
@@ -61,19 +61,19 @@ export default function Factions({
   )
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
-  const fetchFactions = useCallback(
+  const fetchParties = useCallback(
     async (
       page: number = 1,
       sort: string = "created_at",
       order: string = "desc"
     ) => {
       try {
-        const response = await client.getFactions({ page, sort, order })
-        console.log("Fetched factions:", response.data.factions)
+        const response = await client.getParties({ page, sort, order })
+        console.log("Fetched parties:", response.data.parties)
         dispatchForm({
           type: FormActions.UPDATE,
-          name: "factions",
-          value: response.data.factions,
+          name: "parties",
+          value: response.data.parties,
         })
         dispatchForm({
           type: FormActions.UPDATE,
@@ -85,9 +85,9 @@ export default function Factions({
         const errorMessage =
           error instanceof Error
             ? error.message
-            : "Unable to fetch factions data"
+            : "Unable to fetch parties data"
         dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
-        console.error("Fetch factions error:", error)
+        console.error("Fetch parties error:", error)
       }
     },
     [client, dispatchForm]
@@ -96,7 +96,7 @@ export default function Factions({
   useEffect(() => {
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
-    if (campaignData.factions === "reload") {
+    if (campaignData.parties === "reload") {
       const parameters = new URLSearchParams(globalThis.location.search)
       const page = parameters.get("page")
         ? Number.parseInt(parameters.get("page")!, 10)
@@ -121,13 +121,13 @@ export default function Factions({
         name: "order",
         value: currentOrder,
       })
-      fetchFactions(page, currentSort, currentOrder)
+      fetchParties(page, currentSort, currentOrder)
     }
   }, [
     client,
     campaignData,
     dispatchForm,
-    fetchFactions,
+    fetchParties,
     validSorts,
     validOrders,
   ])
@@ -140,34 +140,34 @@ export default function Factions({
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: false })
   }
 
-  const handleSave = async (newFaction: Faction) => {
+  const handleSave = async (newParty: Party) => {
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "factions",
-      value: [newFaction, ...factions],
+      name: "parties",
+      value: [newParty, ...parties],
     })
   }
 
   const handleOrderChange = async () => {
     const newOrder = order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/factions?page=1&sort=${sort}&order=${newOrder}`, {
+    router.push(`/parties?page=1&sort=${sort}&order=${newOrder}`, {
       scroll: false,
     })
-    await fetchFactions(1, sort, newOrder)
+    await fetchParties(1, sort, newOrder)
   }
 
   const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
-      router.push(`/factions?page=1&sort=${sort}&order=${order}`, {
+      router.push(`/parties?page=1&sort=${sort}&order=${order}`, {
         scroll: false,
       })
-      await fetchFactions(1, sort, order)
+      await fetchParties(1, sort, order)
     } else {
-      router.push(`/factions?page=${page}&sort=${sort}&order=${order}`, {
+      router.push(`/parties?page=${page}&sort=${sort}&order=${order}`, {
         scroll: false,
       })
-      await fetchFactions(page, sort, order)
+      await fetchParties(page, sort, order)
     }
   }
 
@@ -175,7 +175,7 @@ export default function Factions({
     const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    const url = `/factions?${queryParams({
+    const url = `/parties?${queryParams({
       page: 1,
       sort: newSort,
       order: newOrder,
@@ -183,7 +183,7 @@ export default function Factions({
     router.push(url, {
       scroll: false,
     })
-    fetchFactions(1, newSort, newOrder)
+    fetchParties(1, newSort, newOrder)
   }
 
   return (
@@ -205,8 +205,8 @@ export default function Factions({
         }}
       >
         <MainHeader
-          title="Factions"
-          icon={<Icon keyword="Factions" size="36" />}
+          title="Parties"
+          icon={<Icon keyword="Parties" size="36" />}
         />
       </Box>
       <View

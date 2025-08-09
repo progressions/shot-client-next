@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { Box, CircularProgress } from "@mui/material"
 import { getUser, getServerClient, getPageParameters } from "@/lib"
-import { Fights } from "@/components/fights"
+import { List } from "@/components/fights"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import type { FightsResponse } from "@/types"
 
@@ -73,7 +73,7 @@ export default async function FightsPage({
         <Breadcrumbs headers={headers} />
       </Suspense>
       <Suspense fallback={<CircularProgress />}>
-        <Fights
+        <List
           initialFights={fightsResponse.fights}
           initialMeta={fightsResponse.meta}
           initialSort={sort}

@@ -43,7 +43,7 @@ export const junctureColors: Record<
   },
 }
 
-interface WeaponPageClientProperties {
+interface ShowProperties {
   weapon: Weapon
 }
 
@@ -53,9 +53,7 @@ type FormStateData = {
   }
 }
 
-export default function WeaponPageClient({
-  weapon: initialWeapon,
-}: WeaponPageClientProperties) {
+export default function Show({ weapon: initialWeapon }: ShowProperties) {
   const { campaignData } = useCampaign()
   const { toastError } = useToast()
   const { formState, dispatchForm } = useForm<FormStateData>({
