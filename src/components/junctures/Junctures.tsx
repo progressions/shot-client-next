@@ -36,7 +36,7 @@ export default function Junctures({
 }: JuncturesProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
-  const { getLocally } = useLocalStorage()
+  const { getLocally, saveLocally } = useLocalStorage()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
     (getLocally("junctureViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
@@ -50,6 +50,10 @@ export default function Junctures({
   })
   const { meta, sort, order, junctures, drawerOpen } = formState.data
   const router = useRouter()
+
+  useEffect(() => {
+    saveLocally("junctureViewMode", viewMode)
+  }, [viewMode, saveLocally])
 
   const validSorts: readonly ValidSort[] = useMemo(
     () => ["created_at", "updated_at", "name"],

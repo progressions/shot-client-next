@@ -36,7 +36,7 @@ export default function Sites({
 }: SitesProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
-  const { getLocally } = useLocalStorage()
+  const { getLocally, saveLocally } = useLocalStorage()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
     (getLocally("siteViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
@@ -50,6 +50,10 @@ export default function Sites({
   })
   const { meta, sort, order, sites, drawerOpen } = formState.data
   const router = useRouter()
+
+  useEffect(() => {
+    saveLocally("siteViewMode", viewMode)
+  }, [viewMode, saveLocally])
 
   const validSorts: readonly ValidSort[] = useMemo(
     () => ["created_at", "updated_at", "name"],

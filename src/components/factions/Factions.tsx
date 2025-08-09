@@ -36,7 +36,7 @@ export default function Factions({
 }: FactionsProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
-  const { getLocally } = useLocalStorage()
+  const { getLocally, saveLocally } = useLocalStorage()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
     (getLocally("factionViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
@@ -50,6 +50,10 @@ export default function Factions({
   })
   const { meta, sort, order, factions, drawerOpen } = formState.data
   const router = useRouter()
+
+  useEffect(() => {
+    saveLocally("factionViewMode", viewMode)
+  }, [viewMode, saveLocally])
 
   const validSorts: readonly ValidSort[] = useMemo(
     () => ["created_at", "updated_at", "name"],

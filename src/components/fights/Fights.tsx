@@ -36,7 +36,7 @@ export default function Fights({
 }: FightsProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
-  const { getLocally } = useLocalStorage()
+  const { getLocally, saveLocally } = useLocalStorage()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
     (getLocally("fightViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
@@ -50,6 +50,10 @@ export default function Fights({
   })
   const { meta, sort, order, fights, drawerOpen } = formState.data
   const router = useRouter()
+
+  useEffect(() => {
+    saveLocally("fightViewMode", viewMode)
+  }, [viewMode, saveLocally])
 
   const validSorts: readonly ValidSort[] = useMemo(
     () => ["created_at", "updated_at", "name"],

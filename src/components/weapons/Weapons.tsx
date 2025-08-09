@@ -36,7 +36,7 @@ export default function Weapons({
 }: WeaponsProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
-  const { getLocally } = useLocalStorage()
+  const { getLocally, saveLocally } = useLocalStorage()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
     (getLocally("weaponViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
@@ -50,6 +50,10 @@ export default function Weapons({
   })
   const { meta, sort, order, weapons, drawerOpen } = formState.data
   const router = useRouter()
+
+  useEffect(() => {
+    saveLocally("weaponViewMode", viewMode)
+  }, [viewMode, saveLocally])
 
   const validSorts: readonly ValidSort[] = useMemo(
     () => ["created_at", "updated_at", "name"],
