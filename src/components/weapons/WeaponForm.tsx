@@ -2,14 +2,7 @@
 
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import {
-  Stack,
-  Drawer,
-  Box,
-  Typography,
-  Alert,
-  IconButton,
-} from "@mui/material"
+import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
 import {
   InfoLink,
   HeroImage,
@@ -18,14 +11,11 @@ import {
   CancelButton,
 } from "@/components/ui"
 import type { EditorChangeEvent, Weapon } from "@/types"
+import { defaultWeapon } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
-import {
-  WeaponJunctureAutocomplete,
-  WeaponCategoryAutocomplete,
-} from "@/components/autocomplete"
 
 type FormStateData = Weapon & {
   [key: string]: unknown
@@ -50,18 +40,7 @@ export default function WeaponForm({
   const { formState, dispatchForm, initialFormState } =
     useForm<FormStateData>(initialFormData)
   const { disabled, error, data } = formState
-  const {
-    name,
-    description,
-    juncture,
-    category,
-    damage,
-    concealment,
-    reload_value,
-    kachunk,
-    mook_bonus,
-    image,
-  } = data
+  const { name, description, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
 
   const theme = useTheme()
@@ -109,18 +88,8 @@ export default function WeaponForm({
     dispatchForm({ type: FormActions.SUBMIT })
     try {
       const formData = new FormData()
-      const weaponData = {
-        name,
-        description,
-        damage,
-        concealment,
-        reload_value,
-        category,
-        juncture,
-        kachunk,
-        mook_bonus,
-      } as Weapon
-      formData.append("weapon", JSON.stringify(weaponData))
+      const weaponData = { ...defaultWeapon, name, description } as Weapon
+      formData.append("weapon", JSON.stringify(siteData))
       if (image) {
         formData.append("image", image)
       }
@@ -140,14 +109,6 @@ export default function WeaponForm({
     onClose()
   }
 
-  const handleJunctureChange = async (value: string | null) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "juncture", value })
-  }
-
-  const handleCategoryChange = async (value: string | null) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "category", value })
-  }
-
   return (
     <Drawer
       anchor={isMobile ? "bottom" : "right"}
@@ -158,11 +119,7 @@ export default function WeaponForm({
       <Box
         component="form"
         onSubmit={handleSubmit}
-        sx={{
-          width: isMobile ? "100%" : "30rem",
-          height: isMobile ? "auto" : "100%",
-          p: isMobile ? "1rem" : "2rem",
-        }}
+        sx={{ width: isMobile ? "100%" : "30rem", height: isMobile ? "auto" : "100%", p: isMobile ? "1rem" : "2rem",  }}
       >
         <Typography variant="h5" sx={{ mb: 2, color: "#ffffff" }}>
           {title}
@@ -172,6 +129,9 @@ export default function WeaponForm({
             {error}
           </Alert>
         )}
+        <Typography>
+          Describe this thing.
+        </Typography>
         <TextField
           label="Name"
           value={name}
@@ -197,66 +157,6 @@ export default function WeaponForm({
             })
           }}
         />
-        <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-          <WeaponJunctureAutocomplete
-            value={juncture || ""}
-            onChange={handleJunctureChange}
-          />
-          <WeaponCategoryAutocomplete
-            value={category || ""}
-            onChange={handleCategoryChange}
-          />
-        </Stack>
-        <Stack direction="row" spacing={2} my={2}>
-          <TextField
-            label="Damage"
-            value={damage || ""}
-            type="number"
-            onChange={e =>
-              dispatchForm({
-                type: FormActions.UPDATE,
-                name: "damage",
-                value: Number.parseInt(e.target.value, 10),
-              })
-            }
-            margin="normal"
-            required
-            sx={{ width: 80 }}
-          />
-          <TextField
-            label="Concealment"
-            value={concealment || ""}
-            type="number"
-            onChange={e =>
-              dispatchForm({
-                type: FormActions.UPDATE,
-                name: "concealment",
-                value: e.target.value || "",
-              })
-            }
-            margin="normal"
-            sx={{ width: 80 }}
-          />
-          <TextField
-            label="Reload"
-            value={reload_value || ""}
-            type="number"
-            onChange={e =>
-              dispatchForm({
-                type: FormActions.UPDATE,
-                name: "reload_value",
-                value: e.target.value || "",
-              })
-            }
-            margin="normal"
-            sx={{ width: 80 }}
-          />
-        </Stack>
-        <Typography>
-          Typical weapon <InfoLink info="Damage" /> is 9, only extreme weapons
-          are 12 or higher. For <InfoLink info="Concealment" /> and{" "}
-          <InfoLink info="Reload" />, lower is better.
-        </Typography>
         <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: "1rem" }}>
           <IconButton component="label">
             <AddPhotoAlternateIcon sx={{ color: "#ffffff" }} />

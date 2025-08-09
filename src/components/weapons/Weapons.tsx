@@ -1,28 +1,13 @@
 "use client"
-
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import {
-  Pagination,
-  Box,
-  Button,
-  Typography,
-  Alert,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Stack,
-  IconButton,
-  Tooltip,
-} from "@mui/material"
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp"
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
-import { WeaponDetail, CreateWeaponForm } from "@/components/weapons"
+import { Box } from "@mui/material"
+import { View, Menu } from "@/components/weapons"
 import type { Weapon, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
-import { useCampaign, useClient } from "@/contexts"
-import type { SelectChangeEvent } from "@mui/material"
+import { useLocalStorage, useCampaign, useClient } from "@/contexts"
+import { queryParams } from "@/lib"
+import { Icon, MainHeader } from "@/components/ui"
 
 interface WeaponsProperties {
   initialWeapons: Weapon[]
@@ -32,11 +17,14 @@ interface WeaponsProperties {
   initialIsMobile?: boolean
 }
 
+type ValidSort = "created_at" | "updated_at" | "name"
+type ValidOrder = "asc" | "desc"
 type FormStateData = {
   weapons: Weapon[]
   meta: PaginationMeta
   drawerOpen: boolean
-  error: string | null
+  sort: string
+  order: string
 }
 
 export default function Weapons({
@@ -44,61 +32,51 @@ export default function Weapons({
   initialMeta,
   initialSort,
   initialOrder,
+  initialIsMobile
 }: WeaponsProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
+  const { getLocally } = useLocalStorage()
+  const [viewMode, setViewMode] = useState<"table" | "mobile">(
+    (getLocally("weaponViewMode") as "table" | "mobile") ||
+      (initialIsMobile ? "mobile" : "table")
+  )
   const { formState, dispatchForm } = useForm<FormStateData>({
     weapons: initialWeapons,
     meta: initialMeta,
     drawerOpen: false,
-    error: null,
+    sort: initialSort,
+    order: initialOrder
   })
-  const { meta, weapons, drawerOpen, error } = formState.data
-  const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null)
-  const [sort, setSort] = useState<string>(initialSort)
-  const [order, setOrder] = useState<string>(initialOrder)
+  const { meta, sort, order, weapons, drawerOpen } = formState.data
   const router = useRouter()
 
-  type ValidSort =
-    | "created_at"
-    | "updated_at"
-    | "name"
-    | "juncture"
-    | "category"
   const validSorts: readonly ValidSort[] = useMemo(
-    () => ["created_at", "updated_at", "name", "juncture", "category"],
+    () => ["created_at", "updated_at", "name"],
     []
   )
-  type ValidOrder = "asc" | "desc"
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
   const fetchWeapons = useCallback(
-    async (
-      page: number = 1,
-      sort: string = "created_at",
-      order: string = "desc"
-    ) => {
+    async (page: number = 1, sort: string = "created_at", order: string = "desc") => {
       try {
         const response = await client.getWeapons({ page, sort, order })
         console.log("Fetched weapons:", response.data.weapons)
         dispatchForm({
           type: FormActions.UPDATE,
           name: "weapons",
-          value: response.data.weapons,
+          value: response.data.weapons
         })
         dispatchForm({
           type: FormActions.UPDATE,
           name: "meta",
-          value: response.data.meta,
+          value: response.data.meta || { current_page: page, total_pages: 1 }
         })
-        dispatchForm({ type: FormActions.SUCCESS })
-      } catch (error_: unknown) {
-        dispatchForm({
-          type: FormActions.STATUS,
-          severity: "error",
-          message: "Failed to fetch weapons",
-        })
-        console.error("Fetch weapons error:", error_)
+        dispatchForm({ type: FormActions.ERROR, payload: null })
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unable to fetch weapons data"
+        dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
+        console.error("Fetch weapons error:", error)
       }
     },
     [client, dispatchForm]
@@ -122,18 +100,11 @@ export default function Weapons({
         orderParameter && validOrders.includes(orderParameter as ValidOrder)
           ? orderParameter
           : "desc"
-      setSort(currentSort)
-      setOrder(currentOrder)
+      dispatchForm({ type: FormActions.UPDATE, name: "sort", value: currentSort })
+      dispatchForm({ type: FormActions.UPDATE, name: "order", value: currentOrder })
       fetchWeapons(page, currentSort, currentOrder)
     }
-  }, [
-    client,
-    campaignData,
-    dispatchForm,
-    fetchWeapons,
-    validSorts,
-    validOrders,
-  ])
+  }, [client, campaignData, dispatchForm, fetchWeapons, validSorts, validOrders])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -143,184 +114,76 @@ export default function Weapons({
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: false })
   }
 
-  const handleSaveWeapon = async (newWeapon: Weapon) => {
+  const handleSave = async (newWeapon: Weapon) => {
     dispatchForm({
       type: FormActions.UPDATE,
       name: "weapons",
-      value: [newWeapon, ...weapons],
+      value: [newWeapon, ...weapons]
     })
   }
 
-  const handleDeleteWeapon = (weaponId: string) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "weapons",
-      value: weapons.filter(weapon => weapon.id !== weaponId),
+  const handleOrderChange = async () => {
+    const newOrder = order === "asc" ? "desc" : "asc"
+    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
+    router.push(`/weapons?page=1&sort=${sort}&order=${newOrder}`, {
+      scroll: false
     })
-    if (selectedWeapon?.id === weaponId) setSelectedWeapon(null)
-    router.refresh()
+    await fetchWeapons(1, sort, newOrder)
   }
 
-  const handlePageChange = async (
-    _event: React.ChangeEvent<unknown>,
-    page: number
-  ) => {
+  const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
       router.push(`/weapons?page=1&sort=${sort}&order=${order}`, {
-        scroll: false,
+        scroll: false
       })
       await fetchWeapons(1, sort, order)
     } else {
       router.push(`/weapons?page=${page}&sort=${sort}&order=${order}`, {
-        scroll: false,
+        scroll: false
       })
       await fetchWeapons(page, sort, order)
     }
   }
 
-  const handleSortChange = (event: SelectChangeEvent<string>) => {
-    const newSort = event.target.value as ValidSort
-    if (validSorts.includes(newSort)) {
-      setSort(newSort)
-      // Perform async operations
-      router.push(`/weapons?page=1&sort=${newSort}&order=${order}`, {
-        scroll: false,
-      })
-      fetchWeapons(1, newSort, order)
-    }
-  }
-
-  const handleOrderChange = async () => {
-    const newOrder = order === "asc" ? "desc" : "asc"
-    setOrder(newOrder)
-    router.push(`/weapons?page=1&sort=${sort}&order=${newOrder}`, {
-      scroll: false,
+  const handleSortChange = (newSort: ValidSort) => {
+    const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
+    dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
+    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
+    const url = `/weapons?${queryParams({
+      page: 1,
+      sort: newSort,
+      order: newOrder
+    })}`
+    router.push(url, {
+      scroll: false
     })
-    await fetchWeapons(1, sort, newOrder)
+    fetchWeapons(1, newSort, newOrder)
   }
 
   return (
-    <Box>
-      <Stack spacing={2} sx={{ mb: 4 }}>
-        <Typography
-          variant="h4"
-          sx={{
-            color: "#ffffff",
-            fontSize: { xs: "1.5rem", sm: "2.125rem" },
-          }}
-        >
-          Weapons
-        </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            gap: { xs: 1, sm: 1.5 },
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              gap: 1,
-              alignItems: "center",
-            }}
-          >
-            <FormControl sx={{ minWidth: { xs: 80, sm: 100 } }}>
-              <InputLabel id="sort-label" sx={{ color: "#ffffff" }}>
-                Sort By
-              </InputLabel>
-              <Select
-                labelId="sort-label"
-                value={sort}
-                label="Sort By"
-                onChange={handleSortChange}
-                sx={{
-                  color: "#ffffff",
-                  "& .MuiSvgIcon-root": { color: "#ffffff" },
-                }}
-              >
-                <MenuItem value="juncture">Juncture</MenuItem>
-                <MenuItem value="category">Category</MenuItem>
-                <MenuItem value="created_at">Created At</MenuItem>
-                <MenuItem value="updated_at">Updated At</MenuItem>
-                <MenuItem value="name">Name</MenuItem>
-              </Select>
-            </FormControl>
-            <Tooltip
-              title={order === "asc" ? "Sort Ascending" : "Sort Descending"}
-            >
-              <IconButton
-                onClick={handleOrderChange}
-                sx={{ color: "#ffffff" }}
-                aria-label={
-                  order === "asc" ? "sort ascending" : "sort descending"
-                }
-              >
-                {order === "asc" ? (
-                  <KeyboardArrowUpIcon />
-                ) : (
-                  <KeyboardArrowDownIcon />
-                )}
-              </IconButton>
-            </Tooltip>
-          </Box>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenCreateDrawer}
-            sx={{ px: 2 }}
-            aria-label="create new weapon"
-          >
-            New
-          </Button>
-        </Box>
-      </Stack>
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-      <Pagination
-        count={meta.total_pages}
-        page={meta.current_page}
-        onChange={handlePageChange}
-        variant="outlined"
-        color="primary"
-        shape="rounded"
-        size="large"
+    <>
+      <Menu
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        drawerOpen={drawerOpen}
+        handleOpenCreateDrawer={handleOpenCreateDrawer}
+        handleCloseCreateDrawer={handleCloseCreateDrawer}
+        handleSave={handleSave}
       />
-      <Box my={2}>
-        {weapons.length === 0 ? (
-          <Typography variant="body1" sx={{ color: "#ffffff" }}>
-            No weapons available
-          </Typography>
-        ) : (
-          weapons.map(weapon => (
-            <WeaponDetail
-              key={weapon.id}
-              weapon={weapon}
-              onDelete={handleDeleteWeapon}
-            />
-          ))
-        )}
+      <Box
+        sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}
+      >
+        <MainHeader title="Weapons" icon={<Icon keyword="Weapons" size="36" />} />
       </Box>
-      <Pagination
-        count={meta.total_pages}
-        page={meta.current_page}
-        onChange={handlePageChange}
-        variant="outlined"
-        color="primary"
-        shape="rounded"
-        size="large"
+      <View
+        viewMode={viewMode}
+        formState={formState}
+        dispatchForm={dispatchForm}
+        onPageChange={handlePageChange}
+        onSortChange={handleSortChange}
+        onOrderChange={handleOrderChange}
+        initialIsMobile={initialIsMobile}
       />
-      <CreateWeaponForm
-        open={drawerOpen}
-        onClose={handleCloseCreateDrawer}
-        onSave={handleSaveWeapon}
-      />
-    </Box>
+    </>
   )
 }

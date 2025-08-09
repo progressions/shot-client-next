@@ -24,12 +24,14 @@ export default function CreateWeaponForm({
     onSave(response.data)
   }
 
+  const defaultEntity = defaultWeapon
+
   return (
     <WeaponForm
       open={open}
       onClose={onClose}
       onSave={handleSave}
-      initialFormData={{ ...defaultWeapon, image: null }}
+      initialFormData={{ ...defaultEntity, image: null }}
       title="New Weapon"
     />
   )
