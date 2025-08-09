@@ -24,12 +24,14 @@ export default function CreateSchtickForm({
     onSave(response.data)
   }
 
+  const defaultEntity = defaultSchtick
+
   return (
     <SchtickForm
       open={open}
       onClose={onClose}
       onSave={handleSave}
-      initialFormData={{ ...defaultSchtick, image: null }}
+      initialFormData={{ ...defaultEntity, image: null }}
       title="New Schtick"
     />
   )

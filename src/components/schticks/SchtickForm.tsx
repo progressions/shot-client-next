@@ -1,61 +1,48 @@
 "use client"
+
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
+import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
 import {
-  Stack,
-  Drawer,
-  Box,
-  Typography,
-  Alert,
-  IconButton,
-  FormControl,
-  FormHelperText,
-} from "@mui/material"
-import {
+  InfoLink,
   HeroImage,
-  type Option,
   TextField,
   SaveButton,
   CancelButton,
-  InfoLink,
 } from "@/components/ui"
-import type { SchtickPath, EditorChangeEvent, Schtick } from "@/types"
+import type { EditorChangeEvent, Schtick } from "@/types"
 import { defaultSchtick } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
-import {
-  SchtickCategoryAutocomplete,
-  SchtickPathAutocomplete,
-} from "@/components/autocomplete"
-import { useClient } from "@/contexts"
-import { useEntity } from "@/hooks"
 
-// Extend form state to include field-specific errors
 type FormStateData = Schtick & {
+  [key: string]: unknown
   image?: File | null
-  errors?: Partial<Record<keyof Omit<FormStateData, "errors">, string>>
 }
 
 interface SchtickFormProperties {
   open: boolean
   onClose: () => void
+  onSave: (formData: FormData, schtickData: Schtick) => Promise<void>
+  initialFormData: FormStateData
+  title: string
 }
 
-export default function SchtickForm({ open, onClose }: SchtickFormProperties) {
-  const { client } = useClient()
-  const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
-    ...defaultSchtick,
-    errors: {},
-  })
-  const { disabled, data } = formState
-  const { name, description, category, path, image, errors = {} } = data
+export default function SchtickForm({
+  open,
+  onClose,
+  onSave,
+  initialFormData,
+  title,
+}: SchtickFormProperties) {
+  const { formState, dispatchForm, initialFormState } =
+    useForm<FormStateData>(initialFormData)
+  const { disabled, error, data } = formState
+  const { name, description, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const { createEntity, handleFormErrors } = useEntity<Schtick>(
-    defaultSchtick,
-    dispatchForm
-  )
+
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
@@ -97,60 +84,29 @@ export default function SchtickForm({ open, onClose }: SchtickFormProperties) {
       dispatchForm({ type: FormActions.ERROR, payload: "Name is required" })
       return
     }
+
     dispatchForm({ type: FormActions.SUBMIT })
     try {
-      await createEntity(data, image)
+      const formData = new FormData()
+      const schtickData = { ...defaultSchtick, name, description } as Schtick
+      formData.append("schtick", JSON.stringify(siteData))
+      if (image) {
+        formData.append("image", image)
+      }
+      await onSave(formData, schtickData)
+    } catch (error_: unknown) {
+      const errorMessage = "An error occurred."
+      dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
+      console.error(`${title} error:`, error_)
+    } finally {
       handleClose()
-    } catch (error) {
-      handleFormErrors(error)
     }
   }
 
   const handleClose = () => {
-    dispatchForm({
-      type: FormActions.RESET,
-      payload: { ...initialFormState, errors: {} },
-    })
+    dispatchForm({ type: FormActions.RESET, payload: initialFormState })
     setImagePreview(null)
     onClose()
-  }
-
-  const handleCategoryChange = async (value: string | null) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "category", value })
-    if (errors.category) {
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "errors",
-        value: { ...errors, category: undefined },
-      })
-    }
-  }
-
-  const handlePathChange = async (value: string | null) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "path", value })
-    if (errors.path) {
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "errors",
-        value: { ...errors, path: undefined },
-      })
-    }
-  }
-
-  const fetchPaths = async (inputValue: string): Promise<Option[]> => {
-    try {
-      const response = await client.getSchtickPaths({
-        search: inputValue,
-        category: category,
-      })
-      return response.data.paths.map((path: SchtickPath) => ({
-        label: path || "",
-        value: path || "",
-      }))
-    } catch (error) {
-      console.error("Error fetching options:", error)
-      return []
-    }
   }
 
   return (
@@ -163,93 +119,44 @@ export default function SchtickForm({ open, onClose }: SchtickFormProperties) {
       <Box
         component="form"
         onSubmit={handleSubmit}
-        sx={{
-          width: isMobile ? "100%" : "30rem",
-          height: isMobile ? "auto" : "100%",
-          p: isMobile ? "1rem" : "2rem",
-        }}
+        sx={{ width: isMobile ? "100%" : "30rem", height: isMobile ? "auto" : "100%", p: isMobile ? "1rem" : "2rem",  }}
       >
         <Typography variant="h5" sx={{ mb: 2, color: "#ffffff" }}>
-          New Schtick
+          {title}
         </Typography>
-        {status && (
-          <Alert severity={status.severity} sx={{ mb: 2 }}>
-            {status.message}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
           </Alert>
         )}
-        <FormControl fullWidth margin="normal" error={!!errors.name}>
-          <TextField
-            label="Name"
-            value={name}
-            onChange={e => {
-              dispatchForm({
-                type: FormActions.UPDATE,
-                name: "name",
-                value: e.target.value,
-              })
-              if (errors.name) {
-                dispatchForm({
-                  type: FormActions.UPDATE,
-                  name: "errors",
-                  value: { ...errors, name: undefined },
-                })
-              }
-            }}
-            required
-            autoFocus
-          />
-          {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
-        </FormControl>
-        <FormControl fullWidth margin="normal" error={!!errors.description}>
-          <Editor
-            name="description"
-            value={description}
-            onChange={(e: EditorChangeEvent) => {
-              dispatchForm({
-                type: FormActions.UPDATE,
-                name: "description",
-                value: e.target.value,
-              })
-              if (errors.description) {
-                dispatchForm({
-                  type: FormActions.UPDATE,
-                  name: "errors",
-                  value: { ...errors, description: undefined },
-                })
-              }
-            }}
-          />
-          {errors.description && (
-            <FormHelperText>{errors.description}</FormHelperText>
-          )}
-        </FormControl>
-        <Stack direction="column" spacing={2} sx={{ mt: 2 }}>
-          <Typography sx={{ mb: 2 }}>
-            A <InfoLink href="/schticks" info="Schtick" /> belongs to a certain{" "}
-            <InfoLink info="Category" /> and <InfoLink info="Path" />.
-          </Typography>
-          <FormControl fullWidth error={!!errors.category}>
-            <SchtickCategoryAutocomplete
-              required
-              value={category || ""}
-              onChange={handleCategoryChange}
-              allowNone={false}
-            />
-            {errors.category && (
-              <FormHelperText>{errors.category}</FormHelperText>
-            )}
-          </FormControl>
-          <FormControl fullWidth error={!!errors.path}>
-            <SchtickPathAutocomplete
-              required
-              value={path || ""}
-              onChange={handlePathChange}
-              fetchOptions={fetchPaths}
-              allowNone={false}
-            />
-            {errors.path && <FormHelperText>{errors.path}</FormHelperText>}
-          </FormControl>
-        </Stack>
+        <Typography>
+          Describe this thing.
+        </Typography>
+        <TextField
+          label="Name"
+          value={name}
+          onChange={e =>
+            dispatchForm({
+              type: FormActions.UPDATE,
+              name: "name",
+              value: e.target.value,
+            })
+          }
+          margin="normal"
+          required
+          autoFocus
+        />
+        <Editor
+          name="description"
+          value={description}
+          onChange={(e: EditorChangeEvent) => {
+            dispatchForm({
+              type: FormActions.UPDATE,
+              name: "description",
+              value: e.target.value,
+            })
+          }}
+        />
         <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: "1rem" }}>
           <IconButton component="label">
             <AddPhotoAlternateIcon sx={{ color: "#ffffff" }} />
