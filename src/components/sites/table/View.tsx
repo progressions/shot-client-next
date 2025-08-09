@@ -5,7 +5,6 @@ import {
   SitesMobile,
   TableHeader,
   TableBody,
-  SiteFilter,
 } from "@/components/sites"
 import { SortControls } from "@/components/ui"
 

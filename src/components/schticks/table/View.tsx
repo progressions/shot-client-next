@@ -5,7 +5,6 @@ import {
   SchticksMobile,
   TableHeader,
   TableBody,
-  SchtickFilter,
 } from "@/components/schticks"
 import { SortControls } from "@/components/ui"
 

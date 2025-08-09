@@ -3,7 +3,6 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { Box } from "@mui/material"
 import type { SelectChangeEvent } from "@mui/material"
-import { FightFilter } from "@/components/fights"
 import { SortControls } from "@/components/ui"
 
 interface FightsControlsProps {

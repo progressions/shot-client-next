@@ -5,7 +5,6 @@ import {
   PartiesMobile,
   TableHeader,
   TableBody,
-  PartyFilter,
 } from "@/components/parties"
 import { SortControls } from "@/components/ui"
 

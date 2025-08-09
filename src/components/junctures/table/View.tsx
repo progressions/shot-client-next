@@ -5,7 +5,6 @@ import {
   JuncturesMobile,
   TableHeader,
   TableBody,
-  JunctureFilter,
 } from "@/components/junctures"
 import { SortControls } from "@/components/ui"
 

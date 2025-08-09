@@ -3,12 +3,7 @@
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
-import {
-  HeroImage,
-  TextField,
-  SaveButton,
-  CancelButton,
-} from "@/components/ui"
+import { HeroImage, TextField, SaveButton, CancelButton } from "@/components/ui"
 import type { EditorChangeEvent, Schtick } from "@/types"
 import { defaultSchtick } from "@/types"
 import { FormActions, useForm } from "@/reducers"

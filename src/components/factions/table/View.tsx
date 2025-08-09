@@ -5,7 +5,6 @@ import {
   FactionsMobile,
   TableHeader,
   TableBody,
-  FactionFilter,
 } from "@/components/factions"
 import { SortControls } from "@/components/ui"
 

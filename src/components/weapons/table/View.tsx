@@ -5,7 +5,6 @@ import {
   WeaponsMobile,
   TableHeader,
   TableBody,
-  WeaponFilter,
 } from "@/components/weapons"
 import { SortControls } from "@/components/ui"
 

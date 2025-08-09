@@ -5,7 +5,6 @@ import {
   VehiclesMobile,
   TableHeader,
   TableBody,
-  VehicleFilter,
 } from "@/components/vehicles"
 import { SortControls } from "@/components/ui"
 
