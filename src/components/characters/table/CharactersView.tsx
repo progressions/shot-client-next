@@ -80,7 +80,6 @@ export default function CharactersView({
         filter={
           <CharacterFilter
             dispatch={dispatchForm}
-            includeCharacters={false}
             omit={["add"]}
           />
         }

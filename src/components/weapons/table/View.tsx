@@ -2,6 +2,7 @@
 import { Box, Table } from "@mui/material"
 import { FormStateType, FormStateAction } from "@/reducers"
 import {
+  WeaponFilter,
   WeaponsMobile,
   TableHeader,
   TableBody,
@@ -76,6 +77,12 @@ export default function WeaponsView({
         totalPages={meta.total_pages}
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
+        filter={
+          <WeaponFilter
+            dispatch={dispatchForm}
+            omit={["add"]}
+          />
+        }
       >
         {viewMode === "mobile" ? (
           <WeaponsMobile

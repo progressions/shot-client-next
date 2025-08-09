@@ -21,6 +21,8 @@ type ValidSort = "created_at" | "updated_at" | "name"
 type ValidOrder = "asc" | "desc"
 type FormStateData = {
   weapons: Weapon[]
+  category: string | null
+  juncture: string | null
   meta: PaginationMeta
   drawerOpen: boolean
   sort: string
@@ -43,13 +45,17 @@ export default function Weapons({
   )
   const { formState, dispatchForm } = useForm<FormStateData>({
     weapons: initialWeapons,
+    category: null,
+    juncture: null,
     meta: initialMeta,
     drawerOpen: false,
     sort: initialSort,
     order: initialOrder,
   })
-  const { meta, sort, order, weapons, drawerOpen } = formState.data
+  const { meta, sort, order, weapons, category, juncture, drawerOpen } = formState.data
   const router = useRouter()
+
+  console.log("formState.data", formState.data)
 
   useEffect(() => {
     saveLocally("weaponViewMode", viewMode)
@@ -65,10 +71,12 @@ export default function Weapons({
     async (
       page: number = 1,
       sort: string = "created_at",
-      order: string = "desc"
+      order: string = "desc",
+      category: string | null = null,
+      juncture: string | null = null
     ) => {
       try {
-        const response = await client.getWeapons({ page, sort, order })
+        const response = await client.getWeapons({ page, sort, order, category, juncture })
         console.log("Fetched weapons:", response.data.weapons)
         dispatchForm({
           type: FormActions.UPDATE,
@@ -90,7 +98,7 @@ export default function Weapons({
         console.error("Fetch weapons error:", error)
       }
     },
-    [client, dispatchForm]
+    [client, dispatchForm, category, juncture]
   )
 
   useEffect(() => {
@@ -121,7 +129,7 @@ export default function Weapons({
         name: "order",
         value: currentOrder,
       })
-      fetchWeapons(page, currentSort, currentOrder)
+      fetchWeapons(page, currentSort, currentOrder, category, juncture)
     }
   }, [
     client,
@@ -130,6 +138,8 @@ export default function Weapons({
     fetchWeapons,
     validSorts,
     validOrders,
+    category,
+    juncture,
   ])
 
   const handleOpenCreateDrawer = () => {
