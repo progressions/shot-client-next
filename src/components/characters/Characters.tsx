@@ -7,7 +7,7 @@ import { useCampaign, useClient, useLocalStorage } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
 import { Icon, MainHeader } from "@/components/ui"
 import { queryParams } from "@/lib"
-import { CharactersView, CharactersMenu } from "@/components/characters"
+import { View, Menu } from "@/components/characters"
 
 interface CharactersProperties {
   initialCharacters: Character[]
@@ -201,7 +201,7 @@ export default function Characters({
 
   return (
     <>
-      <CharactersMenu viewMode={viewMode} setViewMode={setViewMode} />
+      <Menu viewMode={viewMode} setViewMode={setViewMode} />
       <Box
         sx={{
           display: "flex",
@@ -215,7 +215,7 @@ export default function Characters({
           icon={<Icon keyword="Characters" size="36" />}
         />
       </Box>
-      <CharactersView
+      <View
         viewMode={viewMode}
         formState={formState}
         dispatchForm={dispatchForm}

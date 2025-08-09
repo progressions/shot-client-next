@@ -3,8 +3,8 @@ import { Box, Table } from "@mui/material"
 import { FormStateType, FormStateAction } from "@/reducers"
 import {
   CharactersMobile,
-  CharactersTableHeader,
-  CharactersTableBody,
+  TableHeader,
+  TableBody,
   CharacterFilter,
 } from "@/components/characters"
 import { SortControls } from "@/components/ui"
@@ -102,12 +102,12 @@ export default function CharactersView({
                   tableLayout: "fixed",
                 }}
               >
-                <CharactersTableHeader
+                <TableHeader
                   sort={sort}
                   order={order}
                   onSortChange={onSortChange}
                 />
-                <CharactersTableBody
+                <TableBody
                   characters={characters}
                   formatDate={formatDate}
                 />
