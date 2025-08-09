@@ -1,7 +1,7 @@
 "use client"
 import { TableCell, TableHead, TableRow, TableSortLabel } from "@mui/material"
 
-interface SchticksTableHeaderProps {
+interface PartiesTableHeaderProps {
   sort: string
   order: string
   onSortChange: (newSort: ValidSort) => void
@@ -10,11 +10,11 @@ interface SchticksTableHeaderProps {
 type ValidSort = "name" | "type" | "created_at" | "updated_at"
 type ValidOrder = "asc" | "desc"
 
-export default function SchticksTableHeader({
+export default function PartiesTableHeader({
   sort,
   order,
   onSortChange
-}: SchticksTableHeaderProps) {
+}: PartiesTableHeaderProps) {
   return (
     <TableHead>
       <TableRow>

@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
-import { CircularProgress } from "@mui/material"
+import { Box, CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Parties } from "@/components/parties"
 import type { PartiesResponse } from "@/types"
@@ -70,7 +70,14 @@ export default async function PartiesPage({
   const initialIsMobile = /mobile/i.test(userAgent)
 
   return (
-    <>
+    <Box
+      sx={{
+        justifyContent: "space-between",
+        alignItems: "center",
+        mb: 2,
+        position: "relative",
+      }}
+    >
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
         <Parties
@@ -82,6 +89,6 @@ export default async function PartiesPage({
           initialIsMobile={initialIsMobile}
         />
       </Suspense>
-    </>
+    </Box>
   )
 }

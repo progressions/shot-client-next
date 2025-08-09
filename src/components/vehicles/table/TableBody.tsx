@@ -2,7 +2,7 @@
 import { TableBody, TableCell, TableRow } from "@mui/material"
 import Link from "next/link"
 import { VehicleName } from "@/components/vehicles"
-import { CS } from "@/services"
+import { VS } from "@/services"
 import type { Vehicle } from "@/types"
 
 interface VehiclesTableBodyProps {
@@ -43,7 +43,7 @@ export default function VehiclesTableBody({
             <TableCell
               sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}
             >
-              {CS.type(vehicle)}
+              {vS.type(vehicle)}
             </TableCell>
             <TableCell
               sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}

@@ -2,7 +2,6 @@
 import { TableBody, TableCell, TableRow } from "@mui/material"
 import Link from "next/link"
 import { FactionName } from "@/components/factions"
-import { CS } from "@/services"
 import type { Faction } from "@/types"
 
 interface FactionsTableBodyProps {
@@ -37,11 +36,6 @@ export default function FactionsTableBody({
               >
                 <FactionName faction={ faction } />
               </Link>
-            </TableCell>
-            <TableCell
-              sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}
-            >
-              { CS.type(faction) }
             </TableCell>
             <TableCell
               sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}

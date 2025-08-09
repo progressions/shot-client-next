@@ -32,18 +32,6 @@ export default function WeaponsTableHeader({
           sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}
         >
           <TableSortLabel
-            active={sort === "type"}
-            direction={sort === "type" ? (order as ValidOrder) : "asc"}
-            onClick={() => onSortChange("type")}
-            sx={{ color: "#ffffff", "&.Mui-active": { color: "#ffffff" }, "& .MuiTableSortLabel-icon": { color: "#ffffff !important" } }}
-          >
-            Type
-          </TableSortLabel>
-        </TableCell>
-        <TableCell
-          sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}
-        >
-          <TableSortLabel
             active={sort === "created_at"}
             direction={sort === "created_at" ? (order as ValidOrder) : "asc"}
             onClick={() => onSortChange("created_at")}

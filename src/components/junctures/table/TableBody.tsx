@@ -2,7 +2,6 @@
 import { TableBody, TableCell, TableRow } from "@mui/material"
 import Link from "next/link"
 import { JunctureName } from "@/components/junctures"
-import { CS } from "@/services"
 import type { Juncture } from "@/types"
 
 interface JuncturesTableBodyProps {
@@ -37,11 +36,6 @@ export default function JuncturesTableBody({
               >
                 <JunctureName juncture={ juncture } />
               </Link>
-            </TableCell>
-            <TableCell
-              sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}
-            >
-              { CS.type(juncture) }
             </TableCell>
             <TableCell
               sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}

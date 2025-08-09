@@ -2,7 +2,6 @@
 import { TableBody, TableCell, TableRow } from "@mui/material"
 import Link from "next/link"
 import { SchtickName } from "@/components/schticks"
-import { CS } from "@/services"
 import type { Schtick } from "@/types"
 
 interface SchticksTableBodyProps {
@@ -37,11 +36,6 @@ export default function SchticksTableBody({
               >
                 <SchtickName schtick={ schtick } />
               </Link>
-            </TableCell>
-            <TableCell
-              sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}
-            >
-              { CS.type(schtick) }
             </TableCell>
             <TableCell
               sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}

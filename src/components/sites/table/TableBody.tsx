@@ -2,7 +2,6 @@
 import { TableBody, TableCell, TableRow } from "@mui/material"
 import Link from "next/link"
 import { SiteName } from "@/components/sites"
-import { CS } from "@/services"
 import type { Site } from "@/types"
 
 interface SitesTableBodyProps {
@@ -39,11 +38,6 @@ export default function SitesTableBody({
               >
                 <SiteName site={site} />
               </Link>
-            </TableCell>
-            <TableCell
-              sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}
-            >
-              {CS.type(site)}
             </TableCell>
             <TableCell
               sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}

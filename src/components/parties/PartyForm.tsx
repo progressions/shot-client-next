@@ -16,8 +16,6 @@ import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
-import { FactionAutocomplete } from "@/components/autocomplete"
-import { useEntity } from "@/hooks"
 
 type FormStateData = Party & {
   [key: string]: unknown
@@ -27,20 +25,23 @@ type FormStateData = Party & {
 interface PartyFormProperties {
   open: boolean
   onClose: () => void
-  setParty: (party: Party) => void
+  onSave: (formData: FormData, partyData: Party) => Promise<void>
+  initialFormData: FormStateData
+  title: string
 }
 
 export default function PartyForm({
   open,
   onClose,
-  setParty,
+  onSave,
+  initialFormData,
+  title,
 }: PartyFormProperties) {
   const { formState, dispatchForm, initialFormState } =
-    useForm<FormStateData>(defaultParty)
+    useForm<FormStateData>(initialFormData)
   const { disabled, error, data } = formState
-  const { name, description, faction_id, image } = data
+  const { name, description, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const { createEntity } = useEntity<Party>(defaultParty, setParty)
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
@@ -86,7 +87,13 @@ export default function PartyForm({
 
     dispatchForm({ type: FormActions.SUBMIT })
     try {
-      await createEntity(data, image)
+      const formData = new FormData()
+      const partyData = { ...defaultParty, name, description } as Party
+      formData.append("party", JSON.stringify(siteData))
+      if (image) {
+        formData.append("image", image)
+      }
+      await onSave(formData, partyData)
     } catch (error_: unknown) {
       const errorMessage = "An error occurred."
       dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
@@ -102,30 +109,20 @@ export default function PartyForm({
     onClose()
   }
 
-  const handleFactionChange = async (value: string | null) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "faction_id", value })
-  }
-
-  const previewImage = imagePreview || data.image_url || null
-
   return (
     <Drawer
       anchor={isMobile ? "bottom" : "right"}
       open={open}
       onClose={handleClose}
     >
-      <HeroImage entity={{ image_url: previewImage }} positionable={false} />
+      <HeroImage entity={formState.data} />
       <Box
         component="form"
         onSubmit={handleSubmit}
-        sx={{
-          width: isMobile ? "100%" : "30rem",
-          height: isMobile ? "auto" : "100%",
-          p: isMobile ? "1rem" : "2rem",
-        }}
+        sx={{ width: isMobile ? "100%" : "30rem", height: isMobile ? "auto" : "100%", p: isMobile ? "1rem" : "2rem",  }}
       >
         <Typography variant="h5" sx={{ mb: 2, color: "#ffffff" }}>
-          New Party
+          {title}
         </Typography>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -133,11 +130,7 @@ export default function PartyForm({
           </Alert>
         )}
         <Typography>
-          A <InfoLink href="/parties" info="Party" /> is a group of{" "}
-          <InfoLink href="/characters" info="Characters" /> that work together
-          in the Chi War. They can be part of a{" "}
-          <InfoLink href="/factions" info="Faction" /> and have unique abilities
-          and characteristics.
+          Describe this thing.
         </Typography>
         <TextField
           label="Name"
@@ -164,17 +157,6 @@ export default function PartyForm({
             })
           }}
         />
-        <Box sx={{ mt: 2 }}>
-          <Typography sx={{ mb: 2 }}>
-            A <InfoLink href="/parties" info="Party" /> belongs to a certain{" "}
-            <InfoLink href="/factions" info="Faction" />, which influences how
-            they engage in the Chi War.
-          </Typography>
-          <FactionAutocomplete
-            value={faction_id || ""}
-            onChange={handleFactionChange}
-          />
-        </Box>
         <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: "1rem" }}>
           <IconButton component="label">
             <AddPhotoAlternateIcon sx={{ color: "#ffffff" }} />
@@ -189,6 +171,7 @@ export default function PartyForm({
             Update Image
           </Typography>
         </Box>
+        {imagePreview && <HeroImage entity={{ image_url: imagePreview }} />}
         <Box sx={{ display: "flex", gap: "1rem", mt: 3 }}>
           <SaveButton type="submit" disabled={disabled}>
             Save
