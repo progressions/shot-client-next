@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
-import { CircularProgress } from "@mui/material"
+import { Box, CircularProgress } from "@mui/material"
 import { getUser, getServerClient } from "@/lib/getServerClient"
 import { Junctures } from "@/components/junctures"
 import type { JuncturesResponse } from "@/types"
@@ -70,7 +70,14 @@ export default async function JuncturesPage({
   const initialIsMobile = /mobile/i.test(userAgent)
 
   return (
-    <>
+    <Box
+      sx={{
+        justifyContent: "space-between",
+        alignItems: "center",
+        mb: 2,
+        position: "relative",
+      }}
+    >
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
         <Junctures
@@ -82,6 +89,6 @@ export default async function JuncturesPage({
           initialIsMobile={initialIsMobile}
         />
       </Suspense>
-    </>
+    </Box>
   )
 }

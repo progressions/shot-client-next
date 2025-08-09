@@ -16,7 +16,6 @@ import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
-import { FactionAutocomplete } from "@/components/autocomplete"
 
 type FormStateData = Juncture & {
   [key: string]: unknown
@@ -41,7 +40,7 @@ export default function JunctureForm({
   const { formState, dispatchForm, initialFormState } =
     useForm<FormStateData>(initialFormData)
   const { disabled, error, data } = formState
-  const { name, description, faction_id, image } = data
+  const { name, description, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
 
   const theme = useTheme()
@@ -89,13 +88,8 @@ export default function JunctureForm({
     dispatchForm({ type: FormActions.SUBMIT })
     try {
       const formData = new FormData()
-      const junctureData = {
-        ...defaultJuncture,
-        name,
-        description,
-        faction_id,
-      } as Juncture
-      formData.append("juncture", JSON.stringify(junctureData))
+      const junctureData = { ...defaultJuncture, name, description } as Juncture
+      formData.append("juncture", JSON.stringify(siteData))
       if (image) {
         formData.append("image", image)
       }
@@ -115,10 +109,6 @@ export default function JunctureForm({
     onClose()
   }
 
-  const handleFactionChange = async (value: string | null): Promise<void> => {
-    dispatchForm({ type: FormActions.UPDATE, name: "faction_id", value })
-  }
-
   return (
     <Drawer
       anchor={isMobile ? "bottom" : "right"}
@@ -129,11 +119,7 @@ export default function JunctureForm({
       <Box
         component="form"
         onSubmit={handleSubmit}
-        sx={{
-          width: isMobile ? "100%" : "30rem",
-          height: isMobile ? "auto" : "100%",
-          p: isMobile ? "1rem" : "2rem",
-        }}
+        sx={{ width: isMobile ? "100%" : "30rem", height: isMobile ? "auto" : "100%", p: isMobile ? "1rem" : "2rem",  }}
       >
         <Typography variant="h5" sx={{ mb: 2, color: "#ffffff" }}>
           {title}
@@ -144,11 +130,7 @@ export default function JunctureForm({
           </Alert>
         )}
         <Typography>
-          A <InfoLink href="/junctures" info="Juncture" /> is a period in time
-          which has <InfoLink info="Portals" /> opening to the{" "}
-          <InfoLink info="Netherworld" />. A Juncture is controlled by the{" "}
-          <InfoLink href="/factions" info="Faction" /> which controlls the most
-          powerful <InfoLink href="/sites" info="Feng Shui Sites" />.
+          Describe this thing.
         </Typography>
         <TextField
           label="Name"
@@ -175,17 +157,6 @@ export default function JunctureForm({
             })
           }}
         />
-        <Box sx={{ mt: 2 }}>
-          <Typography sx={{ mb: 2 }}>
-            A <InfoLink href="/juncture" info="Juncture" /> belongs to a certain{" "}
-            <InfoLink href="/factions" info="Faction" /> that controls the most
-            powerful <InfoLink href="/sites" info="Feng Shui Sites" />.
-          </Typography>
-          <FactionAutocomplete
-            value={faction_id || ""}
-            onChange={handleFactionChange}
-          />
-        </Box>
         <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: "1rem" }}>
           <IconButton component="label">
             <AddPhotoAlternateIcon sx={{ color: "#ffffff" }} />

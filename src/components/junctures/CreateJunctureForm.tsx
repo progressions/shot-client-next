@@ -24,12 +24,14 @@ export default function CreateJunctureForm({
     onSave(response.data)
   }
 
+  const defaultEntity = defaultJuncture
+
   return (
     <JunctureForm
       open={open}
       onClose={onClose}
       onSave={handleSave}
-      initialFormData={{ ...defaultJuncture, image: null }}
+      initialFormData={{ ...defaultEntity, image: null }}
       title="New Juncture"
     />
   )
