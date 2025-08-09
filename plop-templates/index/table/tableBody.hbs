@@ -1,0 +1,61 @@
+"use client"
+import { TableBody, TableCell, TableRow } from "@mui/material"
+import Link from "next/link"
+import { {{pascalCase (singular name)}}Name } from "@/components/{{snakeCase (plural name)}}"
+import { CS } from "@/services"
+import type { {{pascalCase (singular name)}} } from "@/types"
+
+interface {{pascalCase (plural name)}}TableBodyProps {
+  {{snakeCase (plural name)}}: {{pascalCase (singular name)}}[]
+  formatDate: (date: string) => string
+}
+
+export default function {{pascalCase (plural name)}}TableBody({
+  {{snakeCase (plural name)}},
+  formatDate
+}: {{pascalCase (plural name)}}TableBodyProps) {
+  return (
+    <TableBody>
+      { {{snakeCase (plural name)}}.length === 0 ? (
+        <TableRow>
+          <TableCell colSpan={4} sx={{{ b "color: \"#ffffff\"" }}}>
+            No {{snakeCase (plural name)}} available
+          </TableCell>
+        </TableRow>
+      ) : (
+        {{snakeCase (plural name)}}.map({{snakeCase (singular name)}} => (
+          <TableRow
+            key={ {{snakeCase (singular name)}}.id }
+            sx={{{ b "\"&:hover\": { bgcolor: \"#616161\" }" }}}
+          >
+            <TableCell
+              sx={{{ b "color: \"#ffffff\", overflow: \"hidden\", textOverflow: \"ellipsis\", whiteSpace: \"nowrap\"" }}}
+            >
+              <Link
+                href={`/{{snakeCase (plural name)}}/${ {{snakeCase (singular name)}}.id}` }
+                style={{{ b "color: \"#ffffff\", textDecoration: \"underline\"" }}}
+              >
+                <{{pascalCase (singular name)}}Name {{snakeCase (singular name)}}={ {{snakeCase (singular name)}} } />
+              </Link>
+            </TableCell>
+            <TableCell
+              sx={{{ b "color: \"#ffffff\", width: { xs: \"65px\", sm: \"150px\" }" }}}
+            >
+              { CS.type({{snakeCase (singular name)}}) }
+            </TableCell>
+            <TableCell
+              sx={{{ b "color: \"#ffffff\", width: { xs: \"65px\", sm: \"150px\" }" }}}
+            >
+              { formatDate({{snakeCase (singular name)}}.created_at || "") }
+            </TableCell>
+            <TableCell
+              sx={{{ b "color: \"#ffffff\", width: { xs: \"60px\", sm: \"100px\" }, textAlign: \"center\", padding: { xs: \"8px 4px\", sm: \"16px 8px\" }" }}}
+            >
+              { {{snakeCase (singular name)}}.active ? "Yes" : "No" }
+            </TableCell>
+          </TableRow>
+        ))
+      )}
+    </TableBody>
+  )
+}

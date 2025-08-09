@@ -4,33 +4,33 @@ import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
 import { HeroImage, TextField, SaveButton, CancelButton } from "@/components/ui"
-import type { EditorChangeEvent, Site } from "@/types"
-import { defaultSite } from "@/types"
+import type { EditorChangeEvent, Vehicle } from "@/types"
+import { defaultVehicle } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
 
-type FormStateData = Site & {
+type FormStateData = Vehicle & {
   [key: string]: unknown
   image?: File | null
 }
 
-interface SiteFormProperties {
+interface VehicleFormProperties {
   open: boolean
   onClose: () => void
-  onSave: (formData: FormData, siteData: Site) => Promise<void>
+  onSave: (formData: FormData, vehicleData: Vehicle) => Promise<void>
   initialFormData: FormStateData
   title: string
 }
 
-export default function SiteForm({
+export default function VehicleForm({
   open,
   onClose,
   onSave,
   initialFormData,
   title,
-}: SiteFormProperties) {
+}: VehicleFormProperties) {
   const { formState, dispatchForm, initialFormState } =
     useForm<FormStateData>(initialFormData)
   const { disabled, error, data } = formState
@@ -82,12 +82,12 @@ export default function SiteForm({
     dispatchForm({ type: FormActions.SUBMIT })
     try {
       const formData = new FormData()
-      const siteData = { ...defaultSite, name, description } as Site
-      formData.append("site", JSON.stringify(siteData))
+      const vehicleData = { ...defaultVehicle, name, description } as Vehicle
+      formData.append("vehicle", JSON.stringify(siteData))
       if (image) {
         formData.append("image", image)
       }
-      await onSave(formData, siteData)
+      await onSave(formData, vehicleData)
     } catch (error_: unknown) {
       const errorMessage = "An error occurred."
       dispatchForm({ type: FormActions.ERROR, payload: errorMessage })

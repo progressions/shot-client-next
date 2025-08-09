@@ -414,7 +414,7 @@ class Client {
     vehicle: Vehicle | ID,
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<Vehicle>> {
-    return this.get(this.api.vehicles(null, vehicle), {}, cacheOptions)
+    return this.get(this.apiV2.vehicles(vehicle), {}, cacheOptions)
   }
 
   async getVehicleArchetypes(
@@ -540,10 +540,14 @@ class Client {
   }
 
   async updateVehicle(
-    vehicle: Vehicle,
-    fight?: Fight | null
+    id: string,
+    formData: FormData
   ): Promise<AxiosResponse<Vehicle>> {
-    return this.patch(this.api.vehicles(fight, vehicle), { vehicle: vehicle })
+    return this.requestFormData(
+      "PATCH",
+      `${this.apiV2.vehicles({ id })}`,
+      formData
+    )
   }
 
   async deleteVehicle(

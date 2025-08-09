@@ -1,36 +1,25 @@
-import { redirect } from "next/navigation"
-import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
-import UploadIcon from "@mui/icons-material/Upload"
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
+"use client"
 
 import { SpeedDialMenu } from "@/components/ui"
+import { useState } from "react"
 
-const handleCreate = () => {
-  redirect("/vehicles/create")
-}
-
-const handleGenerate = () => {
-  redirect("/vehicles/generate")
-}
-
-const handleImport = () => {
-  redirect("/vehicles/import")
-}
-
-export const actions = [
-  { icon: <PersonAddAlt1Icon />, name: "Create", onClick: handleCreate },
-  { icon: <UploadIcon />, name: "Import", onClick: handleImport },
-  {
-    icon: <AddCircleOutlineIcon />,
-    name: "Generate",
-    onClick: handleGenerate,
-  },
-]
+export const actions = []
 
 type SpeedDialProps = {
-  actions: typeof actions
+  actions?: typeof actions
 }
 
-export default function SpeedDial({ actions: initialActions }: SpeedDialProps) {
-  return <SpeedDialMenu actions={initialActions || actions} />
+export default function SpeedDial({
+  actions: initialActions = actions,
+}: SpeedDialProps) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <SpeedDialMenu
+      actions={initialActions}
+      open={open}
+      onOpen={() => setOpen(true)}
+      onClose={() => setOpen(false)}
+    />
+  )
 }

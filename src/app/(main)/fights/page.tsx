@@ -45,7 +45,10 @@ export default async function FightsPage({
       throw new Error("No data returned from getFights")
     }
     fightsResponse = response.data
-    if (page > fightsResponse.meta.total_pages) {
+    if (
+      page > fightsResponse.meta.total_pages &&
+      fightsResponse.meta.total_pages > 0
+    ) {
       redirect("/fights?page=1&sort=created_at&order=desc")
     }
   } catch (error) {
@@ -67,7 +70,7 @@ export default async function FightsPage({
       }}
     >
       <Suspense fallback={<CircularProgress />}>
-        <Breadcrumbs />
+        <Breadcrumbs headers={headers} />
       </Suspense>
       <Suspense fallback={<CircularProgress />}>
         <Fights

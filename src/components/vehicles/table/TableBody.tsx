@@ -1,3 +1,4 @@
+"use client"
 import { TableBody, TableCell, TableRow } from "@mui/material"
 import Link from "next/link"
 import { VehicleName } from "@/components/vehicles"
@@ -34,27 +35,18 @@ export default function VehiclesTableBody({
             >
               <Link
                 href={`/vehicles/${vehicle.id}`}
-                style={{
-                  color: "#ffffff",
-                  textDecoration: "underline",
-                }}
+                style={{ color: "#ffffff", textDecoration: "underline" }}
               >
                 <VehicleName vehicle={vehicle} />
               </Link>
             </TableCell>
             <TableCell
-              sx={{
-                color: "#ffffff",
-                width: { xs: "65px", sm: "150px" },
-              }}
+              sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}
             >
               {CS.type(vehicle)}
             </TableCell>
             <TableCell
-              sx={{
-                color: "#ffffff",
-                width: { xs: "65px", sm: "150px" },
-              }}
+              sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}
             >
               {formatDate(vehicle.created_at || "")}
             </TableCell>

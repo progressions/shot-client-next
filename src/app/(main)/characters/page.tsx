@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { CircularProgress, Box } from "@mui/material"
 import { Characters } from "@/components/characters"
-import { getUser, getServerClient, getPageParameters } from "@/lib"
+import { getServerClient, getPageParameters } from "@/lib"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import type { CharactersResponse } from "@/types"
 
@@ -17,10 +17,6 @@ export default async function CharactersPage({
   searchParams: Promise<{ page?: string; sort?: string; order?: string }>
 }) {
   const client = await getServerClient()
-  const user = await getUser()
-  if (!client || !user) {
-    redirect("/login")
-  }
 
   // Validate parameters using getPageParameters
   const { page, sort, order } = await getPageParameters(searchParams, {

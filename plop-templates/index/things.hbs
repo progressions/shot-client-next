@@ -2,15 +2,15 @@
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Box } from "@mui/material"
-import { View, Menu } from "@/components/sites"
-import type { Site, PaginationMeta } from "@/types"
+import { View, Menu } from "@/components/{{snakeCase (plural name)}}"
+import type { {{pascalCase (singular name)}}, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useLocalStorage, useCampaign, useClient } from "@/contexts"
 import { queryParams } from "@/lib"
 import { Icon, MainHeader } from "@/components/ui"
 
-interface SitesProperties {
-  initialSites: Site[]
+interface {{pascalCase (plural name)}}Properties {
+  initial{{pascalCase (plural name)}}: {{pascalCase (singular name)}}[]
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
@@ -20,35 +20,35 @@ interface SitesProperties {
 type ValidSort = "created_at" | "updated_at" | "name"
 type ValidOrder = "asc" | "desc"
 type FormStateData = {
-  sites: Site[]
+  {{snakeCase (plural name)}}: {{pascalCase (singular name)}}[]
   meta: PaginationMeta
   drawerOpen: boolean
   sort: string
   order: string
 }
 
-export default function Sites({
-  initialSites,
+export default function {{pascalCase (plural name)}}({
+  initial{{pascalCase (plural name)}},
   initialMeta,
   initialSort,
   initialOrder,
-  initialIsMobile,
-}: SitesProperties) {
+  initialIsMobile
+}: {{pascalCase (plural name)}}Properties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { getLocally } = useLocalStorage()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
-    (getLocally("siteViewMode") as "table" | "mobile") ||
+    (getLocally("{{snakeCase (singular name)}}ViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
   )
   const { formState, dispatchForm } = useForm<FormStateData>({
-    sites: initialSites,
+    {{snakeCase (plural name)}}: initial{{pascalCase (plural name)}},
     meta: initialMeta,
     drawerOpen: false,
     sort: initialSort,
-    order: initialOrder,
+    order: initialOrder
   })
-  const { meta, sort, order, sites, drawerOpen } = formState.data
+  const { meta, sort, order, {{snakeCase (plural name)}}, drawerOpen } = formState.data
   const router = useRouter()
 
   const validSorts: readonly ValidSort[] = useMemo(
@@ -57,31 +57,26 @@ export default function Sites({
   )
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
-  const fetchSites = useCallback(
-    async (
-      page: number = 1,
-      sort: string = "created_at",
-      order: string = "desc"
-    ) => {
+  const fetch{{pascalCase (plural name)}} = useCallback(
+    async (page: number = 1, sort: string = "created_at", order: string = "desc") => {
       try {
-        const response = await client.getSites({ page, sort, order })
-        console.log("Fetched sites:", response.data.sites)
+        const response = await client.get{{pascalCase (plural name)}}({ page, sort, order })
+        console.log("Fetched {{snakeCase (plural name)}}:", response.data.{{snakeCase (plural name)}})
         dispatchForm({
           type: FormActions.UPDATE,
-          name: "sites",
-          value: response.data.sites,
+          name: "{{snakeCase (plural name)}}",
+          value: response.data.{{snakeCase (plural name)}}
         })
         dispatchForm({
           type: FormActions.UPDATE,
           name: "meta",
-          value: response.data.meta || { current_page: page, total_pages: 1 },
+          value: response.data.meta || { current_page: page, total_pages: 1 }
         })
         dispatchForm({ type: FormActions.ERROR, payload: null })
       } catch (error: unknown) {
-        const errorMessage =
-          error instanceof Error ? error.message : "Unable to fetch sites data"
+        const errorMessage = error instanceof Error ? error.message : "Unable to fetch {{snakeCase (plural name)}} data"
         dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
-        console.error("Fetch sites error:", error)
+        console.error("Fetch {{snakeCase (plural name)}} error:", error)
       }
     },
     [client, dispatchForm]
@@ -90,7 +85,7 @@ export default function Sites({
   useEffect(() => {
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
-    if (campaignData.sites === "reload") {
+    if (campaignData.{{snakeCase (plural name)}} === "reload") {
       const parameters = new URLSearchParams(globalThis.location.search)
       const page = parameters.get("page")
         ? Number.parseInt(parameters.get("page")!, 10)
@@ -105,19 +100,11 @@ export default function Sites({
         orderParameter && validOrders.includes(orderParameter as ValidOrder)
           ? orderParameter
           : "desc"
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "sort",
-        value: currentSort,
-      })
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "order",
-        value: currentOrder,
-      })
-      fetchSites(page, currentSort, currentOrder)
+      dispatchForm({ type: FormActions.UPDATE, name: "sort", value: currentSort })
+      dispatchForm({ type: FormActions.UPDATE, name: "order", value: currentOrder })
+      fetch{{pascalCase (plural name)}}(page, currentSort, currentOrder)
     }
-  }, [client, campaignData, dispatchForm, fetchSites, validSorts, validOrders])
+  }, [client, campaignData, dispatchForm, fetch{{pascalCase (plural name)}}, validSorts, validOrders])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -127,34 +114,34 @@ export default function Sites({
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: false })
   }
 
-  const handleSave = async (newSite: Site) => {
+  const handleSave = async (new{{pascalCase (singular name)}}: {{pascalCase (singular name)}}) => {
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "sites",
-      value: [newSite, ...sites],
+      name: "{{snakeCase (plural name)}}",
+      value: [new{{pascalCase (singular name)}}, ...{{snakeCase (plural name)}}]
     })
   }
 
   const handleOrderChange = async () => {
     const newOrder = order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/sites?page=1&sort=${sort}&order=${newOrder}`, {
-      scroll: false,
+    router.push(`/{{snakeCase (plural name)}}?page=1&sort=${sort}&order=${newOrder}`, {
+      scroll: false
     })
-    await fetchSites(1, sort, newOrder)
+    await fetch{{pascalCase (plural name)}}(1, sort, newOrder)
   }
 
   const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
-      router.push(`/sites?page=1&sort=${sort}&order=${order}`, {
-        scroll: false,
+      router.push(`/{{snakeCase (plural name)}}?page=1&sort=${sort}&order=${order}`, {
+        scroll: false
       })
-      await fetchSites(1, sort, order)
+      await fetch{{pascalCase (plural name)}}(1, sort, order)
     } else {
-      router.push(`/sites?page=${page}&sort=${sort}&order=${order}`, {
-        scroll: false,
+      router.push(`/{{snakeCase (plural name)}}?page=${page}&sort=${sort}&order=${order}`, {
+        scroll: false
       })
-      await fetchSites(page, sort, order)
+      await fetch{{pascalCase (plural name)}}(page, sort, order)
     }
   }
 
@@ -162,15 +149,15 @@ export default function Sites({
     const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    const url = `/sites?${queryParams({
+    const url = `/{{snakeCase (plural name)}}?${queryParams({
       page: 1,
       sort: newSort,
-      order: newOrder,
+      order: newOrder
     })}`
     router.push(url, {
-      scroll: false,
+      scroll: false
     })
-    fetchSites(1, newSort, newOrder)
+    fetch{{pascalCase (plural name)}}(1, newSort, newOrder)
   }
 
   return (
@@ -184,14 +171,9 @@ export default function Sites({
         handleSave={handleSave}
       />
       <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 2,
-        }}
+        sx={{{ b "display: \"flex\", justifyContent: \"space-between\", alignItems: \"center\", mb: 2" }}}
       >
-        <MainHeader title="Sites" icon={<Icon keyword="Sites" size="36" />} />
+        <MainHeader title="{{pascalCase (plural name)}}" icon={<Icon keyword="{{pascalCase (plural name)}}" size="36" />} />
       </Box>
       <View
         viewMode={viewMode}

@@ -3,34 +3,40 @@
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
-import { HeroImage, TextField, SaveButton, CancelButton } from "@/components/ui"
-import type { EditorChangeEvent, Site } from "@/types"
-import { defaultSite } from "@/types"
+import {
+  InfoLink,
+  HeroImage,
+  TextField,
+  SaveButton,
+  CancelButton,
+} from "@/components/ui"
+import type { EditorChangeEvent, {{pascalCase (singular name)}} } from "@/types"
+import { default{{pascalCase (singular name)}} } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
 
-type FormStateData = Site & {
+type FormStateData = {{pascalCase (singular name)}} & {
   [key: string]: unknown
   image?: File | null
 }
 
-interface SiteFormProperties {
+interface {{pascalCase (singular name)}}FormProperties {
   open: boolean
   onClose: () => void
-  onSave: (formData: FormData, siteData: Site) => Promise<void>
+  onSave: (formData: FormData, {{snakeCase (singular name)}}Data: {{pascalCase (singular name)}}) => Promise<void>
   initialFormData: FormStateData
   title: string
 }
 
-export default function SiteForm({
+export default function {{pascalCase (singular name)}}Form({
   open,
   onClose,
   onSave,
   initialFormData,
   title,
-}: SiteFormProperties) {
+}: {{pascalCase (singular name)}}FormProperties) {
   const { formState, dispatchForm, initialFormState } =
     useForm<FormStateData>(initialFormData)
   const { disabled, error, data } = formState
@@ -82,12 +88,12 @@ export default function SiteForm({
     dispatchForm({ type: FormActions.SUBMIT })
     try {
       const formData = new FormData()
-      const siteData = { ...defaultSite, name, description } as Site
-      formData.append("site", JSON.stringify(siteData))
+      const {{snakeCase (singular name)}}Data = { ...default{{pascalCase (singular name)}}, name, description } as {{pascalCase (singular name)}}
+      formData.append("{{snakeCase (singular name)}}", JSON.stringify(siteData))
       if (image) {
         formData.append("image", image)
       }
-      await onSave(formData, siteData)
+      await onSave(formData, {{snakeCase (singular name)}}Data)
     } catch (error_: unknown) {
       const errorMessage = "An error occurred."
       dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
@@ -113,21 +119,19 @@ export default function SiteForm({
       <Box
         component="form"
         onSubmit={handleSubmit}
-        sx={{
-          width: isMobile ? "100%" : "30rem",
-          height: isMobile ? "auto" : "100%",
-          p: isMobile ? "1rem" : "2rem",
-        }}
+        sx={{{ b "width: isMobile ? \"100%\" : \"30rem\", height: isMobile ? \"auto\" : \"100%\", p: isMobile ? \"1rem\" : \"2rem\", " }}}
       >
-        <Typography variant="h5" sx={{ mb: 2, color: "#ffffff" }}>
+        <Typography variant="h5" sx={{{ b "mb: 2, color: \"#ffffff\"" }}}>
           {title}
         </Typography>
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
+          <Alert severity="error" sx={{{ b "mb: 2" }}}>
             {error}
           </Alert>
         )}
-        <Typography>Describe this thing.</Typography>
+        <Typography>
+          Describe this thing.
+        </Typography>
         <TextField
           label="Name"
           value={name}
@@ -153,9 +157,9 @@ export default function SiteForm({
             })
           }}
         />
-        <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: "1rem" }}>
+        <Box sx={{{ b "mt: 2, display: \"flex\", alignItems: \"center\", gap: \"1rem\"" }}}>
           <IconButton component="label">
-            <AddPhotoAlternateIcon sx={{ color: "#ffffff" }} />
+            <AddPhotoAlternateIcon sx={{{ b "color: \"#ffffff\"" }}} />
             <input
               type="file"
               hidden
@@ -163,12 +167,12 @@ export default function SiteForm({
               onChange={handleImageChange}
             />
           </IconButton>
-          <Typography variant="body2" sx={{ color: "#ffffff" }}>
+          <Typography variant="body2" sx={{{ b "color: \"#ffffff\"" }}}>
             Update Image
           </Typography>
         </Box>
-        {imagePreview && <HeroImage entity={{ image_url: imagePreview }} />}
-        <Box sx={{ display: "flex", gap: "1rem", mt: 3 }}>
+        {imagePreview && <HeroImage entity={{{ b "image_url: imagePreview" }}} />}
+        <Box sx={{{ b "display: \"flex\", gap: \"1rem\", mt: 3" }}}>
           <SaveButton type="submit" disabled={disabled}>
             Save
           </SaveButton>

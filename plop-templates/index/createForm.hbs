@@ -1,0 +1,38 @@
+"use client"
+
+import { default{{pascalCase (singular name)}}, type {{pascalCase (singular name)}} } from "@/types"
+import { useClient } from "@/contexts"
+import {{pascalCase (singular name)}}Form from "./{{pascalCase (singular name)}}Form"
+
+interface Create{{pascalCase (singular name)}}FormProperties {
+  open: boolean
+  onClose: () => void
+  onSave: (new{{pascalCase (singular name)}}: {{pascalCase (singular name)}}) => void
+}
+
+export default function Create{{pascalCase (singular name)}}Form({
+  open,
+  onClose,
+  onSave,
+}: Create{{pascalCase (singular name)}}FormProperties) {
+  const { client } = useClient()
+
+  const handleSave = async (formData: FormData, {{snakeCase (singular name)}}Data: {{pascalCase (singular name)}}) => {
+    const {{snakeCase (singular name)}} = { ...default{{pascalCase (singular name)}}, ...{{snakeCase (singular name)}}Data } as {{pascalCase (singular name)}}
+    formData.set("{{snakeCase (singular name)}}", JSON.stringify({{snakeCase (singular name)}}))
+    const response = await client.create{{pascalCase (singular name)}}(formData)
+    onSave(response.data)
+  }
+
+  const defaultEntity = default{{pascalCase (singular name)}}
+
+  return (
+    <{{pascalCase (singular name)}}Form
+      open={open}
+      onClose={onClose}
+      onSave={handleSave}
+      initialFormData={{{ b "...defaultEntity, image: null" }}}
+      title="New {{titleCase (singular name)}}"
+    />
+  )
+}

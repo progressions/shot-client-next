@@ -14,7 +14,6 @@ import { useCampaign, useClient } from "@/contexts"
 import { FactionLink, VehicleLink } from "@/components/ui"
 import DetailButtons from "@/components/DetailButtons"
 import { CS } from "@/services"
-import { VehicleDescription } from "@/components/vehicles"
 
 interface VehicleDetailProperties {
   vehicle: Vehicle
@@ -117,7 +116,6 @@ export default function VehicleDetail({
             </>
           )}
         </Typography>
-        <VehicleDescription vehicle={vehicle} />
         <Typography variant="body2" sx={{ mt: 1, color: "#ffffff" }}>
           Created: {formattedCreatedAt}
         </Typography>

@@ -2,14 +2,14 @@
 import { Box, Table } from "@mui/material"
 import { FormStateType, FormStateAction } from "@/reducers"
 import {
-  CharactersMobile,
-  CharactersTableHeader,
-  CharactersTableBody,
-  CharacterFilter,
-} from "@/components/characters"
+  {{pascalCase (plural name)}}Mobile,
+  TableHeader,
+  TableBody,
+  {{pascalCase (singular name)}}Filter
+} from "@/components/{{snakeCase (plural name)}}"
 import { SortControls } from "@/components/ui"
 
-interface CharactersViewProps {
+interface {{pascalCase (plural name)}}ViewProps {
   viewMode: "table" | "mobile"
   formState: FormStateType<FormStateData>
   dispatchForm: (action: FormStateAction<FormStateData>) => void
@@ -20,17 +20,17 @@ interface CharactersViewProps {
 }
 
 type ValidSort = "name" | "type" | "created_at" | "updated_at"
+
 type FormStateData = {
-  characters: Character[]
+  {{snakeCase (plural name)}}: {{pascalCase (singular name)}}[]
   meta: PaginationMeta
   sort: string
   order: string
-  character_type: string
+  {{snakeCase (singular name)}}_type: string
   archetype: string
-  faction_id: string
 }
 
-interface Character {
+interface {{pascalCase (singular name)}} {
   id: string
   name: string
   type: string
@@ -43,16 +43,16 @@ interface PaginationMeta {
   total_pages: number
 }
 
-export default function CharactersView({
+export default function {{pascalCase (plural name)}}View({
   viewMode,
   formState,
   dispatchForm,
   onPageChange,
   onSortChange,
   onOrderChange,
-  initialIsMobile,
-}: CharactersViewProps) {
-  const { characters, meta, sort, order } = formState.data
+  initialIsMobile
+}: {{pascalCase (plural name)}}ViewProps) {
+  const { {{snakeCase (plural name)}}, meta, sort, order } = formState.data
 
   const formatDate = (date: string) => {
     if (viewMode === "mobile") {
@@ -62,14 +62,14 @@ export default function CharactersView({
     return new Date(date).toLocaleString("en-US", {
       year: "numeric",
       month: "short",
-      day: "numeric",
+      day: "numeric"
     })
   }
 
   return (
-    <Box sx={{ width: "100%", mb: 2 }}>
+    <Box sx={{{ b "width: \"100%\", mb: 2" }}}>
       <SortControls
-        route="/characters"
+        route="/{{snakeCase (plural name)}}"
         validSorts={["name", "type", "created_at", "updated_at"]}
         sort={sort}
         order={order}
@@ -77,16 +77,14 @@ export default function CharactersView({
         totalPages={meta.total_pages}
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
-        filter={
-          <CharacterFilter
-            dispatch={dispatchForm}
-            includeCharacters={false}
-            omit={["add"]}
-          />
-        }
+        filter={<{{pascalCase (singular name)}}Filter
+          dispatch={dispatchForm}
+          include{{pascalCase (plural name)}}={false}
+          omit={["add"]}
+        />}
       >
-        {viewMode === "mobile" ? (
-          <CharactersMobile
+        { viewMode === "mobile" ? (
+          <{{pascalCase (plural name)}}Mobile
             formState={formState}
             dispatchForm={dispatchForm}
             onPageChange={onPageChange}
@@ -96,20 +94,17 @@ export default function CharactersView({
           />
         ) : (
           <>
-            <Box sx={{ bgcolor: "#424242", borderRadius: 1 }}>
+            <Box sx={{{ b "bgcolor: \"#424242\", borderRadius: 1" }}}>
               <Table
-                sx={{
-                  maxWidth: { xs: "400px", sm: "100%" },
-                  tableLayout: "fixed",
-                }}
+                sx={{{ b "maxWidth: { xs: \"400px\", sm: \"100%\" }, tableLayout: \"fixed\"" }}}
               >
-                <CharactersTableHeader
+                <TableHeader
                   sort={sort}
                   order={order}
                   onSortChange={onSortChange}
                 />
-                <CharactersTableBody
-                  characters={characters}
+                <TableBody
+                  {{snakeCase (plural name)}}={ {{snakeCase (plural name)}} }
                   formatDate={formatDate}
                 />
               </Table>

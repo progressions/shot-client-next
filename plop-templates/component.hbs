@@ -1,0 +1,16 @@
+import React from "react"
+import { Box } from "@mui/material"
+import { useStyles } from "./{{pascalCase name}}.styles"
+
+interface {{pascalCase name}}Props {
+  // Define your props here
+}
+
+export default function {{pascalCase name}}({}: {{pascalCase name}}Props) {
+  const classes = useStyles()
+  return (
+    <Box className={classes.root}>
+      <h1>{{pascalCase name}} Component</h1>
+    </Box>
+  )
+}

@@ -1,7 +1,8 @@
 import { GridView, ViewList } from "@mui/icons-material"
-import { FightForm, SpeedDial } from "@/components/fights"
-import { actions as initialActions } from "@/components/fights/SpeedDial"
+import { Create{{pascalCase (singular name)}}Form, SpeedDial } from "@/components/{{snakeCase (plural name)}}"
+import { actions as initialActions } from "@/components/{{snakeCase (plural name)}}/SpeedDial"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
+import { default{{pascalCase (singular name)}} } from "@/types"
 
 interface MenuProps {
   viewMode: "table" | "mobile"
@@ -14,7 +15,7 @@ export default function Menu({
   drawerOpen,
   handleOpenCreateDrawer,
   handleCloseCreateDrawer,
-  handleSaveFight,
+  handleSave,
 }: MenuProps) {
   const handleToggleView = () => {
     setViewMode(viewMode === "table" ? "mobile" : "table")
@@ -35,13 +36,16 @@ export default function Menu({
     ...initialActions,
   ]
 
+  const defaultEntity = default{{pascalCase (singular name)}}
+
   return (
     <>
       <SpeedDial actions={actions} />
-      <FightForm
+      <Create{{pascalCase (singular name)}}Form
         open={drawerOpen}
         onClose={handleCloseCreateDrawer}
-        onSave={handleSaveFight}
+        onSave={handleSave}
+        initialFormData={{{b "defaultEntity"}}}
       />
     </>
   )

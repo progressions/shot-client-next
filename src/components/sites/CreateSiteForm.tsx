@@ -24,12 +24,14 @@ export default function CreateSiteForm({
     onSave(response.data)
   }
 
+  const defaultEntity = defaultSite
+
   return (
     <SiteForm
       open={open}
       onClose={onClose}
       onSave={handleSave}
-      initialFormData={{ ...defaultSite, image: null }}
+      initialFormData={{ ...defaultEntity, image: null }}
       title="New Site"
     />
   )

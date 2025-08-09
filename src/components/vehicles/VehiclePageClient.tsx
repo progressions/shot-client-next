@@ -1,48 +1,70 @@
 "use client"
 
-import type { Character } from "@/types"
-import { useClient, useCampaign } from "@/contexts"
-import { useState, useEffect } from "react"
-import { Box, Stack } from "@mui/material"
-import { CS } from "@/services"
-import { Icon, SectionHeader } from "@/components/ui"
+import { useEffect } from "react"
+import { FormControl, FormHelperText, Box } from "@mui/material"
+import type { Vehicle } from "@/types"
 import {
-  Header,
-  Owner,
-  Associations,
-  ActionValues,
-  Skills,
-  Weapons,
-  Description,
-  Schticks,
-  Parties,
-  Sites,
-  CharacterSpeedDial,
-} from "@/components/characters"
+  InfoLink,
+  Icon,
+  SectionHeader,
+  Alert,
+  NameEditor,
+  HeroImage,
+  SpeedDialMenu,
+} from "@/components/ui"
+import { useCampaign } from "@/contexts"
+import { ActionValuesEdit, VehicleChips } from "@/components/vehicles"
+import { useEntity } from "@/hooks"
+import { FormActions, useForm } from "@/reducers"
+import { Owner } from "@/components/characters"
 
-type CharacterPageClientProps = {
-  character: Character
+type FormStateData = {
+  entity: Vehicle & {
+    image?: File | null
+  }
 }
 
-export default function CharacterPageClient({
-  character: initialCharacter,
-}: CharacterPageClientProps) {
+interface VehiclePageClientProperties {
+  vehicle: Vehicle
+}
+
+export default function VehiclePageClient({
+  vehicle: initialVehicle,
+}: VehiclePageClientProperties) {
   const { campaignData } = useCampaign()
-  const { client } = useClient()
-  const [character, setCharacter] = useState<Character>(initialCharacter)
+  const { formState, dispatchForm } = useForm<FormStateData>({
+    entity: initialVehicle,
+  })
+  const { errors, status, data } = formState
+  const vehicle = data.entity
+  const { updateEntity, deleteEntity } = useEntity(vehicle, dispatchForm)
 
   useEffect(() => {
-    document.title = character.name ? `${character.name} - Chi War` : "Chi War"
-  }, [character.name])
+    document.title = vehicle.name ? `${vehicle.name} - Chi War` : "Chi War"
+  }, [vehicle.name])
 
   useEffect(() => {
+    console.log("got campaignData", campaignData)
     if (
-      campaignData?.character &&
-      campaignData.character.id === initialCharacter.id
+      campaignData?.vehicle &&
+      campaignData.vehicle.id === initialVehicle.id
     ) {
-      setCharacter(campaignData.character)
+      console.log("campaignData.vehicle", campaignData.vehicle)
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "entity",
+        value: { ...campaignData.vehicle },
+      })
     }
-  }, [campaignData, initialCharacter])
+  }, [campaignData, initialVehicle, dispatchForm])
+
+  const setVehicle = (updatedVehicle: Vehicle) => {
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "entity",
+      value: updatedVehicle,
+    })
+  }
 
   return (
     <Box
@@ -51,55 +73,29 @@ export default function CharacterPageClient({
         position: "relative",
       }}
     >
-      <CharacterSpeedDial
-        character={character}
-        client={client}
-        setCharacter={setCharacter}
-      />
-      <Header character={character} />
-      <Owner character={character} />
-      <SectionHeader
-        title="Action Values"
-        icon={<Icon keyword="Action Values" />}
-      >
-        Action Values are the core stats of your Character, used to resolve
-        actions and challenges in the game.
+      <SpeedDialMenu onDelete={deleteEntity} />
+      <HeroImage entity={vehicle} setEntity={setVehicle} />
+      <VehicleChips vehicle={vehicle} />
+      <Alert status={status} />
+      <FormControl fullWidth margin="normal" error={!!errors.name}>
+        <NameEditor
+          entity={vehicle}
+          setEntity={setVehicle}
+          updateEntity={updateEntity}
+        />
+        {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
+      </FormControl>
+      <Owner character={vehicle} />
+      <SectionHeader title="Stats" icon={<Icon keyword="Action Values" />}>
+        Stats are the core attributes that define a{" "}
+        <InfoLink href="/vehicles" info="Vehicle" />
+        &rsquo;s capabilities.
       </SectionHeader>
-      <ActionValues character={character} />
-      {!CS.isMook(character) && (
-        <Stack
-          direction={{ xs: "column", md: "row" }}
-          sx={{
-            gap: { xs: 1, md: 2 },
-            "& > *": {
-              flex: { md: 1 },
-              width: { xs: "100%", md: "50%" },
-            },
-          }}
-        >
-          <SectionHeader
-            title="Personal Details"
-            icon={<Icon keyword="Personal Details" />}
-          >
-            Personal details about your character, such as their type,
-            archetype, juncture, and wealth.
-          </SectionHeader>
-          <Associations character={character} />
-
-          <SectionHeader title="Skills" icon={<Icon keyword="Skills" />}>
-            Skills are what your character can do. They are used to resolve
-            actions and challenges in the game.
-          </SectionHeader>
-          <Skills character={character} />
-        </Stack>
-      )}
-      <Description character={character} />
-      <Weapons character={character} />
-      {!CS.isMook(character) && (
-        <Schticks character={character} setCharacter={setCharacter} />
-      )}
-      <Parties character={character} setCharacter={setCharacter} />
-      <Sites character={character} setCharacter={setCharacter} />
+      <ActionValuesEdit
+        entity={vehicle}
+        setEntity={setVehicle}
+        updateEntity={updateEntity}
+      />
     </Box>
   )
 }

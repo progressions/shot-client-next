@@ -1,8 +1,8 @@
 import { Suspense } from "react"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
-import { CircularProgress } from "@mui/material"
-import { getUser, getServerClient } from "@/lib/getServerClient"
+import { Box, CircularProgress } from "@mui/material"
+import { getServerClient } from "@/lib/getServerClient"
 import { Sites } from "@/components/sites"
 import type { SitesResponse } from "@/types"
 import Breadcrumbs from "@/components/Breadcrumbs"
@@ -22,10 +22,6 @@ export default async function SitesPage({
   }>
 }) {
   const client = await getServerClient()
-  const user = await getUser()
-  if (!client || !user) {
-    redirect("/login")
-  }
 
   // Resolve searchParams
   const parameters = await searchParams
@@ -70,7 +66,14 @@ export default async function SitesPage({
   const initialIsMobile = /mobile/i.test(userAgent)
 
   return (
-    <>
+    <Box
+      sx={{
+        justifyContent: "space-between",
+        alignItems: "center",
+        mb: 2,
+        position: "relative",
+      }}
+    >
       <Breadcrumbs />
       <Suspense fallback={<CircularProgress />}>
         <Sites
@@ -82,6 +85,6 @@ export default async function SitesPage({
           initialIsMobile={initialIsMobile}
         />
       </Suspense>
-    </>
+    </Box>
   )
 }

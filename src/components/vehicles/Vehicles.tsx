@@ -1,33 +1,30 @@
 "use client"
+import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useMemo, useEffect, useCallback, useState } from "react"
 import { Box } from "@mui/material"
+import { View, Menu } from "@/components/vehicles"
 import type { Vehicle, PaginationMeta } from "@/types"
-import { useCampaign, useClient, useLocalStorage } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
-import { HeroTitle } from "@/components/ui"
+import { useLocalStorage, useCampaign, useClient } from "@/contexts"
 import { queryParams } from "@/lib"
-import { VehiclesView, VehiclesMenu } from "@/components/vehicles"
+import { Icon, MainHeader } from "@/components/ui"
 
 interface VehiclesProperties {
   initialVehicles: Vehicle[]
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
-  initialIsMobile: boolean
+  initialIsMobile?: boolean
 }
 
-type ValidSort = "name" | "type" | "created_at" | "updated_at"
+type ValidSort = "created_at" | "updated_at" | "name"
 type ValidOrder = "asc" | "desc"
-
 type FormStateData = {
   vehicles: Vehicle[]
   meta: PaginationMeta
+  drawerOpen: boolean
   sort: string
   order: string
-  vehicle_type: string
-  archetype: string
-  faction_id: string
 }
 
 export default function Vehicles({
@@ -39,8 +36,7 @@ export default function Vehicles({
 }: VehiclesProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
-  const { saveLocally, getLocally } = useLocalStorage()
-  const router = useRouter()
+  const { getLocally } = useLocalStorage()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
     (getLocally("vehicleViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
@@ -48,35 +44,28 @@ export default function Vehicles({
   const { formState, dispatchForm } = useForm<FormStateData>({
     vehicles: initialVehicles,
     meta: initialMeta,
+    drawerOpen: false,
     sort: initialSort,
     order: initialOrder,
-    vehicle_type: "",
-    archetype: "",
-    faction_id: "",
   })
-  const { meta, sort, order, vehicle_type, archetype, faction_id } =
-    formState.data
+  const { meta, sort, order, vehicles, drawerOpen } = formState.data
+  const router = useRouter()
 
+  const validSorts: readonly ValidSort[] = useMemo(
+    () => ["created_at", "updated_at", "name"],
+    []
+  )
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
   const fetchVehicles = useCallback(
     async (
       page: number = 1,
-      sort: string = "name",
-      order: string = "asc",
-      vehicle_type: string = "",
-      faction_id: string = "",
-      archetype: string = ""
+      sort: string = "created_at",
+      order: string = "desc"
     ) => {
       try {
-        const response = await client.getVehicles({
-          archetype,
-          page,
-          sort,
-          order,
-          type: vehicle_type,
-          faction_id,
-        })
+        const response = await client.getVehicles({ page, sort, order })
+        console.log("Fetched vehicles:", response.data.vehicles)
         dispatchForm({
           type: FormActions.UPDATE,
           name: "vehicles",
@@ -85,9 +74,15 @@ export default function Vehicles({
         dispatchForm({
           type: FormActions.UPDATE,
           name: "meta",
-          value: response.data.meta,
+          value: response.data.meta || { current_page: page, total_pages: 1 },
         })
-      } catch (error) {
+        dispatchForm({ type: FormActions.ERROR, payload: null })
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Unable to fetch vehicles data"
+        dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
         console.error("Fetch vehicles error:", error)
       }
     },
@@ -98,78 +93,77 @@ export default function Vehicles({
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
     if (campaignData.vehicles === "reload") {
-      fetchVehicles(
-        meta.current_page,
-        sort,
-        order,
-        vehicle_type,
-        faction_id,
-        archetype
-      )
+      const parameters = new URLSearchParams(globalThis.location.search)
+      const page = parameters.get("page")
+        ? Number.parseInt(parameters.get("page")!, 10)
+        : 1
+      const sortParameter = parameters.get("sort")
+      const orderParameter = parameters.get("order")
+      const currentSort =
+        sortParameter && validSorts.includes(sortParameter as ValidSort)
+          ? sortParameter
+          : "created_at"
+      const currentOrder =
+        orderParameter && validOrders.includes(orderParameter as ValidOrder)
+          ? orderParameter
+          : "desc"
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "sort",
+        value: currentSort,
+      })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "order",
+        value: currentOrder,
+      })
+      fetchVehicles(page, currentSort, currentOrder)
     }
   }, [
     client,
     campaignData,
     dispatchForm,
     fetchVehicles,
+    validSorts,
     validOrders,
-    archetype,
-    faction_id,
-    vehicle_type,
-    sort,
-    order,
-    meta.current_page,
   ])
 
-  useEffect(() => {
-    const url = `/vehicles?${queryParams({
-      page: 1,
-      sort,
-      order,
-      type: vehicle_type,
-      faction_id,
-      archetype,
-    })}`
-    router.push(url, {
+  const handleOpenCreateDrawer = () => {
+    dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
+  }
+
+  const handleCloseCreateDrawer = () => {
+    dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: false })
+  }
+
+  const handleSave = async (newVehicle: Vehicle) => {
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "vehicles",
+      value: [newVehicle, ...vehicles],
+    })
+  }
+
+  const handleOrderChange = async () => {
+    const newOrder = order === "asc" ? "desc" : "asc"
+    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
+    router.push(`/vehicles?page=1&sort=${sort}&order=${newOrder}`, {
       scroll: false,
     })
-    fetchVehicles(1, sort, order, vehicle_type, faction_id, archetype)
-  }, [vehicle_type, archetype, faction_id, fetchVehicles, order, router, sort])
+    await fetchVehicles(1, sort, newOrder)
+  }
 
-  useEffect(() => {
-    saveLocally("vehicleViewMode", viewMode)
-  }, [viewMode, saveLocally])
-
-  const handlePageChange = (
-    _event: React.ChangeEvent<unknown>,
-    page: number
-  ) => {
+  const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
-      const url = `/vehicles?${queryParams({
-        page: 1,
-        sort,
-        order,
-        type: vehicle_type,
-        faction_id,
-        archetype,
-      })}`
-      router.push(url, {
+      router.push(`/vehicles?page=1&sort=${sort}&order=${order}`, {
         scroll: false,
       })
-      fetchVehicles(1, sort, order)
+      await fetchVehicles(1, sort, order)
     } else {
-      const url = `/vehicles?${queryParams({
-        page,
-        sort,
-        order,
-        type: vehicle_type,
-        faction_id,
-        archetype,
-      })}`
-      router.push(url, {
+      router.push(`/vehicles?page=${page}&sort=${sort}&order=${order}`, {
         scroll: false,
       })
-      fetchVehicles(page, sort, order)
+      await fetchVehicles(page, sort, order)
     }
   }
 
@@ -181,9 +175,6 @@ export default function Vehicles({
       page: 1,
       sort: newSort,
       order: newOrder,
-      type: vehicle_type,
-      faction_id,
-      archetype,
     })}`
     router.push(url, {
       scroll: false,
@@ -193,7 +184,14 @@ export default function Vehicles({
 
   return (
     <>
-      <VehiclesMenu viewMode={viewMode} setViewMode={setViewMode} />
+      <Menu
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        drawerOpen={drawerOpen}
+        handleOpenCreateDrawer={handleOpenCreateDrawer}
+        handleCloseCreateDrawer={handleCloseCreateDrawer}
+        handleSave={handleSave}
+      />
       <Box
         sx={{
           display: "flex",
@@ -202,15 +200,18 @@ export default function Vehicles({
           mb: 2,
         }}
       >
-        <HeroTitle>Vehicles</HeroTitle>
+        <MainHeader
+          title="Vehicles"
+          icon={<Icon keyword="Vehicles" size="36" />}
+        />
       </Box>
-      <VehiclesView
+      <View
         viewMode={viewMode}
         formState={formState}
         dispatchForm={dispatchForm}
         onPageChange={handlePageChange}
         onSortChange={handleSortChange}
-        onOrderChange={() => handleSortChange(sort as ValidSort)}
+        onOrderChange={handleOrderChange}
         initialIsMobile={initialIsMobile}
       />
     </>

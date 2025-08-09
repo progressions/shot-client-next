@@ -1,10 +1,7 @@
 "use client"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import {
-  Box,
-  Pagination,
-} from "@mui/material"
+import { Box } from "@mui/material"
 import type { SelectChangeEvent } from "@mui/material"
 import { FightFilter } from "@/components/fights"
 import { SortControls } from "@/components/ui"
@@ -12,11 +9,8 @@ import { SortControls } from "@/components/ui"
 interface FightsControlsProps {
   sort: string
   order: string
-  page: number
-  totalPages: number
   onSortChange: (newSort: string) => void
   onOrderChange: () => void
-  onPageChange: (page: number) => void
   children: React.ReactNode
   isMobile?: boolean
 }
@@ -24,11 +18,8 @@ interface FightsControlsProps {
 export default function FightsControls({
   sort,
   order,
-  page,
-  totalPages,
   onSortChange,
   onOrderChange,
-  onPageChange,
   dispatchForm,
   children,
   isMobile = false,
@@ -57,16 +48,6 @@ export default function FightsControls({
     })
   }
 
-  const handlePageChange = (
-    _event: React.ChangeEvent<unknown>,
-    newPage: number
-  ) => {
-    onPageChange(newPage)
-    router.push(`/fights?page=${newPage}&sort=${sort}&order=${order}`, {
-      scroll: false,
-    })
-  }
-
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <Box>
@@ -79,33 +60,17 @@ export default function FightsControls({
           sort={sort}
           order={order}
           showFilter={showFilter}
+          filter={
+            <FightFilter
+              dispatch={dispatchForm}
+              includeFights={false}
+              omit={["add"]}
+            />
+          }
         >
-          <FightFilter
-            dispatch={dispatchForm}
-            includeFights={false}
-            omit={["add"]}
-          />
+          {children}
         </SortControls>
-        <Pagination
-          count={totalPages}
-          page={page}
-          onChange={handlePageChange}
-          variant="outlined"
-          color="primary"
-          shape="rounded"
-          size="large"
-        />
       </Box>
-      {children}
-      <Pagination
-        count={totalPages}
-        page={page}
-        onChange={handlePageChange}
-        variant="outlined"
-        color="primary"
-        shape="rounded"
-        size="large"
-      />
     </Box>
   )
 }

@@ -1,15 +1,16 @@
+"use client"
 import { Pagination } from "@mui/material"
 import type { PaginationMeta } from "@/types"
 
-interface VehiclesPaginationProps {
+interface {{pascalCase (plural name)}}MenuProps {
   meta: PaginationMeta
   onPageChange: (event: React.ChangeEvent<unknown>, page: number) => void
 }
 
-export default function VehiclesPagination({
+export default function {{pascalCase (plural name)}}Menu({
   meta,
-  onPageChange,
-}: VehiclesPaginationProps) {
+  onPageChange
+}: {{pascalCase (plural name)}}MenuProps) {
   return (
     <Pagination
       count={meta.total_pages}
@@ -19,7 +20,7 @@ export default function VehiclesPagination({
       color="primary"
       shape="rounded"
       size="large"
-      sx={{ mt: 2 }}
+      sx={{{ b "mt: 2" }}}
     />
   )
 }

@@ -1,0 +1,39 @@
+"use client"
+import { Stack, Typography } from "@mui/material"
+import type { SelectChangeEvent } from "@mui/material"
+import { {{ pascalCase (singular name) }}Detail } from "@/components/{{snakeCase (plural name) }}"
+import { useToast } from "@/contexts"
+
+interface {{ pascalCase (plural name) }}MobileProps {
+  formState: {
+    data: {
+      {{ snakeCase (plural name) }}: Array<unknown> // Replace unknown with specific type if available
+    }
+  }
+}
+
+export default function {{ pascalCase (plural name) }}Mobile({ formState }: {{pascalCase (plural name) }}MobileProps) {
+  const { toastSuccess } = useToast()
+  const { {{ snakeCase (plural name) }} } = formState.data
+
+  const handleDelete = async () => {
+    toastSuccess("{{ pascalCase (singular name) }} deleted successfully")
+  }
+
+  return (
+    <Stack spacing={2}>
+      { {{ snakeCase (plural name) }}.length === 0 && (
+        <Typography sx={{{ b "color: \"#fff\"" }}}>
+          No {{ snakeCase (plural name) }} available
+        </Typography>
+      )}
+      { {{ snakeCase (plural name) }}.map({{snakeCase (singular name) }} => (
+        <{{ pascalCase (singular name) }}Detail
+          {{ snakeCase (singular name) }}={ {{snakeCase (singular name) }} }
+          key={ {{ snakeCase (singular name) }}.id }
+          onDelete={handleDelete}
+        />
+      ))}
+    </Stack>
+  )
+}

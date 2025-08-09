@@ -1,11 +1,12 @@
 "use client"
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useMediaQuery, useTheme, Box } from "@mui/material"
+import { Box } from "@mui/material"
 import { View, Menu } from "@/components/fights"
 import type { Fight, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useLocalStorage, useCampaign, useClient } from "@/contexts"
+import { queryParams } from "@/lib"
 import { Icon, MainHeader } from "@/components/ui"
 
 interface FightsProperties {
@@ -16,14 +17,12 @@ interface FightsProperties {
   initialIsMobile?: boolean
 }
 
-type ValidSort = "name" | "type" | "created_at" | "updated_at"
 type ValidOrder = "asc" | "desc"
 
 type FormStateData = {
   fights: Fight[]
   meta: PaginationMeta
   drawerOpen: boolean
-  error: string | null
   sort: string
   order: string
 }
@@ -37,7 +36,7 @@ export default function Fights({
 }: FightsProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
-  const { saveLocally, getLocally } = useLocalStorage()
+  const { getLocally } = useLocalStorage()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
     (getLocally("fightViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
@@ -46,23 +45,12 @@ export default function Fights({
     fights: initialFights,
     meta: initialMeta,
     drawerOpen: false,
-    error: null,
     sort: initialSort,
     order: initialOrder,
   })
-  const { meta, fights, drawerOpen, error } = formState.data
-  const [selectedFight, setSelectedFight] = useState<Fight | null>(null)
-  const [sort, setSort] = useState<string>(initialSort)
-  const [order, setOrder] = useState<string>(initialOrder)
+  const { meta, sort, order, fights, drawerOpen } = formState.data
   const router = useRouter()
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"), {
-    noSsr: true,
-    defaultMatches: initialIsMobile ?? false,
-  })
 
-  type ValidSort = "created_at" | "updated_at" | "name"
-  type ValidOrder = "asc" | "desc"
   const validSorts: readonly ValidSort[] = useMemo(
     () => ["created_at", "updated_at", "name"],
     []
@@ -141,16 +129,14 @@ export default function Fights({
     })
   }
 
-  const handleDeleteFight = (fightId: string) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "fights",
-      value: fights.filter(fight => fight.id !== fightId),
+  const handleOrderChange = async () => {
+    const newOrder = order === "asc" ? "desc" : "asc"
+    setOrder(newOrder)
+    router.push(`/sites?page=1&sort=${sort}&order=${newOrder}`, {
+      scroll: false,
     })
-    if (selectedFight?.id === fightId) setSelectedFight(null)
-    router.refresh()
+    await fetchSites(1, sort, newOrder, faction_id)
   }
-
   const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
       router.push(`/fights?page=1&sort=${sort}&order=${order}`, {
@@ -165,20 +151,31 @@ export default function Fights({
     }
   }
 
-  const handleSortChange = (newSort: string) => {
-    setSort(newSort)
-    fetchFights(1, newSort, order)
-  }
-
-  const handleOrderChange = async () => {
-    const newOrder = order === "asc" ? "desc" : "asc"
-    setOrder(newOrder)
-    await fetchFights(1, sort, newOrder)
+  const handleSortChange = (newSort: ValidSort) => {
+    const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
+    dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
+    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
+    const url = `/fights?${queryParams({
+      page: 1,
+      sort: newSort,
+      order: newOrder,
+    })}`
+    router.push(url, {
+      scroll: false,
+    })
+    fetchFights(1, newSort, newOrder)
   }
 
   return (
     <>
-      <Menu viewMode={viewMode} setViewMode={setViewMode} />
+      <Menu
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        drawerOpen={drawerOpen}
+        handleOpenCreateDrawer={handleOpenCreateDrawer}
+        handleCloseCreateDrawer={handleCloseCreateDrawer}
+        handleSaveFight={handleSaveFight}
+      />
       <Box
         sx={{
           display: "flex",
@@ -195,7 +192,7 @@ export default function Fights({
         dispatchForm={dispatchForm}
         onPageChange={handlePageChange}
         onSortChange={handleSortChange}
-        onOrderChange={() => handleSortChange(sort as ValidSort)}
+        onOrderChange={handleOrderChange}
         initialIsMobile={initialIsMobile}
       />
     </>

@@ -1,3 +1,4 @@
+"use client"
 import { TableCell, TableHead, TableRow, TableSortLabel } from "@mui/material"
 
 interface VehiclesTableHeaderProps {
@@ -25,19 +26,14 @@ export default function VehiclesTableHeader({
             sx={{
               color: "#ffffff",
               "&.Mui-active": { color: "#ffffff" },
-              "& .MuiTableSortLabel-icon": {
-                color: "#ffffff !important",
-              },
+              "& .MuiTableSortLabel-icon": { color: "#ffffff !important" },
             }}
           >
             Name
           </TableSortLabel>
         </TableCell>
         <TableCell
-          sx={{
-            color: "#ffffff",
-            width: { xs: "65px", sm: "150px" },
-          }}
+          sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}
         >
           <TableSortLabel
             active={sort === "type"}
@@ -46,19 +42,14 @@ export default function VehiclesTableHeader({
             sx={{
               color: "#ffffff",
               "&.Mui-active": { color: "#ffffff" },
-              "& .MuiTableSortLabel-icon": {
-                color: "#ffffff !important",
-              },
+              "& .MuiTableSortLabel-icon": { color: "#ffffff !important" },
             }}
           >
             Type
           </TableSortLabel>
         </TableCell>
         <TableCell
-          sx={{
-            color: "#ffffff",
-            width: { xs: "65px", sm: "150px" },
-          }}
+          sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}
         >
           <TableSortLabel
             active={sort === "created_at"}
@@ -67,9 +58,7 @@ export default function VehiclesTableHeader({
             sx={{
               color: "#ffffff",
               "&.Mui-active": { color: "#ffffff" },
-              "& .MuiTableSortLabel-icon": {
-                color: "#ffffff !important",
-              },
+              "& .MuiTableSortLabel-icon": { color: "#ffffff !important" },
             }}
           >
             Created

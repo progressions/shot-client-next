@@ -1,56 +1,55 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
-import { Box, CircularProgress } from "@mui/material"
-import { getUser, getServerClient } from "@/lib/getServerClient"
+import { CircularProgress, Box } from "@mui/material"
 import { Vehicles } from "@/components/vehicles"
+import { getServerClient, getPageParameters } from "@/lib"
 import Breadcrumbs from "@/components/Breadcrumbs"
+import type { VehiclesResponse } from "@/types"
 
 export const metadata = {
   title: "Vehicles - Chi War",
 }
 
-type VehiclesPageProperties = {
-  searchParams: Promise<{ page?: string; sort?: string; order?: string }>
-}
-
 export default async function VehiclesPage({
   searchParams,
-}: VehiclesPageProperties) {
+}: {
+  searchParams: Promise<{ page?: string; sort?: string; order?: string }>
+}) {
   const client = await getServerClient()
-  const user = await getUser()
 
-  if (!client || !user) {
-    redirect("/login")
-  }
+  // Validate parameters using getPageParameters
+  const { page, sort, order } = await getPageParameters(searchParams, {
+    validSorts: ["name", "created_at", "updated_at"],
+    defaultSort: "name",
+    defaultOrder: "asc",
+  })
 
-  const parameters = await searchParams
-  const pageParameter = parameters.page
-  const page = pageParameter ? Number.parseInt(pageParameter, 10) : 1
-
-  if (isNaN(page) || page <= 0) {
+  // Redirect if page is invalid
+  if (page <= 0) {
     redirect("/vehicles?page=1&sort=name&order=asc")
   }
 
-  type ValidSort = "name" | "created_at" | "updated_at"
-  const validSorts: readonly ValidSort[] = ["name", "created_at", "updated_at"]
-  const sort =
-    parameters.sort && validSorts.includes(parameters.sort as ValidSort)
-      ? parameters.sort
-      : "name"
-
-  type ValidOrder = "asc" | "desc"
-  const validOrders: readonly ValidOrder[] = ["asc", "desc"]
-  const order =
-    parameters.order && validOrders.includes(parameters.order as ValidOrder)
-      ? parameters.order
-      : "asc"
-
-  const response = await client.getVehicles({ page, sort, order })
-  const { vehicles, meta } = response.data
-
-  if (page > meta.total_pages) {
-    redirect("/vehicles?page=1&sort=name&order=asc")
+  // Fetch vehicles for the requested page, sort, and order
+  let vehiclesResponse: VehiclesResponse = {
+    vehicles: [],
+    meta: { current_page: page, total_pages: 1 },
+  }
+  try {
+    const response = await client.getVehicles({ page, sort, order })
+    if (!response.data) {
+      throw new Error("No data returned from getVehicles")
+    }
+    vehiclesResponse = response.data
+    console.log("vehiclesResponse:", vehiclesResponse)
+    if (
+      page > vehiclesResponse.meta.total_pages &&
+      vehiclesResponse.meta.total_pages > 0
+    ) {
+      redirect("/vehicles?page=1&sort=name&order=asc")
+    }
+  } catch (error) {
+    console.error("Error fetching vehicles in VehiclesPage:", error)
   }
 
   // Detect mobile device on the server
@@ -67,11 +66,13 @@ export default async function VehiclesPage({
         position: "relative",
       }}
     >
-      <Breadcrumbs />
+      <Suspense fallback={<CircularProgress />}>
+        <Breadcrumbs />
+      </Suspense>
       <Suspense fallback={<CircularProgress />}>
         <Vehicles
-          initialVehicles={vehicles}
-          initialMeta={meta}
+          initialVehicles={vehiclesResponse.vehicles}
+          initialMeta={vehiclesResponse.meta}
           initialSort={sort}
           initialOrder={order}
           initialIsMobile={initialIsMobile}

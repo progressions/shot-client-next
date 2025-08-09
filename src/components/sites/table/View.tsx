@@ -2,14 +2,14 @@
 import { Box, Table } from "@mui/material"
 import { FormStateType, FormStateAction } from "@/reducers"
 import {
-  CharactersMobile,
-  CharactersTableHeader,
-  CharactersTableBody,
-  CharacterFilter,
-} from "@/components/characters"
+  SitesMobile,
+  TableHeader,
+  TableBody,
+  SiteFilter,
+} from "@/components/sites"
 import { SortControls } from "@/components/ui"
 
-interface CharactersViewProps {
+interface SitesViewProps {
   viewMode: "table" | "mobile"
   formState: FormStateType<FormStateData>
   dispatchForm: (action: FormStateAction<FormStateData>) => void
@@ -20,17 +20,17 @@ interface CharactersViewProps {
 }
 
 type ValidSort = "name" | "type" | "created_at" | "updated_at"
+
 type FormStateData = {
-  characters: Character[]
+  sites: Site[]
   meta: PaginationMeta
   sort: string
   order: string
-  character_type: string
+  site_type: string
   archetype: string
-  faction_id: string
 }
 
-interface Character {
+interface Site {
   id: string
   name: string
   type: string
@@ -43,7 +43,7 @@ interface PaginationMeta {
   total_pages: number
 }
 
-export default function CharactersView({
+export default function SitesView({
   viewMode,
   formState,
   dispatchForm,
@@ -51,8 +51,8 @@ export default function CharactersView({
   onSortChange,
   onOrderChange,
   initialIsMobile,
-}: CharactersViewProps) {
-  const { characters, meta, sort, order } = formState.data
+}: SitesViewProps) {
+  const { sites, meta, sort, order } = formState.data
 
   const formatDate = (date: string) => {
     if (viewMode === "mobile") {
@@ -69,7 +69,7 @@ export default function CharactersView({
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
       <SortControls
-        route="/characters"
+        route="/sites"
         validSorts={["name", "type", "created_at", "updated_at"]}
         sort={sort}
         order={order}
@@ -78,15 +78,15 @@ export default function CharactersView({
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
         filter={
-          <CharacterFilter
+          <SiteFilter
             dispatch={dispatchForm}
-            includeCharacters={false}
+            includeSites={false}
             omit={["add"]}
           />
         }
       >
         {viewMode === "mobile" ? (
-          <CharactersMobile
+          <SitesMobile
             formState={formState}
             dispatchForm={dispatchForm}
             onPageChange={onPageChange}
@@ -103,15 +103,12 @@ export default function CharactersView({
                   tableLayout: "fixed",
                 }}
               >
-                <CharactersTableHeader
+                <TableHeader
                   sort={sort}
                   order={order}
                   onSortChange={onSortChange}
                 />
-                <CharactersTableBody
-                  characters={characters}
-                  formatDate={formatDate}
-                />
+                <TableBody sites={sites} formatDate={formatDate} />
               </Table>
             </Box>
           </>

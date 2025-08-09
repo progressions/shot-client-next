@@ -7,18 +7,18 @@ import {
   AttackValueEdit,
   ActionValueEdit as ActionValue,
 } from "@/components/characters"
-type ActionValuesProps = {
+type ActionValuesEditProps = {
   character: Character
   size: "small" | "large"
   setCharacter: (character: Character) => void
   updateCharacter: (updatedCharacter: Character) => Promise<void>
 }
-export default function ActionValues({
+export default function ActionValuesEdit({
   character,
   size,
   setCharacter,
   updateCharacter,
-}: ActionValuesProps) {
+}: ActionValuesEditProps) {
   return (
     <Box sx={{ display: "flex", justifyContent: "center" }}>
       <Stack direction={{ xs: "column", md: "row" }} spacing={2} mb={2}>

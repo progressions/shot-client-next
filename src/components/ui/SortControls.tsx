@@ -116,47 +116,49 @@ export function SortControls({
               </IconButton>
             </Tooltip>
           </Box>
-          { !!filter && <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: 1,
-            }}
-          >
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={handleToggleFilter}
-              sx={{ height: "fit-content" }}
-              endIcon={showFilter ? <ArrowDropUp /> : <ArrowDropDown />}
+          {!!filter && (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 1,
+              }}
             >
-              Filter
-            </Button>
-          </Box> }
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={handleToggleFilter}
+                sx={{ height: "fit-content" }}
+                endIcon={showFilter ? <ArrowDropUp /> : <ArrowDropDown />}
+              >
+                Filter
+              </Button>
+            </Box>
+          )}
         </Box>
       )}
-        {(!isMobile || showFilter) && filter}
-        <Pagination
-          count={totalPages}
-          page={page}
-          onChange={handlePageChange}
-          variant="outlined"
-          color="primary"
-          shape="rounded"
-          size="large"
-        />
-        {children}
+      {(!isMobile || showFilter) && filter}
       <Pagination
-          count={totalPages}
-          page={page}
-          onChange={handlePageChange}
-          variant="outlined"
-          color="primary"
-          shape="rounded"
-          size="large"
-        />
-      </Box>
+        count={totalPages}
+        page={page}
+        onChange={handlePageChange}
+        variant="outlined"
+        color="primary"
+        shape="rounded"
+        size="large"
+      />
+      {children}
+      <Pagination
+        count={totalPages}
+        page={page}
+        onChange={handlePageChange}
+        variant="outlined"
+        color="primary"
+        shape="rounded"
+        size="large"
+      />
+    </Box>
   )
 }
