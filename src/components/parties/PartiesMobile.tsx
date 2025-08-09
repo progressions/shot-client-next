@@ -1,6 +1,5 @@
 "use client"
 import { Stack, Typography } from "@mui/material"
-import type { SelectChangeEvent } from "@mui/material"
 import { PartyDetail } from "@/components/parties"
 import { useToast } from "@/contexts"
 
@@ -22,17 +21,11 @@ export default function PartiesMobile({ formState }: PartiesMobileProps) {
 
   return (
     <Stack spacing={2}>
-      { parties.length === 0 && (
-        <Typography sx={{ color: "#fff" }}>
-          No parties available
-        </Typography>
+      {parties.length === 0 && (
+        <Typography sx={{ color: "#fff" }}>No parties available</Typography>
       )}
-      { parties.map(party => (
-        <PartyDetail
-          party={ party }
-          key={ party.id }
-          onDelete={handleDelete}
-        />
+      {parties.map(party => (
+        <PartyDetail party={party} key={party.id} onDelete={handleDelete} />
       ))}
     </Stack>
   )

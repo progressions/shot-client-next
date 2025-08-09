@@ -1,6 +1,5 @@
 "use client"
 import { Stack, Typography } from "@mui/material"
-import type { SelectChangeEvent } from "@mui/material"
 import { SchtickDetail } from "@/components/schticks"
 import { useToast } from "@/contexts"
 
@@ -22,15 +21,13 @@ export default function SchticksMobile({ formState }: SchticksMobileProps) {
 
   return (
     <Stack spacing={2}>
-      { schticks.length === 0 && (
-        <Typography sx={{ color: "#fff" }}>
-          No schticks available
-        </Typography>
+      {schticks.length === 0 && (
+        <Typography sx={{ color: "#fff" }}>No schticks available</Typography>
       )}
-      { schticks.map(schtick => (
+      {schticks.map(schtick => (
         <SchtickDetail
-          schtick={ schtick }
-          key={ schtick.id }
+          schtick={schtick}
+          key={schtick.id}
           onDelete={handleDelete}
         />
       ))}

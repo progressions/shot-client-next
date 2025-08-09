@@ -5,7 +5,7 @@ import {
   FactionsMobile,
   TableHeader,
   TableBody,
-  FactionFilter
+  FactionFilter,
 } from "@/components/factions"
 import { SortControls } from "@/components/ui"
 
@@ -50,7 +50,7 @@ export default function FactionsView({
   onPageChange,
   onSortChange,
   onOrderChange,
-  initialIsMobile
+  initialIsMobile,
 }: FactionsViewProps) {
   const { factions, meta, sort, order } = formState.data
 
@@ -62,7 +62,7 @@ export default function FactionsView({
     return new Date(date).toLocaleString("en-US", {
       year: "numeric",
       month: "short",
-      day: "numeric"
+      day: "numeric",
     })
   }
 
@@ -78,13 +78,15 @@ export default function FactionsView({
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
         onPageChange={onPageChange}
-        filter={<FactionFilter
-          dispatch={dispatchForm}
-          includeFactions={false}
-          omit={["add"]}
-        />}
+        filter={
+          <FactionFilter
+            dispatch={dispatchForm}
+            includeFactions={false}
+            omit={["add"]}
+          />
+        }
       >
-        { viewMode === "mobile" ? (
+        {viewMode === "mobile" ? (
           <FactionsMobile
             formState={formState}
             dispatchForm={dispatchForm}
@@ -97,17 +99,17 @@ export default function FactionsView({
           <>
             <Box sx={{ bgcolor: "#424242", borderRadius: 1 }}>
               <Table
-                sx={{ maxWidth: { xs: "400px", sm: "100%" }, tableLayout: "fixed" }}
+                sx={{
+                  maxWidth: { xs: "400px", sm: "100%" },
+                  tableLayout: "fixed",
+                }}
               >
                 <TableHeader
                   sort={sort}
                   order={order}
                   onSortChange={onSortChange}
                 />
-                <TableBody
-                  factions={ factions }
-                  formatDate={formatDate}
-                />
+                <TableBody factions={factions} formatDate={formatDate} />
               </Table>
             </Box>
           </>

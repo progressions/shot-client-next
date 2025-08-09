@@ -5,7 +5,7 @@ import {
   PartiesMobile,
   TableHeader,
   TableBody,
-  PartyFilter
+  PartyFilter,
 } from "@/components/parties"
 import { SortControls } from "@/components/ui"
 
@@ -50,7 +50,7 @@ export default function PartiesView({
   onPageChange,
   onSortChange,
   onOrderChange,
-  initialIsMobile
+  initialIsMobile,
 }: PartiesViewProps) {
   const { parties, meta, sort, order } = formState.data
 
@@ -62,7 +62,7 @@ export default function PartiesView({
     return new Date(date).toLocaleString("en-US", {
       year: "numeric",
       month: "short",
-      day: "numeric"
+      day: "numeric",
     })
   }
 
@@ -78,13 +78,15 @@ export default function PartiesView({
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
         onPageChange={onPageChange}
-        filter={<PartyFilter
-          dispatch={dispatchForm}
-          includeParties={false}
-          omit={["add"]}
-        />}
+        filter={
+          <PartyFilter
+            dispatch={dispatchForm}
+            includeParties={false}
+            omit={["add"]}
+          />
+        }
       >
-        { viewMode === "mobile" ? (
+        {viewMode === "mobile" ? (
           <PartiesMobile
             formState={formState}
             dispatchForm={dispatchForm}
@@ -97,17 +99,17 @@ export default function PartiesView({
           <>
             <Box sx={{ bgcolor: "#424242", borderRadius: 1 }}>
               <Table
-                sx={{ maxWidth: { xs: "400px", sm: "100%" }, tableLayout: "fixed" }}
+                sx={{
+                  maxWidth: { xs: "400px", sm: "100%" },
+                  tableLayout: "fixed",
+                }}
               >
                 <TableHeader
                   sort={sort}
                   order={order}
                   onSortChange={onSortChange}
                 />
-                <TableBody
-                  parties={ parties }
-                  formatDate={formatDate}
-                />
+                <TableBody parties={parties} formatDate={formatDate} />
               </Table>
             </Box>
           </>

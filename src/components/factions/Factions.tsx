@@ -32,7 +32,7 @@ export default function Factions({
   initialMeta,
   initialSort,
   initialOrder,
-  initialIsMobile
+  initialIsMobile,
 }: FactionsProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
@@ -46,7 +46,7 @@ export default function Factions({
     meta: initialMeta,
     drawerOpen: false,
     sort: initialSort,
-    order: initialOrder
+    order: initialOrder,
   })
   const { meta, sort, order, factions, drawerOpen } = formState.data
   const router = useRouter()
@@ -58,23 +58,30 @@ export default function Factions({
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
   const fetchFactions = useCallback(
-    async (page: number = 1, sort: string = "created_at", order: string = "desc") => {
+    async (
+      page: number = 1,
+      sort: string = "created_at",
+      order: string = "desc"
+    ) => {
       try {
         const response = await client.getFactions({ page, sort, order })
         console.log("Fetched factions:", response.data.factions)
         dispatchForm({
           type: FormActions.UPDATE,
           name: "factions",
-          value: response.data.factions
+          value: response.data.factions,
         })
         dispatchForm({
           type: FormActions.UPDATE,
           name: "meta",
-          value: response.data.meta || { current_page: page, total_pages: 1 }
+          value: response.data.meta || { current_page: page, total_pages: 1 },
         })
         dispatchForm({ type: FormActions.ERROR, payload: null })
       } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : "Unable to fetch factions data"
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Unable to fetch factions data"
         dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
         console.error("Fetch factions error:", error)
       }
@@ -100,11 +107,26 @@ export default function Factions({
         orderParameter && validOrders.includes(orderParameter as ValidOrder)
           ? orderParameter
           : "desc"
-      dispatchForm({ type: FormActions.UPDATE, name: "sort", value: currentSort })
-      dispatchForm({ type: FormActions.UPDATE, name: "order", value: currentOrder })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "sort",
+        value: currentSort,
+      })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "order",
+        value: currentOrder,
+      })
       fetchFactions(page, currentSort, currentOrder)
     }
-  }, [client, campaignData, dispatchForm, fetchFactions, validSorts, validOrders])
+  }, [
+    client,
+    campaignData,
+    dispatchForm,
+    fetchFactions,
+    validSorts,
+    validOrders,
+  ])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -118,7 +140,7 @@ export default function Factions({
     dispatchForm({
       type: FormActions.UPDATE,
       name: "factions",
-      value: [newFaction, ...factions]
+      value: [newFaction, ...factions],
     })
   }
 
@@ -126,7 +148,7 @@ export default function Factions({
     const newOrder = order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
     router.push(`/factions?page=1&sort=${sort}&order=${newOrder}`, {
-      scroll: false
+      scroll: false,
     })
     await fetchFactions(1, sort, newOrder)
   }
@@ -134,12 +156,12 @@ export default function Factions({
   const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
       router.push(`/factions?page=1&sort=${sort}&order=${order}`, {
-        scroll: false
+        scroll: false,
       })
       await fetchFactions(1, sort, order)
     } else {
       router.push(`/factions?page=${page}&sort=${sort}&order=${order}`, {
-        scroll: false
+        scroll: false,
       })
       await fetchFactions(page, sort, order)
     }
@@ -152,10 +174,10 @@ export default function Factions({
     const url = `/factions?${queryParams({
       page: 1,
       sort: newSort,
-      order: newOrder
+      order: newOrder,
     })}`
     router.push(url, {
-      scroll: false
+      scroll: false,
     })
     fetchFactions(1, newSort, newOrder)
   }
@@ -171,9 +193,17 @@ export default function Factions({
         handleSave={handleSave}
       />
       <Box
-        sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
       >
-        <MainHeader title="Factions" icon={<Icon keyword="Factions" size="36" />} />
+        <MainHeader
+          title="Factions"
+          icon={<Icon keyword="Factions" size="36" />}
+        />
       </Box>
       <View
         viewMode={viewMode}

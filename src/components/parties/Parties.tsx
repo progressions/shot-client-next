@@ -32,7 +32,7 @@ export default function Parties({
   initialMeta,
   initialSort,
   initialOrder,
-  initialIsMobile
+  initialIsMobile,
 }: PartiesProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
@@ -46,7 +46,7 @@ export default function Parties({
     meta: initialMeta,
     drawerOpen: false,
     sort: initialSort,
-    order: initialOrder
+    order: initialOrder,
   })
   const { meta, sort, order, parties, drawerOpen } = formState.data
   const router = useRouter()
@@ -58,23 +58,30 @@ export default function Parties({
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
   const fetchParties = useCallback(
-    async (page: number = 1, sort: string = "created_at", order: string = "desc") => {
+    async (
+      page: number = 1,
+      sort: string = "created_at",
+      order: string = "desc"
+    ) => {
       try {
         const response = await client.getParties({ page, sort, order })
         console.log("Fetched parties:", response.data.parties)
         dispatchForm({
           type: FormActions.UPDATE,
           name: "parties",
-          value: response.data.parties
+          value: response.data.parties,
         })
         dispatchForm({
           type: FormActions.UPDATE,
           name: "meta",
-          value: response.data.meta || { current_page: page, total_pages: 1 }
+          value: response.data.meta || { current_page: page, total_pages: 1 },
         })
         dispatchForm({ type: FormActions.ERROR, payload: null })
       } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : "Unable to fetch parties data"
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Unable to fetch parties data"
         dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
         console.error("Fetch parties error:", error)
       }
@@ -100,11 +107,26 @@ export default function Parties({
         orderParameter && validOrders.includes(orderParameter as ValidOrder)
           ? orderParameter
           : "desc"
-      dispatchForm({ type: FormActions.UPDATE, name: "sort", value: currentSort })
-      dispatchForm({ type: FormActions.UPDATE, name: "order", value: currentOrder })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "sort",
+        value: currentSort,
+      })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "order",
+        value: currentOrder,
+      })
       fetchParties(page, currentSort, currentOrder)
     }
-  }, [client, campaignData, dispatchForm, fetchParties, validSorts, validOrders])
+  }, [
+    client,
+    campaignData,
+    dispatchForm,
+    fetchParties,
+    validSorts,
+    validOrders,
+  ])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -118,7 +140,7 @@ export default function Parties({
     dispatchForm({
       type: FormActions.UPDATE,
       name: "parties",
-      value: [newParty, ...parties]
+      value: [newParty, ...parties],
     })
   }
 
@@ -126,7 +148,7 @@ export default function Parties({
     const newOrder = order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
     router.push(`/parties?page=1&sort=${sort}&order=${newOrder}`, {
-      scroll: false
+      scroll: false,
     })
     await fetchParties(1, sort, newOrder)
   }
@@ -134,12 +156,12 @@ export default function Parties({
   const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
       router.push(`/parties?page=1&sort=${sort}&order=${order}`, {
-        scroll: false
+        scroll: false,
       })
       await fetchParties(1, sort, order)
     } else {
       router.push(`/parties?page=${page}&sort=${sort}&order=${order}`, {
-        scroll: false
+        scroll: false,
       })
       await fetchParties(page, sort, order)
     }
@@ -152,10 +174,10 @@ export default function Parties({
     const url = `/parties?${queryParams({
       page: 1,
       sort: newSort,
-      order: newOrder
+      order: newOrder,
     })}`
     router.push(url, {
-      scroll: false
+      scroll: false,
     })
     fetchParties(1, newSort, newOrder)
   }
@@ -171,9 +193,17 @@ export default function Parties({
         handleSave={handleSave}
       />
       <Box
-        sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
       >
-        <MainHeader title="Parties" icon={<Icon keyword="Parties" size="36" />} />
+        <MainHeader
+          title="Parties"
+          icon={<Icon keyword="Parties" size="36" />}
+        />
       </Box>
       <View
         viewMode={viewMode}

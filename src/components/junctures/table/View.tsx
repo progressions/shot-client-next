@@ -5,7 +5,7 @@ import {
   JuncturesMobile,
   TableHeader,
   TableBody,
-  JunctureFilter
+  JunctureFilter,
 } from "@/components/junctures"
 import { SortControls } from "@/components/ui"
 
@@ -50,7 +50,7 @@ export default function JuncturesView({
   onPageChange,
   onSortChange,
   onOrderChange,
-  initialIsMobile
+  initialIsMobile,
 }: JuncturesViewProps) {
   const { junctures, meta, sort, order } = formState.data
 
@@ -62,7 +62,7 @@ export default function JuncturesView({
     return new Date(date).toLocaleString("en-US", {
       year: "numeric",
       month: "short",
-      day: "numeric"
+      day: "numeric",
     })
   }
 
@@ -78,13 +78,15 @@ export default function JuncturesView({
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
         onPageChange={onPageChange}
-        filter={<JunctureFilter
-          dispatch={dispatchForm}
-          includeJunctures={false}
-          omit={["add"]}
-        />}
+        filter={
+          <JunctureFilter
+            dispatch={dispatchForm}
+            includeJunctures={false}
+            omit={["add"]}
+          />
+        }
       >
-        { viewMode === "mobile" ? (
+        {viewMode === "mobile" ? (
           <JuncturesMobile
             formState={formState}
             dispatchForm={dispatchForm}
@@ -97,17 +99,17 @@ export default function JuncturesView({
           <>
             <Box sx={{ bgcolor: "#424242", borderRadius: 1 }}>
               <Table
-                sx={{ maxWidth: { xs: "400px", sm: "100%" }, tableLayout: "fixed" }}
+                sx={{
+                  maxWidth: { xs: "400px", sm: "100%" },
+                  tableLayout: "fixed",
+                }}
               >
                 <TableHeader
                   sort={sort}
                   order={order}
                   onSortChange={onSortChange}
                 />
-                <TableBody
-                  junctures={ junctures }
-                  formatDate={formatDate}
-                />
+                <TableBody junctures={junctures} formatDate={formatDate} />
               </Table>
             </Box>
           </>

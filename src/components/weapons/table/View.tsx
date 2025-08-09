@@ -5,7 +5,7 @@ import {
   WeaponsMobile,
   TableHeader,
   TableBody,
-  WeaponFilter
+  WeaponFilter,
 } from "@/components/weapons"
 import { SortControls } from "@/components/ui"
 
@@ -50,7 +50,7 @@ export default function WeaponsView({
   onPageChange,
   onSortChange,
   onOrderChange,
-  initialIsMobile
+  initialIsMobile,
 }: WeaponsViewProps) {
   const { weapons, meta, sort, order } = formState.data
 
@@ -62,7 +62,7 @@ export default function WeaponsView({
     return new Date(date).toLocaleString("en-US", {
       year: "numeric",
       month: "short",
-      day: "numeric"
+      day: "numeric",
     })
   }
 
@@ -77,13 +77,15 @@ export default function WeaponsView({
         totalPages={meta.total_pages}
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
-        filter={<WeaponFilter
-          dispatch={dispatchForm}
-          includeWeapons={false}
-          omit={["add"]}
-        />}
+        filter={
+          <WeaponFilter
+            dispatch={dispatchForm}
+            includeWeapons={false}
+            omit={["add"]}
+          />
+        }
       >
-        { viewMode === "mobile" ? (
+        {viewMode === "mobile" ? (
           <WeaponsMobile
             formState={formState}
             dispatchForm={dispatchForm}
@@ -96,17 +98,17 @@ export default function WeaponsView({
           <>
             <Box sx={{ bgcolor: "#424242", borderRadius: 1 }}>
               <Table
-                sx={{ maxWidth: { xs: "400px", sm: "100%" }, tableLayout: "fixed" }}
+                sx={{
+                  maxWidth: { xs: "400px", sm: "100%" },
+                  tableLayout: "fixed",
+                }}
               >
                 <TableHeader
                   sort={sort}
                   order={order}
                   onSortChange={onSortChange}
                 />
-                <TableBody
-                  weapons={ weapons }
-                  formatDate={formatDate}
-                />
+                <TableBody weapons={weapons} formatDate={formatDate} />
               </Table>
             </Box>
           </>

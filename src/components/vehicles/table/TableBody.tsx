@@ -2,7 +2,6 @@
 import { TableBody, TableCell, TableRow } from "@mui/material"
 import Link from "next/link"
 import { VehicleName } from "@/components/vehicles"
-import { VS } from "@/services"
 import type { Vehicle } from "@/types"
 
 interface VehiclesTableBodyProps {

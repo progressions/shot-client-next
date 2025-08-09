@@ -1,6 +1,5 @@
 "use client"
 import { Stack, Typography } from "@mui/material"
-import type { SelectChangeEvent } from "@mui/material"
 import { FactionDetail } from "@/components/factions"
 import { useToast } from "@/contexts"
 
@@ -22,15 +21,13 @@ export default function FactionsMobile({ formState }: FactionsMobileProps) {
 
   return (
     <Stack spacing={2}>
-      { factions.length === 0 && (
-        <Typography sx={{ color: "#fff" }}>
-          No factions available
-        </Typography>
+      {factions.length === 0 && (
+        <Typography sx={{ color: "#fff" }}>No factions available</Typography>
       )}
-      { factions.map(faction => (
+      {factions.map(faction => (
         <FactionDetail
-          faction={ faction }
-          key={ faction.id }
+          faction={faction}
+          key={faction.id}
           onDelete={handleDelete}
         />
       ))}

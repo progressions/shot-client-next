@@ -13,7 +13,7 @@ type ValidOrder = "asc" | "desc"
 export default function WeaponsTableHeader({
   sort,
   order,
-  onSortChange
+  onSortChange,
 }: WeaponsTableHeaderProps) {
   return (
     <TableHead>
@@ -23,7 +23,11 @@ export default function WeaponsTableHeader({
             active={sort === "name"}
             direction={sort === "name" ? (order as ValidOrder) : "asc"}
             onClick={() => onSortChange("name")}
-            sx={{ color: "#ffffff", "&.Mui-active": { color: "#ffffff" }, "& .MuiTableSortLabel-icon": { color: "#ffffff !important" } }}
+            sx={{
+              color: "#ffffff",
+              "&.Mui-active": { color: "#ffffff" },
+              "& .MuiTableSortLabel-icon": { color: "#ffffff !important" },
+            }}
           >
             Name
           </TableSortLabel>
@@ -35,13 +39,22 @@ export default function WeaponsTableHeader({
             active={sort === "created_at"}
             direction={sort === "created_at" ? (order as ValidOrder) : "asc"}
             onClick={() => onSortChange("created_at")}
-            sx={{ color: "#ffffff", "&.Mui-active": { color: "#ffffff" }, "& .MuiTableSortLabel-icon": { color: "#ffffff !important" } }}
+            sx={{
+              color: "#ffffff",
+              "&.Mui-active": { color: "#ffffff" },
+              "& .MuiTableSortLabel-icon": { color: "#ffffff !important" },
+            }}
           >
             Created
           </TableSortLabel>
         </TableCell>
         <TableCell
-          sx={{ color: "#ffffff", width: { xs: "60px", sm: "100px" }, textAlign: "center", padding: { xs: "8px 4px", sm: "16px 8px" } }}
+          sx={{
+            color: "#ffffff",
+            width: { xs: "60px", sm: "100px" },
+            textAlign: "center",
+            padding: { xs: "8px 4px", sm: "16px 8px" },
+          }}
         >
           Active
         </TableCell>

@@ -1,6 +1,5 @@
 "use client"
 import { Stack, Typography } from "@mui/material"
-import type { SelectChangeEvent } from "@mui/material"
 import { JunctureDetail } from "@/components/junctures"
 import { useToast } from "@/contexts"
 
@@ -22,15 +21,13 @@ export default function JuncturesMobile({ formState }: JuncturesMobileProps) {
 
   return (
     <Stack spacing={2}>
-      { junctures.length === 0 && (
-        <Typography sx={{ color: "#fff" }}>
-          No junctures available
-        </Typography>
+      {junctures.length === 0 && (
+        <Typography sx={{ color: "#fff" }}>No junctures available</Typography>
       )}
-      { junctures.map(juncture => (
+      {junctures.map(juncture => (
         <JunctureDetail
-          juncture={ juncture }
-          key={ juncture.id }
+          juncture={juncture}
+          key={juncture.id}
           onDelete={handleDelete}
         />
       ))}

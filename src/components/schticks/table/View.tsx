@@ -5,7 +5,7 @@ import {
   SchticksMobile,
   TableHeader,
   TableBody,
-  SchtickFilter
+  SchtickFilter,
 } from "@/components/schticks"
 import { SortControls } from "@/components/ui"
 
@@ -50,7 +50,7 @@ export default function SchticksView({
   onPageChange,
   onSortChange,
   onOrderChange,
-  initialIsMobile
+  initialIsMobile,
 }: SchticksViewProps) {
   const { schticks, meta, sort, order } = formState.data
 
@@ -62,7 +62,7 @@ export default function SchticksView({
     return new Date(date).toLocaleString("en-US", {
       year: "numeric",
       month: "short",
-      day: "numeric"
+      day: "numeric",
     })
   }
 
@@ -78,13 +78,15 @@ export default function SchticksView({
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
         onPageChange={onPageChange}
-        filter={<SchtickFilter
-          dispatch={dispatchForm}
-          includeSchticks={false}
-          omit={["add"]}
-        />}
+        filter={
+          <SchtickFilter
+            dispatch={dispatchForm}
+            includeSchticks={false}
+            omit={["add"]}
+          />
+        }
       >
-        { viewMode === "mobile" ? (
+        {viewMode === "mobile" ? (
           <SchticksMobile
             formState={formState}
             dispatchForm={dispatchForm}
@@ -97,17 +99,17 @@ export default function SchticksView({
           <>
             <Box sx={{ bgcolor: "#424242", borderRadius: 1 }}>
               <Table
-                sx={{ maxWidth: { xs: "400px", sm: "100%" }, tableLayout: "fixed" }}
+                sx={{
+                  maxWidth: { xs: "400px", sm: "100%" },
+                  tableLayout: "fixed",
+                }}
               >
                 <TableHeader
                   sort={sort}
                   order={order}
                   onSortChange={onSortChange}
                 />
-                <TableBody
-                  schticks={ schticks }
-                  formatDate={formatDate}
-                />
+                <TableBody schticks={schticks} formatDate={formatDate} />
               </Table>
             </Box>
           </>

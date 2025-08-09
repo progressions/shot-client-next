@@ -32,7 +32,7 @@ export default function Weapons({
   initialMeta,
   initialSort,
   initialOrder,
-  initialIsMobile
+  initialIsMobile,
 }: WeaponsProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
@@ -46,7 +46,7 @@ export default function Weapons({
     meta: initialMeta,
     drawerOpen: false,
     sort: initialSort,
-    order: initialOrder
+    order: initialOrder,
   })
   const { meta, sort, order, weapons, drawerOpen } = formState.data
   const router = useRouter()
@@ -58,23 +58,30 @@ export default function Weapons({
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
   const fetchWeapons = useCallback(
-    async (page: number = 1, sort: string = "created_at", order: string = "desc") => {
+    async (
+      page: number = 1,
+      sort: string = "created_at",
+      order: string = "desc"
+    ) => {
       try {
         const response = await client.getWeapons({ page, sort, order })
         console.log("Fetched weapons:", response.data.weapons)
         dispatchForm({
           type: FormActions.UPDATE,
           name: "weapons",
-          value: response.data.weapons
+          value: response.data.weapons,
         })
         dispatchForm({
           type: FormActions.UPDATE,
           name: "meta",
-          value: response.data.meta || { current_page: page, total_pages: 1 }
+          value: response.data.meta || { current_page: page, total_pages: 1 },
         })
         dispatchForm({ type: FormActions.ERROR, payload: null })
       } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : "Unable to fetch weapons data"
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Unable to fetch weapons data"
         dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
         console.error("Fetch weapons error:", error)
       }
@@ -100,11 +107,26 @@ export default function Weapons({
         orderParameter && validOrders.includes(orderParameter as ValidOrder)
           ? orderParameter
           : "desc"
-      dispatchForm({ type: FormActions.UPDATE, name: "sort", value: currentSort })
-      dispatchForm({ type: FormActions.UPDATE, name: "order", value: currentOrder })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "sort",
+        value: currentSort,
+      })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "order",
+        value: currentOrder,
+      })
       fetchWeapons(page, currentSort, currentOrder)
     }
-  }, [client, campaignData, dispatchForm, fetchWeapons, validSorts, validOrders])
+  }, [
+    client,
+    campaignData,
+    dispatchForm,
+    fetchWeapons,
+    validSorts,
+    validOrders,
+  ])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -118,7 +140,7 @@ export default function Weapons({
     dispatchForm({
       type: FormActions.UPDATE,
       name: "weapons",
-      value: [newWeapon, ...weapons]
+      value: [newWeapon, ...weapons],
     })
   }
 
@@ -126,7 +148,7 @@ export default function Weapons({
     const newOrder = order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
     router.push(`/weapons?page=1&sort=${sort}&order=${newOrder}`, {
-      scroll: false
+      scroll: false,
     })
     await fetchWeapons(1, sort, newOrder)
   }
@@ -134,12 +156,12 @@ export default function Weapons({
   const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
       router.push(`/weapons?page=1&sort=${sort}&order=${order}`, {
-        scroll: false
+        scroll: false,
       })
       await fetchWeapons(1, sort, order)
     } else {
       router.push(`/weapons?page=${page}&sort=${sort}&order=${order}`, {
-        scroll: false
+        scroll: false,
       })
       await fetchWeapons(page, sort, order)
     }
@@ -152,10 +174,10 @@ export default function Weapons({
     const url = `/weapons?${queryParams({
       page: 1,
       sort: newSort,
-      order: newOrder
+      order: newOrder,
     })}`
     router.push(url, {
-      scroll: false
+      scroll: false,
     })
     fetchWeapons(1, newSort, newOrder)
   }
@@ -171,9 +193,17 @@ export default function Weapons({
         handleSave={handleSave}
       />
       <Box
-        sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
       >
-        <MainHeader title="Weapons" icon={<Icon keyword="Weapons" size="36" />} />
+        <MainHeader
+          title="Weapons"
+          icon={<Icon keyword="Weapons" size="36" />}
+        />
       </Box>
       <View
         viewMode={viewMode}

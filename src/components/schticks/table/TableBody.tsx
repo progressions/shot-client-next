@@ -11,11 +11,11 @@ interface SchticksTableBodyProps {
 
 export default function SchticksTableBody({
   schticks,
-  formatDate
+  formatDate,
 }: SchticksTableBodyProps) {
   return (
     <TableBody>
-      { schticks.length === 0 ? (
+      {schticks.length === 0 ? (
         <TableRow>
           <TableCell colSpan={4} sx={{ color: "#ffffff" }}>
             No schticks available
@@ -23,29 +23,36 @@ export default function SchticksTableBody({
         </TableRow>
       ) : (
         schticks.map(schtick => (
-          <TableRow
-            key={ schtick.id }
-            sx={{ "&:hover": { bgcolor: "#616161" } }}
-          >
+          <TableRow key={schtick.id} sx={{ "&:hover": { bgcolor: "#616161" } }}>
             <TableCell
-              sx={{ color: "#ffffff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+              sx={{
+                color: "#ffffff",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
             >
               <Link
-                href={`/schticks/${ schtick.id}` }
+                href={`/schticks/${schtick.id}`}
                 style={{ color: "#ffffff", textDecoration: "underline" }}
               >
-                <SchtickName schtick={ schtick } />
+                <SchtickName schtick={schtick} />
               </Link>
             </TableCell>
             <TableCell
               sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}
             >
-              { formatDate(schtick.created_at || "") }
+              {formatDate(schtick.created_at || "")}
             </TableCell>
             <TableCell
-              sx={{ color: "#ffffff", width: { xs: "60px", sm: "100px" }, textAlign: "center", padding: { xs: "8px 4px", sm: "16px 8px" } }}
+              sx={{
+                color: "#ffffff",
+                width: { xs: "60px", sm: "100px" },
+                textAlign: "center",
+                padding: { xs: "8px 4px", sm: "16px 8px" },
+              }}
             >
-              { schtick.active ? "Yes" : "No" }
+              {schtick.active ? "Yes" : "No"}
             </TableCell>
           </TableRow>
         ))

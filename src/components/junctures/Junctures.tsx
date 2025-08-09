@@ -32,7 +32,7 @@ export default function Junctures({
   initialMeta,
   initialSort,
   initialOrder,
-  initialIsMobile
+  initialIsMobile,
 }: JuncturesProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
@@ -46,7 +46,7 @@ export default function Junctures({
     meta: initialMeta,
     drawerOpen: false,
     sort: initialSort,
-    order: initialOrder
+    order: initialOrder,
   })
   const { meta, sort, order, junctures, drawerOpen } = formState.data
   const router = useRouter()
@@ -58,23 +58,30 @@ export default function Junctures({
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
   const fetchJunctures = useCallback(
-    async (page: number = 1, sort: string = "created_at", order: string = "desc") => {
+    async (
+      page: number = 1,
+      sort: string = "created_at",
+      order: string = "desc"
+    ) => {
       try {
         const response = await client.getJunctures({ page, sort, order })
         console.log("Fetched junctures:", response.data.junctures)
         dispatchForm({
           type: FormActions.UPDATE,
           name: "junctures",
-          value: response.data.junctures
+          value: response.data.junctures,
         })
         dispatchForm({
           type: FormActions.UPDATE,
           name: "meta",
-          value: response.data.meta || { current_page: page, total_pages: 1 }
+          value: response.data.meta || { current_page: page, total_pages: 1 },
         })
         dispatchForm({ type: FormActions.ERROR, payload: null })
       } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : "Unable to fetch junctures data"
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Unable to fetch junctures data"
         dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
         console.error("Fetch junctures error:", error)
       }
@@ -100,11 +107,26 @@ export default function Junctures({
         orderParameter && validOrders.includes(orderParameter as ValidOrder)
           ? orderParameter
           : "desc"
-      dispatchForm({ type: FormActions.UPDATE, name: "sort", value: currentSort })
-      dispatchForm({ type: FormActions.UPDATE, name: "order", value: currentOrder })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "sort",
+        value: currentSort,
+      })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "order",
+        value: currentOrder,
+      })
       fetchJunctures(page, currentSort, currentOrder)
     }
-  }, [client, campaignData, dispatchForm, fetchJunctures, validSorts, validOrders])
+  }, [
+    client,
+    campaignData,
+    dispatchForm,
+    fetchJunctures,
+    validSorts,
+    validOrders,
+  ])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -118,7 +140,7 @@ export default function Junctures({
     dispatchForm({
       type: FormActions.UPDATE,
       name: "junctures",
-      value: [newJuncture, ...junctures]
+      value: [newJuncture, ...junctures],
     })
   }
 
@@ -126,7 +148,7 @@ export default function Junctures({
     const newOrder = order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
     router.push(`/junctures?page=1&sort=${sort}&order=${newOrder}`, {
-      scroll: false
+      scroll: false,
     })
     await fetchJunctures(1, sort, newOrder)
   }
@@ -134,12 +156,12 @@ export default function Junctures({
   const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
       router.push(`/junctures?page=1&sort=${sort}&order=${order}`, {
-        scroll: false
+        scroll: false,
       })
       await fetchJunctures(1, sort, order)
     } else {
       router.push(`/junctures?page=${page}&sort=${sort}&order=${order}`, {
-        scroll: false
+        scroll: false,
       })
       await fetchJunctures(page, sort, order)
     }
@@ -152,10 +174,10 @@ export default function Junctures({
     const url = `/junctures?${queryParams({
       page: 1,
       sort: newSort,
-      order: newOrder
+      order: newOrder,
     })}`
     router.push(url, {
-      scroll: false
+      scroll: false,
     })
     fetchJunctures(1, newSort, newOrder)
   }
@@ -171,9 +193,17 @@ export default function Junctures({
         handleSave={handleSave}
       />
       <Box
-        sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
       >
-        <MainHeader title="Junctures" icon={<Icon keyword="Junctures" size="36" />} />
+        <MainHeader
+          title="Junctures"
+          icon={<Icon keyword="Junctures" size="36" />}
+        />
       </Box>
       <View
         viewMode={viewMode}

@@ -11,11 +11,11 @@ interface FactionsTableBodyProps {
 
 export default function FactionsTableBody({
   factions,
-  formatDate
+  formatDate,
 }: FactionsTableBodyProps) {
   return (
     <TableBody>
-      { factions.length === 0 ? (
+      {factions.length === 0 ? (
         <TableRow>
           <TableCell colSpan={4} sx={{ color: "#ffffff" }}>
             No factions available
@@ -23,29 +23,36 @@ export default function FactionsTableBody({
         </TableRow>
       ) : (
         factions.map(faction => (
-          <TableRow
-            key={ faction.id }
-            sx={{ "&:hover": { bgcolor: "#616161" } }}
-          >
+          <TableRow key={faction.id} sx={{ "&:hover": { bgcolor: "#616161" } }}>
             <TableCell
-              sx={{ color: "#ffffff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+              sx={{
+                color: "#ffffff",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
             >
               <Link
-                href={`/factions/${ faction.id}` }
+                href={`/factions/${faction.id}`}
                 style={{ color: "#ffffff", textDecoration: "underline" }}
               >
-                <FactionName faction={ faction } />
+                <FactionName faction={faction} />
               </Link>
             </TableCell>
             <TableCell
               sx={{ color: "#ffffff", width: { xs: "65px", sm: "150px" } }}
             >
-              { formatDate(faction.created_at || "") }
+              {formatDate(faction.created_at || "")}
             </TableCell>
             <TableCell
-              sx={{ color: "#ffffff", width: { xs: "60px", sm: "100px" }, textAlign: "center", padding: { xs: "8px 4px", sm: "16px 8px" } }}
+              sx={{
+                color: "#ffffff",
+                width: { xs: "60px", sm: "100px" },
+                textAlign: "center",
+                padding: { xs: "8px 4px", sm: "16px 8px" },
+              }}
             >
-              { faction.active ? "Yes" : "No" }
+              {faction.active ? "Yes" : "No"}
             </TableCell>
           </TableRow>
         ))

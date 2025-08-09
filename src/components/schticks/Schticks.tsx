@@ -32,7 +32,7 @@ export default function Schticks({
   initialMeta,
   initialSort,
   initialOrder,
-  initialIsMobile
+  initialIsMobile,
 }: SchticksProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
@@ -46,7 +46,7 @@ export default function Schticks({
     meta: initialMeta,
     drawerOpen: false,
     sort: initialSort,
-    order: initialOrder
+    order: initialOrder,
   })
   const { meta, sort, order, schticks, drawerOpen } = formState.data
   const router = useRouter()
@@ -58,23 +58,30 @@ export default function Schticks({
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
   const fetchSchticks = useCallback(
-    async (page: number = 1, sort: string = "created_at", order: string = "desc") => {
+    async (
+      page: number = 1,
+      sort: string = "created_at",
+      order: string = "desc"
+    ) => {
       try {
         const response = await client.getSchticks({ page, sort, order })
         console.log("Fetched schticks:", response.data.schticks)
         dispatchForm({
           type: FormActions.UPDATE,
           name: "schticks",
-          value: response.data.schticks
+          value: response.data.schticks,
         })
         dispatchForm({
           type: FormActions.UPDATE,
           name: "meta",
-          value: response.data.meta || { current_page: page, total_pages: 1 }
+          value: response.data.meta || { current_page: page, total_pages: 1 },
         })
         dispatchForm({ type: FormActions.ERROR, payload: null })
       } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : "Unable to fetch schticks data"
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Unable to fetch schticks data"
         dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
         console.error("Fetch schticks error:", error)
       }
@@ -100,11 +107,26 @@ export default function Schticks({
         orderParameter && validOrders.includes(orderParameter as ValidOrder)
           ? orderParameter
           : "desc"
-      dispatchForm({ type: FormActions.UPDATE, name: "sort", value: currentSort })
-      dispatchForm({ type: FormActions.UPDATE, name: "order", value: currentOrder })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "sort",
+        value: currentSort,
+      })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "order",
+        value: currentOrder,
+      })
       fetchSchticks(page, currentSort, currentOrder)
     }
-  }, [client, campaignData, dispatchForm, fetchSchticks, validSorts, validOrders])
+  }, [
+    client,
+    campaignData,
+    dispatchForm,
+    fetchSchticks,
+    validSorts,
+    validOrders,
+  ])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -118,7 +140,7 @@ export default function Schticks({
     dispatchForm({
       type: FormActions.UPDATE,
       name: "schticks",
-      value: [newSchtick, ...schticks]
+      value: [newSchtick, ...schticks],
     })
   }
 
@@ -126,7 +148,7 @@ export default function Schticks({
     const newOrder = order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
     router.push(`/schticks?page=1&sort=${sort}&order=${newOrder}`, {
-      scroll: false
+      scroll: false,
     })
     await fetchSchticks(1, sort, newOrder)
   }
@@ -134,12 +156,12 @@ export default function Schticks({
   const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
       router.push(`/schticks?page=1&sort=${sort}&order=${order}`, {
-        scroll: false
+        scroll: false,
       })
       await fetchSchticks(1, sort, order)
     } else {
       router.push(`/schticks?page=${page}&sort=${sort}&order=${order}`, {
-        scroll: false
+        scroll: false,
       })
       await fetchSchticks(page, sort, order)
     }
@@ -152,10 +174,10 @@ export default function Schticks({
     const url = `/schticks?${queryParams({
       page: 1,
       sort: newSort,
-      order: newOrder
+      order: newOrder,
     })}`
     router.push(url, {
-      scroll: false
+      scroll: false,
     })
     fetchSchticks(1, newSort, newOrder)
   }
@@ -171,9 +193,17 @@ export default function Schticks({
         handleSave={handleSave}
       />
       <Box
-        sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
       >
-        <MainHeader title="Schticks" icon={<Icon keyword="Schticks" size="36" />} />
+        <MainHeader
+          title="Schticks"
+          icon={<Icon keyword="Schticks" size="36" />}
+        />
       </Box>
       <View
         viewMode={viewMode}

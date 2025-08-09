@@ -4,7 +4,6 @@ import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
 import {
-  InfoLink,
   HeroImage,
   TextField,
   SaveButton,
@@ -119,7 +118,11 @@ export default function PartyForm({
       <Box
         component="form"
         onSubmit={handleSubmit}
-        sx={{ width: isMobile ? "100%" : "30rem", height: isMobile ? "auto" : "100%", p: isMobile ? "1rem" : "2rem",  }}
+        sx={{
+          width: isMobile ? "100%" : "30rem",
+          height: isMobile ? "auto" : "100%",
+          p: isMobile ? "1rem" : "2rem",
+        }}
       >
         <Typography variant="h5" sx={{ mb: 2, color: "#ffffff" }}>
           {title}
@@ -129,9 +132,7 @@ export default function PartyForm({
             {error}
           </Alert>
         )}
-        <Typography>
-          Describe this thing.
-        </Typography>
+        <Typography>Describe this thing.</Typography>
         <TextField
           label="Name"
           value={name}

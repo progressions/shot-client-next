@@ -32,7 +32,9 @@ export default function JuncturePageClient({
   juncture: initialJuncture,
 }: JuncturePageClientProperties) {
   const { campaignData } = useCampaign()
-  const { formState, dispatchForm } = useForm<FormStateData>({ entity: initialJuncture })
+  const { formState, dispatchForm } = useForm<FormStateData>({
+    entity: initialJuncture,
+  })
   const juncture = formState.data.entity
 
   const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
