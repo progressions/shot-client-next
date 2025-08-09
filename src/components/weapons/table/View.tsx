@@ -77,13 +77,6 @@ export default function WeaponsView({
         totalPages={meta.total_pages}
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
-        filter={
-          <WeaponFilter
-            dispatch={dispatchForm}
-            includeWeapons={false}
-            omit={["add"]}
-          />
-        }
       >
         {viewMode === "mobile" ? (
           <WeaponsMobile

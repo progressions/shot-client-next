@@ -78,13 +78,6 @@ export default function SitesView({
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
         onPageChange={onPageChange}
-        filter={
-          <SiteFilter
-            dispatch={dispatchForm}
-            includeSites={false}
-            omit={["add"]}
-          />
-        }
       >
         {viewMode === "mobile" ? (
           <SitesMobile

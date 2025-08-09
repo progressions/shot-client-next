@@ -78,13 +78,6 @@ export default function JuncturesView({
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
         onPageChange={onPageChange}
-        filter={
-          <JunctureFilter
-            dispatch={dispatchForm}
-            includeJunctures={false}
-            omit={["add"]}
-          />
-        }
       >
         {viewMode === "mobile" ? (
           <JuncturesMobile

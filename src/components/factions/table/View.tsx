@@ -78,13 +78,6 @@ export default function FactionsView({
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
         onPageChange={onPageChange}
-        filter={
-          <FactionFilter
-            dispatch={dispatchForm}
-            includeFactions={false}
-            omit={["add"]}
-          />
-        }
       >
         {viewMode === "mobile" ? (
           <FactionsMobile

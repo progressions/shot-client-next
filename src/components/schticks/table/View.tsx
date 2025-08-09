@@ -78,13 +78,6 @@ export default function SchticksView({
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
         onPageChange={onPageChange}
-        filter={
-          <SchtickFilter
-            dispatch={dispatchForm}
-            includeSchticks={false}
-            omit={["add"]}
-          />
-        }
       >
         {viewMode === "mobile" ? (
           <SchticksMobile

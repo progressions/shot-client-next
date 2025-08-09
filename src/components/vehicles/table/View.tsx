@@ -78,13 +78,6 @@ export default function VehiclesView({
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
         onPageChange={onPageChange}
-        filter={
-          <VehicleFilter
-            dispatch={dispatchForm}
-            includeVehicles={false}
-            omit={["add"]}
-          />
-        }
       >
         {viewMode === "mobile" ? (
           <VehiclesMobile

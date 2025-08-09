@@ -78,13 +78,6 @@ export default function PartiesView({
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
         onPageChange={onPageChange}
-        filter={
-          <PartyFilter
-            dispatch={dispatchForm}
-            includeParties={false}
-            omit={["add"]}
-          />
-        }
       >
         {viewMode === "mobile" ? (
           <PartiesMobile

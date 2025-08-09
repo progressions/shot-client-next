@@ -60,13 +60,6 @@ export default function FightsControls({
           sort={sort}
           order={order}
           showFilter={showFilter}
-          filter={
-            <FightFilter
-              dispatch={dispatchForm}
-              includeFights={false}
-              omit={["add"]}
-            />
-          }
         >
           {children}
         </SortControls>
