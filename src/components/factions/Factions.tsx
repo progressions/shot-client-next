@@ -1,45 +1,30 @@
 "use client"
-
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import {
-  Pagination,
-  Box,
-  Button,
-  Typography,
-  Alert,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Stack,
-  IconButton,
-  Tooltip,
-} from "@mui/material"
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp"
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
-import {
-  FactionDetail,
-  CreateFactionForm,
-  EditFactionForm,
-} from "@/components/factions"
+import { Box } from "@mui/material"
+import { View, Menu } from "@/components/factions"
 import type { Faction, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
-import { useCampaign, useClient } from "@/contexts"
-import type { SelectChangeEvent } from "@mui/material"
+import { useLocalStorage, useCampaign, useClient } from "@/contexts"
+import { queryParams } from "@/lib"
+import { Icon, MainHeader } from "@/components/ui"
 
 interface FactionsProperties {
   initialFactions: Faction[]
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
+  initialIsMobile?: boolean
 }
 
+type ValidSort = "created_at" | "updated_at" | "name"
+type ValidOrder = "asc" | "desc"
 type FormStateData = {
   factions: Faction[]
   meta: PaginationMeta
   drawerOpen: boolean
-  error: string | null
+  sort: string
+  order: string
 }
 
 export default function Factions({
@@ -47,58 +32,51 @@ export default function Factions({
   initialMeta,
   initialSort,
   initialOrder,
+  initialIsMobile
 }: FactionsProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
+  const { getLocally } = useLocalStorage()
+  const [viewMode, setViewMode] = useState<"table" | "mobile">(
+    (getLocally("factionViewMode") as "table" | "mobile") ||
+      (initialIsMobile ? "mobile" : "table")
+  )
   const { formState, dispatchForm } = useForm<FormStateData>({
     factions: initialFactions,
     meta: initialMeta,
     drawerOpen: false,
-    error: null,
+    sort: initialSort,
+    order: initialOrder
   })
-  const { meta, factions, drawerOpen, error } = formState.data
-  const [selectedFaction, setSelectedFaction] = useState<Faction | null>(null)
-  const [sort, setSort] = useState<string>(initialSort)
-  const [order, setOrder] = useState<string>(initialOrder)
+  const { meta, sort, order, factions, drawerOpen } = formState.data
   const router = useRouter()
 
-  type ValidSort = "created_at" | "updated_at" | "name"
   const validSorts: readonly ValidSort[] = useMemo(
     () => ["created_at", "updated_at", "name"],
     []
   )
-  type ValidOrder = "asc" | "desc"
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
   const fetchFactions = useCallback(
-    async (
-      page: number = 1,
-      sort: string = "created_at",
-      order: string = "desc"
-    ) => {
+    async (page: number = 1, sort: string = "created_at", order: string = "desc") => {
       try {
         const response = await client.getFactions({ page, sort, order })
         console.log("Fetched factions:", response.data.factions)
         dispatchForm({
           type: FormActions.UPDATE,
           name: "factions",
-          value: response.data.factions,
+          value: response.data.factions
         })
         dispatchForm({
           type: FormActions.UPDATE,
           name: "meta",
-          value: response.data.meta,
+          value: response.data.meta || { current_page: page, total_pages: 1 }
         })
         dispatchForm({ type: FormActions.ERROR, payload: null })
-      } catch (error_: unknown) {
-        dispatchForm({
-          type: FormActions.ERROR,
-          payload:
-            error_ instanceof Error
-              ? error_.message
-              : "Failed to fetch factions",
-        })
-        console.error("Fetch factions error:", error_)
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unable to fetch factions data"
+        dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
+        console.error("Fetch factions error:", error)
       }
     },
     [client, dispatchForm]
@@ -122,18 +100,11 @@ export default function Factions({
         orderParameter && validOrders.includes(orderParameter as ValidOrder)
           ? orderParameter
           : "desc"
-      setSort(currentSort)
-      setOrder(currentOrder)
+      dispatchForm({ type: FormActions.UPDATE, name: "sort", value: currentSort })
+      dispatchForm({ type: FormActions.UPDATE, name: "order", value: currentOrder })
       fetchFactions(page, currentSort, currentOrder)
     }
-  }, [
-    client,
-    campaignData,
-    dispatchForm,
-    fetchFactions,
-    validSorts,
-    validOrders,
-  ])
+  }, [client, campaignData, dispatchForm, fetchFactions, validSorts, validOrders])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -143,210 +114,76 @@ export default function Factions({
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: false })
   }
 
-  const handleSaveFaction = async (newFaction: Faction) => {
+  const handleSave = async (newFaction: Faction) => {
     dispatchForm({
       type: FormActions.UPDATE,
       name: "factions",
-      value: [newFaction, ...factions],
+      value: [newFaction, ...factions]
     })
   }
 
-  const handleDeleteFaction = (factionId: string) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "factions",
-      value: factions.filter(faction => faction.id !== factionId),
+  const handleOrderChange = async () => {
+    const newOrder = order === "asc" ? "desc" : "asc"
+    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
+    router.push(`/factions?page=1&sort=${sort}&order=${newOrder}`, {
+      scroll: false
     })
-    if (selectedFaction?.id === factionId) setSelectedFaction(null)
-    router.refresh()
+    await fetchFactions(1, sort, newOrder)
   }
 
-  const handleEditFaction = (faction: Faction) => {
-    setSelectedFaction(faction)
-  }
-
-  const handleCloseEditFaction = () => {
-    setSelectedFaction(null)
-  }
-
-  const handleSaveEditFaction = (updatedFaction: Faction) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "factions",
-      value: factions.map(f =>
-        f.id === updatedFaction.id ? updatedFaction : f
-      ),
-    })
-    setSelectedFaction(null)
-  }
-
-  const handlePageChange = async (
-    _event: React.ChangeEvent<unknown>,
-    page: number
-  ) => {
+  const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
       router.push(`/factions?page=1&sort=${sort}&order=${order}`, {
-        scroll: false,
+        scroll: false
       })
       await fetchFactions(1, sort, order)
     } else {
       router.push(`/factions?page=${page}&sort=${sort}&order=${order}`, {
-        scroll: false,
+        scroll: false
       })
       await fetchFactions(page, sort, order)
     }
   }
 
-  const handleSortChange = (event: SelectChangeEvent<string>) => {
-    const newSort = event.target.value as ValidSort
-    if (validSorts.includes(newSort)) {
-      setSort(newSort)
-      // Perform async operations
-      router.push(`/factions?page=1&sort=${newSort}&order=${order}`, {
-        scroll: false,
-      })
-      fetchFactions(1, newSort, order)
-    }
-  }
-
-  const handleOrderChange = async () => {
-    const newOrder = order === "asc" ? "desc" : "asc"
-    setOrder(newOrder)
-    router.push(`/factions?page=1&sort=${sort}&order=${newOrder}`, {
-      scroll: false,
+  const handleSortChange = (newSort: ValidSort) => {
+    const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
+    dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
+    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
+    const url = `/factions?${queryParams({
+      page: 1,
+      sort: newSort,
+      order: newOrder
+    })}`
+    router.push(url, {
+      scroll: false
     })
-    await fetchFactions(1, sort, newOrder)
+    fetchFactions(1, newSort, newOrder)
   }
 
   return (
-    <Box>
-      <Stack spacing={2} sx={{ mb: 4 }}>
-        <Typography
-          variant="h4"
-          sx={{
-            color: "#ffffff",
-            fontSize: { xs: "1.5rem", sm: "2.125rem" },
-          }}
-        >
-          Factions
-        </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            gap: { xs: 1, sm: 1.5 },
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              gap: 1,
-              alignItems: "center",
-            }}
-          >
-            <FormControl sx={{ minWidth: { xs: 80, sm: 100 } }}>
-              <InputLabel id="sort-label" sx={{ color: "#ffffff" }}>
-                Sort By
-              </InputLabel>
-              <Select
-                labelId="sort-label"
-                value={sort}
-                label="Sort By"
-                onChange={handleSortChange}
-                sx={{
-                  color: "#ffffff",
-                  "& .MuiSvgIcon-root": { color: "#ffffff" },
-                }}
-              >
-                <MenuItem value="created_at">Created At</MenuItem>
-                <MenuItem value="updated_at">Updated At</MenuItem>
-                <MenuItem value="name">Name</MenuItem>
-              </Select>
-            </FormControl>
-            <Tooltip
-              title={order === "asc" ? "Sort Ascending" : "Sort Descending"}
-            >
-              <IconButton
-                onClick={handleOrderChange}
-                sx={{ color: "#ffffff" }}
-                aria-label={
-                  order === "asc" ? "sort ascending" : "sort descending"
-                }
-              >
-                {order === "asc" ? (
-                  <KeyboardArrowUpIcon />
-                ) : (
-                  <KeyboardArrowDownIcon />
-                )}
-              </IconButton>
-            </Tooltip>
-          </Box>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenCreateDrawer}
-            sx={{ px: 2 }}
-            aria-label="create new faction"
-          >
-            New
-          </Button>
-        </Box>
-      </Stack>
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-      <Pagination
-        count={meta.total_pages}
-        page={meta.current_page}
-        onChange={handlePageChange}
-        variant="outlined"
-        color="primary"
-        shape="rounded"
-        size="large"
+    <>
+      <Menu
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        drawerOpen={drawerOpen}
+        handleOpenCreateDrawer={handleOpenCreateDrawer}
+        handleCloseCreateDrawer={handleCloseCreateDrawer}
+        handleSave={handleSave}
       />
-      <Box my={2}>
-        {factions.length === 0 ? (
-          <Typography variant="body1" sx={{ color: "#ffffff" }}>
-            No factions available
-          </Typography>
-        ) : (
-          factions.map(faction => (
-            <FactionDetail
-              key={faction.id}
-              faction={faction}
-              onDelete={handleDeleteFaction}
-              onEdit={handleEditFaction}
-            />
-          ))
-        )}
+      <Box
+        sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}
+      >
+        <MainHeader title="Factions" icon={<Icon keyword="Factions" size="36" />} />
       </Box>
-      <Pagination
-        count={meta.total_pages}
-        page={meta.current_page}
-        onChange={handlePageChange}
-        variant="outlined"
-        color="primary"
-        shape="rounded"
-        size="large"
+      <View
+        viewMode={viewMode}
+        formState={formState}
+        dispatchForm={dispatchForm}
+        onPageChange={handlePageChange}
+        onSortChange={handleSortChange}
+        onOrderChange={handleOrderChange}
+        initialIsMobile={initialIsMobile}
       />
-      <CreateFactionForm
-        open={drawerOpen}
-        onClose={handleCloseCreateDrawer}
-        onSave={handleSaveFaction}
-      />
-      {selectedFaction && (
-        <EditFactionForm
-          open={!!selectedFaction}
-          onClose={handleCloseEditFaction}
-          onSave={handleSaveEditFaction}
-          faction={selectedFaction}
-        />
-      )}
-    </Box>
+    </>
   )
 }

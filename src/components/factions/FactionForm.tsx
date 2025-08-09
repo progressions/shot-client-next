@@ -3,8 +3,15 @@
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
-import { HeroImage, TextField, SaveButton, CancelButton } from "@/components/ui"
+import {
+  InfoLink,
+  HeroImage,
+  TextField,
+  SaveButton,
+  CancelButton,
+} from "@/components/ui"
 import type { EditorChangeEvent, Faction } from "@/types"
+import { defaultFaction } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
@@ -81,8 +88,8 @@ export default function FactionForm({
     dispatchForm({ type: FormActions.SUBMIT })
     try {
       const formData = new FormData()
-      const factionData = { name, description } as Faction
-      formData.append("faction", JSON.stringify(factionData))
+      const factionData = { ...defaultFaction, name, description } as Faction
+      formData.append("faction", JSON.stringify(siteData))
       if (image) {
         formData.append("image", image)
       }
@@ -112,11 +119,7 @@ export default function FactionForm({
       <Box
         component="form"
         onSubmit={handleSubmit}
-        sx={{
-          width: isMobile ? "100%" : "30rem",
-          height: isMobile ? "auto" : "100%",
-          p: isMobile ? "1rem" : "2rem",
-        }}
+        sx={{ width: isMobile ? "100%" : "30rem", height: isMobile ? "auto" : "100%", p: isMobile ? "1rem" : "2rem",  }}
       >
         <Typography variant="h5" sx={{ mb: 2, color: "#ffffff" }}>
           {title}
@@ -126,6 +129,9 @@ export default function FactionForm({
             {error}
           </Alert>
         )}
+        <Typography>
+          Describe this thing.
+        </Typography>
         <TextField
           label="Name"
           value={name}

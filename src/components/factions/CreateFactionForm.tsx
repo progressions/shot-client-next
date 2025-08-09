@@ -24,12 +24,14 @@ export default function CreateFactionForm({
     onSave(response.data)
   }
 
+  const defaultEntity = defaultFaction
+
   return (
     <FactionForm
       open={open}
       onClose={onClose}
       onSave={handleSave}
-      initialFormData={{ ...defaultFaction, image: null }}
+      initialFormData={{ ...defaultEntity, image: null }}
       title="New Faction"
     />
   )
