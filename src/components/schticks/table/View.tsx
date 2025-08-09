@@ -77,6 +77,7 @@ export default function SchticksView({
         totalPages={meta.total_pages}
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
+        onPageChange={onPageChange}
         filter={<SchtickFilter
           dispatch={dispatchForm}
           includeSchticks={false}

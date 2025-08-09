@@ -77,6 +77,7 @@ export default function VehiclesView({
         totalPages={meta.total_pages}
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
+        onPageChange={onPageChange}
         filter={
           <VehicleFilter
             dispatch={dispatchForm}

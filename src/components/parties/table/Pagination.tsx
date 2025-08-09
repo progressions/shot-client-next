@@ -7,10 +7,10 @@ interface PartiesMenuProps {
   onPageChange: (event: React.ChangeEvent<unknown>, page: number) => void
 }
 
-export default function PartiesMenu({
+export default function PartiesPagination({
   meta,
   onPageChange
-}: PartiesMenuProps) {
+}: PartiesPagination) {
   return (
     <Pagination
       count={meta.total_pages}

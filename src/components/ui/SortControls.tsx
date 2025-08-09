@@ -36,6 +36,7 @@ export function SortControls({
   order,
   children,
   filter,
+  onPageChange,
 }: SortControlsProps) {
   const router = useRouter()
   const [showFilter, setShowFilter] = useState(false)

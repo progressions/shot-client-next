@@ -2,15 +2,15 @@
 import { Pagination } from "@mui/material"
 import type { PaginationMeta } from "@/types"
 
-interface {{pascalCase (plural name)}}MenuProps {
+interface {{pascalCase (plural name)}}PaginationProps {
   meta: PaginationMeta
   onPageChange: (event: React.ChangeEvent<unknown>, page: number) => void
 }
 
-export default function {{pascalCase (plural name)}}Menu({
+export default function {{pascalCase (plural name)}}Pagination({
   meta,
   onPageChange
-}: {{pascalCase (plural name)}}MenuProps) {
+}: {{pascalCase (plural name)}}PaginationProps) {
   return (
     <Pagination
       count={meta.total_pages}

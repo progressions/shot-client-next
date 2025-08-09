@@ -77,6 +77,7 @@ export default function FactionsView({
         totalPages={meta.total_pages}
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
+        onPageChange={onPageChange}
         filter={<FactionFilter
           dispatch={dispatchForm}
           includeFactions={false}

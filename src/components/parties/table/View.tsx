@@ -77,6 +77,7 @@ export default function PartiesView({
         totalPages={meta.total_pages}
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
+        onPageChange={onPageChange}
         filter={<PartyFilter
           dispatch={dispatchForm}
           includeParties={false}

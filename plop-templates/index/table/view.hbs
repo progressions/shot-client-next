@@ -77,6 +77,7 @@ export default function {{pascalCase (plural name)}}View({
         totalPages={meta.total_pages}
         isMobile={viewMode === "mobile"}
         dispatchForm={dispatchForm}
+        onPageChange={onPageChange}
         filter={<{{pascalCase (singular name)}}Filter
           dispatch={dispatchForm}
           include{{pascalCase (plural name)}}={false}
