@@ -3,52 +3,74 @@
 import { Stack, Box } from "@mui/material"
 import { FormActions, useForm } from "@/reducers"
 import { useClient } from "@/contexts"
-import { WeaponAutocomplete } from "@/components/autocomplete"
-import { Autocomplete } from "@/components/ui"
-import type { Weapon } from "@/types"
+import {
+  JunctureAutocomplete,
+  WeaponAutocomplete,
+} from "@/components/autocomplete"
+import { AddButton, Autocomplete } from "@/components/ui"
+import type { Weapon, Juncture } from "@/types"
 import { useCallback, useEffect } from "react"
 
 type FormStateData = {
-  weapons: Weapon[]
-  weapon_id: string | null
+  weapon_type: string | null
   categories: string[]
   category: string | null
-  junctures: string[]
+  weapons: Weapon[]
+  junctures: Juncture[]
   juncture: string | null
+  selectedChild: Weapon | null
 }
 
+type OmitType = "category" | "juncture" | "weapon" | "add"
+
 type WeaponFilterProps = {
-  setEntity: (weapon: Weapon) => void
+  // value is the ID of the selected weapon
+  value?: string | null
+  setSelectedChild: (weapon: Weapon) => void
+  addMember?: (weapon: Weapon) => void
   dispatch: React.Dispatch<FormStateData>
-  omit: string[]
+  omit: OmitType[]
 }
 
 export default function WeaponFilter({
-  setEntity,
+  value,
+  setSelectedChild,
+  addMember,
   dispatch,
   omit = [],
 }: WeaponFilterProps) {
   const { client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
-    weapons: [],
-    weapon_id: null,
+    weapon_type: null,
     categories: [],
     category: null,
+    weapons: [],
     junctures: [],
-    juncture: null,
+    selectedChild: value,
   })
-  const { weapons, weapon_id, categories, category, junctures, juncture } =
-    formState.data
+  const {
+    weapon_type,
+    categories,
+    category,
+    weapons,
+    junctures,
+    juncture,
+    selectedChild,
+  } = formState.data
+
+  const weapon_id = selectedChild?.id
 
   const fetchWeapons = useCallback(async () => {
     try {
       const response = await client.getWeapons({
-        category: category,
+        autocomplete: true,
         juncture: juncture,
+        category: category,
         per_page: 100,
         sort: "name",
         order: "asc",
       })
+      console.log("WeaponFilter Fetched weapons:", response.data.weapons)
       dispatchForm({
         type: FormActions.UPDATE,
         name: "weapons",
@@ -64,33 +86,16 @@ export default function WeaponFilter({
         name: "junctures",
         value: response.data.junctures || [],
       })
+      if (dispatch) {
+        dispatch({ type: FormActions.UPDATE, name: "weapons", value: weapons })
+        dispatch({ type: FormActions.UPDATE, name: "category", value: category })
+        dispatch({ type: FormActions.UPDATE, name: "juncture", value: juncture })
+      }
     } catch (error) {
       console.error("Error fetching weapons:", error)
       return []
     }
-  }, [client, category, juncture, dispatchForm])
-
-  useEffect(() => {
-    if (!dispatch) return
-    // update the set of weapons outside the component
-    dispatch({
-      type: FormActions.UPDATE,
-      name: "category",
-      value: category,
-    })
-    dispatch({ type: FormActions.UPDATE, name: "category", value: category })
-    dispatch({
-      type: FormActions.UPDATE,
-      name: "juncture",
-      value: juncture,
-    })
-  }, [dispatch, category, juncture])
-
-  useEffect(() => {
-    fetchWeapons().catch(error => {
-      console.error("Error in useEffect fetchWeapons:", error)
-    })
-  }, [fetchWeapons])
+  }, [client, juncture, category, dispatchForm, dispatch])
 
   useEffect(() => {
     fetchWeapons()
@@ -104,23 +109,39 @@ export default function WeaponFilter({
           value: false,
         })
       })
-  }, [client, dispatchForm, fetchWeapons, category, juncture])
+  }, [
+    client,
+    dispatchForm,
+    weapon_type,
+    selectedChild,
+    juncture,
+    fetchWeapons,
+  ])
 
   const handleWeaponChange = (weapon: Weapon | null) => {
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "weapon_id",
-      value: weapon.id,
+      name: "selectedChild",
+      value: weapon,
     })
-    setEntity(weapon)
-  }
-
-  const handleCategoryChange = (value: string | null) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "category", value })
+    setSelectedChild?.(weapon)
   }
 
   const handleJunctureChange = (value: string | null) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "juncture", value })
+    console.log("handleJunctureChange value", value)
+    dispatchForm({ type: FormActions.UPDATE, name: "juncture", value: value })
+  }
+
+  const handleCategoryChange = (value: string | null) => {
+    dispatchForm({ type: FormActions.UPDATE, name: "category", value: value })
+  }
+
+  const handleTypeChange = (value: string | null) => {
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "weapon_type",
+      value: value,
+    })
   }
 
   const fetchCategories = async () => {
@@ -139,6 +160,17 @@ export default function WeaponFilter({
     return Promise.resolve(opts)
   }
 
+  const handleAddMember = () => {
+    console.log("add", selectedChild)
+    addMember?.(selectedChild)
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "selectedChild",
+      value: null,
+    })
+    setSelectedChild(null)
+  }
+
   return (
     <Box
       sx={{
@@ -151,7 +183,8 @@ export default function WeaponFilter({
     >
       <Stack
         direction={{ xs: "column", sm: "row" }}
-        spacing={2}
+        spacing={1}
+        alignItems="center"
         sx={{ width: "100%" }}
       >
         {!omit.includes("juncture") && (
@@ -182,6 +215,9 @@ export default function WeaponFilter({
             onChange={handleWeaponChange}
             allowNone={false}
           />
+        )}
+        {!omit.includes("add") && (
+          <AddButton onClick={handleAddMember} disabled={!selectedChild} />
         )}
       </Stack>
     </Box>

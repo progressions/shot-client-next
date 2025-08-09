@@ -25,6 +25,7 @@ export default function FactionAutocomplete({
 
   useEffect(() => {
     const fetchFactions = async () => {
+      console.log("FactionAutocomplete useEffect called")
       try {
         const response = await client.getFactions({
           autocomplete: true,
@@ -33,6 +34,7 @@ export default function FactionAutocomplete({
           sort: "name",
           order: "asc",
         })
+        console.log("response.data.factions", response.data.factions)
         setFactions(response.data.factions || [])
       } catch (error) {
         console.error("Error fetching factions:", error)
@@ -65,6 +67,7 @@ export default function FactionAutocomplete({
   }
 
   const handleChange = (selectedOption: Option | null) => {
+    console.log("Selected option:", selectedOption)
     const faction = factions.find(s => s.id === selectedOption)
     onChange(faction)
   }

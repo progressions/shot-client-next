@@ -149,6 +149,27 @@ export default function List({
     juncture,
   ])
 
+  useEffect(() => {
+    const url = `/weapons?${queryParams({
+      page: 1,
+      sort,
+      order,
+      category,
+      juncture,
+    })}`
+    router.push(url, {
+      scroll: false,
+    })
+    fetchWeapons(1, sort, order, category, juncture)
+  }, [
+    fetchWeapons,
+    category,
+    juncture,
+    order,
+    router,
+    sort,
+  ])
+
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
   }
@@ -168,23 +189,23 @@ export default function List({
   const handleOrderChange = async () => {
     const newOrder = order === "asc" ? "desc" : "asc"
     dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/weapons?page=1&sort=${sort}&order=${newOrder}`, {
+    router.push(`/weapons?page=1&sort=${sort}&order=${newOrder}&category=${category}&juncture=${juncture}`, {
       scroll: false,
     })
-    await fetchWeapons(1, sort, newOrder)
+    await fetchWeapons(1, sort, newOrder, category, juncture)
   }
 
   const handlePageChange = async (page: number) => {
     if (page <= 0 || page > meta.total_pages) {
-      router.push(`/weapons?page=1&sort=${sort}&order=${order}`, {
+      router.push(`/weapons?page=1&sort=${sort}&order=${order}&category=${category}&juncture=${juncture}`, {
         scroll: false,
       })
-      await fetchWeapons(1, sort, order)
+      await fetchWeapons(1, sort, order, category, juncture)
     } else {
-      router.push(`/weapons?page=${page}&sort=${sort}&order=${order}`, {
+      router.push(`/weapons?page=${page}&sort=${sort}&order=${order}&category=${category}&juncture=${juncture}`, {
         scroll: false,
       })
-      await fetchWeapons(page, sort, order)
+      await fetchWeapons(page, sort, order, category, juncture)
     }
   }
 

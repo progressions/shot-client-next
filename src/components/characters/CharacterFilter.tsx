@@ -21,7 +21,7 @@ type FormStateData = {
   selectedChild: Character | null
 }
 
-type OmitType = "type" | "archetype" | "faction" | "character"
+type OmitType = "type" | "archetype" | "faction" | "character" | "add"
 
 type CharacterFilterProps = {
   // value is the ID of the selected character

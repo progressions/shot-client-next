@@ -57,10 +57,12 @@ export default async function JuncturesPage({
 
   // Fetch junctures for the requested page, sort, and order
   const response = await client.getJunctures({ page, sort, order, faction_id })
+  console.log("Fetched junctures response:", response)
+  console.log("Fetched junctures:", response.data)
   const { junctures, factions, meta }: JuncturesResponse = response.data
 
   // Check if page exceeds total_pages
-  if (page > meta.total_pages) {
+  if (page > meta.total_pages && meta.total_pages > 0) {
     redirect("/junctures?page=1&sort=created_at&order=desc")
   }
 
