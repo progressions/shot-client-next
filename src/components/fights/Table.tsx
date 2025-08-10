@@ -5,6 +5,7 @@ import Box from "@mui/material/Box"
 import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid"
 import { FormActions } from "@/reducers"
 import { FightLink } from "@/components/ui"
+import type { Fight } from "@/types"
 
 interface PaginationMeta {
   current_page: number
@@ -12,12 +13,6 @@ interface PaginationMeta {
   prev_page: number | null
   total_pages: number
   total_count: number
-}
-
-interface Fight {
-  id: number
-  name: string
-  created_at: string
 }
 
 interface FormStateData {
@@ -42,7 +37,7 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
   {
     field: "name",
     headerName: "Name",
-    width: 350,
+    width: 280,
     editable: false,
     sortable: true,
     renderCell: params => <FightLink fight={params.row} />,
@@ -51,33 +46,47 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
     field: "season",
     headerName: "Season",
     type: "number",
-    width: 100,
+    width: 80,
     editable: false,
   },
   {
     field: "session",
     headerName: "Session",
     type: "number",
-    width: 100,
+    width: 80,
     editable: false,
   },
   {
     field: "created_at",
-    headerName: "Created At",
+    headerName: "Created",
     type: "date",
     width: 110,
     editable: false,
   },
+  {
+    field: "started_at",
+    headerName: "Started",
+    type: "date",
+    width: 100,
+    editable: false,
+  },
+  {
+    field: "ended_at",
+    headerName: "Ended",
+    type: "ended",
+    width: 100,
+    editable: false,
+  }
 ]
 
 export default function View({ formState, dispatchForm }: ViewProps) {
   const { meta, sort, order, fights } = formState.data
 
   const rows = fights.map(fight => ({
-    id: fight.id,
-    name: fight.name,
-    season: fight.season,
-    session: fight.session,
+    ...fight,
+    started_at: fight.started_at ? new Date(fight.started_at) : null,
+    ended_at: fight.ended_at ? new Date(fight.ended_at) : null,
+    updated_at: new Date(fight.updated_at),
     created_at: new Date(fight.created_at),
   }))
 

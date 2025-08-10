@@ -4,7 +4,8 @@ import * as React from "react"
 import Box from "@mui/material/Box"
 import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid"
 import { FormActions } from "@/reducers"
-import { VehicleLink } from "@/components/ui"
+import { FactionLink, VehicleLink } from "@/components/ui"
+import { VS } from "@/services"
 
 interface PaginationMeta {
   current_page: number
@@ -42,10 +43,39 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
   {
     field: "name",
     headerName: "Name",
-    width: 350,
+    width: 240,
     editable: false,
     sortable: true,
     renderCell: params => <VehicleLink vehicle={params.row} />,
+  },
+  {
+    field: "type",
+    headerName: "Type",
+    width: 110,
+    editable: false,
+    renderCell: params => VS.type(params.row),
+  },
+  {
+    field: "archtype",
+    headerName: "Archetype",
+    width: 140,
+    editable: false,
+    renderCell: params => VS.archetype(params.row),
+  },
+  {
+    field: "faction",
+    headerName: "Faction",
+    width: 160,
+    editable: false,
+    renderCell: params => (VS.faction(params.row) ? <FactionLink faction={VS.faction(params.row)} /> : null),
+  },
+  {
+    field: "task",
+    headerName: "Task",
+    type: "boolean",
+    width: 50,
+    editable: false,
+    renderCell: params => VS.isTask(params.row) ? "Yes" : "",
   },
   {
     field: "created_at",
@@ -56,12 +86,12 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
   },
 ]
 
+
 export default function View({ formState, dispatchForm }: ViewProps) {
   const { meta, sort, order, vehicles } = formState.data
 
   const rows = vehicles.map(vehicle => ({
-    id: vehicle.id,
-    name: vehicle.name,
+    ...vehicle,
     created_at: new Date(vehicle.created_at),
   }))
 

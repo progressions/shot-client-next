@@ -48,6 +48,20 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
     renderCell: params => <SchtickLink schtick={params.row} />,
   },
   {
+    field: "category",
+    headerName: "Category",
+    width: 250,
+    editable: false,
+    sortable: true,
+  },
+  {
+    field: "path",
+    headerName: "Path",
+    width: 150,
+    editable: false,
+    sortable: true,
+  },
+  {
     field: "created_at",
     headerName: "Created At",
     type: "date",
@@ -60,8 +74,7 @@ export default function View({ formState, dispatchForm }: ViewProps) {
   const { meta, sort, order, schticks } = formState.data
 
   const rows = schticks.map(schtick => ({
-    id: schtick.id,
-    name: schtick.name,
+    ...schtick,
     created_at: new Date(schtick.created_at),
   }))
 

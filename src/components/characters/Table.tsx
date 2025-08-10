@@ -4,7 +4,8 @@ import * as React from "react"
 import Box from "@mui/material/Box"
 import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid"
 import { FormActions } from "@/reducers"
-import { CharacterLink } from "@/components/ui"
+import { FactionLink, CharacterLink } from "@/components/ui"
+import { CS } from "@/services"
 
 interface PaginationMeta {
   current_page: number
@@ -42,10 +43,39 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
   {
     field: "name",
     headerName: "Name",
-    width: 350,
+    width: 240,
     editable: false,
     sortable: true,
     renderCell: params => <CharacterLink character={params.row} />,
+  },
+  {
+    field: "type",
+    headerName: "Type",
+    width: 110,
+    editable: false,
+    renderCell: params => CS.type(params.row),
+  },
+  {
+    field: "archtype",
+    headerName: "Archetype",
+    width: 140,
+    editable: false,
+    renderCell: params => CS.archetype(params.row),
+  },
+  {
+    field: "faction",
+    headerName: "Faction",
+    width: 160,
+    editable: false,
+    renderCell: params => (CS.faction(params.row) ? <FactionLink faction={CS.faction(params.row)} /> : null),
+  },
+  {
+    field: "task",
+    headerName: "Task",
+    type: "boolean",
+    width: 50,
+    editable: false,
+    renderCell: params => CS.isTask(params.row) ? "Yes" : "",
   },
   {
     field: "created_at",
@@ -60,8 +90,7 @@ export default function View({ formState, dispatchForm }: ViewProps) {
   const { meta, sort, order, characters } = formState.data
 
   const rows = characters.map(character => ({
-    id: character.id,
-    name: character.name,
+    ...character,
     created_at: new Date(character.created_at),
   }))
 

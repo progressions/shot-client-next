@@ -40,12 +40,26 @@ interface ViewProps {
 
 const columns: GridColDef<(typeof rows)[number]>[] = [
   {
-    field: "name",
-    headerName: "Name",
-    width: 350,
+    field: "email",
+    headerName: "Email",
+    width: 250,
     editable: false,
     sortable: true,
     renderCell: params => <UserLink user={params.row} />,
+  },
+  {
+    field: "first_name",
+    headerName: "First Name",
+    width: 150,
+    editable: false,
+    sortable: true,
+  },
+  {
+    field: "last_name",
+    headerName: "Last Name",
+    width: 150,
+    editable: false,
+    sortable: true,
   },
   {
     field: "created_at",
@@ -59,9 +73,9 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
 export default function View({ formState, dispatchForm }: ViewProps) {
   const { meta, sort, order, users } = formState.data
 
+  console.log("users", users)
   const rows = users.map(user => ({
-    id: user.id,
-    name: user.name,
+    ...user,
     created_at: new Date(user.created_at),
   }))
 
