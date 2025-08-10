@@ -10,10 +10,7 @@ import { queryParams } from "@/lib"
 import { Icon, MainHeader } from "@/components/ui"
 
 interface ListProps {
-  initialFights: Fight[]
-  initialMeta: PaginationMeta
-  initialSort: string
-  initialOrder: string
+  initialFormData: FormStateData
   initialIsMobile?: boolean
 }
 
@@ -25,15 +22,10 @@ type FormStateData = {
   drawerOpen: boolean
   sort: string
   order: string
+  page: number
 }
 
-export default function List({
-  initialFights,
-  initialMeta,
-  initialSort,
-  initialOrder,
-  initialIsMobile,
-}: ListProps) {
+export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { getLocally } = useLocalStorage()
@@ -41,14 +33,8 @@ export default function List({
     (getLocally("fightViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
   )
-  const { formState, dispatchForm } = useForm<FormStateData>({
-    fights: initialFights,
-    meta: initialMeta,
-    drawerOpen: false,
-    sort: initialSort,
-    order: initialOrder,
-  })
-  const { meta, sort, order, fights, drawerOpen } = formState.data
+  const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
+  const { page, sort, order, fights, drawerOpen } = formState.data
   const router = useRouter()
 
   const validSorts: readonly ValidSort[] = useMemo(
@@ -119,17 +105,18 @@ export default function List({
     }
   }, [client, campaignData, dispatchForm, fetchFights, validSorts, validOrders])
 
+  // whenever page, sort, or order changes, update the URL and fetch fights
   useEffect(() => {
     const url = `/fights?${queryParams({
-      page: 1,
+      page: page,
       sort,
       order,
     })}`
     router.push(url, {
       scroll: false,
     })
-    fetchFights(1, sort, order)
-  }, [fetchFights, order, router, sort])
+    fetchFights(page, sort, order)
+  }, [fetchFights, order, router, sort, page])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -145,44 +132,6 @@ export default function List({
       name: "fights",
       value: [newFight, ...fights],
     })
-  }
-
-  const handleOrderChange = async () => {
-    const newOrder = order === "asc" ? "desc" : "asc"
-    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/fights?page=1&sort=${sort}&order=${newOrder}`, {
-      scroll: false,
-    })
-    await fetchFights(1, sort, newOrder)
-  }
-
-  const handlePageChange = async (page: number) => {
-    if (page <= 0 || page > meta.total_pages) {
-      router.push(`/fights?page=1&sort=${sort}&order=${order}`, {
-        scroll: false,
-      })
-      await fetchFights(1, sort, order)
-    } else {
-      router.push(`/fights?page=${page}&sort=${sort}&order=${order}`, {
-        scroll: false,
-      })
-      await fetchFights(page, sort, order)
-    }
-  }
-
-  const handleSortChange = (newSort: ValidSort) => {
-    const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
-    dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
-    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    const url = `/fights?${queryParams({
-      page: 1,
-      sort: newSort,
-      order: newOrder,
-    })}`
-    router.push(url, {
-      scroll: false,
-    })
-    fetchFights(1, newSort, newOrder)
   }
 
   return (
@@ -209,9 +158,6 @@ export default function List({
         viewMode={viewMode}
         formState={formState}
         dispatchForm={dispatchForm}
-        onPageChange={handlePageChange}
-        onSortChange={handleSortChange}
-        onOrderChange={handleOrderChange}
         initialIsMobile={initialIsMobile}
       />
     </>

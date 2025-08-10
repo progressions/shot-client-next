@@ -1,6 +1,6 @@
 import { GridView, ViewList } from "@mui/icons-material"
-import { CreateVehicleForm, SpeedDial } from "@/components/vehicles"
-import { actions as initialActions } from "@/components/vehicles/SpeedDial"
+import { CreateVehicleForm } from "@/components/vehicles"
+import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
 import { defaultVehicle } from "@/types"
 

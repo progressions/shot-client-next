@@ -25,15 +25,10 @@ type FormStateData = {
   drawerOpen: boolean
   sort: string
   order: string
+  page: number
 }
 
-export default function List({
-  initialVehicles,
-  initialMeta,
-  initialSort,
-  initialOrder,
-  initialIsMobile,
-}: ListProps) {
+export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { getLocally } = useLocalStorage()
@@ -41,14 +36,8 @@ export default function List({
     (getLocally("vehicleViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
   )
-  const { formState, dispatchForm } = useForm<FormStateData>({
-    vehicles: initialVehicles,
-    meta: initialMeta,
-    drawerOpen: false,
-    sort: initialSort,
-    order: initialOrder,
-  })
-  const { meta, sort, order, vehicles, drawerOpen } = formState.data
+  const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
+  const { page, sort, order, vehicles, drawerOpen } = formState.data
   const router = useRouter()
 
   const validSorts: readonly ValidSort[] = useMemo(
@@ -130,15 +119,15 @@ export default function List({
 
   useEffect(() => {
     const url = `/vehicles?${queryParams({
-      page: 1,
+      page: page,
       sort,
       order,
     })}`
     router.push(url, {
       scroll: false,
     })
-    fetchVehicles(1, sort, order)
-  }, [fetchVehicles, order, router, sort])
+    fetchVehicles(page, sort, order)
+  }, [fetchVehicles, page, order, router, sort])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -154,44 +143,6 @@ export default function List({
       name: "vehicles",
       value: [newVehicle, ...vehicles],
     })
-  }
-
-  const handleOrderChange = async () => {
-    const newOrder = order === "asc" ? "desc" : "asc"
-    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/vehicles?page=1&sort=${sort}&order=${newOrder}`, {
-      scroll: false,
-    })
-    await fetchVehicles(1, sort, newOrder)
-  }
-
-  const handlePageChange = async (page: number) => {
-    if (page <= 0 || page > meta.total_pages) {
-      router.push(`/vehicles?page=1&sort=${sort}&order=${order}`, {
-        scroll: false,
-      })
-      await fetchVehicles(1, sort, order)
-    } else {
-      router.push(`/vehicles?page=${page}&sort=${sort}&order=${order}`, {
-        scroll: false,
-      })
-      await fetchVehicles(page, sort, order)
-    }
-  }
-
-  const handleSortChange = (newSort: ValidSort) => {
-    const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
-    dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
-    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    const url = `/vehicles?${queryParams({
-      page: 1,
-      sort: newSort,
-      order: newOrder,
-    })}`
-    router.push(url, {
-      scroll: false,
-    })
-    fetchVehicles(1, newSort, newOrder)
   }
 
   return (
@@ -221,9 +172,6 @@ export default function List({
         viewMode={viewMode}
         formState={formState}
         dispatchForm={dispatchForm}
-        onPageChange={handlePageChange}
-        onSortChange={handleSortChange}
-        onOrderChange={handleOrderChange}
         initialIsMobile={initialIsMobile}
       />
     </>

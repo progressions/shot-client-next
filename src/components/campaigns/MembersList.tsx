@@ -18,7 +18,9 @@ export default function MembersList({
   async function update(updatedCampaign: Campaign) {
     console.log("campaignId", updatedCampaign)
     try {
-      const response = await client.updateCampaign(updatedCampaign.id, { campaign: updatedCampaign })
+      const response = await client.updateCampaign(updatedCampaign.id, {
+        campaign: updatedCampaign,
+      })
       setCampaign(response.data)
     } catch (error) {
       console.error("Error updating campaign:", error)

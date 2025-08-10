@@ -35,7 +35,6 @@ export default function FightLink({
       const session = fight.session.toString().padStart(2, "0")
       return ` (${fight.season}-${session})`
     }
-    return fight.name
   }
 
   return (

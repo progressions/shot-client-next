@@ -1,71 +1,52 @@
 "use client"
-
-import { queryParams } from "@/lib"
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import {
-  Pagination,
-  Box,
-  Button,
-  Typography,
-  Alert,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Stack,
-  IconButton,
-  Tooltip,
-} from "@mui/material"
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp"
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
-import { UserDetail, CreateUserForm, EditUserForm } from "@/components/users"
+import { Box } from "@mui/material"
+import { View, Menu } from "@/components/users"
 import type { User, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
-import { useCampaign, useClient } from "@/contexts"
-import type { SelectChangeEvent } from "@mui/material"
-import { InfoLink } from "@/components/ui"
+import { useLocalStorage, useCampaign, useClient } from "@/contexts"
+import { queryParams } from "@/lib"
+import { Icon, MainHeader } from "@/components/ui"
 
-interface ListProperties {
+interface ListProps {
   initialUsers: User[]
   initialMeta: PaginationMeta
   initialSort: string
   initialOrder: string
+  initialIsMobile?: boolean
 }
 
+type ValidSort = "created_at" | "updated_at" | "name"
+type ValidOrder = "asc" | "desc"
 type FormStateData = {
   users: User[]
   meta: PaginationMeta
   drawerOpen: boolean
-  error: string | null
+  sort: string
+  order: string
 }
 
-export default function List({
-  initialUsers,
-  initialMeta,
-  initialSort,
-  initialOrder,
-}: ListProperties) {
+export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
-  const { formState, dispatchForm } = useForm<FormStateData>({
-    users: initialUsers,
-    meta: initialMeta,
-    drawerOpen: false,
-    error: null,
-  })
-  const { meta, users, drawerOpen, error } = formState.data
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
-  const [sort, setSort] = useState<string>(initialSort)
-  const [order, setOrder] = useState<string>(initialOrder)
+  const { getLocally, saveLocally } = useLocalStorage()
+  const [viewMode, setViewMode] = useState<"table" | "mobile">(
+    (getLocally("userViewMode") as "table" | "mobile") ||
+      (initialIsMobile ? "mobile" : "table")
+  )
+  const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
+  const { meta, sort, order, users, drawerOpen } = formState.data
   const router = useRouter()
 
-  type ValidSort = "created_at" | "updated_at" | "name"
+  useEffect(() => {
+    saveLocally("userViewMode", viewMode)
+  }, [viewMode, saveLocally])
+
   const validSorts: readonly ValidSort[] = useMemo(
     () => ["created_at", "updated_at", "name"],
     []
   )
-  type ValidOrder = "asc" | "desc"
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
   const fetchUsers = useCallback(
@@ -85,16 +66,14 @@ export default function List({
         dispatchForm({
           type: FormActions.UPDATE,
           name: "meta",
-          value: response.data.meta,
+          value: response.data.meta || { current_page: page, total_pages: 1 },
         })
         dispatchForm({ type: FormActions.ERROR, payload: null })
-      } catch (error_: unknown) {
-        dispatchForm({
-          type: FormActions.ERROR,
-          payload:
-            error_ instanceof Error ? error_.message : "Failed to fetch users",
-        })
-        console.error("Fetch users error:", error_)
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Unable to fetch users data"
+        dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
+        console.error("Fetch users error:", error)
       }
     },
     [client, dispatchForm]
@@ -102,7 +81,7 @@ export default function List({
 
   useEffect(() => {
     if (!campaignData) return
-    console.log("User data:", campaignData)
+    console.log("Campaign data:", campaignData)
     if (campaignData.users === "reload") {
       const parameters = new URLSearchParams(globalThis.location.search)
       const page = parameters.get("page")
@@ -118,8 +97,16 @@ export default function List({
         orderParameter && validOrders.includes(orderParameter as ValidOrder)
           ? orderParameter
           : "desc"
-      setSort(currentSort)
-      setOrder(currentOrder)
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "sort",
+        value: currentSort,
+      })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "order",
+        value: currentOrder,
+      })
       fetchUsers(page, currentSort, currentOrder)
     }
   }, [client, campaignData, dispatchForm, fetchUsers, validSorts, validOrders])
@@ -144,7 +131,7 @@ export default function List({
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: false })
   }
 
-  const handleSaveUser = async (newUser: User) => {
+  const handleSave = async (newUser: User) => {
     dispatchForm({
       type: FormActions.UPDATE,
       name: "users",
@@ -152,37 +139,16 @@ export default function List({
     })
   }
 
-  const handleDeleteUser = (userId: string) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "users",
-      value: users.filter(user => user.id !== userId),
+  const handleOrderChange = async () => {
+    const newOrder = order === "asc" ? "desc" : "asc"
+    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
+    router.push(`/users?page=1&sort=${sort}&order=${newOrder}`, {
+      scroll: false,
     })
-    if (selectedUser?.id === userId) setSelectedUser(null)
-    router.refresh()
+    await fetchUsers(1, sort, newOrder)
   }
 
-  const handleEditUser = (user: User) => {
-    setSelectedUser(user)
-  }
-
-  const handleCloseEditUser = () => {
-    setSelectedUser(null)
-  }
-
-  const handleSaveEditUser = (updatedUser: User) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "users",
-      value: users.map(f => (f.id === updatedUser.id ? updatedUser : f)),
-    })
-    setSelectedUser(null)
-  }
-
-  const handlePageChange = async (
-    _event: React.ChangeEvent<unknown>,
-    page: number
-  ) => {
+  const handlePageChange = async (_event, page: number) => {
     if (page <= 0 || page > meta.total_pages) {
       router.push(`/users?page=1&sort=${sort}&order=${order}`, {
         scroll: false,
@@ -196,163 +162,50 @@ export default function List({
     }
   }
 
-  const handleSortChange = (event: SelectChangeEvent<string>) => {
-    const newSort = event.target.value as ValidSort
-    if (validSorts.includes(newSort)) {
-      setSort(newSort)
-      // Perform async operations
-      router.push(`/users?page=1&sort=${newSort}&order=${order}`, {
-        scroll: false,
-      })
-      fetchUsers(1, newSort, order)
-    }
-  }
-
-  const handleOrderChange = async () => {
-    const newOrder = order === "asc" ? "desc" : "asc"
-    setOrder(newOrder)
-    router.push(`/users?page=1&sort=${sort}&order=${newOrder}`, {
+  const handleSortChange = (newSort: ValidSort) => {
+    const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
+    dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
+    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
+    const url = `/users?${queryParams({
+      page: 1,
+      sort: newSort,
+      order: newOrder,
+    })}`
+    router.push(url, {
       scroll: false,
     })
-    await fetchUsers(1, sort, newOrder)
+    fetchUsers(1, newSort, newOrder)
   }
 
   return (
-    <Box>
-      <Stack spacing={2} sx={{ mb: 4 }}>
-        <Typography
-          variant="h4"
-          sx={{
-            color: "#ffffff",
-            fontSize: { xs: "1.5rem", sm: "2.125rem" },
-          }}
-        >
-          Users
-        </Typography>
-        <Box sx={{ pb: 2 }}>
-          <Typography>
-            A <InfoLink href="/users" info="User" /> is a player of the game.{" "}
-            They could have multiple{" "}
-            <InfoLink href="/characters" info="Characters" /> and belong to
-            multiple <InfoLink href="/campaigns" info="Campaigns" />.
-          </Typography>
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            gap: { xs: 1, sm: 1.5 },
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              gap: 1,
-              alignItems: "center",
-            }}
-          >
-            <FormControl sx={{ minWidth: { xs: 80, sm: 100 } }}>
-              <InputLabel id="sort-label" sx={{ color: "#ffffff" }}>
-                Sort By
-              </InputLabel>
-              <Select
-                labelId="sort-label"
-                value={sort}
-                label="Sort By"
-                onChange={handleSortChange}
-                sx={{
-                  color: "#ffffff",
-                  "& .MuiSvgIcon-root": { color: "#ffffff" },
-                }}
-              >
-                <MenuItem value="created_at">Created At</MenuItem>
-                <MenuItem value="updated_at">Updated At</MenuItem>
-                <MenuItem value="name">Name</MenuItem>
-              </Select>
-            </FormControl>
-            <Tooltip
-              title={order === "asc" ? "Sort Ascending" : "Sort Descending"}
-            >
-              <IconButton
-                onClick={handleOrderChange}
-                sx={{ color: "#ffffff" }}
-                aria-label={
-                  order === "asc" ? "sort ascending" : "sort descending"
-                }
-              >
-                {order === "asc" ? (
-                  <KeyboardArrowUpIcon />
-                ) : (
-                  <KeyboardArrowDownIcon />
-                )}
-              </IconButton>
-            </Tooltip>
-          </Box>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenCreateDrawer}
-            sx={{ px: 2 }}
-          >
-            New
-          </Button>
-        </Box>
-      </Stack>
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-      <Pagination
-        count={meta.total_pages}
-        page={meta.current_page}
-        onChange={handlePageChange}
-        variant="outlined"
-        color="primary"
-        shape="rounded"
-        size="large"
+    <>
+      <Menu
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        drawerOpen={drawerOpen}
+        handleOpenCreateDrawer={handleOpenCreateDrawer}
+        handleCloseCreateDrawer={handleCloseCreateDrawer}
+        handleSave={handleSave}
       />
-      <Box my={2}>
-        {users.length === 0 ? (
-          <Typography variant="body1" sx={{ color: "#ffffff" }}>
-            No users available
-          </Typography>
-        ) : (
-          users.map(user => (
-            <UserDetail
-              key={JSON.stringify(user)}
-              user={user}
-              onDelete={handleDeleteUser}
-              onEdit={handleEditUser}
-            />
-          ))
-        )}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
+        <MainHeader title="Users" icon={<Icon keyword="Users" size="36" />} />
       </Box>
-      <Pagination
-        count={meta.total_pages}
-        page={meta.current_page}
-        onChange={handlePageChange}
-        variant="outlined"
-        color="primary"
-        shape="rounded"
-        size="large"
+      <View
+        viewMode={viewMode}
+        formState={formState}
+        dispatchForm={dispatchForm}
+        onPageChange={handlePageChange}
+        onSortChange={handleSortChange}
+        onOrderChange={handleOrderChange}
+        initialIsMobile={initialIsMobile}
       />
-      <CreateUserForm
-        open={drawerOpen}
-        onClose={handleCloseCreateDrawer}
-        onSave={handleSaveUser}
-      />
-      {selectedUser && (
-        <EditUserForm
-          open={!!selectedUser}
-          onClose={handleCloseEditUser}
-          onSave={handleSaveEditUser}
-          user={selectedUser}
-        />
-      )}
-    </Box>
+    </>
   )
 }

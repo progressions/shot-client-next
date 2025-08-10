@@ -1,6 +1,6 @@
 import { GridView, ViewList } from "@mui/icons-material"
-import { CreatePartyForm, SpeedDial } from "@/components/parties"
-import { actions as initialActions } from "@/components/parties/SpeedDial"
+import { CreatePartyForm } from "@/components/parties"
+import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
 import { defaultParty } from "@/types"
 

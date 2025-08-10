@@ -72,6 +72,8 @@ export function NumberField({
     } as React.ChangeEvent<HTMLInputElement>)
   }
 
+  if (!onBlur) throw "WTF"
+
   return (
     <Box
       sx={{
@@ -91,6 +93,7 @@ export function NumberField({
         onChange={onChange}
         onBlur={event => {
           setIsFocused(false)
+          console.log("blur", event)
           onBlur(event)
         }}
         onFocus={() => setIsFocused(true)}

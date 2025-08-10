@@ -10,10 +10,6 @@ import { queryParams } from "@/lib"
 import { Icon, MainHeader } from "@/components/ui"
 
 interface List {
-  initialWeapons: Weapon[]
-  initialMeta: PaginationMeta
-  initialSort: string
-  initialOrder: string
   initialIsMobile?: boolean
 }
 
@@ -29,13 +25,7 @@ type FormStateData = {
   order: string
 }
 
-export default function List({
-  initialWeapons,
-  initialMeta,
-  initialSort,
-  initialOrder,
-  initialIsMobile,
-}: List) {
+export default function List({ initialFormData, initialIsMobile }: List) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { getLocally, saveLocally } = useLocalStorage()
@@ -43,16 +33,8 @@ export default function List({
     (getLocally("weaponViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
   )
-  const { formState, dispatchForm } = useForm<FormStateData>({
-    weapons: initialWeapons,
-    category: null,
-    juncture: null,
-    meta: initialMeta,
-    drawerOpen: false,
-    sort: initialSort,
-    order: initialOrder,
-  })
-  const { meta, sort, order, weapons, category, juncture, drawerOpen } =
+  const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
+  const { sort, order, weapons, category, juncture, drawerOpen } =
     formState.data
   const router = useRouter()
 
@@ -176,53 +158,6 @@ export default function List({
     })
   }
 
-  const handleOrderChange = async () => {
-    const newOrder = order === "asc" ? "desc" : "asc"
-    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(
-      `/weapons?page=1&sort=${sort}&order=${newOrder}&category=${category}&juncture=${juncture}`,
-      {
-        scroll: false,
-      }
-    )
-    await fetchWeapons(1, sort, newOrder, category, juncture)
-  }
-
-  const handlePageChange = async (page: number) => {
-    if (page <= 0 || page > meta.total_pages) {
-      router.push(
-        `/weapons?page=1&sort=${sort}&order=${order}&category=${category}&juncture=${juncture}`,
-        {
-          scroll: false,
-        }
-      )
-      await fetchWeapons(1, sort, order, category, juncture)
-    } else {
-      router.push(
-        `/weapons?page=${page}&sort=${sort}&order=${order}&category=${category}&juncture=${juncture}`,
-        {
-          scroll: false,
-        }
-      )
-      await fetchWeapons(page, sort, order, category, juncture)
-    }
-  }
-
-  const handleSortChange = (newSort: ValidSort) => {
-    const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
-    dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
-    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    const url = `/weapons?${queryParams({
-      page: 1,
-      sort: newSort,
-      order: newOrder,
-    })}`
-    router.push(url, {
-      scroll: false,
-    })
-    fetchWeapons(1, newSort, newOrder)
-  }
-
   return (
     <>
       <Menu
@@ -250,9 +185,6 @@ export default function List({
         viewMode={viewMode}
         formState={formState}
         dispatchForm={dispatchForm}
-        onPageChange={handlePageChange}
-        onSortChange={handleSortChange}
-        onOrderChange={handleOrderChange}
         initialIsMobile={initialIsMobile}
       />
     </>

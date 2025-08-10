@@ -27,13 +27,7 @@ type FormStateData = {
   order: string
 }
 
-export default function List({
-  initialSites,
-  initialMeta,
-  initialSort,
-  initialOrder,
-  initialIsMobile,
-}: ListProps) {
+export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { getLocally, saveLocally } = useLocalStorage()
@@ -41,13 +35,7 @@ export default function List({
     (getLocally("siteViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
   )
-  const { formState, dispatchForm } = useForm<FormStateData>({
-    sites: initialSites,
-    meta: initialMeta,
-    drawerOpen: false,
-    sort: initialSort,
-    order: initialOrder,
-  })
+  const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
   const { meta, sort, order, sites, drawerOpen } = formState.data
   const router = useRouter()
 
@@ -160,7 +148,7 @@ export default function List({
     await fetchSites(1, sort, newOrder)
   }
 
-  const handlePageChange = async (page: number) => {
+  const handlePageChange = async (_event, page: number) => {
     if (page <= 0 || page > meta.total_pages) {
       router.push(`/sites?page=1&sort=${sort}&order=${order}`, {
         scroll: false,

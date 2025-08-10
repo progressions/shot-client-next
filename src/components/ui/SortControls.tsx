@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import {
   Pagination,
   Box,
@@ -16,59 +15,64 @@ import {
 import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
+import { FormStateType, FormActions } from "@/reducers"
 
 type SortControlsProps = {
   isMobile: boolean
   validSorts: string[]
-  sort: string
-  order: "asc" | "desc"
   children?: React.ReactNode
   filter?: React.ReactNode
+  formState: FormStateType
+  dispatchForm: React.Dispatch<FormStateType>
 }
 
 export function SortControls({
-  route,
   isMobile,
   validSorts,
-  page,
-  totalPages,
-  sort,
-  order,
   children,
   filter,
-  onPageChange,
+  formState,
+  dispatchForm,
 }: SortControlsProps) {
-  const router = useRouter()
   const [showFilter, setShowFilter] = useState(false)
+
+  const { meta, sort, order } = formState.data
+  const page = meta?.current_page || 1
+  const totalPages = meta?.total_pages || 1
+
+  const handleSortChange = (event: SelectChangeEvent<string>) => {
+    const newSort = event.target.value as string
+    if (sort === newSort) {
+      // If the sort is already the same, toggle the order
+      const newOrder = order === "asc" ? "desc" : "asc"
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "order",
+        value: newOrder,
+      })
+      return
+    }
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "sort",
+      value: newSort,
+    })
+  }
 
   const handleToggleFilter = () => {
     setShowFilter(!showFilter)
   }
 
-  const handleSortChange = (event: SelectChangeEvent<string>) => {
-    const newSort = event.target.value
-    onSortChange(newSort)
-    router.push(`${route}?page=1&sort=${newSort}&order=${order}`, {
-      scroll: false,
-    })
-  }
-
   const handleOrderChange = () => {
-    onOrderChange()
     const newOrder = order === "asc" ? "desc" : "asc"
-    router.push(`${route}?page=1&sort=${sort}&order=${newOrder}`, {
-      scroll: false,
-    })
+    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
   }
 
   const handlePageChange = (
-    _event: React.ChangeEvent<unknown>,
+    event: React.ChangeEvent<unknown>,
     newPage: number
   ) => {
-    onPageChange(newPage)
-    router.push(`${route}?page=${newPage}&sort=${sort}&order=${order}`, {
-      scroll: false,
-    })
+    dispatchForm({ type: FormActions.UPDATE, name: "page", value: newPage })
   }
 
   return (

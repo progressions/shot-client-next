@@ -28,10 +28,7 @@ type FormStateData = {
 }
 
 export default function List({
-  initialSchticks,
-  initialMeta,
-  initialSort,
-  initialOrder,
+  initialFormData,
   initialIsMobile,
 }: ListProperties) {
   const { client } = useClient()
@@ -41,14 +38,8 @@ export default function List({
     (getLocally("schtickViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
   )
-  const { formState, dispatchForm } = useForm<FormStateData>({
-    schticks: initialSchticks,
-    meta: initialMeta,
-    drawerOpen: false,
-    sort: initialSort,
-    order: initialOrder,
-  })
-  const { meta, sort, order, schticks, drawerOpen } = formState.data
+  const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
+  const { sort, order, schticks, drawerOpen } = formState.data
   const router = useRouter()
 
   useEffect(() => {
@@ -160,44 +151,6 @@ export default function List({
     })
   }
 
-  const handleOrderChange = async () => {
-    const newOrder = order === "asc" ? "desc" : "asc"
-    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/schticks?page=1&sort=${sort}&order=${newOrder}`, {
-      scroll: false,
-    })
-    await fetchSchticks(1, sort, newOrder)
-  }
-
-  const handlePageChange = async (page: number) => {
-    if (page <= 0 || page > meta.total_pages) {
-      router.push(`/schticks?page=1&sort=${sort}&order=${order}`, {
-        scroll: false,
-      })
-      await fetchSchticks(1, sort, order)
-    } else {
-      router.push(`/schticks?page=${page}&sort=${sort}&order=${order}`, {
-        scroll: false,
-      })
-      await fetchSchticks(page, sort, order)
-    }
-  }
-
-  const handleSortChange = (newSort: ValidSort) => {
-    const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
-    dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
-    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    const url = `/schticks?${queryParams({
-      page: 1,
-      sort: newSort,
-      order: newOrder,
-    })}`
-    router.push(url, {
-      scroll: false,
-    })
-    fetchSchticks(1, newSort, newOrder)
-  }
-
   return (
     <>
       <Menu
@@ -225,9 +178,6 @@ export default function List({
         viewMode={viewMode}
         formState={formState}
         dispatchForm={dispatchForm}
-        onPageChange={handlePageChange}
-        onSortChange={handleSortChange}
-        onOrderChange={handleOrderChange}
         initialIsMobile={initialIsMobile}
       />
     </>

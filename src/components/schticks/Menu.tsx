@@ -1,6 +1,6 @@
 import { GridView, ViewList } from "@mui/icons-material"
-import { CreateSchtickForm, SpeedDial } from "@/components/schticks"
-import { actions as initialActions } from "@/components/schticks/SpeedDial"
+import { CreateSchtickForm } from "@/components/schticks"
+import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
 import { defaultSchtick } from "@/types"
 

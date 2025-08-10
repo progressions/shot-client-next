@@ -27,13 +27,7 @@ type FormStateData = {
   order: string
 }
 
-export default function List({
-  initialFactions,
-  initialMeta,
-  initialSort,
-  initialOrder,
-  initialIsMobile,
-}: ListProps) {
+export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { getLocally, saveLocally } = useLocalStorage()
@@ -41,13 +35,7 @@ export default function List({
     (getLocally("factionViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
   )
-  const { formState, dispatchForm } = useForm<FormStateData>({
-    factions: initialFactions,
-    meta: initialMeta,
-    drawerOpen: false,
-    sort: initialSort,
-    order: initialOrder,
-  })
+  const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
   const { meta, sort, order, factions, drawerOpen } = formState.data
   const router = useRouter()
 
@@ -169,7 +157,7 @@ export default function List({
     await fetchFactions(1, sort, newOrder)
   }
 
-  const handlePageChange = async (page: number) => {
+  const handlePageChange = async (_event, page: number) => {
     if (page <= 0 || page > meta.total_pages) {
       router.push(`/factions?page=1&sort=${sort}&order=${order}`, {
         scroll: false,

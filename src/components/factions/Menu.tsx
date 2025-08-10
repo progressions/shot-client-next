@@ -1,6 +1,6 @@
 import { GridView, ViewList } from "@mui/icons-material"
-import { CreateFactionForm, SpeedDial } from "@/components/factions"
-import { actions as initialActions } from "@/components/factions/SpeedDial"
+import { CreateFactionForm } from "@/components/factions"
+import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
 import { defaultFaction } from "@/types"
 

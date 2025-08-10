@@ -1,6 +1,6 @@
 import { GridView, ViewList } from "@mui/icons-material"
-import { CreateWeaponForm, SpeedDial } from "@/components/weapons"
-import { actions as initialActions } from "@/components/weapons/SpeedDial"
+import { CreateWeaponForm } from "@/components/weapons"
+import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
 import { defaultWeapon } from "@/types"
 

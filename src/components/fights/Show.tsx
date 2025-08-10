@@ -52,6 +52,8 @@ export default function Show({ fight: initialFight }: ShowProperties) {
     dispatchForm
   )
 
+  console.log("fight.season", fight.season)
+
   useEffect(() => {
     document.title = fight.name ? `${fight.name} - Chi War` : "Chi War"
   }, [fight.name])
@@ -93,15 +95,18 @@ export default function Show({ fight: initialFight }: ShowProperties) {
     console.log("Join fight clicked")
   }
 
-  console.log("fight.image_url", fight.image_url)
+  const handleChangeLocal = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    console.log("name, value", { name, value })
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "entity",
+      value: { ...fight, [name]: value },
+    })
+  }
 
   return (
-    <Box
-      sx={{
-        mb: { xs: 1, md: 2 },
-        position: "relative",
-      }}
-    >
+    <>
       <SpeedDialMenu onDelete={deleteEntity} />
       <HeroImage entity={fight} setEntity={setFight} />
       <FightChips fight={fight} />
@@ -151,13 +156,7 @@ export default function Show({ fight: initialFight }: ShowProperties) {
               label="Season"
               name="season"
               value={fight.season || ""}
-              onChange={e =>
-                dispatchForm({
-                  type: FormActions.UPDATE,
-                  name: "season",
-                  value: e.target.value,
-                })
-              }
+              onChange={handleChangeLocal}
               onBlur={handleChangeAndSave}
               size="small"
             />
@@ -171,13 +170,7 @@ export default function Show({ fight: initialFight }: ShowProperties) {
               label="Session"
               name="session"
               value={fight.session || ""}
-              onChange={e =>
-                dispatchForm({
-                  type: FormActions.UPDATE,
-                  name: "session",
-                  value: e.target.value,
-                })
-              }
+              onChange={handleChangeLocal}
               onBlur={handleChangeAndSave}
               size="small"
             />
@@ -217,6 +210,6 @@ export default function Show({ fight: initialFight }: ShowProperties) {
           updateParent={updateEntity}
         />
       </Stack>
-    </Box>
+    </>
   )
 }

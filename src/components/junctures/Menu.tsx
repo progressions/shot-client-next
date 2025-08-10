@@ -1,6 +1,6 @@
 import { GridView, ViewList } from "@mui/icons-material"
-import { CreateJunctureForm, SpeedDial } from "@/components/junctures"
-import { actions as initialActions } from "@/components/junctures/SpeedDial"
+import { CreateJunctureForm } from "@/components/junctures"
+import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
 import { defaultJuncture } from "@/types"
 

@@ -60,11 +60,10 @@ export default function CharacterFilter({
 
   const character_id = selectedChild?.id
 
-  console.log("character_id", character_id)
-
   const fetchCharacters = useCallback(async () => {
     try {
-      const response = await client.getCharacterNames({
+      const response = await client.getCharacter({
+        autocomplete: true,
         faction_id,
         type: character_type,
         archetype: archetype,

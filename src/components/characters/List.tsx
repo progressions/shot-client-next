@@ -10,14 +10,10 @@ import { queryParams } from "@/lib"
 import { View, Menu } from "@/components/characters"
 
 interface ListProps {
-  initialCharacters: Character[]
-  initialMeta: PaginationMeta
-  initialSort: string
-  initialOrder: string
+  initialFormData: FormStateData
   initialIsMobile: boolean
 }
 
-type ValidSort = "name" | "type" | "created_at" | "updated_at"
 type ValidOrder = "asc" | "desc"
 
 type FormStateData = {
@@ -28,15 +24,10 @@ type FormStateData = {
   character_type: string
   archetype: string
   faction_id: string
+  page: number
 }
 
-export default function List({
-  initialCharacters,
-  initialMeta,
-  initialSort,
-  initialOrder,
-  initialIsMobile,
-}: ListProps) {
+export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { saveLocally, getLocally } = useLocalStorage()
@@ -45,16 +36,9 @@ export default function List({
     (getLocally("characterViewMode") as "table" | "mobile") ||
       (initialIsMobile ? "mobile" : "table")
   )
-  const { formState, dispatchForm } = useForm<FormStateData>({
-    characters: initialCharacters,
-    meta: initialMeta,
-    sort: initialSort,
-    order: initialOrder,
-    character_type: "",
-    archetype: "",
-    faction_id: "",
-  })
-  const { meta, sort, order, character_type, archetype, faction_id } =
+  const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
+  console.log("Form state:", formState)
+  const { meta, page, sort, order, character_type, archetype, faction_id } =
     formState.data
 
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
@@ -123,7 +107,7 @@ export default function List({
 
   useEffect(() => {
     const url = `/characters?${queryParams({
-      page: 1,
+      page: page,
       sort,
       order,
       type: character_type,
@@ -133,7 +117,7 @@ export default function List({
     router.push(url, {
       scroll: false,
     })
-    fetchCharacters(1, sort, order, character_type, faction_id, archetype)
+    fetchCharacters(page, sort, order, character_type, faction_id, archetype)
   }, [
     character_type,
     archetype,
@@ -142,62 +126,12 @@ export default function List({
     order,
     router,
     sort,
+    page,
   ])
 
   useEffect(() => {
     saveLocally("characterViewMode", viewMode)
   }, [viewMode, saveLocally])
-
-  const handlePageChange = (
-    _event: React.ChangeEvent<unknown>,
-    page: number
-  ) => {
-    if (page <= 0 || page > meta.total_pages) {
-      const url = `/characters?${queryParams({
-        page: 1,
-        sort,
-        order,
-        type: character_type,
-        faction_id,
-        archetype,
-      })}`
-      router.push(url, {
-        scroll: false,
-      })
-      fetchCharacters(1, sort, order)
-    } else {
-      const url = `/characters?${queryParams({
-        page,
-        sort,
-        order,
-        type: character_type,
-        faction_id,
-        archetype,
-      })}`
-      router.push(url, {
-        scroll: false,
-      })
-      fetchCharacters(page, sort, order)
-    }
-  }
-
-  const handleSortChange = (newSort: ValidSort) => {
-    const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
-    dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
-    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    const url = `/characters?${queryParams({
-      page: 1,
-      sort: newSort,
-      order: newOrder,
-      type: character_type,
-      faction_id,
-      archetype,
-    })}`
-    router.push(url, {
-      scroll: false,
-    })
-    fetchCharacters(1, newSort, newOrder)
-  }
 
   return (
     <>
@@ -219,9 +153,6 @@ export default function List({
         viewMode={viewMode}
         formState={formState}
         dispatchForm={dispatchForm}
-        onPageChange={handlePageChange}
-        onSortChange={handleSortChange}
-        onOrderChange={() => handleSortChange(sort as ValidSort)}
         initialIsMobile={initialIsMobile}
       />
     </>

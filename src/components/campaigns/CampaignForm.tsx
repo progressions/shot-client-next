@@ -37,8 +37,9 @@ export default function CampaignForm({
   initialFormData,
   title,
 }: CampaignFormProperties) {
-  const { formState, dispatchForm, initialFormState } =
-    useForm<FormStateData>(initialFormData)
+  const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
+    entity: initialFormData,
+  })
   const { disabled, error, data } = formState
   const { name, description, faction_id, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)

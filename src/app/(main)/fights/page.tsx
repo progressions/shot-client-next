@@ -1,10 +1,6 @@
-import { Suspense } from "react"
-import { redirect } from "next/navigation"
-import { headers } from "next/headers"
-import { Box, CircularProgress } from "@mui/material"
-import { getUser, getServerClient, getPageParameters } from "@/lib"
+// app/fights/page.tsx
 import { List } from "@/components/fights"
-import Breadcrumbs from "@/components/Breadcrumbs"
+import ResourcePage from "@/components/ResourcePage"
 import type { FightsResponse } from "@/types"
 
 export const metadata = {
@@ -16,71 +12,21 @@ export default async function FightsPage({
 }: {
   searchParams: Promise<{ page?: string; sort?: string; order?: string }>
 }) {
-  const client = await getServerClient()
-  const user = await getUser()
-  if (!client || !user) {
-    redirect("/login")
-  }
-
-  // Validate parameters using getPageParameters
-  const { page, sort, order } = await getPageParameters(searchParams, {
-    validSorts: ["created_at", "updated_at", "name"],
-    defaultSort: "created_at",
-    defaultOrder: "desc",
-  })
-
-  // Redirect if page is invalid
-  if (page <= 0) {
-    redirect("/fights?page=1&sort=created_at&order=desc")
-  }
-
-  // Fetch fights for the requested page, sort, and order
-  let fightsResponse: FightsResponse = {
-    fights: [],
-    meta: { current_page: page, total_pages: 1 },
-  }
-  try {
-    const response = await client.getFights({ page, sort, order })
-    if (!response.data) {
-      throw new Error("No data returned from getFights")
-    }
-    fightsResponse = response.data
-    if (
-      page > fightsResponse.meta.total_pages &&
-      fightsResponse.meta.total_pages > 0
-    ) {
-      redirect("/fights?page=1&sort=created_at&order=desc")
-    }
-  } catch (error) {
-    console.error("Error fetching fights in FightsPage:", error)
-  }
-
-  // Detect mobile device on the server
-  const headersState = await headers()
-  const userAgent = headersState.get("user-agent") || ""
-  const initialIsMobile = /mobile/i.test(userAgent)
-
   return (
-    <Box
-      sx={{
-        justifyContent: "space-between",
-        alignItems: "center",
-        mb: 2,
-        position: "relative",
-      }}
-    >
-      <Suspense fallback={<CircularProgress />}>
-        <Breadcrumbs headers={headers} />
-      </Suspense>
-      <Suspense fallback={<CircularProgress />}>
-        <List
-          initialFights={fightsResponse.fights}
-          initialMeta={fightsResponse.meta}
-          initialSort={sort}
-          initialOrder={order}
-          initialIsMobile={initialIsMobile}
-        />
-      </Suspense>
-    </Box>
+    <ResourcePage
+      resourceName="fights"
+      fetchData={async (client, params) => client.getFights(params)}
+      validSorts={["name", "created_at", "updated_at"]}
+      getInitialFormData={(data: FightsResponse, page, sort, order) => ({
+        fights: data.fights,
+        meta: data.meta,
+        sort,
+        order,
+        page,
+        drawerOpen: false,
+      })}
+      ListComponent={List}
+      searchParams={searchParams}
+    />
   )
 }

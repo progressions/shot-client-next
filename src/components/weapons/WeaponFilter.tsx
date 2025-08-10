@@ -132,14 +132,6 @@ export default function WeaponFilter({
     dispatchForm({ type: FormActions.UPDATE, name: "category", value: value })
   }
 
-  const handleTypeChange = (value: string | null) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "weapon_type",
-      value: value,
-    })
-  }
-
   const fetchCategories = async () => {
     const opts = categories.map(category => ({
       label: category,
