@@ -5,6 +5,7 @@ import Box from "@mui/material/Box"
 import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid"
 import { FormActions } from "@/reducers"
 import { WeaponLink } from "@/components/ui"
+import { WeaponAvatar } from "@/components/avatars"
 
 interface PaginationMeta {
   current_page: number
@@ -40,18 +41,62 @@ interface ViewProps {
 
 const columns: GridColDef<(typeof rows)[number]>[] = [
   {
+    field: "avatar",
+    headerName: "",
+    width: 70,
+    editable: false,
+    sortable: false,
+    renderCell: params => <WeaponAvatar weapon={params.row} />,
+  },
+  {
     field: "name",
     headerName: "Name",
-    width: 350,
+    width: 200,
     editable: false,
     sortable: true,
     renderCell: params => <WeaponLink weapon={params.row} />,
   },
   {
-    field: "created_at",
-    headerName: "Created At",
-    type: "date",
+    field: "juncture",
+    headerName: "Juncture",
     width: 110,
+    editable: false,
+  },
+  {
+    field: "category",
+    headerName: "Category",
+    width: 110,
+    editable: false,
+  },
+  {
+    field: "damage",
+    headerName: "Damage",
+    width: 60,
+    type: "number",
+    editable: false,
+    sortable: true,
+  },
+  {
+    field: "concealment",
+    headerName: "Conceal",
+    width: 60,
+    type: "number",
+    editable: false,
+    sortable: true,
+  },
+  {
+    field: "reload_value",
+    headerName: "Reload",
+    width: 60,
+    type: "number",
+    editable: false,
+    sortable: true,
+  },
+  {
+    field: "created_at",
+    headerName: "Created",
+    type: "date",
+    width: 100,
     editable: false,
   },
 ]
@@ -59,9 +104,9 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
 export default function View({ formState, dispatchForm }: ViewProps) {
   const { meta, sort, order, weapons } = formState.data
 
+  console.log("weapons", weapons)
   const rows = weapons.map(weapon => ({
-    id: weapon.id,
-    name: weapon.name,
+    ...weapon,
     created_at: new Date(weapon.created_at),
   }))
 

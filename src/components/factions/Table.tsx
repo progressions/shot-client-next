@@ -1,10 +1,10 @@
 "use client"
 
-import * as React from "react"
-import Box from "@mui/material/Box"
+import { Box } from "@mui/material"
 import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid"
 import { FormActions } from "@/reducers"
-import { FactionLink } from "@/components/ui"
+import { MembersGroup, FactionLink } from "@/components/ui"
+import { CharacterAvatar, FactionAvatar } from "@/components/avatars"
 
 interface PaginationMeta {
   current_page: number
@@ -40,12 +40,35 @@ interface ViewProps {
 
 const columns: GridColDef<(typeof rows)[number]>[] = [
   {
+    field: "avatar",
+    headerName: "",
+    width: 70,
+    editable: false,
+    sortable: false,
+    renderCell: params => <FactionAvatar faction={params.row} />,
+  },
+  {
     field: "name",
     headerName: "Name",
     width: 350,
     editable: false,
     sortable: true,
     renderCell: params => <FactionLink faction={params.row} />,
+  },
+  {
+    field: "members",
+    headerName: "Members",
+    width: 150,
+    editable: false,
+    sortable: true,
+    renderCell: params => (
+      <MembersGroup
+        items={params.row.characters || []}
+        AvatarComponent={CharacterAvatar}
+        itemPropName="character"
+        max={3}
+      />
+    ),
   },
   {
     field: "created_at",
@@ -60,8 +83,7 @@ export default function View({ formState, dispatchForm }: ViewProps) {
   const { meta, sort, order, factions } = formState.data
 
   const rows = factions.map(faction => ({
-    id: faction.id,
-    name: faction.name,
+    ...faction,
     created_at: new Date(faction.created_at),
   }))
 

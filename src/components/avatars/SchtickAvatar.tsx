@@ -2,30 +2,30 @@
 
 import { Avatar, Link } from "@mui/material"
 import { RefObject, useRef } from "react"
-import type { Fight } from "@/types"
+import type { Schtick } from "@/types"
 import { SystemStyleObject, Theme } from "@mui/system"
 
-interface FightAvatarProperties {
-  fight: Fight
+interface SchtickAvatarProperties {
+  schtick: Schtick
   href?: string
   disablePopup?: boolean
   sx?: SystemStyleObject<Theme>
 }
 
-const FightAvatar = ({
-  fight,
+const SchtickAvatar = ({
+  schtick,
   href,
   disablePopup,
   sx = {},
-}: FightAvatarProperties) => {
+}: SchtickAvatarProperties) => {
   const avatarReference: RefObject<HTMLDivElement | null> = useRef(null)
 
-  if (!fight?.id) {
+  if (!schtick?.id) {
     return <></>
   }
 
-  const initials = fight.name
-    ? fight.name
+  const initials = schtick.name
+    ? schtick.name
         .split(" ")
         .map(part => part.charAt(0).toUpperCase())
         .join("")
@@ -33,8 +33,8 @@ const FightAvatar = ({
 
   const baseAvatar = (
     <Avatar
-      alt={fight.name}
-      src={fight.image_url || ""}
+      alt={schtick.name}
+      src={schtick.image_url || ""}
       ref={avatarReference}
       sx={sx}
     >
@@ -51,8 +51,8 @@ const FightAvatar = ({
       <Link
         href={href}
         target="_blank"
-        data-mention-id={fight.id}
-        data-mention-class-name="Fight"
+        data-mention-id={schtick.id}
+        data-mention-class-name="Schtick"
         sx={{ padding: 0, ml: -1.5 }}
       >
         {baseAvatar}
@@ -63,4 +63,4 @@ const FightAvatar = ({
   return baseAvatar
 }
 
-export default FightAvatar
+export default SchtickAvatar

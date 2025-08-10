@@ -6,6 +6,7 @@ import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid"
 import { FormActions } from "@/reducers"
 import { FactionLink, CharacterLink } from "@/components/ui"
 import { CS } from "@/services"
+import { CharacterAvatar } from "@/components/avatars"
 
 interface PaginationMeta {
   current_page: number
@@ -41,6 +42,14 @@ interface ViewProps {
 
 const columns: GridColDef<(typeof rows)[number]>[] = [
   {
+    field: "avatar",
+    headerName: "",
+    width: 70,
+    editable: false,
+    sortable: false,
+    renderCell: params => <CharacterAvatar faction={params.row} />,
+  },
+  {
     field: "name",
     headerName: "Name",
     width: 240,
@@ -67,7 +76,10 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
     headerName: "Faction",
     width: 160,
     editable: false,
-    renderCell: params => (CS.faction(params.row) ? <FactionLink faction={CS.faction(params.row)} /> : null),
+    renderCell: params =>
+      CS.faction(params.row) ? (
+        <FactionLink faction={CS.faction(params.row)} />
+      ) : null,
   },
   {
     field: "task",
@@ -75,7 +87,7 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
     type: "boolean",
     width: 50,
     editable: false,
-    renderCell: params => CS.isTask(params.row) ? "Yes" : "",
+    renderCell: params => (CS.isTask(params.row) ? "Yes" : ""),
   },
   {
     field: "created_at",

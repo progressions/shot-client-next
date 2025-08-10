@@ -5,6 +5,7 @@ import Box from "@mui/material/Box"
 import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid"
 import { FormActions } from "@/reducers"
 import { CampaignLink } from "@/components/ui"
+import { CampaignAvatar } from "@/components/avatars"
 
 interface PaginationMeta {
   current_page: number
@@ -39,6 +40,14 @@ interface ViewProps {
 }
 
 const columns: GridColDef<(typeof rows)[number]>[] = [
+  {
+    field: "avatar",
+    headerName: "",
+    width: 70,
+    editable: false,
+    sortable: false,
+    renderCell: params => <CampaignAvatar campaign={params.row} />,
+  },
   {
     field: "name",
     headerName: "Name",

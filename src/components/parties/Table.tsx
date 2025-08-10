@@ -4,7 +4,8 @@ import * as React from "react"
 import Box from "@mui/material/Box"
 import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid"
 import { FormActions } from "@/reducers"
-import { PartyLink } from "@/components/ui"
+import { FactionLink, PartyLink } from "@/components/ui"
+import { PartyAvatar } from "@/components/avatars"
 
 interface PaginationMeta {
   current_page: number
@@ -40,12 +41,40 @@ interface ViewProps {
 
 const columns: GridColDef<(typeof rows)[number]>[] = [
   {
+    field: "avatar",
+    headerName: "",
+    width: 70,
+    editable: false,
+    sortable: false,
+    renderCell: params => <PartyAvatar party={params.row} />,
+  },
+  {
     field: "name",
     headerName: "Name",
     width: 350,
     editable: false,
     sortable: true,
     renderCell: params => <PartyLink party={params.row} />,
+  },
+  {
+    field: "faction",
+    headerName: "Faction",
+    width: 150,
+    editable: false,
+    sortable: true,
+    renderCell: params =>
+      params.row.faction?.id ? (
+        <FactionLink faction={params.row.faction} />
+      ) : null,
+  },
+  {
+    field: "members",
+    headerName: "Members",
+    width: 100,
+    editable: false,
+    sortable: true,
+    renderCell: params =>
+      params.row.characters?.length ? params.row.characters.length : 0,
   },
   {
     field: "created_at",
@@ -59,9 +88,10 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
 export default function View({ formState, dispatchForm }: ViewProps) {
   const { meta, sort, order, parties } = formState.data
 
+  console.log("parties", parties)
+
   const rows = parties.map(party => ({
-    id: party.id,
-    name: party.name,
+    ...party,
     created_at: new Date(party.created_at),
   }))
 
