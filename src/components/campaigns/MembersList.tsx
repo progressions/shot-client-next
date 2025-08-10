@@ -15,9 +15,10 @@ export default function MembersList({
 }: MembersListProperties) {
   const { client } = useClient()
 
-  async function update(campaignId: string, formData: FormData) {
+  async function update(updatedCampaign: Campaign) {
+    console.log("campaignId", updatedCampaign)
     try {
-      const response = await client.updateCampaign(campaignId, formData)
+      const response = await client.updateCampaign(updatedCampaign.id, { campaign: updatedCampaign })
       setCampaign(response.data)
     } catch (error) {
       console.error("Error updating campaign:", error)
@@ -30,7 +31,6 @@ export default function MembersList({
       parent={campaign}
       name="Campaign"
       collectionName="players"
-      collection_ids="player_ids"
       title="Campaign Members"
       description={
         <>

@@ -920,6 +920,14 @@ class Client {
     })
   }
 
+  async getPlayers(
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<UsersResponse>> {
+    const query = queryParams(parameters)
+    return this.get(`${this.apiV2.users()}?${query}`, {}, cacheOptions)
+  }
+
   async getUsers(
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
