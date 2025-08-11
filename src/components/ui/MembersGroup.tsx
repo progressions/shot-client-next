@@ -1,22 +1,18 @@
 import { AvatarGroup, Box } from "@mui/material"
-import type { ComponentType } from "react"
-import { SystemStyleObject, Theme } from "@mui/system"
 import { Avatar } from "@/components/avatars"
+import { SystemStyleObject, Theme } from "@mui/system"
 
 // Define a generic type for the items and props
 interface MembersGroupProps<T> {
   items: T[]
   max?: number
+  sx?: SystemStyleObject<Theme>
 }
 
-export function MembersGroup<T>({
-  items,
-  AvatarComponent,
-  itemPropName = "item", // Default to 'item' if not specified
-  max = 5,
-}: MembersGroupProps<T>) {
+export function MembersGroup<T>({ items, max = 5, sx }: MembersGroupProps<T>) {
   return (
     <AvatarGroup
+      sx={sx}
       max={max}
       slotProps={{
         surplus: {

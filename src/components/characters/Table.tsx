@@ -1,21 +1,10 @@
 "use client"
-
-import * as React from "react"
-import Box from "@mui/material/Box"
-import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid"
-import { FormActions } from "@/reducers"
-import { FactionLink, CharacterLink } from "@/components/ui"
+import { GridColDef } from "@mui/x-data-grid"
+import { FormStateType, FormStateAction } from "@/reducers"
+import { BaseDataGrid, FactionLink, CharacterLink } from "@/components/ui"
 import { CS } from "@/services"
 import { Avatar } from "@/components/avatars"
-import type { Character } from "@/types"
-
-interface PaginationMeta {
-  current_page: number
-  next_page: number | null
-  prev_page: number | null
-  total_pages: number
-  total_count: number
-}
+import { PaginationMeta, Character } from "@/types"
 
 interface FormStateData {
   meta: PaginationMeta
@@ -27,15 +16,11 @@ interface FormStateData {
 }
 
 interface ViewProps {
-  formState: { data: FormStateData }
-  dispatchForm: (action: {
-    type: FormActions
-    name: string
-    value: unknown
-  }) => void
+  formState: FormStateType<FormStateData>
+  dispatchForm: (action: FormStateAction<FormStateData>) => void
 }
 
-const columns: GridColDef<(typeof rows)[number]>[] = [
+const columns: GridColDef<Character>[] = [
   {
     field: "avatar",
     headerName: "",
@@ -71,10 +56,13 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
     headerName: "Faction",
     width: 160,
     editable: false,
-    renderCell: params =>
-      CS.faction(params.row) ? (
-        <FactionLink faction={CS.faction(params.row)} />
-      ) : null,
+    renderCell: params => {
+      const faction = CS.faction(params.row)
+      if (faction) {
+        return <FactionLink faction={faction} />
+      }
+      return null
+    },
   },
   {
     field: "task",
@@ -86,7 +74,7 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
   },
   {
     field: "created_at",
-    headerName: "Created At",
+    headerName: "Created",
     type: "date",
     width: 110,
     editable: false,
@@ -94,68 +82,19 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
 ]
 
 export default function View({ formState, dispatchForm }: ViewProps) {
-  const { meta, sort, order, characters } = formState.data
-
-  console.log("Rendering View with characters:", characters)
-
+  const { characters } = formState.data
   const rows = characters.map(character => ({
     ...character,
     created_at: new Date(character.created_at),
   }))
 
-  const onPageChange = (newPage: number) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "page",
-      value: newPage, // Already 1-based from Pagination
-    })
-  }
-
-  const onSortChange = (model: GridSortModel) => {
-    const sortField = model[0]?.field || ""
-    const sortOrder = model[0]?.sort || ""
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "sort",
-      value: sortField,
-    })
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "order",
-      value: sortOrder,
-    })
-  }
-
   return (
-    <Box
-      sx={{ display: "flex", flexDirection: "column", gap: 2, width: "100%", height: 800 }}
-    >
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        paginationMode="server"
-        rowCount={meta.total_count}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 10,
-              page: meta.current_page - 1, // Convert to 0-based for DataGrid
-            },
-          },
-          sortModel: [
-            {
-              field: sort,
-              sort: order as "asc" | "desc" | undefined,
-            },
-          ],
-        }}
-        pageSizeOptions={[10]}
-        disableRowSelectionOnClick
-        onPaginationModelChange={model => onPageChange(model.page + 1)}
-        onSortModelChange={onSortChange}
-        sortingMode="server"
-        hideFooterPagination
-      />
-    </Box>
+    <BaseDataGrid
+      formState={formState}
+      dispatchForm={dispatchForm}
+      columns={columns}
+      rows={rows}
+      sx={{ height: 800 }}
+    />
   )
 }

@@ -9,12 +9,7 @@ interface AvatarProperties {
   sx?: SystemStyleObject<Theme>
 }
 
-const Avatar = ({
-  entity,
-  href,
-  disablePopup,
-  sx = {},
-}: AvatarProperties) => {
+const Avatar = ({ entity, href, disablePopup, sx = {} }: AvatarProperties) => {
   if (!entity?.id) {
     return <></>
   }

@@ -30,9 +30,11 @@ type FormStateData = {
 export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
-  const { saveLocally, getLocally } = useLocalStorage()
+  const { saveLocally } = useLocalStorage()
   const router = useRouter()
-  const [viewMode, setViewMode] = useState<"table" | "mobile">(initialIsMobile ? "mobile" : "table")
+  const [viewMode, setViewMode] = useState<"table" | "mobile">(
+    initialIsMobile ? "mobile" : "table"
+  )
   const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
   const { meta, page, sort, order, character_type, archetype, faction_id } =
     formState.data
