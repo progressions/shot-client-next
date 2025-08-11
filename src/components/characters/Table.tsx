@@ -6,7 +6,8 @@ import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid"
 import { FormActions } from "@/reducers"
 import { FactionLink, CharacterLink } from "@/components/ui"
 import { CS } from "@/services"
-import { CharacterAvatar } from "@/components/avatars"
+import { Avatar } from "@/components/avatars"
+import type { Character } from "@/types"
 
 interface PaginationMeta {
   current_page: number
@@ -14,12 +15,6 @@ interface PaginationMeta {
   prev_page: number | null
   total_pages: number
   total_count: number
-}
-
-interface Character {
-  id: number
-  name: string
-  created_at: string
 }
 
 interface FormStateData {
@@ -47,7 +42,7 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
     width: 70,
     editable: false,
     sortable: false,
-    renderCell: params => <CharacterAvatar faction={params.row} />,
+    renderCell: params => <Avatar entity={params.row} />,
   },
   {
     field: "name",
@@ -101,6 +96,8 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
 export default function View({ formState, dispatchForm }: ViewProps) {
   const { meta, sort, order, characters } = formState.data
 
+  console.log("Rendering View with characters:", characters)
+
   const rows = characters.map(character => ({
     ...character,
     created_at: new Date(character.created_at),
@@ -131,7 +128,7 @@ export default function View({ formState, dispatchForm }: ViewProps) {
 
   return (
     <Box
-      sx={{ display: "flex", flexDirection: "column", gap: 2, width: "100%" }}
+      sx={{ display: "flex", flexDirection: "column", gap: 2, width: "100%", height: 800 }}
     >
       <DataGrid
         rows={rows}

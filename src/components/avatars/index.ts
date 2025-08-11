@@ -1,3 +1,4 @@
+export { default as Avatar } from "@/components/avatars/Avatar"
 export { default as CharacterAvatar } from "@/components/avatars/CharacterAvatar"
 export { default as VehicleAvatar } from "@/components/avatars/VehicleAvatar"
 export { default as WeaponAvatar } from "@/components/avatars/WeaponAvatar"

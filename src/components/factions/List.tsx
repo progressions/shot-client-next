@@ -31,10 +31,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { getLocally, saveLocally } = useLocalStorage()
-  const [viewMode, setViewMode] = useState<"table" | "mobile">(
-    (getLocally("factionViewMode") as "table" | "mobile") ||
-      (initialIsMobile ? "mobile" : "table")
-  )
+  const [viewMode, setViewMode] = useState<"table" | "mobile">(initialIsMobile ? "mobile" : "table")
   const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
   const { meta, sort, order, factions, drawerOpen } = formState.data
   const router = useRouter()
