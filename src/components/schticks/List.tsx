@@ -1,65 +1,46 @@
 "use client"
-import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useEffect, useCallback, useState } from "react"
 import { Box } from "@mui/material"
-import { View, Menu } from "@/components/schticks"
 import type { Schtick, PaginationMeta } from "@/types"
+import { useCampaign, useClient, useLocalStorage } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
-import { useLocalStorage, useCampaign, useClient } from "@/contexts"
-import { queryParams } from "@/lib"
 import { Icon, MainHeader } from "@/components/ui"
+import { queryParams } from "@/lib"
+import { View, Menu } from "@/components/schticks"
 
-interface ListProperties {
-  initialSchticks: Schtick[]
-  initialMeta: PaginationMeta
-  initialSort: string
-  initialOrder: string
-  initialIsMobile?: boolean
+interface ListProps {
+  initialFormData: FormStateData
+  initialIsMobile: boolean
 }
 
-type ValidSort = "created_at" | "updated_at" | "name"
-type ValidOrder = "asc" | "desc"
-type FormStateData = {
+export type FormStateData = {
   schticks: Schtick[]
   meta: PaginationMeta
-  drawerOpen: boolean
-  sort: string
-  order: string
+  filters: {
+    sort: string
+    order: string
+    category: string
+    path: string
+    page: number
+  }
 }
 
-export default function List({
-  initialFormData,
-  initialIsMobile,
-}: ListProperties) {
+export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { saveLocally } = useLocalStorage()
+  const router = useRouter()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
     initialIsMobile ? "mobile" : "table"
   )
   const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
-  const { sort, order, schticks, drawerOpen } = formState.data
-  const router = useRouter()
-
-  useEffect(() => {
-    saveLocally("schtickViewMode", viewMode)
-  }, [viewMode, saveLocally])
-
-  const validSorts: readonly ValidSort[] = useMemo(
-    () => ["created_at", "updated_at", "name"],
-    []
-  )
-  const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
+  const { filters } = formState.data
 
   const fetchSchticks = useCallback(
-    async (
-      page: number = 1,
-      sort: string = "created_at",
-      order: string = "desc"
-    ) => {
+    async filters => {
       try {
-        const response = await client.getSchticks({ page, sort, order })
-        console.log("Fetched schticks:", response.data.schticks)
+        const response = await client.getSchticks({ ...filters })
         dispatchForm({
           type: FormActions.UPDATE,
           name: "schticks",
@@ -68,15 +49,9 @@ export default function List({
         dispatchForm({
           type: FormActions.UPDATE,
           name: "meta",
-          value: response.data.meta || { current_page: page, total_pages: 1 },
+          value: response.data.meta,
         })
-        dispatchForm({ type: FormActions.ERROR, payload: null })
-      } catch (error: unknown) {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : "Unable to fetch schticks data"
-        dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
+      } catch (error) {
         console.error("Fetch schticks error:", error)
       }
     },
@@ -87,79 +62,25 @@ export default function List({
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
     if (campaignData.schticks === "reload") {
-      const parameters = new URLSearchParams(globalThis.location.search)
-      const page = parameters.get("page")
-        ? Number.parseInt(parameters.get("page")!, 10)
-        : 1
-      const sortParameter = parameters.get("sort")
-      const orderParameter = parameters.get("order")
-      const currentSort =
-        sortParameter && validSorts.includes(sortParameter as ValidSort)
-          ? sortParameter
-          : "created_at"
-      const currentOrder =
-        orderParameter && validOrders.includes(orderParameter as ValidOrder)
-          ? orderParameter
-          : "desc"
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "sort",
-        value: currentSort,
-      })
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "order",
-        value: currentOrder,
-      })
-      fetchSchticks(page, currentSort, currentOrder)
+      fetchSchticks(filters)
     }
-  }, [
-    client,
-    campaignData,
-    dispatchForm,
-    fetchSchticks,
-    validSorts,
-    validOrders,
-  ])
+  }, [campaignData, fetchSchticks, filters])
 
   useEffect(() => {
-    const url = `/schticks?${queryParams({
-      page: 1,
-      sort,
-      order,
-    })}`
+    const url = `/schticks?${queryParams(filters)}`
     router.push(url, {
       scroll: false,
     })
-    fetchSchticks(1, sort, order)
-  }, [fetchSchticks, order, router, sort])
+    fetchSchticks(filters)
+  }, [filters, fetchSchticks, router])
 
-  const handleOpenCreateDrawer = () => {
-    dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
-  }
-
-  const handleCloseCreateDrawer = () => {
-    dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: false })
-  }
-
-  const handleSave = async (newSchtick: Schtick) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "schticks",
-      value: [newSchtick, ...schticks],
-    })
-  }
+  useEffect(() => {
+    saveLocally("schtickViewMode", viewMode)
+  }, [viewMode, saveLocally])
 
   return (
     <>
-      <Menu
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-        drawerOpen={drawerOpen}
-        handleOpenCreateDrawer={handleOpenCreateDrawer}
-        handleCloseCreateDrawer={handleCloseCreateDrawer}
-        handleSave={handleSave}
-      />
+      <Menu viewMode={viewMode} setViewMode={setViewMode} />
       <Box
         sx={{
           display: "flex",

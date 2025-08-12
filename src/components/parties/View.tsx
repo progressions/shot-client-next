@@ -1,8 +1,10 @@
 "use client"
+import { useMemo, useCallback } from "react"
 import { Box } from "@mui/material"
-import { FormStateType, FormStateAction } from "@/reducers"
+import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, PartyDetail } from "@/components/parties"
-import { GridView, SortControls } from "@/components/ui"
+import { createFilterComponent, GridView, SortControls } from "@/components/ui"
+import { filterConfigs } from "@/lib/filterConfigs"
 
 interface ViewProps {
   viewMode: "table" | "mobile"
@@ -10,29 +12,26 @@ interface ViewProps {
   dispatchForm: (action: FormStateAction<FormStateData>) => void
 }
 
-type FormStateData = {
-  parties: Party[]
-  meta: PaginationMeta
-  sort: string
-  order: string
-  party_type: string
-  archetype: string
-}
-
-interface Party {
-  id: string
-  name: string
-  type: string
-  created_at: string
-  active: boolean
-}
-
-interface PaginationMeta {
-  current_page: number
-  total_pages: number
-}
-
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
+  const PartyFilter = useMemo(
+    () => createFilterComponent(filterConfigs["Party"]),
+    []
+  )
+
+  const updateFilters = useCallback(
+    filters => {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "filters",
+        value: {
+          ...formState.data.filters,
+          ...filters,
+        },
+      })
+    },
+    [dispatchForm]
+  )
+
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
       <SortControls
@@ -40,6 +39,7 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         dispatchForm={dispatchForm}
         formState={formState}
         isMobile={viewMode === "mobile"}
+        filter={<PartyFilter omit={["add"]} onFiltersUpdate={updateFilters} />}
       >
         {viewMode === "mobile" ? (
           <GridView

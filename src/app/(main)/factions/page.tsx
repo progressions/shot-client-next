@@ -20,9 +20,11 @@ export default async function FactionsPage({
       getInitialFormData={(data: FactionsResponse, page, sort, order) => ({
         factions: data.factions,
         meta: data.meta,
-        sort,
-        order,
-        page,
+        filters: {
+          sort,
+          order,
+          page,
+        },
         drawerOpen: false,
       })}
       ListComponent={List}

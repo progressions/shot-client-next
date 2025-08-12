@@ -1,6 +1,7 @@
 "use client"
 
-import { useReducer } from "react"
+// @/reducers/index.tsx
+import { useReducer, useMemo } from "react"
 
 export enum FormActions {
   EDIT = "edit",
@@ -109,9 +110,9 @@ export function initializeFormState<T extends Record<string, unknown>>(
     disabled: true,
     open: false,
     errors: {},
+    status: null,
     success: null,
-    status: {},
-    data: data, // ?? ({} as T),
+    data: data ?? ({} as T),
   }
 }
 
@@ -128,8 +129,8 @@ export function formReducer<T extends Record<string, unknown>>(
           loading: false,
           data: {
             ...state.data,
-          },
-          [action.name]: action.value,
+            [action.name]: action.value,
+          } as T,
         }
       }
       return {
@@ -186,7 +187,7 @@ export function formReducer<T extends Record<string, unknown>>(
         disabled: true,
         saving: false,
         loading: false,
-        errors: action.payload,
+        errors: action.payload ?? {},
         success: null,
       }
     }
@@ -220,7 +221,7 @@ export function formReducer<T extends Record<string, unknown>>(
         success: null,
         edited: false,
         saving: true,
-        status: {},
+        status: null,
       }
     }
     case FormActions.RESET: {
@@ -235,5 +236,23 @@ export function formReducer<T extends Record<string, unknown>>(
 export function useForm<T extends Record<string, unknown>>(initialData: T) {
   const initialFormState = initializeFormState<T>(initialData)
   const [formState, dispatchForm] = useReducer(formReducer<T>, initialFormState)
-  return { formState, dispatchForm, initialFormState }
+  // Memoize formState.data to ensure stability
+  const memoizedFormState = useMemo(
+    () => ({
+      ...formState,
+      data: formState.data,
+    }),
+    [
+      formState.data,
+      formState.edited,
+      formState.loading,
+      formState.saving,
+      formState.disabled,
+      formState.open,
+      formState.errors,
+      formState.status,
+      formState.success,
+    ]
+  )
+  return { formState: memoizedFormState, dispatchForm, initialFormState }
 }

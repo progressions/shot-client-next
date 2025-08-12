@@ -21,11 +21,10 @@ import {
   EditableRichText,
   InfoLink,
   Icon,
+  Manager,
 } from "@/components/ui"
 import { useCampaign } from "@/contexts"
 import { FightChips } from "@/components/fights"
-import { VehicleManager } from "@/components/vehicles"
-import { CharacterManager } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -51,8 +50,6 @@ export default function Show({ fight: initialFight }: ShowProperties) {
     fight,
     dispatchForm
   )
-
-  console.log("fight.season", fight.season)
 
   useEffect(() => {
     document.title = fight.name ? `${fight.name} - Chi War` : "Chi War"
@@ -181,9 +178,10 @@ export default function Show({ fight: initialFight }: ShowProperties) {
         </Stack>
       </Box>
       <Stack direction="column" spacing={2}>
-        <CharacterManager
+        <Manager
           icon={<Icon keyword="Fighters" size="24" />}
-          entity={fight}
+          parentEntity={fight}
+          childEntityName="Character"
           title="Fighters"
           description={
             <>
@@ -193,11 +191,13 @@ export default function Show({ fight: initialFight }: ShowProperties) {
               <InfoLink href="/sites" info="Feng Shui Site" />.
             </>
           }
-          updateParent={updateEntity}
+          onListUpdate={updateEntity}
+          excludeIds={fight.character_ids || []}
         />
-        <VehicleManager
+        <Manager
           icon={<Icon keyword="Vehicles" size="24" />}
-          entity={fight}
+          parentEntity={fight}
+          childEntityName="Vehicle"
           title="Vehicles"
           description={
             <>
@@ -207,7 +207,8 @@ export default function Show({ fight: initialFight }: ShowProperties) {
               <InfoLink href="/sites" info="Feng Shui Site" />.
             </>
           }
-          updateParent={updateEntity}
+          onListUpdate={updateEntity}
+          excludeIds={fight.vehicle_ids || []}
         />
       </Stack>
     </>

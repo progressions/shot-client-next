@@ -1,26 +1,19 @@
 "use client"
 
 import { Button } from "@mui/material"
-import { FormActions } from "@/reducers"
 
 type ManageButtonProps = {
   open: boolean
-  dispatchForm: (action: { type: string; name: string; value: boolean }) => void
+  onClick: (value: boolean) => void
 }
 
-export function ManageButton({ open, dispatchForm }: ManageButtonProps) {
+export function ManageButton({ open, onClick }: ManageButtonProps) {
   if (open) {
     return (
       <Button
         variant="contained"
         color="primary"
-        onClick={() =>
-          dispatchForm({
-            type: FormActions.UPDATE,
-            name: "open",
-            value: false,
-          })
-        }
+        onClick={() => onClick(false)}
         size="small"
         sx={{ px: 1.5 }}
       >
@@ -34,13 +27,7 @@ export function ManageButton({ open, dispatchForm }: ManageButtonProps) {
       variant="contained"
       color="primary"
       size="small"
-      onClick={() =>
-        dispatchForm({
-          type: FormActions.UPDATE,
-          name: "open",
-          value: true,
-        })
-      }
+      onClick={() => onClick(true)}
       sx={{ px: 1.5 }}
     >
       Manage

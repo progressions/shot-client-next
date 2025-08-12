@@ -1,8 +1,10 @@
 "use client"
+import { useMemo, useCallback } from "react"
 import { Box } from "@mui/material"
-import { FormStateType, FormStateAction } from "@/reducers"
+import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, FactionDetail } from "@/components/factions"
-import { GridView, SortControls } from "@/components/ui"
+import { createFilterComponent, GridView, SortControls } from "@/components/ui"
+import { filterConfigs } from "@/lib/filterConfigs"
 
 interface ViewProps {
   viewMode: "table" | "mobile"
@@ -10,29 +12,26 @@ interface ViewProps {
   dispatchForm: (action: FormStateAction<FormStateData>) => void
 }
 
-type FormStateData = {
-  factions: Faction[]
-  meta: PaginationMeta
-  sort: string
-  order: string
-  faction_type: string
-  archetype: string
-}
-
-interface Faction {
-  id: string
-  name: string
-  type: string
-  created_at: string
-  active: boolean
-}
-
-interface PaginationMeta {
-  current_page: number
-  total_pages: number
-}
-
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
+  const FactionFilter = useMemo(
+    () => createFilterComponent(filterConfigs["Faction"]),
+    []
+  )
+
+  const updateFilters = useCallback(
+    filters => {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "filters",
+        value: {
+          ...formState.data.filters,
+          ...filters,
+        },
+      })
+    },
+    [dispatchForm]
+  )
+
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
       <SortControls
@@ -40,6 +39,9 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         isMobile={viewMode === "mobile"}
         formState={formState}
         dispatchForm={dispatchForm}
+        filter={
+          <FactionFilter omit={["add"]} onFiltersUpdate={updateFilters} />
+        }
       >
         {viewMode === "mobile" ? (
           <GridView

@@ -1,29 +1,56 @@
 "use client"
 
-import { redirect } from "next/navigation"
-import { useState, useEffect } from "react"
-import { Stack, Alert, Typography, Box } from "@mui/material"
+import { useCallback, useEffect } from "react"
+import { FormControl, FormHelperText, Stack, Box } from "@mui/material"
 import type { Campaign } from "@/types"
-import { RichTextRenderer } from "@/components/editor"
 import { useCampaign } from "@/contexts"
-import { MembersList, EditCampaignForm } from "@/components/campaigns"
-import { useClient } from "@/contexts"
-import { HeroImage, SpeedDialMenu } from "@/components/ui"
+import {
+  Manager,
+  Icon,
+  InfoLink,
+  Alert,
+  NameEditor,
+  EditableRichText,
+  SectionHeader,
+  HeroImage,
+  SpeedDialMenu,
+} from "@/components/ui"
+import { useEntity } from "@/hooks"
+import { FormActions, useForm } from "@/reducers"
 
 interface ShowProperties {
   campaign: Campaign
 }
 
+type FormStateData = {
+  entity: Campaign & {
+    image?: File | null
+  }
+}
+
 export default function Show({ campaign: initialCampaign }: ShowProperties) {
   const { campaignData } = useCampaign()
-  const { user, client } = useClient()
+  const { formState, dispatchForm } = useForm<FormStateData>({
+    entity: initialCampaign,
+  })
+  const { status, errors } = formState
+  const campaign = formState.data.entity
 
-  const [campaign, setCampaign] = useState<Campaign>(initialCampaign)
-  const [editOpen, setEditOpen] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
+    campaign,
+    dispatchForm
+  )
 
-  const gameMaster =
-    user.gamemaster && campaign.gamemaster && user.id === campaign.gamemaster.id
+  const setCampaign = useCallback(
+    (campaign: Campaign) => {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "entity",
+        value: campaign,
+      })
+    },
+    [dispatchForm]
+  )
 
   useEffect(() => {
     document.title = campaign.name ? `${campaign.name} - Chi War` : "Chi War"
@@ -36,34 +63,7 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
     ) {
       setCampaign(campaignData.campaign)
     }
-  }, [campaignData, initialCampaign])
-
-  const handleSave = async () => {
-    setEditOpen(false)
-  }
-
-  const handleDelete = async () => {
-    if (!campaign?.id) return
-    if (
-      !confirm(
-        `Are you sure you want to delete the campaign: ${campaign.name}?`
-      )
-    )
-      return
-
-    try {
-      await client.deleteCampaign(campaign)
-      handleMenuClose()
-      redirect("/campaigns")
-    } catch (error_) {
-      console.error("Failed to delete campaign:", error_)
-      setError("Failed to delete campaign.")
-    }
-  }
-
-  const replaceCampaign = (updatedCampaign: Campaign) => {
-    setCampaign(updatedCampaign)
-  }
+  }, [campaignData, initialCampaign, setCampaign])
 
   return (
     <Box
@@ -72,42 +72,49 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
         position: "relative",
       }}
     >
-      <SpeedDialMenu onEdit={() => setEditOpen(true)} onDelete={handleDelete} />
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          mb: 1,
-        }}
-      >
-        <Typography variant="h4">{campaign.name}</Typography>
-      </Box>
-      <HeroImage entity={campaign} />
-      <Box sx={{ p: 2, backgroundColor: "#2e2e2e", borderRadius: 1, my: 2 }}>
-        <RichTextRenderer
-          key={campaign.description}
-          html={campaign.description || ""}
+      <SpeedDialMenu onDelete={deleteEntity} />
+      <HeroImage entity={campaign} setEntity={setCampaign} />
+      <Alert status={status} />
+      <FormControl fullWidth margin="normal" error={!!errors.name}>
+        <NameEditor
+          entity={campaign}
+          setEntity={setCampaign}
+          updateEntity={updateEntity}
+        />
+        {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
+      </FormControl>
+      <Box sx={{ mb: 2 }}>
+        <SectionHeader
+          title="Description"
+          icon={<Icon keyword="Description" />}
           sx={{ mb: 2 }}
+        >
+          Description of this <InfoLink href="/campaigns" info="Campaign" />,
+          including its premise, significance, and any notable events.
+        </SectionHeader>
+        <EditableRichText
+          name="Description"
+          html={campaign.description}
+          editable={true}
+          onChange={handleChangeAndSave}
+          fallback="No description available."
         />
       </Box>
-      {gameMaster && (
-        <Stack direction="column" spacing={2}>
-          <MembersList campaign={campaign} setCampaign={replaceCampaign} />
-        </Stack>
-      )}
-      <EditCampaignForm
-        key={JSON.stringify(campaign)}
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        onSave={handleSave}
-        campaign={campaign}
-      />
-      {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
-      )}
+      <Stack direction="column" spacing={2}>
+        <Manager
+          icon={<Icon keyword="User" size="24" />}
+          parentEntity={campaign}
+          childEntityName="User"
+          title="Members"
+          description={
+            <>
+              A <InfoLink href="/campaigns" info="Feng Shui Campaign" /> is a
+              collection of adventures.
+            </>
+          }
+          onListUpdate={updateEntity}
+        />
+      </Stack>
     </Box>
   )
 }

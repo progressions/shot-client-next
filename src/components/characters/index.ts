@@ -17,7 +17,6 @@ export { default as Description } from "@/components/characters/display/Descript
 export { default as Parties } from "@/components/characters/display/Parties"
 export { default as Sites } from "@/components/characters/display/Sites"
 export { default as CharacterFilter } from "@/components/characters/CharacterFilter"
-export { default as CharacterManager } from "@/components/characters/CharacterManager"
 export { default as CharacterDetail } from "@/components/characters/CharacterDetail"
 export { default as CharacterDescription } from "@/components/characters/CharacterDescription"
 export { default as CharacterSpeedDial } from "@/components/characters/CharacterSpeedDial"

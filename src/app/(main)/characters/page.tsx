@@ -20,13 +20,15 @@ export default async function CharactersPage({
       getInitialFormData={(data: CharactersResponse, page, sort, order) => ({
         characters: data.characters,
         meta: data.meta,
-        sort,
-        order,
-        page,
-        drawerOpen: false,
-        character_type: "",
-        archetype: "",
-        faction_id: "",
+        filters: {
+          sort,
+          order,
+          page,
+          drawerOpen: false,
+          character_type: "",
+          archetype: "",
+          faction_id: "",
+        },
       })}
       ListComponent={List}
       searchParams={searchParams}

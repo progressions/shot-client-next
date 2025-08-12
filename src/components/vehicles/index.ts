@@ -5,7 +5,6 @@ export { default as VehicleDescription } from "@/components/vehicles/VehicleDesc
 export { default as VehicleDetail } from "@/components/vehicles/VehicleDetail"
 export { default as VehicleFilter } from "@/components/vehicles/VehicleFilter"
 export { default as VehicleSpeedDial } from "@/components/vehicles/VehicleSpeedDial"
-export { default as VehicleManager } from "@/components/vehicles/VehicleManager"
 export { default as NotFound } from "@/components/vehicles/NotFound"
 export { default as View } from "@/components/vehicles/View"
 export { default as Menu } from "@/components/vehicles/Menu"

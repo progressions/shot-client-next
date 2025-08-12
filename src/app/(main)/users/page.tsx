@@ -20,9 +20,11 @@ export default async function UsersPage({
       getInitialFormData={(data: UsersResponse, page, sort, order) => ({
         users: data.users,
         meta: data.meta,
-        sort,
-        order,
-        page,
+        filters: {
+          sort,
+          order,
+          page,
+        },
         drawerOpen: false,
       })}
       ListComponent={List}

@@ -20,9 +20,11 @@ export default async function SitesPage({
       getInitialFormData={(data: SitesResponse, page, sort, order) => ({
         sites: data.sites,
         meta: data.meta,
-        sort,
-        order,
-        page,
+        filters: {
+          sort,
+          order,
+          page,
+        },
         drawerOpen: false,
       })}
       ListComponent={List}

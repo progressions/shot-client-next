@@ -20,9 +20,11 @@ export default async function CampaignsPage({
       getInitialFormData={(data: CampaignsResponse, page, sort, order) => ({
         campaigns: data.campaigns,
         meta: data.meta,
-        sort,
-        order,
-        page,
+        filters: {
+          sort,
+          order,
+          page,
+        },
         drawerOpen: false,
       })}
       ListComponent={List}

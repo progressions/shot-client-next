@@ -1,8 +1,10 @@
 "use client"
+import { useMemo, useCallback } from "react"
 import { Box } from "@mui/material"
-import { FormStateType, FormStateAction } from "@/reducers"
+import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, UserDetail } from "@/components/users"
-import { GridView, SortControls } from "@/components/ui"
+import { createFilterComponent, GridView, SortControls } from "@/components/ui"
+import { filterConfigs } from "@/lib/filterConfigs"
 
 interface ViewProps {
   viewMode: "table" | "mobile"
@@ -10,36 +12,34 @@ interface ViewProps {
   dispatchForm: (action: FormStateAction<FormStateData>) => void
 }
 
-type FormStateData = {
-  users: User[]
-  meta: PaginationMeta
-  sort: string
-  order: string
-  user_type: string
-  archetype: string
-}
-
-interface User {
-  id: string
-  name: string
-  type: string
-  created_at: string
-  active: boolean
-}
-
-interface PaginationMeta {
-  current_page: number
-  total_pages: number
-}
-
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
+  const UserFilter = useMemo(
+    () => createFilterComponent(filterConfigs["User"]),
+    []
+  )
+
+  const updateFilters = useCallback(
+    filters => {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "filters",
+        value: {
+          ...formState.data.filters,
+          ...filters,
+        },
+      })
+    },
+    [dispatchForm]
+  )
+
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
       <SortControls
-        validSorts={["name", "type", "created_at", "updated_at"]}
+        validSorts={["name", "created_at", "updated_at"]}
         isMobile={viewMode === "mobile"}
         formState={formState}
         dispatchForm={dispatchForm}
+        filter={<UserFilter onFiltersUpdate={updateFilters} omit={["add"]} />}
       >
         {viewMode === "mobile" ? (
           <GridView

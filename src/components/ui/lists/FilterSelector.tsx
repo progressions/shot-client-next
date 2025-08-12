@@ -1,5 +1,4 @@
 import { SchtickFilter } from "@/components/schticks"
-import { WeaponFilter } from "@/components/weapons"
 import { CharacterFilter } from "@/components/characters"
 import {
   UserAutocomplete,
@@ -7,7 +6,6 @@ import {
   PartyAutocomplete,
   JunctureAutocomplete,
   SiteAutocomplete,
-  FactionAutocomplete,
 } from "@/components/autocomplete"
 
 export function FilterSelector({
@@ -52,15 +50,6 @@ export function FilterSelector({
     ),
     sites: (
       <SiteAutocomplete
-        value={selectedChild?.id || ""}
-        onChange={setSelectedChild}
-        exclude={collectionIds}
-        allowNone={false}
-      />
-    ),
-    weapons: <WeaponFilter setEntity={setSelectedChild} />,
-    factions: (
-      <FactionAutocomplete
         value={selectedChild?.id || ""}
         onChange={setSelectedChild}
         exclude={collectionIds}

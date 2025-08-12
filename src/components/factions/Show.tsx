@@ -6,8 +6,13 @@ import type { Faction } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import { useCampaign } from "@/contexts"
 import { JuncturesList, SitesList, PartiesList } from "@/components/factions"
-import { InfoLink, NameEditor, HeroImage, SpeedDialMenu } from "@/components/ui"
-import { CharacterManager } from "@/components/characters"
+import {
+  Manager,
+  InfoLink,
+  NameEditor,
+  HeroImage,
+  SpeedDialMenu,
+} from "@/components/ui"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -86,10 +91,11 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
       </Box>
 
       <Stack direction="column" spacing={2}>
-        <CharacterManager
+        <Manager
           name="faction"
           title="Attuned Characters"
-          entity={faction}
+          parentEntity={faction}
+          childEntityName="Character"
           description={
             <>
               A <InfoLink href="/factions" info="Faction" /> recruits{" "}
@@ -98,7 +104,7 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
               <InfoLink info="Chi War" />.
             </>
           }
-          updateParent={updateEntity}
+          onListUpdate={updateEntity}
         />
         <PartiesList entity={faction} updateEntity={updateEntity} />
         <SitesList entity={faction} updateEntity={updateEntity} />

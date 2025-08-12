@@ -1,7 +1,7 @@
 "use client"
 
 import type { Faction } from "@/types"
-import { InfoLink, ListManager } from "@/components/ui"
+import { Icon, InfoLink, Manager } from "@/components/ui"
 
 type PartiesListProperties = {
   entity: Faction
@@ -13,10 +13,10 @@ export default function PartiesList({
   updateEntity,
 }: PartiesListProperties) {
   return (
-    <ListManager
-      parent={entity}
-      collectionName="parties"
-      collection_ids="party_ids"
+    <Manager
+      icon={<Icon keyword="Parties" />}
+      parentEntity={entity}
+      childEntityName="Party"
       title="Parties"
       description={
         <>
@@ -26,7 +26,7 @@ export default function PartiesList({
           <InfoLink info="Chi War" />.
         </>
       }
-      updateParent={updateEntity}
+      onListUpdate={updateEntity}
     />
   )
 }

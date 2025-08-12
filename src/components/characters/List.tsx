@@ -1,6 +1,6 @@
 "use client"
 import { useRouter } from "next/navigation"
-import { useMemo, useEffect, useCallback, useState } from "react"
+import { useEffect, useCallback, useState } from "react"
 import { Box } from "@mui/material"
 import type { Character, PaginationMeta } from "@/types"
 import { useCampaign, useClient, useLocalStorage } from "@/contexts"
@@ -14,17 +14,17 @@ interface ListProps {
   initialIsMobile: boolean
 }
 
-type ValidOrder = "asc" | "desc"
-
-type FormStateData = {
+export type FormStateData = {
   characters: Character[]
   meta: PaginationMeta
-  sort: string
-  order: string
-  character_type: string
-  archetype: string
-  faction_id: string
-  page: number
+  filters: {
+    sort: string
+    order: string
+    character_type: string
+    archetype: string
+    faction_id: string
+    page: number
+  }
 }
 
 export default function List({ initialFormData, initialIsMobile }: ListProps) {
@@ -36,29 +36,12 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
     initialIsMobile ? "mobile" : "table"
   )
   const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
-  const { meta, page, sort, order, character_type, archetype, faction_id } =
-    formState.data
-
-  const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
+  const { filters } = formState.data
 
   const fetchCharacters = useCallback(
-    async (
-      page: number = 1,
-      sort: string = "name",
-      order: string = "asc",
-      character_type: string = "",
-      faction_id: string = "",
-      archetype: string = ""
-    ) => {
+    async filters => {
       try {
-        const response = await client.getCharacters({
-          archetype,
-          page,
-          sort,
-          order,
-          type: character_type,
-          faction_id,
-        })
+        const response = await client.getCharacters(filters)
         dispatchForm({
           type: FormActions.UPDATE,
           name: "characters",
@@ -80,52 +63,17 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
     if (campaignData.characters === "reload") {
-      fetchCharacters(
-        meta.current_page,
-        sort,
-        order,
-        character_type,
-        faction_id,
-        archetype
-      )
+      fetchCharacters(filters)
     }
-  }, [
-    meta.current_page,
-    client,
-    campaignData,
-    dispatchForm,
-    fetchCharacters,
-    validOrders,
-    archetype,
-    faction_id,
-    character_type,
-    sort,
-    order,
-  ])
+  }, [campaignData, fetchCharacters, filters])
 
   useEffect(() => {
-    const url = `/characters?${queryParams({
-      page: page,
-      sort,
-      order,
-      type: character_type,
-      faction_id,
-      archetype,
-    })}`
+    const url = `/characters?${queryParams(filters)}`
     router.push(url, {
       scroll: false,
     })
-    fetchCharacters(page, sort, order, character_type, faction_id, archetype)
-  }, [
-    character_type,
-    archetype,
-    faction_id,
-    fetchCharacters,
-    order,
-    router,
-    sort,
-    page,
-  ])
+    fetchCharacters(filters)
+  }, [filters, fetchCharacters, router])
 
   useEffect(() => {
     saveLocally("characterViewMode", viewMode)

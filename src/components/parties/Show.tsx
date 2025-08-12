@@ -5,6 +5,7 @@ import { Stack, Box } from "@mui/material"
 import type { Party } from "@/types"
 import { useCampaign } from "@/contexts"
 import {
+  Manager,
   HeroImage,
   SpeedDialMenu,
   SectionHeader,
@@ -13,7 +14,6 @@ import {
   InfoLink,
   Icon,
 } from "@/components/ui"
-import { CharacterManager } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { EditFaction } from "@/components/factions"
 import { FormActions, useForm } from "@/reducers"
@@ -107,11 +107,12 @@ export default function Show({ party: initialParty }: ShowProperties) {
       </Box>
 
       <Stack direction="column" spacing={2}>
-        <CharacterManager
+        <Manager
           icon={<Icon keyword="Fighters" />}
           name="party"
           title="Party Members"
-          entity={party}
+          parentEntity={party}
+          childEntityName="Character"
           description={
             <>
               A <InfoLink href="/parties" info="Party" /> consists of{" "}
@@ -119,7 +120,7 @@ export default function Show({ party: initialParty }: ShowProperties) {
               together for a <InfoLink href="/factions" info="Faction" />.
             </>
           }
-          updateParent={updateEntity}
+          onListUpdate={updateEntity}
         />
       </Stack>
     </Box>

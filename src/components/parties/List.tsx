@@ -18,13 +18,16 @@ interface ListProps {
 }
 
 type ValidSort = "created_at" | "updated_at" | "name"
-type ValidOrder = "asc" | "desc"
 type FormStateData = {
   parties: Party[]
   meta: PaginationMeta
   drawerOpen: boolean
-  sort: string
-  order: string
+  filters: {
+    sort: string
+    order: string
+    page: number
+    faction_id: string | null
+  }
 }
 
 export default function List({ initialFormData, initialIsMobile }: ListProps) {
@@ -35,7 +38,8 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
     initialIsMobile ? "mobile" : "table"
   )
   const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
-  const { meta, sort, order, parties, drawerOpen } = formState.data
+  const { meta, filters, parties, drawerOpen } = formState.data
+  const { sort, order } = filters
   const router = useRouter()
 
   useEffect(() => {
@@ -49,13 +53,9 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
   const fetchParties = useCallback(
-    async (
-      page: number = 1,
-      sort: string = "created_at",
-      order: string = "desc"
-    ) => {
+    async filters => {
       try {
-        const response = await client.getParties({ page, sort, order })
+        const response = await client.getParties(filters)
         console.log("Fetched parties:", response.data.parties)
         dispatchForm({
           type: FormActions.UPDATE,
@@ -65,7 +65,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
         dispatchForm({
           type: FormActions.UPDATE,
           name: "meta",
-          value: response.data.meta || { current_page: page, total_pages: 1 },
+          value: response.data.meta,
         })
         dispatchForm({ type: FormActions.ERROR, payload: null })
       } catch (error: unknown) {
@@ -100,15 +100,15 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
           : "desc"
       dispatchForm({
         type: FormActions.UPDATE,
-        name: "sort",
-        value: currentSort,
+        name: "filters",
+        value: {
+          ...filters,
+          page,
+          sort: currentSort,
+          order: currentOrder,
+        },
       })
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "order",
-        value: currentOrder,
-      })
-      fetchParties(page, currentSort, currentOrder)
+      fetchParties(filters)
     }
   }, [
     client,
@@ -120,16 +120,9 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   ])
 
   useEffect(() => {
-    const url = `/parties?${queryParams({
-      page: 1,
-      sort,
-      order,
-    })}`
-    router.push(url, {
-      scroll: false,
-    })
-    fetchParties(1, sort, order)
-  }, [fetchParties, order, router, sort])
+    router.push(`/parties?${queryParams(filters)}`, { scroll: false })
+    fetchParties(filters)
+  }, [fetchParties, router, filters])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
@@ -149,11 +142,19 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   const handleOrderChange = async () => {
     const newOrder = order === "asc" ? "desc" : "asc"
-    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    router.push(`/parties?page=1&sort=${sort}&order=${newOrder}`, {
-      scroll: false,
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "filters",
+      value: {
+        ...filters,
+        order: newOrder,
+      },
     })
-    await fetchParties(1, sort, newOrder)
+    router.push(
+      `/parties?${queryParams({ page: 1, sort: sort, order: newOrder, ...filters })}`,
+      { scroll: false }
+    )
+    await fetchParties({ page: 1, sort, order: newOrder, ...filters })
   }
 
   const handlePageChange = async (_event, page: number) => {
@@ -166,7 +167,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
       router.push(`/parties?page=${page}&sort=${sort}&order=${order}`, {
         scroll: false,
       })
-      await fetchParties(page, sort, order)
+      await fetchParties({ page, sort, order, ...filters })
     }
   }
 

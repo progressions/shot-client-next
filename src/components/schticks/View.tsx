@@ -1,45 +1,48 @@
 "use client"
+import { useMemo, useCallback } from "react"
 import { Box } from "@mui/material"
-import { FormStateType, FormStateAction } from "@/reducers"
-import { Table, SchtickDetail } from "@/components/schticks"
-import { GridView, SortControls } from "@/components/ui"
+import { FormActions, FormStateType } from "@/reducers"
+import { SchtickDetail, Table } from "@/components/schticks"
+import { createFilterComponent, GridView, SortControls } from "@/components/ui"
+import type { FormStateData } from "@/components/schticks/List"
+import { filterConfigs } from "@/lib/filterConfigs"
 
 interface ViewProps {
   viewMode: "table" | "mobile"
   formState: FormStateType<FormStateData>
-  dispatchForm: (action: FormStateAction<FormStateData>) => void
-}
-
-type FormStateData = {
-  schticks: Schtick[]
-  meta: PaginationMeta
-  sort: string
-  order: string
-  schtick_type: string
-  archetype: string
-}
-
-interface Schtick {
-  id: string
-  name: string
-  type: string
-  created_at: string
-  active: boolean
-}
-
-interface PaginationMeta {
-  current_page: number
-  total_pages: number
+  dispatchForm: (action: FormStateType<FormStateData>) => void
 }
 
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
+  const SchtickFilter = useMemo(
+    () => createFilterComponent(filterConfigs["Schtick"]),
+    []
+  )
+
+  const updateFilters = useCallback(
+    filters => {
+      console.log("Updating filters:", filters)
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "filters",
+        value: {
+          ...formState.data.filters,
+          ...filters,
+        },
+      })
+    },
+    [dispatchForm]
+  )
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
       <SortControls
         isMobile={viewMode === "mobile"}
-        validSorts={["name", "created_at", "updated_at"]}
+        validSorts={["name", "category", "path", "created_at", "updated_at"]}
         dispatchForm={dispatchForm}
         formState={formState}
+        filter={
+          <SchtickFilter onFiltersUpdate={updateFilters} omit={["add"]} />
+        }
       >
         {viewMode === "mobile" ? (
           <GridView

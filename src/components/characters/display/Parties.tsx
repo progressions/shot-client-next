@@ -2,7 +2,7 @@
 
 import { Box } from "@mui/material"
 import type { Character } from "@/types"
-import { Icon, InfoLink, ListManager } from "@/components/ui"
+import { Manager, Icon, InfoLink } from "@/components/ui"
 
 type PartiesProperties = {
   character: Character
@@ -15,11 +15,12 @@ export default function Parties({
 }: PartiesProperties) {
   return (
     <Box>
-      <ListManager
+      <Manager
         icon={<Icon keyword="Parties" />}
-        parent={character}
         name="Character"
         title="Parties"
+        parentEntity={character}
+        childEntityName="Party"
         description={
           <>
             A <InfoLink href="/characters" info="Character" /> organizes its
@@ -28,10 +29,7 @@ export default function Parties({
             <InfoLink info="Chi War" />
           </>
         }
-        updateParent={updateCharacter}
-        collectionName="parties"
-        collection_ids="party_ids"
-        manage={true}
+        onListUpdate={updateCharacter}
       />
     </Box>
   )

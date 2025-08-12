@@ -36,8 +36,9 @@ export function SortControls({
 }: SortControlsProps) {
   const [showFilter, setShowFilter] = useState(false)
 
-  const { meta, sort, order } = formState.data
-  const page = meta?.current_page || 1
+  const { filters, meta } = formState.data
+  const { page, sort = "name", order = "asc" } = filters
+
   const totalPages = meta?.total_pages || 1
 
   const handleSortChange = (event: SelectChangeEvent<string>) => {
@@ -47,15 +48,23 @@ export function SortControls({
       const newOrder = order === "asc" ? "desc" : "asc"
       dispatchForm({
         type: FormActions.UPDATE,
-        name: "order",
-        value: newOrder,
+        name: "filters",
+        value: {
+          ...formState.data.filters,
+          sort: newSort,
+          order: newOrder,
+        },
       })
       return
     }
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "sort",
-      value: newSort,
+      name: "filters",
+      value: {
+        ...formState.data.filters,
+        sort: newSort,
+        order: "asc", // Reset to ascending when changing sort
+      },
     })
   }
 
@@ -64,15 +73,25 @@ export function SortControls({
   }
 
   const handleOrderChange = () => {
+    console.log("Current order:", order)
     const newOrder = order === "asc" ? "desc" : "asc"
-    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "filters",
+      value: { ...formState.data.filters, order: newOrder },
+    })
   }
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
     newPage: number
   ) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "page", value: newPage })
+    console.log("newPage", newPage)
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "filters",
+      value: { ...formState.data.filters, page: newPage },
+    })
   }
 
   return (

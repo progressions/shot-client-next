@@ -5,6 +5,7 @@ import { FormControl, FormHelperText, Stack, Box } from "@mui/material"
 import type { Site } from "@/types"
 import { useCampaign } from "@/contexts"
 import {
+  Manager,
   Icon,
   InfoLink,
   Alert,
@@ -14,7 +15,6 @@ import {
   HeroImage,
   SpeedDialMenu,
 } from "@/components/ui"
-import { CharacterManager } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import { EditFaction } from "@/components/factions"
@@ -113,9 +113,10 @@ export default function Show({ site: initialSite }: ShowProperties) {
         />
       </Box>
       <Stack direction="column" spacing={2}>
-        <CharacterManager
+        <Manager
           icon={<Icon keyword="Characters" size="24" />}
-          entity={site}
+          parentEntity={site}
+          childEntityName="Character"
           title="Attuned Characters"
           description={
             <>
@@ -124,7 +125,7 @@ export default function Show({ site: initialSite }: ShowProperties) {
               those <InfoLink info="Attuned" /> to it.{" "}
             </>
           }
-          updateParent={updateEntity}
+          onListUpdate={updateEntity}
         />
       </Stack>
     </Box>

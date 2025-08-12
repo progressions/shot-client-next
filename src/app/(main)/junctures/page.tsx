@@ -20,9 +20,11 @@ export default async function JuncturesPage({
       getInitialFormData={(data: JuncturesResponse, page, sort, order) => ({
         junctures: data.junctures,
         meta: data.meta,
-        sort,
-        order,
-        page,
+        filters: {
+          sort,
+          order,
+          page,
+        },
         drawerOpen: false,
       })}
       ListComponent={List}

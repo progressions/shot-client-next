@@ -1,7 +1,7 @@
 "use client"
 
 import type { Faction } from "@/types"
-import { InfoLink, ListManager } from "@/components/ui"
+import { Icon, InfoLink, Manager } from "@/components/ui"
 
 type SitesListProperties = {
   entity: Faction
@@ -13,10 +13,10 @@ export default function SitesList({
   updateEntity,
 }: SitesListProperties) {
   return (
-    <ListManager
-      parent={entity}
-      collectionName="sites"
-      collection_ids="site_ids"
+    <Manager
+      icon={<Icon keyword="Sites" />}
+      parentEntity={entity}
+      childEntityName="Site"
       title="Feng Shui Sites"
       description={
         <>
@@ -25,7 +25,7 @@ export default function SitesList({
           <InfoLink href="/chi" info="Chi" /> to its members.
         </>
       }
-      updateParent={updateEntity}
+      onListUpdate={updateEntity}
     />
   )
 }

@@ -20,9 +20,11 @@ export default async function WeaponsPage({
       getInitialFormData={(data: WeaponsResponse, page, sort, order) => ({
         weapons: data.weapons,
         meta: data.meta,
-        sort,
-        order,
-        page,
+        filters: {
+          sort,
+          order,
+          page,
+        },
         drawerOpen: false,
       })}
       ListComponent={List}

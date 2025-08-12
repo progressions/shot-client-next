@@ -5,7 +5,7 @@ import { Box } from "@mui/material"
 import { View, Menu } from "@/components/vehicles"
 import type { Vehicle, PaginationMeta } from "@/types"
 import { FormActions, useForm } from "@/reducers"
-import { useLocalStorage, useCampaign, useClient } from "@/contexts"
+import { useCampaign, useClient } from "@/contexts"
 import { queryParams } from "@/lib"
 import { Icon, MainHeader } from "@/components/ui"
 
@@ -17,15 +17,18 @@ interface ListProps {
   initialIsMobile?: boolean
 }
 
-type ValidSort = "created_at" | "updated_at" | "name"
-type ValidOrder = "asc" | "desc"
 type FormStateData = {
   vehicles: Vehicle[]
   meta: PaginationMeta
+  filters: {
+    vehicle_type: string
+    archetype: string
+    faction_id: string
+    sort: string
+    order: string
+    page: number
+  }
   drawerOpen: boolean
-  sort: string
-  order: string
-  page: number
 }
 
 export default function List({ initialFormData, initialIsMobile }: ListProps) {
@@ -35,7 +38,8 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
     initialIsMobile ? "mobile" : "table"
   )
   const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
-  const { page, sort, order, vehicles, drawerOpen } = formState.data
+  const { filters, vehicles, drawerOpen } = formState.data
+  const { page } = filters
   const router = useRouter()
 
   const validSorts: readonly ValidSort[] = useMemo(
@@ -45,13 +49,9 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
 
   const fetchVehicles = useCallback(
-    async (
-      page: number = 1,
-      sort: string = "created_at",
-      order: string = "desc"
-    ) => {
+    async filters => {
       try {
-        const response = await client.getVehicles({ page, sort, order })
+        const response = await client.getVehicles({ ...filters })
         console.log("Fetched vehicles:", response.data.vehicles)
         dispatchForm({
           type: FormActions.UPDATE,
@@ -73,7 +73,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
         console.error("Fetch vehicles error:", error)
       }
     },
-    [client, dispatchForm]
+    [client, dispatchForm, page]
   )
 
   useEffect(() => {
@@ -96,17 +96,20 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
           : "desc"
       dispatchForm({
         type: FormActions.UPDATE,
-        name: "sort",
-        value: currentSort,
+        name: "filters",
+        value: {
+          ...formState.data.filters,
+          page: page,
+          sort: currentSort,
+          order: currentOrder,
+        },
       })
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "order",
-        value: currentOrder,
-      })
-      fetchVehicles(page, currentSort, currentOrder)
+
+      fetchVehicles(filters)
     }
   }, [
+    filters,
+    formState.data.filters,
     client,
     campaignData,
     dispatchForm,
@@ -116,16 +119,12 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   ])
 
   useEffect(() => {
-    const url = `/vehicles?${queryParams({
-      page: page,
-      sort,
-      order,
-    })}`
+    const url = `/vehicles?${queryParams(filters)}`
     router.push(url, {
       scroll: false,
     })
-    fetchVehicles(page, sort, order)
-  }, [fetchVehicles, page, order, router, sort])
+    fetchVehicles(filters)
+  }, [fetchVehicles, router, filters])
 
   const handleOpenCreateDrawer = () => {
     dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })

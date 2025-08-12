@@ -2,7 +2,7 @@
 
 import { Box } from "@mui/material"
 import type { Character } from "@/types"
-import { Icon, InfoLink, ListManager } from "@/components/ui"
+import { Icon, InfoLink, Manager } from "@/components/ui"
 
 type SitesListProperties = {
   character: Pick<Character, "id" | "user" | "site_ids">
@@ -15,9 +15,10 @@ export default function SitesList({
 }: SitesListProperties) {
   return (
     <Box>
-      <ListManager
+      <Manager
         icon={<Icon keyword="Sites" />}
-        parent={character}
+        parentEntity={character}
+        childEntityName="Site"
         name="Character"
         title="Feng Shui Sites"
         description={
@@ -27,10 +28,7 @@ export default function SitesList({
             <InfoLink href="/chi" info="Chi" />, increasing his power.
           </>
         }
-        updateParent={updateCharacter}
-        collectionName="sites"
-        collection_ids="site_ids"
-        manage={true}
+        onListUpdate={updateCharacter}
       />
     </Box>
   )

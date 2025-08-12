@@ -44,13 +44,12 @@ export function BaseDataGrid<T>({
     const sortOrder = model[0]?.sort || ""
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "sort",
-      value: sortField,
-    })
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "order",
-      value: sortOrder,
+      name: "filters",
+      value: {
+        ...formState.data.filters,
+        sort: sortField,
+        order: sortOrder,
+      },
     })
   }
 

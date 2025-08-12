@@ -6,7 +6,6 @@ export { default as CreateCampaignForm } from "@/components/campaigns/CreateCamp
 export { default as EditCampaignForm } from "@/components/campaigns/EditCampaignForm"
 export { default as CampaignForm } from "@/components/campaigns/CampaignForm"
 export { default as Show } from "@/components/campaigns/Show"
-export { default as MembersList } from "@/components/campaigns/MembersList"
 export { default as NotFound } from "@/components/campaigns/NotFound"
 export { default as View } from "@/components/campaigns/View"
 export { default as Menu } from "@/components/campaigns/Menu"

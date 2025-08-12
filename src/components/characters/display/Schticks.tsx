@@ -1,7 +1,7 @@
 "use client"
 
 import type { Character } from "@/types"
-import { Icon, InfoLink, ListManager } from "@/components/ui"
+import { Icon, InfoLink, Manager } from "@/components/ui"
 
 type SchticksProperties = {
   character: Character
@@ -13,10 +13,10 @@ export default function Schticks({
   updateCharacter,
 }: SchticksProperties) {
   return (
-    <ListManager
+    <Manager
       icon={<Icon keyword="Schticks" />}
-      parent={character}
-      name="schticks"
+      parentEntity={character}
+      childEntityName="Schtick"
       title="Schticks"
       description={
         <>
@@ -25,10 +25,7 @@ export default function Schticks({
           <InfoLink info="Magic" /> spells.
         </>
       }
-      updateParent={updateCharacter}
-      collectionName="schticks"
-      collection_ids="schtick_ids"
-      manage={true}
+      onListUpdate={updateCharacter}
     />
   )
 }

@@ -20,9 +20,11 @@ export default async function SchticksPage({
       getInitialFormData={(data: SchticksResponse, page, sort, order) => ({
         schticks: data.schticks,
         meta: data.meta,
-        sort,
-        order,
-        page,
+        filters: {
+          sort,
+          order,
+          page,
+        },
         drawerOpen: false,
       })}
       ListComponent={List}

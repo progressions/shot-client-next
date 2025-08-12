@@ -1,7 +1,7 @@
 "use client"
 
 import type { Faction } from "@/types"
-import { Icon, InfoLink, ListManager } from "@/components/ui"
+import { Icon, InfoLink, Manager } from "@/components/ui"
 
 type JuncturesListProperties = {
   entity: Faction
@@ -13,12 +13,11 @@ export default function JuncturesList({
   updateEntity,
 }: JuncturesListProperties) {
   return (
-    <ListManager
+    <Manager
       icon={<Icon keyword="Junctures" />}
-      parent={entity}
+      parentEntity={entity}
+      childEntityName="Juncture"
       name="junctures"
-      collectionName="junctures"
-      collection_ids="juncture_ids"
       title="Junctures"
       description={
         <>
@@ -29,7 +28,7 @@ export default function JuncturesList({
           whether it&rsquo;s friendly or hostile to <InfoLink info="Magic" />.
         </>
       }
-      updateParent={updateEntity}
+      onListUpdate={updateEntity}
     />
   )
 }

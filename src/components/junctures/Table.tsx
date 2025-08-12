@@ -1,7 +1,7 @@
 "use client"
 import { GridColDef } from "@mui/x-data-grid"
 import { FormStateType, FormStateAction } from "@/reducers"
-import { BaseDataGrid, JunctureLink } from "@/components/ui"
+import { BaseDataGrid, FactionLink, JunctureLink } from "@/components/ui"
 import { Avatar } from "@/components/avatars"
 import { PaginationMeta, Juncture } from "@/types"
 
@@ -31,10 +31,23 @@ const columns: GridColDef<Juncture>[] = [
   {
     field: "name",
     headerName: "Name",
-    width: 350,
+    width: 250,
     editable: false,
     sortable: true,
     renderCell: params => <JunctureLink juncture={params.row} />,
+  },
+  {
+    field: "faction",
+    headerName: "Faction",
+    width: 150,
+    editable: false,
+    sortable: false,
+    renderCell: params => {
+      if (params.row.faction?.id) {
+        return <FactionLink faction={params.row.faction} />
+      }
+      return null
+    },
   },
   {
     field: "created_at",

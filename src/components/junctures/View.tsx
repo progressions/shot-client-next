@@ -1,8 +1,10 @@
 "use client"
+import { useMemo, useCallback } from "react"
 import { Box } from "@mui/material"
-import { FormStateType, FormStateAction } from "@/reducers"
+import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, JunctureDetail } from "@/components/junctures"
-import { GridView, SortControls } from "@/components/ui"
+import { createFilterComponent, GridView, SortControls } from "@/components/ui"
+import { filterConfigs } from "@/lib/filterConfigs"
 
 interface ViewProps {
   viewMode: "table" | "mobile"
@@ -10,36 +12,36 @@ interface ViewProps {
   dispatchForm: (action: FormStateAction<FormStateData>) => void
 }
 
-type FormStateData = {
-  junctures: Juncture[]
-  meta: PaginationMeta
-  sort: string
-  order: string
-  juncture_type: string
-  archetype: string
-}
-
-interface Juncture {
-  id: string
-  name: string
-  type: string
-  created_at: string
-  active: boolean
-}
-
-interface PaginationMeta {
-  current_page: number
-  total_pages: number
-}
-
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
+  const JunctureFilter = useMemo(
+    () => createFilterComponent(filterConfigs["Juncture"]),
+    []
+  )
+
+  const updateFilters = useCallback(
+    filters => {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "filters",
+        value: {
+          ...formState.data.filters,
+          ...filters,
+        },
+      })
+    },
+    [dispatchForm]
+  )
+
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
       <SortControls
-        validSorts={["name", "type", "created_at", "updated_at"]}
-        isMobile={viewMode === "mobile"}
-        formState={formState}
+        validSorts={["name", "created_at", "updated_at"]}
         dispatchForm={dispatchForm}
+        formState={formState}
+        isMobile={viewMode === "mobile"}
+        filter={
+          <JunctureFilter omit={["add"]} onFiltersUpdate={updateFilters} />
+        }
       >
         {viewMode === "mobile" ? (
           <GridView

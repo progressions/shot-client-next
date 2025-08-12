@@ -20,9 +20,11 @@ export default async function FightsPage({
       getInitialFormData={(data: FightsResponse, page, sort, order) => ({
         fights: data.fights,
         meta: data.meta,
-        sort,
-        order,
-        page,
+        filters: {
+          sort,
+          order,
+          page,
+        },
         drawerOpen: false,
       })}
       ListComponent={List}

@@ -1,46 +1,45 @@
 "use client"
+import { useMemo, useCallback } from "react"
 import { Box } from "@mui/material"
-import { FormStateType, FormStateAction } from "@/reducers"
-import { Table, WeaponDetail, WeaponFilter } from "@/components/weapons"
-import { GridView, SortControls } from "@/components/ui"
+import { FormActions, FormStateType } from "@/reducers"
+import { WeaponDetail, Table } from "@/components/weapons"
+import { createFilterComponent, GridView, SortControls } from "@/components/ui"
+import type { FormStateData } from "@/components/weapons/List"
+import { filterConfigs } from "@/lib/filterConfigs"
 
 interface ViewProps {
   viewMode: "table" | "mobile"
   formState: FormStateType<FormStateData>
-  dispatchForm: (action: FormStateAction<FormStateData>) => void
-}
-
-type FormStateData = {
-  weapons: Weapon[]
-  meta: PaginationMeta
-  sort: string
-  order: string
-  weapon_type: string
-  archetype: string
-}
-
-interface Weapon {
-  id: string
-  name: string
-  type: string
-  created_at: string
-  active: boolean
-}
-
-interface PaginationMeta {
-  current_page: number
-  total_pages: number
+  dispatchForm: (action: FormStateType<FormStateData>) => void
 }
 
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
+  const WeaponFilter = useMemo(
+    () => createFilterComponent(filterConfigs["Weapon"]),
+    []
+  )
+
+  const updateFilters = useCallback(
+    filters => {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "filters",
+        value: {
+          ...formState.data.filters,
+          ...filters,
+        },
+      })
+    },
+    [dispatchForm]
+  )
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
       <SortControls
         isMobile={viewMode === "mobile"}
-        validSorts={["name", "created_at", "updated_at"]}
+        validSorts={["name", "season", "session", "created_at", "updated_at"]}
         dispatchForm={dispatchForm}
         formState={formState}
-        filter={<WeaponFilter dispatch={dispatchForm} omit={["add"]} />}
+        filter={<WeaponFilter onFiltersUpdate={updateFilters} omit={["add"]} />}
       >
         {viewMode === "mobile" ? (
           <GridView

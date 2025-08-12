@@ -1,7 +1,7 @@
 "use client"
 
 import type { Character } from "@/types"
-import { Icon, InfoLink, ListManager } from "@/components/ui"
+import { Icon, InfoLink, Manager } from "@/components/ui"
 
 type WeaponsProperties = {
   character: Pick<Character, "id" | "user" | "weapon_ids">
@@ -13,9 +13,10 @@ export default function Weapons({
   updateCharacter,
 }: WeaponsProperties) {
   return (
-    <ListManager
+    <Manager
       icon={<Icon keyword="Weapons" />}
-      parent={character}
+      parentEntity={character}
+      childEntityName="Weapon"
       name="weapons"
       title="Weapons"
       description={
@@ -28,10 +29,7 @@ export default function Weapons({
           is average, and 12 and above is getting serious.
         </>
       }
-      updateParent={updateCharacter}
-      collectionName="weapons"
-      collection_ids="weapon_ids"
-      manage={true}
+      onListUpdate={updateCharacter}
     />
   )
 }

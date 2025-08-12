@@ -5,6 +5,7 @@ import { Stack, Box } from "@mui/material"
 import type { Juncture } from "@/types"
 import { useCampaign } from "@/contexts"
 import {
+  Manager,
   HeroImage,
   SpeedDialMenu,
   SectionHeader,
@@ -13,7 +14,6 @@ import {
   InfoLink,
   Icon,
 } from "@/components/ui"
-import { CharacterManager } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { EditFaction } from "@/components/factions"
 import { FormActions, useForm } from "@/reducers"
@@ -114,11 +114,12 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
       </Box>
 
       <Stack direction="column" spacing={2}>
-        <CharacterManager
+        <Manager
           icon={<Icon keyword="Fighters" />}
           name="juncture"
           title="Juncture Natives"
-          entity={juncture}
+          parentEntity={juncture}
+          childEntityName="Character"
           description={
             <>
               <InfoLink href="/characters" info="Characters" /> born into a
@@ -128,7 +129,7 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
               shaping its outcomes.
             </>
           }
-          updateParent={updateEntity}
+          onListUpdate={updateEntity}
         />
       </Stack>
     </Box>
