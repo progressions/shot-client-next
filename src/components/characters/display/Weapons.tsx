@@ -6,11 +6,13 @@ import { Icon, InfoLink, Manager } from "@/components/ui"
 type WeaponsProperties = {
   character: Pick<Character, "id" | "user" | "weapon_ids">
   updateCharacter: (character: Character) => void
+  manage?: boolean
 }
 
 export default function Weapons({
   character,
   updateCharacter,
+  manage = true,
 }: WeaponsProperties) {
   return (
     <Manager
@@ -30,6 +32,7 @@ export default function Weapons({
         </>
       }
       onListUpdate={updateCharacter}
+      manage={manage}
     />
   )
 }

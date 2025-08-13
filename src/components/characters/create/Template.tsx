@@ -8,6 +8,7 @@ import {
   Associations,
   Skills,
   Schticks,
+  Weapons,
 } from "@/components/characters"
 
 type TemplateProps = {
@@ -17,7 +18,7 @@ type TemplateProps = {
 export default function Template({ template }: TemplateProps) {
   return (
     <Box sx={{ width: 770, mt: 2, mx: "auto" }}>
-      <Header character={template} />
+      <Header character={template} manage={false} />
       <ActionValues character={template} size="large" />
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 2 }}>
         <Box sx={{ flex: 1, flexGrow: 1 }}>
@@ -31,6 +32,7 @@ export default function Template({ template }: TemplateProps) {
         <RichTextRenderer html={CS.background(template)} />
       </Box>
       <Schticks character={template} manage={false} />
+      <Weapons character={template} manage={false} />
       <p>&nbsp;</p>
     </Box>
   )

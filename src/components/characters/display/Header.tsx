@@ -7,12 +7,13 @@ import { TypeLink, FactionLink } from "@/components/ui"
 
 type HeaderProps = {
   character: Character
+  manage?: boolean
 }
 
-export default function Header({ character }: HeaderProps) {
+export default function Header({ character, manage = true }: HeaderProps) {
   return (
     <>
-      <HeroImage entity={character} />
+      <HeroImage entity={character} positionable={manage} />
       <Stack
         direction="row"
         sx={{ alignItems: "center", mb: 2, gap: { xs: 1, sm: 2 } }}

@@ -11,7 +11,9 @@ type SchticksProperties = {
 export default function Schticks({
   character,
   updateCharacter,
+  manage = true,
 }: SchticksProperties) {
+    console.log("Schticks component rendered with character:", character)
   return (
     <Manager
       icon={<Icon keyword="Schticks" />}
@@ -26,6 +28,7 @@ export default function Schticks({
         </>
       }
       onListUpdate={updateCharacter}
+      manage={manage}
     />
   )
 }

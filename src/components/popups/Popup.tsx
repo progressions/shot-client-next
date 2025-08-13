@@ -19,6 +19,8 @@ export default function Popup({
 }: PopupProps) {
   const word = pluralize.singular(keyword).toLowerCase()
 
+  console.log("Popup word", word)
+
   const content = contents[word] || <p>Unknown</p>
   const html = ReactDOMServer.renderToStaticMarkup(content)
 

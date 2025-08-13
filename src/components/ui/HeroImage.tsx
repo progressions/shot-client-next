@@ -30,6 +30,9 @@ export function HeroImage({
     )
   }
 
+  if (!positionable && !entity.image_url) {
+    return null
+  }
   if (!entity.image_url) {
     return (
       <Box

@@ -30,6 +30,7 @@ type ListManagerProps = {
     | "Faction"
   onListUpdate: (updatedEntity: Entity) => Promise<void>
   excludeIds?: number[]
+  manage?: boolean
 }
 
 const collectionNames: Record<string, string> = {
@@ -52,6 +53,7 @@ export function ListManager({
   childEntityName,
   onListUpdate,
   excludeIds = [],
+  manage = true,
 }: ListManagerProps) {
   const { client } = useClient()
   const [childEntities, setChildEntities] = useState<AutocompleteOption[]>([])
@@ -179,7 +181,7 @@ export function ListManager({
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      {open && (
+      {manage && open && (
         <FilterComponent
           onChange={handleAdd}
           excludeIds={stableExcludeIds}
