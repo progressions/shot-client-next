@@ -1,5 +1,13 @@
 "use client"
-import { Stack, FormControl, FormHelperText, Box, CircularProgress, Typography, Divider } from "@mui/material"
+import {
+  Stack,
+  FormControl,
+  FormHelperText,
+  Box,
+  CircularProgress,
+  Typography,
+  Divider,
+} from "@mui/material"
 import { InfoLink, SectionHeader } from "@/components/ui"
 import { createStringAutocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
@@ -33,12 +41,16 @@ interface EditCategoryPathProps {
 const CategoryAutocomplete = createStringAutocomplete("Category")
 const PathAutocomplete = createStringAutocomplete("Path")
 
-export default function EditCategoryPath({ schtick, updateEntity, state }: EditCategoryPathProps) {
+export default function EditCategoryPath({
+  schtick,
+  updateEntity,
+  state,
+}: EditCategoryPathProps) {
   const { client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     category: schtick.category || null,
     path: schtick.path || null,
-    isPathsLoading: false
+    isPathsLoading: false,
   })
   const { category, path, isPathsLoading } = formState.data
   const { saving, errors } = state
@@ -49,8 +61,14 @@ export default function EditCategoryPath({ schtick, updateEntity, state }: EditC
   const fetchCategories = useCallback(async () => {
     try {
       const response = await client.getSchtickCategories({ autocomplete: true })
-      const general = response.data.general?.filter((item: string | null) => item != null).map(String) || []
-      const core = response.data.core?.filter((item: string | null) => item != null).map(String) || []
+      const general =
+        response.data.general
+          ?.filter((item: string | null) => item != null)
+          .map(String) || []
+      const core =
+        response.data.core
+          ?.filter((item: string | null) => item != null)
+          .map(String) || []
       setCategories([...general, ...core])
       setGeneralLength(general.length)
     } catch (error) {
@@ -58,23 +76,37 @@ export default function EditCategoryPath({ schtick, updateEntity, state }: EditC
     }
   }, [client])
 
-  const fetchPaths = useCallback(async (inputValue: string): Promise<string[]> => {
-    dispatchForm({ type: FormActions.EDIT, name: "isPathsLoading", value: true })
-    try {
-      const response = await client.getSchtickPaths({
-        search: inputValue,
-        category: category
+  const fetchPaths = useCallback(
+    async (inputValue: string): Promise<string[]> => {
+      dispatchForm({
+        type: FormActions.EDIT,
+        name: "isPathsLoading",
+        value: true,
       })
-      const fetchedPaths = response.data.paths?.filter((item: string | null) => item != null).map(String) || []
-      setPaths(fetchedPaths)
-      return fetchedPaths
-    } catch (error) {
-      console.error("Error fetching paths:", error)
-      return []
-    } finally {
-      dispatchForm({ type: FormActions.EDIT, name: "isPathsLoading", value: false })
-    }
-  }, [category, client, dispatchForm])
+      try {
+        const response = await client.getSchtickPaths({
+          search: inputValue,
+          category: category,
+        })
+        const fetchedPaths =
+          response.data.paths
+            ?.filter((item: string | null) => item != null)
+            .map(String) || []
+        setPaths(fetchedPaths)
+        return fetchedPaths
+      } catch (error) {
+        console.error("Error fetching paths:", error)
+        return []
+      } finally {
+        dispatchForm({
+          type: FormActions.EDIT,
+          name: "isPathsLoading",
+          value: false,
+        })
+      }
+    },
+    [category, client, dispatchForm]
+  )
 
   const handleCategoryChange = async (value: string | null) => {
     dispatchForm({ type: FormActions.UPDATE, name: "category", value })
@@ -119,10 +151,17 @@ export default function EditCategoryPath({ schtick, updateEntity, state }: EditC
             records={categories}
             sx={{ width: "100%" }}
             allowNone={false}
-            groupBy={option => categories.indexOf(option.id as string) < generalLength ? "General" : "Core"}
+            groupBy={option =>
+              categories.indexOf(option.id as string) < generalLength
+                ? "General"
+                : "Core"
+            }
             renderGroup={params => (
               <Box key={params.key}>
-                <Typography variant="subtitle2" sx={{ px: 2, py: 1, fontWeight: "bold" }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ px: 2, py: 1, fontWeight: "bold" }}
+                >
                   {params.group}
                 </Typography>
                 {params.children}

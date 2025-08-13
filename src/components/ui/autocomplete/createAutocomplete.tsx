@@ -122,7 +122,7 @@ export function createStringAutocomplete(model: string) {
     sx,
     allowNone,
     groupBy,
-    renderGroup
+    renderGroup,
   }: Omit<ModelAutocompleteProps, "onInputChange" | "filters"> & {
     allowNone?: boolean
     groupBy?: (option: AutocompleteOption) => string
@@ -130,13 +130,18 @@ export function createStringAutocomplete(model: string) {
   }) {
     const noneOption: AutocompleteOption = { id: NONE_VALUE, name: "None" }
     const options = useMemo(() => {
-      const opts = allowNone ? [noneOption, ...records.map(item => ({
-        id: String(item),
-        name: String(item)
-      }))] : records.map(item => ({
-        id: String(item),
-        name: String(item)
-      }))
+      const opts = allowNone
+        ? [
+            noneOption,
+            ...records.map(item => ({
+              id: String(item),
+              name: String(item),
+            })),
+          ]
+        : records.map(item => ({
+            id: String(item),
+            name: String(item),
+          }))
       return opts
     }, [records, allowNone])
     return (

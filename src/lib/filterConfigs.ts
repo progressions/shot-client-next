@@ -46,6 +46,7 @@ export const filterConfigs: Record<string, FilterConfig> = {
       { name: "category", type: "string" },
       { name: "path", type: "string" },
       { name: "schtick", type: "entity", allowNone: false },
+      { name: "search", type: "search" },
     ],
     responseKeys: {
       category: "categories",
@@ -59,6 +60,7 @@ export const filterConfigs: Record<string, FilterConfig> = {
       { name: "juncture", type: "string" },
       { name: "category", type: "string" },
       { name: "weapon", type: "entity", allowNone: false },
+      { name: "search", type: "search" },
     ],
     responseKeys: {
       category: "categories",
@@ -85,6 +87,7 @@ export const filterConfigs: Record<string, FilterConfig> = {
       { name: "archetype", type: "string" },
       { name: "faction", type: "entity" },
       { name: "vehicle", type: "entity", allowNone: false },
+      { name: "search", type: "search" },
     ],
     responseKeys: {
       type: "types",
@@ -103,6 +106,7 @@ export const filterConfigs: Record<string, FilterConfig> = {
         staticOptions: ["Started", "Unstarted", "Ended"],
       },
       { name: "fight", type: "entity", allowNone: false },
+      { name: "search", type: "search" },
     ],
     responseKeys: { season: "seasons", status: "status", fight: "fights" },
   },
@@ -119,12 +123,16 @@ export const filterConfigs: Record<string, FilterConfig> = {
     fields: [
       { name: "faction", type: "entity" },
       { name: "juncture", type: "entity", allowNone: false },
+      { name: "search", type: "search" },
     ],
     responseKeys: { faction: "factions", juncture: "junctures" },
   },
   User: {
     entityName: "User",
-    fields: [{ name: "user", type: "entity", allowNone: false }],
+    fields: [
+      { name: "user", type: "entity", allowNone: false },
+      { name: "search", type: "search" },
+    ],
     responseKeys: { user: "users" },
   },
   Site: {
@@ -132,17 +140,24 @@ export const filterConfigs: Record<string, FilterConfig> = {
     fields: [
       { name: "faction", type: "entity" },
       { name: "site", type: "entity", allowNone: false },
+      { name: "search", type: "search" },
     ],
     responseKeys: { faction: "factions", site: "sites" },
   },
   Campaign: {
     entityName: "Campaign",
-    fields: [{ name: "campaign", type: "entity", allowNone: false }],
+    fields: [
+      { name: "campaign", type: "entity", allowNone: false },
+      { name: "search", type: "search" },
+    ],
     responseKeys: { campaign: "campaigns" },
   },
   Faction: {
     entityName: "Faction",
-    fields: [{ name: "faction", type: "entity", allowNone: false }],
+    fields: [
+      { name: "faction", type: "entity", allowNone: false },
+      { name: "search", type: "search" },
+    ],
     responseKeys: { faction: "factions" },
   },
 }

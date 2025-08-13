@@ -153,7 +153,9 @@ export default function SkillsManager({
     dispatchForm({ type: FormActions.UPDATE, name: "open", value })
   }
 
-  const actionButton = <ManageButton open={open} onClick={() => openManager(!open)} />
+  const actionButton = (
+    <ManageButton open={open} onClick={() => openManager(!open)} />
+  )
 
   return (
     <>

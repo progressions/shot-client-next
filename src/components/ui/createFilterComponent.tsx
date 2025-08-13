@@ -158,9 +158,10 @@ export function createFilterComponent(config: FilterConfig) {
     const debouncedSetMainSearch = debounce((value: string) => {
       console.log("debouncedSetMainSearch called", { value })
       setMainSearch(value)
-      if (true
-          // stableOnFiltersUpdate &&
-          // !stableOmit.includes(entityName.toLowerCase())
+      if (
+        true
+        // stableOnFiltersUpdate &&
+        // !stableOmit.includes(entityName.toLowerCase())
       ) {
         const newFilters = filterMapper(formState.data, value, stableOmit)
         console.log(
@@ -346,10 +347,11 @@ export function createFilterComponent(config: FilterConfig) {
             if (!AutocompleteComponent) return null
             if (field.type === "search") {
               return (
-                <TextField key={keys[field.name]}
+                <TextField
+                  key={keys[field.name]}
                   name={field.name}
                   value={formState.data[field.name] as string | null}
-                  onChange={(e) => handleInputChange(e, e.target.value)}
+                  onChange={e => handleInputChange(e, e.target.value)}
                   placeholder={`${entityName}`}
                   sx={{ width: "100%" }}
                 />

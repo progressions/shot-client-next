@@ -93,8 +93,8 @@ export default function Show({ schtick: initialSchtick }: ShowProperties) {
       />
       <SectionHeader title="Description" icon={<Icon keyword="Schtick" />}>
         A description of the Schtick, including whether it costs a{" "}
-        <InfoLink info="Shot" /> or <InfoLink info="Chi" /> to activate, who it affects, and what its
-        effects are.
+        <InfoLink info="Shot" /> or <InfoLink info="Chi" /> to activate, who it
+        affects, and what its effects are.
       </SectionHeader>
       <EditableRichText
         name="description"
