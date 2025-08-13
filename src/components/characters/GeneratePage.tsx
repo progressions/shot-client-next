@@ -19,11 +19,10 @@ import type {
 import { FormActions, useForm } from "@/reducers"
 import { AxiosError } from "axios"
 import { Editor } from "@/components/editor"
-import { SaveButton, SaveCancelButtons } from "@/components/ui"
-import CS from "@/services/CharacterService"
+import { HeroTitle, SaveButton, SaveCancelButtons } from "@/components/ui"
+import { CS } from "@/services"
 import { FormEvent, useState, useEffect } from "react"
 import { Subscription } from "@rails/actioncable"
-import { HeroTitle } from "@/components/ui"
 import { SpeedDial } from "@/components/characters"
 
 type FormStateData = {

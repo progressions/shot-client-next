@@ -1,5 +1,6 @@
 import { GridView, ViewList } from "@mui/icons-material"
-import { SpeedDial, actions as initialActions } from "@/components/ui"
+import { SpeedDial } from "@/components/characters"
+import { actions as initialActions } from "@/components/characters/SpeedDial"
 
 interface CharactersMenuProps {
   viewMode: "table" | "mobile"
