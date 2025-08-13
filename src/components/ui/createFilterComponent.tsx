@@ -1,5 +1,5 @@
 "use client"
-import { Stack, Alert } from "@mui/material"
+import { TextField, Stack, Alert } from "@mui/material"
 import {
   createAutocomplete,
   createStringAutocomplete,
@@ -18,7 +18,7 @@ interface AutocompleteOption {
 
 interface FilterFieldConfig {
   name: string
-  type: "entity" | "string" | "static"
+  type: "entity" | "string" | "static" | "search"
   staticOptions?: string[]
   responseKey?: string
   allowNone?: boolean
@@ -48,6 +48,8 @@ export function createFilterComponent(config: FilterConfig) {
         acc[field.name] = createStringAutocomplete(
           field.name.charAt(0).toUpperCase() + field.name.slice(1)
         )
+      } else if (field.type === "search") {
+        acc[field.name] = TextField
       }
       return acc
     },
@@ -60,7 +62,7 @@ export function createFilterComponent(config: FilterConfig) {
     omit: string[]
   ) => {
     const filters: Record<string, string | boolean> = {}
-    if (search && !omit.includes(entityName.toLowerCase())) {
+    if (search) {
       filters.search = search
     }
     fields.forEach(field => {
@@ -156,9 +158,9 @@ export function createFilterComponent(config: FilterConfig) {
     const debouncedSetMainSearch = debounce((value: string) => {
       console.log("debouncedSetMainSearch called", { value })
       setMainSearch(value)
-      if (
-        stableOnFiltersUpdate &&
-        !stableOmit.includes(entityName.toLowerCase())
+      if (true
+          // stableOnFiltersUpdate &&
+          // !stableOmit.includes(entityName.toLowerCase())
       ) {
         const newFilters = filterMapper(formState.data, value, stableOmit)
         console.log(
@@ -167,6 +169,8 @@ export function createFilterComponent(config: FilterConfig) {
         )
         stableOnFiltersUpdate(newFilters)
         fetchRecords(newFilters)
+      } else {
+        console.log("didn't do it")
       }
     }, 300)
 
@@ -340,6 +344,18 @@ export function createFilterComponent(config: FilterConfig) {
             }
             const AutocompleteComponent = fieldAutocompletes[field.name]
             if (!AutocompleteComponent) return null
+            if (field.type === "search") {
+              return (
+                <TextField key={keys[field.name]}
+                  name={field.name}
+                  value={formState.data[field.name] as string | null}
+                  onChange={(e) => handleInputChange(e, e.target.value)}
+                  placeholder={`${entityName}`}
+                  sx={{ width: "100%" }}
+                />
+              )
+            }
+
             return (
               <AutocompleteComponent
                 key={keys[field.name]}

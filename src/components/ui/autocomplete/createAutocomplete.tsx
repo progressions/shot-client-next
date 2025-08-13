@@ -151,7 +151,7 @@ export function createStringAutocomplete(model: string) {
         renderInput={params => (
           <TextField
             {...params}
-            label={`Select ${model}`}
+            label={`${model}`}
             variant="outlined"
             InputProps={{ ...params.InputProps }}
           />

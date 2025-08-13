@@ -32,6 +32,7 @@ export const filterConfigs: Record<string, FilterConfig> = {
       { name: "faction", type: "entity" },
       { name: "archetype", type: "string" },
       { name: "character", type: "entity", allowNone: false },
+      { name: "search", type: "search" },
     ],
     responseKeys: {
       faction: "factions",
