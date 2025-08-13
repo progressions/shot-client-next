@@ -33,6 +33,7 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialJuncture,
   })
+  const { status, errors } = formState
   const juncture = formState.data.entity
 
   const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(

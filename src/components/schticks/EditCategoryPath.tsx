@@ -1,21 +1,22 @@
 "use client"
-import {
-  Stack,
-  FormControl,
-  FormHelperText,
-  Box,
-  CircularProgress,
-  Typography,
-} from "@mui/material"
+import { Stack, FormControl, FormHelperText, Box, CircularProgress, Typography, Divider } from "@mui/material"
 import { InfoLink, SectionHeader } from "@/components/ui"
-import {
-  SchtickCategoryAutocomplete,
-  SchtickPathAutocomplete,
-} from "@/components/autocomplete"
+import { createStringAutocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
-import type { Schtick, SchtickPath } from "@/types"
-import { useCallback } from "react"
-import { FormStateType, FormActions, useForm } from "@/reducers"
+import { useState, useCallback, useEffect } from "react"
+import { useForm, FormActions } from "@/reducers"
+import type { Schtick } from "@/types"
+
+interface Schtick {
+  category?: string | null
+  path?: string | null
+}
+
+interface AutocompleteOption {
+  id: number | string
+  name: string
+  group?: string
+}
 
 type FormStateData = {
   category: string | null
@@ -25,73 +26,82 @@ type FormStateData = {
 
 interface EditCategoryPathProps {
   schtick: Schtick
-  updateSchtick: (data: Partial<Schtick>) => Promise<void>
-  state: FormStateType<FormStateData>
+  updateEntity: (entity: Schtick) => Promise<void>
+  state: { saving: boolean; errors: Record<string, string> }
 }
 
-export default function EditCategoryPath({
-  schtick,
-  updateEntity: updateSchtick,
-  state,
-}: EditCategoryPathProps) {
-  const { client } = useClient()
+const CategoryAutocomplete = createStringAutocomplete("Category")
+const PathAutocomplete = createStringAutocomplete("Path")
 
-  // local state
+export default function EditCategoryPath({ schtick, updateEntity, state }: EditCategoryPathProps) {
+  const { client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     category: schtick.category || null,
     path: schtick.path || null,
-    errors: {},
-    isPathsLoading: false,
+    isPathsLoading: false
   })
   const { category, path, isPathsLoading } = formState.data
-
-  // external state for errors
   const { saving, errors } = state
+  const [categories, setCategories] = useState<string[]>([])
+  const [paths, setPaths] = useState<string[]>([])
+  const [generalLength, setGeneralLength] = useState(0)
 
-  const fetchPaths = useCallback(
-    async (inputValue: string): Promise<Option[]> => {
-      dispatchForm({
-        type: FormActions.EDIT,
-        name: "isPathsLoading",
-        value: true,
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await client.getSchtickCategories({ autocomplete: true })
+      const general = response.data.general?.filter((item: string | null) => item != null).map(String) || []
+      const core = response.data.core?.filter((item: string | null) => item != null).map(String) || []
+      setCategories([...general, ...core])
+      setGeneralLength(general.length)
+    } catch (error) {
+      console.error("Error fetching categories:", error)
+    }
+  }, [client])
+
+  const fetchPaths = useCallback(async (inputValue: string): Promise<string[]> => {
+    dispatchForm({ type: FormActions.EDIT, name: "isPathsLoading", value: true })
+    try {
+      const response = await client.getSchtickPaths({
+        search: inputValue,
+        category: category
       })
-      try {
-        const response = await client.getSchtickPaths({
-          search: inputValue,
-          category: category,
-        })
-        return response.data.paths.map((path: SchtickPath) => ({
-          label: path || "",
-          value: path || "",
-        }))
-      } catch (error) {
-        console.error("Error fetching options:", error)
-        return []
-      } finally {
-        dispatchForm({
-          type: FormActions.EDIT,
-          name: "isPathsLoading",
-          value: false,
-        })
-      }
-    },
-    [category, client, dispatchForm]
-  )
+      const fetchedPaths = response.data.paths?.filter((item: string | null) => item != null).map(String) || []
+      setPaths(fetchedPaths)
+      return fetchedPaths
+    } catch (error) {
+      console.error("Error fetching paths:", error)
+      return []
+    } finally {
+      dispatchForm({ type: FormActions.EDIT, name: "isPathsLoading", value: false })
+    }
+  }, [category, client, dispatchForm])
 
   const handleCategoryChange = async (value: string | null) => {
     dispatchForm({ type: FormActions.UPDATE, name: "category", value })
     dispatchForm({ type: FormActions.UPDATE, name: "path", value: null })
     dispatchForm({ type: FormActions.SUBMIT })
-    await updateSchtick({ ...schtick, category: value, path: null })
+    await updateEntity({ ...schtick, category: value, path: null })
     dispatchForm({ type: FormActions.SUCCESS })
   }
 
   const handlePathChange = async (value: string | null) => {
     dispatchForm({ type: FormActions.UPDATE, name: "path", value })
     dispatchForm({ type: FormActions.SUBMIT })
-    await updateSchtick({ ...schtick, path: value })
+    await updateEntity({ ...schtick, path: value })
     dispatchForm({ type: FormActions.SUCCESS })
   }
+
+  useEffect(() => {
+    fetchCategories()
+  }, [fetchCategories])
+
+  useEffect(() => {
+    if (category) {
+      fetchPaths("")
+    } else {
+      setPaths([])
+    }
+  }, [category, fetchPaths])
 
   return (
     <Box sx={{ mt: 4 }}>
@@ -103,11 +113,22 @@ export default function EditCategoryPath({
       </SectionHeader>
       <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
         <FormControl fullWidth error={!!errors.category}>
-          <SchtickCategoryAutocomplete
+          <CategoryAutocomplete
             value={category || ""}
             onChange={handleCategoryChange}
+            records={categories}
+            sx={{ width: "100%" }}
             allowNone={false}
-            disabled={saving}
+            groupBy={option => categories.indexOf(option.id as string) < generalLength ? "General" : "Core"}
+            renderGroup={params => (
+              <Box key={params.key}>
+                <Typography variant="subtitle2" sx={{ px: 2, py: 1, fontWeight: "bold" }}>
+                  {params.group}
+                </Typography>
+                {params.children}
+                {params.group === "General" && <Divider sx={{ my: 1 }} />}
+              </Box>
+            )}
           />
           {errors.category && (
             <FormHelperText>{errors.category}</FormHelperText>
@@ -122,11 +143,12 @@ export default function EditCategoryPath({
               </Typography>
             </Box>
           ) : category ? (
-            <SchtickPathAutocomplete
+            <PathAutocomplete
               value={path || ""}
               onChange={handlePathChange}
               fetchOptions={fetchPaths}
-              disabled={saving}
+              records={paths}
+              sx={{ width: "100%" }}
               allowNone={false}
             />
           ) : (

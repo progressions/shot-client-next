@@ -33,6 +33,7 @@ export default function Show({ party: initialParty }: ShowProperties) {
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialParty,
   })
+  const { status, errors } = formState
   const party = formState.data.entity
 
   const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(

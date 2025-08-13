@@ -119,34 +119,39 @@ export function createStringAutocomplete(model: string) {
     value,
     onChange,
     records,
-    allowNone = true,
     sx,
-  }: Omit<ModelAutocompleteProps, "onInputChange" | "filters">) {
+    allowNone,
+    groupBy,
+    renderGroup
+  }: Omit<ModelAutocompleteProps, "onInputChange" | "filters"> & {
+    allowNone?: boolean
+    groupBy?: (option: AutocompleteOption) => string
+    renderGroup?: (params: AutocompleteRenderGroupParams) => React.ReactNode
+  }) {
     const noneOption: AutocompleteOption = { id: NONE_VALUE, name: "None" }
-
-    const options = useMemo(
-      () =>
-        [
-          allowNone ? noneOption : null,
-          ...(records as string[]).map(item => ({
-            id: String(item),
-            name: String(item),
-          })),
-        ].filter(option => option !== null),
-      [records]
-    )
-
+    const options = useMemo(() => {
+      const opts = allowNone ? [noneOption, ...records.map(item => ({
+        id: String(item),
+        name: String(item)
+      }))] : records.map(item => ({
+        id: String(item),
+        name: String(item)
+      }))
+      return opts
+    }, [records, allowNone])
     return (
       <Autocomplete
         options={options}
         getOptionLabel={option => String(option.name)}
         value={options.find(option => option.id === value) || null}
-        onChange={(event, newValue) => onChange(newValue?.id)}
+        onChange={(event, newValue) => onChange(newValue ? newValue.id : null)}
         isOptionEqualToValue={(option, val) => option.id === val.id}
+        groupBy={groupBy}
+        renderGroup={renderGroup}
         renderInput={params => (
           <TextField
             {...params}
-            label={`${model}`}
+            label={`Select ${model}`}
             variant="outlined"
             InputProps={{ ...params.InputProps }}
           />

@@ -2,12 +2,13 @@
 
 import { VscGithubAction } from "react-icons/vsc"
 import { useEffect } from "react"
-import { FormControl, FormHelperText, Alert, Box } from "@mui/material"
+import { FormControl, FormHelperText, Box } from "@mui/material"
 import type { Weapon } from "@/types"
 import { useCampaign } from "@/contexts"
 import { WeaponChips, Stats, EditJunctureCategory } from "@/components/weapons"
 import { useToast } from "@/contexts"
 import {
+  Alert,
   SectionHeader,
   EditableRichText,
   HeroImage,
@@ -121,11 +122,7 @@ export default function Show({ weapon: initialWeapon }: ShowProperties) {
     >
       <SpeedDialMenu onDelete={handleDelete} />
       <HeroImage entity={weapon} setEntity={setWeapon} />
-      {status.message && (
-        <Alert severity={status.severity} sx={{ mb: 2 }}>
-          {status.message}
-        </Alert>
-      )}
+      <Alert status={status} />
       <Box
         sx={{
           display: "flex",

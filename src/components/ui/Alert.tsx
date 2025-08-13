@@ -10,7 +10,7 @@ type AlertProps = {
 }
 
 export function Alert({ status, sx }: AlertProps) {
-  if (!status.message) return null
+  if (!status?.message) return null
 
   return (
     <MuiAlert severity={status.severity} sx={{ mb: 2, ...sx }}>
