@@ -39,7 +39,12 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         validSorts={["name", "season", "session", "created_at", "updated_at"]}
         dispatchForm={dispatchForm}
         formState={formState}
-        filter={<WeaponFilter onFiltersUpdate={updateFilters} omit={["add"]} />}
+        filter={
+          <WeaponFilter
+            onFiltersUpdate={updateFilters}
+            omit={["add", "weapon"]}
+          />
+        }
       >
         {viewMode === "mobile" ? (
           <GridView

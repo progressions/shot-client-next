@@ -15,17 +15,6 @@ import { useState, useCallback, useEffect } from "react"
 import { useForm, FormActions } from "@/reducers"
 import type { Schtick } from "@/types"
 
-interface Schtick {
-  category?: string | null
-  path?: string | null
-}
-
-interface AutocompleteOption {
-  id: number | string
-  name: string
-  group?: string
-}
-
 type FormStateData = {
   category: string | null
   path: string | null

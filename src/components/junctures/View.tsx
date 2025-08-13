@@ -40,7 +40,10 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         formState={formState}
         isMobile={viewMode === "mobile"}
         filter={
-          <JunctureFilter omit={["add"]} onFiltersUpdate={updateFilters} />
+          <JunctureFilter
+            omit={["add", "juncture"]}
+            onFiltersUpdate={updateFilters}
+          />
         }
       >
         {viewMode === "mobile" ? (

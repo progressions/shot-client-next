@@ -33,7 +33,6 @@ interface FilterConfig {
 export function createFilterComponent(config: FilterConfig) {
   const { entityName, fields, responseKeys } = config
   const pluralEntityName = pluralize(entityName)
-  const omitKeys = [...fields.map(field => field.name), "add"]
   const MainAutocomplete = fields.find(f => f.name === entityName.toLowerCase())
     ? createAutocomplete(entityName)
     : null
@@ -158,21 +157,14 @@ export function createFilterComponent(config: FilterConfig) {
     const debouncedSetMainSearch = debounce((value: string) => {
       console.log("debouncedSetMainSearch called", { value })
       setMainSearch(value)
-      if (
-        true
-        // stableOnFiltersUpdate &&
-        // !stableOmit.includes(entityName.toLowerCase())
-      ) {
-        const newFilters = filterMapper(formState.data, value, stableOmit)
-        console.log(
-          "Calling onFiltersUpdate and fetchRecords from debouncedSetMainSearch",
-          { newFilters }
-        )
-        stableOnFiltersUpdate(newFilters)
-        fetchRecords(newFilters)
-      } else {
-        console.log("didn't do it")
-      }
+
+      const newFilters = filterMapper(formState.data, value, stableOmit)
+      console.log(
+        "Calling onFiltersUpdate and fetchRecords from debouncedSetMainSearch",
+        { newFilters }
+      )
+      stableOnFiltersUpdate(newFilters)
+      fetchRecords(newFilters)
     }, 300)
 
     const fetchRecords = debounce(
@@ -350,7 +342,7 @@ export function createFilterComponent(config: FilterConfig) {
                 <TextField
                   key={keys[field.name]}
                   name={field.name}
-                  value={formState.data[field.name] as string | null}
+                  value={(formState.data[field.name] as string | null) || ""}
                   onChange={e => handleInputChange(e, e.target.value)}
                   placeholder={`${entityName}`}
                   sx={{ width: "100%" }}

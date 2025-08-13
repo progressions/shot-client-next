@@ -39,7 +39,9 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         isMobile={viewMode === "mobile"}
         formState={formState}
         dispatchForm={dispatchForm}
-        filter={<SiteFilter onFiltersUpdate={updateFilters} omit={["add"]} />}
+        filter={
+          <SiteFilter onFiltersUpdate={updateFilters} omit={["add", "site"]} />
+        }
       >
         {viewMode === "mobile" ? (
           <GridView

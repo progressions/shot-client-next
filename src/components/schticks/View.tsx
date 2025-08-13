@@ -41,7 +41,10 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         dispatchForm={dispatchForm}
         formState={formState}
         filter={
-          <SchtickFilter onFiltersUpdate={updateFilters} omit={["add"]} />
+          <SchtickFilter
+            onFiltersUpdate={updateFilters}
+            omit={["add", "schtick"]}
+          />
         }
       >
         {viewMode === "mobile" ? (

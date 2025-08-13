@@ -40,7 +40,10 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         formState={formState}
         dispatchForm={dispatchForm}
         filter={
-          <FactionFilter omit={["add"]} onFiltersUpdate={updateFilters} />
+          <FactionFilter
+            omit={["add", "faction"]}
+            onFiltersUpdate={updateFilters}
+          />
         }
       >
         {viewMode === "mobile" ? (

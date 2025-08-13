@@ -180,7 +180,11 @@ export function ListManager({
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       {open && (
-        <FilterComponent onChange={handleAdd} excludeIds={stableExcludeIds} />
+        <FilterComponent
+          onChange={handleAdd}
+          excludeIds={stableExcludeIds}
+          omit={["search"]}
+        />
       )}
       {loading ? (
         <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 2 }}>
