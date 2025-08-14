@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation"
 import { useEffect, useCallback, useState } from "react"
 import { Box } from "@mui/material"
-import type { User, PaginationMeta } from "@/types"
+import type { User, Faction, PaginationMeta } from "@/types"
 import { useCampaign, useClient, useLocalStorage } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
 import { Icon, MainHeader } from "@/components/ui"
@@ -16,11 +16,17 @@ interface ListProps {
 
 export type FormStateData = {
   users: User[]
+  factions: Faction[]
+  archetypes: string[]
   meta: PaginationMeta
   filters: {
     sort: string
     order: string
+    user_type: string
+    archetype: string
+    faction_id: string
     page: number
+    search: string
   }
 }
 
@@ -46,6 +52,21 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
         })
         dispatchForm({
           type: FormActions.UPDATE,
+          name: "factions",
+          value: response.data.factions,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "types",
+          value: response.data.types,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "archetypes",
+          value: response.data.archetypes,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
           name: "meta",
           value: response.data.meta,
         })
@@ -58,7 +79,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   useEffect(() => {
     if (!campaignData) return
-    console.log("Campaign data:", campaignData)
+    console.log("User data:", campaignData)
     if (campaignData.users === "reload") {
       fetchUsers(filters)
     }
@@ -87,7 +108,10 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
           mb: 2,
         }}
       >
-        <MainHeader title="Users" icon={<Icon keyword="Users" size="36" />} />
+        <MainHeader
+          title="Users"
+          icon={<Icon keyword="Users" size="36" />}
+        />
       </Box>
       <View
         viewMode={viewMode}

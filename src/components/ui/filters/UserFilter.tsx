@@ -1,107 +1,56 @@
 // components/UserFilter.tsx
 "use client"
-import { Stack } from "@mui/material"
-import { createAutocomplete, AddButton } from "@/components/ui"
-import { useClient } from "@/contexts"
-import { useState, useEffect, useCallback } from "react"
+import { Stack, TextField } from "@mui/material"
+import { createAutocomplete, createStringAutocomplete, SearchInput } from "@/components/ui"
+import { useState, useCallback } from "react"
 import { debounce } from "lodash"
+import { FormActions, useForm } from "@/reducers"
 
 interface AutocompleteOption {
   id: number
   name: string
 }
 
-const UsersAutocomplete = createAutocomplete("User")
-
 type UserFilterProps = {
+  filters: Record<string, string | boolean>
   onChange: (value: AutocompleteOption | null) => void
-  omit?: Array<"user" | "add">
+  onFiltersUpdate?: (filters: Record<string, string | boolean>) => void
+  omit?: Array<"user" | "search" | "add">
   excludeIds?: number[]
 }
 
 export function UserFilter({
+  formState,
   onChange,
+  onFiltersUpdate,
   omit = [],
   excludeIds = [],
 }: UserFilterProps) {
-  const { client } = useClient()
-  const [selectedUser, setSelectedUser] = useState<AutocompleteOption | null>(
-    null
-  )
-  const [userRecords, setUserRecords] = useState<AutocompleteOption[]>([])
-  const [userKey, setUserKey] = useState("user-0")
-  const [keyCounter, setKeyCounter] = useState(1)
+  console.log("formState in UserFilter", formState)
+  const { filters } = formState.data
 
-  const filteredUserRecords = userRecords.filter(
-    record => !excludeIds.includes(record.id)
-  )
-
-  const fetchRecords = useCallback(
-    debounce(async () => {
-      try {
-        const response = await client.getUsers({
-          autocomplete: true,
-          per_page: 200,
-        })
-        const users = response.data.users
-        setUserRecords(users)
-      } catch (error) {
-        console.error("Failed to fetch records:", error)
-      }
-    }, 300),
-    [client]
-  )
-
-  useEffect(() => {
-    fetchRecords()
-    return () => {
-      fetchRecords.cancel()
-    }
-  }, [fetchRecords])
-
-  const handleAdd = () => {
-    if (selectedUser) {
-      onChange(selectedUser)
-      setSelectedUser(null)
-      setUserKey(`user-${keyCounter}`)
-      setKeyCounter(prev => prev + 1)
-    }
-  }
-
-  const handleUserChange = (value: AutocompleteOption | null) => {
-    setSelectedUser(value)
-    if (omit.includes("add") && value) {
-      onChange(value)
-      setSelectedUser(null)
-      setUserKey(`user-${keyCounter}`)
-      setKeyCounter(prev => prev + 1)
-    }
+  const changeFilter = (name, newValue) => {
+    onFiltersUpdate?.({
+      ...filters,
+      [name]: newValue?.id || newValue || "",
+      page: 1, // Reset to first page on filter change
+    })
   }
 
   return (
-    <Stack
-      direction="row"
-      spacing={2}
-      alignItems="center"
-      sx={{ width: "100%" }}
-    >
-      {!omit.includes("user") && (
-        <UsersAutocomplete
-          key={userKey}
-          value={selectedUser}
-          onChange={handleUserChange}
-          filters={{}}
-          records={filteredUserRecords}
-          sx={{ width: "100%" }}
-        />
-      )}
-      {!omit.includes("add") && (
-        <AddButton
-          onClick={handleAdd}
-          disabled={!selectedUser}
-          sx={{ height: "fit-content", alignSelf: "center" }}
-        />
-      )}
+    <Stack direction="row" spacing={2} alignItems="center">
+      { !omit.includes("email") && <SearchInput
+        name="email"
+        value={filters?.email as string}
+        onFiltersUpdate={(newValue) => changeFilter("email", newValue)}
+        placeholder="Email"
+      /> }
+      { !omit.includes("search") && <SearchInput
+        name="search"
+        value={filters?.search as string}
+        onFiltersUpdate={(newValue) => changeFilter("search", newValue)}
+        placeholder="User"
+      /> }
     </Stack>
   )
 }
