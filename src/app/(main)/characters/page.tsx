@@ -26,10 +26,10 @@ export default async function CharactersPage({
           sort,
           order,
           page,
+          search,
           character_type: "",
           archetype: "",
           faction_id: "",
-          search,
         },
       })}
       ListComponent={List}

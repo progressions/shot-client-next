@@ -17,13 +17,19 @@ export default async function VehiclesPage({
       resourceName="vehicles"
       fetchData={async (client, params) => client.getVehicles(params)}
       validSorts={["name", "created_at", "updated_at"]}
-      getInitialFormData={(data: VehiclesResponse, page, sort, order) => ({
+      getInitialFormData={(data: VehiclesResponse, page, sort, order, search) => ({
         vehicles: data.vehicles,
+        factions: data.factions,
+        archetypes: data.archetypes,
         meta: data.meta,
         filters: {
           sort,
           order,
           page,
+          search,
+          character_type: "",
+          archetype: "",
+          faction_id: "",
         },
         drawerOpen: false,
       })}
