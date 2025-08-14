@@ -17,17 +17,19 @@ export default async function CharactersPage({
       resourceName="characters"
       fetchData={async (client, params) => client.getCharacters(params)}
       validSorts={["name", "created_at", "updated_at"]}
-      getInitialFormData={(data: CharactersResponse, page, sort, order) => ({
+      getInitialFormData={(data: CharactersResponse, page, sort, order, search) => ({
         characters: data.characters,
+        factions: data.factions,
+        archetypes: data.archetypes,
         meta: data.meta,
         filters: {
           sort,
           order,
           page,
-          drawerOpen: false,
           character_type: "",
           archetype: "",
           faction_id: "",
+          search,
         },
       })}
       ListComponent={List}

@@ -3,7 +3,7 @@ import { useMemo, useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, CharacterDetail } from "@/components/characters"
-import { createFilterComponent, GridView, SortControls } from "@/components/ui"
+import { CharacterFilter, GridView, SortControls } from "@/components/ui"
 import type { FormStateData } from "@/components/characters/List"
 import { filterConfigs } from "@/lib/filterConfigs"
 
@@ -14,11 +14,6 @@ interface ViewProps {
 }
 
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
-  const CharacterFilter = useMemo(
-    () => createFilterComponent(filterConfigs["Character"]),
-    []
-  )
-
   const updateFilters = useCallback(
     filters => {
       dispatchForm({
@@ -43,6 +38,7 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         formState={formState}
         filter={
           <CharacterFilter
+            formState={formState}
             omit={["add", "character"]}
             onFiltersUpdate={updateFilters}
           />
