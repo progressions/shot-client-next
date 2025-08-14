@@ -17,7 +17,8 @@ interface ResourcePageProps<T> {
     data: T,
     page: number,
     sort: string,
-    order: string
+    order: string,
+    search?: string
   ) => object
   ListComponent: React.ComponentType<{
     initialFormData: object
@@ -42,7 +43,7 @@ export default async function ResourcePage<T>({
   }
 
   // Validate parameters with fixed defaults
-  const { page, sort, order } = await getPageParameters(searchParams, {
+  const { page, sort, order, search } = await getPageParameters(searchParams, {
     validSorts,
     defaultSort: "created_at",
     defaultOrder: "desc",
@@ -50,7 +51,7 @@ export default async function ResourcePage<T>({
 
   // Redirect if page is invalid
   if (page <= 0) {
-    redirect(`/${resourceName}?page=1&sort=created_at&order=desc`)
+    redirect(`/${resourceName}?page=1&sort=created_at&order=desc&search=${search}`)
   }
 
   // Fetch data
@@ -63,7 +64,7 @@ export default async function ResourcePage<T>({
   const initialIsMobile = /mobile/i.test(userAgent)
 
   // Prepare initial form data
-  const initialFormData = getInitialFormData(data, page, sort, order)
+  const initialFormData = getInitialFormData(data, page, sort, order, search)
 
   return (
     <Box

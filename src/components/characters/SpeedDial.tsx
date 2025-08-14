@@ -38,7 +38,6 @@ export default function SpeedDial({
 }: SpeedDialProps) {
   const [open, setOpen] = useState(false)
 
-
   return (
     <SpeedDialMenu
       actions={initialActions}

@@ -23,9 +23,9 @@ export default function Parties({
         childEntityName="Party"
         description={
           <>
-            A <InfoLink href="/characters" info="Character" /> may belong to
-            one or more <InfoLink href="/parties" info="Parties" />, allowing
-            him to work with others on missions and adventures in the world of the{" "}
+            A <InfoLink href="/characters" info="Character" /> may belong to one
+            or more <InfoLink href="/parties" info="Parties" />, allowing him to
+            work with others on missions and adventures in the world of the{" "}
             <InfoLink info="Chi War" />
           </>
         }

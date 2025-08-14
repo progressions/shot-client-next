@@ -1,6 +1,6 @@
 "use client"
 
-import AccessibilityNewIcon from '@mui/icons-material/AccessibilityNew'
+import AccessibilityNewIcon from "@mui/icons-material/AccessibilityNew"
 import FileDownloadIcon from "@mui/icons-material/FileDownload"
 import DeleteIcon from "@mui/icons-material/Delete"
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
@@ -223,7 +223,11 @@ Action Values: ${JSON.stringify(character.actionValues, null, 2)}
         </MenuItem>
         <MenuItem onClick={handleExportTXT}>Export as TXT</MenuItem>
       </Menu>
-      <Extend character={character} open={extendOpen} onClose={() => setExtendOpen(false)} />
+      <Extend
+        character={character}
+        open={extendOpen}
+        onClose={() => setExtendOpen(false)}
+      />
     </>
   )
 }

@@ -1,8 +1,7 @@
-import { Stack, Box, Typography } from "@mui/material"
+import { Stack, Box } from "@mui/material"
 import { getUser } from "@/lib/getServerClient"
 import { Suspense } from "react"
 import { Campaign } from "@/types"
-import { UserName } from "@/components/users"
 import {
   LoadingModule,
   PartiesModule,

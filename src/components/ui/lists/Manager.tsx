@@ -36,7 +36,9 @@ export function Manager({
 }: ManagerProperties) {
   const [open, setOpen] = useState(false)
 
-  const actionButton = manage ? <ManageButton open={open} onClick={setOpen} /> : null
+  const actionButton = manage ? (
+    <ManageButton open={open} onClick={setOpen} />
+  ) : null
 
   return (
     <Box sx={{ my: 4 }}>

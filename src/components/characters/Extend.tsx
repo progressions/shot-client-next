@@ -1,9 +1,8 @@
 "use client"
 
 import { Button, DialogBox } from "@/components/ui"
-import { Box, Stack, Typography } from "@mui/material"
+import { Stack, Typography } from "@mui/material"
 import type { Character } from "@/types"
-import { CS } from "@/services"
 import { useState } from "react"
 import { useClient } from "@/contexts"
 
@@ -35,16 +34,15 @@ export default function Extend({ character, open, onClose }: ExtendProps) {
     <>
       <DialogBox open={open} onClose={onClose} title="Extend your Character">
         <Typography>We can flesh out your character a bit with AI.</Typography>
-        <Typography>Just click the button and we'll update your character with some additional details.</Typography>
+        <Typography>
+          Just click the button and we'll update your character with some
+          additional details.
+        </Typography>
         <Stack direction="row" justifyContent="flex-end" spacing={2} mt={2}>
           <Button variant="outlined" onClick={onClose}>
             Cancel
           </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={extendCharacter}
-          >
+          <Button variant="contained" color="primary" onClick={extendCharacter}>
             Extend Character
           </Button>
         </Stack>

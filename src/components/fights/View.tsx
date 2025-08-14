@@ -1,11 +1,10 @@
 "use client"
-import { useMemo, useCallback } from "react"
+import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType } from "@/reducers"
 import { FightDetail, Table } from "@/components/fights"
-import { createFilterComponent, GridView, SortControls } from "@/components/ui"
+import { FightFilter, GridView, SortControls } from "@/components/ui"
 import type { FormStateData } from "@/components/fights/List"
-import { filterConfigs } from "@/lib/filterConfigs"
 
 interface ViewProps {
   viewMode: "table" | "mobile"
@@ -14,11 +13,6 @@ interface ViewProps {
 }
 
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
-  const FightFilter = useMemo(
-    () => createFilterComponent(filterConfigs["Fight"]),
-    []
-  )
-
   const updateFilters = useCallback(
     filters => {
       console.log("Updating filters:", filters)
@@ -42,6 +36,7 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         formState={formState}
         filter={
           <FightFilter
+            filters={formState.data.filters}
             onFiltersUpdate={updateFilters}
             omit={["add", "fight"]}
           />
