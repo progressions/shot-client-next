@@ -10,7 +10,7 @@ export const metadata = {
 export default async function CharactersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; sort?: string; order?: string }>
+  searchParams: Promise<{ page?: string; sort?: string; order?: string, search?: string }>
 }) {
   return (
     <ResourcePage

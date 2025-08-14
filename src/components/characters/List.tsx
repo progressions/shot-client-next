@@ -52,6 +52,11 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
         })
         dispatchForm({
           type: FormActions.UPDATE,
+          name: "factions",
+          value: response.data.factions,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
           name: "types",
           value: response.data.types,
         })

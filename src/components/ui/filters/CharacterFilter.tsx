@@ -15,7 +15,7 @@ type CharacterFilterProps = {
   filters: Record<string, string | boolean>
   onChange: (value: AutocompleteOption | null) => void
   onFiltersUpdate?: (filters: Record<string, string | boolean>) => void
-  omit?: Array<"character" | "add">
+  omit?: Array<"character" | "type" | "archetype" | "faction" | "search" | "add">
   excludeIds?: number[]
 }
 
