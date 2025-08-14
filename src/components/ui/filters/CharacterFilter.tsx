@@ -34,7 +34,6 @@ export function CharacterFilter({
   const { filters, factions, archetypes } = formState.data
 
   const changeFilter = (name, newValue) => {
-    console.log("wut", newValue)
     onFiltersUpdate?.({
       ...filters,
       [name]: newValue?.id || newValue || "",

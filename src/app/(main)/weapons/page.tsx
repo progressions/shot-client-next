@@ -17,15 +17,19 @@ export default async function WeaponsPage({
       resourceName="weapons"
       fetchData={async (client, params) => client.getWeapons(params)}
       validSorts={["name", "created_at", "updated_at"]}
-      getInitialFormData={(data: WeaponsResponse, page, sort, order) => ({
+      getInitialFormData={(data: WeaponsResponse, page, sort, order, search) => ({
         weapons: data.weapons,
+        categories: data.categories,
+        junctures: data.junctures,
         meta: data.meta,
         filters: {
           sort,
           order,
           page,
+          search,
+          category: "",
+          juncture: "",
         },
-        drawerOpen: false,
       })}
       ListComponent={List}
       searchParams={searchParams}
