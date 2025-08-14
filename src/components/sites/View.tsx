@@ -3,7 +3,8 @@ import { useMemo, useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, SiteDetail } from "@/components/sites"
-import { createFilterComponent, GridView, SortControls } from "@/components/ui"
+import { SiteFilter, GridView, SortControls } from "@/components/ui"
+import type { FormStateData } from "@/components/sites/List"
 import { filterConfigs } from "@/lib/filterConfigs"
 
 interface ViewProps {
@@ -13,11 +14,6 @@ interface ViewProps {
 }
 
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
-  const SiteFilter = useMemo(
-    () => createFilterComponent(filterConfigs["Site"]),
-    []
-  )
-
   const updateFilters = useCallback(
     filters => {
       dispatchForm({
@@ -35,12 +31,17 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
       <SortControls
-        validSorts={["name", "created_at", "updated_at"]}
+        route="/sites"
         isMobile={viewMode === "mobile"}
-        formState={formState}
+        validSorts={["name", "created_at", "updated_at"]}
         dispatchForm={dispatchForm}
+        formState={formState}
         filter={
-          <SiteFilter onFiltersUpdate={updateFilters} omit={["add", "site"]} />
+          <SiteFilter
+            formState={formState}
+            omit={["add", "site"]}
+            onFiltersUpdate={updateFilters}
+          />
         }
       >
         {viewMode === "mobile" ? (

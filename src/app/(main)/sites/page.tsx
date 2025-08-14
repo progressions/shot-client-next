@@ -10,22 +10,24 @@ export const metadata = {
 export default async function SitesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; sort?: string; order?: string }>
+  searchParams: Promise<{ page?: string; sort?: string; order?: string, search?: string }>
 }) {
   return (
     <ResourcePage
       resourceName="sites"
       fetchData={async (client, params) => client.getSites(params)}
       validSorts={["name", "created_at", "updated_at"]}
-      getInitialFormData={(data: SitesResponse, page, sort, order) => ({
+      getInitialFormData={(data: SitesResponse, page, sort, order, search) => ({
         sites: data.sites,
+        factions: data.factions,
         meta: data.meta,
         filters: {
           sort,
           order,
           page,
+          search,
+          faction_id: "",
         },
-        drawerOpen: false,
       })}
       ListComponent={List}
       searchParams={searchParams}
