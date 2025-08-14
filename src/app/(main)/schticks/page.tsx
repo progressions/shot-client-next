@@ -17,7 +17,13 @@ export default async function SchticksPage({
       resourceName="schticks"
       fetchData={async (client, params) => client.getSchticks(params)}
       validSorts={["name", "created_at", "updated_at"]}
-      getInitialFormData={(data: SchticksResponse, page, sort, order, search) => ({
+      getInitialFormData={(
+        data: SchticksResponse,
+        page,
+        sort,
+        order,
+        search
+      ) => ({
         schticks: data.schticks,
         categories: data.categories,
         paths: data.paths,

@@ -1,10 +1,7 @@
 // components/UserFilter.tsx
 "use client"
-import { Stack, TextField } from "@mui/material"
-import { createAutocomplete, createStringAutocomplete, SearchInput } from "@/components/ui"
-import { useState, useCallback } from "react"
-import { debounce } from "lodash"
-import { FormActions, useForm } from "@/reducers"
+import { Stack } from "@mui/material"
+import { SearchInput } from "@/components/ui"
 
 interface AutocompleteOption {
   id: number
@@ -39,18 +36,22 @@ export function UserFilter({
 
   return (
     <Stack direction="row" spacing={2} alignItems="center">
-      { !omit.includes("email") && <SearchInput
-        name="email"
-        value={filters?.email as string}
-        onFiltersUpdate={(newValue) => changeFilter("email", newValue)}
-        placeholder="Email"
-      /> }
-      { !omit.includes("search") && <SearchInput
-        name="search"
-        value={filters?.search as string}
-        onFiltersUpdate={(newValue) => changeFilter("search", newValue)}
-        placeholder="User"
-      /> }
+      {!omit.includes("email") && (
+        <SearchInput
+          name="email"
+          value={filters?.email as string}
+          onFiltersUpdate={newValue => changeFilter("email", newValue)}
+          placeholder="Email"
+        />
+      )}
+      {!omit.includes("search") && (
+        <SearchInput
+          name="search"
+          value={filters?.search as string}
+          onFiltersUpdate={newValue => changeFilter("search", newValue)}
+          placeholder="User"
+        />
+      )}
     </Stack>
   )
 }

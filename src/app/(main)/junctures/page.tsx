@@ -10,14 +10,25 @@ export const metadata = {
 export default async function JuncturesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; sort?: string; order?: string, search?: string }>
+  searchParams: Promise<{
+    page?: string
+    sort?: string
+    order?: string
+    search?: string
+  }>
 }) {
   return (
     <ResourcePage
       resourceName="junctures"
       fetchData={async (client, params) => client.getJunctures(params)}
       validSorts={["name", "created_at", "updated_at"]}
-      getInitialFormData={(data: JuncturesResponse, page, sort, order, search) => ({
+      getInitialFormData={(
+        data: JuncturesResponse,
+        page,
+        sort,
+        order,
+        search
+      ) => ({
         junctures: data.junctures,
         factions: data.factions,
         meta: data.meta,

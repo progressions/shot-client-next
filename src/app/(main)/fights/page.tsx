@@ -10,14 +10,25 @@ export const metadata = {
 export default async function FightsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; sort?: string; order?: string, search?: string }>
+  searchParams: Promise<{
+    page?: string
+    sort?: string
+    order?: string
+    search?: string
+  }>
 }) {
   return (
     <ResourcePage
       resourceName="fights"
       fetchData={async (client, params) => client.getFights(params)}
       validSorts={["name", "created_at", "updated_at"]}
-      getInitialFormData={(data: FightsResponse, page, sort, order, search) => ({
+      getInitialFormData={(
+        data: FightsResponse,
+        page,
+        sort,
+        order,
+        search
+      ) => ({
         fights: data.fights,
         seasons: data.seasons,
         meta: data.meta,

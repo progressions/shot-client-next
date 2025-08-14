@@ -1,6 +1,6 @@
 "use client"
 import { TextField } from "@mui/material"
-import { useCallback, useState, useEffect } from "react"
+import { useCallback, useState } from "react"
 import { debounce } from "lodash"
 
 interface SearchInputProps {
@@ -10,7 +10,13 @@ interface SearchInputProps {
   onFiltersUpdate?: (filters: Record<string, string | boolean>) => void
 }
 
-export function SearchInput({ name, value: initialValue, placeholder, sx, onFiltersUpdate }: SearchInputProps) {
+export function SearchInput({
+  name,
+  value: initialValue,
+  placeholder,
+  sx,
+  onFiltersUpdate,
+}: SearchInputProps) {
   const [value, setValue] = useState<string | null>(initialValue)
 
   const debouncedOnFiltersUpdate = useCallback(
@@ -27,11 +33,11 @@ export function SearchInput({ name, value: initialValue, placeholder, sx, onFilt
   }
 
   return (
-      <TextField
-        name={name}
-        value={value || ""}
-        onChange={handleInputChange}
-        placeholder={placeholder}
-      />
+    <TextField
+      name={name}
+      value={value || ""}
+      onChange={handleInputChange}
+      placeholder={placeholder}
+    />
   )
 }

@@ -1,10 +1,7 @@
 // components/JunctureFilter.tsx
 "use client"
-import { Stack, TextField } from "@mui/material"
-import { createAutocomplete, createStringAutocomplete, SearchInput } from "@/components/ui"
-import { useState, useCallback } from "react"
-import { debounce } from "lodash"
-import { FormActions, useForm } from "@/reducers"
+import { Stack } from "@mui/material"
+import { createAutocomplete, SearchInput } from "@/components/ui"
 
 interface AutocompleteOption {
   id: number
@@ -41,20 +38,24 @@ export function JunctureFilter({
 
   return (
     <Stack direction="row" spacing={2} alignItems="center">
-      { !omit.includes("faction") && <FactionAutocomplete
-        value={filters?.faction as string}
-        onChange={(newValue => changeFilter("faction_id", newValue))}
-        records={factions}
-        allowNone={true}
-        sx={{ width: 200 }}
-        placeholder="Faction"
-      /> }
-      { !omit.includes("search") && <SearchInput
-        name="search"
-        value={filters?.search as string}
-        onFiltersUpdate={(newValue) => changeFilter("search", newValue)}
-        placeholder="Juncture"
-      /> }
+      {!omit.includes("faction") && (
+        <FactionAutocomplete
+          value={filters?.faction as string}
+          onChange={newValue => changeFilter("faction_id", newValue)}
+          records={factions}
+          allowNone={true}
+          sx={{ width: 200 }}
+          placeholder="Faction"
+        />
+      )}
+      {!omit.includes("search") && (
+        <SearchInput
+          name="search"
+          value={filters?.search as string}
+          onFiltersUpdate={newValue => changeFilter("search", newValue)}
+          placeholder="Juncture"
+        />
+      )}
     </Stack>
   )
 }

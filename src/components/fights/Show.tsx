@@ -22,6 +22,7 @@ import {
   InfoLink,
   Icon,
   Manager,
+  CharacterManager,
 } from "@/components/ui"
 import { useCampaign } from "@/contexts"
 import { FightChips } from "@/components/fights"

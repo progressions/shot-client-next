@@ -138,7 +138,7 @@ export function createStringAutocomplete(model: string) {
               name: String(item),
             })),
           ]
-          : records
+        : records
             .filter(item => item)
             .map(item => ({
               id: String(item),

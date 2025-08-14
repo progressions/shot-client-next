@@ -1,11 +1,10 @@
 "use client"
-import { useMemo, useCallback } from "react"
+import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, WeaponDetail } from "@/components/weapons"
 import { WeaponFilter, GridView, SortControls } from "@/components/ui"
 import type { FormStateData } from "@/components/weapons/List"
-import { filterConfigs } from "@/lib/filterConfigs"
 
 interface ViewProps {
   viewMode: "table" | "mobile"
@@ -33,7 +32,14 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
       <SortControls
         route="/weapons"
         isMobile={viewMode === "mobile"}
-        validSorts={["name", "damage", "concealment", "reload_value", "created_at", "updated_at"]}
+        validSorts={[
+          "name",
+          "damage",
+          "concealment",
+          "reload_value",
+          "created_at",
+          "updated_at",
+        ]}
         dispatchForm={dispatchForm}
         formState={formState}
         filter={

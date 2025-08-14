@@ -10,7 +10,12 @@ export const metadata = {
 export default async function SitesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; sort?: string; order?: string, search?: string }>
+  searchParams: Promise<{
+    page?: string
+    sort?: string
+    order?: string
+    search?: string
+  }>
 }) {
   return (
     <ResourcePage

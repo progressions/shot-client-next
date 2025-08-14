@@ -1,10 +1,7 @@
 // components/WeaponFilter.tsx
 "use client"
-import { Stack, TextField } from "@mui/material"
-import { createAutocomplete, createStringAutocomplete, SearchInput } from "@/components/ui"
-import { useState, useCallback } from "react"
-import { debounce } from "lodash"
-import { FormActions, useForm } from "@/reducers"
+import { Stack } from "@mui/material"
+import { createStringAutocomplete, SearchInput } from "@/components/ui"
 
 interface AutocompleteOption {
   id: number
@@ -29,7 +26,7 @@ export function WeaponFilter({
   omit = [],
   excludeIds = [],
 }: WeaponFilterProps) {
-    console.log("formState in WeaponFilter", formState)
+  console.log("formState in WeaponFilter", formState)
   const { filters, categories, junctures } = formState.data
 
   const changeFilter = (name, newValue) => {
@@ -42,26 +39,32 @@ export function WeaponFilter({
 
   return (
     <Stack direction="row" spacing={2} alignItems="center">
-      { !omit.includes("juncture") && <JunctureAutocomplete
-        value={filters?.juncture as string}
-        onChange={(newValue => changeFilter("juncture", newValue))}
-        records={junctures}
-        allowNone={true}
-        sx={{ width: 200 }}
-      /> }
-      { !omit.includes("category") && <CategoryAutocomplete
-        value={filters?.category as string}
-        onChange={(newValue => changeFilter("category", newValue))}
-        records={categories}
-        allowNone={true}
-        sx={{ width: 200 }}
-      /> }
-      { !omit.includes("search") && <SearchInput
-        name="search"
-        value={filters?.search as string}
-        onFiltersUpdate={(newValue) => changeFilter("search", newValue)}
-        placeholder="Weapon"
-      /> }
+      {!omit.includes("juncture") && (
+        <JunctureAutocomplete
+          value={filters?.juncture as string}
+          onChange={newValue => changeFilter("juncture", newValue)}
+          records={junctures}
+          allowNone={true}
+          sx={{ width: 200 }}
+        />
+      )}
+      {!omit.includes("category") && (
+        <CategoryAutocomplete
+          value={filters?.category as string}
+          onChange={newValue => changeFilter("category", newValue)}
+          records={categories}
+          allowNone={true}
+          sx={{ width: 200 }}
+        />
+      )}
+      {!omit.includes("search") && (
+        <SearchInput
+          name="search"
+          value={filters?.search as string}
+          onFiltersUpdate={newValue => changeFilter("search", newValue)}
+          placeholder="Weapon"
+        />
+      )}
     </Stack>
   )
 }

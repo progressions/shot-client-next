@@ -14,12 +14,12 @@ import {
   UserFilter,
   JunctureFilter,
   BadgeList,
+  ManageButton,
 } from "@/components/ui"
 import { useClient } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
-import { useMemo, useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { paginateArray } from "@/lib"
-import { filterConfigs } from "@/lib/filterConfigs"
 import type {
   Fight,
 } from "@/types"
@@ -58,8 +58,7 @@ const filterComponents: Record<string, React.ComponentType<any>> = {
   Juncture: JunctureFilter,
 }
 
-export function ListManager({
-  open,
+export function CharacterManager({
   title,
   icon,
   description,
@@ -79,11 +78,12 @@ export function ListManager({
     parentEntity.characters || []
   )
   const { client } = useClient()
+  const [open, setOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(true)
 
   // Instantiate only the required FilterComponent
-  const FilterComponent = useMemo(() => filterComponents[childEntityName] || (() => null), [childEntityName])
+  const FilterComponent = filterComponents[childEntityName] || (() => null)
 
   const { items: paginatedItems, meta } = paginateArray(
     childEntities,
@@ -103,22 +103,6 @@ export function ListManager({
   const { filters } = formState.data
 
   useEffect(() => {
-    const fetchChildEntities = async () => {
-      try {
-        const getFunc = `get${pluralChildEntityName}` as keyof typeof client
-        const response = await client[getFunc]({
-          ids: childIds,
-        })
-        setChildEntities(response.data[collection] || [])
-      } catch (error) {
-        console.error(`Fetch ${childEntityName} error:`, error)
-      }
-    }
-
-    fetchChildEntities()
-  }, [dispatchForm])
-
-  useEffect(() => {
     dispatchForm({
       type: FormActions.UPDATE,
       name: "filters",
@@ -126,21 +110,38 @@ export function ListManager({
     })
   }, [])
 
-  const fetchChildrenForAutocomplete = useCallback(
+  const fetchChildren = useCallback(
     async localFilters => {
       try {
-        console.log("Fetching children", localFilters)
-        const getFunc = `get${pluralChildEntityName}` as keyof typeof client
-        const response = await client[getFunc](localFilters)
-        for (const [key, value] of Object.entries(response.data)) {
-          dispatchForm({
-            type: FormActions.UPDATE,
-            name: key,
-            value: value,
-          })
-        }
+        console.log("Fetching characters", localFilters)
+        const response = await client.getCharacters(localFilters)
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "characters",
+          value: response.data.characters,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "factions",
+          value: response.data.factions,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "types",
+          value: response.data.types,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "archetypes",
+          value: response.data.archetypes,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "meta",
+          value: response.data.meta,
+        })
       } catch (error) {
-        console.error("Fetch children error:", error)
+        console.error("Fetch characters error:", error)
       }
       setLoading(false)
     },
@@ -148,8 +149,8 @@ export function ListManager({
   )
 
   useEffect(() => {
-    fetchChildrenForAutocomplete(filters)
-  }, [filters, fetchChildrenForAutocomplete])
+    fetchChildren(filters)
+  }, [filters, fetchChildren])
 
   const updateFilters = useCallback(
     filters => {
@@ -230,6 +231,12 @@ export function ListManager({
     setCurrentPage(newPage)
   }
 
+  const actionButton = manage ? (
+    <ManageButton open={open} onClick={setOpen} />
+  ) : null
+
+  console.log("Manager formState", formState)
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       {manage && open && (
@@ -249,7 +256,7 @@ export function ListManager({
         <BadgeList
           items={paginatedItems}
           open={open}
-          collection={collection}
+          collection="characters"
           meta={meta}
           handleDelete={handleDelete}
           handlePageChange={handlePageChange}

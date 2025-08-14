@@ -51,7 +51,9 @@ export default async function ResourcePage<T>({
 
   // Redirect if page is invalid
   if (page <= 0) {
-    redirect(`/${resourceName}?page=1&sort=created_at&order=desc&search=${search}`)
+    redirect(
+      `/${resourceName}?page=1&sort=created_at&order=desc&search=${search}`
+    )
   }
 
   // Fetch data

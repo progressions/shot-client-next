@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation"
 import { useEffect, useCallback, useState } from "react"
 import { Box } from "@mui/material"
-import type { Weapon, Faction, PaginationMeta } from "@/types"
+import type { Weapon, PaginationMeta } from "@/types"
 import { useCampaign, useClient, useLocalStorage } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
 import { Icon, MainHeader } from "@/components/ui"

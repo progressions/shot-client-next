@@ -1,11 +1,10 @@
 "use client"
-import { useMemo, useCallback } from "react"
+import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, CampaignDetail } from "@/components/campaigns"
 import { CampaignFilter, GridView, SortControls } from "@/components/ui"
 import type { FormStateData } from "@/components/campaigns/List"
-import { filterConfigs } from "@/lib/filterConfigs"
 
 interface ViewProps {
   viewMode: "table" | "mobile"

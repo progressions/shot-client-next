@@ -1,11 +1,10 @@
 "use client"
-import { useMemo, useCallback } from "react"
+import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, FactionDetail } from "@/components/factions"
 import { FactionFilter, GridView, SortControls } from "@/components/ui"
 import type { FormStateData } from "@/components/factions/List"
-import { filterConfigs } from "@/lib/filterConfigs"
 
 interface ViewProps {
   viewMode: "table" | "mobile"

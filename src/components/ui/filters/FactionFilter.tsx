@@ -1,10 +1,7 @@
 // components/FactionFilter.tsx
 "use client"
-import { Stack, TextField } from "@mui/material"
-import { createAutocomplete, createStringAutocomplete, SearchInput } from "@/components/ui"
-import { useState, useCallback } from "react"
-import { debounce } from "lodash"
-import { FormActions, useForm } from "@/reducers"
+import { Stack } from "@mui/material"
+import { SearchInput } from "@/components/ui"
 
 interface AutocompleteOption {
   id: number
@@ -39,12 +36,14 @@ export function FactionFilter({
 
   return (
     <Stack direction="row" spacing={2} alignItems="center">
-      { !omit.includes("search") && <SearchInput
-        name="search"
-        value={filters?.search as string}
-        onFiltersUpdate={(newValue) => changeFilter("search", newValue)}
-        placeholder="Faction"
-      /> }
+      {!omit.includes("search") && (
+        <SearchInput
+          name="search"
+          value={filters?.search as string}
+          onFiltersUpdate={newValue => changeFilter("search", newValue)}
+          placeholder="Faction"
+        />
+      )}
     </Stack>
   )
 }

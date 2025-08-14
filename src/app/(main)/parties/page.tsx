@@ -10,14 +10,25 @@ export const metadata = {
 export default async function PartiesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; sort?: string; order?: string, search?: string }>
+  searchParams: Promise<{
+    page?: string
+    sort?: string
+    order?: string
+    search?: string
+  }>
 }) {
   return (
     <ResourcePage
       resourceName="parties"
       fetchData={async (client, params) => client.getParties(params)}
       validSorts={["name", "created_at", "updated_at"]}
-      getInitialFormData={(data: PartiesResponse, page, sort, order, search) => ({
+      getInitialFormData={(
+        data: PartiesResponse,
+        page,
+        sort,
+        order,
+        search
+      ) => ({
         parties: data.parties,
         factions: data.factions,
         meta: data.meta,

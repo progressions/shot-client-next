@@ -108,10 +108,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
           mb: 2,
         }}
       >
-        <MainHeader
-          title="Users"
-          icon={<Icon keyword="Users" size="36" />}
-        />
+        <MainHeader title="Users" icon={<Icon keyword="Users" size="36" />} />
       </Box>
       <View
         viewMode={viewMode}
