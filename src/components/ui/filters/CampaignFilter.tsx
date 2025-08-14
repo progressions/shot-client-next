@@ -1,108 +1,50 @@
 // components/CampaignFilter.tsx
 "use client"
-import { Stack } from "@mui/material"
-import { createAutocomplete, AddButton } from "@/components/ui"
-import { useClient } from "@/contexts"
-import { useState, useEffect, useCallback } from "react"
+import { Stack, TextField } from "@mui/material"
+import { createAutocomplete, createStringAutocomplete, SearchInput } from "@/components/ui"
+import { useState, useCallback } from "react"
 import { debounce } from "lodash"
+import { FormActions, useForm } from "@/reducers"
 
 interface AutocompleteOption {
   id: number
   name: string
 }
 
-const CampaignAutocomplete = createAutocomplete("Campaign")
-
 type CampaignFilterProps = {
+  filters: Record<string, string | boolean>
   onChange: (value: AutocompleteOption | null) => void
-  omit?: Array<"campaign" | "add">
+  onFiltersUpdate?: (filters: Record<string, string | boolean>) => void
+  omit?: Array<"campaign" | "search" | "add">
   excludeIds?: number[]
 }
 
 export function CampaignFilter({
+  formState,
   onChange,
+  onFiltersUpdate,
   omit = [],
   excludeIds = [],
 }: CampaignFilterProps) {
-  const { client } = useClient()
-  const [selectedCampaign, setSelectedCampaign] =
-    useState<AutocompleteOption | null>(null)
-  const [campaignRecords, setCampaignRecords] = useState<AutocompleteOption[]>(
-    []
-  )
-  const [campaignKey, setCampaignKey] = useState("campaign-0")
-  const [keyCounter, setKeyCounter] = useState(1)
+  console.log("formState in CampaignFilter", formState)
+  const { filters } = formState.data
 
-  const filteredCampaignRecords = campaignRecords.filter(
-    record => !excludeIds.includes(record.id)
-  )
-
-  const fetchRecords = useCallback(
-    debounce(async () => {
-      try {
-        const response = await client.getCampaigns({
-          autocomplete: true,
-          per_page: 200,
-        })
-        const campaigns = response.data.campaigns
-        setCampaignRecords(campaigns)
-      } catch (error) {
-        console.error("Failed to fetch records:", error)
-      }
-    }, 300),
-    [client]
-  )
-
-  useEffect(() => {
-    fetchRecords()
-    return () => {
-      fetchRecords.cancel()
-    }
-  }, [fetchRecords])
-
-  const handleAdd = () => {
-    if (selectedCampaign) {
-      onChange(selectedCampaign)
-      setSelectedCampaign(null)
-      setCampaignKey(`campaign-${keyCounter}`)
-      setKeyCounter(prev => prev + 1)
-    }
-  }
-
-  const handleCampaignChange = (value: AutocompleteOption | null) => {
-    setSelectedCampaign(value)
-    if (omit.includes("add") && value) {
-      onChange(value)
-      setSelectedCampaign(null)
-      setCampaignKey(`campaign-${keyCounter}`)
-      setKeyCounter(prev => prev + 1)
-    }
+  const changeFilter = (name, newValue) => {
+    onFiltersUpdate?.({
+      ...filters,
+      [name]: newValue?.id || newValue || "",
+      page: 1, // Reset to first page on filter change
+    })
   }
 
   return (
-    <Stack
-      direction="row"
-      spacing={2}
-      alignItems="center"
-      sx={{ width: "100%" }}
-    >
-      {!omit.includes("campaign") && (
-        <CampaignAutocomplete
-          key={campaignKey}
-          value={selectedCampaign}
-          onChange={handleCampaignChange}
-          filters={{}}
-          records={filteredCampaignRecords}
-          sx={{ width: "100%" }}
-        />
-      )}
-      {!omit.includes("add") && (
-        <AddButton
-          onClick={handleAdd}
-          disabled={!selectedCampaign}
-          sx={{ height: "fit-content", alignSelf: "center" }}
-        />
-      )}
+    <Stack direction="row" spacing={2} alignItems="center">
+      { !omit.includes("search") && <SearchInput
+        name="search"
+        value={filters?.search as string}
+        onFiltersUpdate={(newValue) => changeFilter("search", newValue)}
+        placeholder="Campaign"
+      /> }
     </Stack>
   )
 }

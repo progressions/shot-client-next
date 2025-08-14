@@ -3,7 +3,8 @@ import { useMemo, useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, CampaignDetail } from "@/components/campaigns"
-import { createFilterComponent, GridView, SortControls } from "@/components/ui"
+import { CampaignFilter, GridView, SortControls } from "@/components/ui"
+import type { FormStateData } from "@/components/campaigns/List"
 import { filterConfigs } from "@/lib/filterConfigs"
 
 interface ViewProps {
@@ -13,11 +14,6 @@ interface ViewProps {
 }
 
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
-  const CampaignFilter = useMemo(
-    () => createFilterComponent(filterConfigs["Campaign"]),
-    []
-  )
-
   const updateFilters = useCallback(
     filters => {
       dispatchForm({
@@ -35,14 +31,16 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
       <SortControls
-        validSorts={["name", "created_at", "updated_at"]}
+        route="/campaigns"
         isMobile={viewMode === "mobile"}
-        formState={formState}
+        validSorts={["name", "created_at", "updated_at"]}
         dispatchForm={dispatchForm}
+        formState={formState}
         filter={
           <CampaignFilter
-            onFiltersUpdate={updateFilters}
+            formState={formState}
             omit={["add", "campaign"]}
+            onFiltersUpdate={updateFilters}
           />
         }
       >
