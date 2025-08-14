@@ -11,11 +11,6 @@ interface AutocompleteOption {
   name: string
 }
 
-type FormStateData = {
-  filters: Record<string, string | boolean>
-  fights: AutocompleteOption[]
-}
-
 type FightFilterProps = {
   filters: Record<string, string | boolean>
   onChange: (value: AutocompleteOption | null) => void
@@ -33,15 +28,12 @@ export function FightFilter({
   omit = [],
   excludeIds = [],
 }: FightFilterProps) {
-  console.log("Rendering FightFilter with filters:", formState)
   const { filters, seasons } = formState.data
-  console.log("filters", filters)
 
-  const changeSeason = (newValue) => {
-    console.log("Selected season:", newValue, filters)
+  const changeFilter = (name, newValue) => {
     onFiltersUpdate?.({
       ...filters,
-      season: newValue || "",
+      [name]: newValue || "",
       page: 1, // Reset to first page on filter change
     })
   }
@@ -50,7 +42,7 @@ export function FightFilter({
     <Stack direction="row" spacing={2} alignItems="center">
       { !omit.includes("season") && <SeasonAutocomplete
         value={filters?.season as string}
-        onChange={changeSeason}
+        onChange={(newValue => changeFilter("season", newValue))}
         filters={{ exclude_ids: excludeIds.join(",") }}
         records={seasons}
         allowNone={true}
@@ -60,13 +52,7 @@ export function FightFilter({
       { !omit.includes("search") && <SearchInput
         name="search"
         value={filters?.search as string}
-        onFiltersUpdate={(newFilters) =>
-          onFiltersUpdate?.({
-            ...filters,
-            ...newFilters,
-            page: 1, // Reset to first page on filter change
-          })
-        }
+        onFiltersUpdate={(newValue) => changeFilter("search", newValue)}
         placeholder="Fight"
       /> }
     </Stack>

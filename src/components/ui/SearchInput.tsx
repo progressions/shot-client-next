@@ -14,8 +14,8 @@ export function SearchInput({ name, value: initialValue, placeholder, sx, onFilt
   const [value, setValue] = useState<string | null>(initialValue)
 
   const debouncedOnFiltersUpdate = useCallback(
-    debounce((filters: Record<string, string | boolean>) => {
-      onFiltersUpdate(filters)
+    debounce((newValue: string) => {
+      onFiltersUpdate(newValue)
     }, 300),
     [onFiltersUpdate]
   )
@@ -23,7 +23,7 @@ export function SearchInput({ name, value: initialValue, placeholder, sx, onFilt
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value
     setValue(newValue)
-    debouncedOnFiltersUpdate({ [name]: newValue })
+    debouncedOnFiltersUpdate(newValue)
   }
 
   return (
