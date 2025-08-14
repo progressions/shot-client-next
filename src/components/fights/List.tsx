@@ -50,6 +50,11 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
         })
         dispatchForm({
           type: FormActions.UPDATE,
+          name: "seasons",
+          value: response.data.seasons,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
           name: "meta",
           value: response.data.meta,
         })

@@ -19,6 +19,7 @@ export default async function FightsPage({
       validSorts={["name", "created_at", "updated_at"]}
       getInitialFormData={(data: FightsResponse, page, sort, order, search) => ({
         fights: data.fights,
+        seasons: data.seasons,
         meta: data.meta,
         filters: {
           sort,

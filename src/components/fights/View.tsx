@@ -13,6 +13,7 @@ interface ViewProps {
 }
 
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
+  console.log("View formState", formState)
   const updateFilters = useCallback(
     filters => {
       console.log("Updating filters:", filters)
@@ -36,7 +37,7 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         formState={formState}
         filter={
           <FightFilter
-            filters={formState.data.filters}
+            formState={formState}
             onFiltersUpdate={updateFilters}
             omit={["add", "fight"]}
           />
