@@ -1,27 +1,21 @@
 "use client"
 import { useMemo, useCallback } from "react"
 import { Box } from "@mui/material"
-import { FormActions, FormStateType } from "@/reducers"
-import { SchtickDetail, Table } from "@/components/schticks"
-import { createFilterComponent, GridView, SortControls } from "@/components/ui"
+import { FormActions, FormStateType, FormStateAction } from "@/reducers"
+import { Table, SchtickDetail } from "@/components/schticks"
+import { SchtickFilter, GridView, SortControls } from "@/components/ui"
 import type { FormStateData } from "@/components/schticks/List"
 import { filterConfigs } from "@/lib/filterConfigs"
 
 interface ViewProps {
   viewMode: "table" | "mobile"
   formState: FormStateType<FormStateData>
-  dispatchForm: (action: FormStateType<FormStateData>) => void
+  dispatchForm: (action: FormStateAction<FormStateData>) => void
 }
 
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
-  const SchtickFilter = useMemo(
-    () => createFilterComponent(filterConfigs["Schtick"]),
-    []
-  )
-
   const updateFilters = useCallback(
     filters => {
-      console.log("Updating filters:", filters)
       dispatchForm({
         type: FormActions.UPDATE,
         name: "filters",
@@ -33,17 +27,20 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
     },
     [dispatchForm]
   )
+
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
       <SortControls
+        route="/schticks"
         isMobile={viewMode === "mobile"}
-        validSorts={["name", "category", "path", "created_at", "updated_at"]}
+        validSorts={["name", "created_at", "updated_at"]}
         dispatchForm={dispatchForm}
         formState={formState}
         filter={
           <SchtickFilter
-            onFiltersUpdate={updateFilters}
+            formState={formState}
             omit={["add", "schtick"]}
+            onFiltersUpdate={updateFilters}
           />
         }
       >

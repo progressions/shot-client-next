@@ -60,7 +60,7 @@ export function CharacterFilter({
         sx={{ width: 200 }}
         placeholder="Faction"
       /> }
-      { !omit.includes("type") && <ArchetypeAutocomplete
+      { !omit.includes("archetype") && <ArchetypeAutocomplete
         value={filters?.archetype as string}
         onChange={(newValue => changeFilter("archetype", newValue))}
         records={archetypes.filter(archetype => archetype)}
