@@ -24,9 +24,6 @@ export default async function Dashboard({
   const user = await getUser()
   return (
     <Box>
-      <Typography variant="h6" color="#fff" gutterBottom>
-        Welcome, <UserName user={user} />
-      </Typography>
       <CampaignBanner campaign={campaign} />
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 2 }}>
         <Suspense fallback={<LoadingModule />}>
