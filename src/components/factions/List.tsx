@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation"
 import { useEffect, useCallback, useState } from "react"
 import { Box } from "@mui/material"
-import type { Faction, PaginationMeta } from "@/types"
+import type { Faction, Faction, PaginationMeta } from "@/types"
 import { useCampaign, useClient, useLocalStorage } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
 import { Icon, MainHeader } from "@/components/ui"
@@ -21,6 +21,7 @@ export type FormStateData = {
     sort: string
     order: string
     page: number
+    search: string
   }
 }
 

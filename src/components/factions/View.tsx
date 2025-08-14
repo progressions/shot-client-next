@@ -3,7 +3,8 @@ import { useMemo, useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, FactionDetail } from "@/components/factions"
-import { createFilterComponent, GridView, SortControls } from "@/components/ui"
+import { FactionFilter, GridView, SortControls } from "@/components/ui"
+import type { FormStateData } from "@/components/factions/List"
 import { filterConfigs } from "@/lib/filterConfigs"
 
 interface ViewProps {
@@ -13,11 +14,6 @@ interface ViewProps {
 }
 
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
-  const FactionFilter = useMemo(
-    () => createFilterComponent(filterConfigs["Faction"]),
-    []
-  )
-
   const updateFilters = useCallback(
     filters => {
       dispatchForm({
@@ -35,12 +31,14 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
       <SortControls
-        validSorts={["name", "created_at", "updated_at"]}
+        route="/factions"
         isMobile={viewMode === "mobile"}
-        formState={formState}
+        validSorts={["name", "created_at", "updated_at"]}
         dispatchForm={dispatchForm}
+        formState={formState}
         filter={
           <FactionFilter
+            formState={formState}
             omit={["add", "faction"]}
             onFiltersUpdate={updateFilters}
           />

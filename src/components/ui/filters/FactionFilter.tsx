@@ -1,106 +1,50 @@
 // components/FactionFilter.tsx
 "use client"
-import { Stack } from "@mui/material"
-import { createAutocomplete, AddButton } from "@/components/ui"
-import { useClient } from "@/contexts"
-import { useState, useEffect, useCallback } from "react"
+import { Stack, TextField } from "@mui/material"
+import { createAutocomplete, createStringAutocomplete, SearchInput } from "@/components/ui"
+import { useState, useCallback } from "react"
 import { debounce } from "lodash"
+import { FormActions, useForm } from "@/reducers"
 
 interface AutocompleteOption {
   id: number
   name: string
 }
 
-const FactionAutocomplete = createAutocomplete("Faction")
-
 type FactionFilterProps = {
+  filters: Record<string, string | boolean>
   onChange: (value: AutocompleteOption | null) => void
-  omit?: Array<"faction" | "add">
+  onFiltersUpdate?: (filters: Record<string, string | boolean>) => void
+  omit?: Array<"faction" | "search" | "add">
   excludeIds?: number[]
 }
 
 export function FactionFilter({
+  formState,
   onChange,
+  onFiltersUpdate,
   omit = [],
   excludeIds = [],
 }: FactionFilterProps) {
-  const { client } = useClient()
-  const [selectedFaction, setSelectedFaction] =
-    useState<AutocompleteOption | null>(null)
-  const [factionRecords, setFactionRecords] = useState<AutocompleteOption[]>([])
-  const [factionKey, setFactionKey] = useState("faction-0")
-  const [keyCounter, setKeyCounter] = useState(1)
+  console.log("formState in FactionFilter", formState)
+  const { filters, factions } = formState.data
 
-  const filteredFactionRecords = factionRecords.filter(
-    record => !excludeIds.includes(record.id)
-  )
-
-  const fetchRecords = useCallback(
-    debounce(async () => {
-      try {
-        const response = await client.getFactions({
-          autocomplete: true,
-          per_page: 200,
-        })
-        const factions = response.data.factions
-        setFactionRecords(factions)
-      } catch (error) {
-        console.error("Failed to fetch records:", error)
-      }
-    }, 300),
-    [client]
-  )
-
-  useEffect(() => {
-    fetchRecords()
-    return () => {
-      fetchRecords.cancel()
-    }
-  }, [fetchRecords])
-
-  const handleAdd = () => {
-    if (selectedFaction) {
-      onChange(selectedFaction)
-      setSelectedFaction(null)
-      setFactionKey(`faction-${keyCounter}`)
-      setKeyCounter(prev => prev + 1)
-    }
-  }
-
-  const handleFactionChange = (value: AutocompleteOption | null) => {
-    setSelectedFaction(value)
-    if (omit.includes("add") && value) {
-      onChange(value)
-      setSelectedFaction(null)
-      setFactionKey(`faction-${keyCounter}`)
-      setKeyCounter(prev => prev + 1)
-    }
+  const changeFilter = (name, newValue) => {
+    onFiltersUpdate?.({
+      ...filters,
+      [name]: newValue?.id || newValue || "",
+      page: 1, // Reset to first page on filter change
+    })
   }
 
   return (
-    <Stack
-      direction="row"
-      spacing={2}
-      alignItems="center"
-      sx={{ width: "100%" }}
-    >
-      {!omit.includes("faction") && (
-        <FactionAutocomplete
-          key={factionKey}
-          value={selectedFaction}
-          onChange={handleFactionChange}
-          filters={{}}
-          records={filteredFactionRecords}
-          sx={{ width: "100%" }}
-        />
-      )}
-      {!omit.includes("add") && (
-        <AddButton
-          onClick={handleAdd}
-          disabled={!selectedFaction}
-          sx={{ height: "fit-content", alignSelf: "center" }}
-        />
-      )}
+    <Stack direction="row" spacing={2} alignItems="center">
+      { !omit.includes("search") && <SearchInput
+        name="search"
+        value={filters?.search as string}
+        onFiltersUpdate={(newValue) => changeFilter("search", newValue)}
+        placeholder="Faction"
+      /> }
     </Stack>
   )
 }

@@ -30,7 +30,7 @@ export function CharacterFilter({
   omit = [],
   excludeIds = [],
 }: CharacterFilterProps) {
-    console.log("formState in CharacterFilter", formState)
+  console.log("formState in CharacterFilter", formState)
   const { filters, factions, archetypes } = formState.data
 
   const changeFilter = (name, newValue) => {
