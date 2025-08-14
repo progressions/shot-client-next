@@ -3,7 +3,8 @@ import { useMemo, useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, JunctureDetail } from "@/components/junctures"
-import { createFilterComponent, GridView, SortControls } from "@/components/ui"
+import { JunctureFilter, GridView, SortControls } from "@/components/ui"
+import type { FormStateData } from "@/components/junctures/List"
 import { filterConfigs } from "@/lib/filterConfigs"
 
 interface ViewProps {
@@ -13,11 +14,6 @@ interface ViewProps {
 }
 
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
-  const JunctureFilter = useMemo(
-    () => createFilterComponent(filterConfigs["Juncture"]),
-    []
-  )
-
   const updateFilters = useCallback(
     filters => {
       dispatchForm({
@@ -35,12 +31,14 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
       <SortControls
+        route="/junctures"
+        isMobile={viewMode === "mobile"}
         validSorts={["name", "created_at", "updated_at"]}
         dispatchForm={dispatchForm}
         formState={formState}
-        isMobile={viewMode === "mobile"}
         filter={
           <JunctureFilter
+            formState={formState}
             omit={["add", "juncture"]}
             onFiltersUpdate={updateFilters}
           />
