@@ -16,9 +16,6 @@ interface AutocompleteOption {
 
 type ListManagerProps = {
   open: boolean
-  title: string
-  icon: string
-  description: string
   parentEntity: Fight
   childEntityName: keyof typeof filterConfigs
   onListUpdate?: (updatedEntity: Fight) => Promise<void>
@@ -42,9 +39,6 @@ const collectionNames: Record<string, string> = {
 
 export function ListManager({
   open,
-  title,
-  icon,
-  description,
   parentEntity,
   childEntityName,
   onListUpdate,
