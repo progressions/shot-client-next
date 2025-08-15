@@ -38,6 +38,7 @@ export function SearchInput({
       value={value || ""}
       onChange={handleInputChange}
       placeholder={placeholder}
+      sx={sx}
     />
   )
 }
