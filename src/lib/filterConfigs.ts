@@ -1,9 +1,10 @@
-// lib/filterConfigs.ts
 interface FilterFieldConfig {
   name: string
-  type: "entity" | "string" | "static"
+  type: "entity" | "string" | "static" | "search"
   staticOptions?: string[]
+  allowNone?: boolean
   responseKey?: string
+  displayName?: string
 }
 
 interface FilterConfig {
@@ -17,7 +18,7 @@ export const filterConfigs: Record<string, FilterConfig> = {
     entityName: "Character",
     fields: [
       {
-        name: "type",
+        name: "character_type",
         type: "static",
         allowNone: false,
         staticOptions: [
@@ -28,6 +29,7 @@ export const filterConfigs: Record<string, FilterConfig> = {
           "Boss",
           "Uber-Boss",
         ],
+        displayName: "Type",
       },
       { name: "faction", type: "entity" },
       { name: "archetype", type: "string" },

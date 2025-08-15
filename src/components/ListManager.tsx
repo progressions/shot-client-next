@@ -1,33 +1,29 @@
 "use client"
-
 import { Skeleton, Stack, Box } from "@mui/material"
-import {
-  FightFilter,
-  CharacterFilter,
-  VehicleFilter,
-  SchtickFilter,
-  WeaponFilter,
-  PartyFilter,
-  SiteFilter,
-  CampaignFilter,
-  FactionFilter,
-  UserFilter,
-  JunctureFilter,
-  BadgeList,
-} from "@/components/ui"
+import { GenericFilter, BadgeList } from "@/components/ui"
 import { useClient } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
 import { useMemo, useState, useEffect, useCallback } from "react"
 import { paginateArray } from "@/lib"
 import { filterConfigs } from "@/lib/filterConfigs"
-import type {
-  Fight,
-} from "@/types"
+import type { Fight } from "@/types"
 import pluralize from "pluralize"
 
-type CharacterManagerProps = {
+interface AutocompleteOption {
+  id: number
+  name: string
+}
+
+type ListManagerProps = {
+  open: boolean
+  title: string
+  icon: string
+  description: string
   parentEntity: Fight
+  childEntityName: keyof typeof filterConfigs
   onListUpdate?: (updatedEntity: Fight) => Promise<void>
+  excludeIds?: number[]
+  manage?: boolean
 }
 
 const collectionNames: Record<string, string> = {
@@ -44,20 +40,6 @@ const collectionNames: Record<string, string> = {
   Faction: "factions",
 }
 
-const filterComponents: Record<string, React.ComponentType<any>> = {
-  Character: CharacterFilter,
-  Schtick: SchtickFilter,
-  Weapon: WeaponFilter,
-  Vehicle: VehicleFilter,
-  Fight: FightFilter,
-  Party: PartyFilter,
-  Site: SiteFilter,
-  Campaign: CampaignFilter,
-  Faction: FactionFilter,
-  User: UserFilter,
-  Juncture: JunctureFilter,
-}
-
 export function ListManager({
   open,
   title,
@@ -68,13 +50,12 @@ export function ListManager({
   onListUpdate,
   excludeIds = [],
   manage = true,
-}: CharacterManagerProps) {
+}: ListManagerProps) {
   const childIdsKey = `${childEntityName.toLowerCase()}_ids`
   const childIds = parentEntity[childIdsKey] || []
   const stableExcludeIds = excludeIds
   const collection = collectionNames[childEntityName]
   const pluralChildEntityName = pluralize(childEntityName)
-
   const [childEntities, setChildEntities] = useState(
     parentEntity.characters || []
   )
@@ -82,22 +63,27 @@ export function ListManager({
   const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(true)
 
-  // Instantiate only the required FilterComponent
-  const FilterComponent = useMemo(() => filterComponents[childEntityName] || (() => null), [childEntityName])
-
   const { items: paginatedItems, meta } = paginateArray(
-    childEntities,
+    childEntities.sort((a, b) => a.name.localeCompare(b.name)),
     currentPage,
     5
   )
-
-  const { formState, dispatchForm } = useForm<FormStateData>({
-    characters: [],
-    factions: [],
-    archetypes: [],
-    types: [],
-    filters: {
-      per_page: 200,
+  const { formState, dispatchForm } = useForm<{
+    data: {
+      filters: Record<string, string | boolean | null>
+      [key: string]: any
+    }
+  }>({
+    data: {
+      characters: [],
+      factions: [],
+      archetypes: [],
+      types: [],
+      filters: {
+        per_page: 200,
+        sort: "name",
+        order: "asc",
+      },
     },
   })
   const { filters } = formState.data
@@ -107,6 +93,8 @@ export function ListManager({
       try {
         const getFunc = `get${pluralChildEntityName}` as keyof typeof client
         const response = await client[getFunc]({
+          sort: "name",
+          order: "asc",
           ids: childIds,
         })
         setChildEntities(response.data[collection] || [])
@@ -114,20 +102,19 @@ export function ListManager({
         console.error(`Fetch ${childEntityName} error:`, error)
       }
     }
-
     fetchChildEntities()
-  }, [dispatchForm])
+  }, [dispatchForm, childIds, childEntityName, client, collection, pluralChildEntityName])
 
   useEffect(() => {
     dispatchForm({
       type: FormActions.UPDATE,
       name: "filters",
-      value: { per_page: 200 },
+      value: { sort: "name", order: "asc", per_page: 200 },
     })
-  }, [])
+  }, [dispatchForm])
 
   const fetchChildrenForAutocomplete = useCallback(
-    async localFilters => {
+    async (localFilters: Record<string, string | boolean | null>) => {
       try {
         console.log("Fetching children", localFilters)
         const getFunc = `get${pluralChildEntityName}` as keyof typeof client
@@ -144,7 +131,7 @@ export function ListManager({
       }
       setLoading(false)
     },
-    [client, dispatchForm]
+    [client, dispatchForm, pluralChildEntityName]
   )
 
   useEffect(() => {
@@ -152,7 +139,7 @@ export function ListManager({
   }, [filters, fetchChildrenForAutocomplete])
 
   const updateFilters = useCallback(
-    filters => {
+    (filters: Record<string, string | boolean | null>) => {
       dispatchForm({
         type: FormActions.UPDATE,
         name: "filters",
@@ -162,7 +149,7 @@ export function ListManager({
         },
       })
     },
-    [dispatchForm]
+    [dispatchForm, formState.data.filters]
   )
 
   const handleAdd = useCallback(
@@ -173,7 +160,7 @@ export function ListManager({
         setChildEntities(prev => [...prev, child])
         const newChildIds = [...childIds, child.id]
         try {
-          await onListUpdate({ ...parentEntity, [childIdsKey]: newChildIds })
+          await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
           setCurrentPage(1)
         } catch (error) {
           console.error(
@@ -199,7 +186,7 @@ export function ListManager({
         (childId: number) => childId !== item.id
       )
       try {
-        await onListUpdate({ ...parentEntity, [childIdsKey]: newChildIds })
+        await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
         setCurrentPage(1)
       } catch (error) {
         console.error(
@@ -233,11 +220,13 @@ export function ListManager({
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       {manage && open && (
-        <FilterComponent
+        <GenericFilter
+          entity={childEntityName}
           formState={formState}
           omit={["search"]}
           onFiltersUpdate={updateFilters}
           onChange={handleAdd}
+          excludeIds={stableExcludeIds}
         />
       )}
       {loading ? (

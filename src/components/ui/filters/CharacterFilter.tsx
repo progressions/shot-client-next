@@ -1,4 +1,3 @@
-// components/CharacterFilter.tsx
 "use client"
 import { Stack } from "@mui/material"
 import {
@@ -7,7 +6,7 @@ import {
   createStringAutocomplete,
   SearchInput,
 } from "@/components/ui"
-import { useState, useCallback } from "react"
+import { useCallback } from "react"
 
 interface AutocompleteOption {
   id: number
@@ -15,12 +14,17 @@ interface AutocompleteOption {
 }
 
 type CharacterFilterProps = {
-  filters: Record<string, string | boolean>
+  formState: {
+    data: {
+      filters: Record<string, string | boolean | null>
+      characters: AutocompleteOption[]
+      factions: AutocompleteOption[]
+      archetypes: string[]
+    }
+  }
   onChange: (value: AutocompleteOption | null) => void
-  onFiltersUpdate?: (filters: Record<string, string | boolean>) => void
-  omit?: Array<
-    "character" | "type" | "archetype" | "faction" | "search" | "add"
-  >
+  onFiltersUpdate?: (filters: Record<string, string | boolean | null>) => void
+  omit?: Array<"character" | "type" | "archetype" | "faction" | "search" | "add">
   excludeIds?: number[]
 }
 
@@ -39,10 +43,10 @@ export function CharacterFilter({
   console.log("formState in CharacterFilter", formState)
   const { filters, characters, factions, archetypes } = formState.data
 
-  const changeFilter = (name, newValue) => {
+  const changeFilter = (name: string, newValue: AutocompleteOption | string | null) => {
     onFiltersUpdate?.({
       ...filters,
-      [name]: newValue?.id || newValue || "",
+      [name]: newValue && typeof newValue === "object" ? newValue.id : newValue || "",
       page: 1, // Reset to first page on filter change
     })
   }
@@ -51,13 +55,13 @@ export function CharacterFilter({
     console.log("character_id", filters?.character_id)
     const character = characters.find(c => c.id === filters?.character_id)
     console.log("character", character)
-    onChange(character)
+    onChange(character || null)
     onFiltersUpdate?.({
       ...filters,
       character_id: null,
-      character: null,
+      character: null, // Ensure this matches the value prop of CharacterAutocomplete
     })
-  }, [filters?.character_id])
+  }, [filters, characters, onChange, onFiltersUpdate])
 
   return (
     <Stack direction="row" spacing={1} alignItems="center">
@@ -93,7 +97,7 @@ export function CharacterFilter({
       )}
       {!omit.includes("character") && (
         <CharacterAutocomplete
-          value={filters?.character || {id: null, name: ""}}
+          value={filters?.character as AutocompleteOption | null}
           onChange={newValue => changeFilter("character_id", newValue)}
           records={characters}
           allowNone={true}
