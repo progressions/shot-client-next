@@ -3,7 +3,7 @@ import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, SchtickDetail } from "@/components/schticks"
-import { SchtickFilter, GridView, SortControls } from "@/components/ui"
+import { GenericFilter, GridView, SortControls } from "@/components/ui"
 import type { FormStateData } from "@/components/schticks/List"
 
 interface ViewProps {
@@ -36,7 +36,8 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         dispatchForm={dispatchForm}
         formState={formState}
         filter={
-          <SchtickFilter
+          <GenericFilter
+            entity="Schtick"
             formState={formState}
             omit={["add", "schtick"]}
             onFiltersUpdate={updateFilters}

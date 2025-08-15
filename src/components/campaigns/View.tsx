@@ -3,7 +3,7 @@ import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, CampaignDetail } from "@/components/campaigns"
-import { CampaignFilter, GridView, SortControls } from "@/components/ui"
+import { GenericFilter, GridView, SortControls } from "@/components/ui"
 import type { FormStateData } from "@/components/campaigns/List"
 
 interface ViewProps {
@@ -36,7 +36,8 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         dispatchForm={dispatchForm}
         formState={formState}
         filter={
-          <CampaignFilter
+          <GenericFilter
+            entity="Campaign"
             formState={formState}
             omit={["add", "campaign"]}
             onFiltersUpdate={updateFilters}

@@ -3,7 +3,7 @@ import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType } from "@/reducers"
 import { FightDetail, Table } from "@/components/fights"
-import { FightFilter, GridView, SortControls } from "@/components/ui"
+import { GenericFilter, GridView, SortControls } from "@/components/ui"
 import type { FormStateData } from "@/components/fights/List"
 
 interface ViewProps {
@@ -36,7 +36,8 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         dispatchForm={dispatchForm}
         formState={formState}
         filter={
-          <FightFilter
+          <GenericFilter
+            entity="Fight"
             formState={formState}
             onFiltersUpdate={updateFilters}
             omit={["add", "fight"]}

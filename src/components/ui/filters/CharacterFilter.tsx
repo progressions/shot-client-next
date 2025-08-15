@@ -24,7 +24,9 @@ type CharacterFilterProps = {
   }
   onChange: (value: AutocompleteOption | null) => void
   onFiltersUpdate?: (filters: Record<string, string | boolean | null>) => void
-  omit?: Array<"character" | "type" | "archetype" | "faction" | "search" | "add">
+  omit?: Array<
+    "character" | "type" | "archetype" | "faction" | "search" | "add"
+  >
   excludeIds?: number[]
 }
 
@@ -43,10 +45,14 @@ export function CharacterFilter({
   console.log("formState in CharacterFilter", formState)
   const { filters, characters, factions, archetypes } = formState.data
 
-  const changeFilter = (name: string, newValue: AutocompleteOption | string | null) => {
+  const changeFilter = (
+    name: string,
+    newValue: AutocompleteOption | string | null
+  ) => {
     onFiltersUpdate?.({
       ...filters,
-      [name]: newValue && typeof newValue === "object" ? newValue.id : newValue || "",
+      [name]:
+        newValue && typeof newValue === "object" ? newValue.id : newValue || "",
       page: 1, // Reset to first page on filter change
     })
   }

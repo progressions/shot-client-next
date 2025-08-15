@@ -7,7 +7,7 @@ import {
   createStringAutocomplete,
   SearchInput,
 } from "@/components/ui"
-import { useState, useCallback } from "react"
+import { useCallback } from "react"
 
 interface AutocompleteOption {
   id: number
@@ -18,9 +18,7 @@ type VehicleFilterProps = {
   filters: Record<string, string | boolean>
   onChange: (value: AutocompleteOption | null) => void
   onFiltersUpdate?: (filters: Record<string, string | boolean>) => void
-  omit?: Array<
-    "vehicle" | "type" | "archetype" | "faction" | "search" | "add"
-  >
+  omit?: Array<"vehicle" | "type" | "archetype" | "faction" | "search" | "add">
   excludeIds?: number[]
 }
 
@@ -93,7 +91,7 @@ export function VehicleFilter({
       )}
       {!omit.includes("vehicle") && (
         <VehicleAutocomplete
-          value={filters?.vehicle || {id: null, name: ""}}
+          value={filters?.vehicle || { id: null, name: "" }}
           onChange={newValue => changeFilter("vehicle_id", newValue)}
           records={vehicles}
           allowNone={true}

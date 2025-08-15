@@ -35,7 +35,7 @@ export default function Extend({ character, open, onClose }: ExtendProps) {
       <DialogBox open={open} onClose={onClose} title="Extend your Character">
         <Typography>We can flesh out your character a bit with AI.</Typography>
         <Typography>
-          Just click the button and we'll update your character with some
+          Just click the button and we&rsquo;ll update your character with some
           additional details.
         </Typography>
         <Stack direction="row" justifyContent="flex-end" spacing={2} mt={2}>

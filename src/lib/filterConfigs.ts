@@ -117,6 +117,7 @@ export const filterConfigs: Record<string, FilterConfig> = {
     fields: [
       { name: "faction", type: "entity" },
       { name: "party", type: "entity", allowNone: false },
+      { name: "search", type: "search" },
     ],
     responseKeys: { faction: "factions", party: "parties" },
   },

@@ -3,7 +3,7 @@ import { Skeleton, Stack, Box } from "@mui/material"
 import { GenericFilter, BadgeList } from "@/components/ui"
 import { useClient } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
-import { useMemo, useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { paginateArray } from "@/lib"
 import { filterConfigs } from "@/lib/filterConfigs"
 import type { Fight } from "@/types"
@@ -52,7 +52,10 @@ export function ListManager({
   manage = true,
 }: ListManagerProps) {
   const childIdsKey = `${childEntityName.toLowerCase()}_ids`
-  const childIds = parentEntity[childIdsKey] || []
+  const childIds = useMemo(
+    () => parentEntity[childIdsKey] || [],
+    [parentEntity, childIdsKey]
+  )
   const stableExcludeIds = excludeIds
   const collection = collectionNames[childEntityName]
   const pluralChildEntityName = pluralize(childEntityName)
@@ -71,7 +74,7 @@ export function ListManager({
   const { formState, dispatchForm } = useForm<{
     data: {
       filters: Record<string, string | boolean | null>
-      [key: string]: any
+      [key: string]: unknown
     }
   }>({
     data: {
@@ -103,7 +106,14 @@ export function ListManager({
       }
     }
     fetchChildEntities()
-  }, [dispatchForm, childIds, childEntityName, client, collection, pluralChildEntityName])
+  }, [
+    dispatchForm,
+    childIds,
+    childEntityName,
+    client,
+    collection,
+    pluralChildEntityName,
+  ])
 
   useEffect(() => {
     dispatchForm({
