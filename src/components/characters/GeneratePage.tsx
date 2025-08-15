@@ -59,14 +59,14 @@ export default function GeneratePage() {
     dispatchForm({ type: FormActions.SUBMIT })
     setPending(true)
     try {
-      await client.generateAiCharacter({ description })
+      const response = await client.generateAiCharacter({ description })
+      console.log("response", response)
 
       const sub = consumer.subscriptions.create(
         { channel: "CampaignChannel", id: campaign?.id },
         {
           received: (data: CableData) => {
             if (data.status === "preview_ready" && data.json) {
-              // const char = CS.characterFromJson(data.json) // data.json is guaranteed non-undefined here
               dispatchForm({
                 type: FormActions.UPDATE,
                 name: "json",

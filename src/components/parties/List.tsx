@@ -1,32 +1,30 @@
 "use client"
-import { useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useEffect, useCallback, useState } from "react"
 import { Box } from "@mui/material"
-import { View, Menu } from "@/components/parties"
-import type { Party, PaginationMeta } from "@/types"
+import type { Party, Faction, PaginationMeta } from "@/types"
+import { useCampaign, useClient, useLocalStorage } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
-import { useLocalStorage, useCampaign, useClient } from "@/contexts"
-import { queryParams } from "@/lib"
 import { Icon, MainHeader } from "@/components/ui"
+import { queryParams } from "@/lib"
+import { View, Menu } from "@/components/parties"
 
 interface ListProps {
-  initialParties: Party[]
-  initialMeta: PaginationMeta
-  initialSort: string
-  initialOrder: string
-  initialIsMobile?: boolean
+  initialFormData: FormStateData
+  initialIsMobile: boolean
 }
 
-type ValidSort = "created_at" | "updated_at" | "name"
-type FormStateData = {
+export type FormStateData = {
   parties: Party[]
+  factions: Faction[]
   meta: PaginationMeta
-  drawerOpen: boolean
   filters: {
     sort: string
     order: string
+    party_type: string
+    faction_id: string
     page: number
-    faction_id: string | null
+    search: string
   }
 }
 
@@ -34,29 +32,17 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
   const { saveLocally } = useLocalStorage()
+  const router = useRouter()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
     initialIsMobile ? "mobile" : "table"
   )
   const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
-  const { meta, filters, parties, drawerOpen } = formState.data
-  const { sort, order } = filters
-  const router = useRouter()
-
-  useEffect(() => {
-    saveLocally("partyViewMode", viewMode)
-  }, [viewMode, saveLocally])
-
-  const validSorts: readonly ValidSort[] = useMemo(
-    () => ["created_at", "updated_at", "name"],
-    []
-  )
-  const validOrders: readonly ValidOrder[] = useMemo(() => ["asc", "desc"], [])
+  const { filters } = formState.data
 
   const fetchParties = useCallback(
     async filters => {
       try {
         const response = await client.getParties(filters)
-        console.log("Fetched parties:", response.data.parties)
         dispatchForm({
           type: FormActions.UPDATE,
           name: "parties",
@@ -64,16 +50,15 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
         })
         dispatchForm({
           type: FormActions.UPDATE,
+          name: "factions",
+          value: response.data.factions,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
           name: "meta",
           value: response.data.meta,
         })
-        dispatchForm({ type: FormActions.ERROR, payload: null })
-      } catch (error: unknown) {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : "Unable to fetch parties data"
-        dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
+      } catch (error) {
         console.error("Fetch parties error:", error)
       }
     },
@@ -84,118 +69,25 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
     if (campaignData.parties === "reload") {
-      const parameters = new URLSearchParams(globalThis.location.search)
-      const page = parameters.get("page")
-        ? Number.parseInt(parameters.get("page")!, 10)
-        : 1
-      const sortParameter = parameters.get("sort")
-      const orderParameter = parameters.get("order")
-      const currentSort =
-        sortParameter && validSorts.includes(sortParameter as ValidSort)
-          ? sortParameter
-          : "created_at"
-      const currentOrder =
-        orderParameter && validOrders.includes(orderParameter as ValidOrder)
-          ? orderParameter
-          : "desc"
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "filters",
-        value: {
-          ...filters,
-          page,
-          sort: currentSort,
-          order: currentOrder,
-        },
-      })
       fetchParties(filters)
     }
-  }, [
-    client,
-    campaignData,
-    dispatchForm,
-    fetchParties,
-    validSorts,
-    validOrders,
-  ])
+  }, [campaignData, fetchParties, filters])
 
   useEffect(() => {
-    router.push(`/parties?${queryParams(filters)}`, { scroll: false })
-    fetchParties(filters)
-  }, [fetchParties, router, filters])
-
-  const handleOpenCreateDrawer = () => {
-    dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: true })
-  }
-
-  const handleCloseCreateDrawer = () => {
-    dispatchForm({ type: FormActions.UPDATE, name: "drawerOpen", value: false })
-  }
-
-  const handleSave = async (newParty: Party) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "parties",
-      value: [newParty, ...parties],
-    })
-  }
-
-  const handleOrderChange = async () => {
-    const newOrder = order === "asc" ? "desc" : "asc"
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "filters",
-      value: {
-        ...filters,
-        order: newOrder,
-      },
-    })
-    router.push(
-      `/parties?${queryParams({ page: 1, sort: sort, order: newOrder, ...filters })}`,
-      { scroll: false }
-    )
-    await fetchParties({ page: 1, sort, order: newOrder, ...filters })
-  }
-
-  const handlePageChange = async (_event, page: number) => {
-    if (page <= 0 || page > meta.total_pages) {
-      router.push(`/parties?page=1&sort=${sort}&order=${order}`, {
-        scroll: false,
-      })
-      await fetchParties(1, sort, order)
-    } else {
-      router.push(`/parties?page=${page}&sort=${sort}&order=${order}`, {
-        scroll: false,
-      })
-      await fetchParties({ page, sort, order, ...filters })
-    }
-  }
-
-  const handleSortChange = (newSort: ValidSort) => {
-    const newOrder = sort === newSort && order === "asc" ? "desc" : "asc"
-    dispatchForm({ type: FormActions.UPDATE, name: "sort", value: newSort })
-    dispatchForm({ type: FormActions.UPDATE, name: "order", value: newOrder })
-    const url = `/parties?${queryParams({
-      page: 1,
-      sort: newSort,
-      order: newOrder,
-    })}`
+    const url = `/parties?${queryParams(filters)}`
     router.push(url, {
       scroll: false,
     })
-    fetchParties(1, newSort, newOrder)
-  }
+    fetchParties(filters)
+  }, [filters, fetchParties, router])
+
+  useEffect(() => {
+    saveLocally("partyViewMode", viewMode)
+  }, [viewMode, saveLocally])
 
   return (
     <>
-      <Menu
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-        drawerOpen={drawerOpen}
-        handleOpenCreateDrawer={handleOpenCreateDrawer}
-        handleCloseCreateDrawer={handleCloseCreateDrawer}
-        handleSave={handleSave}
-      />
+      <Menu viewMode={viewMode} setViewMode={setViewMode} />
       <Box
         sx={{
           display: "flex",
@@ -213,9 +105,6 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
         viewMode={viewMode}
         formState={formState}
         dispatchForm={dispatchForm}
-        onPageChange={handlePageChange}
-        onSortChange={handleSortChange}
-        onOrderChange={handleOrderChange}
         initialIsMobile={initialIsMobile}
       />
     </>

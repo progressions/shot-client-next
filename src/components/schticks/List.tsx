@@ -16,6 +16,8 @@ interface ListProps {
 
 export type FormStateData = {
   schticks: Schtick[]
+  categories: string[]
+  paths: string[]
   meta: PaginationMeta
   filters: {
     sort: string
@@ -45,6 +47,16 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
           type: FormActions.UPDATE,
           name: "schticks",
           value: response.data.schticks,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "categories",
+          value: response.data.categories,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "paths",
+          value: response.data.paths,
         })
         dispatchForm({
           type: FormActions.UPDATE,

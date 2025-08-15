@@ -105,6 +105,14 @@ class Client {
     )
   }
 
+  async extendCharacter(
+    character: Character
+  ): Promise<AxiosResponse<Character>> {
+    return this.patch(`${this.apiV2.ai()}/${character.id}/extend`, {
+      character: character,
+    })
+  }
+
   async generateAiCharacter(
     parameters: { description: string } = { description: "" }
   ): Promise<AxiosResponse<CharacterJson>> {

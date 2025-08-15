@@ -16,11 +16,14 @@ interface ListProps {
 
 export type FormStateData = {
   weapons: Weapon[]
+  junctures: string[]
+  categories: string[]
   meta: PaginationMeta
   filters: {
     sort: string
     order: string
     page: number
+    search: string
     category: string
     juncture: string
   }
@@ -40,11 +43,21 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const fetchWeapons = useCallback(
     async filters => {
       try {
-        const response = await client.getWeapons({ ...filters })
+        const response = await client.getWeapons(filters)
         dispatchForm({
           type: FormActions.UPDATE,
           name: "weapons",
           value: response.data.weapons,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "junctures",
+          value: response.data.junctures,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "categories",
+          value: response.data.categories,
         })
         dispatchForm({
           type: FormActions.UPDATE,

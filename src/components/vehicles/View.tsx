@@ -1,23 +1,18 @@
 "use client"
-import { useMemo, useCallback } from "react"
+import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, VehicleDetail } from "@/components/vehicles"
-import { createFilterComponent, GridView, SortControls } from "@/components/ui"
-import { filterConfigs } from "@/lib/filterConfigs"
+import { GenericFilter, GridView, SortControls } from "@/components/ui"
+import type { FormStateData } from "@/components/vehicles/List"
 
-type ViewProps = {
+interface ViewProps {
   viewMode: "table" | "mobile"
   formState: FormStateType<FormStateData>
   dispatchForm: (action: FormStateAction<FormStateData>) => void
 }
 
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
-  const VehicleFilter = useMemo(
-    () => createFilterComponent(filterConfigs["Vehicle"]),
-    []
-  )
-
   const updateFilters = useCallback(
     filters => {
       dispatchForm({
@@ -29,8 +24,9 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         },
       })
     },
-    [dispatchForm]
+    [dispatchForm, formState.data.filters]
   )
+
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
       <SortControls
@@ -40,9 +36,11 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         dispatchForm={dispatchForm}
         formState={formState}
         filter={
-          <VehicleFilter
-            onFiltersUpdate={updateFilters}
+          <GenericFilter
+            entity="Vehicle"
+            formState={formState}
             omit={["add", "vehicle"]}
+            onFiltersUpdate={updateFilters}
           />
         }
       >

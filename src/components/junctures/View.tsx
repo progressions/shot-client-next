@@ -1,10 +1,10 @@
 "use client"
-import { useMemo, useCallback } from "react"
+import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, JunctureDetail } from "@/components/junctures"
-import { createFilterComponent, GridView, SortControls } from "@/components/ui"
-import { filterConfigs } from "@/lib/filterConfigs"
+import { GenericFilter, GridView, SortControls } from "@/components/ui"
+import type { FormStateData } from "@/components/junctures/List"
 
 interface ViewProps {
   viewMode: "table" | "mobile"
@@ -13,11 +13,6 @@ interface ViewProps {
 }
 
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
-  const JunctureFilter = useMemo(
-    () => createFilterComponent(filterConfigs["Juncture"]),
-    []
-  )
-
   const updateFilters = useCallback(
     filters => {
       dispatchForm({
@@ -29,18 +24,21 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         },
       })
     },
-    [dispatchForm]
+    [dispatchForm, formState.data.filters]
   )
 
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
       <SortControls
+        route="/junctures"
+        isMobile={viewMode === "mobile"}
         validSorts={["name", "created_at", "updated_at"]}
         dispatchForm={dispatchForm}
         formState={formState}
-        isMobile={viewMode === "mobile"}
         filter={
-          <JunctureFilter
+          <GenericFilter
+            entity="Juncture"
+            formState={formState}
             omit={["add", "juncture"]}
             onFiltersUpdate={updateFilters}
           />

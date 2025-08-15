@@ -58,6 +58,10 @@ export default function Show({
       campaignData?.character &&
       campaignData.character.id === initialCharacter.id
     ) {
+      console.log(
+        "Setting character from campaign data",
+        campaignData.character
+      )
       setCharacter(campaignData.character)
     }
   }, [campaignData, initialCharacter])

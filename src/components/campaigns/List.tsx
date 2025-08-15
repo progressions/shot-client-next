@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation"
 import { useEffect, useCallback, useState } from "react"
 import { Box } from "@mui/material"
-import type { Campaign, PaginationMeta } from "@/types"
+import type { Campaign, Faction, PaginationMeta } from "@/types"
 import { useCampaign, useClient, useLocalStorage } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
 import { Icon, MainHeader } from "@/components/ui"
@@ -16,11 +16,17 @@ interface ListProps {
 
 export type FormStateData = {
   campaigns: Campaign[]
+  factions: Faction[]
+  archetypes: string[]
   meta: PaginationMeta
   filters: {
     sort: string
     order: string
+    campaign_type: string
+    archetype: string
+    faction_id: string
     page: number
+    search: string
   }
 }
 
@@ -43,6 +49,21 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
           type: FormActions.UPDATE,
           name: "campaigns",
           value: response.data.campaigns,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "factions",
+          value: response.data.factions,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "types",
+          value: response.data.types,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "archetypes",
+          value: response.data.archetypes,
         })
         dispatchForm({
           type: FormActions.UPDATE,

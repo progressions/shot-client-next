@@ -103,7 +103,12 @@ export default function Show({ fight: initialFight }: ShowProperties) {
   }
 
   return (
-    <>
+    <Box
+      sx={{
+        mb: { xs: 1, md: 2 },
+        position: "relative",
+      }}
+    >
       <SpeedDialMenu onDelete={deleteEntity} />
       <HeroImage entity={fight} setEntity={setFight} />
       <FightChips fight={fight} />
@@ -211,6 +216,6 @@ export default function Show({ fight: initialFight }: ShowProperties) {
           excludeIds={fight.vehicle_ids || []}
         />
       </Stack>
-    </>
+    </Box>
   )
 }

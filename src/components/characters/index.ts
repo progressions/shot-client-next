@@ -39,3 +39,4 @@ export { default as SkillsManager } from "@/components/characters/edit/SkillsMan
 export { default as DescriptionValue } from "@/components/characters/edit/DescriptionValue"
 export { default as NotFound } from "@/components/characters/NotFound"
 export { default as Table } from "@/components/characters/Table"
+export { default as Extend } from "@/components/characters/Extend"

@@ -1,24 +1,18 @@
 "use client"
-import { useMemo, useCallback } from "react"
+import { useCallback } from "react"
 import { Box } from "@mui/material"
-import { FormActions, FormStateType } from "@/reducers"
-import { WeaponDetail, Table } from "@/components/weapons"
-import { createFilterComponent, GridView, SortControls } from "@/components/ui"
+import { FormActions, FormStateType, FormStateAction } from "@/reducers"
+import { Table, WeaponDetail } from "@/components/weapons"
+import { GenericFilter, GridView, SortControls } from "@/components/ui"
 import type { FormStateData } from "@/components/weapons/List"
-import { filterConfigs } from "@/lib/filterConfigs"
 
 interface ViewProps {
   viewMode: "table" | "mobile"
   formState: FormStateType<FormStateData>
-  dispatchForm: (action: FormStateType<FormStateData>) => void
+  dispatchForm: (action: FormStateAction<FormStateData>) => void
 }
 
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
-  const WeaponFilter = useMemo(
-    () => createFilterComponent(filterConfigs["Weapon"]),
-    []
-  )
-
   const updateFilters = useCallback(
     filters => {
       dispatchForm({
@@ -30,19 +24,30 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         },
       })
     },
-    [dispatchForm]
+    [dispatchForm, formState.data.filters]
   )
+
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
       <SortControls
+        route="/weapons"
         isMobile={viewMode === "mobile"}
-        validSorts={["name", "season", "session", "created_at", "updated_at"]}
+        validSorts={[
+          "name",
+          "damage",
+          "concealment",
+          "reload_value",
+          "created_at",
+          "updated_at",
+        ]}
         dispatchForm={dispatchForm}
         formState={formState}
         filter={
-          <WeaponFilter
-            onFiltersUpdate={updateFilters}
+          <GenericFilter
+            entity="Weapon"
+            formState={formState}
             omit={["add", "weapon"]}
+            onFiltersUpdate={updateFilters}
           />
         }
       >

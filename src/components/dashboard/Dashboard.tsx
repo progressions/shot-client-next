@@ -1,8 +1,7 @@
-import { Stack, Box, Typography } from "@mui/material"
+import { Stack, Box } from "@mui/material"
 import { getUser } from "@/lib/getServerClient"
 import { Suspense } from "react"
 import { Campaign } from "@/types"
-import { UserName } from "@/components/users"
 import {
   LoadingModule,
   PartiesModule,
@@ -24,9 +23,6 @@ export default async function Dashboard({
   const user = await getUser()
   return (
     <Box>
-      <Typography variant="h6" color="#fff" gutterBottom>
-        Welcome, <UserName user={user} />
-      </Typography>
       <CampaignBanner campaign={campaign} />
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 2 }}>
         <Suspense fallback={<LoadingModule />}>

@@ -1,5 +1,6 @@
 "use client"
 
+import AccessibilityNewIcon from "@mui/icons-material/AccessibilityNew"
 import FileDownloadIcon from "@mui/icons-material/FileDownload"
 import DeleteIcon from "@mui/icons-material/Delete"
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
@@ -18,6 +19,7 @@ import { useRouter } from "next/navigation"
 import type { Character } from "@/types"
 import { CS } from "@/services"
 import { useClient } from "@/contexts"
+import { Extend } from "@/components/characters"
 
 type Action = {
   [key: string]: unknown
@@ -43,6 +45,7 @@ export default function CharacterSpeedDial({
   const [speedDialOpen, setSpeedDialOpen] = useState(false)
   const [exportingPdf, setExportingPdf] = useState(false)
   const [persist, setPersist] = useState(false)
+  const [extendOpen, setExtendOpen] = useState(false)
 
   // Reset persist when SpeedDial is closed externally
   useEffect(() => {
@@ -143,6 +146,10 @@ Action Values: ${JSON.stringify(character.actionValues, null, 2)}
     setExportAnchorEl(null)
   }
 
+  const handleExtend = () => {
+    setExtendOpen(true)
+  }
+
   const actions = [
     {
       icon: <FileDownloadIcon />,
@@ -151,6 +158,7 @@ Action Values: ${JSON.stringify(character.actionValues, null, 2)}
       preventClose: true,
     },
     { icon: <PeopleAltIcon />, name: "Copy", onClick: handleDuplicate },
+    { icon: <AccessibilityNewIcon />, name: "Extend", onClick: handleExtend },
     { icon: <DeleteIcon />, name: "Delete", onClick: handleDelete },
   ]
 
@@ -215,6 +223,11 @@ Action Values: ${JSON.stringify(character.actionValues, null, 2)}
         </MenuItem>
         <MenuItem onClick={handleExportTXT}>Export as TXT</MenuItem>
       </Menu>
+      <Extend
+        character={character}
+        open={extendOpen}
+        onClose={() => setExtendOpen(false)}
+      />
     </>
   )
 }

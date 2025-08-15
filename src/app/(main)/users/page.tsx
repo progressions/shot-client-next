@@ -10,22 +10,27 @@ export const metadata = {
 export default async function UsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; sort?: string; order?: string }>
+  searchParams: Promise<{
+    page?: string
+    sort?: string
+    order?: string
+    search?: string
+  }>
 }) {
   return (
     <ResourcePage
       resourceName="users"
       fetchData={async (client, params) => client.getUsers(params)}
       validSorts={["name", "created_at", "updated_at"]}
-      getInitialFormData={(data: UsersResponse, page, sort, order) => ({
+      getInitialFormData={(data: UsersResponse, page, sort, order, search) => ({
         users: data.users,
         meta: data.meta,
         filters: {
           sort,
           order,
           page,
+          search,
         },
-        drawerOpen: false,
       })}
       ListComponent={List}
       searchParams={searchParams}

@@ -248,7 +248,7 @@ export const contents: Record<PopupProps["id"], React.ReactElement> = {
       </p>
     </>
   ),
-  "av martial arts": (
+  "av martial art": (
     <>
       <Typography variant="h4">Martial Arts</Typography>
       <p>

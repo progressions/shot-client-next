@@ -28,7 +28,7 @@ export function DialogBox({
   const { isConfirmDialogOpen } = formState.data
 
   const handleClose = () => {
-    if (hasUploaded) {
+    if (!isConfirmDialogOpen) {
       dispatchForm({
         type: FormActions.UPDATE,
         name: "isConfirmDialogOpen",

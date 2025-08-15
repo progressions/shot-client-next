@@ -14,7 +14,7 @@ export default async function PartiesPage({
     page?: string
     sort?: string
     order?: string
-    faction_id?: string
+    search?: string
   }>
 }) {
   return (
@@ -27,17 +27,18 @@ export default async function PartiesPage({
         page,
         sort,
         order,
-        faction_id
+        search
       ) => ({
         parties: data.parties,
+        factions: data.factions,
         meta: data.meta,
         filters: {
           sort,
           order,
           page,
-          faction_id,
+          search,
+          faction_id: "",
         },
-        drawerOpen: false,
       })}
       ListComponent={List}
       searchParams={searchParams}

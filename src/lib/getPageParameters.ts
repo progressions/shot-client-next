@@ -37,5 +37,7 @@ export async function getPageParameters(
       ? (parameters.order as "asc" | "desc")
       : defaultOrder
 
-  return { page, sort, order }
+  const search = parameters.search || ""
+
+  return { page, sort, order, search }
 }

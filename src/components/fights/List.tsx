@@ -22,9 +22,8 @@ export type FormStateData = {
     order: string
     page: number
     season: number
-    unstarted: boolean
-    unended: boolean
-    ended: boolean
+    status: "Started" | "Unended" | "Ended"
+    search: string
   }
 }
 
@@ -47,6 +46,11 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
           type: FormActions.UPDATE,
           name: "fights",
           value: response.data.fights,
+        })
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "seasons",
+          value: response.data.seasons,
         })
         dispatchForm({
           type: FormActions.UPDATE,

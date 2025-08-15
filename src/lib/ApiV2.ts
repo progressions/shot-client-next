@@ -44,6 +44,10 @@ class ApiV2 {
       : `${this.api()}/vehicles`
   }
 
+  ai(): string {
+    return `${this.api()}/ai`
+  }
+
   aiImages(): string {
     return `${this.api()}/ai_images`
   }

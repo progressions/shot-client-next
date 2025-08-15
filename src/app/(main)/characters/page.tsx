@@ -10,21 +10,34 @@ export const metadata = {
 export default async function CharactersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; sort?: string; order?: string }>
+  searchParams: Promise<{
+    page?: string
+    sort?: string
+    order?: string
+    search?: string
+  }>
 }) {
   return (
     <ResourcePage
       resourceName="characters"
       fetchData={async (client, params) => client.getCharacters(params)}
       validSorts={["name", "created_at", "updated_at"]}
-      getInitialFormData={(data: CharactersResponse, page, sort, order) => ({
+      getInitialFormData={(
+        data: CharactersResponse,
+        page,
+        sort,
+        order,
+        search
+      ) => ({
         characters: data.characters,
+        factions: data.factions,
+        archetypes: data.archetypes,
         meta: data.meta,
         filters: {
           sort,
           order,
           page,
-          drawerOpen: false,
+          search,
           character_type: "",
           archetype: "",
           faction_id: "",

@@ -1,10 +1,10 @@
 "use client"
-import { useMemo, useCallback } from "react"
+import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, FactionDetail } from "@/components/factions"
-import { createFilterComponent, GridView, SortControls } from "@/components/ui"
-import { filterConfigs } from "@/lib/filterConfigs"
+import { GenericFilter, GridView, SortControls } from "@/components/ui"
+import type { FormStateData } from "@/components/factions/List"
 
 interface ViewProps {
   viewMode: "table" | "mobile"
@@ -13,11 +13,6 @@ interface ViewProps {
 }
 
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
-  const FactionFilter = useMemo(
-    () => createFilterComponent(filterConfigs["Faction"]),
-    []
-  )
-
   const updateFilters = useCallback(
     filters => {
       dispatchForm({
@@ -29,18 +24,21 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         },
       })
     },
-    [dispatchForm]
+    [dispatchForm, formState.data.filters]
   )
 
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
       <SortControls
-        validSorts={["name", "created_at", "updated_at"]}
+        route="/factions"
         isMobile={viewMode === "mobile"}
-        formState={formState}
+        validSorts={["name", "created_at", "updated_at"]}
         dispatchForm={dispatchForm}
+        formState={formState}
         filter={
-          <FactionFilter
+          <GenericFilter
+            entity="Faction"
+            formState={formState}
             omit={["add", "faction"]}
             onFiltersUpdate={updateFilters}
           />

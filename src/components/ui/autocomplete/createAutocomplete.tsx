@@ -138,10 +138,12 @@ export function createStringAutocomplete(model: string) {
               name: String(item),
             })),
           ]
-        : records.map(item => ({
-            id: String(item),
-            name: String(item),
-          }))
+        : records
+            .filter(item => item)
+            .map(item => ({
+              id: String(item),
+              name: String(item),
+            }))
       return opts
     }, [records, allowNone])
     return (

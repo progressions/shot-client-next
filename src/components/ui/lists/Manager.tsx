@@ -21,6 +21,7 @@ type ManagerProperties = {
     | "Juncture"
   onListUpdate: (entity: Entity) => Promise<void>
   excludeIds?: string[]
+  manage?: boolean
 }
 
 export function Manager({
@@ -31,10 +32,15 @@ export function Manager({
   description,
   onListUpdate,
   excludeIds = [],
+  manage = true,
 }: ManagerProperties) {
   const [open, setOpen] = useState(false)
 
-  const actionButton = <ManageButton open={open} onClick={setOpen} />
+  const actionButton = manage ? (
+    <ManageButton open={open} onClick={setOpen} />
+  ) : null
+
+  console.log("ListManager")
 
   return (
     <Box sx={{ my: 4 }}>
@@ -63,6 +69,7 @@ export function Manager({
         childEntityName={childEntityName}
         onListUpdate={onListUpdate}
         excludeIds={excludeIds}
+        manage={manage}
       />
     </Box>
   )

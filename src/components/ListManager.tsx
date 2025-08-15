@@ -1,11 +1,12 @@
 "use client"
-import { useState, useEffect, useCallback, useMemo } from "react"
-import { Box, Stack, Skeleton } from "@mui/material"
-import { createFilterComponent, BadgeList } from "@/components/ui"
+import { Skeleton, Stack, Box } from "@mui/material"
+import { GenericFilter, BadgeList } from "@/components/ui"
 import { useClient } from "@/contexts"
+import { FormActions, useForm } from "@/reducers"
+import { useMemo, useState, useEffect, useCallback } from "react"
 import { paginateArray } from "@/lib"
-import type { Entity } from "@/types"
 import { filterConfigs } from "@/lib/filterConfigs"
+import type { Fight } from "@/types"
 import pluralize from "pluralize"
 
 interface AutocompleteOption {
@@ -15,21 +16,11 @@ interface AutocompleteOption {
 
 type ListManagerProps = {
   open: boolean
-  parentEntity: Entity
-  childEntityName:
-    | "Character"
-    | "Schtick"
-    | "Weapon"
-    | "Vehicle"
-    | "Fight"
-    | "Party"
-    | "Juncture"
-    | "User"
-    | "Site"
-    | "Campaign"
-    | "Faction"
-  onListUpdate: (updatedEntity: Entity) => Promise<void>
+  parentEntity: Fight
+  childEntityName: keyof typeof filterConfigs
+  onListUpdate?: (updatedEntity: Fight) => Promise<void>
   excludeIds?: number[]
+  manage?: boolean
 }
 
 const collectionNames: Record<string, string> = {
@@ -52,64 +43,126 @@ export function ListManager({
   childEntityName,
   onListUpdate,
   excludeIds = [],
+  manage = true,
 }: ListManagerProps) {
-  const { client } = useClient()
-  const [childEntities, setChildEntities] = useState<AutocompleteOption[]>([])
-  const [currentPage, setCurrentPage] = useState(1)
-  const [loading, setLoading] = useState(true)
-
   const childIdsKey = `${childEntityName.toLowerCase()}_ids`
   const childIds = useMemo(
     () => parentEntity[childIdsKey] || [],
     [parentEntity, childIdsKey]
   )
-  const stableExcludeIds = useMemo(() => excludeIds, [excludeIds])
+  const stableExcludeIds = excludeIds
   const collection = collectionNames[childEntityName]
   const pluralChildEntityName = pluralize(childEntityName)
-
-  // Instantiate only the required FilterComponent
-  const FilterComponent = useMemo(
-    () => createFilterComponent(filterConfigs[childEntityName]),
-    [childEntityName]
+  const [childEntities, setChildEntities] = useState(
+    parentEntity.characters || []
   )
+  const { client } = useClient()
+  const [currentPage, setCurrentPage] = useState(1)
+  const [loading, setLoading] = useState(true)
 
   const { items: paginatedItems, meta } = paginateArray(
-    childEntities,
+    childEntities.sort((a, b) => a.name.localeCompare(b.name)),
     currentPage,
     5
   )
+  const { formState, dispatchForm } = useForm<{
+    data: {
+      filters: Record<string, string | boolean | null>
+      [key: string]: unknown
+    }
+  }>({
+    data: {
+      characters: [],
+      factions: [],
+      archetypes: [],
+      types: [],
+      filters: {
+        per_page: 200,
+        sort: "name",
+        order: "asc",
+      },
+    },
+  })
+  const { filters } = formState.data
 
-  const fetchChildEntities = useCallback(async () => {
-    // Only fetch if childIds contains IDs not in childEntities
-    const missingIds = childIds.filter(
-      id => !childEntities.some(entity => entity.id === id)
-    )
-    if (!missingIds.length) {
-      setLoading(false)
-      return
-    }
-    try {
-      setLoading(true)
-      console.log("fetchChildEntities called", { missingIds, childEntityName })
-      const response = await client[
-        `get${pluralChildEntityName}` as keyof typeof client
-      ]({
-        ids: missingIds,
-      })
-      setChildEntities(prev => [
-        ...prev,
-        ...(response.data[collection] as AutocompleteOption[]),
-      ])
-    } catch (error) {
-      console.error(`Failed to fetch ${collection}:`, error)
-    } finally {
-      setLoading(false)
-    }
-  }, [client, childIds, childEntityName, collection, childEntities])
+  const parentIdName = `${parentEntity.entity_class.toLowerCase()}_id`
 
   useEffect(() => {
+    const fetchChildEntities = async () => {
+      try {
+        const getFunc = `get${pluralChildEntityName}` as keyof typeof client
+        console.log("fetching childIds", childIds)
+        const response = await client[getFunc]({
+          sort: "name",
+          order: "asc",
+          // [parentIdName]: parentEntity.id,
+          ids: childIds
+        })
+        if (response.data[collection].length !== childIds.length) {
+          console.error(getFunc, childIds.length, response.data[collection].length)
+          throw "WTF"
+        }
+        setChildEntities(response.data[collection] || [])
+      } catch (error) {
+        console.error(`Fetch ${childEntityName} error:`, error)
+      }
+    }
     fetchChildEntities()
-  }, [fetchChildEntities])
+  }, [
+    dispatchForm,
+    childIds,
+    childEntityName,
+    client,
+    collection,
+    pluralChildEntityName,
+  ])
+
+  useEffect(() => {
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "filters",
+      value: { sort: "name", order: "asc", per_page: 200 },
+    })
+  }, [dispatchForm])
+
+  const fetchChildrenForAutocomplete = useCallback(
+    async (localFilters: Record<string, string | boolean | null>) => {
+      try {
+        console.log("Fetching children", localFilters)
+        const getFunc = `get${pluralChildEntityName}` as keyof typeof client
+        const response = await client[getFunc](localFilters)
+        for (const [key, value] of Object.entries(response.data)) {
+          dispatchForm({
+            type: FormActions.UPDATE,
+            name: key,
+            value: value,
+          })
+        }
+      } catch (error) {
+        console.error("Fetch children error:", error)
+      }
+      setLoading(false)
+    },
+    [client, dispatchForm, pluralChildEntityName]
+  )
+
+  useEffect(() => {
+    fetchChildrenForAutocomplete(filters)
+  }, [filters, fetchChildrenForAutocomplete])
+
+  const updateFilters = useCallback(
+    (filters: Record<string, string | boolean | null>) => {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "filters",
+        value: {
+          ...formState.data.filters,
+          ...filters,
+        },
+      })
+    },
+    [dispatchForm, formState.data.filters]
+  )
 
   const handleAdd = useCallback(
     async (child: AutocompleteOption | string | null) => {
@@ -119,7 +172,7 @@ export function ListManager({
         setChildEntities(prev => [...prev, child])
         const newChildIds = [...childIds, child.id]
         try {
-          await onListUpdate({ ...parentEntity, [childIdsKey]: newChildIds })
+          await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
           setCurrentPage(1)
         } catch (error) {
           console.error(
@@ -145,8 +198,7 @@ export function ListManager({
         (childId: number) => childId !== item.id
       )
       try {
-        await onListUpdate({ ...parentEntity, [childIdsKey]: newChildIds })
-        setCurrentPage(1)
+        await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
       } catch (error) {
         console.error(
           `Failed to delete ${childEntityName.toLowerCase()}:`,
@@ -169,21 +221,23 @@ export function ListManager({
     ]
   )
 
-  const handlePageChange = useCallback(
-    (event: React.ChangeEvent<unknown>, value: number) => {
-      console.log("handlePageChange called", { value })
-      setCurrentPage(value)
-    },
-    []
-  )
+  const handlePageChange = (
+    _event: React.ChangeEvent<unknown>,
+    newPage: number
+  ) => {
+    setCurrentPage(newPage)
+  }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      {open && (
-        <FilterComponent
+      {manage && open && (
+        <GenericFilter
+          entity={childEntityName}
+          formState={formState}
+          omit={["search"]}
+          onFiltersUpdate={updateFilters}
           onChange={handleAdd}
           excludeIds={stableExcludeIds}
-          omit={["search"]}
         />
       )}
       {loading ? (
