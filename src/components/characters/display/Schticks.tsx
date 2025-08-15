@@ -29,6 +29,7 @@ export default function Schticks({
       }
       onListUpdate={updateCharacter}
       manage={manage}
+      excludeIds={character.schtick_ids || []}
     />
   )
 }

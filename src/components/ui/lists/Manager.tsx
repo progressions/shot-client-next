@@ -40,6 +40,8 @@ export function Manager({
     <ManageButton open={open} onClick={setOpen} />
   ) : null
 
+  console.log("ListManager")
+
   return (
     <Box sx={{ my: 4 }}>
       <Box

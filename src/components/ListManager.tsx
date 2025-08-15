@@ -85,15 +85,23 @@ export function ListManager({
   })
   const { filters } = formState.data
 
+  const parentIdName = `${parentEntity.entity_class.toLowerCase()}_id`
+
   useEffect(() => {
     const fetchChildEntities = async () => {
       try {
         const getFunc = `get${pluralChildEntityName}` as keyof typeof client
+        console.log("fetching childIds", childIds)
         const response = await client[getFunc]({
           sort: "name",
           order: "asc",
-          ids: childIds,
+          // [parentIdName]: parentEntity.id,
+          ids: childIds
         })
+        if (response.data[collection].length !== childIds.length) {
+          console.error(getFunc, childIds.length, response.data[collection].length)
+          throw "WTF"
+        }
         setChildEntities(response.data[collection] || [])
       } catch (error) {
         console.error(`Fetch ${childEntityName} error:`, error)
