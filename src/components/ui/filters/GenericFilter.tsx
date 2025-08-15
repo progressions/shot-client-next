@@ -122,6 +122,7 @@ export function GenericFilter({
     const displayName =
       field.displayName ||
       field.name.charAt(0).toUpperCase() + field.name.slice(1)
+    const isPrimaryField = field.name.toLowerCase() === entity.toLowerCase()
 
     if (field.type === "static") {
       console.log(`Creating String Autocomplete for ${displayName}`)
@@ -178,6 +179,7 @@ export function GenericFilter({
           allowNone={field.allowNone ?? true}
           sx={{ width: 200 }}
           placeholder={displayName}
+          excludeIds={isPrimaryField ? excludeIds : undefined}
         />
       )
     }
