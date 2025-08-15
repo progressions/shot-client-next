@@ -187,7 +187,6 @@ export function ListManager({
       )
       try {
         await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
-        setCurrentPage(1)
       } catch (error) {
         console.error(
           `Failed to delete ${childEntityName.toLowerCase()}:`,
