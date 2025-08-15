@@ -24,7 +24,7 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         },
       })
     },
-    [dispatchForm]
+    [dispatchForm, formState.data.filters]
   )
 
   return (

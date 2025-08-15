@@ -26,7 +26,7 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         },
       })
     },
-    [dispatchForm]
+    [dispatchForm, formState.data.filters]
   )
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
