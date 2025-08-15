@@ -140,6 +140,7 @@ export default function EditCategoryPath({
             records={categories}
             sx={{ width: "100%" }}
             allowNone={false}
+            disabled={saving}
             groupBy={option =>
               categories.indexOf(option.id as string) < generalLength
                 ? "General"

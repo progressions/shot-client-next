@@ -32,7 +32,7 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialFaction,
   })
-  const { status, errors } = formState
+  const { status } = formState
   const faction = formState.data.entity
 
   const { updateEntity, deleteEntity } = useEntity(faction, dispatchForm)

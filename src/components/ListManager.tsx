@@ -85,8 +85,6 @@ export function ListManager({
   })
   const { filters } = formState.data
 
-  const parentIdName = `${parentEntity.entity_class.toLowerCase()}_id`
-
   useEffect(() => {
     const fetchChildEntities = async () => {
       try {
@@ -95,12 +93,15 @@ export function ListManager({
         const response = await client[getFunc]({
           sort: "name",
           order: "asc",
-          // [parentIdName]: parentEntity.id,
-          ids: childIds
+          ids: childIds,
         })
         if (response.data[collection].length !== childIds.length) {
-          console.error(getFunc, childIds.length, response.data[collection].length)
-          throw "WTF"
+          console.error(
+            getFunc,
+            childIds.length,
+            response.data[collection].length
+          )
+          throw "Mismatch in fetched child entities length"
         }
         setChildEntities(response.data[collection] || [])
       } catch (error) {

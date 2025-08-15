@@ -19,6 +19,7 @@ type ModelAutocompleteProps = {
   filters: Record<string, string | boolean>
   records: AutocompleteOption[] | string[]
   allowNone: boolean
+  disabled?: boolean
   sx?: Record<string, unknown>
 }
 
@@ -30,6 +31,7 @@ export function createAutocomplete(model: string) {
     filters,
     records,
     allowNone = true,
+    disabled,
     sx,
   }: ModelAutocompleteProps) {
     const { client } = useClient()
@@ -109,6 +111,7 @@ export function createAutocomplete(model: string) {
           />
         )}
         sx={sx}
+        disabled={disabled}
       />
     )
   }
@@ -123,6 +126,7 @@ export function createStringAutocomplete(model: string) {
     allowNone,
     groupBy,
     renderGroup,
+    disabled = false,
   }: Omit<ModelAutocompleteProps, "onInputChange" | "filters"> & {
     allowNone?: boolean
     groupBy?: (option: AutocompleteOption) => string
@@ -164,6 +168,7 @@ export function createStringAutocomplete(model: string) {
           />
         )}
         sx={sx}
+        disabled={disabled}
       />
     )
   }

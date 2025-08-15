@@ -5,6 +5,7 @@ import { Stack, Box } from "@mui/material"
 import type { Party } from "@/types"
 import { useCampaign } from "@/contexts"
 import {
+  Alert,
   Manager,
   HeroImage,
   SpeedDialMenu,
@@ -33,7 +34,7 @@ export default function Show({ party: initialParty }: ShowProperties) {
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialParty,
   })
-  const { status, errors } = formState
+  const { status } = formState
   const party = formState.data.entity
 
   const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
@@ -71,6 +72,7 @@ export default function Show({ party: initialParty }: ShowProperties) {
     >
       <SpeedDialMenu onDelete={deleteEntity} />
       <HeroImage entity={party} setEntity={setParty} />
+      <Alert status={status} />
       <Box
         sx={{
           display: "flex",

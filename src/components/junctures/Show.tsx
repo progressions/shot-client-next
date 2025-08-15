@@ -5,6 +5,7 @@ import { Stack, Box } from "@mui/material"
 import type { Juncture } from "@/types"
 import { useCampaign } from "@/contexts"
 import {
+  Alert,
   Manager,
   HeroImage,
   SpeedDialMenu,
@@ -33,7 +34,7 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialJuncture,
   })
-  const { status, errors } = formState
+  const { status } = formState
   const juncture = formState.data.entity
 
   const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
@@ -76,6 +77,7 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
     >
       <SpeedDialMenu onDelete={deleteEntity} />
       <HeroImage entity={juncture} setEntity={setJuncture} />
+      <Alert status={status} />
       <Box
         sx={{
           display: "flex",
