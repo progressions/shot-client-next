@@ -242,17 +242,7 @@ export function useForm<T extends Record<string, unknown>>(initialData: T) {
       ...formState,
       data: formState.data,
     }),
-    [
-      formState.data,
-      formState.edited,
-      formState.loading,
-      formState.saving,
-      formState.disabled,
-      formState.open,
-      formState.errors,
-      formState.status,
-      formState.success,
-    ]
+    [formState]
   )
   return { formState: memoizedFormState, dispatchForm, initialFormState }
 }
