@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { CircularProgress, Typography } from "@mui/material"
-import { getServerClient, getCurrentUser } from "@/lib/getServerClient"
+import { getServerClient, getCurrentUser } from "@/lib"
 import type { User } from "@/types"
 import { NotFound, Show } from "@/components/users"
 import { Suspense } from "react"

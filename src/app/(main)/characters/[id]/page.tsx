@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { CircularProgress } from "@mui/material"
-import { getCurrentUser, getServerClient } from "@/lib/getServerClient"
+import { getCurrentUser, getServerClient } from "@/lib"
 import type { Character } from "@/types"
 import type { Metadata } from "next"
 import Breadcrumbs from "@/components/Breadcrumbs"

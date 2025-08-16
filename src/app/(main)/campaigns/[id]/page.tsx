@@ -1,6 +1,6 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
-import { getServerClient, getCurrentUser } from "@/lib/getServerClient"
+import { getServerClient, getCurrentUser } from "@/lib"
 import type { Campaign } from "@/types"
 import { NotFound, Show } from "@/components/campaigns"
 import Breadcrumbs from "@/components/Breadcrumbs"

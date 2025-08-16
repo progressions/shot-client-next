@@ -1,6 +1,6 @@
 import { headers } from "next/headers"
 import { CircularProgress, Typography } from "@mui/material"
-import { getServerClient, getCurrentUser } from "@/lib/getServerClient"
+import { getServerClient, getCurrentUser } from "@/lib"
 import { NotFound, Show } from "@/components/parties"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"

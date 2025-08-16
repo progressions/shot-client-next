@@ -1,7 +1,7 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { EncounterProvider } from "@/contexts"
 import { headers } from "next/headers"
-import { getServerClient, getCurrentUser } from "@/lib/getServerClient"
+import { getServerClient, getCurrentUser } from "@/lib"
 import type { Encounter } from "@/types"
 import { NotFound, Encounter } from "@/components/encounters"
 import { Suspense } from "react"
