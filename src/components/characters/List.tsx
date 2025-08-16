@@ -1,6 +1,6 @@
 "use client"
 import { useRouter } from "next/navigation"
-import { useEffect, useCallback, useState } from "react"
+import { useRef, useEffect, useCallback, useState } from "react"
 import { Box } from "@mui/material"
 import type { Character, Faction, PaginationMeta } from "@/types"
 import { useCampaign, useClient, useLocalStorage } from "@/contexts"
@@ -40,9 +40,14 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   )
   const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
   const { filters } = formState.data
+  const isFetching = useRef(false)
+  const isInitialRender = useRef(true)
 
   const fetchCharacters = useCallback(
     async filters => {
+      console.log("fetchCharacters - isFetching.current:", isFetching.current)
+      if (isFetching.current) return
+      isFetching.current = true
       try {
         const response = await client.getCharacters(filters)
         dispatchForm({
@@ -72,6 +77,8 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
         })
       } catch (error) {
         console.error("Fetch characters error:", error)
+      } finally {
+        isFetching.current = false
       }
     },
     [client, dispatchForm]
@@ -86,6 +93,11 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   }, [campaignData, fetchCharacters, filters])
 
   useEffect(() => {
+    console.log("Filters useEffect - filters:", filters, "isInitialRender.current:", isInitialRender.current)
+    if (isInitialRender.current) {
+      isInitialRender.current = false
+      return
+    }
     const url = `/characters?${queryParams(filters)}`
     router.push(url, {
       scroll: false,
