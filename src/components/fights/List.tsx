@@ -1,6 +1,6 @@
 "use client"
 import { useRouter } from "next/navigation"
-import { useEffect, useCallback, useState, useRef } from "react"
+import { useRef, useEffect, useCallback, useState } from "react"
 import { Box } from "@mui/material"
 import type { Fight, PaginationMeta } from "@/types"
 import { useCampaign, useClient, useLocalStorage } from "@/contexts"
@@ -21,8 +21,8 @@ export type FormStateData = {
     sort: string
     order: string
     page: number
-    season: number | null
-    status: "Started" | "Unended" | "Ended" | null
+    season: number
+    status: "Started" | "Unended" | "Ended"
     search: string
   }
 }
@@ -39,10 +39,9 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { filters } = formState.data
   const isFetching = useRef(true) // Prevent duplicate fetches
 
-  console.log("initialFormData:", initialFormData)
-
   const fetchFights = useCallback(
-    async (filters: FormStateData["filters"]) => {
+    async filters => {
+      console.log("isFetching.current:", isFetching.current)
       if (isFetching.current) return
       isFetching.current = true
       try {
@@ -64,20 +63,30 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
         })
       } catch (error) {
         console.error("Fetch fights error:", error)
-      } finally {
-        isFetching.current = false
       }
     },
-    [client, dispatchForm]
+    [client, dispatchForm, isFetching.current]
   )
 
   useEffect(() => {
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
-    fetchFights(filters)
+    if (campaignData.fights === "reload") {
+      fetchFights(filters).then(() => {
+        isFetching.current = false
+      })
+    }
+  }, [campaignData, fetchFights, filters])
+
+  useEffect(() => {
     const url = `/fights?${queryParams(filters)}`
-    router.push(url, { scroll: false })
-  }, [campaignData, filters, fetchFights, router])
+    router.push(url, {
+      scroll: false,
+    })
+    fetchFights(filters).then(() => {
+      isFetching.current = false
+    })
+  }, [filters, fetchFights, router])
 
   useEffect(() => {
     saveLocally("fightViewMode", viewMode)
