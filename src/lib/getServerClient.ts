@@ -1,7 +1,7 @@
 "use server"
 
 import { cookies } from "next/headers"
-import Client from "@/lib/Client"
+import { Client } from "@/lib"
 
 export async function getServerClient(): Promise<Client | null> {
   const cookieStore = await cookies()

@@ -11,7 +11,7 @@ import {
   useRef,
 } from "react"
 import Cookies from "js-cookie"
-import Client from "@/lib/Client"
+import { Client } from "@/lib"
 import {
   defaultUser,
   type User,

@@ -6,7 +6,7 @@ import { Stack, Box, Typography, Alert, Container } from "@mui/material"
 import { Button, TextField } from "@/components/ui"
 import Cookies from "js-cookie"
 import { useClient } from "@/contexts"
-import Client from "@/lib/Client"
+import { Client } from "@/lib"
 import { UserActions } from "@/reducers"
 
 export default function LoginPage() {
