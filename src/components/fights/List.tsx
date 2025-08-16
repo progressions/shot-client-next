@@ -37,11 +37,32 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   )
   const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
   const { filters } = formState.data
-  const isFetching = useRef(true) // Prevent duplicate fetches
+  const isFetching = useRef(false)
+  const isInitialRender = useRef(true)
+
+  // Set initial data on mount
+  useEffect(() => {
+    console.log("List initialFormData:", initialFormData)
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "fights",
+      value: initialFormData.fights
+    })
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "seasons",
+      value: initialFormData.seasons
+    })
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "meta",
+      value: initialFormData.meta
+    })
+  }, [initialFormData, dispatchForm])
 
   const fetchFights = useCallback(
     async filters => {
-      console.log("isFetching.current:", isFetching.current)
+      console.log("fetchFights - isFetching.current:", isFetching.current)
       if (isFetching.current) return
       isFetching.current = true
       try {
@@ -49,43 +70,46 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
         dispatchForm({
           type: FormActions.UPDATE,
           name: "fights",
-          value: response.data.fights,
+          value: response.data.fights
         })
         dispatchForm({
           type: FormActions.UPDATE,
           name: "seasons",
-          value: response.data.seasons,
+          value: response.data.seasons
         })
         dispatchForm({
           type: FormActions.UPDATE,
           name: "meta",
-          value: response.data.meta,
+          value: response.data.meta
         })
       } catch (error) {
         console.error("Fetch fights error:", error)
+      } finally {
+        isFetching.current = false
       }
     },
-    [client, dispatchForm, isFetching.current]
+    [client, dispatchForm]
   )
 
   useEffect(() => {
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
     if (campaignData.fights === "reload") {
-      fetchFights(filters).then(() => {
-        isFetching.current = false
-      })
+      fetchFights(filters)
     }
   }, [campaignData, fetchFights, filters])
 
   useEffect(() => {
+    console.log("Filters useEffect - filters:", filters, "isInitialRender.current:", isInitialRender.current)
+    if (isInitialRender.current) {
+      isInitialRender.current = false
+      return
+    }
     const url = `/fights?${queryParams(filters)}`
     router.push(url, {
-      scroll: false,
+      scroll: false
     })
-    fetchFights(filters).then(() => {
-      isFetching.current = false
-    })
+    fetchFights(filters)
   }, [filters, fetchFights, router])
 
   useEffect(() => {
@@ -100,7 +124,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          mb: 2,
+          mb: 2
         }}
       >
         <MainHeader title="Fights" icon={<Icon keyword="Fights" size="36" />} />
