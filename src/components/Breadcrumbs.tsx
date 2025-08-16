@@ -2,7 +2,6 @@ import Link from "next/link"
 import { headers } from "next/headers"
 import { Breadcrumbs as MuiBreadcrumbs, Typography } from "@mui/material"
 import NavigateNextIcon from "@mui/icons-material/NavigateNext"
-import { getServerClient } from "@/lib"
 import {
   SiteName,
   WeaponName,
