@@ -1,5 +1,5 @@
 import { Stack, Box } from "@mui/material"
-import { getCurrentUser } from "@/lib/getServerClient"
+import { getCurrentUser } from "@/lib"
 import { Suspense } from "react"
 import { Campaign } from "@/types"
 import {
