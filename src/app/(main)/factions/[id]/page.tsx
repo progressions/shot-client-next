@@ -1,6 +1,6 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
-import { getServerClient, getUser } from "@/lib/getServerClient"
+import { getServerClient, getCurrentUser } from "@/lib/getServerClient"
 import type { Faction } from "@/types"
 import { NotFound, Show } from "@/components/factions"
 import Breadcrumbs from "@/components/Breadcrumbs"
@@ -13,7 +13,7 @@ type FactionPageProperties = {
 export default async function FactionPage({ params }: FactionPageProperties) {
   const { id } = await params
   const client = await getServerClient()
-  const user = await getUser()
+  const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
   try {

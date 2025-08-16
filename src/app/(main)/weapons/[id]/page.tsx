@@ -1,6 +1,6 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
-import { getServerClient, getUser } from "@/lib/getServerClient"
+import { getServerClient, getCurrentUser } from "@/lib/getServerClient"
 import type { Weapon } from "@/types"
 import { NotFound, Show } from "@/components/weapons"
 import { Suspense } from "react"
@@ -13,7 +13,7 @@ type WeaponPageProperties = {
 export default async function WeaponPage({ params }: WeaponPageProperties) {
   const { id } = await params
   const client = await getServerClient()
-  const user = await getUser()
+  const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
   try {

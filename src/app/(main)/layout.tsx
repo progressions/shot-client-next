@@ -1,7 +1,7 @@
 import ThemeRegistry from "@/components/ThemeRegistry"
 import { AppProvider, LocalStorageProvider, ToastProvider } from "@/contexts"
 import { Navbar, Footer } from "@/components/ui"
-import { getUser } from "@/lib/getServerClient"
+import { getCurrentUser } from "@/lib/getServerClient"
 import "@/styles/global.scss"
 import { Container } from "@mui/material"
 import PopupToast from "@/components/PopupToast"
@@ -11,7 +11,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const user = await getUser()
+  const user = await getCurrentUser()
 
   return (
     <html lang="en">

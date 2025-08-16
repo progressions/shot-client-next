@@ -1,6 +1,6 @@
 import { headers } from "next/headers"
 import { CircularProgress, Typography } from "@mui/material"
-import { getServerClient, getUser } from "@/lib/getServerClient"
+import { getServerClient, getCurrentUser } from "@/lib/getServerClient"
 import { NotFound, Show } from "@/components/parties"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
@@ -12,7 +12,7 @@ type PartyPageProperties = {
 export default async function PartyPage({ params }: PartyPageProperties) {
   const { id } = await params
   const client = await getServerClient()
-  const user = await getUser()
+  const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
   try {

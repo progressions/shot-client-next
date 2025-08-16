@@ -35,7 +35,7 @@ export function createAuthClient(deps: ClientDependencies) {
     return delete_(`${api.users(user)}/image`)
   }
 
-  async function getUser(
+  async function getCurrentUser(
     user: User | string,
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<User>> {
@@ -45,7 +45,7 @@ export function createAuthClient(deps: ClientDependencies) {
   async function getCurrentUser(
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<User>> {
-    return get(api.currentUser(), {}, cacheOptions)
+    return get(apiV2.currentUser(), {}, cacheOptions)
   }
 
   async function unlockUser(
@@ -83,7 +83,7 @@ export function createAuthClient(deps: ClientDependencies) {
     return get(`${apiV2.users()}?${query}`, {}, cacheOptions)
   }
 
-  async function getUsers(
+  async function getCurrentUsers(
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<UsersResponse>> {
@@ -96,13 +96,13 @@ export function createAuthClient(deps: ClientDependencies) {
     updateUser,
     deleteUser,
     deleteUserImage,
-    getUser,
+    getCurrentUser,
     getCurrentUser,
     unlockUser,
     confirmUser,
     sendResetPasswordLink,
     resetUserPassword,
     getPlayers,
-    getUsers,
+    getCurrentUsers,
   }
 }

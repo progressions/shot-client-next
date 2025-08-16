@@ -3,7 +3,7 @@ import { Suspense } from "react"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { Box, CircularProgress } from "@mui/material"
-import { getServerClient, getPageParameters, getUser } from "@/lib"
+import { getServerClient, getPageParameters, getCurrentUser } from "@/lib"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
 interface ResourcePageProps<T> {
@@ -37,7 +37,7 @@ export default async function ResourcePage<T>({
   searchParams: Promise<{ page?: string; sort?: string; order?: string }>
 }) {
   const client = await getServerClient()
-  const user = await getUser()
+  const user = await getCurrentUser()
   if (!client || !user) {
     redirect("/login")
   }

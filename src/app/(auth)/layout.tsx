@@ -4,7 +4,7 @@ import {
   ClientProvider,
   LocalStorageProvider,
 } from "@/contexts"
-import { getUser } from "@/lib/getServerClient"
+import { getCurrentUser } from "@/lib/getServerClient"
 import "@/styles/global.scss"
 
 export default async function RootLayout({
@@ -12,7 +12,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const user = await getUser()
+  const user = await getCurrentUser()
 
   return (
     <html lang="en">

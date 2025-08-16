@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { CircularProgress, Typography } from "@mui/material"
-import { getServerClient, getUser } from "@/lib/getServerClient"
+import { getServerClient, getCurrentUser } from "@/lib/getServerClient"
 import type { User } from "@/types"
 import { NotFound, Show } from "@/components/users"
 import { Suspense } from "react"
@@ -14,7 +14,7 @@ type UserPageProperties = {
 export default async function UserPage({ params }: UserPageProperties) {
   const { id } = await params
   const client = await getServerClient()
-  const currentUser = await getUser()
+  const currentUser = await getCurrentUser()
   if (!client || !currentUser) return <Typography>Not logged in</Typography>
 
   try {

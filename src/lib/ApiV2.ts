@@ -125,6 +125,11 @@ class ApiV2 {
   users(user?: User | ID): string {
     return user ? `${this.api()}/users/${user.id}` : `${this.api()}/users`
   }
+
+  currentUser(): string {
+    return `${this.api()}/users/current`
+  }
+
 }
 
 export default ApiV2

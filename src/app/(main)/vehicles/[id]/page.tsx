@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { CircularProgress } from "@mui/material"
-import { getUser, getServerClient } from "@/lib/getServerClient"
+import { getCurrentUser, getServerClient } from "@/lib/getServerClient"
 import type { Vehicle } from "@/types"
 import type { Metadata } from "next"
 import Breadcrumbs from "@/components/Breadcrumbs"
@@ -15,7 +15,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>
 }): Promise<Metadata> {
   const client = await getServerClient()
-  const user = await getUser()
+  const user = await getCurrentUser()
   if (!client || !user) {
     return { title: "Vehicle - Chi War" }
   }
@@ -41,7 +41,7 @@ export default async function VehiclePage({
   params: Promise<{ id: string }>
 }) {
   const client = await getServerClient()
-  const user = await getUser()
+  const user = await getCurrentUser()
   if (!client || !user) {
     redirect("/login")
   }

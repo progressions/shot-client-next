@@ -113,6 +113,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         setError(null)
 
         const cachedUser = localStorage.getItem(`currentUser-${jwt}`)
+        console.log("Cached user:", cachedUser)
         if (cachedUser) {
           const parsedUser = JSON.parse(cachedUser)
           if (parsedUser && parsedUser.id !== defaultUser.id) {
