@@ -1,13 +1,20 @@
 import { CircularProgress, Box, Typography, Stack } from "@mui/material"
-import type { PopupProps, Vehicle } from "@/types"
+import type { PopupProps, Faction, Vehicle } from "@/types"
 import { defaultVehicle } from "@/types"
 import { useState, useEffect } from "react"
-import VehicleAvatar from "@/components/avatars/VehicleAvatar"
+import { VehicleAvatar } from "@/components/avatars"
 import VS from "@/services/VehicleService"
 import GamemasterOnly from "@/components/GamemasterOnly"
+import { RichTextRenderer } from "@/components/editor"
 import { useClient } from "@/contexts"
+import {
+  VehicleLink,
+  ArchetypeLink,
+  TypeLink,
+  FactionLink,
+} from "@/components/ui"
 
-export default function CharacterPopup({ id }: PopupProps) {
+export default function VehiclePopup({ id }: PopupProps) {
   const { user, client } = useClient()
   const [vehicle, setVehicle] = useState<Vehicle>(defaultVehicle)
 
@@ -38,10 +45,6 @@ export default function CharacterPopup({ id }: PopupProps) {
     return null
   }
 
-  const subhead = [VS.type(vehicle), VS.factionName(vehicle)]
-    .filter(Boolean)
-    .join(" - ")
-
   if (!vehicle?.id) {
     return (
       <Box sx={{ p: 2 }}>
@@ -50,14 +53,33 @@ export default function CharacterPopup({ id }: PopupProps) {
       </Box>
     )
   }
+
   return (
     <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
-        <VehicleAvatar vehicle={vehicle} />
-        <Typography>{vehicle.name}</Typography>
+        <VehicleAvatar vehicle={vehicle} disablePopup={true} />
+        <Typography variant="h6">
+          <VehicleLink vehicle={vehicle} disablePopup={true} />
+        </Typography>
       </Stack>
-      <Typography variant="caption" sx={{ textTransform: "uppercase" }}>
-        {subhead}
+      <Typography
+        component="div"
+        variant="caption"
+        sx={{ textTransform: "uppercase" }}
+      >
+        {VS.type(vehicle) && <TypeLink vehicleType={VS.type(vehicle)} />}
+        {VS.archetype(vehicle) && (
+          <>
+            {" - "}
+            <ArchetypeLink archetype={VS.archetype(vehicle)} />
+          </>
+        )}
+        {VS.faction(vehicle) && (
+          <>
+            {" - "}
+            <FactionLink faction={VS.faction(vehicle) as Faction} />
+          </>
+        )}
       </Typography>
       <GamemasterOnly user={user}>
         <Box mt={1}>
