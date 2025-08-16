@@ -1,4 +1,4 @@
-import { Box } from "@mui/material"
+import { Typography, Box } from "@mui/material"
 import ReactDOMServer from "react-dom/server"
 import { RichTextRenderer } from "@/components/editor"
 import { contents } from "@/components/popups/info"
@@ -19,12 +19,12 @@ export default function Popup({
 }: PopupProps) {
   const word = pluralize.singular(keyword).toLowerCase()
 
-  const content = contents[word] || <p>Unknown</p>
-  const html = ReactDOMServer.renderToStaticMarkup(content)
+  const item = contents[word] || <p>Unknown</p>
 
   return (
     <Box sx={{ py: 2, maxWidth: 400 }}>
-      {content}
+      <Typography variant="h6" sx={{fontWeight: 800}}>{item.title}</Typography>
+      <Box>{item.content}</Box>
     </Box>
   )
 }
