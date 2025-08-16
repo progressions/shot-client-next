@@ -1,9 +1,5 @@
 import ThemeRegistry from "@/components/ThemeRegistry"
-import {
-  AppProvider,
-  LocalStorageProvider,
-  ToastProvider,
-} from "@/contexts"
+import { AppProvider, LocalStorageProvider, ToastProvider } from "@/contexts"
 import { Navbar, Footer } from "@/components/ui"
 import { getUser } from "@/lib/getServerClient"
 import "@/styles/global.scss"
@@ -23,17 +19,17 @@ export default async function RootLayout({
         <ThemeRegistry>
           <LocalStorageProvider>
             <AppProvider initialUser={user}>
-                <ToastProvider>
-                  <Navbar />
-                  <Container
-                    maxWidth="md"
-                    sx={{ paddingTop: 2, paddingBottom: 2 }}
-                  >
-                    {children}
-                    <PopupToast />
-                    <Footer />
-                  </Container>
-                </ToastProvider>
+              <ToastProvider>
+                <Navbar />
+                <Container
+                  maxWidth="md"
+                  sx={{ paddingTop: 2, paddingBottom: 2 }}
+                >
+                  {children}
+                  <PopupToast />
+                  <Footer />
+                </Container>
+              </ToastProvider>
             </AppProvider>
           </LocalStorageProvider>
         </ThemeRegistry>

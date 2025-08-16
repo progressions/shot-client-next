@@ -12,7 +12,12 @@ import {
 } from "react"
 import Cookies from "js-cookie"
 import Client from "@/lib/Client"
-import { defaultUser, type User, type Campaign, CampaignCableData } from "@/types"
+import {
+  defaultUser,
+  type User,
+  type Campaign,
+  CampaignCableData,
+} from "@/types"
 import { defaultCampaign } from "@/types"
 import {
   UserStateAction,
@@ -62,7 +67,9 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
   })
   const [campaign, setCampaign] = useState<Campaign | null>(defaultCampaign)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
-  const [campaignData, setCampaignData] = useState<CampaignCableData | null>(null)
+  const [campaignData, setCampaignData] = useState<CampaignCableData | null>(
+    null
+  )
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const jwt = Cookies.get("jwtToken") ?? ""
@@ -79,7 +86,10 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
           return null
         }
         setCampaign(data)
-        localStorage.setItem(`currentCampaign-${state.user.id}`, JSON.stringify(data))
+        localStorage.setItem(
+          `currentCampaign-${state.user.id}`,
+          JSON.stringify(data)
+        )
         return data
       } catch (error) {
         setError("Failed to set current campaign: " + (error as Error).message)
@@ -107,7 +117,9 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
           const parsedUser = JSON.parse(cachedUser)
           if (parsedUser && parsedUser.id !== defaultUser.id) {
             dispatch({ type: UserActions.USER, payload: parsedUser })
-            const cachedCampaign = localStorage.getItem(`currentCampaign-${parsedUser.id}`)
+            const cachedCampaign = localStorage.getItem(
+              `currentCampaign-${parsedUser.id}`
+            )
             if (cachedCampaign) {
               const parsedCampaign = JSON.parse(cachedCampaign)
               if (parsedCampaign && parsedCampaign.id !== defaultCampaign.id) {
@@ -130,7 +142,9 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         dispatch({ type: UserActions.USER, payload: userData })
         localStorage.setItem(`currentUser-${jwt}`, JSON.stringify(userData))
 
-        const cachedCampaign = localStorage.getItem(`currentCampaign-${userData.id}`)
+        const cachedCampaign = localStorage.getItem(
+          `currentCampaign-${userData.id}`
+        )
         if (cachedCampaign) {
           const parsedCampaign = JSON.parse(cachedCampaign)
           if (parsedCampaign && parsedCampaign.id !== defaultCampaign.id) {
@@ -147,10 +161,15 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
           setCampaign(defaultCampaign)
         } else {
           setCampaign(campaignData)
-          localStorage.setItem(`currentCampaign-${userData.id}`, JSON.stringify(campaignData))
+          localStorage.setItem(
+            `currentCampaign-${userData.id}`,
+            JSON.stringify(campaignData)
+          )
         }
       } catch (error) {
-        setError("Failed to fetch user or campaign: " + (error as Error).message)
+        setError(
+          "Failed to fetch user or campaign: " + (error as Error).message
+        )
         Cookies.remove("jwtToken")
         setCampaign(defaultCampaign)
       } finally {
@@ -162,7 +181,8 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
   }, [jwt, client, state.user.id, campaign])
 
   useEffect(() => {
-    if (!state.user.id || !campaign?.id || campaign.id === defaultCampaign.id) return
+    if (!state.user.id || !campaign?.id || campaign.id === defaultCampaign.id)
+      return
 
     const sub = client.consumer().subscriptions.create(
       { channel: "CampaignChannel", id: campaign.id },
@@ -215,11 +235,13 @@ export function useApp(): AppContextType {
 }
 
 export function useClient() {
-  const { client, jwt, user, currentUserState, dispatchCurrentUser } = useContext(AppContext)
+  const { client, jwt, user, currentUserState, dispatchCurrentUser } =
+    useContext(AppContext)
   return { client, jwt, user, currentUserState, dispatchCurrentUser }
 }
 
 export function useCampaign() {
-  const { campaign, subscription, campaignData, setCurrentCampaign } = useContext(AppContext)
+  const { campaign, subscription, campaignData, setCurrentCampaign } =
+    useContext(AppContext)
   return { campaign, subscription, campaignData, setCurrentCampaign }
 }
