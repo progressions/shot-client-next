@@ -1,10 +1,9 @@
 import ThemeRegistry from "@/components/ThemeRegistry"
 import {
-  CampaignProvider,
-  ClientProvider,
+  AppProvider,
   LocalStorageProvider,
 } from "@/contexts"
-import { getCurrentUser } from "@/lib/getServerClient"
+import { getCurrentUser } from "@/lib"
 import "@/styles/global.scss"
 
 export default async function RootLayout({
@@ -19,9 +18,9 @@ export default async function RootLayout({
       <body>
         <ThemeRegistry>
           <LocalStorageProvider>
-            <ClientProvider initialUser={user}>
-              <CampaignProvider>{children}</CampaignProvider>
-            </ClientProvider>
+            <AppProvider initialUser={user}>
+              {children}
+            </AppProvider>
           </LocalStorageProvider>
         </ThemeRegistry>
       </body>

@@ -1,3 +1,4 @@
+import React from "react"
 import ThemeRegistry from "@/components/ThemeRegistry"
 import { AppProvider, LocalStorageProvider, ToastProvider } from "@/contexts"
 import { Navbar, Footer } from "@/components/ui"
@@ -12,7 +13,6 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   const user = await getCurrentUser()
-
   return (
     <html lang="en">
       <body>
@@ -25,7 +25,11 @@ export default async function RootLayout({
                   maxWidth="md"
                   sx={{ paddingTop: 2, paddingBottom: 2 }}
                 >
-                  {children}
+                  {React.Children.map(children, child =>
+                    React.isValidElement(child)
+                      ? React.cloneElement(child, { user })
+                      : child
+                  )}
                   <PopupToast />
                   <Footer />
                 </Container>
