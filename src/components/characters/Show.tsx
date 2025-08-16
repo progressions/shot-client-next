@@ -7,6 +7,7 @@ import { useMediaQuery, Box, Stack } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import { CS } from "@/services"
 import {
+  InfoLink,
   Icon,
   NameEditor,
   SectionHeader,
@@ -121,7 +122,7 @@ export default function Show({
         title="Action Values"
         icon={<Icon keyword="Action Values" />}
       >
-        Action Values are the core stats of your Character, used to resolve
+        <InfoLink info="Action Values" /> are the core stats of your <InfoLink href="/characters" info="Character" />, used to resolve
         actions and challenges in the game.
       </SectionHeader>
       <ActionValuesEdit
@@ -134,8 +135,8 @@ export default function Show({
         title="Personal Details"
         icon={<Icon keyword="Personal Details" />}
       >
-        Personal details about your character, such as their type, archetype,
-        juncture, and wealth.
+        Personal details about your <InfoLink href="/characters" info="Character" />, such as their <InfoLink info="Type" />, <InfoLink info="Archetype" />,
+        <InfoLink info="Juncture" />, and <InfoLink info="Wealth" />.
       </SectionHeader>
       <Stack direction="row" spacing={2} sx={{ my: 2 }}>
         <EditType

@@ -23,8 +23,8 @@ export default function Popup({
   const html = ReactDOMServer.renderToStaticMarkup(content)
 
   return (
-    <Box sx={{ maxWidth: 400 }}>
-      <RichTextRenderer html={html || ""} />
+    <Box sx={{ py: 2, maxWidth: 400 }}>
+      {content}
     </Box>
   )
 }

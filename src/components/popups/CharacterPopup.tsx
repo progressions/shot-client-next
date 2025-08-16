@@ -62,7 +62,7 @@ export default function CharacterPopup({ id }: PopupProps) {
     <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
         <CharacterAvatar character={character} disablePopup={true} />
-        <Typography>
+        <Typography variant="h6">
           <CharacterLink character={character} disablePopup={true} />
         </Typography>
       </Stack>
