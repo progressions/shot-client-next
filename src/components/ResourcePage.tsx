@@ -57,8 +57,10 @@ export default async function ResourcePage<T>({
   }
 
   // Fetch data
-  const response = await fetchData(client, { page, sort, order })
+  const response = await fetchData(client, { page, sort, order, search })
   const data = response.data
+
+  console.log("ResourcePage", data)
 
   // Detect mobile device
   const headersState = await headers()
@@ -67,6 +69,8 @@ export default async function ResourcePage<T>({
 
   // Prepare initial form data
   const initialFormData = getInitialFormData(data, page, sort, order, search)
+
+  console.log("ResourcePage initialFormData", initialFormData)
 
   return (
     <Box

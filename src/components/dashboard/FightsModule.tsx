@@ -24,12 +24,13 @@ export default async function FightsModule({
   try {
     const fightsResponse = await client.getFights({
       user_id: userId,
-      unended: true,
+      status: "Unended",
       per_page: 5,
       sort: "created_at",
       order: "desc",
     })
     fights = fightsResponse.data?.fights || []
+    console.log("Fetched fights:", fights)
   } catch (error) {
     console.error("Error fetching fights:", error)
     return (

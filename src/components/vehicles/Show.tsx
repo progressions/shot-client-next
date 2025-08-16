@@ -13,7 +13,11 @@ import {
   SpeedDialMenu,
 } from "@/components/ui"
 import { useCampaign } from "@/contexts"
-import { ActionValuesEdit, VehicleChips } from "@/components/vehicles"
+import {
+  ActionValuesEdit,
+  VehicleChips,
+  Archetype,
+} from "@/components/vehicles"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import { Owner } from "@/components/characters"
@@ -94,6 +98,11 @@ export default function Show({ vehicle: initialVehicle }: ShowProperties) {
         setEntity={setVehicle}
         updateEntity={updateEntity}
       />
+      <SectionHeader title="Details" icon={<Icon keyword="Personal Details" />}>
+        Personal details provide additional context and background about a{" "}
+        <InfoLink href="/vehicles" info="Vehicle" />.
+      </SectionHeader>
+      <Archetype vehicle={vehicle} updateEntity={updateEntity} />
     </Box>
   )
 }

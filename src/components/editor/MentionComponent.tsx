@@ -3,8 +3,6 @@
 import { NodeViewWrapper, NodeViewProps } from "@tiptap/react"
 import { EntityLink } from "@/components/ui"
 
-
-
 export default function MentionComponent({ node }: NodeViewProps) {
   const { id, label, className } = node.attrs
   const displayLabel = label || "unknown"

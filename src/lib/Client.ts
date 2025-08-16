@@ -428,7 +428,7 @@ class Client {
   async getVehicleArchetypes(
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<VehicleArchetype[]>> {
-    return this.get(`${this.api.vehicles()}/archetypes`, {}, cacheOptions)
+    return this.get(`${this.apiV2.vehicles()}/archetypes`, {}, cacheOptions)
   }
 
   async updateCharacter(
@@ -540,11 +540,8 @@ class Client {
     })
   }
 
-  async createVehicle(
-    vehicle: Vehicle,
-    fight?: Fight | null
-  ): Promise<AxiosResponse<Vehicle>> {
-    return this.post(this.api.vehicles(fight, vehicle), { vehicle: vehicle })
+  async createVehicle(formData: FormData): Promise<AxiosResponse<Vehicle>> {
+    return this.requestFormData("POST", `${this.apiV2.vehicles()}`, formData)
   }
 
   async updateVehicle(

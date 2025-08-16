@@ -5,7 +5,6 @@ import { useState, useEffect } from "react"
 import { VehicleAvatar } from "@/components/avatars"
 import VS from "@/services/VehicleService"
 import GamemasterOnly from "@/components/GamemasterOnly"
-import { RichTextRenderer } from "@/components/editor"
 import { useClient } from "@/contexts"
 import {
   VehicleLink,

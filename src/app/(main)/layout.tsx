@@ -1,7 +1,6 @@
 import ThemeRegistry from "@/components/ThemeRegistry"
 import {
-  CampaignProvider,
-  ClientProvider,
+  AppProvider,
   LocalStorageProvider,
   ToastProvider,
 } from "@/contexts"
@@ -23,8 +22,7 @@ export default async function RootLayout({
       <body>
         <ThemeRegistry>
           <LocalStorageProvider>
-            <ClientProvider initialUser={user}>
-              <CampaignProvider>
+            <AppProvider initialUser={user}>
                 <ToastProvider>
                   <Navbar />
                   <Container
@@ -36,8 +34,7 @@ export default async function RootLayout({
                     <Footer />
                   </Container>
                 </ToastProvider>
-              </CampaignProvider>
-            </ClientProvider>
+            </AppProvider>
           </LocalStorageProvider>
         </ThemeRegistry>
       </body>

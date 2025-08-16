@@ -6,9 +6,7 @@ type InfoPopupProps = {
   keyword: string
 }
 
-export default function InfoPopup({
-  keyword,
-}: InfoPopupProps) {
+export default function InfoPopup({ keyword }: InfoPopupProps) {
   const word = pluralize.singular(keyword).toLowerCase()
 
   const item = contents[word] || <p>Unknown</p>

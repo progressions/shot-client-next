@@ -1,6 +1,6 @@
 "use client"
 import { useRouter } from "next/navigation"
-import { useEffect, useCallback, useState } from "react"
+import { useEffect, useCallback, useState, useRef } from "react"
 import { Box } from "@mui/material"
 import type { Fight, PaginationMeta } from "@/types"
 import { useCampaign, useClient, useLocalStorage } from "@/contexts"
@@ -21,8 +21,8 @@ export type FormStateData = {
     sort: string
     order: string
     page: number
-    season: number
-    status: "Started" | "Unended" | "Ended"
+    season: number | null
+    status: "Started" | "Unended" | "Ended" | null
     search: string
   }
 }
@@ -37,9 +37,14 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   )
   const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
   const { filters } = formState.data
+  const isFetching = useRef(true) // Prevent duplicate fetches
+
+  console.log("initialFormData:", initialFormData)
 
   const fetchFights = useCallback(
-    async filters => {
+    async (filters: FormStateData["filters"]) => {
+      if (isFetching.current) return
+      isFetching.current = true
       try {
         const response = await client.getFights({ ...filters })
         dispatchForm({
@@ -59,6 +64,8 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
         })
       } catch (error) {
         console.error("Fetch fights error:", error)
+      } finally {
+        isFetching.current = false
       }
     },
     [client, dispatchForm]
@@ -67,18 +74,10 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   useEffect(() => {
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
-    if (campaignData.fights === "reload") {
-      fetchFights(filters)
-    }
-  }, [campaignData, fetchFights, filters])
-
-  useEffect(() => {
-    const url = `/fights?${queryParams(filters)}`
-    router.push(url, {
-      scroll: false,
-    })
     fetchFights(filters)
-  }, [filters, fetchFights, router])
+    const url = `/fights?${queryParams(filters)}`
+    router.push(url, { scroll: false })
+  }, [campaignData, filters, fetchFights, router])
 
   useEffect(() => {
     saveLocally("fightViewMode", viewMode)

@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Box, Skeleton, Stack, SxProps, Theme } from "@mui/material"
 import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
@@ -31,13 +31,14 @@ export function BaseDataGrid<T>({
 }: BaseDataGridProps<T>) {
   const { meta, sort, order } = formState.data
   const ready = useRef(false)
+  const [forceRender, setForceRender] = useState(false)
 
   useEffect(() => {
     if (!ready.current) {
       ready.current = true
-      return
+      // setForceRender(true)
     }
-  }, [])
+  }, [ready])
 
   const onSortChange = (model: GridSortModel) => {
     const sortField = model[0]?.field || ""

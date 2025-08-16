@@ -13,6 +13,7 @@ export default function FightBadge({
   fight,
   size = "md",
 }: FightBadgeProperties) {
+  console.log("fight badge", fight)
   return (
     <Badge
       name="fight"

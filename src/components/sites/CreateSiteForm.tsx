@@ -21,7 +21,7 @@ export default function CreateSiteForm({
     const site = { ...defaultSite, ...siteData } as Site
     formData.set("site", JSON.stringify(site))
     const response = await client.createSite(formData)
-    onSave(response.data)
+    onSave?.(response.data)
   }
 
   const defaultEntity = defaultSite

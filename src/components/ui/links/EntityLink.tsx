@@ -125,6 +125,7 @@ export default function EntityLink({
 
   // Update anchorEl on scroll with debouncing to prevent excessive updates
   useEffect(() => {
+    if (!entity?.id) return
     let scrollTimeoutId: NodeJS.Timeout | null = null
     const handleScroll = () => {
       if (isOpen && target.current) {
@@ -147,7 +148,9 @@ export default function EntityLink({
       if (closeTimeoutId) clearTimeout(closeTimeoutId)
       if (scrollTimeoutId) clearTimeout(scrollTimeoutId)
     }
-  }, [isOpen, entity.id, entity.entity_class])
+  }, [isOpen, entity?.id, entity?.entity_class])
+
+  if (!entity || !entity.id || !entity.entity_class) return null
 
   // Get the appropriate Popup and Name components and prop name
   const PopupComponent =

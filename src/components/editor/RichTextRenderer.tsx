@@ -17,9 +17,9 @@ export default function RichTextRenderer({ html }: RichTextRendererProperties) {
   const preprocessContent = (inputHtml: string) => {
     if (!inputHtml) return ""
     let processed = inputHtml.replaceAll(
-     /<li><p>(.*?)<\/p><\/li>/g,
-     "<li>$1</li>"
-     )
+      /<li><p>(.*?)<\/p><\/li>/g,
+      "<li>$1</li>"
+    )
     const regex = new RegExp(
       `<a href="([^"]+)" class="${styles.mention}"[^>]*data-mention-id="([^"]+)"[^>]*data-mention-class-name="([^"]*)"[^>]*>(@[^<]+)</a>`,
       "g"

@@ -1,7 +1,12 @@
 "use client"
 import { GridColDef } from "@mui/x-data-grid"
 import { FormStateType, FormStateAction } from "@/reducers"
-import { BaseDataGrid, MembersGroup, SiteLink } from "@/components/ui"
+import {
+  BaseDataGrid,
+  MembersGroup,
+  FactionLink,
+  SiteLink,
+} from "@/components/ui"
 import { Avatar } from "@/components/avatars"
 import type { PaginationMeta, Site } from "@/types"
 
@@ -37,6 +42,14 @@ const columns: GridColDef<Site>[] = [
     renderCell: params => <SiteLink site={params.row} />,
   },
   {
+    field: "faction",
+    headerName: "Faction",
+    width: 200,
+    editable: false,
+    sortable: false,
+    renderCell: params => <FactionLink faction={params.row.faction} />,
+  },
+  {
     field: "members",
     headerName: "Attuned",
     width: 150,
@@ -65,6 +78,8 @@ export default function View({ formState, dispatchForm }: ViewProps) {
     ...site,
     created_at: new Date(site.created_at),
   }))
+
+  console.log("Rendering Site Table with rows:", rows)
 
   return (
     <BaseDataGrid
