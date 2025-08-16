@@ -20,7 +20,7 @@ export default async function RootLayout({
           <LocalStorageProvider>
             <AppProvider initialUser={user}>
               <ToastProvider>
-                <Navbar />
+                <Navbar user={user} />
                 <Container
                   maxWidth="md"
                   sx={{ paddingTop: 2, paddingBottom: 2 }}

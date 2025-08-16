@@ -12,7 +12,7 @@ import type {
   Encounter,
   Entity,
   ImagePosition,
-  NotionPage
+  NotionPage,
 } from "@/types"
 
 interface ClientDependencies {
@@ -24,15 +24,27 @@ interface ClientDependencies {
 
 export function createCharacterClient(deps: ClientDependencies) {
   const { api, apiV2, queryParams } = deps
-  const { get, post, patch, delete: delete_, requestFormData } = createBaseClient(deps)
+  const {
+    get,
+    post,
+    patch,
+    delete: delete_,
+    requestFormData,
+  } = createBaseClient(deps)
 
-  async function getEncounter(fight?: Fight | string): Promise<AxiosResponse<Encounter>> {
+  async function getEncounter(
+    fight?: Fight | string
+  ): Promise<AxiosResponse<Encounter>> {
     return get(apiV2.encounters(fight), {}, { cache: "no-store" })
   }
 
   async function createImagePosition(
     entity: Entity,
-    parameters: Parameters_ = { context: "desktop_index", x_position: 0, y_position: 0 }
+    parameters: Parameters_ = {
+      context: "desktop_index",
+      x_position: 0,
+      y_position: 0,
+    }
   ): Promise<AxiosResponse<Entity>> {
     return post(apiV2.imagePositions(entity), { image_position: parameters })
   }
@@ -89,11 +101,7 @@ export function createCharacterClient(deps: ClientDependencies) {
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<CharactersResponse>> {
     const query = queryParams(parameters)
-    return get(
-      `${apiV2.characters()}/names?${query}`,
-      {},
-      cacheOptions
-    )
+    return get(`${apiV2.characters()}/names?${query}`, {}, cacheOptions)
   }
 
   async function getCharactersInFight(
@@ -116,7 +124,9 @@ export function createCharacterClient(deps: ClientDependencies) {
     return get(api.characters(null, character), {}, cacheOptions)
   }
 
-  async function getCharacterPdf(character: Character | string): Promise<AxiosResponse<string>> {
+  async function getCharacterPdf(
+    character: Character | string
+  ): Promise<AxiosResponse<string>> {
     const url = `${apiV2.characterPdf(character)}`
     return await axios({
       url: url,
@@ -131,33 +141,50 @@ export function createCharacterClient(deps: ClientDependencies) {
     })
   }
 
-  async function updateCharacter(id: string, formData: FormData): Promise<AxiosResponse<Character>> {
+  async function updateCharacter(
+    id: string,
+    formData: FormData
+  ): Promise<AxiosResponse<Character>> {
     return requestFormData("PATCH", `${apiV2.characters({ id })}`, formData)
   }
 
-  async function duplicateCharacter(character: Character): Promise<AxiosResponse<Person>> {
+  async function duplicateCharacter(
+    character: Character
+  ): Promise<AxiosResponse<Person>> {
     return post(`${apiV2.characters(character)}/duplicate`)
   }
 
-  async function createCharacter(character: Character, fight?: Fight | null): Promise<AxiosResponse<Person>> {
+  async function createCharacter(
+    character: Character,
+    fight?: Fight | null
+  ): Promise<AxiosResponse<Person>> {
     return post(api.characters(fight, character), { character: character })
   }
 
-  async function uploadCharacterPdf(formData: FormData): Promise<AxiosResponse<Character>> {
+  async function uploadCharacterPdf(
+    formData: FormData
+  ): Promise<AxiosResponse<Character>> {
     return requestFormData("POST", `${apiV2.characters()}/pdf`, formData)
   }
 
-  async function deleteCharacter(character: Character, fight?: Fight | null): Promise<AxiosResponse<void>> {
+  async function deleteCharacter(
+    character: Character,
+    fight?: Fight | null
+  ): Promise<AxiosResponse<void>> {
     return fight?.id
       ? delete_(api.characters(fight, { id: character.shot_id } as Character))
       : delete_(apiV2.characters(character))
   }
 
-  async function deleteCharacterImage(character: Character): Promise<AxiosResponse<void>> {
+  async function deleteCharacterImage(
+    character: Character
+  ): Promise<AxiosResponse<void>> {
     return delete_(`${api.characters(null, character)}/image`)
   }
 
-  async function syncCharacter(character: Character): Promise<AxiosResponse<Person>> {
+  async function syncCharacter(
+    character: Character
+  ): Promise<AxiosResponse<Person>> {
     return post(`${api.characters(null, character)}/sync`)
   }
 
@@ -174,22 +201,37 @@ export function createCharacterClient(deps: ClientDependencies) {
     })
   }
 
-  async function hideCharacter(fight: Fight, character: Character): Promise<AxiosResponse<Character>> {
-    return patch(
-      api.hideCharacter(fight, { id: character.id } as Character),
-      { character: { id: character.id, shot_id: character.shot_id } as Character }
-    )
+  async function hideCharacter(
+    fight: Fight,
+    character: Character
+  ): Promise<AxiosResponse<Character>> {
+    return patch(api.hideCharacter(fight, { id: character.id } as Character), {
+      character: { id: character.id, shot_id: character.shot_id } as Character,
+    })
   }
 
-  async function showCharacter(fight: Fight, character: Character): Promise<AxiosResponse<Character>> {
+  async function showCharacter(
+    fight: Fight,
+    character: Character
+  ): Promise<AxiosResponse<Character>> {
     return patch(
       api.revealCharacter(fight, { id: character.id } as Character),
-      { character: { id: character.id, shot_id: character.shot_id } as Character }
+      {
+        character: {
+          id: character.id,
+          shot_id: character.shot_id,
+        } as Character,
+      }
     )
   }
 
-  async function addCharacter(fight: Fight, character: Character | string): Promise<AxiosResponse<Character>> {
-    return post(api.addCharacter(fight, character), { character: { current_shot: 0 } })
+  async function addCharacter(
+    fight: Fight,
+    character: Character | string
+  ): Promise<AxiosResponse<Character>> {
+    return post(api.addCharacter(fight, character), {
+      character: { current_shot: 0 },
+    })
   }
 
   async function createAdvancement(
@@ -206,7 +248,9 @@ export function createCharacterClient(deps: ClientDependencies) {
     return delete_(api.advancements(character, advancement))
   }
 
-  async function getAllCharacters(cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Character[]>> {
+  async function getAllCharacters(
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<Character[]>> {
     return get(api.allCharacters(), {}, cacheOptions)
   }
 
@@ -235,6 +279,6 @@ export function createCharacterClient(deps: ClientDependencies) {
     addCharacter,
     createAdvancement,
     deleteAdvancement,
-    getAllCharacters
+    getAllCharacters,
   }
 }

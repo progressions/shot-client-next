@@ -12,8 +12,12 @@ export function createAiClient(deps: ClientDependencies) {
   const { api, apiV2 } = deps
   const { post } = createBaseClient(deps)
 
-  async function extendCharacter(character: Character): Promise<AxiosResponse<Character>> {
-    return post(`${apiV2.ai()}/${character.id}/extend`, { character: character })
+  async function extendCharacter(
+    character: Character
+  ): Promise<AxiosResponse<Character>> {
+    return post(`${apiV2.ai()}/${character.id}/extend`, {
+      character: character,
+    })
   }
 
   async function generateAiCharacter(
@@ -50,6 +54,6 @@ export function createAiClient(deps: ClientDependencies) {
     extendCharacter,
     generateAiCharacter,
     generateAiImages,
-    attachImage
+    attachImage,
   }
 }

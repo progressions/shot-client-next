@@ -1,6 +1,12 @@
 import { AxiosResponse } from "axios"
 import { createBaseClient } from "@/lib/client/baseClient"
-import type { Weapon, WeaponsResponse, Character, CacheOptions, Parameters_ } from "@/types"
+import type {
+  Weapon,
+  WeaponsResponse,
+  Character,
+  CacheOptions,
+  Parameters_,
+} from "@/types"
 
 interface ClientDependencies {
   jwt?: string
@@ -51,23 +57,36 @@ export function createWeaponClient(deps: ClientDependencies) {
     return get(`${apiV2.weaponCategories()}?${query}`, {}, cacheOptions)
   }
 
-  async function createWeapon(formData: FormData): Promise<AxiosResponse<Weapon>> {
+  async function createWeapon(
+    formData: FormData
+  ): Promise<AxiosResponse<Weapon>> {
     return requestFormData("POST", `${apiV2.weapons()}`, formData)
   }
 
-  async function updateWeapon(id: string, formData: FormData): Promise<AxiosResponse<Weapon>> {
+  async function updateWeapon(
+    id: string,
+    formData: FormData
+  ): Promise<AxiosResponse<Weapon>> {
     return requestFormData("PATCH", `${apiV2.weapons({ id })}`, formData)
   }
 
-  async function deleteWeapon(weapon: Weapon, params = {}): Promise<AxiosResponse<void>> {
+  async function deleteWeapon(
+    weapon: Weapon,
+    params = {}
+  ): Promise<AxiosResponse<void>> {
     return delete_(`${apiV2.weapons(weapon)}`, params)
   }
 
-  async function deleteWeaponImage(weapon: Weapon): Promise<AxiosResponse<void>> {
+  async function deleteWeaponImage(
+    weapon: Weapon
+  ): Promise<AxiosResponse<void>> {
     return delete_(`${apiV2.weapons(weapon)}/image`)
   }
 
-  async function addWeapon(character: Character | string, weapon: Weapon): Promise<AxiosResponse<Character>> {
+  async function addWeapon(
+    character: Character | string,
+    weapon: Weapon
+  ): Promise<AxiosResponse<Character>> {
     return post(api.characterWeapons(character), { weapon: weapon })
   }
 
@@ -104,6 +123,6 @@ export function createWeaponClient(deps: ClientDependencies) {
     addWeapon,
     uploadWeapons,
     removeWeapon,
-    getCharacterWeapons
+    getCharacterWeapons,
   }
 }

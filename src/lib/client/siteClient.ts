@@ -1,6 +1,14 @@
 import { AxiosResponse } from "axios"
 import { createBaseClient } from "@/lib/client/baseClient"
-import type { Site, SitesResponse, Juncture, JuncturesResponse, Character, CacheOptions, Parameters_ } from "@/types"
+import type {
+  Site,
+  SitesResponse,
+  Juncture,
+  JuncturesResponse,
+  Character,
+  CacheOptions,
+  Parameters_,
+} from "@/types"
 
 interface ClientDependencies {
   jwt?: string
@@ -25,11 +33,17 @@ export function createSiteClient(deps: ClientDependencies) {
     return requestFormData("POST", `${apiV2.sites()}`, formData)
   }
 
-  async function updateSite(id: string, formData: FormData): Promise<AxiosResponse<Site>> {
+  async function updateSite(
+    id: string,
+    formData: FormData
+  ): Promise<AxiosResponse<Site>> {
     return requestFormData("PATCH", `${apiV2.sites({ id })}`, formData)
   }
 
-  async function getSite(site: Site | string, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Site>> {
+  async function getSite(
+    site: Site | string,
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<Site>> {
     return get(apiV2.sites(site), {}, cacheOptions)
   }
 
@@ -41,11 +55,17 @@ export function createSiteClient(deps: ClientDependencies) {
     return delete_(`${apiV2.sites(site)}/image`)
   }
 
-  async function addCharacterToSite(site: Site, character: Character): Promise<AxiosResponse<Site>> {
+  async function addCharacterToSite(
+    site: Site,
+    character: Character
+  ): Promise<AxiosResponse<Site>> {
     return post(api.sites(character), { site: site })
   }
 
-  async function removeCharacterFromSite(site: Site, character: Character): Promise<AxiosResponse<void>> {
+  async function removeCharacterFromSite(
+    site: Site,
+    character: Character
+  ): Promise<AxiosResponse<void>> {
     return delete_(api.sites(character, site))
   }
 
@@ -57,11 +77,16 @@ export function createSiteClient(deps: ClientDependencies) {
     return get(`${apiV2.junctures()}?${query}`, {}, cacheOptions)
   }
 
-  async function createJuncture(formData: FormData): Promise<AxiosResponse<Juncture>> {
+  async function createJuncture(
+    formData: FormData
+  ): Promise<AxiosResponse<Juncture>> {
     return requestFormData("POST", `${apiV2.junctures()}`, formData)
   }
 
-  async function updateJuncture(id: string, formData: FormData): Promise<AxiosResponse<Juncture>> {
+  async function updateJuncture(
+    id: string,
+    formData: FormData
+  ): Promise<AxiosResponse<Juncture>> {
     return requestFormData("PATCH", `${apiV2.junctures({ id })}`, formData)
   }
 
@@ -72,11 +97,15 @@ export function createSiteClient(deps: ClientDependencies) {
     return get(apiV2.junctures(juncture), {}, cacheOptions)
   }
 
-  async function deleteJuncture(juncture: Juncture): Promise<AxiosResponse<void>> {
+  async function deleteJuncture(
+    juncture: Juncture
+  ): Promise<AxiosResponse<void>> {
     return delete_(apiV2.junctures(juncture))
   }
 
-  async function deleteJunctureImage(juncture: Juncture): Promise<AxiosResponse<void>> {
+  async function deleteJunctureImage(
+    juncture: Juncture
+  ): Promise<AxiosResponse<void>> {
     return delete_(`${apiV2.junctures(juncture)}/image`)
   }
 
@@ -94,6 +123,6 @@ export function createSiteClient(deps: ClientDependencies) {
     updateJuncture,
     getJuncture,
     deleteJuncture,
-    deleteJunctureImage
+    deleteJunctureImage,
   }
 }

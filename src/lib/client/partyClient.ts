@@ -1,6 +1,12 @@
 import { AxiosResponse } from "axios"
 import { createBaseClient } from "@/lib/client/baseClient"
-import type { Party, PartiesResponse, CacheOptions, Parameters_, Fight } from "@/types"
+import type {
+  Party,
+  PartiesResponse,
+  CacheOptions,
+  Parameters_,
+  Fight,
+} from "@/types"
 
 interface ClientDependencies {
   jwt?: string
@@ -56,15 +62,22 @@ export function createPartyClient(deps: ClientDependencies) {
     return get(apiV2.parties(party), {}, cacheOptions)
   }
 
-  async function deleteParty(party: Party | string): Promise<AxiosResponse<void>> {
+  async function deleteParty(
+    party: Party | string
+  ): Promise<AxiosResponse<void>> {
     return delete_(apiV2.parties(party))
   }
 
-  async function createParty(formData: FormData): Promise<AxiosResponse<Party>> {
+  async function createParty(
+    formData: FormData
+  ): Promise<AxiosResponse<Party>> {
     return requestFormData("POST", `${apiV2.parties()}`, formData)
   }
 
-  async function updateParty(id: string, formData: FormData): Promise<AxiosResponse<Party>> {
+  async function updateParty(
+    id: string,
+    formData: FormData
+  ): Promise<AxiosResponse<Party>> {
     return requestFormData("PATCH", `${apiV2.parties({ id })}`, formData)
   }
 
@@ -90,6 +103,6 @@ export function createPartyClient(deps: ClientDependencies) {
     createParty,
     updateParty,
     deletePartyImage,
-    addPartyToFight
+    addPartyToFight,
   }
 }

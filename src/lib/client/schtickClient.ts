@@ -1,6 +1,12 @@
 import { AxiosResponse } from "axios"
 import { createBaseClient } from "@/lib/client/baseClient"
-import type { Schtick, SchticksResponse, Character, CacheOptions, Parameters_ } from "@/types"
+import type {
+  Schtick,
+  SchticksResponse,
+  Character,
+  CacheOptions,
+  Parameters_,
+} from "@/types"
 
 interface ClientDependencies {
   jwt?: string
@@ -51,11 +57,16 @@ export function createSchtickClient(deps: ClientDependencies) {
     return get(apiV2.schticks(schtick), {}, cacheOptions)
   }
 
-  async function createSchtick(formData: FormData): Promise<AxiosResponse<Schtick>> {
+  async function createSchtick(
+    formData: FormData
+  ): Promise<AxiosResponse<Schtick>> {
     return requestFormData("POST", `${apiV2.schticks()}`, formData)
   }
 
-  async function updateSchtick(id: string, formData: FormData): Promise<AxiosResponse<Schtick>> {
+  async function updateSchtick(
+    id: string,
+    formData: FormData
+  ): Promise<AxiosResponse<Schtick>> {
     return requestFormData("PATCH", `${apiV2.schticks({ id })}`, formData)
   }
 
@@ -102,6 +113,6 @@ export function createSchtickClient(deps: ClientDependencies) {
     getCharacterSchticks,
     addSchtick,
     uploadSchticks,
-    removeSchtick
+    removeSchtick,
   }
 }

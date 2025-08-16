@@ -27,7 +27,8 @@ export function createBaseClient({ jwt }: ClientDependencies) {
       Authorization: `Bearer ${jwt}`,
     }
     if (cacheOptions.cache === "no-store") {
-      headers["Cache-Control"] = "no-store, no-cache, must-revalidate, proxy-revalidate"
+      headers["Cache-Control"] =
+        "no-store, no-cache, must-revalidate, proxy-revalidate"
     } else if (cacheOptions.cache === "force-cache") {
       headers["Cache-Control"] = `max-age=${cacheOptions.revalidate || 3600}`
     }
@@ -86,7 +87,8 @@ export function createBaseClient({ jwt }: ClientDependencies) {
       Authorization: `Bearer ${jwt}`,
     }
     if (cacheOptions.cache === "no-store") {
-      headers["Cache-Control"] = "no-store, no-cache, must-revalidate, proxy-revalidate"
+      headers["Cache-Control"] =
+        "no-store, no-cache, must-revalidate, proxy-revalidate"
     } else if (cacheOptions.cache === "force-cache") {
       headers["Cache-Control"] = `max-age=${cacheOptions.revalidate || 3600}`
     }
@@ -131,6 +133,6 @@ export function createBaseClient({ jwt }: ClientDependencies) {
     patch,
     delete: delete_,
     request,
-    requestFormData
+    requestFormData,
   }
 }

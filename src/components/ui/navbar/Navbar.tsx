@@ -1,13 +1,10 @@
 import { Box, AppBar, Toolbar, Typography, Avatar } from "@mui/material"
 import Link from "next/link"
-import { getUser } from "@/lib/getServerClient"
 import { logoutAction } from "@/lib/actions"
 import { Button } from "@/components/ui"
 import { MainMenu } from "@/components/ui/navbar"
 
-export async function Navbar() {
-  const user = await getUser()
-
+export async function Navbar({ user }) {
   return (
     <AppBar position="static" sx={{ bgcolor: "#1d1d1d" }}>
       <Toolbar

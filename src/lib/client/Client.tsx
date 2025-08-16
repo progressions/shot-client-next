@@ -1,6 +1,6 @@
 import Cookies from "js-cookie"
 import { Api, ApiV2, queryParams } from "@/lib"
-import { createConsumer, Consumer } from "@rails/actioncable"
+import { createConsumer } from "@rails/actioncable"
 import * as auth from "@/lib/client/authClient"
 import * as character from "@/lib/client/characterClient"
 import * as vehicle from "@/lib/client/vehicleClient"
@@ -12,7 +12,6 @@ import * as faction from "@/lib/client/factionClient"
 import * as weapon from "@/lib/client/weaponClient"
 import * as schtick from "@/lib/client/schtickClient"
 import * as ai from "@/lib/client/aiClient"
-import * as websocket from "@/lib/client/websocketClient"
 
 interface ClientParameters {
   jwt?: string
@@ -43,6 +42,6 @@ export default function createClient(parameters: ClientParameters = {}) {
     ...faction.createFactionClient({ jwt, api, apiV2, queryParams }),
     ...weapon.createWeaponClient({ jwt, api, apiV2, queryParams }),
     ...schtick.createSchtickClient({ jwt, api, apiV2, queryParams }),
-    ...ai.createAiClient({ jwt, api, apiV2 })
+    ...ai.createAiClient({ jwt, api, apiV2 }),
   }
 }

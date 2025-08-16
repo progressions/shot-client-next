@@ -1,6 +1,13 @@
 import { AxiosResponse } from "axios"
 import { createBaseClient } from "@/lib/client/baseClient"
-import type { Campaign, CampaignsResponse, Invitation, User, CacheOptions, Parameters_ } from "@/types"
+import type {
+  Campaign,
+  CampaignsResponse,
+  Invitation,
+  User,
+  CacheOptions,
+  Parameters_,
+} from "@/types"
 
 interface ClientDependencies {
   jwt?: string
@@ -11,16 +18,28 @@ interface ClientDependencies {
 
 export function createCampaignClient(deps: ClientDependencies) {
   const { api, apiV2, queryParams } = deps
-  const { get, post, patch, delete: delete_, requestFormData } = createBaseClient(deps)
+  const {
+    get,
+    post,
+    patch,
+    delete: delete_,
+    requestFormData,
+  } = createBaseClient(deps)
 
-  async function addPlayer(user: User, campaign: Campaign): Promise<AxiosResponse<Campaign>> {
+  async function addPlayer(
+    user: User,
+    campaign: Campaign
+  ): Promise<AxiosResponse<Campaign>> {
     return post(api.campaignMemberships(), {
       campaign_id: campaign.id,
       user_id: user.id,
     })
   }
 
-  async function removePlayer(user: User, campaign: Campaign): Promise<AxiosResponse<void>> {
+  async function removePlayer(
+    user: User,
+    campaign: Campaign
+  ): Promise<AxiosResponse<void>> {
     const url = `${api.campaignMemberships()}?campaign_id=${campaign.id}&user_id=${user.id}`
     return delete_(url)
   }
@@ -41,7 +60,9 @@ export function createCampaignClient(deps: ClientDependencies) {
     })
   }
 
-  async function deleteInvitation(invitation: Invitation): Promise<AxiosResponse<void>> {
+  async function deleteInvitation(
+    invitation: Invitation
+  ): Promise<AxiosResponse<void>> {
     return delete_(api.invitations(invitation))
   }
 
@@ -52,15 +73,22 @@ export function createCampaignClient(deps: ClientDependencies) {
     return patch(`${api.invitations(invitation)}/redeem`, { user: user })
   }
 
-  async function resendInvitation(invitation: Invitation): Promise<AxiosResponse<void>> {
+  async function resendInvitation(
+    invitation: Invitation
+  ): Promise<AxiosResponse<void>> {
     return post(`${api.invitations(invitation)}/resend`)
   }
 
-  async function createCampaign(formData: FormData): Promise<AxiosResponse<Campaign>> {
+  async function createCampaign(
+    formData: FormData
+  ): Promise<AxiosResponse<Campaign>> {
     return requestFormData("POST", `${apiV2.campaigns()}`, formData)
   }
 
-  async function updateCampaign(id: string, formData: FormData): Promise<AxiosResponse<Campaign>> {
+  async function updateCampaign(
+    id: string,
+    formData: FormData
+  ): Promise<AxiosResponse<Campaign>> {
     return requestFormData("PATCH", `${apiV2.campaigns({ id })}`, formData)
   }
 
@@ -79,7 +107,9 @@ export function createCampaignClient(deps: ClientDependencies) {
     return get(apiV2.campaigns(campaign), {}, cacheOptions)
   }
 
-  async function deleteCampaign(campaign: Campaign): Promise<AxiosResponse<void>> {
+  async function deleteCampaign(
+    campaign: Campaign
+  ): Promise<AxiosResponse<void>> {
     return delete_(apiV2.campaigns(campaign))
   }
 
@@ -109,6 +139,6 @@ export function createCampaignClient(deps: ClientDependencies) {
     getCampaign,
     deleteCampaign,
     setCurrentCampaign,
-    getCurrentCampaign
+    getCurrentCampaign,
   }
 }

@@ -1,6 +1,12 @@
 import { AxiosResponse } from "axios"
 import { createBaseClient } from "@/lib/client/baseClient"
-import type { User, PasswordWithConfirmation, UsersResponse, CacheOptions, Parameters_ } from "@/types"
+import type {
+  User,
+  PasswordWithConfirmation,
+  UsersResponse,
+  CacheOptions,
+  Parameters_,
+} from "@/types"
 
 interface ClientDependencies {
   jwt?: string
@@ -29,23 +35,34 @@ export function createAuthClient(deps: ClientDependencies) {
     return delete_(`${api.users(user)}/image`)
   }
 
-  async function getUser(user: User | string, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<User>> {
+  async function getUser(
+    user: User | string,
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<User>> {
     return get(api.adminUsers(user), {}, cacheOptions)
   }
 
-  async function getCurrentUser(cacheOptions: CacheOptions = {}): Promise<AxiosResponse<User>> {
+  async function getCurrentUser(
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<User>> {
     return get(api.currentUser(), {}, cacheOptions)
   }
 
-  async function unlockUser(unlock_token: string): Promise<AxiosResponse<User>> {
+  async function unlockUser(
+    unlock_token: string
+  ): Promise<AxiosResponse<User>> {
     return get(`${api.unlockUser()}?unlock_token=${unlock_token}`)
   }
 
-  async function confirmUser(confirmation_token: string): Promise<AxiosResponse<User>> {
+  async function confirmUser(
+    confirmation_token: string
+  ): Promise<AxiosResponse<User>> {
     return post(api.confirmUser(), { confirmation_token: confirmation_token })
   }
 
-  async function sendResetPasswordLink(email: string): Promise<AxiosResponse<void>> {
+  async function sendResetPasswordLink(
+    email: string
+  ): Promise<AxiosResponse<void>> {
     return post(api.resetUserPassword(), { user: { email: email } })
   }
 
@@ -58,12 +75,18 @@ export function createAuthClient(deps: ClientDependencies) {
     })
   }
 
-  async function getPlayers(parameters: Parameters_ = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<UsersResponse>> {
+  async function getPlayers(
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<UsersResponse>> {
     const query = queryParams(parameters)
     return get(`${apiV2.users()}?${query}`, {}, cacheOptions)
   }
 
-  async function getUsers(parameters: Parameters_ = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<UsersResponse>> {
+  async function getUsers(
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<UsersResponse>> {
     const query = queryParams(parameters)
     return get(`${apiV2.users()}?${query}`, {}, cacheOptions)
   }
@@ -80,6 +103,6 @@ export function createAuthClient(deps: ClientDependencies) {
     sendResetPasswordLink,
     resetUserPassword,
     getPlayers,
-    getUsers
+    getUsers,
   }
 }

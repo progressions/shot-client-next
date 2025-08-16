@@ -7,7 +7,7 @@ import type {
   VehicleArchetype,
   CacheOptions,
   Parameters_,
-  Fight
+  Fight,
 } from "@/types"
 
 interface ClientDependencies {
@@ -19,7 +19,13 @@ interface ClientDependencies {
 
 export function createVehicleClient(deps: ClientDependencies) {
   const { api, apiV2, queryParams } = deps
-  const { get, post, patch, delete: delete_, requestFormData } = createBaseClient(deps)
+  const {
+    get,
+    post,
+    patch,
+    delete: delete_,
+    requestFormData,
+  } = createBaseClient(deps)
 
   async function getLocationForVehicle(
     vehicle: Vehicle,
@@ -76,42 +82,73 @@ export function createVehicleClient(deps: ClientDependencies) {
     return get(`${apiV2.vehicles()}/archetypes`, {}, cacheOptions)
   }
 
-  async function createVehicle(formData: FormData): Promise<AxiosResponse<Vehicle>> {
+  async function createVehicle(
+    formData: FormData
+  ): Promise<AxiosResponse<Vehicle>> {
     return requestFormData("POST", `${apiV2.vehicles()}`, formData)
   }
 
-  async function updateVehicle(id: string, formData: FormData): Promise<AxiosResponse<Vehicle>> {
+  async function updateVehicle(
+    id: string,
+    formData: FormData
+  ): Promise<AxiosResponse<Vehicle>> {
     return requestFormData("PATCH", `${apiV2.vehicles({ id })}`, formData)
   }
 
-  async function deleteVehicle(vehicle: Vehicle, fight?: Fight | null): Promise<AxiosResponse<void>> {
+  async function deleteVehicle(
+    vehicle: Vehicle,
+    fight?: Fight | null
+  ): Promise<AxiosResponse<void>> {
     return delete_(api.vehicles(fight, { id: vehicle.shot_id } as Vehicle))
   }
 
-  async function deleteVehicleImage(vehicle: Vehicle): Promise<AxiosResponse<void>> {
+  async function deleteVehicleImage(
+    vehicle: Vehicle
+  ): Promise<AxiosResponse<void>> {
     return delete_(`${api.allVehicles(vehicle)}/image`)
   }
 
-  async function actVehicle(vehicle: Vehicle, fight: Fight, shots: number): Promise<AxiosResponse<Vehicle>> {
+  async function actVehicle(
+    vehicle: Vehicle,
+    fight: Fight,
+    shots: number
+  ): Promise<AxiosResponse<Vehicle>> {
     return patch(api.actVehicle(fight, vehicle), {
       vehicle: { id: vehicle.id, shot_id: vehicle.shot_id } as Vehicle,
       shots: shots,
     })
   }
 
-  async function addVehicle(fight: Fight, vehicle: Vehicle | string): Promise<AxiosResponse<Vehicle>> {
-    return post(api.addVehicle(fight, vehicle), { vehicle: { current_shot: 0 } })
+  async function addVehicle(
+    fight: Fight,
+    vehicle: Vehicle | string
+  ): Promise<AxiosResponse<Vehicle>> {
+    return post(api.addVehicle(fight, vehicle), {
+      vehicle: { current_shot: 0 },
+    })
   }
 
-  async function hideVehicle(fight: Fight, vehicle: Vehicle | string): Promise<AxiosResponse<Vehicle>> {
-    return patch(api.hideVehicle(fight, vehicle as Vehicle), { vehicle: vehicle })
+  async function hideVehicle(
+    fight: Fight,
+    vehicle: Vehicle | string
+  ): Promise<AxiosResponse<Vehicle>> {
+    return patch(api.hideVehicle(fight, vehicle as Vehicle), {
+      vehicle: vehicle,
+    })
   }
 
-  async function showVehicle(fight: Fight, vehicle: Vehicle | string): Promise<AxiosResponse<Vehicle>> {
-    return patch(api.revealVehicle(fight, vehicle as Vehicle), { vehicle: vehicle })
+  async function showVehicle(
+    fight: Fight,
+    vehicle: Vehicle | string
+  ): Promise<AxiosResponse<Vehicle>> {
+    return patch(api.revealVehicle(fight, vehicle as Vehicle), {
+      vehicle: vehicle,
+    })
   }
 
-  async function getAllVehicles(cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Vehicle[]>> {
+  async function getAllVehicles(
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<Vehicle[]>> {
     return get(api.allVehicles(), {}, cacheOptions)
   }
 
@@ -130,6 +167,6 @@ export function createVehicleClient(deps: ClientDependencies) {
     addVehicle,
     hideVehicle,
     showVehicle,
-    getAllVehicles
+    getAllVehicles,
   }
 }

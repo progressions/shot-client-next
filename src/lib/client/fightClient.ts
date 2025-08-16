@@ -1,6 +1,14 @@
 import { AxiosResponse } from "axios"
 import { createBaseClient } from "@/lib/client/baseClient"
-import type { Fight, FightsResponse, FightEvent, CacheOptions, Parameters_, Encounter, Entity } from "@/types"
+import type {
+  Fight,
+  FightsResponse,
+  FightEvent,
+  CacheOptions,
+  Parameters_,
+  Encounter,
+  Entity,
+} from "@/types"
 
 interface ClientDependencies {
   jwt?: string
@@ -11,30 +19,51 @@ interface ClientDependencies {
 
 export function createFightClient(deps: ClientDependencies) {
   const { api, apiV2, queryParams } = deps
-  const { get, post, patch, delete: delete_, requestFormData } = createBaseClient(deps)
+  const {
+    get,
+    post,
+    patch,
+    delete: delete_,
+    requestFormData,
+  } = createBaseClient(deps)
 
-  async function getEncounter(fight?: Fight | string): Promise<AxiosResponse<Encounter>> {
+  async function getEncounter(
+    fight?: Fight | string
+  ): Promise<AxiosResponse<Encounter>> {
     return get(apiV2.encounters(fight), {}, { cache: "no-store" })
   }
 
-  async function getFights(parameters: Parameters_ = {}, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<FightsResponse>> {
+  async function getFights(
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<FightsResponse>> {
     const query = queryParams(parameters)
     return get(`${apiV2.fights()}?${query}`, {}, cacheOptions)
   }
 
-  async function getFight(fight: Fight | string, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<Fight>> {
+  async function getFight(
+    fight: Fight | string,
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<Fight>> {
     return get(apiV2.fights(fight), {}, cacheOptions)
   }
 
-  async function createFight(formData: FormData): Promise<AxiosResponse<Fight>> {
+  async function createFight(
+    formData: FormData
+  ): Promise<AxiosResponse<Fight>> {
     return requestFormData("POST", `${apiV2.fights()}`, formData)
   }
 
-  async function updateFight(id: string, formData: FormData): Promise<AxiosResponse<Fight>> {
+  async function updateFight(
+    id: string,
+    formData: FormData
+  ): Promise<AxiosResponse<Fight>> {
     return requestFormData("PATCH", `${apiV2.fights({ id })}`, formData)
   }
 
-  async function touchFight(fight: Fight | string): Promise<AxiosResponse<Fight>> {
+  async function touchFight(
+    fight: Fight | string
+  ): Promise<AxiosResponse<Fight>> {
     return patch(`${apiV2.fights(fight)}/touch`)
   }
 
@@ -42,11 +71,17 @@ export function createFightClient(deps: ClientDependencies) {
     return delete_(apiV2.fights(fight))
   }
 
-  async function getFightEvents(fight: Fight | string, cacheOptions: CacheOptions = {}): Promise<AxiosResponse<FightEvent[]>> {
+  async function getFightEvents(
+    fight: Fight | string,
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<FightEvent[]>> {
     return get(api.fightEvents(fight), {}, cacheOptions)
   }
 
-  async function createFightEvent(fight: Fight | string, fightEvent: FightEvent): Promise<AxiosResponse<FightEvent>> {
+  async function createFightEvent(
+    fight: Fight | string,
+    fightEvent: FightEvent
+  ): Promise<AxiosResponse<FightEvent>> {
     return post(api.fightEvents(fight), { fight_event: fightEvent })
   }
 
@@ -73,6 +108,6 @@ export function createFightClient(deps: ClientDependencies) {
     deleteFight,
     getFightEvents,
     createFightEvent,
-    spendShots
+    spendShots,
   }
 }
