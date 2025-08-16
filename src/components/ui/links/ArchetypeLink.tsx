@@ -1,7 +1,12 @@
 "use client"
-import { Entity } from "@/types"
+import type { Entity } from "@/types"
 import { EntityLink } from "@/components/ui"
-import { Popup } from "@/components/popups"
+import dynamic from "next/dynamic"
+
+const ArchetypePopup = dynamic(
+  () => import("@/components/popups/ArchetypePopup"),
+  { ssr: false }
+)
 
 type ArchetypeLinkProperties = {
   archetype: string
@@ -24,7 +29,7 @@ export default function ArchetypeLink({
       entity={entity}
       data={data}
       disablePopup={disablePopup}
-      popupOverride={Popup}
+      popupOverride={ArchetypePopup}
       sx={{
         fontWeight: "bold",
         textDecoration: "underline",

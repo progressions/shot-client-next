@@ -8,6 +8,7 @@ import { paginateArray } from "@/lib"
 import { filterConfigs } from "@/lib/filterConfigs"
 import type { Fight } from "@/types"
 import pluralize from "pluralize"
+import { collectionNames } from "@/lib/maps"
 
 interface AutocompleteOption {
   id: number
@@ -21,20 +22,6 @@ type ListManagerProps = {
   onListUpdate?: (updatedEntity: Fight) => Promise<void>
   excludeIds?: number[]
   manage?: boolean
-}
-
-const collectionNames: Record<string, string> = {
-  Character: "characters",
-  Schtick: "schticks",
-  Weapon: "weapons",
-  Vehicle: "vehicles",
-  Fight: "fights",
-  Party: "parties",
-  Juncture: "junctures",
-  User: "users",
-  Site: "sites",
-  Campaign: "campaigns",
-  Faction: "factions",
 }
 
 export function ListManager({

@@ -1,7 +1,7 @@
 import { Box } from "@mui/material"
 import ReactDOMServer from "react-dom/server"
 import { RichTextRenderer } from "@/components/editor"
-import { contents } from "@/components/popups/info"
+import { contents } from "@/lib/info"
 import pluralize from "pluralize"
 
 type PopupProps = {

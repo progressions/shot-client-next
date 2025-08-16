@@ -1,8 +1,12 @@
 "use client"
 import { Entity } from "@/types"
-import { EntityLink } from "@/components/ui"
-import { InfoPopup } from "@/components/popups"
-import { Icon } from "@/components/ui"
+import { EntityLink, Icon } from "@/components/ui"
+import dynamic from "next/dynamic"
+
+// Dynamically import InfoPopup to break circular dependency
+const InfoPopup = dynamic(() => import("@/components/popups/InfoPopup"), {
+  ssr: false,
+})
 
 type InfoLinkProperties = {
   info: string
@@ -25,7 +29,6 @@ export default function InfoLink({
     id: info,
     entity_class: "Info",
   }
-
   return (
     <EntityLink
       entity={entity}

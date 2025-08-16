@@ -85,9 +85,11 @@ export default function CharacterPopup({ id }: PopupProps) {
           </>
         )}
       </Typography>
-      { description && <Box mt={1}>
-        <RichTextRenderer html={description} />
-      </Box> }
+      {description && (
+        <Box mt={1}>
+          <RichTextRenderer html={description} />
+        </Box>
+      )}
       <GamemasterOnly user={user}>
         <Box mt={1}>
           <Typography variant="body2">

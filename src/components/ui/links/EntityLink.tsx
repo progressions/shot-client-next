@@ -2,78 +2,10 @@
 import { Box, Popover, Link } from "@mui/material"
 import { useRef, useState, useEffect } from "react"
 import type { Entity } from "@/types"
-import {
-  FightPopup,
-  CharacterPopup,
-  VehiclePopup,
-  SchtickPopup,
-  WeaponPopup,
-  SitePopup,
-  PartyPopup,
-  FactionPopup,
-  JuncturePopup,
-  UserPopup,
-  CampaignPopup,
-} from "@/components/popups"
-import {
-  FightName,
-  CharacterName,
-  VehicleName,
-  SchtickName,
-  WeaponName,
-  SiteName,
-  PartyName,
-  FactionName,
-  JunctureName,
-  UserName,
-  CampaignName,
-} from "@/components/names"
+import { CharacterPopup } from "@/components/popups"
+import { CharacterName } from "@/components/names"
 import pluralize from "pluralize"
-
-// Map entity_class to Popup components
-const popupComponents: Record<string, React.ComponentType<{ id: string }>> = {
-  Character: CharacterPopup,
-  Fight: FightPopup,
-  Vehicle: VehiclePopup,
-  Schtick: SchtickPopup,
-  Weapon: WeaponPopup,
-  Site: SitePopup,
-  Party: PartyPopup,
-  Faction: FactionPopup,
-  Juncture: JuncturePopup,
-  User: UserPopup,
-  Campaign: CampaignPopup,
-}
-
-// Map entity_class to Name components
-const nameComponents: Record<string, React.ComponentType<unknown>> = {
-  Character: CharacterName,
-  Fight: FightName,
-  Vehicle: VehicleName,
-  Schtick: SchtickName,
-  Weapon: WeaponName,
-  Site: SiteName,
-  Party: PartyName,
-  Faction: FactionName,
-  Juncture: JunctureName,
-  User: UserName,
-  Campaign: CampaignName,
-}
-
-// Map entity_class to the prop name expected by the Name component
-const namePropNames: Record<string, string> = {
-  Character: "character",
-  Fight: "fight",
-  Vehicle: "vehicle",
-  Schtick: "schtick",
-  Weapon: "weapon",
-  Site: "site",
-  Party: "party",
-  Faction: "faction",
-  Juncture: "juncture",
-  User: "user",
-  Campaign: "campaign",
-}
+import { namePropNames, nameComponents, popupComponents } from "@/lib/maps"
 
 // Map entity_class to keyword generation function
 const keywordMap: Record<string, (id: string) => string | undefined> = {

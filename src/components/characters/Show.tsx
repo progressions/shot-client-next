@@ -122,7 +122,8 @@ export default function Show({
         title="Action Values"
         icon={<Icon keyword="Action Values" />}
       >
-        <InfoLink info="Action Values" /> are the core stats of your <InfoLink href="/characters" info="Character" />, used to resolve
+        <InfoLink info="Action Values" /> are the core stats of your{" "}
+        <InfoLink href="/characters" info="Character" />, used to resolve
         actions and challenges in the game.
       </SectionHeader>
       <ActionValuesEdit
@@ -135,7 +136,9 @@ export default function Show({
         title="Personal Details"
         icon={<Icon keyword="Personal Details" />}
       >
-        Personal details about your <InfoLink href="/characters" info="Character" />, such as their <InfoLink info="Type" />, <InfoLink info="Archetype" />,
+        Personal details about your{" "}
+        <InfoLink href="/characters" info="Character" />, such as their{" "}
+        <InfoLink info="Type" />, <InfoLink info="Archetype" />,
         <InfoLink info="Juncture" />, and <InfoLink info="Wealth" />.
       </SectionHeader>
       <Stack direction="row" spacing={2} sx={{ my: 2 }}>
