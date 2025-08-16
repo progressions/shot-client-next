@@ -1,7 +1,7 @@
 import ThemeRegistry from "@/components/ThemeRegistry"
 import { AppProvider, LocalStorageProvider, ToastProvider } from "@/contexts"
 import { Navbar, Footer } from "@/components/ui"
-import { getCurrentUser } from "@/lib/getServerClient"
+import { getCurrentUser } from "@/lib"
 import "@/styles/global.scss"
 import { Container } from "@mui/material"
 import PopupToast from "@/components/PopupToast"
