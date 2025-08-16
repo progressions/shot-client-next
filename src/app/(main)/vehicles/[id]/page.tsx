@@ -61,7 +61,7 @@ export default async function VehiclePage({
 
     return (
       <>
-        <Breadcrumbs />
+        <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
           <Show vehicle={vehicle} initialIsMobile={initialIsMobile} />
         </Suspense>

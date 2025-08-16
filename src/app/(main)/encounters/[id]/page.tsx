@@ -30,7 +30,7 @@ export default async function EncounterPage({
 
     return (
       <>
-        <Breadcrumbs />
+        <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
           <EncounterProvider encounter={encounter}>
             <Encounter

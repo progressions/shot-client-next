@@ -27,7 +27,7 @@ export default async function FightPage({ params }: FightPageProperties) {
 
     return (
       <>
-        <Breadcrumbs />
+        <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
           <Show fight={fight} initialIsMobile={initialIsMobile} />
         </Suspense>

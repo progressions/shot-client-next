@@ -59,7 +59,7 @@ export default async function CharacterPage({
 
     return (
       <>
-        <Breadcrumbs />
+        <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
           <Show character={character} initialIsMobile={initialIsMobile} />
         </Suspense>

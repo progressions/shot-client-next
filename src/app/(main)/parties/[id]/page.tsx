@@ -26,7 +26,7 @@ export default async function PartyPage({ params }: PartyPageProperties) {
 
     return (
       <>
-        <Breadcrumbs />
+        <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
           <Show party={party} initialIsMobile={initialIsMobile} />
         </Suspense>

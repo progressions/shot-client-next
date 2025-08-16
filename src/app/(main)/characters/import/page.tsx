@@ -16,7 +16,7 @@ export default async function CharacterImportPage() {
 
   return (
     <>
-      <Breadcrumbs />
+      <Breadcrumbs client={client} />
       <Suspense fallback={<CircularProgress />}>
         <ImportPage initialIsMobile={initialIsMobile} />
       </Suspense>

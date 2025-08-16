@@ -27,7 +27,7 @@ export default async function WeaponPage({ params }: WeaponPageProperties) {
 
     return (
       <>
-        <Breadcrumbs />
+        <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
           <Show weapon={weapon} initialIsMobile={initialIsMobile} />
         </Suspense>

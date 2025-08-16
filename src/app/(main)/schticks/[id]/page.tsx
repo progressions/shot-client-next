@@ -27,7 +27,7 @@ export default async function SchtickPage({ params }: SchtickPageProperties) {
 
     return (
       <>
-        <Breadcrumbs />
+        <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
           <Show schtick={schtick} initialIsMobile={initialIsMobile} />
         </Suspense>

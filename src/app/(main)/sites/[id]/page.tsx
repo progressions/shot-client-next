@@ -27,7 +27,7 @@ export default async function SitePage({ params }: SitePageProperties) {
 
     return (
       <>
-        <Breadcrumbs />
+        <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
           <Show site={site} initialIsMobile={initialIsMobile} />
         </Suspense>

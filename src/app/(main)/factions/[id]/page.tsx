@@ -27,7 +27,7 @@ export default async function FactionPage({ params }: FactionPageProperties) {
 
     return (
       <>
-        <Breadcrumbs />
+        <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
           <Show faction={faction} initialIsMobile={initialIsMobile} />
         </Suspense>

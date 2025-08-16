@@ -30,7 +30,7 @@ export default async function UserPage({ params }: UserPageProperties) {
 
     return (
       <>
-        <Breadcrumbs />
+        <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
           <Show user={user} initialIsMobile={initialIsMobile} />
         </Suspense>

@@ -82,7 +82,7 @@ export default async function ResourcePage<T>({
       }}
     >
       <Suspense fallback={<CircularProgress />}>
-        <Breadcrumbs />
+        <Breadcrumbs client={client} />
       </Suspense>
       <Suspense fallback={<CircularProgress />}>
         <ListComponent

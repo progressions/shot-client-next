@@ -32,7 +32,7 @@ export default async function CharacterCreatePage() {
 
   return (
     <>
-      <Breadcrumbs />
+      <Breadcrumbs client={client} />
       <Suspense fallback={<CircularProgress />}>
         <CreatePage templates={characters} initialIsMobile={initialIsMobile} />
       </Suspense>

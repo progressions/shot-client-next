@@ -27,7 +27,7 @@ export default async function JuncturePage({ params }: JuncturePageProperties) {
 
     return (
       <>
-        <Breadcrumbs />
+        <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
           <Show juncture={juncture} initialIsMobile={initialIsMobile} />
         </Suspense>

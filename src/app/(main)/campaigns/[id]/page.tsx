@@ -27,7 +27,7 @@ export default async function CampaignPage({ params }: CampaignPageProperties) {
 
     return (
       <>
-        <Breadcrumbs />
+        <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
           <Show campaign={campaign} initialIsMobile={initialIsMobile} />
         </Suspense>
