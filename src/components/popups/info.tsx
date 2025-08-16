@@ -177,6 +177,15 @@ export const contents: Record<PopupProps["id"], React.ReactElement> = {
       </p>
     </>
   ),
+  "martial art": (
+    <>
+      <Typography variant="h4">Martial Art</Typography>
+      <p>
+        A Martial Art is a combat style or technique that Characters can learn
+        and use in fights.
+      </p>
+    </>
+  ),
   magic: (
     <>
       <Typography variant="h4">Magic</Typography>

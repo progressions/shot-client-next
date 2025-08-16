@@ -1,7 +1,6 @@
 "use client"
-
-import { Box, Popover, Link } from "@mui/material"
-import { useState, MouseEvent } from "react"
+import { Entity } from "@/types"
+import { EntityLink } from "@/components/ui"
 import { TypePopup } from "@/components/popups"
 
 type TypeLinkProperties = {
@@ -13,55 +12,27 @@ type TypeLinkProperties = {
 export default function TypeLink({
   characterType,
   data,
-  disablePopup,
+  disablePopup = false,
 }: TypeLinkProperties) {
-  const [anchorEl, setAnchorEl] = useState<HTMLAnchorElement | null>(null)
-
-  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault()
-    setAnchorEl(event.currentTarget)
+  const entity: Entity = {
+    id: characterType,
+    entity_class: "Type",
   }
-
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
-
-  const open = Boolean(anchorEl)
 
   return (
-    <>
-      <Link
-        data-mention-id={characterType}
-        data-mention-class-name="Type"
-        data-mention-data={data ? JSON.stringify(data) : undefined}
-        style={{
-          fontWeight: "bold",
-          cursor: "pointer",
-          textDecoration: "underline",
-          color: "#ffffff",
-          cursor: "pointer",
-        }}
-        onClick={!disablePopup ? handleClick : undefined}
-      >
-        {characterType}
-      </Link>
-      <Popover
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "center",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-      >
-        <Box sx={{ p: 2, maxWidth: 400 }}>
-          <TypePopup id={characterType} />
-        </Box>
-      </Popover>
-    </>
+    <EntityLink
+      entity={entity}
+      data={data}
+      disablePopup={disablePopup}
+      popupOverride={TypePopup}
+      sx={{
+        fontWeight: "bold",
+        textDecoration: "underline",
+        color: "#fff",
+        cursor: "pointer",
+      }}
+    >
+      {characterType}
+    </EntityLink>
   )
 }

@@ -1,7 +1,6 @@
 "use client"
-
-import { Link } from "@mui/material"
-import { useState, MouseEvent } from "react"
+import { Entity } from "@/types"
+import { EntityLink } from "@/components/ui"
 import { Popup } from "@/components/popups"
 
 type ActionValueLinkProperties = {
@@ -15,41 +14,25 @@ export default function ActionValueLink({
   data,
   disablePopup = false,
 }: ActionValueLinkProperties) {
-  const [anchorEl, setAnchorEl] = useState<HTMLAnchorElement | null>(null)
-
-  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault()
-    setAnchorEl(event.currentTarget)
+  const entity: Entity = {
+    id: name,
+    entity_class: "ActionValue",
   }
-
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
-
-  const open = Boolean(anchorEl)
 
   return (
-    <>
-      <Link
-        data-mention-id={name}
-        data-mention-class-name="ActionValue"
-        data-mention-data={data ? JSON.stringify(data) : undefined}
-        style={{
-          fontWeight: "bold",
-          cursor: "pointer",
-          textDecoration: "underline",
-          color: "#ffffff",
-        }}
-        onClick={!disablePopup ? handleClick : undefined}
-      >
-        {name}
-      </Link>
-      <Popup
-        handleClose={handleClose}
-        anchorEl={anchorEl}
-        open={open}
-        keyword={`AV ${name}`}
-      />
-    </>
+    <EntityLink
+      entity={entity}
+      data={data}
+      disablePopup={disablePopup}
+      popupOverride={Popup}
+      sx={{
+        fontWeight: "bold",
+        textDecoration: "underline",
+        color: "#fff",
+        cursor: "pointer",
+      }}
+    >
+      {name}
+    </EntityLink>
   )
 }

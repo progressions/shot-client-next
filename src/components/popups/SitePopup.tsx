@@ -1,12 +1,11 @@
-import { Box, Typography, Stack } from "@mui/material"
-import styles from "@/components/editor/Editor.module.scss"
+import { CircularProgress, Box, Typography, Stack } from "@mui/material"
 import type { PopupProps, Site } from "@/types"
 import { defaultSite } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
 import { SiteAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
-import { SiteLink } from "@/components/ui"
+import { MembersGroup, FactionLink, SiteLink } from "@/components/ui"
 
 export default function SitePopup({ id }: PopupProps) {
   const { user, client } = useClient()
@@ -39,27 +38,40 @@ export default function SitePopup({ id }: PopupProps) {
     return null // Use null instead of <></> for consistency
   }
 
-  const subhead = ["Feng Shui Site", site.faction?.name]
-    .filter(Boolean)
-    .join(" - ")
-
   if (!site?.id) {
     return (
-      <Box className={styles.mentionPopup}>
+      <Box sx={{ p: 2 }}>
         <Typography variant="body2">Loading...</Typography>
+        <CircularProgress size={24} sx={{ mt: 2 }} />
       </Box>
     )
   }
   return (
-    <Box className={styles.mentionPopup}>
+    <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
         <SiteAvatar site={site} disablePopup={true} />
         <Typography>
           <SiteLink site={site} disablePopup={true} />
         </Typography>
       </Stack>
-      <Typography variant="caption" sx={{ textTransform: "uppercase" }}>
-        {subhead}
+      <Typography
+        component="div"
+        variant="caption"
+        sx={{ textTransform: "uppercase" }}
+      >
+        {site.faction && (
+          <>
+            <FactionLink faction={site.faction} />
+          </>
+        )}
+      </Typography>
+      <Typography>
+        {site.characters && site.characters.length > 0 && (
+          <>
+            {site.characters.length} member
+            {site.characters.length !== 1 ? "s" : ""}
+          </>
+        )}
       </Typography>
       <Box mt={1}>
         <RichTextRenderer
@@ -67,6 +79,7 @@ export default function SitePopup({ id }: PopupProps) {
           html={site.description || ""}
         />
       </Box>
+      <MembersGroup items={site.characters || []} />
     </Box>
   )
 }

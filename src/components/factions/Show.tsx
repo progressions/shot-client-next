@@ -3,16 +3,18 @@
 import { useCallback, useEffect } from "react"
 import { Stack, Box } from "@mui/material"
 import type { Faction } from "@/types"
-import { RichTextRenderer } from "@/components/editor"
 import { useCampaign } from "@/contexts"
 import { JuncturesList, SitesList, PartiesList } from "@/components/factions"
 import {
+  Icon,
   Alert,
   Manager,
   InfoLink,
   NameEditor,
   HeroImage,
   SpeedDialMenu,
+  EditableRichText,
+  SectionHeader,
 } from "@/components/ui"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
@@ -35,7 +37,10 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
   const { status } = formState
   const faction = formState.data.entity
 
-  const { updateEntity, deleteEntity } = useEntity(faction, dispatchForm)
+  const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
+    faction,
+    dispatchForm
+  )
 
   const setFaction = useCallback(
     (faction: Faction) => {
@@ -85,11 +90,17 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
           updateEntity={updateEntity}
         />
       </Box>
-      <Box sx={{ p: 2, backgroundColor: "#2e2e2e", borderRadius: 1, my: 2 }}>
-        <RichTextRenderer
-          key={faction.description}
-          html={faction.description || ""}
-          sx={{ mb: 2 }}
+      <Box>
+        <SectionHeader
+          title="Description"
+          icon={<Icon keyword="Description" />}
+        />
+        <EditableRichText
+          name="description"
+          html={faction.description}
+          editable={true}
+          onChange={handleChangeAndSave}
+          fallback="No description available."
         />
       </Box>
 

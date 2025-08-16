@@ -1,12 +1,11 @@
-import { Box, Typography, Stack } from "@mui/material"
-import styles from "@/components/editor/Editor.module.scss"
+import { CircularProgress, Box, Typography, Stack } from "@mui/material"
 import type { PopupProps, Faction } from "@/types"
 import { defaultFaction } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
 import { FactionAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
-import { FactionLink } from "@/components/ui"
+import { MembersGroup, FactionLink } from "@/components/ui"
 
 export default function FactionPopup({ id }: PopupProps) {
   const { user, client } = useClient()
@@ -39,25 +38,30 @@ export default function FactionPopup({ id }: PopupProps) {
     return null // Use null instead of <></> for consistency
   }
 
-  const subhead = ["Faction"].filter(Boolean).join(" - ")
-
   if (!faction?.id) {
     return (
-      <Box className={styles.mentionPopup}>
+      <Box sx={{ p: 2 }}>
         <Typography variant="body2">Loading...</Typography>
+        <CircularProgress size={24} sx={{ mt: 2 }} />
       </Box>
     )
   }
+
   return (
-    <Box className={styles.mentionPopup}>
+    <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
         <FactionAvatar faction={faction} disablePopup={true} />
         <Typography>
           <FactionLink faction={faction} disablePopup={true} />
         </Typography>
       </Stack>
-      <Typography variant="caption" sx={{ textTransform: "uppercase" }}>
-        {subhead}
+      <Typography>
+        {faction.characters && faction.characters.length > 0 && (
+          <>
+            {faction.characters.length} member
+            {faction.characters.length !== 1 ? "s" : ""}
+          </>
+        )}
       </Typography>
       <Box mt={1}>
         <RichTextRenderer
@@ -65,6 +69,7 @@ export default function FactionPopup({ id }: PopupProps) {
           html={faction.description || ""}
         />
       </Box>
+      <MembersGroup items={faction.characters || []} />
     </Box>
   )
 }

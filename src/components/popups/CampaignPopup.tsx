@@ -1,5 +1,4 @@
-import { Box, Typography, Stack } from "@mui/material"
-import styles from "@/components/editor/Editor.module.scss"
+import { CircularProgress, Box, Typography, Stack } from "@mui/material"
 import type { PopupProps, Campaign } from "@/types"
 import { defaultCampaign } from "@/types"
 import { useState, useEffect } from "react"
@@ -41,13 +40,14 @@ export default function CampaignPopup({ id }: PopupProps) {
 
   if (!campaign?.id) {
     return (
-      <Box className={styles.mentionPopup}>
+      <Box sx={{ p: 2 }}>
         <Typography variant="body2">Loading...</Typography>
+        <CircularProgress size={24} sx={{ mt: 2 }} />
       </Box>
     )
   }
   return (
-    <Box className={styles.mentionPopup}>
+    <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
         <CampaignAvatar campaign={campaign} disablePopup={true} />
         <Typography>

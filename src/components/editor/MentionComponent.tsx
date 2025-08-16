@@ -1,10 +1,10 @@
 "use client"
 
 import { NodeViewWrapper, NodeViewProps } from "@tiptap/react"
-import { Chip, Link, Popover, Typography, Box } from "@mui/material"
+import { Typography, Box } from "@mui/material"
 import { useState, useRef } from "react"
-import ClickAwayListener from "@mui/material/ClickAwayListener"
 import { PopupProps } from "@/types"
+import { EntityLink } from "@/components/ui"
 import {
   JuncturePopup,
   CharacterPopup,
@@ -83,49 +83,7 @@ export default function MentionComponent({ node }: NodeViewProps) {
 
   return (
     <NodeViewWrapper as="span">
-      <ClickAwayListener onClickAway={handleClose}>
-        <span>
-          <Link
-            href={href}
-            underline="none"
-            target="_blank"
-            rel="noopener noreferrer"
-            sx={{ display: "inline-flex" }}
-            onClick={handleClick}
-          >
-            <Chip
-              label={`${mentionSuggestionChar}${displayLabel}`}
-              variant="outlined"
-              color="primary"
-              size="small"
-              sx={{ height: "auto", "& .MuiChip-label": { px: 1 } }}
-              data-id={id}
-              data-label={displayLabel}
-              data-mention-class-name={className}
-              data-mention-suggestion-char={mentionSuggestionChar}
-            />
-          </Link>
-          <Popover
-            open={open}
-            anchorEl={anchorElement}
-            onClose={handleClose}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "left",
-            }}
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "left",
-            }}
-            disableRestoreFocus
-            sx={{ pointerEvents: "auto" }}
-            onClick={handlePopoverClick}
-            onMouseLeave={handlePopoverMouseLeave}
-          >
-            {popupContent}
-          </Popover>
-        </span>
-      </ClickAwayListener>
+      <EntityLink entity={{ id, entity_class: className }}>{label}</EntityLink>
     </NodeViewWrapper>
   )
 }

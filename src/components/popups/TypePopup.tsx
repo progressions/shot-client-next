@@ -1,5 +1,4 @@
 import { Box, Typography, Stack } from "@mui/material"
-import styles from "@/components/editor/Editor.module.scss"
 import { RichTextRenderer } from "@/components/editor"
 import ReactDOMServer from "react-dom/server"
 import type { PopupProps } from "@/types"
@@ -20,7 +19,7 @@ export default function TypePopup({ id }: PopupProps) {
   const html = ReactDOMServer.renderToStaticMarkup(description)
 
   return (
-    <Box className={styles.mentionPopup}>
+    <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
         <Typography>{id}</Typography>
       </Stack>

@@ -1,6 +1,7 @@
 import { AvatarGroup, Box } from "@mui/material"
 import { Avatar } from "@/components/avatars"
 import { SystemStyleObject, Theme } from "@mui/system"
+import pluralize from "pluralize"
 
 // Define a generic type for the items and props
 interface MembersGroupProps<T> {
@@ -30,13 +31,18 @@ export function MembersGroup<T>({ items, max = 5, sx }: MembersGroupProps<T>) {
           component="span"
           sx={{ width: 30, height: 30, fontSize: "0.75rem" }}
         >
-          +{surplus.toString()[0]}
+          +{surplus.toString()}
         </Box>
       )}
     >
       {items.map(item => (
         <Avatar
           entity={item}
+          href={
+            item.id
+              ? `/${pluralize(item.entity_class.toLowerCase())}/${item.id}`
+              : undefined
+          }
           key={item.id} // Assumes each item has an 'id' property; adjust if needed
           sx={{ width: 30, height: 30, fontSize: "0.75rem" }}
         />

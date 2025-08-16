@@ -1,5 +1,6 @@
 "use client"
 
+import { Stack, Box } from "@mui/material"
 import type { Weapon } from "@/types"
 import { WeaponLink } from "@/components/ui"
 import { Badge } from "@/components/badges"
@@ -20,7 +21,14 @@ export default function WeaponBadge({
       size={size}
       title={<WeaponLink weapon={weapon} />}
     >
-      ({weapon.damage}/{weapon.concealment || "-"}/{weapon.reload_value || "-"})
+      <Stack direction="row" spacing={0.5} alignItems="center">
+        <Box component="span">
+          ({weapon.damage}/{weapon.concealment || "-"}/
+          {weapon.reload_value || "-"})
+        </Box>
+        <Box component="span">{weapon.juncture}</Box>
+        <Box component="span">{weapon.category}</Box>
+      </Stack>
     </Badge>
   )
 }

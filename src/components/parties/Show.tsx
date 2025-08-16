@@ -89,7 +89,9 @@ export default function Show({ party: initialParty }: ShowProperties) {
       </Box>
       <Box sx={{ mb: 2 }}>
         <SectionHeader title="Faction" icon={<Icon keyword="Factions" />}>
-          A Party belongs to a Faction, which governs its aims and objectives.
+          A <InfoLink href="/parties" info="Party" /> belongs to a{" "}
+          <InfoLink href="/factions" info="Faction" />, which governs its aims
+          and objectives.
         </SectionHeader>
         <Box sx={{ width: 400 }}>
           <EditFaction entity={party} updateEntity={updateEntity} />

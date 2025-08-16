@@ -1,6 +1,7 @@
-import { Avatar as MuiAvatar, Link } from "@mui/material"
+import { Avatar as MuiAvatar } from "@mui/material"
 import type { Entity } from "@/types"
 import { SystemStyleObject, Theme } from "@mui/system"
+import { CharacterLink } from "@/components/ui"
 
 interface AvatarProperties {
   entity: Entity
@@ -39,7 +40,8 @@ const Avatar = ({ entity, href, disablePopup, sx = {} }: AvatarProperties) => {
 
   if (href) {
     return (
-      <Link
+      <CharacterLink
+        character={entity}
         href={href}
         target="_blank"
         data-mention-id={entity.id}
@@ -47,7 +49,7 @@ const Avatar = ({ entity, href, disablePopup, sx = {} }: AvatarProperties) => {
         sx={{ padding: 0, ml: -1.5 }}
       >
         {baseAvatar}
-      </Link>
+      </CharacterLink>
     )
   }
 

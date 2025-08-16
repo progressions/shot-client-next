@@ -10,7 +10,7 @@ export default function SkillsPopup({ data }: SkillsPopupProperties) {
   const skillValues = data || []
 
   return (
-    <>
+    <Box sx={{ py: 2 }}>
       <Typography variant="h6">Skills</Typography>
       <Box pt={2}>
         {skillValues.map(([name, value]: SkillValue) => {
@@ -22,6 +22,6 @@ export default function SkillsPopup({ data }: SkillsPopupProperties) {
           )
         })}
       </Box>
-    </>
+    </Box>
   )
 }

@@ -80,10 +80,18 @@ const categoryMap: Record<Keyword, Category> = {
 const iconMap: Record<Keyword, React.ReactElement> = {
   Juncture: <IoIosClock />,
   Site: <GiMagicGate />,
-  "Feng Shui Site": <GiMagicGate />,
+  "Feng Shui Site": (
+    <Box component="span">
+      <GiMagicGate />
+    </Box>
+  ),
   Fight: <GiSpikyExplosion />,
   Fighter: <GiSwordman />,
-  Character: <IoPeopleSharp />,
+  Character: (
+    <Box component="span">
+      <IoPeopleSharp />
+    </Box>
+  ),
   Party: <GroupIcon />,
   Faction: <FlagIcon />,
   Schtick: <VscGithubAction />,

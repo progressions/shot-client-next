@@ -1,11 +1,16 @@
-import { Box, Typography, Stack } from "@mui/material"
+import { CircularProgress, Box, Typography, Stack } from "@mui/material"
 import styles from "@/components/editor/Editor.module.scss"
 import type { PopupProps, Juncture } from "@/types"
 import { defaultJuncture } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
 import { useClient } from "@/contexts"
-import { JunctureLink } from "@/components/ui"
+import {
+  MembersGroup,
+  InfoLink,
+  FactionLink,
+  JunctureLink,
+} from "@/components/ui"
 
 export default function JuncturePopup({ id }: PopupProps) {
   const { user, client } = useClient()
@@ -44,25 +49,39 @@ export default function JuncturePopup({ id }: PopupProps) {
 
   if (!juncture?.id) {
     return (
-      <Box className={styles.mentionPopup}>
+      <Box sx={{ p: 2 }}>
         <Typography variant="body2">Loading...</Typography>
+        <CircularProgress size={24} sx={{ mt: 2 }} />
       </Box>
     )
   }
+
   return (
-    <Box className={styles.mentionPopup}>
+    <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
         <Typography>
           <JunctureLink juncture={juncture} disablePopup={true} />
         </Typography>
       </Stack>
-      <Typography variant="caption" sx={{ textTransform: "uppercase" }}>
-        {subhead}
+      <Typography
+        component="div"
+        variant="caption"
+        className={styles.popupSubhead}
+        sx={{ textTransform: "uppercase" }}
+      >
+        <InfoLink href="/junctures" info="Juncture" />{" "}
+        {juncture.faction && (
+          <>
+            {" - "}
+            <FactionLink faction={juncture.faction} />
+          </>
+        )}
       </Typography>
       <RichTextRenderer
         key={juncture.description}
         html={juncture.description || ""}
       />
+      <MembersGroup items={juncture.members || []} />
     </Box>
   )
 }

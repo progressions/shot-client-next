@@ -94,15 +94,8 @@ export function ListManager({
           sort: "name",
           order: "asc",
           ids: childIds,
+          per_page: 200,
         })
-        if (response.data[collection].length !== childIds.length) {
-          console.error(
-            getFunc,
-            childIds.length,
-            response.data[collection].length
-          )
-          throw "Mismatch in fetched child entities length"
-        }
         setChildEntities(response.data[collection] || [])
       } catch (error) {
         console.error(`Fetch ${childEntityName} error:`, error)

@@ -1,8 +1,7 @@
 "use client"
-
-import { Link } from "@mui/material"
-import { useState, MouseEvent } from "react"
-import { Popup } from "@/components/popups"
+import { Entity } from "@/types"
+import { EntityLink } from "@/components/ui"
+import { InfoPopup } from "@/components/popups"
 import { Icon } from "@/components/ui"
 
 type InfoLinkProperties = {
@@ -16,50 +15,33 @@ type InfoLinkProperties = {
 
 export default function InfoLink({
   info,
-  data,
   keyword = info,
+  data,
   href,
   disablePopup = false,
   disableIcon = false,
 }: InfoLinkProperties) {
-  const [anchorEl, setAnchorEl] = useState<HTMLAnchorElement | null>(null)
-
-  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault()
-    setAnchorEl(event.currentTarget)
+  const entity: Entity = {
+    id: info,
+    entity_class: "Info",
   }
-
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
-
-  const open = Boolean(anchorEl)
 
   return (
-    <>
-      <Link
-        href={href}
-        target="_blank"
-        data-mention-id={info}
-        data-mention-class-name="Info"
-        data-mention-data={data ? JSON.stringify(data) : undefined}
-        style={{
-          fontWeight: "bold",
-          cursor: "pointer",
-          textDecoration: "underline",
-          color: "#ffffff",
-        }}
-        onClick={!disablePopup ? handleClick : undefined}
-      >
-        {!disableIcon && <Icon keyword={keyword} size={16} sx={{ mr: 0.5 }} />}
-        {info}
-      </Link>
-      <Popup
-        handleClose={handleClose}
-        anchorEl={anchorEl}
-        open={open}
-        keyword={keyword}
-      />
-    </>
+    <EntityLink
+      entity={entity}
+      data={data}
+      href={href}
+      disablePopup={disablePopup}
+      popupOverride={InfoPopup}
+      sx={{
+        fontWeight: "bold",
+        textDecoration: "underline",
+        color: "#fff",
+        cursor: "pointer",
+      }}
+    >
+      {!disableIcon && <Icon keyword={keyword} size={16} sx={{ mr: 0.5 }} />}
+      {info}
+    </EntityLink>
   )
 }

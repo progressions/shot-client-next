@@ -1,12 +1,11 @@
-import { Box, Typography, Stack } from "@mui/material"
-import styles from "@/components/editor/Editor.module.scss"
+import { CircularProgress, Box, Typography, Stack } from "@mui/material"
 import type { PopupProps, Party } from "@/types"
 import { defaultParty } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
 import { PartyAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
-import { PartyLink } from "@/components/ui"
+import { MembersGroup, FactionLink, PartyLink } from "@/components/ui"
 
 export default function PartyPopup({ id }: PopupProps) {
   const { user, client } = useClient()
@@ -39,25 +38,40 @@ export default function PartyPopup({ id }: PopupProps) {
     return null // Use null instead of <></> for consistency
   }
 
-  const subhead = [party.faction?.name].filter(Boolean).join(" - ")
-
   if (!party?.id) {
     return (
-      <Box className={styles.mentionPopup}>
+      <Box sx={{ p: 2 }}>
         <Typography variant="body2">Loading...</Typography>
+        <CircularProgress size={24} sx={{ mt: 2 }} />
       </Box>
     )
   }
   return (
-    <Box className={styles.mentionPopup}>
+    <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
         <PartyAvatar party={party} disablePopup={true} />
         <Typography>
           <PartyLink party={party} disablePopup={true} />
         </Typography>
       </Stack>
-      <Typography variant="caption" sx={{ textTransform: "uppercase" }}>
-        {subhead}
+      <Typography
+        component="div"
+        variant="caption"
+        sx={{ textTransform: "uppercase" }}
+      >
+        {party.faction && (
+          <>
+            <FactionLink faction={party.faction} />
+          </>
+        )}
+      </Typography>
+      <Typography>
+        {party.characters && party.characters.length > 0 && (
+          <>
+            {party.characters.length} member
+            {party.characters.length !== 1 ? "s" : ""}
+          </>
+        )}
       </Typography>
       <Box mt={1}>
         <RichTextRenderer
@@ -65,6 +79,7 @@ export default function PartyPopup({ id }: PopupProps) {
           html={party.description || ""}
         />
       </Box>
+      <MembersGroup items={party.characters || []} />
     </Box>
   )
 }

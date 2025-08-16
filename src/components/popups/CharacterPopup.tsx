@@ -1,5 +1,4 @@
-import { Box, Typography, Stack } from "@mui/material"
-import styles from "@/components/editor/Editor.module.scss"
+import { CircularProgress, Box, Typography, Stack } from "@mui/material"
 import type { PopupProps, Faction, Character } from "@/types"
 import { defaultCharacter } from "@/types"
 import { useState, useEffect } from "react"
@@ -51,11 +50,16 @@ export default function CharacterPopup({ id }: PopupProps) {
     : CS.description(character)
 
   if (!character?.id) {
-    return <Typography variant="body2">Loading...</Typography>
+    return (
+      <Box sx={{ p: 2 }}>
+        <Typography variant="body2">Loading...</Typography>
+        <CircularProgress size={24} sx={{ mt: 2 }} />
+      </Box>
+    )
   }
 
   return (
-    <>
+    <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
         <CharacterAvatar character={character} disablePopup={true} />
         <Typography>
@@ -65,7 +69,6 @@ export default function CharacterPopup({ id }: PopupProps) {
       <Typography
         component="div"
         variant="caption"
-        className={styles.popupSubhead}
         sx={{ textTransform: "uppercase" }}
       >
         {CS.type(character) && <TypeLink characterType={CS.type(character)} />}
@@ -82,9 +85,9 @@ export default function CharacterPopup({ id }: PopupProps) {
           </>
         )}
       </Typography>
-      <Box mt={1}>
+      { description && <Box mt={1}>
         <RichTextRenderer html={description} />
-      </Box>
+      </Box> }
       <GamemasterOnly user={user}>
         <Box mt={1}>
           <Typography variant="body2">
@@ -126,6 +129,6 @@ export default function CharacterPopup({ id }: PopupProps) {
           </Typography>
         </Box>
       </GamemasterOnly>
-    </>
+    </Box>
   )
 }

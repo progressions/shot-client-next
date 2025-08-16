@@ -13,7 +13,7 @@ export default function WeaponsPopup({ data }: WeaponsPopupProperties) {
   const weapons = data || []
 
   return (
-    <>
+    <Box sx={{ py: 2 }}>
       <Typography variant="h6">Weapons</Typography>
       <Box pt={2} sx={{ width: 500 }}>
         {weapons.map((weapon: Weapon, index: number) => (
@@ -74,6 +74,6 @@ export default function WeaponsPopup({ data }: WeaponsPopupProperties) {
           </Box>
         ))}
       </Box>
-    </>
+    </Box>
   )
 }

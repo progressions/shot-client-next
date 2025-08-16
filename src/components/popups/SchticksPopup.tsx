@@ -11,7 +11,7 @@ export default function SchticksPopup({ data }: SchticksPopupProperties) {
   const schticks = data || []
 
   return (
-    <>
+    <Box sx={{ py: 2 }}>
       <Typography variant="h5">Schticks</Typography>
       <Box pt={2} sx={{ width: 500 }}>
         {schticks.map((schtick: Schtick) => (
@@ -26,6 +26,6 @@ export default function SchticksPopup({ data }: SchticksPopupProperties) {
           </Typography>
         ))}
       </Box>
-    </>
+    </Box>
   )
 }
