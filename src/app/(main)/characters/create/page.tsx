@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material"
 import { headers } from "next/headers"
 import { CreatePage } from "@/components/characters"
-import { getCurrentUser, getServerClient } from "@/lib/getServerClient"
+import { getCurrentUser, getServerClient } from "@/lib"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 

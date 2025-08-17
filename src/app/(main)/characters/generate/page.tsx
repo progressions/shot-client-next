@@ -2,7 +2,7 @@ import { GeneratePage } from "@/components/characters"
 import { headers } from "next/headers"
 import { Suspense } from "react"
 import { CircularProgress } from "@mui/material"
-import { getServerClient } from "@/lib/getServerClient"
+import { getServerClient } from "@/lib"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
 export const metadata = {

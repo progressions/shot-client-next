@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from "@mui/material"
-import { getServerClient } from "@/lib/getServerClient"
+import { getServerClient } from "@/lib"
 import { SiteBadge } from "@/components/badges"
 import Link from "next/link"
 import { Icon } from "@/components/ui"
