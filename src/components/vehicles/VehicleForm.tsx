@@ -8,9 +8,10 @@ import type { EditorChangeEvent, Vehicle } from "@/types"
 import { defaultVehicle } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
-import { Archetype } from "@/components/vehicles"
+import { Archetype, ActionValuesEdit } from "@/components/vehicles"
+import { VS } from "@/services"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 type FormStateData = Vehicle & {
   [key: string]: unknown
@@ -36,7 +37,9 @@ export default function VehicleForm({
     useForm<FormStateData>(initialFormData)
   const { disabled, error, data } = formState
   const { name, description, image } = data
+  
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const formRef = useRef<HTMLFormElement>(null)
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
@@ -50,6 +53,19 @@ export default function VehicleForm({
       setImagePreview(null)
     }
   }, [image])
+
+  useEffect(() => {
+    const checkFormValidity = () => {
+      if (formRef.current) {
+        const isValid = formRef.current.checkValidity()
+        dispatchForm({
+          type: FormActions.DISABLE,
+          payload: !isValid
+        })
+      }
+    }
+    checkFormValidity()
+  }, [name, description, dispatchForm])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -113,6 +129,7 @@ export default function VehicleForm({
       <HeroImage entity={formState.data} />
       <Box
         component="form"
+        ref={formRef}
         onSubmit={handleSubmit}
         sx={{
           width: isMobile ? "100%" : "30rem",
@@ -146,6 +163,25 @@ export default function VehicleForm({
         <Archetype
           vehicle={data}
           updateEntity={(updatedVehicle) => {
+            dispatchForm({
+              type: FormActions.RESET,
+              payload: { ...formState, data: updatedVehicle }
+            })
+          }}
+        />
+        <ActionValuesEdit
+          key={JSON.stringify(data.action_values || {})}
+          entity={data}
+          size="small"
+          setEntity={(updatedVehicle) => {
+            dispatchForm({
+              type: FormActions.UPDATE,
+              name: "data",
+              value: updatedVehicle,
+            })
+          }}
+          updateEntity={async (updatedVehicle) => {
+            // For form, we just update local state, don't save
             dispatchForm({
               type: FormActions.UPDATE,
               name: "data",
