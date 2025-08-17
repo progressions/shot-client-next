@@ -1,6 +1,5 @@
 "use server"
 
-import { cookies } from "next/headers"
 import { getServerClient } from "@/lib"
 
 export async function getCurrentUser() {
@@ -20,4 +19,3 @@ export async function getCurrentUser() {
     return null
   }
 }
-

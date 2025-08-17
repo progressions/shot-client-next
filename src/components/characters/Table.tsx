@@ -1,7 +1,13 @@
 "use client"
 import { GridColDef } from "@mui/x-data-grid"
 import { FormStateType, FormStateAction } from "@/reducers"
-import { BaseDataGrid, ArchetypeLink, EntityLink, JunctureLink, FactionLink, CharacterLink } from "@/components/ui"
+import {
+  BaseDataGrid,
+  ArchetypeLink,
+  EntityLink,
+  FactionLink,
+  CharacterLink,
+} from "@/components/ui"
 import { CS } from "@/services"
 import { Avatar } from "@/components/avatars"
 import { PaginationMeta, Character } from "@/types"

@@ -46,17 +46,17 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
     dispatchForm({
       type: FormActions.UPDATE,
       name: "fights",
-      value: initialFormData.fights
+      value: initialFormData.fights,
     })
     dispatchForm({
       type: FormActions.UPDATE,
       name: "seasons",
-      value: initialFormData.seasons
+      value: initialFormData.seasons,
     })
     dispatchForm({
       type: FormActions.UPDATE,
       name: "meta",
-      value: initialFormData.meta
+      value: initialFormData.meta,
     })
   }, [initialFormData, dispatchForm])
 
@@ -70,17 +70,17 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
         dispatchForm({
           type: FormActions.UPDATE,
           name: "fights",
-          value: response.data.fights
+          value: response.data.fights,
         })
         dispatchForm({
           type: FormActions.UPDATE,
           name: "seasons",
-          value: response.data.seasons
+          value: response.data.seasons,
         })
         dispatchForm({
           type: FormActions.UPDATE,
           name: "meta",
-          value: response.data.meta
+          value: response.data.meta,
         })
       } catch (error) {
         console.error("Fetch fights error:", error)
@@ -100,14 +100,19 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   }, [campaignData, fetchFights, filters])
 
   useEffect(() => {
-    console.log("Filters useEffect - filters:", filters, "isInitialRender.current:", isInitialRender.current)
+    console.log(
+      "Filters useEffect - filters:",
+      filters,
+      "isInitialRender.current:",
+      isInitialRender.current
+    )
     if (isInitialRender.current) {
       isInitialRender.current = false
       return
     }
     const url = `/fights?${queryParams(filters)}`
     router.push(url, {
-      scroll: false
+      scroll: false,
     })
     fetchFights(filters)
   }, [filters, fetchFights, router])
@@ -124,7 +129,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          mb: 2
+          mb: 2,
         }}
       >
         <MainHeader title="Fights" icon={<Icon keyword="Fights" size="36" />} />

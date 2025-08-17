@@ -129,7 +129,6 @@ class ApiV2 {
   currentUser(): string {
     return `${this.api()}/users/current`
   }
-
 }
 
 export default ApiV2
