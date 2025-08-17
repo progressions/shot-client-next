@@ -19,14 +19,6 @@ export default function EditWealth({
   // Sync local state when character prop changes
   useEffect(() => {
     const newWealth = CS.wealth(character)
-    console.log(
-      "EditWealth useEffect - character.wealth:",
-      character.wealth,
-      "CS.wealth:",
-      newWealth,
-      "current state:",
-      characterWealth
-    )
     setCharacterWealth(newWealth)
   }, [character])
 
@@ -41,20 +33,10 @@ export default function EditWealth({
   const handleWealthChange = async (value: string | null) => {
     if (!value) return
 
-    console.log(
-      "EditWealth handleWealthChange - old wealth:",
-      character.wealth,
-      "new value:",
-      value
-    )
     const updatedCharacter = {
       ...character,
       wealth: value,
     }
-    console.log(
-      "EditWealth handleWealthChange - updated character wealth:",
-      updatedCharacter.wealth
-    )
     setCharacterWealth(value)
     updateCharacter(updatedCharacter)
   }

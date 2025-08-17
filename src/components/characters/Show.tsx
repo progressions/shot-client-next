@@ -48,15 +48,6 @@ export default function Show({
 
   const [character, setCharacter] = useState<Character>(initialCharacter)
 
-  // Debug character changes
-  useEffect(() => {
-    console.log(
-      "Show character state changed - wealth:",
-      character.wealth,
-      "id:",
-      character.id
-    )
-  }, [character.wealth, character.id])
 
   useEffect(() => {
     document.title = character.name ? `${character.name} - Chi War` : "Chi War"
@@ -74,10 +65,6 @@ export default function Show({
 
   const updateCharacter = async updatedCharacter => {
     try {
-      console.log("Show updateCharacter called with:", {
-        wealth: updatedCharacter.wealth,
-        id: updatedCharacter.id,
-      })
       setCharacter(updatedCharacter)
 
       const formData = new FormData()
@@ -89,9 +76,7 @@ export default function Show({
         weapons: undefined,
       }
       formData.append("character", JSON.stringify(characterData))
-      console.log("Sending character data to server:", characterData)
       const response = await client.updateCharacter(character.id, formData)
-      console.log("Server response character:", response.data)
       setCharacter(response.data)
       toastSuccess("Character updated successfully")
 

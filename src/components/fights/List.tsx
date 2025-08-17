@@ -62,7 +62,6 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   const fetchFights = useCallback(
     async filters => {
-      console.log("fetchFights - isFetching.current:", isFetching.current)
       if (isFetching.current) return
       isFetching.current = true
       try {

@@ -124,7 +124,6 @@ export function ListManager({
   const fetchChildrenForAutocomplete = useCallback(
     async (localFilters: Record<string, string | boolean | null>) => {
       try {
-        console.log("Fetching children", localFilters)
         const funcName = `get${pluralChildEntityName}`
         const getFunc = client[funcName as keyof typeof client]
 
@@ -175,7 +174,6 @@ export function ListManager({
   const handleAdd = useCallback(
     async (child: AutocompleteOption | string | null) => {
       if (child && typeof child !== "string" && !childIds.includes(child.id)) {
-        console.log("handleAdd called", { child, childIds })
         // Locally update childEntities
         setChildEntities(prev => [...prev, child])
         const newChildIds = [...childIds, child.id]
@@ -199,7 +197,6 @@ export function ListManager({
 
   const handleDelete = useCallback(
     async (item: AutocompleteOption) => {
-      console.log("handleDelete called", { item, childIds })
       // Locally update childEntities
       setChildEntities(prev => prev.filter(entity => entity.id !== item.id))
       const newChildIds = childIds.filter(

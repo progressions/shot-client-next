@@ -32,7 +32,6 @@ export default function CharactersAutocomplete({
           sort: "name",
           order: "asc",
         })
-        console.log("Fetched characters:", response.data.characters)
         setCharacters(response.data.characters || [])
       } catch (error) {
         console.error("Error fetching characters:", error)

@@ -30,7 +30,6 @@ export default async function FightsModule({
       order: "desc",
     })
     fights = fightsResponse.data?.fights || []
-    console.log("Fetched fights:", fights)
   } catch (error) {
     console.error("Error fetching fights:", error)
     return (
