@@ -10,6 +10,7 @@ import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
+import { useEntity } from "@/hooks"
 
 type FormStateData = Faction & {
   [key: string]: unknown
@@ -19,24 +20,25 @@ type FormStateData = Faction & {
 interface FactionFormProperties {
   open: boolean
   onClose: () => void
-  onSave: (formData: FormData, factionData: Faction) => Promise<void>
-  initialFormData: FormStateData
   title: string
 }
 
 export default function FactionForm({
   open,
   onClose,
-  onSave,
-  initialFormData,
   title,
 }: FactionFormProperties) {
-  const { formState, dispatchForm, initialFormState } =
-    useForm<FormStateData>(initialFormData)
+  const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
+    ...defaultFaction,
+  })
   const { disabled, error, errors, data } = formState
   const { name, description, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [nameValid, setNameValid] = useState(true)
+  const { createEntity, handleFormErrors } = useEntity<Faction>(
+    defaultFaction,
+    dispatchForm
+  )
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
@@ -82,7 +84,7 @@ export default function FactionForm({
   const handleNameEntityUpdate = (updatedFaction: Faction) => {
     // Update the name field
     dispatchForm({
-      type: FormActions.EDIT,
+      type: FormActions.UPDATE,
       name: "name",
       value: updatedFaction.name,
     })
@@ -98,35 +100,12 @@ export default function FactionForm({
   const handleNameEntitySave = async (updatedFaction: Faction) => {
     // For form, we just update local state, don't save
     dispatchForm({
-      type: FormActions.EDIT,
+      type: FormActions.UPDATE,
       name: "name",
       value: updatedFaction.name,
     })
   }
 
-  const handleFormError = (error_: unknown) => {
-    const axiosError = error_ as { response?: { status?: number; data?: { errors?: Record<string, string[]> } } }
-    if (axiosError.response?.status === 422 && axiosError.response?.data?.errors) {
-      const serverErrors = axiosError.response.data.errors
-      const formattedErrors: { [key: string]: string } = {}
-      Object.entries(serverErrors).forEach(([field, messages]) => {
-        if (messages && Array.isArray(messages) && messages.length > 0) {
-          formattedErrors[field] = messages[0]
-        }
-      })
-      dispatchForm({
-        type: FormActions.ERRORS,
-        payload: formattedErrors,
-      })
-      // Don't close drawer on validation errors
-      return false
-    } else {
-      const errorMessage = "An error occurred."
-      dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
-    }
-    console.error(`${title} error:`, error_)
-    return true // Should close drawer
-  }
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()
@@ -135,22 +114,12 @@ export default function FactionForm({
       dispatchForm({ type: FormActions.ERROR, payload: "Name is required" })
       return
     }
-
     dispatchForm({ type: FormActions.SUBMIT })
     try {
-      const formData = new FormData()
-      const factionData = { ...defaultFaction, ...data } as Faction
-      formData.append("faction", JSON.stringify(factionData))
-      if (image) {
-        formData.append("image", image)
-      }
-      await onSave(formData, factionData)
+      await createEntity(data, image)
       handleClose()
-    } catch (error_: unknown) {
-      const shouldClose = handleFormError(error_)
-      if (shouldClose) {
-        handleClose()
-      }
+    } catch (error) {
+      handleFormErrors(error)
     }
   }
 

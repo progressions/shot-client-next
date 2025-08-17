@@ -24,6 +24,7 @@ import { defaultUser } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
+import { useEntity } from "@/hooks"
 
 type FormStateData = User & {
   [key: string]: unknown
@@ -33,23 +34,24 @@ type FormStateData = User & {
 interface UserFormProperties {
   open: boolean
   onClose: () => void
-  onSave: (formData: FormData, userData: User) => Promise<void>
-  initialFormData: FormStateData
   title: string
 }
 
 export default function UserForm({
   open,
   onClose,
-  onSave,
-  initialFormData,
   title,
 }: UserFormProperties) {
-  const { formState, dispatchForm, initialFormState } =
-    useForm<FormStateData>(initialFormData)
+  const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
+    ...defaultUser,
+  })
   const { disabled, error, errors, data } = formState
   const { first_name, last_name, email, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const { createEntity, handleFormErrors } = useEntity<User>(
+    defaultUser,
+    dispatchForm
+  )
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
@@ -85,29 +87,6 @@ export default function UserForm({
     }
   }
 
-  const handleFormError = (error_: unknown) => {
-    const axiosError = error_ as { response?: { status?: number; data?: { errors?: Record<string, string[]> } } }
-    if (axiosError.response?.status === 422 && axiosError.response?.data?.errors) {
-      const serverErrors = axiosError.response.data.errors
-      const formattedErrors: { [key: string]: string } = {}
-      Object.entries(serverErrors).forEach(([field, messages]) => {
-        if (messages && Array.isArray(messages) && messages.length > 0) {
-          formattedErrors[field] = messages[0]
-        }
-      })
-      dispatchForm({
-        type: FormActions.ERRORS,
-        payload: formattedErrors,
-      })
-      // Don't close drawer on validation errors
-      return false
-    } else {
-      const errorMessage = "An error occurred."
-      dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
-    }
-    console.error(`${title} error:`, error_)
-    return true // Should close drawer
-  }
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()
@@ -116,22 +95,12 @@ export default function UserForm({
       dispatchForm({ type: FormActions.ERROR, payload: "First and last name are required" })
       return
     }
-
     dispatchForm({ type: FormActions.SUBMIT })
     try {
-      const formData = new FormData()
-      const userData = { ...defaultUser, ...data } as User
-      formData.append("user", JSON.stringify(userData))
-      if (image) {
-        formData.append("image", image)
-      }
-      await onSave(formData, userData)
+      await createEntity(data, image)
       handleClose()
-    } catch (error_: unknown) {
-      const shouldClose = handleFormError(error_)
-      if (shouldClose) {
-        handleClose()
-      }
+    } catch (error) {
+      handleFormErrors(error)
     }
   }
 

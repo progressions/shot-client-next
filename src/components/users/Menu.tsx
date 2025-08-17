@@ -4,7 +4,6 @@ import { GridView, ViewList } from "@mui/icons-material"
 import { CreateUserForm } from "@/components/users"
 import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
-import { defaultUser } from "@/types"
 import { useState } from "react"
 
 interface MenuProps {
@@ -33,15 +32,10 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
     ...initialActions,
   ]
 
-  const defaultEntity = defaultUser
-
   function handleOpenCreateDrawer() {
     setDrawerOpen(true)
   }
   function handleCloseCreateDrawer() {
-    setDrawerOpen(false)
-  }
-  function handleSave() {
     setDrawerOpen(false)
   }
 
@@ -51,8 +45,6 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
       <CreateUserForm
         open={drawerOpen}
         onClose={handleCloseCreateDrawer}
-        onSave={handleSave}
-        initialFormData={{ defaultEntity }}
       />
     </>
   )
