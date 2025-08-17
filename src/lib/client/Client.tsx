@@ -44,6 +44,6 @@ export default function createClient(parameters: ClientParameters = {}) {
     ...weapon.createWeaponClient({ jwt, api, apiV2, queryParams }),
     ...schtick.createSchtickClient({ jwt, api, apiV2, queryParams }),
     ...ai.createAiClient({ jwt, api, apiV2 }),
-    ...editor.createEditorClient({ jwt, api, apiV2 }),
+    ...editor.createEditorClient({ jwt, api, apiV2, queryParams }),
   }
 }

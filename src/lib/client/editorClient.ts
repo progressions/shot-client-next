@@ -3,6 +3,7 @@ import { createBaseClient } from "@/lib/client/baseClient"
 import type {
   CacheOptions,
   Parameters_,
+  SuggestionsResponse,
 } from "@/types"
 
 interface ClientDependencies {
