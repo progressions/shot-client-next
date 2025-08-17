@@ -30,7 +30,6 @@ export default function Editor({ name, value, onChange }: EditorProps) {
           value: html,
         },
       }
-      console.log("Editor saveOnBlur event:", event)
       onChange(event)
     },
     [name, onChange]
@@ -44,7 +43,6 @@ export default function Editor({ name, value, onChange }: EditorProps) {
       if (editor) {
         const currentContent = editor.getHTML()
         if (currentContent !== value && value !== undefined) {
-          console.log("Editor syncing content from prop change:", { currentContent, newValue: value })
           editor.commands.setContent(value || "")
         }
       }
