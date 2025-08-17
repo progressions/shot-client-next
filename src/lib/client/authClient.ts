@@ -35,7 +35,7 @@ export function createAuthClient(deps: ClientDependencies) {
     return delete_(`${apiV2.users(user)}/image`)
   }
 
-  async function getCurrentUser(
+  async function getUser(
     user: User | string,
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<User>> {
@@ -96,7 +96,7 @@ export function createAuthClient(deps: ClientDependencies) {
     updateUser,
     deleteUser,
     deleteUserImage,
-    getCurrentUser,
+    getUser,
     getCurrentUser,
     unlockUser,
     confirmUser,

@@ -30,7 +30,7 @@ type FormStateData = {
 }
 
 export default function Show({ party: initialParty }: ShowProperties) {
-  const { campaignData } = useCampaign()
+  const { subscribeToEntity } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialParty,
   })
@@ -57,11 +57,19 @@ export default function Show({ party: initialParty }: ShowProperties) {
     document.title = party.name ? `${party.name} - Chi War` : "Chi War"
   }, [party.name])
 
+  // Subscribe to party updates
   useEffect(() => {
-    if (campaignData?.party && campaignData.party.id === initialParty.id) {
-      setParty(campaignData.party)
-    }
-  }, [campaignData, initialParty, setParty])
+    const unsubscribe = subscribeToEntity("party", (data) => {
+      if (data && data.id === initialParty.id) {
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "entity",
+          value: { ...data },
+        })
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, initialParty.id, dispatchForm])
 
   return (
     <Box
