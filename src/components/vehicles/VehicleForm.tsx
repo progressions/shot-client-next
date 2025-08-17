@@ -8,6 +8,7 @@ import type { EditorChangeEvent, Vehicle } from "@/types"
 import { defaultVehicle } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
+import { Archetype } from "@/components/vehicles"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
 
@@ -141,6 +142,16 @@ export default function VehicleForm({
           margin="normal"
           required
           autoFocus
+        />
+        <Archetype
+          vehicle={data}
+          updateEntity={(updatedVehicle) => {
+            dispatchForm({
+              type: FormActions.UPDATE,
+              name: "data",
+              value: updatedVehicle,
+            })
+          }}
         />
         <Editor
           name="description"
