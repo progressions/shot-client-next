@@ -11,6 +11,7 @@ import { Archetype, ActionValuesEdit } from "@/components/vehicles"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect, useRef } from "react"
 import { useEntity } from "@/hooks"
+import { EditFaction } from "@/components/factions"
 
 type FormStateData = Vehicle & {
   [key: string]: unknown
@@ -82,6 +83,7 @@ export default function VehicleForm({
       dispatchForm({ type: FormActions.UPDATE, name: "image", value: file })
     }
   }
+
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()
@@ -167,6 +169,15 @@ export default function VehicleForm({
             {errors.name}
           </FormHelperText>
         )}
+        <EditFaction
+          entity={data}
+          updateEntity={(updatedVehicle) => {
+            dispatchForm({
+              type: FormActions.RESET,
+              payload: { ...formState, data: updatedVehicle }
+            })
+          }}
+        />
         <Archetype
           vehicle={data}
           updateEntity={(updatedVehicle) => {
