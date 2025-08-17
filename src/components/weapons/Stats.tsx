@@ -1,6 +1,7 @@
 "use client"
 
 import { GiBrightExplosion } from "react-icons/gi"
+import { useEffect } from "react"
 import {
   FormControl,
   FormHelperText,
@@ -12,14 +13,16 @@ import {
 } from "@mui/material"
 import { InfoLink, SectionHeader, TextField } from "@/components/ui"
 import type { Weapon } from "@/types"
-import { FormActions, useForm } from "@/reducers"
+import { FormActions, useForm, type FormStateType } from "@/reducers"
 
-type FormStateData = Weapon
+type FormStateData = {
+  weapon: Weapon
+}
 
 type StatsProps = {
   weapon: Weapon
   updateWeapon: (weapon: Weapon) => Promise<void>
-  state?: FormStateData
+  state?: FormStateType<any>
 }
 
 export default function Stats({
@@ -29,35 +32,48 @@ export default function Stats({
 }: StatsProps) {
   // internal state for these stats values
   const { formState, dispatchForm } = useForm<FormStateData>({
-    ...initialWeapon,
+    weapon: initialWeapon,
   })
-  const weapon = formState.data
-  const { kachunk, mook_bonus, damage, concealment, reload_value } =
-    formState.data
+
+  // Sync local state with weapon prop changes from WebSocket
+  useEffect(() => {
+    dispatchForm({
+      type: FormActions.RESET,
+      value: { weapon: initialWeapon },
+    })
+  }, [initialWeapon, dispatchForm])
+  
+  // Safety check to prevent undefined errors
+  if (!formState?.data?.weapon) {
+    return null
+  }
+  
+  const weapon = formState.data.weapon
+  const { kachunk, mook_bonus, damage, concealment, reload_value } = weapon
 
   // external state for overall form
-  const { saving, errors } = state
+  const { saving, errors } = state || {}
 
   const handleChecked = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: event.target.name,
-      value: event.target.checked,
-    })
     const updatedWeapon = {
       ...weapon,
       [event.target.name]: event.target.checked,
     }
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "weapon",
+      value: updatedWeapon,
+    })
     await updateWeapon(updatedWeapon)
   }
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const updatedWeapon = { ...weapon, [event.target.name]: event.target.value }
     dispatchForm({
       type: FormActions.UPDATE,
-      name: event.target.name,
-      value: event.target.value,
+      name: "weapon",
+      value: updatedWeapon,
     })
-    const updatedWeapon = { ...weapon, [event.target.name]: event.target.value }
     await updateWeapon(updatedWeapon)
   }
 

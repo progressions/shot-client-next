@@ -7,7 +7,7 @@ import {
   WeaponJunctureAutocomplete,
 } from "@/components/autocomplete"
 import type { Weapon } from "@/types"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import type { FormStateType } from "@/reducers"
 
 type EditJunctureCategoryProps = {
@@ -29,6 +29,12 @@ export default function EditJunctureCategory({
   const [category, setCategory] = useState<string | null>(
     weapon.category || null
   )
+
+  // Sync local state with weapon prop changes from WebSocket
+  useEffect(() => {
+    setJuncture(weapon.juncture || null)
+    setCategory(weapon.category || null)
+  }, [weapon.juncture, weapon.category])
 
   const handleJunctureChange = async (value: string | null) => {
     setJuncture(value)

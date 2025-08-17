@@ -240,7 +240,7 @@ export function useForm<T extends Record<string, unknown>>(initialData: T) {
   const memoizedFormState = useMemo(
     () => ({
       ...formState,
-      data: formState.data,
+      data: formState?.data,
     }),
     [formState]
   )
