@@ -154,6 +154,20 @@ export default function EditCategoryPath({
     }
   }, [category, fetchPaths])
 
+  // Sync local state with schtick prop changes from WebSocket
+  useEffect(() => {
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "category",
+      value: schtick.category || null,
+    })
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "path",
+      value: schtick.path || null,
+    })
+  }, [schtick.category, schtick.path, dispatchForm])
+
   return (
     <Box sx={{ mt: 4 }}>
       <SectionHeader title="Category and Path">

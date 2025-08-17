@@ -29,7 +29,7 @@ type FormStateData = {
 }
 
 export default function Show({ schtick: initialSchtick }: ShowProperties) {
-  const { campaignData } = useCampaign()
+  const { subscribeToEntity } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialSchtick,
   })
@@ -53,18 +53,19 @@ export default function Show({ schtick: initialSchtick }: ShowProperties) {
     document.title = schtick.name ? `${schtick.name} - Chi War` : "Chi War"
   }, [schtick.name])
 
+  // Subscribe to schtick updates
   useEffect(() => {
-    if (
-      campaignData?.schtick &&
-      campaignData.schtick.id === initialSchtick.id
-    ) {
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "entity",
-        value: campaignData.schtick,
-      })
-    }
-  }, [campaignData, initialSchtick, dispatchForm])
+    const unsubscribe = subscribeToEntity("schtick", (data) => {
+      if (data && data.id === initialSchtick.id) {
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "entity",
+          value: { ...data },
+        })
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, initialSchtick.id, dispatchForm])
 
   return (
     <Box

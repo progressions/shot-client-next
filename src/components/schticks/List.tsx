@@ -30,7 +30,7 @@ export type FormStateData = {
 
 export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { client } = useClient()
-  const { campaignData } = useCampaign()
+  const { subscribeToEntity } = useCampaign()
   const { saveLocally } = useLocalStorage()
   const router = useRouter()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
@@ -70,13 +70,15 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
     [client, dispatchForm]
   )
 
+  // Subscribe to schtick updates
   useEffect(() => {
-    if (!campaignData) return
-    console.log("Campaign data:", campaignData)
-    if (campaignData.schticks === "reload") {
-      fetchSchticks(filters)
-    }
-  }, [campaignData, fetchSchticks, filters])
+    const unsubscribe = subscribeToEntity("schticks", (data) => {
+      if (data === "reload") {
+        fetchSchticks(filters)
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, fetchSchticks, filters])
 
   useEffect(() => {
     const url = `/schticks?${queryParams(filters)}`
