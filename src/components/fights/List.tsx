@@ -43,7 +43,6 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   // Set initial data on mount only
   useEffect(() => {
-    console.log("List initialFormData:", initialFormData)
     dispatchForm({
       type: FormActions.UPDATE,
       name: "fights",
@@ -95,7 +94,6 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   // Subscribe to fight updates
   useEffect(() => {
     const unsubscribe = subscribeToEntity("fights", (data) => {
-      console.log("Fights update:", data)
       if (data === "reload") {
         fetchFights(filters)
       }
