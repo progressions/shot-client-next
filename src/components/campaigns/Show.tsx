@@ -29,7 +29,7 @@ type FormStateData = {
 }
 
 export default function Show({ campaign: initialCampaign }: ShowProperties) {
-  const { campaignData } = useCampaign()
+  const { subscribeToEntity } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialCampaign,
   })
@@ -56,14 +56,19 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
     document.title = campaign.name ? `${campaign.name} - Chi War` : "Chi War"
   }, [campaign.name])
 
+  // Subscribe to campaign updates
   useEffect(() => {
-    if (
-      campaignData?.campaign &&
-      campaignData.campaign.id === initialCampaign.id
-    ) {
-      setCampaign(campaignData.campaign)
-    }
-  }, [campaignData, initialCampaign, setCampaign])
+    const unsubscribe = subscribeToEntity("campaign", (data) => {
+      if (data && data.id === initialCampaign.id) {
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "entity",
+          value: { ...data },
+        })
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, initialCampaign.id, dispatchForm])
 
   return (
     <Box
@@ -93,7 +98,7 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
           including its premise, significance, and any notable events.
         </SectionHeader>
         <EditableRichText
-          name="Description"
+          name="description"
           html={campaign.description}
           editable={true}
           onChange={handleChangeAndSave}

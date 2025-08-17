@@ -28,21 +28,22 @@ export default function CampaignDetail({
   onEdit,
 }: CampaignDetailProperties) {
   const { user, client } = useClient()
-  const { campaignData } = useCampaign()
+  const { subscribeToEntity } = useCampaign()
   const [error, setError] = useState<string | null>(null)
   const [campaign, setCampaign] = useState<Campaign>(initialCampaign)
 
   const gameMaster =
     user.gamemaster && campaign.gamemaster && user.id === campaign.gamemaster.id
 
+  // Subscribe to campaign updates
   useEffect(() => {
-    if (
-      campaignData?.campaign &&
-      campaignData.campaign.id === initialCampaign.id
-    ) {
-      setCampaign(campaignData.campaign)
-    }
-  }, [campaignData, initialCampaign])
+    const unsubscribe = subscribeToEntity("campaign", (data) => {
+      if (data && data.id === initialCampaign.id) {
+        setCampaign({ ...data })
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, initialCampaign.id])
 
   const handleDelete = async () => {
     if (!campaign?.id) return
