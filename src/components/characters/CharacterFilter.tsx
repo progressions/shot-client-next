@@ -143,7 +143,6 @@ export default function CharacterFilter({
   }
 
   const handleFactionChange = (value: string | null) => {
-    console.log("faction change value", value)
     dispatchForm({
       type: FormActions.UPDATE,
       name: "faction_id",
@@ -187,7 +186,6 @@ export default function CharacterFilter({
   }
 
   const handleAddMember = () => {
-    console.log("add", selectedChild)
     addMember?.(selectedChild)
     dispatchForm({
       type: FormActions.UPDATE,

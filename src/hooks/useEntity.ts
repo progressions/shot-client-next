@@ -121,7 +121,6 @@ export function useEntity(
   const handleChangeAndSave = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    console.log("handleChangeAndSave called with event:", event)
     const updatedEntity = {
       ...entity,
       [event.target.name]: event.target.value,

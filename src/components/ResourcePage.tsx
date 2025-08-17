@@ -60,7 +60,6 @@ export default async function ResourcePage<T>({
   const initialIsMobile = /mobile/i.test(userAgent)
   // Prepare initial form data
   const initialFormData = getInitialFormData(data, page, sort, order, search)
-  console.log("ResourcePage initialFormData", initialFormData)
   return (
     <Box
       sx={{
