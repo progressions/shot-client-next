@@ -14,7 +14,7 @@ type ExtendProps = {
 
 export default function Extend({ character, open, onClose }: ExtendProps) {
   const { client } = useClient()
-  const [loading, setLoading] = useState(false)
+  const [_loading, setLoading] = useState(false)
 
   const extendCharacter = async () => {
     console.log("clicked")

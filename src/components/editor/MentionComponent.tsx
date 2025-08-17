@@ -5,7 +5,7 @@ import { EntityLink } from "@/components/ui"
 
 export default function MentionComponent({ node }: NodeViewProps) {
   const { id, label, className } = node.attrs
-  const displayLabel = label || "unknown"
+  const _displayLabel = label || "unknown"
 
   return (
     <NodeViewWrapper as="span">

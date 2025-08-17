@@ -23,4 +23,8 @@ export function createEditorClient(deps: ClientDependencies) {
     const query = queryParams(parameters)
     return get(`${api.suggestions()}?${query}`, {}, cacheOptions)
   }
+
+  return {
+    getSuggestions,
+  }
 }

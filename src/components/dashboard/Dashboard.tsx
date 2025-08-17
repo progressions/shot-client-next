@@ -18,7 +18,7 @@ interface DashboardProperties {
 
 export default async function Dashboard({
   campaign,
-  initialIsMobile,
+  initialIsMobile: _initialIsMobile,
 }: DashboardProperties) {
   const user = await getCurrentUser()
   return (

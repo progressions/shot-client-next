@@ -5,16 +5,10 @@ import { contents } from "@/lib/info"
 import pluralize from "pluralize"
 
 type PopupProps = {
-  handleClose: () => void
-  anchorEl: HTMLElement | null
-  open: boolean
   keyword: string
 }
 
 export default function Popup({
-  handleClose,
-  anchorEl,
-  open,
   keyword,
 }: PopupProps) {
   const word = pluralize.singular(keyword).toLowerCase()

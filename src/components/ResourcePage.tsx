@@ -34,7 +34,7 @@ export default async function ResourcePage<T>({
   getInitialFormData,
   ListComponent,
   searchParams,
-  user,
+  user: _user,
 }: ResourcePageProps<T> & {
   searchParams: Promise<{ page?: string; sort?: string; order?: string }>
 }) {

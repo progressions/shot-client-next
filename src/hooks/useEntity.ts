@@ -90,7 +90,7 @@ export function useEntity(
       return
 
     try {
-      const response = await client[deleteFunction](entity, params)
+      await client[deleteFunction](entity, params)
       router.push(`/${pluralName}`)
       toastSuccess(`${entityClass} deleted successfully`)
     } catch (error) {
