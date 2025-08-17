@@ -323,7 +323,6 @@ const VehicleService = {
         },
       } as Vehicle
     } catch (error) {
-      console.log(error)
       return vehicle
     }
   },

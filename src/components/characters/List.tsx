@@ -45,7 +45,6 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   const fetchCharacters = useCallback(
     async filters => {
-      console.log("fetchCharacters - isFetching.current:", isFetching.current)
       if (isFetching.current) return
       isFetching.current = true
       try {
