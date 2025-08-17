@@ -52,7 +52,10 @@ export function NumberField({
     } as React.ChangeEvent<HTMLInputElement>
     onChange(fakeEvent)
     // Also trigger onBlur to save the change
-    onBlur(fakeEvent as any)
+    const fakeBlurEvent = {
+      target: { name, value: newValue.toString() },
+    } as React.FocusEvent<HTMLInputElement>
+    onBlur(fakeBlurEvent)
   }
 
   const handleDecrement = () => {
@@ -63,7 +66,10 @@ export function NumberField({
     } as React.ChangeEvent<HTMLInputElement>
     onChange(fakeEvent)
     // Also trigger onBlur to save the change
-    onBlur(fakeEvent as any)
+    const fakeBlurEvent = {
+      target: { name, value: newValue.toString() },
+    } as React.FocusEvent<HTMLInputElement>
+    onBlur(fakeBlurEvent)
   }
 
   if (!onBlur) throw "WTF"

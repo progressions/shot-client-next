@@ -11,11 +11,5 @@ export default function CreateSiteForm({
   open,
   onClose,
 }: CreateSiteFormProperties) {
-  return (
-    <SiteForm
-      open={open}
-      onClose={onClose}
-      title="New Site"
-    />
-  )
+  return <SiteForm open={open} onClose={onClose} title="New Site" />
 }

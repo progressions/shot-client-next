@@ -57,7 +57,7 @@ export default function Show({ fight: initialFight }: ShowProperties) {
 
   // Subscribe to fight updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("fight", (data) => {
+    const unsubscribe = subscribeToEntity("fight", data => {
       if (data && data.id === initialFight.id) {
         dispatchForm({
           type: FormActions.UPDATE,

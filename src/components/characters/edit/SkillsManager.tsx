@@ -114,7 +114,7 @@ export default function SkillsManager({
     if (skillName && skillValue !== null && skillName.trim() !== "") {
       const newSkill: SkillValue = [skillName.trim(), skillValue]
       const updatedSkills = [...characterSkills, newSkill]
-      
+
       // Update character skills on the server
       if (updateCharacter) {
         const updatedCharacter = {
@@ -126,7 +126,7 @@ export default function SkillsManager({
         }
         await updateCharacter(updatedCharacter)
       }
-      
+
       // Update options if the skill is new
       if (!options.some(option => option.value === skillName)) {
         const newOption = { label: skillName.trim(), value: skillName.trim() }

@@ -59,7 +59,7 @@ export default function Show({ site: initialSite }: ShowProperties) {
 
   // Subscribe to site updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("site", (data) => {
+    const unsubscribe = subscribeToEntity("site", data => {
       if (data && data.id === initialSite.id) {
         dispatchForm({
           type: FormActions.UPDATE,

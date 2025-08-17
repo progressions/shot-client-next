@@ -74,7 +74,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   // Subscribe to vehicle updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("vehicles", (data) => {
+    const unsubscribe = subscribeToEntity("vehicles", data => {
       if (data === "reload") {
         fetchVehicles(filters)
       }

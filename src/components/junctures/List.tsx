@@ -79,7 +79,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   // Subscribe to juncture updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("junctures", (data) => {
+    const unsubscribe = subscribeToEntity("junctures", data => {
       if (data === "reload") {
         fetchJunctures(filters)
       }

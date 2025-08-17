@@ -27,7 +27,7 @@ import {
 } from "@/reducers"
 import { Subscription } from "@rails/actioncable"
 
-type EntityUpdateCallback = (data: any) => void
+type EntityUpdateCallback = (data: unknown) => void
 
 interface AppContextType {
   client: Client
@@ -39,7 +39,10 @@ interface AppContextType {
   currentUserState: UserStateType
   dispatchCurrentUser: ActionDispatch<[action: UserStateAction]>
   setCurrentCampaign: (camp: Campaign | null) => Promise<Campaign | null>
-  subscribeToEntity: (entityType: string, callback: EntityUpdateCallback) => () => void
+  subscribeToEntity: (
+    entityType: string,
+    callback: EntityUpdateCallback
+  ) => () => void
   loading: boolean
   error: string | null
 }
@@ -79,21 +82,26 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
   const jwt = Cookies.get("jwtToken") ?? ""
   const client = useMemo(() => new Client({ jwt }), [jwt])
   const hasFetched = useRef(false)
-  const entityUpdateCallbacks = useRef<Map<string, Set<EntityUpdateCallback>>>(new Map())
+  const entityUpdateCallbacks = useRef<Map<string, Set<EntityUpdateCallback>>>(
+    new Map()
+  )
 
-  const subscribeToEntity = useCallback((entityType: string, callback: EntityUpdateCallback) => {
-    if (!entityUpdateCallbacks.current.has(entityType)) {
-      entityUpdateCallbacks.current.set(entityType, new Set())
-    }
-    entityUpdateCallbacks.current.get(entityType)!.add(callback)
-    
-    return () => {
-      entityUpdateCallbacks.current.get(entityType)?.delete(callback)
-      if (entityUpdateCallbacks.current.get(entityType)?.size === 0) {
-        entityUpdateCallbacks.current.delete(entityType)
+  const subscribeToEntity = useCallback(
+    (entityType: string, callback: EntityUpdateCallback) => {
+      if (!entityUpdateCallbacks.current.has(entityType)) {
+        entityUpdateCallbacks.current.set(entityType, new Set())
       }
-    }
-  }, [])
+      entityUpdateCallbacks.current.get(entityType)!.add(callback)
+
+      return () => {
+        entityUpdateCallbacks.current.get(entityType)?.delete(callback)
+        if (entityUpdateCallbacks.current.get(entityType)?.size === 0) {
+          entityUpdateCallbacks.current.delete(entityType)
+        }
+      }
+    },
+    []
+  )
 
   const setCurrentCampaign = useCallback(
     async (camp: Campaign | null): Promise<Campaign | null> => {
@@ -225,7 +233,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
   // Process campaignData and trigger callbacks
   useEffect(() => {
     if (!campaignData) return
-    
+
     Object.entries(campaignData).forEach(([key, value]) => {
       const callbacks = entityUpdateCallbacks.current.get(key)
       if (callbacks && callbacks.size > 0) {
@@ -273,7 +281,18 @@ export function useClient() {
 }
 
 export function useCampaign() {
-  const { campaign, subscription, campaignData, setCurrentCampaign, subscribeToEntity } =
-    useContext(AppContext)
-  return { campaign, subscription, campaignData, setCurrentCampaign, subscribeToEntity }
+  const {
+    campaign,
+    subscription,
+    campaignData,
+    setCurrentCampaign,
+    subscribeToEntity,
+  } = useContext(AppContext)
+  return {
+    campaign,
+    subscription,
+    campaignData,
+    setCurrentCampaign,
+    subscribeToEntity,
+  }
 }

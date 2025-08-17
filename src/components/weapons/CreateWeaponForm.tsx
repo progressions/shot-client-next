@@ -11,11 +11,5 @@ export default function CreateWeaponForm({
   open,
   onClose,
 }: CreateWeaponFormProperties) {
-  return (
-    <WeaponForm
-      open={open}
-      onClose={onClose}
-      title="New Weapon"
-    />
-  )
+  return <WeaponForm open={open} onClose={onClose} title="New Weapon" />
 }

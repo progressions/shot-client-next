@@ -79,7 +79,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   // Subscribe to site updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("sites", (data) => {
+    const unsubscribe = subscribeToEntity("sites", data => {
       if (data === "reload") {
         fetchSites(filters)
       }

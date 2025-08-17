@@ -46,7 +46,6 @@ export function PositionableImage({
   const [currentY, setCurrentY] = useState(position.y_position)
   const [isDragging, setIsDragging] = useState(false)
 
-
   useEffect(() => {
     const updateBoxWidth = () => {
       if (imgRef.current?.parentElement) {

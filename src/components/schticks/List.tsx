@@ -72,7 +72,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   // Subscribe to schtick updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("schticks", (data) => {
+    const unsubscribe = subscribeToEntity("schticks", data => {
       if (data === "reload") {
         fetchSchticks(filters)
       }

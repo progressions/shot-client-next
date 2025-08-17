@@ -42,10 +42,7 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
   return (
     <>
       <SpeedDial actions={actions} />
-      <CreateFactionForm
-        open={drawerOpen}
-        onClose={handleCloseCreateDrawer}
-      />
+      <CreateFactionForm open={drawerOpen} onClose={handleCloseCreateDrawer} />
     </>
   )
 }

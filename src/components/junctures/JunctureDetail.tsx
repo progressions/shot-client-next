@@ -34,7 +34,7 @@ export default function JunctureDetail({
 
   // Subscribe to juncture updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("juncture", (data) => {
+    const unsubscribe = subscribeToEntity("juncture", data => {
       if (data && data.id === initialJuncture.id) {
         setJuncture({ ...data })
       }

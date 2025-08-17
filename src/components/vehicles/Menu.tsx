@@ -42,10 +42,7 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
   return (
     <>
       <SpeedDial actions={actions} />
-      <CreateVehicleForm
-        open={drawerOpen}
-        onClose={handleCloseCreateDrawer}
-      />
+      <CreateVehicleForm open={drawerOpen} onClose={handleCloseCreateDrawer} />
     </>
   )
 }

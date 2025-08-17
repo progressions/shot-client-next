@@ -2,7 +2,14 @@
 
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import { Drawer, Box, Typography, Alert, IconButton, FormHelperText } from "@mui/material"
+import {
+  Drawer,
+  Box,
+  Typography,
+  Alert,
+  IconButton,
+  FormHelperText,
+} from "@mui/material"
 import {
   InfoLink,
   HeroImage,
@@ -62,7 +69,7 @@ export default function CampaignForm({
   useEffect(() => {
     dispatchForm({
       type: FormActions.DISABLE,
-      payload: !nameValid || !!errors.name
+      payload: !nameValid || !!errors.name,
     })
   }, [nameValid, errors.name, dispatchForm])
 
@@ -98,7 +105,7 @@ export default function CampaignForm({
     if (errors.name) {
       dispatchForm({
         type: FormActions.ERRORS,
-        payload: { ...errors, name: undefined }
+        payload: { ...errors, name: undefined },
       })
     }
   }
@@ -111,7 +118,6 @@ export default function CampaignForm({
       value: updatedCampaign.name,
     })
   }
-
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()

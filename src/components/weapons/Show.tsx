@@ -73,7 +73,7 @@ export default function Show({ weapon: initialWeapon }: ShowProperties) {
 
   // Subscribe to weapon updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("weapon", (data) => {
+    const unsubscribe = subscribeToEntity("weapon", data => {
       if (data && data.id === initialWeapon.id) {
         dispatchForm({
           type: FormActions.UPDATE,

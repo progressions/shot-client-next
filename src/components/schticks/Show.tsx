@@ -55,7 +55,7 @@ export default function Show({ schtick: initialSchtick }: ShowProperties) {
 
   // Subscribe to schtick updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("schtick", (data) => {
+    const unsubscribe = subscribeToEntity("schtick", data => {
       if (data && data.id === initialSchtick.id) {
         dispatchForm({
           type: FormActions.UPDATE,

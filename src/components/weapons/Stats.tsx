@@ -22,7 +22,7 @@ type FormStateData = {
 type StatsProps = {
   weapon: Weapon
   updateWeapon: (weapon: Weapon) => Promise<void>
-  state?: FormStateType<any>
+  state?: FormStateType<FormStateData>
 }
 
 export default function Stats({
@@ -42,12 +42,12 @@ export default function Stats({
       value: { weapon: initialWeapon },
     })
   }, [initialWeapon, dispatchForm])
-  
+
   // Safety check to prevent undefined errors
   if (!formState?.data?.weapon) {
     return null
   }
-  
+
   const weapon = formState.data.weapon
   const { kachunk, mook_bonus, damage, concealment, reload_value } = weapon
 

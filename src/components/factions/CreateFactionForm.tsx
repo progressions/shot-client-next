@@ -11,11 +11,5 @@ export default function CreateFactionForm({
   open,
   onClose,
 }: CreateFactionFormProperties) {
-  return (
-    <FactionForm
-      open={open}
-      onClose={onClose}
-      title="New Faction"
-    />
-  )
+  return <FactionForm open={open} onClose={onClose} title="New Faction" />
 }

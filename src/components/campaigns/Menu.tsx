@@ -13,7 +13,7 @@ interface MenuProps {
 
 export default function Menu({ viewMode, setViewMode }: MenuProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
-  
+
   const handleToggleView = () => {
     setViewMode(viewMode === "table" ? "mobile" : "table")
   }

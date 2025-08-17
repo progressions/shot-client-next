@@ -1,9 +1,7 @@
 "use client"
 
-import { Paper } from "@mui/material"
-import { Editor, RichTextRenderer } from "@/components/editor"
-import { MiniButton } from "@/components/ui"
-import { useState } from "react"
+import { Editor } from "@/components/editor"
+import type { EditorChangeEvent } from "@/types"
 
 type EditableRichTextProps = {
   name: string

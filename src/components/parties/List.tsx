@@ -67,7 +67,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   // Subscribe to party updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("parties", (data) => {
+    const unsubscribe = subscribeToEntity("parties", data => {
       if (data === "reload") {
         fetchParties(filters)
       }

@@ -48,7 +48,7 @@ export default function Show({ vehicle: initialVehicle }: ShowProperties) {
 
   // Subscribe to vehicle updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("vehicle", (data) => {
+    const unsubscribe = subscribeToEntity("vehicle", data => {
       if (data && data.id === initialVehicle.id) {
         dispatchForm({
           type: FormActions.UPDATE,
@@ -107,10 +107,7 @@ export default function Show({ vehicle: initialVehicle }: ShowProperties) {
           <Archetype vehicle={vehicle} updateEntity={updateEntity} />
         </Box>
         <Box sx={{ flex: 1 }}>
-          <EditFaction
-            entity={vehicle}
-            updateEntity={updateEntity}
-          />
+          <EditFaction entity={vehicle} updateEntity={updateEntity} />
         </Box>
       </Stack>
     </Box>

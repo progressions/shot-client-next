@@ -107,7 +107,7 @@ export default function EditCategoryPath({
     // Always update internal state
     dispatchForm({ type: FormActions.UPDATE, name: "category", value })
     dispatchForm({ type: FormActions.UPDATE, name: "path", value: null })
-    
+
     if (isFormMode && setEntity) {
       // Form mode: just update the parent entity, no server calls
       setEntity({ ...schtick, category: value, path: null })
@@ -118,7 +118,10 @@ export default function EditCategoryPath({
         await updateEntity({ ...schtick, category: value, path: null })
         dispatchForm({ type: FormActions.SUCCESS })
       } catch {
-        dispatchForm({ type: FormActions.ERROR, payload: "Failed to update category" })
+        dispatchForm({
+          type: FormActions.ERROR,
+          payload: "Failed to update category",
+        })
       }
     }
   }
@@ -126,7 +129,7 @@ export default function EditCategoryPath({
   const handlePathChange = async (value: string | null) => {
     // Always update internal state
     dispatchForm({ type: FormActions.UPDATE, name: "path", value })
-    
+
     if (isFormMode && setEntity) {
       // Form mode: just update the parent entity, no server calls
       setEntity({ ...schtick, category, path: value })
@@ -137,7 +140,10 @@ export default function EditCategoryPath({
         await updateEntity({ ...schtick, path: value })
         dispatchForm({ type: FormActions.SUCCESS })
       } catch {
-        dispatchForm({ type: FormActions.ERROR, payload: "Failed to update path" })
+        dispatchForm({
+          type: FormActions.ERROR,
+          payload: "Failed to update path",
+        })
       }
     }
   }
@@ -230,7 +236,9 @@ export default function EditCategoryPath({
               Select a category first
             </Typography>
           )}
-          {actualErrors.path && <FormHelperText>{actualErrors.path}</FormHelperText>}
+          {actualErrors.path && (
+            <FormHelperText>{actualErrors.path}</FormHelperText>
+          )}
         </FormControl>
       </Stack>
     </Box>

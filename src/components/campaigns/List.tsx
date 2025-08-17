@@ -79,7 +79,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   // Subscribe to campaign updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("campaigns", (data) => {
+    const unsubscribe = subscribeToEntity("campaigns", data => {
       if (data === "reload") {
         fetchCampaigns(filters)
       }

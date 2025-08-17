@@ -2,8 +2,20 @@
 
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import { Drawer, Box, Typography, Alert, IconButton, FormHelperText } from "@mui/material"
-import { HeroImage, SaveButton, CancelButton, NameEditor } from "@/components/ui"
+import {
+  Drawer,
+  Box,
+  Typography,
+  Alert,
+  IconButton,
+  FormHelperText,
+} from "@mui/material"
+import {
+  HeroImage,
+  SaveButton,
+  CancelButton,
+  NameEditor,
+} from "@/components/ui"
 import type { EditorChangeEvent, Party } from "@/types"
 import { defaultParty } from "@/types"
 import { FormActions, useForm } from "@/reducers"
@@ -56,7 +68,7 @@ export default function PartyForm({
   useEffect(() => {
     dispatchForm({
       type: FormActions.DISABLE,
-      payload: !nameValid || !!errors.name
+      payload: !nameValid || !!errors.name,
     })
   }, [nameValid, errors.name, dispatchForm])
 
@@ -92,7 +104,7 @@ export default function PartyForm({
     if (errors.name) {
       dispatchForm({
         type: FormActions.ERRORS,
-        payload: { ...errors, name: undefined }
+        payload: { ...errors, name: undefined },
       })
     }
   }
@@ -105,7 +117,6 @@ export default function PartyForm({
       value: updatedParty.name,
     })
   }
-
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()

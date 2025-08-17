@@ -42,10 +42,7 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
   return (
     <>
       <SpeedDial actions={actions} />
-      <CreateSchtickForm
-        open={drawerOpen}
-        onClose={handleCloseCreateDrawer}
-      />
+      <CreateSchtickForm open={drawerOpen} onClose={handleCloseCreateDrawer} />
     </>
   )
 }

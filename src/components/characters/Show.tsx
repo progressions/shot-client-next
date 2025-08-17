@@ -50,7 +50,12 @@ export default function Show({
 
   // Debug character changes
   useEffect(() => {
-    console.log("Show character state changed - wealth:", character.wealth, "id:", character.id)
+    console.log(
+      "Show character state changed - wealth:",
+      character.wealth,
+      "id:",
+      character.id
+    )
   }, [character.wealth, character.id])
 
   useEffect(() => {
@@ -59,7 +64,7 @@ export default function Show({
 
   // Subscribe to character updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("character", (data) => {
+    const unsubscribe = subscribeToEntity("character", data => {
       if (data && data.id === initialCharacter.id) {
         setCharacter(data)
       }
@@ -69,7 +74,10 @@ export default function Show({
 
   const updateCharacter = async updatedCharacter => {
     try {
-      console.log("Show updateCharacter called with:", { wealth: updatedCharacter.wealth, id: updatedCharacter.id })
+      console.log("Show updateCharacter called with:", {
+        wealth: updatedCharacter.wealth,
+        id: updatedCharacter.id,
+      })
       setCharacter(updatedCharacter)
 
       const formData = new FormData()

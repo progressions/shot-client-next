@@ -14,7 +14,7 @@ export default function CampaignName({ campaign }: CampaignNameProperties) {
 
   // Subscribe to campaign updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("campaign", (data) => {
+    const unsubscribe = subscribeToEntity("campaign", data => {
       if (data && data.id === campaign.id && data.name) {
         setDisplayName(data.name)
       }

@@ -11,11 +11,5 @@ export default function CreateUserForm({
   open,
   onClose,
 }: CreateUserFormProperties) {
-  return (
-    <UserForm
-      open={open}
-      onClose={onClose}
-      title="New User"
-    />
-  )
+  return <UserForm open={open} onClose={onClose} title="New User" />
 }

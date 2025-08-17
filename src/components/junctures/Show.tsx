@@ -59,7 +59,7 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
 
   // Subscribe to juncture updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("juncture", (data) => {
+    const unsubscribe = subscribeToEntity("juncture", data => {
       if (data && data.id === initialJuncture.id) {
         dispatchForm({
           type: FormActions.UPDATE,

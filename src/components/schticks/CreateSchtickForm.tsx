@@ -11,11 +11,5 @@ export default function CreateSchtickForm({
   open,
   onClose,
 }: CreateSchtickFormProperties) {
-  return (
-    <SchtickForm
-      open={open}
-      onClose={onClose}
-      title="New Schtick"
-    />
-  )
+  return <SchtickForm open={open} onClose={onClose} title="New Schtick" />
 }

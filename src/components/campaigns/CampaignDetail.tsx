@@ -37,7 +37,7 @@ export default function CampaignDetail({
 
   // Subscribe to campaign updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("campaign", (data) => {
+    const unsubscribe = subscribeToEntity("campaign", data => {
       if (data && data.id === initialCampaign.id) {
         setCampaign({ ...data })
       }

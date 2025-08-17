@@ -85,7 +85,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   // Subscribe to character updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("characters", (data) => {
+    const unsubscribe = subscribeToEntity("characters", data => {
       console.log("Characters update:", data)
       if (data === "reload") {
         fetchCharacters(filters)

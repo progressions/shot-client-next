@@ -8,9 +8,7 @@ type PopupProps = {
   keyword: string
 }
 
-export default function Popup({
-  keyword,
-}: PopupProps) {
+export default function Popup({ keyword }: PopupProps) {
   const word = pluralize.singular(keyword).toLowerCase()
 
   const content = contents[word] || <p>Unknown</p>

@@ -2,8 +2,20 @@
 
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import { Drawer, Box, Typography, Alert, IconButton, FormHelperText } from "@mui/material"
-import { HeroImage, SaveButton, CancelButton, NameEditor } from "@/components/ui"
+import {
+  Drawer,
+  Box,
+  Typography,
+  Alert,
+  IconButton,
+  FormHelperText,
+} from "@mui/material"
+import {
+  HeroImage,
+  SaveButton,
+  CancelButton,
+  NameEditor,
+} from "@/components/ui"
 import type { Vehicle } from "@/types"
 import { defaultVehicle } from "@/types"
 import { FormActions, useForm } from "@/reducers"
@@ -59,7 +71,7 @@ export default function VehicleForm({
   useEffect(() => {
     dispatchForm({
       type: FormActions.DISABLE,
-      payload: !nameValid || !!errors.name
+      payload: !nameValid || !!errors.name,
     })
   }, [nameValid, errors.name, dispatchForm])
 
@@ -83,7 +95,6 @@ export default function VehicleForm({
       dispatchForm({ type: FormActions.UPDATE, name: "image", value: file })
     }
   }
-
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()
@@ -112,7 +123,7 @@ export default function VehicleForm({
     if (errors.name) {
       dispatchForm({
         type: FormActions.ERRORS,
-        payload: { ...errors, name: undefined }
+        payload: { ...errors, name: undefined },
       })
     }
   }
@@ -125,7 +136,6 @@ export default function VehicleForm({
       value: updatedVehicle.name,
     })
   }
-
 
   const handleClose = () => {
     dispatchForm({ type: FormActions.RESET, payload: initialFormState })
@@ -171,19 +181,19 @@ export default function VehicleForm({
         )}
         <EditFaction
           entity={data}
-          updateEntity={(updatedVehicle) => {
+          updateEntity={updatedVehicle => {
             dispatchForm({
               type: FormActions.RESET,
-              payload: { ...formState, data: updatedVehicle }
+              payload: { ...formState, data: updatedVehicle },
             })
           }}
         />
         <Archetype
           vehicle={data}
-          updateEntity={(updatedVehicle) => {
+          updateEntity={updatedVehicle => {
             dispatchForm({
               type: FormActions.RESET,
-              payload: { ...formState, data: updatedVehicle }
+              payload: { ...formState, data: updatedVehicle },
             })
           }}
         />
@@ -191,14 +201,14 @@ export default function VehicleForm({
           key={JSON.stringify(data.action_values || {})}
           entity={data}
           size="small"
-          setEntity={(updatedVehicle) => {
+          setEntity={updatedVehicle => {
             dispatchForm({
               type: FormActions.UPDATE,
               name: "data",
               value: updatedVehicle,
             })
           }}
-          updateEntity={async (updatedVehicle) => {
+          updateEntity={async updatedVehicle => {
             // For form, we just update local state, don't save
             dispatchForm({
               type: FormActions.UPDATE,

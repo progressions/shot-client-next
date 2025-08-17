@@ -73,7 +73,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   // Subscribe to weapon updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("weapons", (data) => {
+    const unsubscribe = subscribeToEntity("weapons", data => {
       if (data === "reload") {
         fetchWeapons(filters)
       }

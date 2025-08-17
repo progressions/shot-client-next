@@ -37,11 +37,7 @@ interface UserFormProperties {
   title: string
 }
 
-export default function UserForm({
-  open,
-  onClose,
-  title,
-}: UserFormProperties) {
+export default function UserForm({ open, onClose, title }: UserFormProperties) {
   const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
     ...defaultUser,
   })
@@ -87,12 +83,14 @@ export default function UserForm({
     }
   }
 
-
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()
     if (disabled) return
     if (!first_name.trim() || !last_name.trim()) {
-      dispatchForm({ type: FormActions.ERROR, payload: "First and last name are required" })
+      dispatchForm({
+        type: FormActions.ERROR,
+        payload: "First and last name are required",
+      })
       return
     }
     dispatchForm({ type: FormActions.SUBMIT })

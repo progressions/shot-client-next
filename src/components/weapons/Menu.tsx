@@ -42,10 +42,7 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
   return (
     <>
       <SpeedDial actions={actions} />
-      <CreateWeaponForm
-        open={drawerOpen}
-        onClose={handleCloseCreateDrawer}
-      />
+      <CreateWeaponForm open={drawerOpen} onClose={handleCloseCreateDrawer} />
     </>
   )
 }

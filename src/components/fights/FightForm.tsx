@@ -65,7 +65,7 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
   useEffect(() => {
     dispatchForm({
       type: FormActions.DISABLE,
-      payload: !nameValid || !!errors.name
+      payload: !nameValid || !!errors.name,
     })
   }, [nameValid, errors.name, dispatchForm])
 
@@ -101,7 +101,7 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
     if (errors.name) {
       dispatchForm({
         type: FormActions.ERRORS,
-        payload: { ...errors, name: undefined }
+        payload: { ...errors, name: undefined },
       })
     }
   }
@@ -115,13 +115,14 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
     })
   }
 
-  const handleNumberFieldChange = (fieldName: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: fieldName,
-      value: e.target.value,
-    })
-  }
+  const handleNumberFieldChange =
+    (fieldName: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: fieldName,
+        value: e.target.value,
+      })
+    }
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()

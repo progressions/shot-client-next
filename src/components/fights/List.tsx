@@ -93,7 +93,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   // Subscribe to fight updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("fights", (data) => {
+    const unsubscribe = subscribeToEntity("fights", data => {
       if (data === "reload") {
         fetchFights(filters)
       }

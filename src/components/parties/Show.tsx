@@ -59,7 +59,7 @@ export default function Show({ party: initialParty }: ShowProperties) {
 
   // Subscribe to party updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("party", (data) => {
+    const unsubscribe = subscribeToEntity("party", data => {
       if (data && data.id === initialParty.id) {
         dispatchForm({
           type: FormActions.UPDATE,

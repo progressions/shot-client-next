@@ -14,7 +14,7 @@ export default function JunctureName({ juncture }: JunctureNameProperties) {
 
   // Subscribe to juncture updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("juncture", (data) => {
+    const unsubscribe = subscribeToEntity("juncture", data => {
       if (data && data.id === juncture.id && data.name) {
         setDisplayName(data.name)
       }

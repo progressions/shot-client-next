@@ -11,11 +11,5 @@ export default function CreatePartyForm({
   open,
   onClose,
 }: CreatePartyFormProperties) {
-  return (
-    <PartyForm
-      open={open}
-      onClose={onClose}
-      title="New Party"
-    />
-  )
+  return <PartyForm open={open} onClose={onClose} title="New Party" />
 }

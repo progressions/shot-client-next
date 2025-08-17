@@ -2,8 +2,20 @@
 
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import { Drawer, Box, Typography, Alert, IconButton, FormHelperText } from "@mui/material"
-import { HeroImage, SaveButton, CancelButton, NameEditor } from "@/components/ui"
+import {
+  Drawer,
+  Box,
+  Typography,
+  Alert,
+  IconButton,
+  FormHelperText,
+} from "@mui/material"
+import {
+  HeroImage,
+  SaveButton,
+  CancelButton,
+  NameEditor,
+} from "@/components/ui"
 import type { EditorChangeEvent, Schtick } from "@/types"
 import { defaultSchtick } from "@/types"
 import { FormActions, useForm } from "@/reducers"
@@ -57,14 +69,14 @@ export default function SchtickForm({
   useEffect(() => {
     dispatchForm({
       type: FormActions.DISABLE,
-      payload: !nameValid || !!errors.name || !data.category
+      payload: !nameValid || !!errors.name || !data.category,
     })
   }, [nameValid, errors.name, data.category, dispatchForm])
 
   const handleSchtickUpdate = (updatedSchtick: Schtick) => {
     dispatchForm({
       type: FormActions.RESET,
-      payload: { ...formState, data: updatedSchtick }
+      payload: { ...formState, data: updatedSchtick },
     })
   }
 
@@ -100,7 +112,7 @@ export default function SchtickForm({
     if (errors.name) {
       dispatchForm({
         type: FormActions.ERRORS,
-        payload: { ...errors, name: undefined }
+        payload: { ...errors, name: undefined },
       })
     }
   }

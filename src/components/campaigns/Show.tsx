@@ -58,7 +58,7 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
 
   // Subscribe to campaign updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("campaign", (data) => {
+    const unsubscribe = subscribeToEntity("campaign", data => {
       if (data && data.id === initialCampaign.id) {
         dispatchForm({
           type: FormActions.UPDATE,

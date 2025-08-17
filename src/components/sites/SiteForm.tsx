@@ -2,8 +2,20 @@
 
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import { Drawer, Box, Typography, Alert, IconButton, FormHelperText } from "@mui/material"
-import { HeroImage, SaveButton, CancelButton, NameEditor } from "@/components/ui"
+import {
+  Drawer,
+  Box,
+  Typography,
+  Alert,
+  IconButton,
+  FormHelperText,
+} from "@mui/material"
+import {
+  HeroImage,
+  SaveButton,
+  CancelButton,
+  NameEditor,
+} from "@/components/ui"
 import type { EditorChangeEvent, Site } from "@/types"
 import { defaultSite } from "@/types"
 import { FormActions, useForm } from "@/reducers"
@@ -23,11 +35,7 @@ interface SiteFormProperties {
   title: string
 }
 
-export default function SiteForm({
-  open,
-  onClose,
-  title,
-}: SiteFormProperties) {
+export default function SiteForm({ open, onClose, title }: SiteFormProperties) {
   const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
     ...defaultSite,
   })
@@ -56,7 +64,7 @@ export default function SiteForm({
   useEffect(() => {
     dispatchForm({
       type: FormActions.DISABLE,
-      payload: !nameValid || !!errors.name
+      payload: !nameValid || !!errors.name,
     })
   }, [nameValid, errors.name, dispatchForm])
 
@@ -92,7 +100,7 @@ export default function SiteForm({
     if (errors.name) {
       dispatchForm({
         type: FormActions.ERRORS,
-        payload: { ...errors, name: undefined }
+        payload: { ...errors, name: undefined },
       })
     }
   }
