@@ -16,7 +16,6 @@ export default function PartyPopup({ id }: PopupProps) {
       try {
         const response = await client.getParty({ id })
         const fetchedParty = response.data
-        console.log("Fetched party:", fetchedParty)
         if (fetchedParty) {
           setParty(fetchedParty)
         } else {

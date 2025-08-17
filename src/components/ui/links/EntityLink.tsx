@@ -49,19 +49,8 @@ export default function EntityLink({
 
   const handleMouseEnterLink = (event: MouseEvent<HTMLAnchorElement>) => {
     if (!disablePopup) {
-      console.log("Mouse enter link: Setting timeout for popover", {
-        linkPosition: event.currentTarget.getBoundingClientRect(),
-        entityId: entity.id,
-        entityClass: entity.entity_class,
-      })
       target.current = event.currentTarget as HTMLAnchorElement
       openTimeoutId = setTimeout(() => {
-        console.log("Timeout complete: Setting anchorEl", {
-          anchorEl: target.current,
-          position: target.current?.getBoundingClientRect(),
-          entityId: entity.id,
-          entityClass: entity.entity_class,
-        })
         if (closeTimeoutId) {
           clearTimeout(closeTimeoutId)
           closeTimeoutId = null
@@ -73,10 +62,6 @@ export default function EntityLink({
   }
 
   const handleMouseEnterPopover = () => {
-    console.log("Mouse enter popover: Keeping open", {
-      entityId: entity.id,
-      entityClass: entity.entity_class,
-    })
     if (closeTimeoutId) {
       clearTimeout(closeTimeoutId)
       closeTimeoutId = null
@@ -88,29 +73,17 @@ export default function EntityLink({
   }
 
   const handleMouseLeave = () => {
-    console.log("Mouse leave: Scheduling popover close", {
-      entityId: entity.id,
-      entityClass: entity.entity_class,
-    })
     if (openTimeoutId) {
       clearTimeout(openTimeoutId)
       openTimeoutId = null
     }
     closeTimeoutId = setTimeout(() => {
-      console.log("Closing popover after delay", {
-        entityId: entity.id,
-        entityClass: entity.entity_class,
-      })
       setAnchorEl(null)
       setIsOpen(false)
     }, 200)
   }
 
   const handleClose = () => {
-    console.log("Handle close called", {
-      entityId: entity.id,
-      entityClass: entity.entity_class,
-    })
     if (openTimeoutId) {
       clearTimeout(openTimeoutId)
       openTimeoutId = null
@@ -131,11 +104,6 @@ export default function EntityLink({
       if (isOpen && target.current) {
         if (scrollTimeoutId) clearTimeout(scrollTimeoutId)
         scrollTimeoutId = setTimeout(() => {
-          console.log("Scroll detected: Updating anchorEl", {
-            position: target.current.getBoundingClientRect(),
-            entityId: entity.id,
-            entityClass: entity.entity_class,
-          })
           setAnchorEl(target.current)
         }, 50)
       }

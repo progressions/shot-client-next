@@ -22,7 +22,6 @@ export default function VehiclePopup({ id }: PopupProps) {
       try {
         const response = await client.getVehicle({ id })
         const fetchedVehicle = response.data
-        console.log("Fetched vehicle:", fetchedVehicle)
         if (fetchedVehicle) {
           setVehicle(fetchedVehicle)
         } else {

@@ -15,7 +15,6 @@ export default function UserPopup({ id }: PopupProps) {
       try {
         const response = await client.getUser({ id })
         const fetchedUser = response.data
-        console.log("Fetched user:", fetchedUser)
         if (fetchedUser) {
           setUser(fetchedUser)
         } else {

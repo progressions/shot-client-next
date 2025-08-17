@@ -16,7 +16,6 @@ export default function FightPopup({ id }: PopupProps) {
       try {
         const response = await client.getFight({ id })
         const fetchedFight = response.data
-        console.log("Fetched fight:", fetchedFight)
         if (fetchedFight) {
           setFight(fetchedFight)
         } else {

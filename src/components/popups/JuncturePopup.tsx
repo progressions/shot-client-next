@@ -21,7 +21,6 @@ export default function JuncturePopup({ id }: PopupProps) {
       try {
         const response = await client.getJuncture({ id })
         const fetchedJuncture = response.data
-        console.log("Fetched juncture:", fetchedJuncture)
         if (fetchedJuncture) {
           setJuncture(fetchedJuncture)
         } else {

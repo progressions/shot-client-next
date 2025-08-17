@@ -16,7 +16,6 @@ export default function SitePopup({ id }: PopupProps) {
       try {
         const response = await client.getSite({ id })
         const fetchedSite = response.data
-        console.log("Fetched site:", fetchedSite)
         if (fetchedSite) {
           setSite(fetchedSite)
         } else {

@@ -16,7 +16,6 @@ export default function CampaignPopup({ id }: PopupProps) {
       try {
         const response = await client.getCampaign({ id })
         const fetchedCampaign = response.data
-        console.log("Fetched campaign:", fetchedCampaign)
         if (fetchedCampaign) {
           setCampaign(fetchedCampaign)
         } else {

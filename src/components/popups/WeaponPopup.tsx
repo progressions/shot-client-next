@@ -16,7 +16,6 @@ export default function WeaponPopup({ id }: PopupProps) {
       try {
         const response = await client.getWeapon({ id })
         const fetchedWeapon = response.data
-        console.log("Fetched weapon:", fetchedWeapon)
         if (fetchedWeapon) {
           setWeapon(fetchedWeapon)
         } else {
@@ -37,8 +36,6 @@ export default function WeaponPopup({ id }: PopupProps) {
   if (!user?.id) {
     return null // Use null instead of <></> for consistency
   }
-
-  console.log("WeaponPopup - weapon:", weapon)
 
   const subhead = [weapon.juncture, weapon.category].filter(Boolean).join(" - ")
 

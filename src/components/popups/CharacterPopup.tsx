@@ -23,7 +23,6 @@ export default function CharacterPopup({ id }: PopupProps) {
       try {
         const response = await client.getCharacter({ id })
         const fetchedCharacter = response.data
-        console.log("Fetched character:", fetchedCharacter)
         if (fetchedCharacter) {
           setCharacter(fetchedCharacter)
         } else {

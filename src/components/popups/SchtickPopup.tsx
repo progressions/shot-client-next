@@ -15,7 +15,6 @@ export default function SchtickPopup({ id }: PopupProps) {
       try {
         const response = await client.getSchtick({ id })
         const fetchedSchtick = response.data
-        console.log("Fetched schtick:", fetchedSchtick)
         if (fetchedSchtick) {
           setSchtick(fetchedSchtick)
         } else {

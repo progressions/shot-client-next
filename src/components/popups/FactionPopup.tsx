@@ -16,7 +16,6 @@ export default function FactionPopup({ id }: PopupProps) {
       try {
         const response = await client.getFaction({ id })
         const fetchedFaction = response.data
-        console.log("Fetched faction:", fetchedFaction)
         if (fetchedFaction) {
           setFaction(fetchedFaction)
         } else {
