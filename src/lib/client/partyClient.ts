@@ -82,7 +82,7 @@ export function createPartyClient(deps: ClientDependencies) {
   }
 
   async function deletePartyImage(party: Party): Promise<AxiosResponse<void>> {
-    return delete_(`${api.parties(party)}/image`)
+    return delete_(`${apiV2.parties(party)}/image`)
   }
 
   async function addPartyToFight(

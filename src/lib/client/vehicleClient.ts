@@ -105,7 +105,7 @@ export function createVehicleClient(deps: ClientDependencies) {
   async function deleteVehicleImage(
     vehicle: Vehicle
   ): Promise<AxiosResponse<void>> {
-    return delete_(`${api.allVehicles(vehicle)}/image`)
+    return delete_(`${apiV2.vehicles(vehicle)}/image`)
   }
 
   async function actVehicle(

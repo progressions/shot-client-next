@@ -28,11 +28,11 @@ export function createAuthClient(deps: ClientDependencies) {
   }
 
   async function deleteUser(user: User): Promise<AxiosResponse<void>> {
-    return delete_(api.adminUsers(user))
+    return delete_(apiV2.users(user))
   }
 
   async function deleteUserImage(user: User): Promise<AxiosResponse<void>> {
-    return delete_(`${api.users(user)}/image`)
+    return delete_(`${apiV2.users(user)}/image`)
   }
 
   async function getCurrentUser(

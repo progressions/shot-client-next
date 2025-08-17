@@ -179,7 +179,7 @@ export function createCharacterClient(deps: ClientDependencies) {
   async function deleteCharacterImage(
     character: Character
   ): Promise<AxiosResponse<void>> {
-    return delete_(`${api.characters(null, character)}/image`)
+    return delete_(`${apiV2.characters(character)}/image`)
   }
 
   async function syncCharacter(
