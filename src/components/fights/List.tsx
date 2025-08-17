@@ -16,13 +16,14 @@ interface ListProps {
 
 export type FormStateData = {
   fights: Fight[]
+  seasons: number[]
   meta: PaginationMeta
   filters: {
     sort: string
     order: string
     page: number
-    season: number
-    status: "Started" | "Unended" | "Ended"
+    season: string
+    status: "Started" | "Unended" | "Ended" | ""
     search: string
   }
 }

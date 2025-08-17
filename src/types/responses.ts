@@ -66,6 +66,7 @@ export interface WeaponsResponse {
 
 export interface FightsResponse {
   fights: Fight[]
+  seasons: number[]
   meta: PaginationMeta
 }
 

@@ -30,13 +30,15 @@ export default async function FightsPage({
         search
       ) => ({
         fights: data.fights,
-        seasons: data.seasons,
+        seasons: data.seasons || [],
         meta: data.meta,
         filters: {
           sort,
           order,
           page,
-          search,
+          search: search || "",
+          season: "",
+          status: "",
         },
         drawerOpen: false,
       })}
