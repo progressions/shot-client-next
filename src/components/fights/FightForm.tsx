@@ -15,9 +15,9 @@ import {
 import {
   NumberField,
   HeroImage,
-  TextField,
   SaveButton,
   CancelButton,
+  NameEditor,
 } from "@/components/ui"
 import type { EditorChangeEvent, Fight } from "@/types"
 import { FormActions, useForm } from "@/reducers"
@@ -40,11 +40,11 @@ interface FightFormProperties {
 export default function FightForm({ open, onClose }: FightFormProperties) {
   const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
     ...defaultFight,
-    errors: {},
   })
-  const { disabled, error, data } = formState
-  const { name, description, image, errors = {} } = data
+  const { disabled, error, errors, data } = formState
+  const { name, description, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [nameValid, setNameValid] = useState(true)
   const { createEntity, handleFormErrors } = useEntity<Fight>(
     defaultFight,
     dispatchForm
@@ -61,6 +61,13 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
       setImagePreview(null)
     }
   }, [image])
+
+  useEffect(() => {
+    dispatchForm({
+      type: FormActions.DISABLE,
+      payload: !nameValid || !!errors.name
+    })
+  }, [nameValid, errors.name, dispatchForm])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -81,6 +88,39 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
       }
       dispatchForm({ type: FormActions.UPDATE, name: "image", value: file })
     }
+  }
+
+  const handleNameEntityUpdate = (updatedFight: Fight) => {
+    // Update the name field
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "name",
+      value: updatedFight.name,
+    })
+    // Clear name errors when user changes the name
+    if (errors.name) {
+      dispatchForm({
+        type: FormActions.ERRORS,
+        payload: { ...errors, name: undefined }
+      })
+    }
+  }
+
+  const handleNameEntitySave = async (updatedFight: Fight) => {
+    // For form, we just update local state, don't save
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "name",
+      value: updatedFight.name,
+    })
+  }
+
+  const handleNumberFieldChange = (fieldName: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: fieldName,
+      value: e.target.value,
+    })
   }
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -131,23 +171,17 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
             {error}
           </Alert>
         )}
-        <FormControl fullWidth margin="normal" error={!!errors.name}>
-          <TextField
-            label="Name"
-            value={name}
-            onChange={e =>
-              dispatchForm({
-                type: FormActions.UPDATE,
-                name: "name",
-                value: e.target.value,
-              })
-            }
-            margin="normal"
-            required
-            autoFocus
-          />
-          {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
-        </FormControl>
+        <NameEditor
+          entity={data}
+          setEntity={handleNameEntityUpdate}
+          updateEntity={handleNameEntitySave}
+          onValidationChange={setNameValid}
+        />
+        {errors.name && (
+          <FormHelperText error sx={{ mt: -1, mb: 1 }}>
+            {errors.name}
+          </FormHelperText>
+        )}
         <FormControl fullWidth margin="normal" error={!!errors.description}>
           <Typography variant="subtitle1" sx={{ fontSize: "0.75rem" }}>
             Description
@@ -175,20 +209,8 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
             <NumberField
               label="Season"
               value={data.season || ""}
-              onChange={e =>
-                dispatchForm({
-                  type: FormActions.UPDATE,
-                  name: "season",
-                  value: e.target.value,
-                })
-              }
-              onBlur={e =>
-                dispatchForm({
-                  type: FormActions.UPDATE,
-                  name: "season",
-                  value: e.target.value,
-                })
-              }
+              onChange={handleNumberFieldChange("season")}
+              onBlur={handleNumberFieldChange("season")}
               required
               margin="normal"
               size="small"
@@ -202,20 +224,8 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
             <NumberField
               label="Session"
               value={data.session || ""}
-              onChange={e =>
-                dispatchForm({
-                  type: FormActions.UPDATE,
-                  name: "session",
-                  value: e.target.value,
-                })
-              }
-              onBlur={e =>
-                dispatchForm({
-                  type: FormActions.UPDATE,
-                  name: "session",
-                  value: e.target.value,
-                })
-              }
+              onChange={handleNumberFieldChange("session")}
+              onBlur={handleNumberFieldChange("session")}
               required
               margin="normal"
               size="small"

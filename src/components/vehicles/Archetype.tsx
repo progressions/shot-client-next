@@ -1,6 +1,6 @@
 "use client"
 
-import { Typography, Stack, Box } from "@mui/material"
+import { Stack, Box } from "@mui/material"
 import type { Vehicle, VehicleArchetype } from "@/types"
 import { Autocomplete } from "@/components/ui"
 import { useRef, useEffect, useState } from "react"
@@ -23,13 +23,9 @@ export default function EditArchetype({
 
   const selectedArchetype = archetypes.find(arch => arch.name === archetype)
 
-  console.log("archetypes", archetypes)
-  console.log("selectedArchetype", selectedArchetype)
-
   const fetchRecords = async () => {
     const response = await client.getVehicleArchetypes()
     setArchetypes(response.data)
-    console.log("response.data", response.data)
   }
 
   useEffect(() => {
@@ -85,8 +81,6 @@ export default function EditArchetype({
     updateEntity(updatedVehicle)
   }
 
-  console.log("archetype", archetype)
-
   return (
     <Stack sx={{ mt: 2 }}>
       <Box sx={{ width: 200 }}>
@@ -99,13 +93,6 @@ export default function EditArchetype({
           allowNone={false}
         />
       </Box>
-      <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-        <Typography>Acceleration {selectedArchetype?.Acceleration}</Typography>
-        <Typography>Handling {selectedArchetype?.Handling}</Typography>
-        <Typography>Squeal {selectedArchetype?.Squeal}</Typography>
-        <Typography>Frame {selectedArchetype?.Frame}</Typography>
-        <Typography>Crunch {selectedArchetype?.Crunch}</Typography>
-      </Stack>
     </Stack>
   )
 }

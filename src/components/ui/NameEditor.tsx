@@ -9,12 +9,14 @@ type NameEditorProps = {
   entity: Entity
   setEntity: (entity: Entity) => void
   updateEntity: (updatedEntity: Entity) => Promise<void>
+  onValidationChange?: (isValid: boolean) => void
 }
 
 export function NameEditor({
   entity,
   setEntity,
-  updateEntity,
+  updateEntity = async () => {},
+  onValidationChange,
 }: NameEditorProps) {
   const [name, setName] = useState<string>(entity.name || "")
   const [nameError, setNameError] = useState<string>("")
@@ -36,6 +38,12 @@ export function NameEditor({
     setName(newName)
     setNameError("") // Clear client-side error while typing
     setServerError("") // Clear server-side error while typing
+
+    // Call validation callback if provided
+    if (onValidationChange) {
+      const isValid = validateName(newName) === ""
+      onValidationChange(isValid)
+    }
   }
 
   const handleNameBlur = async () => {

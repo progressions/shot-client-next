@@ -1,5 +1,5 @@
 import { Stack, Box } from "@mui/material"
-import { getUser } from "@/lib/getServerClient"
+import { getCurrentUser } from "@/lib"
 import { Suspense } from "react"
 import { Campaign } from "@/types"
 import {
@@ -18,9 +18,9 @@ interface DashboardProperties {
 
 export default async function Dashboard({
   campaign,
-  initialIsMobile,
+  initialIsMobile: _initialIsMobile,
 }: DashboardProperties) {
-  const user = await getUser()
+  const user = await getCurrentUser()
   return (
     <Box>
       <CampaignBanner campaign={campaign} />

@@ -2,14 +2,15 @@
 
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
-import { HeroImage, TextField, SaveButton, CancelButton } from "@/components/ui"
+import { Drawer, Box, Typography, Alert, IconButton, FormHelperText } from "@mui/material"
+import { HeroImage, SaveButton, CancelButton, NameEditor } from "@/components/ui"
 import type { EditorChangeEvent, Party } from "@/types"
 import { defaultParty } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
+import { useEntity } from "@/hooks"
 
 type FormStateData = Party & {
   [key: string]: unknown
@@ -19,23 +20,25 @@ type FormStateData = Party & {
 interface PartyFormProperties {
   open: boolean
   onClose: () => void
-  onSave: (formData: FormData, partyData: Party) => Promise<void>
-  initialFormData: FormStateData
   title: string
 }
 
 export default function PartyForm({
   open,
   onClose,
-  onSave,
-  initialFormData,
   title,
 }: PartyFormProperties) {
-  const { formState, dispatchForm, initialFormState } =
-    useForm<FormStateData>(initialFormData)
-  const { disabled, error, data } = formState
+  const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
+    ...defaultParty,
+  })
+  const { disabled, error, errors, data } = formState
   const { name, description, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [nameValid, setNameValid] = useState(true)
+  const { createEntity, handleFormErrors } = useEntity<Party>(
+    defaultParty,
+    dispatchForm
+  )
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
@@ -49,6 +52,13 @@ export default function PartyForm({
       setImagePreview(null)
     }
   }, [image])
+
+  useEffect(() => {
+    dispatchForm({
+      type: FormActions.DISABLE,
+      payload: !nameValid || !!errors.name
+    })
+  }, [nameValid, errors.name, dispatchForm])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -71,6 +81,32 @@ export default function PartyForm({
     }
   }
 
+  const handleNameEntityUpdate = (updatedParty: Party) => {
+    // Update the name field
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "name",
+      value: updatedParty.name,
+    })
+    // Clear name errors when user changes the name
+    if (errors.name) {
+      dispatchForm({
+        type: FormActions.ERRORS,
+        payload: { ...errors, name: undefined }
+      })
+    }
+  }
+
+  const handleNameEntitySave = async (updatedParty: Party) => {
+    // For form, we just update local state, don't save
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "name",
+      value: updatedParty.name,
+    })
+  }
+
+
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()
     if (disabled) return
@@ -78,22 +114,12 @@ export default function PartyForm({
       dispatchForm({ type: FormActions.ERROR, payload: "Name is required" })
       return
     }
-
     dispatchForm({ type: FormActions.SUBMIT })
     try {
-      const formData = new FormData()
-      const partyData = { ...defaultParty, name, description } as Party
-      formData.append("party", JSON.stringify(siteData))
-      if (image) {
-        formData.append("image", image)
-      }
-      await onSave(formData, partyData)
-    } catch (error_: unknown) {
-      const errorMessage = "An error occurred."
-      dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
-      console.error(`${title} error:`, error_)
-    } finally {
+      await createEntity(data, image)
       handleClose()
+    } catch (error) {
+      handleFormErrors(error)
     }
   }
 
@@ -127,21 +153,17 @@ export default function PartyForm({
             {error}
           </Alert>
         )}
-        <Typography>Describe this thing.</Typography>
-        <TextField
-          label="Name"
-          value={name}
-          onChange={e =>
-            dispatchForm({
-              type: FormActions.UPDATE,
-              name: "name",
-              value: e.target.value,
-            })
-          }
-          margin="normal"
-          required
-          autoFocus
+        <NameEditor
+          entity={data}
+          setEntity={handleNameEntityUpdate}
+          updateEntity={handleNameEntitySave}
+          onValidationChange={setNameValid}
         />
+        {errors.name && (
+          <FormHelperText error sx={{ mt: -1, mb: 1 }}>
+            {errors.name}
+          </FormHelperText>
+        )}
         <Editor
           name="description"
           value={description}

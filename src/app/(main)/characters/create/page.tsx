@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material"
 import { headers } from "next/headers"
 import { CreatePage } from "@/components/characters"
-import { getUser, getServerClient } from "@/lib/getServerClient"
+import { getCurrentUser, getServerClient } from "@/lib"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
@@ -11,7 +11,7 @@ export const metadata = {
 
 export default async function CharacterCreatePage() {
   const client = await getServerClient()
-  const user = await getUser()
+  const user = await getCurrentUser()
 
   if (!client || !user) {
     redirect("/login")
@@ -32,7 +32,7 @@ export default async function CharacterCreatePage() {
 
   return (
     <>
-      <Breadcrumbs />
+      <Breadcrumbs client={client} />
       <Suspense fallback={<CircularProgress />}>
         <CreatePage templates={characters} initialIsMobile={initialIsMobile} />
       </Suspense>

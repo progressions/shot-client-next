@@ -2,13 +2,13 @@
 
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
+import { Drawer, Box, Typography, Alert, IconButton, FormHelperText } from "@mui/material"
 import {
   InfoLink,
   HeroImage,
-  TextField,
   SaveButton,
   CancelButton,
+  NameEditor,
 } from "@/components/ui"
 import type { EditorChangeEvent, Campaign } from "@/types"
 import { defaultCampaign } from "@/types"
@@ -16,6 +16,7 @@ import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
+import { useEntity } from "@/hooks"
 
 type FormStateData = Campaign & {
   [key: string]: unknown
@@ -25,24 +26,25 @@ type FormStateData = Campaign & {
 interface CampaignFormProperties {
   open: boolean
   onClose: () => void
-  onSave: (formData: FormData, campaignData: Campaign) => Promise<void>
-  initialFormData: FormStateData
   title: string
 }
 
 export default function CampaignForm({
   open,
   onClose,
-  onSave,
-  initialFormData,
   title,
 }: CampaignFormProperties) {
   const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
-    entity: initialFormData,
+    ...defaultCampaign,
   })
-  const { disabled, error, data } = formState
-  const { name, description, faction_id, image } = data
+  const { disabled, error, errors, data } = formState
+  const { name, description, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [nameValid, setNameValid] = useState(true)
+  const { createEntity, handleFormErrors } = useEntity<Campaign>(
+    defaultCampaign,
+    dispatchForm
+  )
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
@@ -56,6 +58,13 @@ export default function CampaignForm({
       setImagePreview(null)
     }
   }, [image])
+
+  useEffect(() => {
+    dispatchForm({
+      type: FormActions.DISABLE,
+      payload: !nameValid || !!errors.name
+    })
+  }, [nameValid, errors.name, dispatchForm])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -78,6 +87,32 @@ export default function CampaignForm({
     }
   }
 
+  const handleNameEntityUpdate = (updatedCampaign: Campaign) => {
+    // Update the name field
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "name",
+      value: updatedCampaign.name,
+    })
+    // Clear name errors when user changes the name
+    if (errors.name) {
+      dispatchForm({
+        type: FormActions.ERRORS,
+        payload: { ...errors, name: undefined }
+      })
+    }
+  }
+
+  const handleNameEntitySave = async (updatedCampaign: Campaign) => {
+    // For form, we just update local state, don't save
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "name",
+      value: updatedCampaign.name,
+    })
+  }
+
+
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()
     if (disabled) return
@@ -85,27 +120,12 @@ export default function CampaignForm({
       dispatchForm({ type: FormActions.ERROR, payload: "Name is required" })
       return
     }
-
     dispatchForm({ type: FormActions.SUBMIT })
     try {
-      const formData = new FormData()
-      const campaignData = {
-        ...defaultCampaign,
-        name,
-        description,
-        faction_id,
-      } as Campaign
-      formData.append("campaign", JSON.stringify(campaignData))
-      if (image) {
-        formData.append("image", image)
-      }
-      await onSave(formData, campaignData)
-    } catch (error_: unknown) {
-      const errorMessage = "An error occurred."
-      dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
-      console.error(`${title} error:`, error_)
-    } finally {
+      await createEntity(data, image)
       handleClose()
+    } catch (error) {
+      handleFormErrors(error)
     }
   }
 
@@ -146,20 +166,17 @@ export default function CampaignForm({
           of the <InfoLink info="Chi War" />. You can create, edit, and delete
           campaigns.
         </Typography>
-        <TextField
-          label="Name"
-          value={name}
-          onChange={e =>
-            dispatchForm({
-              type: FormActions.UPDATE,
-              name: "name",
-              value: e.target.value,
-            })
-          }
-          margin="normal"
-          required
-          autoFocus
+        <NameEditor
+          entity={data}
+          setEntity={handleNameEntityUpdate}
+          updateEntity={handleNameEntitySave}
+          onValidationChange={setNameValid}
         />
+        {errors.name && (
+          <FormHelperText error sx={{ mt: -1, mb: 1 }}>
+            {errors.name}
+          </FormHelperText>
+        )}
         <Editor
           name="description"
           value={description}

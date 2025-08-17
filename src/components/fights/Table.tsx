@@ -1,7 +1,7 @@
 "use client"
 import { GridColDef } from "@mui/x-data-grid"
 import { FormStateType, FormStateAction } from "@/reducers"
-import { BaseDataGrid, FightLink } from "@/components/ui"
+import { MembersGroup, BaseDataGrid, FightLink } from "@/components/ui"
 import { Avatar } from "@/components/avatars"
 import { PaginationMeta, Fight } from "@/types"
 
@@ -49,6 +49,20 @@ const columns: GridColDef<Fight>[] = [
     type: "number",
     width: 80,
     editable: false,
+  },
+  {
+    field: "members",
+    headerName: "Fighters",
+    width: 150,
+    editable: false,
+    sortable: false,
+    renderCell: params => (
+      <MembersGroup
+        items={params.row.characters || []}
+        max={3}
+        sx={{ mt: 1 }}
+      />
+    ),
   },
   {
     field: "created_at",

@@ -1,22 +1,18 @@
+"use client"
+
 import { GridView, ViewList } from "@mui/icons-material"
 import { CreateFactionForm } from "@/components/factions"
 import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
-import { defaultFaction } from "@/types"
+import { useState } from "react"
 
 interface MenuProps {
   viewMode: "table" | "mobile"
   setViewMode: (mode: "table" | "mobile") => void
 }
 
-export default function Menu({
-  viewMode,
-  setViewMode,
-  drawerOpen,
-  handleOpenCreateDrawer,
-  handleCloseCreateDrawer,
-  handleSave,
-}: MenuProps) {
+export default function Menu({ viewMode, setViewMode }: MenuProps) {
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const handleToggleView = () => {
     setViewMode(viewMode === "table" ? "mobile" : "table")
   }
@@ -36,7 +32,12 @@ export default function Menu({
     ...initialActions,
   ]
 
-  const defaultEntity = defaultFaction
+  function handleOpenCreateDrawer() {
+    setDrawerOpen(true)
+  }
+  function handleCloseCreateDrawer() {
+    setDrawerOpen(false)
+  }
 
   return (
     <>
@@ -44,8 +45,6 @@ export default function Menu({
       <CreateFactionForm
         open={drawerOpen}
         onClose={handleCloseCreateDrawer}
-        onSave={handleSave}
-        initialFormData={{ defaultEntity }}
       />
     </>
   )

@@ -2,7 +2,6 @@ import Link from "next/link"
 import { headers } from "next/headers"
 import { Breadcrumbs as MuiBreadcrumbs, Typography } from "@mui/material"
 import NavigateNextIcon from "@mui/icons-material/NavigateNext"
-import { getServerClient } from "@/lib"
 import {
   SiteName,
   WeaponName,
@@ -96,7 +95,7 @@ async function fetchCrumbName(
   return null
 }
 
-export default async function Breadcrumbs() {
+export default async function Breadcrumbs({ client }) {
   const labelMap: { [key: string]: string } = {
     characters: "Characters",
     vehicles: "Vehicles",
@@ -110,8 +109,6 @@ export default async function Breadcrumbs() {
     parties: "Parties",
     sites: "Sites",
   }
-
-  const client = await getServerClient()
 
   // Infer pathnames from custom header
   const headersState = await headers()

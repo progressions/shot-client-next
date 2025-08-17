@@ -11,7 +11,7 @@ import {
   useRef,
 } from "react"
 import Cookies from "js-cookie"
-import Client from "@/lib/Client"
+import { Client } from "@/lib"
 import {
   defaultUser,
   type User,
@@ -113,6 +113,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         setError(null)
 
         const cachedUser = localStorage.getItem(`currentUser-${jwt}`)
+        console.log("Cached user:", cachedUser)
         if (cachedUser) {
           const parsedUser = JSON.parse(cachedUser)
           if (parsedUser && parsedUser.id !== defaultUser.id) {

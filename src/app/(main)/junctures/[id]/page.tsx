@@ -1,6 +1,6 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
-import { getServerClient, getUser } from "@/lib/getServerClient"
+import { getServerClient, getCurrentUser } from "@/lib"
 import type { Juncture } from "@/types"
 import { NotFound, Show } from "@/components/junctures"
 import { Suspense } from "react"
@@ -13,7 +13,7 @@ type JuncturePageProperties = {
 export default async function JuncturePage({ params }: JuncturePageProperties) {
   const { id } = await params
   const client = await getServerClient()
-  const user = await getUser()
+  const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
   try {
@@ -27,7 +27,7 @@ export default async function JuncturePage({ params }: JuncturePageProperties) {
 
     return (
       <>
-        <Breadcrumbs />
+        <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
           <Show juncture={juncture} initialIsMobile={initialIsMobile} />
         </Suspense>
