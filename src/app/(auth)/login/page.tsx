@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Stack, Box, Typography, Alert, Container } from "@mui/material"
 import { Button, TextField } from "@/components/ui"
 import Cookies from "js-cookie"
@@ -14,7 +14,10 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { dispatchCurrentUser } = useClient()
+  
+  const redirectTo = searchParams.get("redirect") || "/"
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,7 +48,7 @@ export default function LoginPage() {
         payload: temporaryResponse.data,
       })
 
-      router.push("/")
+      router.push(redirectTo)
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : "An error occurred")
       console.error("Login error:", error_)
