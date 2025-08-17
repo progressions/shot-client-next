@@ -1,6 +1,5 @@
 "use client"
 
-import { Stack, Box } from "@mui/material"
 import type { Vehicle, VehicleArchetype } from "@/types"
 import { Autocomplete } from "@/components/ui"
 import { useRef, useEffect, useState } from "react"
@@ -82,17 +81,13 @@ export default function EditArchetype({
   }
 
   return (
-    <Stack sx={{ mt: 2 }}>
-      <Box sx={{ width: 200 }}>
-        <Autocomplete
-          label="Archetype"
-          freeSolo
-          value={archetype || ""}
-          fetchOptions={fetchArchetypes}
-          onChange={handleChange}
-          allowNone={false}
-        />
-      </Box>
-    </Stack>
+    <Autocomplete
+      label="Archetype"
+      freeSolo
+      value={archetype || ""}
+      fetchOptions={fetchArchetypes}
+      onChange={handleChange}
+      allowNone={false}
+    />
   )
 }

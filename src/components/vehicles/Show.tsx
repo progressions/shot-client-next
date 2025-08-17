@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import { FormControl, FormHelperText, Box } from "@mui/material"
+import { FormControl, FormHelperText, Box, Stack } from "@mui/material"
 import type { Vehicle } from "@/types"
 import {
   InfoLink,
@@ -21,6 +21,7 @@ import {
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import { Owner } from "@/components/characters"
+import { EditFaction } from "@/components/factions"
 
 type FormStateData = {
   entity: Vehicle & {
@@ -102,7 +103,17 @@ export default function Show({ vehicle: initialVehicle }: ShowProperties) {
         Personal details provide additional context and background about a{" "}
         <InfoLink href="/vehicles" info="Vehicle" />.
       </SectionHeader>
-      <Archetype vehicle={vehicle} updateEntity={updateEntity} />
+      <Stack direction="row" spacing={2} sx={{ my: 2 }}>
+        <Box sx={{ flex: 1 }}>
+          <Archetype vehicle={vehicle} updateEntity={updateEntity} />
+        </Box>
+        <Box sx={{ flex: 1 }}>
+          <EditFaction
+            entity={vehicle}
+            updateEntity={updateEntity}
+          />
+        </Box>
+      </Stack>
     </Box>
   )
 }
