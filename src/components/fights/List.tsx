@@ -41,7 +41,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const isFetching = useRef(false)
   const isInitialRender = useRef(true)
 
-  // Set initial data on mount
+  // Set initial data on mount only
   useEffect(() => {
     console.log("List initialFormData:", initialFormData)
     dispatchForm({
@@ -59,7 +59,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
       name: "meta",
       value: initialFormData.meta,
     })
-  }, [initialFormData, dispatchForm])
+  }, []) // Remove dependencies to only run on mount
 
   const fetchFights = useCallback(
     async filters => {
