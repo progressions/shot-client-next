@@ -1,7 +1,7 @@
 "use client"
 
 import type { Entity } from "@/types"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { FactionAutocomplete } from "@/components/autocomplete"
 
 type EditFactionProps = {
@@ -14,6 +14,11 @@ export default function EditFaction({
   updateEntity,
 }: EditFactionProps) {
   const [faction, setFaction] = useState(entity.faction)
+
+  // Sync local state when entity prop changes
+  useEffect(() => {
+    setFaction(entity.faction)
+  }, [entity.faction])
 
   const handleFactionChange = async (value: string | null) => {
     if (!value) return

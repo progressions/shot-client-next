@@ -30,7 +30,7 @@ type FormStateData = {
 }
 
 export default function Show({ juncture: initialJuncture }: ShowProperties) {
-  const { campaignData } = useCampaign()
+  const { subscribeToEntity } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialJuncture,
   })
@@ -57,16 +57,19 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
     document.title = juncture.name ? `${juncture.name} - Chi War` : "Chi War"
   }, [juncture.name])
 
+  // Subscribe to juncture updates
   useEffect(() => {
-    if (
-      campaignData?.juncture &&
-      campaignData.juncture.id === initialJuncture.id
-    ) {
-      setJuncture(campaignData.juncture)
-    }
-  }, [campaignData, initialJuncture, setJuncture])
-
-  console.log("juncture.faction_id", juncture.faction_id)
+    const unsubscribe = subscribeToEntity("juncture", (data) => {
+      if (data && data.id === initialJuncture.id) {
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "entity",
+          value: { ...data },
+        })
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, initialJuncture.id, dispatchForm])
 
   return (
     <Box

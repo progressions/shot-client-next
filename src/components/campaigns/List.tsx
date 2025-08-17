@@ -32,7 +32,7 @@ export type FormStateData = {
 
 export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { client } = useClient()
-  const { campaignData } = useCampaign()
+  const { subscribeToEntity } = useCampaign()
   const { saveLocally } = useLocalStorage()
   const router = useRouter()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
@@ -77,13 +77,15 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
     [client, dispatchForm]
   )
 
+  // Subscribe to campaign updates
   useEffect(() => {
-    if (!campaignData) return
-    console.log("Campaign data:", campaignData)
-    if (campaignData.campaigns === "reload") {
-      fetchCampaigns(filters)
-    }
-  }, [campaignData, fetchCampaigns, filters])
+    const unsubscribe = subscribeToEntity("campaigns", (data) => {
+      if (data === "reload") {
+        fetchCampaigns(filters)
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, fetchCampaigns, filters])
 
   useEffect(() => {
     const url = `/campaigns?${queryParams(filters)}`

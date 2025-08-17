@@ -58,8 +58,6 @@ export default function Badge({
     if (!name) return
 
     if (campaignData[name] && campaignData[name].id === entity.id) {
-      console.log("campaignData", campaignData[name])
-      console.log("campaignData", campaignData[name].image_url)
       setEntity(campaignData[name])
     }
   }, [name, campaignData, entity.id])

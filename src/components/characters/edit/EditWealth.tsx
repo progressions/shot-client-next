@@ -2,7 +2,7 @@
 
 import type { Character } from "@/types"
 import { Autocomplete } from "@/components/ui"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { CS } from "@/services"
 
 type EditWealthProps = {
@@ -14,7 +14,14 @@ export default function EditWealth({
   character,
   updateCharacter,
 }: EditWealthProps) {
-  const [characterWealth, setCharacterWealth] = useState(CS.type(character))
+  const [characterWealth, setCharacterWealth] = useState(CS.wealth(character))
+
+  // Sync local state when character prop changes
+  useEffect(() => {
+    const newWealth = CS.wealth(character)
+    console.log("EditWealth useEffect - character.wealth:", character.wealth, "CS.wealth:", newWealth, "current state:", characterWealth)
+    setCharacterWealth(newWealth)
+  }, [character])
 
   const fetchCharacterWealths = async () => {
     const characterWealths = ["Poor", "Working Stiff", "Rich"].map(type => ({
@@ -27,7 +34,12 @@ export default function EditWealth({
   const handleWealthChange = async (value: string | null) => {
     if (!value) return
 
-    const updatedCharacter = CS.updateActionValue(character, "Wealth", value)
+    console.log("EditWealth handleWealthChange - old wealth:", character.wealth, "new value:", value)
+    const updatedCharacter = {
+      ...character,
+      wealth: value,
+    }
+    console.log("EditWealth handleWealthChange - updated character wealth:", updatedCharacter.wealth)
     setCharacterWealth(value)
     updateCharacter(updatedCharacter)
   }

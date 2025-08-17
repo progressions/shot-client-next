@@ -47,29 +47,23 @@ export function NumberField({
   const handleIncrement = () => {
     const currentValue = Number(value) || 0
     const newValue = currentValue + 1
-    console.log(
-      "Increment: currentValue =",
-      currentValue,
-      "newValue =",
-      newValue
-    )
-    onChange({
+    const fakeEvent = {
       target: { name, value: newValue.toString() },
-    } as React.ChangeEvent<HTMLInputElement>)
+    } as React.ChangeEvent<HTMLInputElement>
+    onChange(fakeEvent)
+    // Also trigger onBlur to save the change
+    onBlur(fakeEvent as any)
   }
 
   const handleDecrement = () => {
     const currentValue = Number(value) || 0
     const newValue = currentValue - 1
-    console.log(
-      "Decrement: currentValue =",
-      currentValue,
-      "newValue =",
-      newValue
-    )
-    onChange({
+    const fakeEvent = {
       target: { name, value: newValue.toString() },
-    } as React.ChangeEvent<HTMLInputElement>)
+    } as React.ChangeEvent<HTMLInputElement>
+    onChange(fakeEvent)
+    // Also trigger onBlur to save the change
+    onBlur(fakeEvent as any)
   }
 
   if (!onBlur) throw "WTF"
@@ -93,7 +87,6 @@ export function NumberField({
         onChange={onChange}
         onBlur={event => {
           setIsFocused(false)
-          console.log("blur", event)
           onBlur(event)
         }}
         onFocus={() => setIsFocused(true)}

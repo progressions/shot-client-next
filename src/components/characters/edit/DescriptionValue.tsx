@@ -1,13 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { TextField } from "@/components/ui"
 import { CS } from "@/services"
 import type { Character } from "@/types"
 
 type DescriptionValueProps = {
   name: string
-  type: "text" | "number"
+  type?: "text" | "number"
+  value: string
   character: Character
   updateCharacter: (character: Character) => Promise<void>
 }
@@ -15,11 +16,16 @@ type DescriptionValueProps = {
 export default function DescriptionValue({
   name,
   type = "text",
-  value: initialValue,
+  value: propValue,
   character,
   updateCharacter,
 }: DescriptionValueProps) {
-  const [value, setValue] = useState(initialValue || "")
+  const [value, setValue] = useState(propValue || "")
+
+  // Sync local state when prop value changes
+  useEffect(() => {
+    setValue(propValue || "")
+  }, [propValue])
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value)

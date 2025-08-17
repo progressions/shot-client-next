@@ -32,7 +32,7 @@ export type FormStateData = {
 
 export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { client } = useClient()
-  const { campaignData } = useCampaign()
+  const { subscribeToEntity } = useCampaign()
   const { saveLocally } = useLocalStorage()
   const router = useRouter()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
@@ -45,7 +45,6 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   const fetchCharacters = useCallback(
     async filters => {
-      console.log("fetchCharacters - isFetching.current:", isFetching.current)
       if (isFetching.current) return
       isFetching.current = true
       try {
@@ -84,13 +83,16 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
     [client, dispatchForm]
   )
 
+  // Subscribe to character updates
   useEffect(() => {
-    if (!campaignData) return
-    console.log("Campaign data:", campaignData)
-    if (campaignData.characters === "reload") {
-      fetchCharacters(filters)
-    }
-  }, [campaignData, fetchCharacters, filters])
+    const unsubscribe = subscribeToEntity("characters", (data) => {
+      console.log("Characters update:", data)
+      if (data === "reload") {
+        fetchCharacters(filters)
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, fetchCharacters, filters])
 
   useEffect(() => {
     console.log(

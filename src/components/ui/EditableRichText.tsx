@@ -20,38 +20,11 @@ export function EditableRichText({
   onChange,
   fallback,
 }: EditableRichTextProps) {
-  const [isHovered, setIsHovered] = useState(false)
-  // const [value, setValue] = useState(html)
-
   const handleSave = (event: EditorChangeEvent) => {
-    console.log("EditorRichText about to handleSave", event)
     if (onChange) {
-      console.log("EditorRichText about to submit value", event)
       onChange(event)
     }
   }
 
   return <Editor name={name} value={html} onChange={handleSave} />
-
-  return (
-    <Paper
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <RichTextRenderer html={html || fallback} />
-      {editable && isHovered && (
-        <MiniButton
-          size="mini"
-          sx={{
-            position: "absolute",
-            bottom: 8,
-            right: 8,
-          }}
-          onClick={() => setIsEditing(true)}
-        >
-          Edit
-        </MiniButton>
-      )}
-    </Paper>
-  )
 }

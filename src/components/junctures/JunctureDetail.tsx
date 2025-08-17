@@ -28,24 +28,19 @@ export default function JunctureDetail({
   onEdit,
 }: JunctureDetailProperties) {
   const { client } = useClient()
-  const { campaignData } = useCampaign()
+  const { subscribeToEntity } = useCampaign()
   const [error, setError] = useState<string | null>(null)
   const [juncture, setJuncture] = useState<Juncture>(initialJuncture)
 
+  // Subscribe to juncture updates
   useEffect(() => {
-    if (
-      campaignData?.juncture &&
-      campaignData.juncture.id === initialJuncture.id
-    ) {
-      setJuncture({
-        ...initialJuncture,
-        name: campaignData.juncture.name || initialJuncture.name,
-        description:
-          campaignData.juncture.description || initialJuncture.description,
-        image_url: campaignData.juncture.image_url || initialJuncture.image_url,
-      })
-    }
-  }, [campaignData, initialJuncture])
+    const unsubscribe = subscribeToEntity("juncture", (data) => {
+      if (data && data.id === initialJuncture.id) {
+        setJuncture({ ...data })
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, initialJuncture.id])
 
   const handleDelete = async () => {
     if (!juncture?.id) return

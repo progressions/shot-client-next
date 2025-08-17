@@ -132,9 +132,6 @@ const SharedService = {
     try {
       return (character.action_values[key] as string) || ""
     } catch (error) {
-      console.log("error", error)
-      console.log("character", character)
-      console.log("key", key)
       return ""
     }
   },

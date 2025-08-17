@@ -39,7 +39,7 @@ interface ShowProperties {
 }
 
 export default function Show({ fight: initialFight }: ShowProperties) {
-  const { campaignData } = useCampaign()
+  const { subscribeToEntity } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialFight,
     errors: {},
@@ -55,17 +55,19 @@ export default function Show({ fight: initialFight }: ShowProperties) {
     document.title = fight.name ? `${fight.name} - Chi War` : "Chi War"
   }, [fight.name])
 
+  // Subscribe to fight updates
   useEffect(() => {
-    console.log("got campaignData", campaignData)
-    if (campaignData?.fight && campaignData.fight.id === initialFight.id) {
-      console.log("campaignData.fight", campaignData.fight)
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "entity",
-        value: { ...campaignData.fight },
-      })
-    }
-  }, [campaignData, initialFight, dispatchForm])
+    const unsubscribe = subscribeToEntity("fight", (data) => {
+      if (data && data.id === initialFight.id) {
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "entity",
+          value: { ...data },
+        })
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, initialFight.id, dispatchForm])
 
   const setFight = (updatedFight: Fight) => {
     dispatchForm({
@@ -89,12 +91,11 @@ export default function Show({ fight: initialFight }: ShowProperties) {
   }
 
   const handleJoinFight = () => {
-    console.log("Join fight clicked")
+    // TODO: Implement join fight functionality
   }
 
   const handleChangeLocal = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    console.log("name, value", { name, value })
     dispatchForm({
       type: FormActions.UPDATE,
       name: "entity",
@@ -157,7 +158,7 @@ export default function Show({ fight: initialFight }: ShowProperties) {
             <NumberField
               label="Season"
               name="season"
-              value={fight.season || ""}
+              value={fight.season || null}
               onChange={handleChangeLocal}
               onBlur={handleChangeAndSave}
               size="small"
@@ -171,7 +172,7 @@ export default function Show({ fight: initialFight }: ShowProperties) {
             <NumberField
               label="Session"
               name="session"
-              value={fight.session || ""}
+              value={fight.session || null}
               onChange={handleChangeLocal}
               onBlur={handleChangeAndSave}
               size="small"

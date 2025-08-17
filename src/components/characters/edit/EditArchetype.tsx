@@ -2,7 +2,7 @@
 
 import type { Character } from "@/types"
 import { Autocomplete } from "@/components/ui"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { CS } from "@/services"
 import { useClient } from "@/contexts"
 
@@ -17,6 +17,11 @@ export default function EditType({
 }: EditTypeProps) {
   const { client } = useClient()
   const [archetype, setArchetype] = useState(CS.archetype(character))
+
+  // Sync local state when character prop changes
+  useEffect(() => {
+    setArchetype(CS.archetype(character))
+  }, [character])
 
   const fetchArchetypes = async (inputValue: string) => {
     const response = await client.getCharacters({ per_page: 1000 })

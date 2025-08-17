@@ -9,21 +9,18 @@ interface JunctureNameProperties {
 }
 
 export default function JunctureName({ juncture }: JunctureNameProperties) {
-  const { campaignData } = useCampaign()
+  const { subscribeToEntity } = useCampaign()
   const [displayName, setDisplayName] = useState(juncture.name)
 
+  // Subscribe to juncture updates
   useEffect(() => {
-    if (campaignData && "juncture" in campaignData) {
-      const updatedJuncture = campaignData.juncture
-      if (
-        updatedJuncture &&
-        updatedJuncture.id === juncture.id &&
-        updatedJuncture.name
-      ) {
-        setDisplayName(updatedJuncture.name)
+    const unsubscribe = subscribeToEntity("juncture", (data) => {
+      if (data && data.id === juncture.id && data.name) {
+        setDisplayName(data.name)
       }
-    }
-  }, [campaignData, juncture.id])
+    })
+    return unsubscribe
+  }, [subscribeToEntity, juncture.id])
 
   return <>{displayName}</>
 }

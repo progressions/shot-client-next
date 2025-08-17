@@ -34,7 +34,7 @@ interface ShowProperties {
 }
 
 export default function Show({ vehicle: initialVehicle }: ShowProperties) {
-  const { campaignData } = useCampaign()
+  const { subscribeToEntity } = useCampaign()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialVehicle,
   })
@@ -46,20 +46,19 @@ export default function Show({ vehicle: initialVehicle }: ShowProperties) {
     document.title = vehicle.name ? `${vehicle.name} - Chi War` : "Chi War"
   }, [vehicle.name])
 
+  // Subscribe to vehicle updates
   useEffect(() => {
-    console.log("got campaignData", campaignData)
-    if (
-      campaignData?.vehicle &&
-      campaignData.vehicle.id === initialVehicle.id
-    ) {
-      console.log("campaignData.vehicle", campaignData.vehicle)
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "entity",
-        value: { ...campaignData.vehicle },
-      })
-    }
-  }, [campaignData, initialVehicle, dispatchForm])
+    const unsubscribe = subscribeToEntity("vehicle", (data) => {
+      if (data && data.id === initialVehicle.id) {
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "entity",
+          value: { ...data },
+        })
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, initialVehicle.id, dispatchForm])
 
   const setVehicle = (updatedVehicle: Vehicle) => {
     dispatchForm({

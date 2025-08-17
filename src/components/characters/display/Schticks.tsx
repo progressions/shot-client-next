@@ -13,7 +13,6 @@ export default function Schticks({
   updateCharacter,
   manage = true,
 }: SchticksProperties) {
-  console.log("Schticks component rendered with character:", character)
   return (
     <Manager
       icon={<Icon keyword="Schticks" />}

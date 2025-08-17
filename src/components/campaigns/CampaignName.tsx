@@ -9,21 +9,18 @@ interface CampaignNameProperties {
 }
 
 export default function CampaignName({ campaign }: CampaignNameProperties) {
-  const { campaignData } = useCampaign()
+  const { subscribeToEntity } = useCampaign()
   const [displayName, setDisplayName] = useState(campaign.name)
 
+  // Subscribe to campaign updates
   useEffect(() => {
-    if (campaignData && "campaign" in campaignData) {
-      const updatedCampaign = campaignData.campaign
-      if (
-        updatedCampaign &&
-        updatedCampaign.id === campaign.id &&
-        updatedCampaign.name
-      ) {
-        setDisplayName(updatedCampaign.name)
+    const unsubscribe = subscribeToEntity("campaign", (data) => {
+      if (data && data.id === campaign.id && data.name) {
+        setDisplayName(data.name)
       }
-    }
-  }, [campaignData, campaign.id])
+    })
+    return unsubscribe
+  }, [subscribeToEntity, campaign.id])
 
   return <>{displayName}</>
 }

@@ -55,7 +55,7 @@ type FormStateData = {
 }
 
 export default function Show({ weapon: initialWeapon }: ShowProperties) {
-  const { campaignData } = useCampaign()
+  const { subscribeToEntity } = useCampaign()
   const { toastError } = useToast()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialWeapon,
@@ -71,15 +71,19 @@ export default function Show({ weapon: initialWeapon }: ShowProperties) {
     document.title = weapon.name ? `${weapon.name} - Chi War` : "Chi War"
   }, [weapon.name])
 
+  // Subscribe to weapon updates
   useEffect(() => {
-    if (campaignData?.weapon && campaignData.weapon.id === initialWeapon.id) {
-      dispatchForm({
-        type: FormActions.UPDATE,
-        name: "entity",
-        value: campaignData.weapon,
-      })
-    }
-  }, [campaignData, initialWeapon, dispatchForm])
+    const unsubscribe = subscribeToEntity("weapon", (data) => {
+      if (data && data.id === initialWeapon.id) {
+        dispatchForm({
+          type: FormActions.UPDATE,
+          name: "entity",
+          value: { ...data },
+        })
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, initialWeapon.id, dispatchForm])
 
   const handleDelete = async () => {
     try {

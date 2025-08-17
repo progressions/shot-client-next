@@ -4,7 +4,7 @@ import StarterKit from "@tiptap/starter-kit"
 import CustomMention from "@/components/editor/CustomMention"
 import styles from "@/components/editor/Editor.module.scss"
 import { RichTextEditor } from "mui-tiptap"
-import { useCallback, useRef } from "react"
+import { useCallback, useRef, useEffect } from "react"
 import suggestion from "./suggestion.js"
 import type { EditorChangeEvent } from "@/types"
 import { useClient } from "@/contexts"
@@ -30,11 +30,25 @@ export default function Editor({ name, value, onChange }: EditorProps) {
           value: html,
         },
       }
-      console.log("Editor saveOnBlur event:", event)
       onChange(event)
     },
     [name, onChange]
   )
+  // Sync editor content when value prop changes
+  useEffect(() => {
+    if (editorReference.current) {
+      const editorComponent = editorReference.current
+      // Access the actual TipTap editor instance
+      const editor = editorComponent.editor
+      if (editor) {
+        const currentContent = editor.getHTML()
+        if (currentContent !== value && value !== undefined) {
+          editor.commands.setContent(value || "")
+        }
+      }
+    }
+  }, [value])
+
   const extensions = [
     StarterKit.configure({
       mention: false,

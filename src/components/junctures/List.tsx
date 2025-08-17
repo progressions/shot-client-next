@@ -32,7 +32,7 @@ export type FormStateData = {
 
 export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { client } = useClient()
-  const { campaignData } = useCampaign()
+  const { subscribeToEntity } = useCampaign()
   const { saveLocally } = useLocalStorage()
   const router = useRouter()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
@@ -77,13 +77,15 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
     [client, dispatchForm]
   )
 
+  // Subscribe to juncture updates
   useEffect(() => {
-    if (!campaignData) return
-    console.log("Campaign data:", campaignData)
-    if (campaignData.junctures === "reload") {
-      fetchJunctures(filters)
-    }
-  }, [campaignData, fetchJunctures, filters])
+    const unsubscribe = subscribeToEntity("junctures", (data) => {
+      if (data === "reload") {
+        fetchJunctures(filters)
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, fetchJunctures, filters])
 
   useEffect(() => {
     const url = `/junctures?${queryParams(filters)}`

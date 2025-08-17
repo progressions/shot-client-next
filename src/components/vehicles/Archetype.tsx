@@ -34,6 +34,11 @@ export default function EditArchetype({
     }
   }, [isMounted, fetchRecords])
 
+  // Sync local state with vehicle prop changes from WebSocket
+  useEffect(() => {
+    setArchetype(VS.archetype(vehicle))
+  }, [vehicle])
+
   const fetchArchetypes = async (inputValue: string) => {
     return archetypes
       .filter(arch =>
