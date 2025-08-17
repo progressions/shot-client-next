@@ -41,6 +41,9 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
   function handleCloseCreateDrawer() {
     setDrawerOpen(false)
   }
+  function handleSave() {
+    setDrawerOpen(false)
+  }
 
   return (
     <>
@@ -48,6 +51,7 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
       <CreateSiteForm
         open={drawerOpen}
         onClose={handleCloseCreateDrawer}
+        onSave={handleSave}
         initialFormData={{ defaultEntity }}
       />
     </>
