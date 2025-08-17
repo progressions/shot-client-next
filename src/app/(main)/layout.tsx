@@ -1,7 +1,8 @@
+import React from "react"
 import ThemeRegistry from "@/components/ThemeRegistry"
 import { AppProvider, LocalStorageProvider, ToastProvider } from "@/contexts"
 import { Navbar, Footer } from "@/components/ui"
-import { getUser } from "@/lib/getServerClient"
+import { getCurrentUser } from "@/lib"
 import "@/styles/global.scss"
 import { Container } from "@mui/material"
 import PopupToast from "@/components/PopupToast"
@@ -11,8 +12,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const user = await getUser()
-
+  const user = await getCurrentUser()
   return (
     <html lang="en">
       <body>
@@ -20,12 +20,16 @@ export default async function RootLayout({
           <LocalStorageProvider>
             <AppProvider initialUser={user}>
               <ToastProvider>
-                <Navbar />
+                <Navbar user={user} />
                 <Container
                   maxWidth="md"
                   sx={{ paddingTop: 2, paddingBottom: 2 }}
                 >
-                  {children}
+                  {React.Children.map(children, child =>
+                    React.isValidElement(child)
+                      ? React.cloneElement(child, { user })
+                      : child
+                  )}
                   <PopupToast />
                   <Footer />
                 </Container>

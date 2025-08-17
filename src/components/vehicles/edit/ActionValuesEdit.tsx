@@ -1,6 +1,6 @@
 "use client"
 import type { Entity } from "@/types"
-import { Box, Stack } from "@mui/material"
+import { Box, Grid } from "@mui/material"
 import { VS } from "@/services"
 import { ActionValueEdit as ActionValue } from "@/components/characters"
 type ActionValuesEditProps = {
@@ -16,9 +16,9 @@ export default function ActionValuesEdit({
   updateEntity,
 }: ActionValuesEditProps) {
   return (
-    <Box sx={{ display: "flex", justifyContent: "center" }}>
-      <Stack direction={{ xs: "column", md: "row" }} spacing={2} mb={2}>
-        <Stack direction="row" spacing={2} justifyContent="center">
+    <Box sx={{ width: "100%" }}>
+      <Grid container spacing={2} justifyContent="center">
+        <Grid item xs={6} sm={4} md={2.4}>
           <ActionValue
             name="Acceleration"
             value={VS.acceleration(entity)}
@@ -27,6 +27,8 @@ export default function ActionValuesEdit({
             setCharacter={setEntity}
             updateCharacter={updateEntity}
           />
+        </Grid>
+        <Grid item xs={6} sm={4} md={2.4}>
           <ActionValue
             name="Handling"
             value={VS.handling(entity)}
@@ -35,6 +37,8 @@ export default function ActionValuesEdit({
             setCharacter={setEntity}
             updateCharacter={updateEntity}
           />
+        </Grid>
+        <Grid item xs={6} sm={4} md={2.4}>
           <ActionValue
             name="Squeal"
             value={VS.squeal(entity)}
@@ -43,8 +47,8 @@ export default function ActionValuesEdit({
             setCharacter={setEntity}
             updateCharacter={updateEntity}
           />
-        </Stack>
-        <Stack direction="row" spacing={2} justifyContent="center">
+        </Grid>
+        <Grid item xs={6} sm={4} md={2.4}>
           <ActionValue
             name="Frame"
             value={VS.frame(entity)}
@@ -53,6 +57,8 @@ export default function ActionValuesEdit({
             setCharacter={setEntity}
             updateCharacter={updateEntity}
           />
+        </Grid>
+        <Grid item xs={6} sm={4} md={2.4}>
           <ActionValue
             name="Crunch"
             value={VS.crunch(entity)}
@@ -61,8 +67,8 @@ export default function ActionValuesEdit({
             setCharacter={setEntity}
             updateCharacter={updateEntity}
           />
-        </Stack>
-      </Stack>
+        </Grid>
+      </Grid>
     </Box>
   )
 }

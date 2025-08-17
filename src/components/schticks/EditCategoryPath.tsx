@@ -23,8 +23,10 @@ type FormStateData = {
 
 interface EditCategoryPathProps {
   schtick: Schtick
-  updateEntity: (entity: Schtick) => Promise<void>
-  state: { saving: boolean; errors: Record<string, string> }
+  updateEntity?: (entity: Schtick) => Promise<void> // Optional for forms
+  setEntity?: (entity: Schtick) => void // For form mode
+  state?: { saving: boolean; errors: Record<string, string> } // Optional for forms
+  errors?: Record<string, string> // For form mode
 }
 
 const CategoryAutocomplete = createStringAutocomplete("Category")
@@ -33,7 +35,9 @@ const PathAutocomplete = createStringAutocomplete("Path")
 export default function EditCategoryPath({
   schtick,
   updateEntity,
+  setEntity,
   state,
+  errors: formErrors,
 }: EditCategoryPathProps) {
   const { client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
@@ -42,7 +46,9 @@ export default function EditCategoryPath({
     isPathsLoading: false,
   })
   const { category, path, isPathsLoading } = formState.data
-  const { saving, errors } = state
+  const isFormMode = !!setEntity
+  const { saving, errors } = state || { saving: false, errors: {} }
+  const actualErrors = formErrors || errors
   const [categories, setCategories] = useState<string[]>([])
   const [paths, setPaths] = useState<string[]>([])
   const [generalLength, setGeneralLength] = useState(0)
@@ -98,18 +104,42 @@ export default function EditCategoryPath({
   )
 
   const handleCategoryChange = async (value: string | null) => {
+    // Always update internal state
     dispatchForm({ type: FormActions.UPDATE, name: "category", value })
     dispatchForm({ type: FormActions.UPDATE, name: "path", value: null })
-    dispatchForm({ type: FormActions.SUBMIT })
-    await updateEntity({ ...schtick, category: value, path: null })
-    dispatchForm({ type: FormActions.SUCCESS })
+    
+    if (isFormMode && setEntity) {
+      // Form mode: just update the parent entity, no server calls
+      setEntity({ ...schtick, category: value, path: null })
+    } else if (updateEntity) {
+      // Edit mode: save to server
+      dispatchForm({ type: FormActions.SUBMIT })
+      try {
+        await updateEntity({ ...schtick, category: value, path: null })
+        dispatchForm({ type: FormActions.SUCCESS })
+      } catch {
+        dispatchForm({ type: FormActions.ERROR, payload: "Failed to update category" })
+      }
+    }
   }
 
   const handlePathChange = async (value: string | null) => {
+    // Always update internal state
     dispatchForm({ type: FormActions.UPDATE, name: "path", value })
-    dispatchForm({ type: FormActions.SUBMIT })
-    await updateEntity({ ...schtick, path: value })
-    dispatchForm({ type: FormActions.SUCCESS })
+    
+    if (isFormMode && setEntity) {
+      // Form mode: just update the parent entity, no server calls
+      setEntity({ ...schtick, category, path: value })
+    } else if (updateEntity) {
+      // Edit mode: save to server
+      dispatchForm({ type: FormActions.SUBMIT })
+      try {
+        await updateEntity({ ...schtick, path: value })
+        dispatchForm({ type: FormActions.SUCCESS })
+      } catch {
+        dispatchForm({ type: FormActions.ERROR, payload: "Failed to update path" })
+      }
+    }
   }
 
   useEffect(() => {
@@ -133,14 +163,14 @@ export default function EditCategoryPath({
         <InfoLink info="Advancement" /> choices.
       </SectionHeader>
       <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-        <FormControl fullWidth error={!!errors.category}>
+        <FormControl fullWidth error={!!actualErrors.category}>
           <CategoryAutocomplete
             value={category || ""}
             onChange={handleCategoryChange}
             records={categories}
             sx={{ width: "100%" }}
             allowNone={false}
-            disabled={saving}
+            disabled={isFormMode ? false : saving}
             groupBy={option =>
               categories.indexOf(option.id as string) < generalLength
                 ? "General"
@@ -159,11 +189,11 @@ export default function EditCategoryPath({
               </Box>
             )}
           />
-          {errors.category && (
-            <FormHelperText>{errors.category}</FormHelperText>
+          {actualErrors.category && (
+            <FormHelperText>{actualErrors.category}</FormHelperText>
           )}
         </FormControl>
-        <FormControl fullWidth error={!!errors.path}>
+        <FormControl fullWidth error={!!actualErrors.path}>
           {isPathsLoading ? (
             <Box sx={{ display: "flex", alignItems: "center", p: 2 }}>
               <CircularProgress size={24} />
@@ -179,13 +209,14 @@ export default function EditCategoryPath({
               records={paths}
               sx={{ width: "100%" }}
               allowNone={false}
+              disabled={isFormMode ? false : saving}
             />
           ) : (
             <Typography variant="body2" sx={{ color: "#ffffff" }}>
               Select a category first
             </Typography>
           )}
-          {errors.path && <FormHelperText>{errors.path}</FormHelperText>}
+          {actualErrors.path && <FormHelperText>{actualErrors.path}</FormHelperText>}
         </FormControl>
       </Stack>
     </Box>

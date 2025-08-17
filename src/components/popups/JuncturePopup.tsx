@@ -43,10 +43,6 @@ export default function JuncturePopup({ id }: PopupProps) {
     return null // Use null instead of <></> for consistency
   }
 
-  const subhead = ["Juncture", juncture.faction?.name]
-    .filter(Boolean)
-    .join(" - ")
-
   if (!juncture?.id) {
     return (
       <Box sx={{ p: 2 }}>

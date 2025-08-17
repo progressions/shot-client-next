@@ -4,7 +4,6 @@ import { GridView, ViewList } from "@mui/icons-material"
 import { CreateSiteForm } from "@/components/sites"
 import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
-import { defaultSite } from "@/types"
 import { useState } from "react"
 
 interface MenuProps {
@@ -33,8 +32,6 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
     ...initialActions,
   ]
 
-  const defaultEntity = defaultSite
-
   function handleOpenCreateDrawer() {
     setDrawerOpen(true)
   }
@@ -48,7 +45,6 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
       <CreateSiteForm
         open={drawerOpen}
         onClose={handleCloseCreateDrawer}
-        initialFormData={{ defaultEntity }}
       />
     </>
   )

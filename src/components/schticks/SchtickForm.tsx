@@ -2,14 +2,16 @@
 
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
-import { HeroImage, TextField, SaveButton, CancelButton } from "@/components/ui"
+import { Drawer, Box, Typography, Alert, IconButton, FormHelperText } from "@mui/material"
+import { HeroImage, SaveButton, CancelButton, NameEditor } from "@/components/ui"
 import type { EditorChangeEvent, Schtick } from "@/types"
 import { defaultSchtick } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
+import { useEntity } from "@/hooks"
+import { EditCategoryPath } from "@/components/schticks"
 
 type FormStateData = Schtick & {
   [key: string]: unknown
@@ -19,23 +21,25 @@ type FormStateData = Schtick & {
 interface SchtickFormProperties {
   open: boolean
   onClose: () => void
-  onSave: (formData: FormData, schtickData: Schtick) => Promise<void>
-  initialFormData: FormStateData
   title: string
 }
 
 export default function SchtickForm({
   open,
   onClose,
-  onSave,
-  initialFormData,
   title,
 }: SchtickFormProperties) {
-  const { formState, dispatchForm, initialFormState } =
-    useForm<FormStateData>(initialFormData)
-  const { disabled, error, data } = formState
+  const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
+    ...defaultSchtick,
+  })
+  const { disabled, error, errors, data } = formState
   const { name, description, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [nameValid, setNameValid] = useState(true)
+  const { createEntity, handleFormErrors } = useEntity<Schtick>(
+    defaultSchtick,
+    dispatchForm
+  )
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
@@ -49,6 +53,20 @@ export default function SchtickForm({
       setImagePreview(null)
     }
   }, [image])
+
+  useEffect(() => {
+    dispatchForm({
+      type: FormActions.DISABLE,
+      payload: !nameValid || !!errors.name || !data.category
+    })
+  }, [nameValid, errors.name, data.category, dispatchForm])
+
+  const handleSchtickUpdate = (updatedSchtick: Schtick) => {
+    dispatchForm({
+      type: FormActions.RESET,
+      payload: { ...formState, data: updatedSchtick }
+    })
+  }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -71,6 +89,31 @@ export default function SchtickForm({
     }
   }
 
+  const handleNameEntityUpdate = (updatedSchtick: Schtick) => {
+    // Update the name field
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "name",
+      value: updatedSchtick.name,
+    })
+    // Clear name errors when user changes the name
+    if (errors.name) {
+      dispatchForm({
+        type: FormActions.ERRORS,
+        payload: { ...errors, name: undefined }
+      })
+    }
+  }
+
+  const handleNameEntitySave = async (updatedSchtick: Schtick) => {
+    // For form, we just update local state, don't save
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "name",
+      value: updatedSchtick.name,
+    })
+  }
+
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()
     if (disabled) return
@@ -78,22 +121,12 @@ export default function SchtickForm({
       dispatchForm({ type: FormActions.ERROR, payload: "Name is required" })
       return
     }
-
     dispatchForm({ type: FormActions.SUBMIT })
     try {
-      const formData = new FormData()
-      const schtickData = { ...defaultSchtick, name, description } as Schtick
-      formData.append("schtick", JSON.stringify(siteData))
-      if (image) {
-        formData.append("image", image)
-      }
-      await onSave(formData, schtickData)
-    } catch (error_: unknown) {
-      const errorMessage = "An error occurred."
-      dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
-      console.error(`${title} error:`, error_)
-    } finally {
+      await createEntity(data, image)
       handleClose()
+    } catch (error) {
+      handleFormErrors(error)
     }
   }
 
@@ -127,20 +160,21 @@ export default function SchtickForm({
             {error}
           </Alert>
         )}
-        <Typography>Describe this thing.</Typography>
-        <TextField
-          label="Name"
-          value={name}
-          onChange={e =>
-            dispatchForm({
-              type: FormActions.UPDATE,
-              name: "name",
-              value: e.target.value,
-            })
-          }
-          margin="normal"
-          required
-          autoFocus
+        <NameEditor
+          entity={data}
+          setEntity={handleNameEntityUpdate}
+          updateEntity={handleNameEntitySave}
+          onValidationChange={setNameValid}
+        />
+        {errors.name && (
+          <FormHelperText error sx={{ mt: -1, mb: 1 }}>
+            {errors.name}
+          </FormHelperText>
+        )}
+        <EditCategoryPath
+          schtick={data}
+          setEntity={handleSchtickUpdate}
+          errors={errors}
         />
         <Editor
           name="description"

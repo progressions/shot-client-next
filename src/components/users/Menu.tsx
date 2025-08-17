@@ -1,22 +1,19 @@
+"use client"
+
 import { GridView, ViewList } from "@mui/icons-material"
-import { CreateSiteForm } from "@/components/sites"
+import { CreateUserForm } from "@/components/users"
 import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
-import { defaultSite } from "@/types"
+import { defaultUser } from "@/types"
+import { useState } from "react"
 
 interface MenuProps {
   viewMode: "table" | "mobile"
   setViewMode: (mode: "table" | "mobile") => void
 }
 
-export default function Menu({
-  viewMode,
-  setViewMode,
-  drawerOpen,
-  handleOpenCreateDrawer,
-  handleCloseCreateDrawer,
-  handleSave,
-}: MenuProps) {
+export default function Menu({ viewMode, setViewMode }: MenuProps) {
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const handleToggleView = () => {
     setViewMode(viewMode === "table" ? "mobile" : "table")
   }
@@ -36,12 +33,22 @@ export default function Menu({
     ...initialActions,
   ]
 
-  const defaultEntity = defaultSite
+  const defaultEntity = defaultUser
+
+  function handleOpenCreateDrawer() {
+    setDrawerOpen(true)
+  }
+  function handleCloseCreateDrawer() {
+    setDrawerOpen(false)
+  }
+  function handleSave() {
+    setDrawerOpen(false)
+  }
 
   return (
     <>
       <SpeedDial actions={actions} />
-      <CreateSiteForm
+      <CreateUserForm
         open={drawerOpen}
         onClose={handleCloseCreateDrawer}
         onSave={handleSave}

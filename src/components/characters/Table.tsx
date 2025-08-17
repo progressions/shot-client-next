@@ -1,7 +1,13 @@
 "use client"
 import { GridColDef } from "@mui/x-data-grid"
 import { FormStateType, FormStateAction } from "@/reducers"
-import { BaseDataGrid, FactionLink, CharacterLink } from "@/components/ui"
+import {
+  BaseDataGrid,
+  ArchetypeLink,
+  EntityLink,
+  FactionLink,
+  CharacterLink,
+} from "@/components/ui"
 import { CS } from "@/services"
 import { Avatar } from "@/components/avatars"
 import { PaginationMeta, Character } from "@/types"
@@ -49,7 +55,26 @@ const columns: GridColDef<Character>[] = [
     headerName: "Archetype",
     width: 140,
     editable: false,
-    renderCell: params => CS.archetype(params.row),
+    renderCell: params => {
+      const archetype = CS.archetype(params.row)
+      if (archetype) {
+        return <ArchetypeLink archetype={archetype} />
+      }
+      return null
+    },
+  },
+  {
+    field: "juncture",
+    headerName: "Juncture",
+    width: 160,
+    editable: false,
+    renderCell: params => {
+      const juncture = params.row.juncture
+      if (juncture) {
+        return <EntityLink entity={juncture} />
+      }
+      return null
+    },
   },
   {
     field: "faction",

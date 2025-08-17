@@ -9,6 +9,8 @@ import {
   Typography,
   Alert,
   IconButton,
+  FormControl,
+  FormHelperText,
 } from "@mui/material"
 import {
   InfoLink,
@@ -45,7 +47,7 @@ export default function UserForm({
 }: UserFormProperties) {
   const { formState, dispatchForm, initialFormState } =
     useForm<FormStateData>(initialFormData)
-  const { disabled, error, data } = formState
+  const { disabled, error, errors, data } = formState
   const { first_name, last_name, email, image } = data
   const [imagePreview, setImagePreview] = useState<string | null>(null)
 
@@ -83,34 +85,53 @@ export default function UserForm({
     }
   }
 
+  const handleFormError = (error_: unknown) => {
+    const axiosError = error_ as { response?: { status?: number; data?: { errors?: Record<string, string[]> } } }
+    if (axiosError.response?.status === 422 && axiosError.response?.data?.errors) {
+      const serverErrors = axiosError.response.data.errors
+      const formattedErrors: { [key: string]: string } = {}
+      Object.entries(serverErrors).forEach(([field, messages]) => {
+        if (messages && Array.isArray(messages) && messages.length > 0) {
+          formattedErrors[field] = messages[0]
+        }
+      })
+      dispatchForm({
+        type: FormActions.ERRORS,
+        payload: formattedErrors,
+      })
+      // Don't close drawer on validation errors
+      return false
+    } else {
+      const errorMessage = "An error occurred."
+      dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
+    }
+    console.error(`${title} error:`, error_)
+    return true // Should close drawer
+  }
+
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()
     if (disabled) return
-    if (!name.trim()) {
-      dispatchForm({ type: FormActions.ERROR, payload: "Name is required" })
+    if (!first_name.trim() || !last_name.trim()) {
+      dispatchForm({ type: FormActions.ERROR, payload: "First and last name are required" })
       return
     }
 
     dispatchForm({ type: FormActions.SUBMIT })
     try {
       const formData = new FormData()
-      const userData = {
-        ...defaultUser,
-        name,
-        description,
-        faction_id,
-      } as User
+      const userData = { ...defaultUser, ...data } as User
       formData.append("user", JSON.stringify(userData))
       if (image) {
         formData.append("image", image)
       }
       await onSave(formData, userData)
-    } catch (error_: unknown) {
-      const errorMessage = "An error occurred."
-      dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
-      console.error(`${title} error:`, error_)
-    } finally {
       handleClose()
+    } catch (error_: unknown) {
+      const shouldClose = handleFormError(error_)
+      if (shouldClose) {
+        handleClose()
+      }
     }
   }
 
@@ -151,34 +172,45 @@ export default function UserForm({
           .
         </Typography>
         <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-          <TextField
-            label="First Name"
-            value={first_name}
-            onChange={e =>
-              dispatchForm({
-                type: FormActions.UPDATE,
-                name: "first_name",
-                value: e.target.value,
-              })
-            }
-            margin="normal"
-            required
-            autoFocus
-          />
-          <TextField
-            label="Last Name"
-            value={last_name}
-            onChange={e =>
-              dispatchForm({
-                type: FormActions.UPDATE,
-                name: "last_name",
-                value: e.target.value,
-              })
-            }
-            margin="normal"
-            required
-            autoFocus
-          />
+          <FormControl fullWidth error={!!errors.first_name}>
+            <TextField
+              label="First Name"
+              value={first_name}
+              onChange={e =>
+                dispatchForm({
+                  type: FormActions.UPDATE,
+                  name: "first_name",
+                  value: e.target.value,
+                })
+              }
+              margin="normal"
+              required
+              autoFocus
+              error={!!errors.first_name}
+            />
+            {errors.first_name && (
+              <FormHelperText>{errors.first_name}</FormHelperText>
+            )}
+          </FormControl>
+          <FormControl fullWidth error={!!errors.last_name}>
+            <TextField
+              label="Last Name"
+              value={last_name}
+              onChange={e =>
+                dispatchForm({
+                  type: FormActions.UPDATE,
+                  name: "last_name",
+                  value: e.target.value,
+                })
+              }
+              margin="normal"
+              required
+              error={!!errors.last_name}
+            />
+            {errors.last_name && (
+              <FormHelperText>{errors.last_name}</FormHelperText>
+            )}
+          </FormControl>
         </Stack>
         <TextField
           label="Email"

@@ -1,6 +1,6 @@
 "use client"
 import { useRouter } from "next/navigation"
-import { useEffect, useCallback, useState, useRef } from "react"
+import { useRef, useEffect, useCallback, useState } from "react"
 import { Box } from "@mui/material"
 import type { Fight, PaginationMeta } from "@/types"
 import { useCampaign, useClient, useLocalStorage } from "@/contexts"
@@ -21,8 +21,8 @@ export type FormStateData = {
     sort: string
     order: string
     page: number
-    season: number | null
-    status: "Started" | "Unended" | "Ended" | null
+    season: number
+    status: "Started" | "Unended" | "Ended"
     search: string
   }
 }
@@ -37,12 +37,32 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   )
   const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
   const { filters } = formState.data
-  const isFetching = useRef(true) // Prevent duplicate fetches
+  const isFetching = useRef(false)
+  const isInitialRender = useRef(true)
 
-  console.log("initialFormData:", initialFormData)
+  // Set initial data on mount
+  useEffect(() => {
+    console.log("List initialFormData:", initialFormData)
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "fights",
+      value: initialFormData.fights,
+    })
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "seasons",
+      value: initialFormData.seasons,
+    })
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "meta",
+      value: initialFormData.meta,
+    })
+  }, [initialFormData, dispatchForm])
 
   const fetchFights = useCallback(
-    async (filters: FormStateData["filters"]) => {
+    async filters => {
+      console.log("fetchFights - isFetching.current:", isFetching.current)
       if (isFetching.current) return
       isFetching.current = true
       try {
@@ -74,10 +94,28 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   useEffect(() => {
     if (!campaignData) return
     console.log("Campaign data:", campaignData)
-    fetchFights(filters)
+    if (campaignData.fights === "reload") {
+      fetchFights(filters)
+    }
+  }, [campaignData, fetchFights, filters])
+
+  useEffect(() => {
+    console.log(
+      "Filters useEffect - filters:",
+      filters,
+      "isInitialRender.current:",
+      isInitialRender.current
+    )
+    if (isInitialRender.current) {
+      isInitialRender.current = false
+      return
+    }
     const url = `/fights?${queryParams(filters)}`
-    router.push(url, { scroll: false })
-  }, [campaignData, filters, fetchFights, router])
+    router.push(url, {
+      scroll: false,
+    })
+    fetchFights(filters)
+  }, [filters, fetchFights, router])
 
   useEffect(() => {
     saveLocally("fightViewMode", viewMode)

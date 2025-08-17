@@ -1,7 +1,7 @@
 "use client"
 import { Entity } from "@/types"
 import { EntityLink } from "@/components/ui"
-import { Popup } from "@/components/popups"
+import { InfoPopup } from "@/components/popups"
 
 type ActionValueLinkProperties = {
   name: string
@@ -24,7 +24,7 @@ export default function ActionValueLink({
       entity={entity}
       data={data}
       disablePopup={disablePopup}
-      popupOverride={Popup}
+      popupOverride={InfoPopup}
       sx={{
         fontWeight: "bold",
         textDecoration: "underline",

@@ -2,14 +2,15 @@
 
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import { Drawer, Box, Typography, Alert, IconButton } from "@mui/material"
-import { HeroImage, TextField, SaveButton, CancelButton } from "@/components/ui"
-import type { EditorChangeEvent, Vehicle } from "@/types"
+import { Drawer, Box, Typography, Alert, IconButton, FormHelperText } from "@mui/material"
+import { HeroImage, SaveButton, CancelButton, NameEditor } from "@/components/ui"
+import type { Vehicle } from "@/types"
 import { defaultVehicle } from "@/types"
 import { FormActions, useForm } from "@/reducers"
-import { Editor } from "@/components/editor"
+import { Archetype, ActionValuesEdit } from "@/components/vehicles"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
+import { useEntity } from "@/hooks"
 
 type FormStateData = Vehicle & {
   [key: string]: unknown
@@ -19,23 +20,27 @@ type FormStateData = Vehicle & {
 interface VehicleFormProperties {
   open: boolean
   onClose: () => void
-  onSave: (formData: FormData, vehicleData: Vehicle) => Promise<void>
-  initialFormData: FormStateData
   title: string
 }
 
 export default function VehicleForm({
   open,
   onClose,
-  onSave,
-  initialFormData,
   title,
 }: VehicleFormProperties) {
-  const { formState, dispatchForm, initialFormState } =
-    useForm<FormStateData>(initialFormData)
-  const { disabled, error, data } = formState
-  const { name, description, image } = data
+  const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
+    ...defaultVehicle,
+  })
+  const { disabled, error, errors, data } = formState
+  const { name, image } = data
+
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [nameValid, setNameValid] = useState(true)
+  const formRef = useRef<HTMLFormElement>(null)
+  const { createEntity, handleFormErrors } = useEntity<Vehicle>(
+    defaultVehicle,
+    dispatchForm
+  )
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
@@ -49,6 +54,13 @@ export default function VehicleForm({
       setImagePreview(null)
     }
   }, [image])
+
+  useEffect(() => {
+    dispatchForm({
+      type: FormActions.DISABLE,
+      payload: !nameValid || !!errors.name
+    })
+  }, [nameValid, errors.name, dispatchForm])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -78,24 +90,40 @@ export default function VehicleForm({
       dispatchForm({ type: FormActions.ERROR, payload: "Name is required" })
       return
     }
-
     dispatchForm({ type: FormActions.SUBMIT })
     try {
-      const formData = new FormData()
-      const vehicleData = { ...defaultVehicle, name, description } as Vehicle
-      formData.append("vehicle", JSON.stringify(siteData))
-      if (image) {
-        formData.append("image", image)
-      }
-      await onSave(formData, vehicleData)
-    } catch (error_: unknown) {
-      const errorMessage = "An error occurred."
-      dispatchForm({ type: FormActions.ERROR, payload: errorMessage })
-      console.error(`${title} error:`, error_)
-    } finally {
+      await createEntity(data, image)
       handleClose()
+    } catch (error) {
+      handleFormErrors(error)
     }
   }
+
+  const handleNameEntityUpdate = (updatedVehicle: Vehicle) => {
+    // Update the name field
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "name",
+      value: updatedVehicle.name,
+    })
+    // Clear name errors when user changes the name
+    if (errors.name) {
+      dispatchForm({
+        type: FormActions.ERRORS,
+        payload: { ...errors, name: undefined }
+      })
+    }
+  }
+
+  const handleNameEntitySave = async (updatedVehicle: Vehicle) => {
+    // For form, we just update local state, don't save
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "name",
+      value: updatedVehicle.name,
+    })
+  }
+
 
   const handleClose = () => {
     dispatchForm({ type: FormActions.RESET, payload: initialFormState })
@@ -112,6 +140,7 @@ export default function VehicleForm({
       <HeroImage entity={formState.data} />
       <Box
         component="form"
+        ref={formRef}
         onSubmit={handleSubmit}
         sx={{
           width: isMobile ? "100%" : "30rem",
@@ -127,29 +156,43 @@ export default function VehicleForm({
             {error}
           </Alert>
         )}
-        <Typography>Describe this thing.</Typography>
-        <TextField
-          label="Name"
-          value={name}
-          onChange={e =>
-            dispatchForm({
-              type: FormActions.UPDATE,
-              name: "name",
-              value: e.target.value,
-            })
-          }
-          margin="normal"
-          required
-          autoFocus
+        <NameEditor
+          entity={data}
+          setEntity={handleNameEntityUpdate}
+          updateEntity={handleNameEntitySave}
+          onValidationChange={setNameValid}
         />
-        <Editor
-          name="description"
-          value={description}
-          onChange={(e: EditorChangeEvent) => {
+        {errors.name && (
+          <FormHelperText error sx={{ mt: -1, mb: 1 }}>
+            {errors.name}
+          </FormHelperText>
+        )}
+        <Archetype
+          vehicle={data}
+          updateEntity={(updatedVehicle) => {
+            dispatchForm({
+              type: FormActions.RESET,
+              payload: { ...formState, data: updatedVehicle }
+            })
+          }}
+        />
+        <ActionValuesEdit
+          key={JSON.stringify(data.action_values || {})}
+          entity={data}
+          size="small"
+          setEntity={(updatedVehicle) => {
             dispatchForm({
               type: FormActions.UPDATE,
-              name: "description",
-              value: e.target.value,
+              name: "data",
+              value: updatedVehicle,
+            })
+          }}
+          updateEntity={async (updatedVehicle) => {
+            // For form, we just update local state, don't save
+            dispatchForm({
+              type: FormActions.UPDATE,
+              name: "data",
+              value: updatedVehicle,
             })
           }}
         />

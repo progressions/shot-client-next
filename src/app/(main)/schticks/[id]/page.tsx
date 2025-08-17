@@ -1,6 +1,6 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
-import { getServerClient, getUser } from "@/lib/getServerClient"
+import { getServerClient, getCurrentUser } from "@/lib"
 import type { Schtick } from "@/types"
 import { NotFound, Show } from "@/components/schticks"
 import { Suspense } from "react"
@@ -13,7 +13,7 @@ type SchtickPageProperties = {
 export default async function SchtickPage({ params }: SchtickPageProperties) {
   const { id } = await params
   const client = await getServerClient()
-  const user = await getUser()
+  const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
   try {
@@ -27,7 +27,7 @@ export default async function SchtickPage({ params }: SchtickPageProperties) {
 
     return (
       <>
-        <Breadcrumbs />
+        <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
           <Show schtick={schtick} initialIsMobile={initialIsMobile} />
         </Suspense>

@@ -1,7 +1,7 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { EncounterProvider } from "@/contexts"
 import { headers } from "next/headers"
-import { getServerClient, getUser } from "@/lib/getServerClient"
+import { getServerClient, getCurrentUser } from "@/lib"
 import type { Encounter } from "@/types"
 import { NotFound, Encounter } from "@/components/encounters"
 import { Suspense } from "react"
@@ -16,7 +16,7 @@ export default async function EncounterPage({
 }: EncounterPageProperties) {
   const { id } = await params
   const client = await getServerClient()
-  const user = await getUser()
+  const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
   try {
@@ -30,7 +30,7 @@ export default async function EncounterPage({
 
     return (
       <>
-        <Breadcrumbs />
+        <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
           <EncounterProvider encounter={encounter}>
             <Encounter

@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material"
 import { headers } from "next/headers"
 import { Suspense } from "react"
-import { getServerClient } from "@/lib/getServerClient"
+import { getServerClient } from "@/lib"
 import type { Campaign } from "@/types"
 import { Dashboard } from "@/components/dashboard"
 

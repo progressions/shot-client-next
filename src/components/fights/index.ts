@@ -4,6 +4,7 @@ export { default as FightDescription } from "@/components/fights/FightDescriptio
 export { default as FightDetail } from "@/components/fights/FightDetail"
 export { default as Show } from "@/components/fights/Show"
 export { default as FightForm } from "@/components/fights/FightForm"
+export { default as CreateFightForm } from "@/components/fights/CreateFightForm"
 export { default as FightChips } from "@/components/fights/FightChips"
 export { default as NotFound } from "@/components/fights/NotFound"
 export { default as View } from "@/components/fights/View"

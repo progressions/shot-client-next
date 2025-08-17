@@ -1,10 +1,10 @@
-// components/ResourcePage.tsx
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { Box, CircularProgress } from "@mui/material"
-import { getServerClient, getPageParameters, getUser } from "@/lib"
+import { getServerClient, getPageParameters } from "@/lib"
 import Breadcrumbs from "@/components/Breadcrumbs"
+import { User } from "@/types"
 
 interface ResourcePageProps<T> {
   resourceName: string
@@ -24,6 +24,7 @@ interface ResourcePageProps<T> {
     initialFormData: object
     initialIsMobile: boolean
   }>
+  user: User | null
 }
 
 export default async function ResourcePage<T>({
@@ -33,45 +34,33 @@ export default async function ResourcePage<T>({
   getInitialFormData,
   ListComponent,
   searchParams,
+  user: _user,
 }: ResourcePageProps<T> & {
   searchParams: Promise<{ page?: string; sort?: string; order?: string }>
 }) {
   const client = await getServerClient()
-  const user = await getUser()
-  if (!client || !user) {
-    redirect("/login")
-  }
-
   // Validate parameters with fixed defaults
   const { page, sort, order, search } = await getPageParameters(searchParams, {
     validSorts,
     defaultSort: "created_at",
     defaultOrder: "desc",
   })
-
   // Redirect if page is invalid
   if (page <= 0) {
     redirect(
       `/${resourceName}?page=1&sort=created_at&order=desc&search=${search}`
     )
   }
-
   // Fetch data
   const response = await fetchData(client, { page, sort, order, search })
   const data = response.data
-
-  console.log("ResourcePage", data)
-
   // Detect mobile device
   const headersState = await headers()
   const userAgent = headersState.get("user-agent") || ""
   const initialIsMobile = /mobile/i.test(userAgent)
-
   // Prepare initial form data
   const initialFormData = getInitialFormData(data, page, sort, order, search)
-
   console.log("ResourcePage initialFormData", initialFormData)
-
   return (
     <Box
       sx={{
@@ -82,7 +71,7 @@ export default async function ResourcePage<T>({
       }}
     >
       <Suspense fallback={<CircularProgress />}>
-        <Breadcrumbs />
+        <Breadcrumbs client={client} />
       </Suspense>
       <Suspense fallback={<CircularProgress />}>
         <ListComponent

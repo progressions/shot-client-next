@@ -3,8 +3,8 @@
 import { useToast, useClient } from "@/contexts"
 import type { Entity } from "@/types"
 import pluralize from "pluralize"
-import { redirect } from "next/navigation"
 import { FormActions } from "@/reducers"
+import { useRouter } from "next/navigation"
 
 /*********
  * expects a formState with the following structure:
@@ -33,6 +33,8 @@ export function useEntity(
   const { toastSuccess, toastError } = useToast()
   const entityClass = entity.entity_class
   const name = entity.entity_class.toLowerCase()
+
+  const router = useRouter()
 
   const pluralName = pluralize(name)
   const getFunction = `get${entityClass}`
@@ -89,10 +91,10 @@ export function useEntity(
 
     try {
       await client[deleteFunction](entity, params)
-      redirect(`/${pluralName}`)
+      router.push(`/${pluralName}`)
+      toastSuccess(`${entityClass} deleted successfully`)
     } catch (error) {
-      console.error("Failed to delete entity:", error)
-      toastError("Failed to delete entity.")
+      toastError("Failed to delete entity. yeah")
       throw error
     }
   }
