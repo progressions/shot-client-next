@@ -75,8 +75,15 @@ export function ListManager({
   useEffect(() => {
     const fetchChildEntities = async () => {
       try {
-        const getFunc = `get${pluralChildEntityName}` as keyof typeof client
-        const response = await client[getFunc]({
+        const funcName = `get${pluralChildEntityName}`
+        const getFunc = client[funcName as keyof typeof client]
+        
+        if (typeof getFunc !== 'function') {
+          console.error(`Function ${funcName} does not exist on client`)
+          return
+        }
+        
+        const response = await (getFunc as any)({
           sort: "name",
           order: "asc",
           ids: childIds,
@@ -109,8 +116,15 @@ export function ListManager({
     async (localFilters: Record<string, string | boolean | null>) => {
       try {
         console.log("Fetching children", localFilters)
-        const getFunc = `get${pluralChildEntityName}` as keyof typeof client
-        const response = await client[getFunc](localFilters)
+        const funcName = `get${pluralChildEntityName}`
+        const getFunc = client[funcName as keyof typeof client]
+        
+        if (typeof getFunc !== 'function') {
+          console.error(`Function ${funcName} does not exist on client`)
+          return
+        }
+        
+        const response = await (getFunc as any)(localFilters)
         for (const [key, value] of Object.entries(response.data)) {
           dispatchForm({
             type: FormActions.UPDATE,
