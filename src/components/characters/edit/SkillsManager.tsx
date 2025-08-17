@@ -2,6 +2,7 @@
 
 import DeleteIcon from "@mui/icons-material/Delete"
 import { Stack, Box, IconButton, Typography, Grid } from "@mui/material"
+import { useEffect } from "react"
 import {
   type Option,
   SaveButton,
@@ -66,6 +67,16 @@ export default function SkillsManager({
     formState.data
   const disabled = !skillName || skillValue === null || skillName.trim() === ""
 
+  // Sync characterSkills when character prop changes
+  useEffect(() => {
+    const currentSkills = CS.knownSkills(character)
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "characterSkills",
+      value: currentSkills,
+    })
+  }, [character.skills, dispatchForm])
+
   // Split skills into two even columns
   const midPoint = Math.ceil(characterSkills.length / 2)
   const leftColumnSkills = characterSkills.slice(0, midPoint)
@@ -97,12 +108,25 @@ export default function SkillsManager({
     })
   }
 
-  const handleSave = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     console.log("Saving skillName:", skillName, "skillValue:", skillValue)
     if (skillName && skillValue !== null && skillName.trim() !== "") {
       const newSkill: SkillValue = [skillName.trim(), skillValue]
       const updatedSkills = [...characterSkills, newSkill]
+      
+      // Update character skills on the server
+      if (updateCharacter) {
+        const updatedCharacter = {
+          ...character,
+          skills: updatedSkills.reduce(
+            (acc, [name, value]) => ({ ...acc, [name]: value }),
+            {}
+          ),
+        }
+        await updateCharacter(updatedCharacter)
+      }
+      
       // Update options if the skill is new
       if (!options.some(option => option.value === skillName)) {
         const newOption = { label: skillName.trim(), value: skillName.trim() }

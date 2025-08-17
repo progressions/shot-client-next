@@ -348,6 +348,10 @@ const CharacterService = {
     return this.otherActionValue(character, "Archetype")
   },
 
+  wealth: function (character: Character): string {
+    return character.wealth || ""
+  },
+
   // Not modified by Impairment
   speed: function (character: Character): number {
     return this.rawActionValue(character, "Speed")

@@ -2,7 +2,7 @@
 
 import type { Character } from "@/types"
 import { Autocomplete } from "@/components/ui"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { CS } from "@/services"
 
 type EditTypeProps = {
@@ -15,6 +15,11 @@ export default function EditType({
   updateCharacter,
 }: EditTypeProps) {
   const [characterType, setCharacterType] = useState(CS.type(character))
+
+  // Sync local state when character prop changes
+  useEffect(() => {
+    setCharacterType(CS.type(character))
+  }, [character])
 
   const fetchCharacterTypes = async () => {
     const characterTypes = [
