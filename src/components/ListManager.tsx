@@ -48,7 +48,11 @@ export function ListManager({
   const [loading, setLoading] = useState(true)
 
   const { items: paginatedItems, meta } = paginateArray(
-    childEntities.sort((a, b) => a.name.localeCompare(b.name)),
+    childEntities.sort((a, b) => {
+      const nameA = a.name || ""
+      const nameB = b.name || ""
+      return nameA.localeCompare(nameB)
+    }),
     currentPage,
     5
   )
