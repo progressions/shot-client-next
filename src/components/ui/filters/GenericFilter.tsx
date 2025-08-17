@@ -64,7 +64,6 @@ export function GenericFilter({
       updatedFilters[name] =
         newValue && typeof newValue === "object" ? newValue.id : newValue || ""
     }
-    console.log(`Updating filters for ${name}:`, updatedFilters)
     onFiltersUpdate?.(updatedFilters)
   }
 
@@ -72,15 +71,6 @@ export function GenericFilter({
     const primaryField = config.fields.find(
       f => f.name.toLowerCase() === entity.toLowerCase()
     )
-    console.log(
-      `handleAdd: entity=${entity}, fields=`,
-      config.fields.map(f => ({
-        name: f.name,
-        type: f.type,
-        allowNone: f.allowNone,
-      }))
-    )
-    console.log(`handleAdd: primaryField=${primaryField?.name}`)
     if (!primaryField || primaryField.type !== "entity") {
       console.error(
         `handleAdd: Invalid primary field for entity=${entity}`,
@@ -90,19 +80,13 @@ export function GenericFilter({
     }
     const primaryFieldId = `${primaryField.name}_id`
     if (!filters?.[primaryFieldId]) {
-      console.log(`handleAdd: No ${primaryFieldId} in filters`, filters)
       return
     }
     const responseKey = config.responseKeys[primaryField.name]
     const records = data[responseKey] || []
-    console.log(
-      `handleAdd: Looking in data.${responseKey} for id=${filters[primaryFieldId]}`,
-      records
-    )
     const selected = records.find(
       (r: AutocompleteOption) => r.id === filters[primaryFieldId]
     )
-    console.log(`handleAdd: Selected item`, selected)
     if (!selected) {
       console.error(
         `handleAdd: No item found for id=${filters[primaryFieldId]} in data.${responseKey}`
@@ -125,7 +109,6 @@ export function GenericFilter({
     const isPrimaryField = field.name.toLowerCase() === entity.toLowerCase()
 
     if (field.type === "static") {
-      console.log(`Creating String Autocomplete for ${displayName}`)
       const Autocomplete = createStringAutocomplete(displayName)
       return (
         <Autocomplete
@@ -141,7 +124,6 @@ export function GenericFilter({
     }
 
     if (field.type === "string") {
-      console.log(`Creating String Autocomplete for ${displayName}`)
       const Autocomplete = createStringAutocomplete(displayName)
       return (
         <Autocomplete
@@ -164,9 +146,6 @@ export function GenericFilter({
       const responseKey = config.responseKeys[field.name]
       const entityName =
         responseKey.charAt(0).toUpperCase() + responseKey.slice(1)
-      console.log(
-        `Creating Autocomplete for ${entityName}, expecting client.get${entityName}`
-      )
       const Autocomplete = createAutocomplete(entityName)
       return (
         <Autocomplete
