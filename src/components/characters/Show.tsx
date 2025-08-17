@@ -61,7 +61,6 @@ export default function Show({
   useEffect(() => {
     const unsubscribe = subscribeToEntity("character", (data) => {
       if (data && data.id === initialCharacter.id) {
-        console.log("Setting character from subscription", data)
         setCharacter(data)
       }
     })

@@ -210,15 +210,8 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         connected: () => console.log("Connected to CampaignChannel"),
         disconnected: () => console.log("Disconnected from CampaignChannel"),
         received: (data: CampaignCableData) => {
-          console.log("CampaignChannel data", {
-            encounterId: data?.encounter?.id,
-            shotCount: data?.encounter?.shots?.length,
-            updatedAt: data?.encounter?.updated_at,
-          })
           if (data) {
             setCampaignData(data)
-          } else {
-            console.log("Skipped redundant CampaignChannel data")
           }
         },
       }

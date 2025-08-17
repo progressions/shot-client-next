@@ -46,15 +46,6 @@ export function PositionableImage({
   const [currentY, setCurrentY] = useState(position.y_position)
   const [isDragging, setIsDragging] = useState(false)
 
-  if (entity.name == "Highway Brawl") {
-    console.log("PositionableImage rendered with entity:", {
-      entity,
-      currentX,
-      currentY,
-      context,
-      position,
-    })
-  }
 
   useEffect(() => {
     const updateBoxWidth = () => {

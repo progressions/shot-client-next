@@ -76,7 +76,6 @@ export function ListManager({
     const fetchChildEntities = async () => {
       try {
         const getFunc = `get${pluralChildEntityName}` as keyof typeof client
-        console.log("fetching childIds", childIds)
         const response = await client[getFunc]({
           sort: "name",
           order: "asc",
