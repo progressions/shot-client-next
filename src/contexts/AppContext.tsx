@@ -27,6 +27,8 @@ import {
 } from "@/reducers"
 import { Subscription } from "@rails/actioncable"
 
+type EntityUpdateCallback = (data: any) => void
+
 interface AppContextType {
   client: Client
   jwt: string
@@ -37,6 +39,7 @@ interface AppContextType {
   currentUserState: UserStateType
   dispatchCurrentUser: ActionDispatch<[action: UserStateAction]>
   setCurrentCampaign: (camp: Campaign | null) => Promise<Campaign | null>
+  subscribeToEntity: (entityType: string, callback: EntityUpdateCallback) => () => void
   loading: boolean
   error: string | null
 }
@@ -56,6 +59,7 @@ const AppContext = createContext<AppContextType>({
   currentUserState: initialUserState,
   dispatchCurrentUser: () => {},
   setCurrentCampaign: async (camp: Campaign | null) => camp || defaultCampaign,
+  subscribeToEntity: () => () => {},
   loading: true,
   error: null,
 })
@@ -75,6 +79,21 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
   const jwt = Cookies.get("jwtToken") ?? ""
   const client = useMemo(() => new Client({ jwt }), [jwt])
   const hasFetched = useRef(false)
+  const entityUpdateCallbacks = useRef<Map<string, Set<EntityUpdateCallback>>>(new Map())
+
+  const subscribeToEntity = useCallback((entityType: string, callback: EntityUpdateCallback) => {
+    if (!entityUpdateCallbacks.current.has(entityType)) {
+      entityUpdateCallbacks.current.set(entityType, new Set())
+    }
+    entityUpdateCallbacks.current.get(entityType)!.add(callback)
+    
+    return () => {
+      entityUpdateCallbacks.current.get(entityType)?.delete(callback)
+      if (entityUpdateCallbacks.current.get(entityType)?.size === 0) {
+        entityUpdateCallbacks.current.delete(entityType)
+      }
+    }
+  }, [])
 
   const setCurrentCampaign = useCallback(
     async (camp: Campaign | null): Promise<Campaign | null> => {
@@ -210,6 +229,24 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
     }
   }, [state.user.id, campaign?.id, client])
 
+  // Process campaignData and trigger callbacks
+  useEffect(() => {
+    if (!campaignData) return
+    
+    Object.entries(campaignData).forEach(([key, value]) => {
+      const callbacks = entityUpdateCallbacks.current.get(key)
+      if (callbacks && callbacks.size > 0) {
+        callbacks.forEach(callback => {
+          try {
+            callback(value)
+          } catch (error) {
+            console.error(`Error in ${key} callback:`, error)
+          }
+        })
+      }
+    })
+  }, [campaignData])
+
   return (
     <AppContext.Provider
       value={{
@@ -222,6 +259,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         currentUserState: state,
         dispatchCurrentUser: dispatch,
         setCurrentCampaign,
+        subscribeToEntity,
         loading,
         error,
       }}
@@ -242,7 +280,7 @@ export function useClient() {
 }
 
 export function useCampaign() {
-  const { campaign, subscription, campaignData, setCurrentCampaign } =
+  const { campaign, subscription, campaignData, setCurrentCampaign, subscribeToEntity } =
     useContext(AppContext)
-  return { campaign, subscription, campaignData, setCurrentCampaign }
+  return { campaign, subscription, campaignData, setCurrentCampaign, subscribeToEntity }
 }

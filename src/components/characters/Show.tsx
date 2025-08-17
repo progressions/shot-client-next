@@ -39,7 +39,7 @@ export default function Show({
   character: initialCharacter,
   initialIsMobile = false,
 }: ShowProps) {
-  const { campaignData } = useCampaign()
+  const { subscribeToEntity } = useCampaign()
   const { client } = useClient()
   const { toastSuccess } = useToast()
   const theme = useTheme()
@@ -54,18 +54,16 @@ export default function Show({
     document.title = character.name ? `${character.name} - Chi War` : "Chi War"
   }, [character.name])
 
+  // Subscribe to character updates
   useEffect(() => {
-    if (
-      campaignData?.character &&
-      campaignData.character.id === initialCharacter.id
-    ) {
-      console.log(
-        "Setting character from campaign data",
-        campaignData.character
-      )
-      setCharacter(campaignData.character)
-    }
-  }, [campaignData, initialCharacter])
+    const unsubscribe = subscribeToEntity("character", (data) => {
+      if (data && data.id === initialCharacter.id) {
+        console.log("Setting character from subscription", data)
+        setCharacter(data)
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, initialCharacter.id])
 
   const updateCharacter = async updatedCharacter => {
     try {
