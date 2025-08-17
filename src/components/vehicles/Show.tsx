@@ -50,7 +50,6 @@ export default function Show({ vehicle: initialVehicle }: ShowProperties) {
   useEffect(() => {
     const unsubscribe = subscribeToEntity("vehicle", (data) => {
       if (data && data.id === initialVehicle.id) {
-        console.log("Setting vehicle from subscription", data)
         dispatchForm({
           type: FormActions.UPDATE,
           name: "entity",
