@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import { CS } from "@/services"
 
 type EditWealthProps = {
-  type: string
+  character: Character
   updateCharacter: (character: Character) => void
 }
 
