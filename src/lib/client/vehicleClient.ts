@@ -99,7 +99,7 @@ export function createVehicleClient(deps: ClientDependencies) {
     vehicle: Vehicle,
     fight?: Fight | null
   ): Promise<AxiosResponse<void>> {
-    return delete_(api.vehicles(fight, { id: vehicle.shot_id } as Vehicle))
+    return delete_(apiV2.vehicles(vehicle))
   }
 
   async function deleteVehicleImage(
