@@ -79,8 +79,6 @@ export default function View({ formState, dispatchForm }: ViewProps) {
     created_at: new Date(site.created_at),
   }))
 
-  console.log("Rendering Site Table with rows:", rows)
-
   return (
     <BaseDataGrid
       formState={formState}

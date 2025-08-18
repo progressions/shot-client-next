@@ -11,7 +11,7 @@ export const metadata = {
 
 export default async function HomePage() {
   await requireCampaign()
-  
+
   const client = await getServerClient()
   const campaignResponse = await client.getCurrentCampaign()
   const campaign = campaignResponse.data as Campaign

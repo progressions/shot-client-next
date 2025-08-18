@@ -60,7 +60,6 @@ export default function GeneratePage() {
     setPending(true)
     try {
       const response = await client.generateAiCharacter({ description })
-      console.log("response", response)
 
       const sub = consumer.subscriptions.create(
         { channel: "CampaignChannel", id: campaign?.id },

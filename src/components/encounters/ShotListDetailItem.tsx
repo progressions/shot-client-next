@@ -7,7 +7,6 @@ interface ShotDetailItemProps {
 }
 
 export default function ShotDetailItem({ detail }: ShotDetailItemProps) {
-  console.log("detail.character", detail)
   if (detail.character) {
     return (
       <ListItem sx={{ py: 0.5 }}>

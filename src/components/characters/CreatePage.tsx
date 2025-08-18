@@ -40,7 +40,6 @@ export default function CreatePage({ templates: templates }: CreatePageProps) {
 
   const handleConfirm = async () => {
     if (selectedTemplate) {
-      console.log("Selected template:", selectedTemplate)
       await handleDuplicate(selectedTemplate)
     }
     setDialogOpen(false)

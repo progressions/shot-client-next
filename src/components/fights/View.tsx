@@ -13,10 +13,8 @@ interface ViewProps {
 }
 
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
-  console.log("View formState", formState)
   const updateFilters = useCallback(
     filters => {
-      console.log("Updating filters:", filters)
       dispatchForm({
         type: FormActions.UPDATE,
         name: "filters",

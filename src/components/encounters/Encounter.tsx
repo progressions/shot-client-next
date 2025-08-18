@@ -25,8 +25,6 @@ export default function Encounter() {
   } = useEncounter()
   const { errors, status } = encounterState
 
-  console.log("encounter", encounter)
-
   useEffect(() => {
     document.title = encounter.name ? `${encounter.name} - Chi War` : "Chi War"
   }, [encounter.name])

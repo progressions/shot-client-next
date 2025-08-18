@@ -70,7 +70,6 @@ export default function ActionValue({
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const newValue = event.target.value
-    console.log("Setting new value", name, newValue)
     setValue(newValue)
     setValueError("")
     setServerError("")
@@ -80,19 +79,16 @@ export default function ActionValue({
   }
 
   const handleValueBlur = async event => {
-    console.log("Blur: value =", event.target.value)
     const error = validateValue(event.target.value)
     setValue(event.target.value)
     setValueError(error)
     if (!error) {
       const numericValue = Number(event.target.value.trim())
-      console.log("Blur: numericValue =", numericValue)
       const updatedCharacter = CS.updateActionValue(
         character,
         name,
         numericValue
       )
-      console.log("updatedCharacter", updatedCharacter.action_values)
       setCharacter(updatedCharacter)
       try {
         await updateCharacter(updatedCharacter)

@@ -57,8 +57,6 @@ export default async function VehiclePage({
     const userAgent = headersState.get("user-agent") || ""
     const initialIsMobile = /mobile/i.test(userAgent)
 
-    console.log("vehicle", vehicle)
-
     return (
       <>
         <Breadcrumbs client={client} />

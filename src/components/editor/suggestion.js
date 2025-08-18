@@ -64,7 +64,6 @@ const suggestion = (user, client) => ({
       },
 
       onKeyDown(properties) {
-        console.log("suggestion keydown props", properties)
         if (properties.event.key === "Escape") {
           popup[0].hide()
 

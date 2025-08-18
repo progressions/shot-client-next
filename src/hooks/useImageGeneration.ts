@@ -25,33 +25,22 @@ export function useImageGeneration({
     return () => {
       if (subscription) {
         subscription.unsubscribe()
-        console.log("WebSocket subscription cleaned up")
       }
     }
   }, [subscription])
 
   async function generateImages() {
-    console.log(
-      "Generate button clicked for entity:",
-      entity.name,
-      "campaign ID:",
-      campaignId
-    )
     dispatchForm({ type: FormActions.UPDATE, name: "image_urls", value: [] })
     dispatchForm({ type: FormActions.SUBMIT })
     setPending(true)
     try {
-      console.log("Sending POST request to generateAiImages")
       await client.generateAiImages({ entity })
-      console.log("POST request successful, setting up WebSocket subscription")
       const sub = client.consumer().subscriptions.create(
         { channel: "CampaignChannel", id: campaignId },
         {
           received: (data: CableData) => {
-            console.log("WebSocket data received:", data)
             if (data.status === "preview_ready" && data.json) {
               const imageUrls: string[] = JSON.parse(data.json)
-              console.log("Parsed image URLs:", imageUrls)
               dispatchForm({
                 type: FormActions.UPDATE,
                 name: "image_urls",
@@ -63,7 +52,6 @@ export function useImageGeneration({
               })
               setPending(false)
               sub.unsubscribe()
-              console.log("WebSocket subscription unsubscribed")
             } else if (data.status === "error" && data.error) {
               console.error("WebSocket error:", data.error)
               handleError(new Error(data.error), dispatchForm)
@@ -74,7 +62,6 @@ export function useImageGeneration({
         }
       )
       setSubscription(sub)
-      console.log("WebSocket subscription created")
     } catch (err) {
       handleError(err, dispatchForm)
       setPending(false)

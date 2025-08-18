@@ -36,10 +36,6 @@ export default function CharacterDetail({
       campaignData?.character &&
       campaignData.character.id === initialCharacter.id
     ) {
-      console.log(
-        "Updating character from campaign data:",
-        campaignData.character
-      )
       setCharacter(campaignData.character)
     }
   }, [campaignData, initialCharacter])

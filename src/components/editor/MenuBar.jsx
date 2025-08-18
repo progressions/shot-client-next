@@ -9,7 +9,6 @@ const MenuBar = () => {
   const { editor } = useCurrentEditor()
 
   if (!editor) {
-    console.log("MenuBar: No editor instance")
     return null
   }
 

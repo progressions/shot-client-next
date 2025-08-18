@@ -80,9 +80,6 @@ export function EncounterProvider({
           actionId
         )
         if (response.data) {
-          console.log("Server response received", {
-            serverEncounter: response.data,
-          })
           dispatchEncounter({
             type: FormActions.UPDATE,
             name: "encounter",

@@ -89,7 +89,6 @@ export default function SkillsManager({
   }
 
   const handleNameChange = (newValue: string | null) => {
-    console.log("Selected skillName:", newValue)
     dispatchForm({
       type: FormActions.UPDATE,
       name: "skillName",
@@ -100,7 +99,6 @@ export default function SkillsManager({
   const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value
     const newValue = inputValue === "" ? null : Number(inputValue)
-    console.log("Selected skillValue:", newValue)
     dispatchForm({
       type: FormActions.UPDATE,
       name: "skillValue",
@@ -110,7 +108,6 @@ export default function SkillsManager({
 
   const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    console.log("Saving skillName:", skillName, "skillValue:", skillValue)
     if (skillName && skillValue !== null && skillName.trim() !== "") {
       const newSkill: SkillValue = [skillName.trim(), skillValue]
       const updatedSkills = [...characterSkills, newSkill]

@@ -59,21 +59,23 @@ export function CampaignRequiredMenu() {
               Campaigns
             </Link>
           </MenuItem>,
-          ...(user.admin ? [
-            <Divider key="divider" sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />,
-            <MenuItem key="users" onClick={handleMenuClose}>
-              <Link
-                href="/users"
-                style={{
-                  color: "#ffffff",
-                  textDecoration: "none",
-                  width: "100%",
-                }}
-              >
-                Users
-              </Link>
-            </MenuItem>
-          ] : [])
+          ...(user.admin
+            ? [
+                <Divider key="divider" sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />,
+                <MenuItem key="users" onClick={handleMenuClose}>
+                  <Link
+                    href="/users"
+                    style={{
+                      color: "#ffffff",
+                      textDecoration: "none",
+                      width: "100%",
+                    }}
+                  >
+                    Users
+                  </Link>
+                </MenuItem>,
+              ]
+            : []),
         ]}
       </Menu>
     </>

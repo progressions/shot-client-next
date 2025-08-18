@@ -11,7 +11,6 @@ export default function AddCharacter() {
   const [entity, setEntity] = useState<Entity | null>(null)
 
   const handleAdd = async () => {
-    console.log("about to add", entity)
     const updatedEncounter = {
       ...encounter,
       character_ids: [...encounter.character_ids, entity!.id],

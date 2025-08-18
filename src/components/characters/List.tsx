@@ -94,12 +94,6 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   }, [subscribeToEntity, fetchCharacters, filters])
 
   useEffect(() => {
-    console.log(
-      "Filters useEffect - filters:",
-      filters,
-      "isInitialRender.current:",
-      isInitialRender.current
-    )
     if (isInitialRender.current) {
       isInitialRender.current = false
       return

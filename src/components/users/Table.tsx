@@ -61,7 +61,6 @@ const columns: GridColDef<User>[] = [
 
 export default function View({ formState, dispatchForm }: ViewProps) {
   const { users } = formState.data
-  console.log("users", users)
   const rows = users.map(user => ({
     ...user,
     created_at: new Date(user.created_at),

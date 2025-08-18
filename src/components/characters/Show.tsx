@@ -48,7 +48,6 @@ export default function Show({
 
   const [character, setCharacter] = useState<Character>(initialCharacter)
 
-
   useEffect(() => {
     document.title = character.name ? `${character.name} - Chi War` : "Chi War"
   }, [character.name])

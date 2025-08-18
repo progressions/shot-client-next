@@ -12,7 +12,6 @@ export default function AddVehicle() {
   const [entity, setEntity] = useState<Entity | null>(null)
 
   const handleAdd = async () => {
-    console.log("about to add", entity)
     const updatedEncounter = {
       ...encounter,
       vehicle_ids: [...encounter.vehicle_ids, entity!.id],

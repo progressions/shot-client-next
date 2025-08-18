@@ -21,7 +21,7 @@ interface ClientParameters {
 export default function createClient(parameters: ClientParameters = {}) {
   // Check for JWT token: parameters > localStorage > cookies
   let jwt = parameters.jwt
-  if (!jwt && typeof window !== 'undefined') {
+  if (!jwt && typeof window !== "undefined") {
     jwt = localStorage.getItem("jwtToken") || Cookies.get("jwtToken")
   }
   if (!jwt) {

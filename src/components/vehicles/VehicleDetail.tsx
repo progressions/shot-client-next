@@ -36,7 +36,6 @@ export default function VehicleDetail({
       campaignData?.vehicle &&
       campaignData.vehicle.id === initialVehicle.id
     ) {
-      console.log("Updating vehicle from campaign data:", campaignData.vehicle)
       setVehicle(campaignData.vehicle)
     }
   }, [campaignData, initialVehicle])

@@ -73,7 +73,6 @@ export function SortControls({
   }
 
   const handleOrderChange = () => {
-    console.log("Current order:", order)
     const newOrder = order === "asc" ? "desc" : "asc"
     dispatchForm({
       type: FormActions.UPDATE,
@@ -86,7 +85,6 @@ export function SortControls({
     event: React.ChangeEvent<unknown>,
     newPage: number
   ) => {
-    console.log("newPage", newPage)
     dispatchForm({
       type: FormActions.UPDATE,
       name: "filters",

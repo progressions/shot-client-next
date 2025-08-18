@@ -28,11 +28,13 @@ export default function View({ formState, dispatchForm }: ViewProps) {
   const { client } = useClient()
   const { campaign: currentCampaign, setCurrentCampaign } = useApp()
   const { toastSuccess, toastError } = useToast()
-  const [loadingCampaignId, setLoadingCampaignId] = useState<string | null>(null)
+  const [loadingCampaignId, setLoadingCampaignId] = useState<string | null>(
+    null
+  )
 
   const handleActivateCampaign = async (campaign: Campaign) => {
     if (campaign.id === currentCampaign?.id) return // Already active
-    
+
     setLoadingCampaignId(campaign.id)
     try {
       await client.setCurrentCampaign(campaign)
@@ -47,13 +49,20 @@ export default function View({ formState, dispatchForm }: ViewProps) {
   }
 
   const handleDeactivateCampaign = async (campaign: Campaign) => {
-    if (!confirm(`Are you sure you want to deactivate the campaign "${campaign.name}"?`)) return
-    
+    if (
+      !confirm(
+        `Are you sure you want to deactivate the campaign "${campaign.name}"?`
+      )
+    )
+      return
+
     setLoadingCampaignId(campaign.id)
     try {
       // Clear the current campaign - just unset it as current, don't change the campaign's active status
       await setCurrentCampaign(null)
-      toastSuccess(`Campaign "${campaign.name}" is no longer your current campaign`)
+      toastSuccess(
+        `Campaign "${campaign.name}" is no longer your current campaign`
+      )
       // Trigger a refetch by updating filters slightly and then back
       setTimeout(() => {
         dispatchForm({
@@ -61,8 +70,8 @@ export default function View({ formState, dispatchForm }: ViewProps) {
           name: "filters",
           value: {
             ...formState.data.filters,
-            page: formState.data.filters.page // This will trigger the useEffect in List component
-          }
+            page: formState.data.filters.page, // This will trigger the useEffect in List component
+          },
         })
       }, 100)
     } catch (error) {
@@ -108,7 +117,14 @@ export default function View({ formState, dispatchForm }: ViewProps) {
       renderCell: params => {
         const isActive = params.row.id === currentCampaign?.id
         return (
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "100%",
+            }}
+          >
             {isActive ? (
               <Chip
                 icon={<CheckCircle />}
@@ -117,11 +133,7 @@ export default function View({ formState, dispatchForm }: ViewProps) {
                 size="small"
               />
             ) : (
-              <Chip
-                label="Inactive"
-                color="default"
-                size="small"
-              />
+              <Chip label="Inactive" color="default" size="small" />
             )}
           </Box>
         )
@@ -138,9 +150,17 @@ export default function View({ formState, dispatchForm }: ViewProps) {
       renderCell: params => {
         const isCurrentCampaign = params.row.id === currentCampaign?.id
         const isLoading = loadingCampaignId === params.row.id
-        
+
         return (
-          <Box sx={{ display: "flex", gap: 1, alignItems: "center", justifyContent: "center", height: "100%" }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              alignItems: "center",
+              justifyContent: "center",
+              height: "100%",
+            }}
+          >
             {!isCurrentCampaign && (
               <Button
                 variant="contained"

@@ -116,7 +116,6 @@ export default async function Breadcrumbs({ client }) {
   const pathnames = pathname.split("/").filter(Boolean)
 
   if (!pathnames || pathnames.length === 0) {
-    console.log("Breadcrumbs: empty pathnames, likely root route", { pathname })
     return null
   }
 

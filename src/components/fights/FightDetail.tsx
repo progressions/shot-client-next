@@ -33,7 +33,6 @@ export default function FightDetail({
 
   useEffect(() => {
     if (campaignData?.fight && campaignData.fight.id === initialFight.id) {
-      console.log("Updating fight from campaign data:", campaignData.fight)
       setFight(campaignData.fight)
     }
   }, [campaignData, initialFight])

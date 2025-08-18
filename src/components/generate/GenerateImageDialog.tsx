@@ -63,16 +63,12 @@ export function GenerateImageDialog({
   }
 
   const handleSelect = async (imageUrl: string) => {
-    console.log("Selected image URL:", imageUrl)
-
     try {
       const response = await client.attachImage({
         entity,
         imageUrl,
       })
-      console.log("Image attached successfully:", response)
       toastSuccess("Image attached successfully")
-      console.log("updatedEntity:", response.data.entity)
       handleConfirmClose()
     } catch (error) {
       console.error("Error attaching image:", error)

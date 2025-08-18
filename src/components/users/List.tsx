@@ -79,7 +79,6 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   useEffect(() => {
     if (!campaignData) return
-    console.log("User data:", campaignData)
     if (campaignData.users === "reload") {
       fetchUsers(filters)
     }

@@ -59,7 +59,6 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   useEffect(() => {
     if (!campaignData) return
-    console.log("Campaign data:", campaignData)
     if (campaignData.factions === "reload") {
       fetchFactions(filters)
     }
