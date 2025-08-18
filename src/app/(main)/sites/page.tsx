@@ -1,6 +1,7 @@
 // app/sites/page.tsx
 import { List } from "@/components/sites"
 import ResourcePage from "@/components/ResourcePage"
+import { requireCampaign } from "@/lib"
 import type { SitesResponse } from "@/types"
 
 export const metadata = {
@@ -17,6 +18,9 @@ export default async function SitesPage({
     search?: string
   }>
 }) {
+  // Server-side campaign check - will redirect if no campaign
+  await requireCampaign()
+
   return (
     <ResourcePage
       resourceName="sites"

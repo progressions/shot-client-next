@@ -1,6 +1,7 @@
 // app/weapons/page.tsx
 import { List } from "@/components/weapons"
 import ResourcePage from "@/components/ResourcePage"
+import { requireCampaign } from "@/lib"
 import type { WeaponsResponse } from "@/types"
 
 export const metadata = {
@@ -12,6 +13,9 @@ export default async function WeaponsPage({
 }: {
   searchParams: Promise<{ page?: string; sort?: string; order?: string }>
 }) {
+  // Server-side campaign check - will redirect if no campaign
+  await requireCampaign()
+
   return (
     <ResourcePage
       resourceName="weapons"

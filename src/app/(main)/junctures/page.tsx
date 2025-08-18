@@ -1,6 +1,7 @@
 // app/junctures/page.tsx
 import { List } from "@/components/junctures"
 import ResourcePage from "@/components/ResourcePage"
+import { requireCampaign } from "@/lib"
 import type { JuncturesResponse } from "@/types"
 
 export const metadata = {
@@ -17,6 +18,9 @@ export default async function JuncturesPage({
     search?: string
   }>
 }) {
+  // Server-side campaign check - will redirect if no campaign
+  await requireCampaign()
+
   return (
     <ResourcePage
       resourceName="junctures"
