@@ -34,17 +34,28 @@ export default function LoginPage() {
         throw new Error("Login failed")
       }
 
-      const token = response.headers.get("Authorization")?.split(" ")?.[1] || ""
+      const authHeader = response.headers.get("Authorization")
+      console.log("🔍 Authorization header:", authHeader)
+      
+      const token = authHeader?.split(" ")?.[1] || ""
+      console.log("🔍 Extracted token:", token ? `${token.substring(0, 20)}...` : "NONE")
       
       if (!token) {
         throw new Error("No authentication token received from server")
       }
       
+      console.log("🍪 Setting jwtToken cookie...")
       Cookies.set("jwtToken", token, {
         expires: 1,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: "Strict",
+        sameSite: "Lax",
+        httpOnly: false,
+        path: "/",
       })
+      
+      // Verify the cookie was set
+      const setCookie = Cookies.get("jwtToken")
+      console.log("🍪 Cookie verification:", setCookie ? `${setCookie.substring(0, 20)}...` : "NOT SET")
 
       const temporaryClient = new Client({ jwt: token })
       const temporaryResponse = await temporaryClient.getCurrentUser()

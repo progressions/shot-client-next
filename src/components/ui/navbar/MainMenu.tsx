@@ -120,22 +120,21 @@ export function MainMenu() {
             Junctures
           </Link>
         </MenuItem>
+        <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />
+        <MenuItem onClick={handleMenuClose}>
+          <Link
+            href="/campaigns"
+            style={{
+              color: "#ffffff",
+              textDecoration: "none",
+              width: "100%",
+            }}
+          >
+            Campaigns
+          </Link>
+        </MenuItem>
         {user.gamemaster ||
           (user.admin && <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />)}
-        {user.gamemaster && (
-          <MenuItem onClick={handleMenuClose}>
-            <Link
-              href="/campaigns"
-              style={{
-                color: "#ffffff",
-                textDecoration: "none",
-                width: "100%",
-              }}
-            >
-              Campaigns
-            </Link>
-          </MenuItem>
-        )}
         {user.admin && (
           <MenuItem onClick={handleMenuClose}>
             <Link
