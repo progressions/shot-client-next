@@ -19,9 +19,13 @@ interface ClientParameters {
 }
 
 export default function createClient(parameters: ClientParameters = {}) {
-  const jwt = parameters.jwt || Cookies.get("jwtToken")
+  // Check for JWT token: parameters > localStorage > cookies
+  let jwt = parameters.jwt
+  if (!jwt && typeof window !== 'undefined') {
+    jwt = localStorage.getItem("jwtToken") || Cookies.get("jwtToken")
+  }
   if (!jwt) {
-    console.warn("No JWT provided or found in cookies")
+    console.warn("No JWT provided or found in localStorage/cookies")
   }
   const api = new Api()
   const apiV2 = new ApiV2()

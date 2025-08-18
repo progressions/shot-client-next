@@ -81,7 +81,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
   )
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const jwt = Cookies.get("jwtToken") ?? ""
+  const jwt = (typeof window !== 'undefined' ? localStorage.getItem("jwtToken") : null) || Cookies.get("jwtToken") || ""
   const client = useMemo(() => new Client({ jwt }), [jwt])
   const hasFetched = useRef(false)
   const entityUpdateCallbacks = useRef<Map<string, Set<EntityUpdateCallback>>>(
@@ -110,6 +110,14 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
       try {
         const response = await client.setCurrentCampaign(camp)
         const { data } = response || {}
+        
+        // Handle clearing current campaign (data will be null)
+        if (camp === null) {
+          setCampaign(null)
+          localStorage.removeItem(`currentCampaign-${state.user.id}`)
+          return null
+        }
+        
         if (!data) {
           setError("Failed to set current campaign")
           return null
@@ -121,6 +129,13 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         )
         return data
       } catch (error) {
+        // Only clear JWT token if it's an authentication error
+        if ((error as { response?: { status?: number } })?.response?.status === 401) {
+          console.error("🔥 REMOVING JWT TOKEN - Authentication error during campaign set")
+          Cookies.remove("jwtToken")
+        } else {
+          console.log("⚠️ Campaign set error (not 401):", error)
+        }
         setError("Failed to set current campaign: " + (error as Error).message)
         return null
       }
@@ -165,6 +180,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         const { data: userData } = userResponse || {}
         if (!userData) {
           setError("Failed to fetch user data")
+          console.error("🔥 REMOVING JWT TOKEN - Failed to fetch user data")
           Cookies.remove("jwtToken")
           setLoading(false)
           return
@@ -197,11 +213,23 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
           )
         }
       } catch (error) {
-        setError(
-          "Failed to fetch user or campaign: " + (error as Error).message
-        )
-        Cookies.remove("jwtToken")
-        setCampaign(defaultCampaign)
+        const statusCode = (error as { response?: { status?: number } })?.response?.status
+        
+        // Only clear JWT token for authentication errors (401)
+        if (statusCode === 401) {
+          console.error("🔥 REMOVING JWT TOKEN - Authentication error:", error)
+          Cookies.remove("jwtToken")
+          setError("Authentication expired")
+        } else if (statusCode === 404) {
+          // 404 on current campaign just means no current campaign set - this is normal
+          console.log("ℹ️ No current campaign found (404) - this is expected when user has no active campaign")
+          setCampaign(defaultCampaign)
+        } else {
+          // Other errors - don't clear JWT but log them
+          console.error("⚠️ Error fetching campaign (keeping authentication):", error)
+          setError("Failed to fetch campaign data")
+          setCampaign(defaultCampaign)
+        }
       } finally {
         setLoading(false)
       }

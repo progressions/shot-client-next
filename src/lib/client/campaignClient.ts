@@ -113,6 +113,7 @@ export function createCampaignClient(deps: ClientDependencies) {
     return delete_(apiV2.campaigns(campaign))
   }
 
+
   async function setCurrentCampaign(
     campaign: Campaign | null
   ): Promise<AxiosResponse<Campaign | null>> {

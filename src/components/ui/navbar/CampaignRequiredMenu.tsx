@@ -46,22 +46,22 @@ export function CampaignRequiredMenu() {
           },
         }}
       >
-        <MenuItem onClick={handleMenuClose}>
-          <Link
-            href="/campaigns"
-            style={{
-              color: "#ffffff",
-              textDecoration: "none",
-              width: "100%",
-            }}
-          >
-            Campaigns
-          </Link>
-        </MenuItem>
-        {user.admin && (
-          <>
-            <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />
-            <MenuItem onClick={handleMenuClose}>
+        {[
+          <MenuItem key="campaigns" onClick={handleMenuClose}>
+            <Link
+              href="/campaigns"
+              style={{
+                color: "#ffffff",
+                textDecoration: "none",
+                width: "100%",
+              }}
+            >
+              Campaigns
+            </Link>
+          </MenuItem>,
+          ...(user.admin ? [
+            <Divider key="divider" sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />,
+            <MenuItem key="users" onClick={handleMenuClose}>
               <Link
                 href="/users"
                 style={{
@@ -73,8 +73,8 @@ export function CampaignRequiredMenu() {
                 Users
               </Link>
             </MenuItem>
-          </>
-        )}
+          ] : [])
+        ]}
       </Menu>
     </>
   )
