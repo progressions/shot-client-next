@@ -35,9 +35,14 @@ export default function LoginPage() {
       }
 
       const token = response.headers.get("Authorization")?.split(" ")?.[1] || ""
+      
+      if (!token) {
+        throw new Error("No authentication token received from server")
+      }
+      
       Cookies.set("jwtToken", token, {
         expires: 1,
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
         sameSite: "Strict",
       })
 
