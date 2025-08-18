@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material"
 import { headers } from "next/headers"
 import { Suspense } from "react"
-import { getServerClient } from "@/lib"
+import { getServerClient, requireCampaign } from "@/lib"
 import type { Campaign } from "@/types"
 import { Dashboard } from "@/components/dashboard"
 
@@ -10,6 +10,8 @@ export const metadata = {
 }
 
 export default async function HomePage() {
+  await requireCampaign()
+  
   const client = await getServerClient()
   const campaignResponse = await client.getCurrentCampaign()
   const campaign = campaignResponse.data as Campaign

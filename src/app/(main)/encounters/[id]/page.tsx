@@ -1,7 +1,7 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { EncounterProvider } from "@/contexts"
 import { headers } from "next/headers"
-import { getServerClient, getCurrentUser } from "@/lib"
+import { getServerClient, getCurrentUser, requireCampaign } from "@/lib"
 import type { Encounter } from "@/types"
 import { NotFound, Encounter } from "@/components/encounters"
 import { Suspense } from "react"
@@ -14,6 +14,9 @@ type EncounterPageProperties = {
 export default async function EncounterPage({
   params,
 }: EncounterPageProperties) {
+  // Server-side campaign check - will redirect if no campaign
+  await requireCampaign()
+
   const { id } = await params
   const client = await getServerClient()
   const user = await getCurrentUser()

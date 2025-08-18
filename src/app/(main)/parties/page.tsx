@@ -1,6 +1,7 @@
 // app/parties/page.tsx
 import { List } from "@/components/parties"
 import ResourcePage from "@/components/ResourcePage"
+import { requireCampaign } from "@/lib"
 import type { PartiesResponse } from "@/types"
 
 export const metadata = {
@@ -17,6 +18,9 @@ export default async function PartiesPage({
     search?: string
   }>
 }) {
+  // Server-side campaign check - will redirect if no campaign
+  await requireCampaign()
+
   return (
     <ResourcePage
       resourceName="parties"

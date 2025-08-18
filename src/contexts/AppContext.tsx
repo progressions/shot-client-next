@@ -45,6 +45,7 @@ interface AppContextType {
   ) => () => void
   loading: boolean
   error: string | null
+  hasCampaign: boolean
 }
 
 interface AppProviderProperties {
@@ -65,6 +66,7 @@ const AppContext = createContext<AppContextType>({
   subscribeToEntity: () => () => {},
   loading: true,
   error: null,
+  hasCampaign: false,
 })
 
 export function AppProvider({ children, initialUser }: AppProviderProperties) {
@@ -248,6 +250,8 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
     })
   }, [campaignData])
 
+  const hasCampaign = Boolean(campaign?.id && campaign.id.trim() !== "")
+
   return (
     <AppContext.Provider
       value={{
@@ -263,6 +267,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         subscribeToEntity,
         loading,
         error,
+        hasCampaign,
       }}
     >
       {children}

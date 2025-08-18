@@ -2,7 +2,7 @@ import { Box, AppBar, Toolbar, Typography, Avatar } from "@mui/material"
 import Link from "next/link"
 import { logoutAction } from "@/lib/actions"
 import { Button } from "@/components/ui"
-import { MainMenu } from "@/components/ui/navbar"
+import { ConditionalMenu } from "@/components/ui/navbar"
 
 export async function Navbar({ user }) {
   return (
@@ -15,7 +15,7 @@ export async function Navbar({ user }) {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <MainMenu />
+          <ConditionalMenu />
           <Typography
             variant="h6"
             component={Link}

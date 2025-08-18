@@ -1,6 +1,7 @@
 // app/schticks/page.tsx
 import { List } from "@/components/schticks"
 import ResourcePage from "@/components/ResourcePage"
+import { requireCampaign } from "@/lib"
 import type { SchticksResponse } from "@/types"
 
 export const metadata = {
@@ -12,6 +13,9 @@ export default async function SchticksPage({
 }: {
   searchParams: Promise<{ page?: string; sort?: string; order?: string }>
 }) {
+  // Server-side campaign check - will redirect if no campaign
+  await requireCampaign()
+
   return (
     <ResourcePage
       resourceName="schticks"

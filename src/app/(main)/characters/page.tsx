@@ -1,6 +1,7 @@
 // app/characters/page.tsx
 import { List } from "@/components/characters"
 import ResourcePage from "@/components/ResourcePage"
+import { requireCampaign } from "@/lib"
 import type { CharactersResponse } from "@/types"
 
 export const metadata = {
@@ -17,6 +18,9 @@ export default async function CharactersPage({
     search?: string
   }>
 }) {
+  // Server-side campaign check - will redirect if no campaign
+  await requireCampaign()
+
   return (
     <ResourcePage
       resourceName="characters"
