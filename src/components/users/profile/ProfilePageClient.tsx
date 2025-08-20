@@ -10,6 +10,7 @@ import {
   SectionHeader,
   HeroImage,
 } from "@/components/ui"
+import { CampaignsList } from "@/components/users/profile"
 import { useClient, useToast } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
 
@@ -182,6 +183,11 @@ export default function ProfilePageClient({ user: initialUser }: ProfilePageClie
           </Box>
         </Stack>
       </Box>
+
+      <CampaignsList
+        user={user}
+        onUserUpdate={setUser}
+      />
     </Box>
   )
 }

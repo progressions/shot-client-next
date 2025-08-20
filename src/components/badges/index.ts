@@ -1,4 +1,5 @@
 export { default as Badge } from "@/components/badges/Badge"
+export { default as CampaignBadge } from "@/components/badges/CampaignBadge"
 export { default as CharacterBadge } from "@/components/badges/CharacterBadge"
 export { default as VehicleBadge } from "@/components/badges/VehicleBadge"
 export { default as FightBadge } from "@/components/badges/FightBadge"
