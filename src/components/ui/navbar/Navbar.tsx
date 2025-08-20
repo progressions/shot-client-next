@@ -1,8 +1,7 @@
-import { Box, AppBar, Toolbar, Typography, Avatar } from "@mui/material"
+import { Box, AppBar, Toolbar, Typography } from "@mui/material"
 import Link from "next/link"
-import { logoutAction } from "@/lib/actions"
 import { Button } from "@/components/ui"
-import { ConditionalMenu } from "@/components/ui/navbar"
+import { ConditionalMenu, UserMenu } from "@/components/ui/navbar"
 
 export async function Navbar({ user }) {
   return (
@@ -33,18 +32,7 @@ export async function Navbar({ user }) {
           sx={{ display: "flex", alignItems: "center", gap: { xs: 1, sm: 2 } }}
         >
           {user?.id ? (
-            <>
-              <Avatar
-                src={user.image_url ?? undefined}
-                alt={user.name}
-                sx={{ width: 32, height: 32 }}
-              />
-              <form action={logoutAction}>
-                <Button type="submit" variant="outlined" color="error">
-                  Logout
-                </Button>
-              </form>
-            </>
+            <UserMenu user={user} />
           ) : (
             <Button
               variant="contained"
