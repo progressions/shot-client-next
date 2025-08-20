@@ -95,12 +95,13 @@ export default function ProfileForm({ user, onSave }: ProfileFormProps) {
       if (onSave) {
         onSave(response.data)
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to update profile:", error)
+      const errorResponse = error as { response?: { data?: { errors?: Record<string, string[]> } } }
       dispatchForm({
         type: FormActions.ERROR,
-        payload: error.response?.data?.errors ? 
-          Object.values(error.response.data.errors).flat().join(", ") :
+        payload: errorResponse.response?.data?.errors ? 
+          Object.values(errorResponse.response.data.errors).flat().join(", ") :
           "Failed to update profile"
       })
       toastError("Failed to update profile")

@@ -5,7 +5,7 @@ import { Box, Stack, Typography, Button, IconButton, Dialog, DialogTitle, Dialog
 import CancelIcon from "@mui/icons-material/Cancel"
 import { CampaignBadge } from "@/components/badges"
 import { SectionHeader, Icon } from "@/components/ui"
-import { useClient, useToast } from "@/contexts"
+import { useClient, useToast, useCampaign } from "@/contexts"
 import type { User, Campaign } from "@/types"
 
 interface CampaignsListProps {
@@ -16,6 +16,7 @@ interface CampaignsListProps {
 export default function CampaignsList({ user, onUserUpdate }: CampaignsListProps) {
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
+  const { campaign: currentCampaign, setCurrentCampaign } = useCampaign()
   const [leavingCampaign, setLeavingCampaign] = useState<Campaign | null>(null)
   const [isLeaving, setIsLeaving] = useState(false)
 
@@ -29,6 +30,14 @@ export default function CampaignsList({ user, onUserUpdate }: CampaignsListProps
     try {
       await client.removePlayer(user, campaign)
       
+      // Check if leaving campaign is the current active campaign
+      const isLeavingCurrentCampaign = currentCampaign?.id === campaign.id
+      
+      // Clear current campaign if user is leaving their active campaign
+      if (isLeavingCurrentCampaign) {
+        await setCurrentCampaign(null)
+      }
+      
       // Update user object by removing the campaign from player_campaigns
       const updatedUser = {
         ...user,
@@ -38,13 +47,19 @@ export default function CampaignsList({ user, onUserUpdate }: CampaignsListProps
       onUserUpdate(updatedUser)
       toastSuccess(`Left campaign "${campaign.name}"`)
       setLeavingCampaign(null)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to leave campaign:", error)
-      toastError("Failed to leave campaign")
+      
+      // Handle specific error for gamemasters trying to leave their own campaigns
+      if ((error as { response?: { status?: number } })?.response?.status === 403) {
+        toastError("Gamemasters cannot leave their own campaigns. Transfer ownership or archive the campaign instead.")
+      } else {
+        toastError("Failed to leave campaign")
+      }
     } finally {
       setIsLeaving(false)
     }
-  }, [client, user, playerCampaigns, onUserUpdate, toastSuccess, toastError])
+  }, [client, user, playerCampaigns, currentCampaign, setCurrentCampaign, onUserUpdate, toastSuccess, toastError])
 
   const handleLeaveClick = (campaign: Campaign) => {
     setLeavingCampaign(campaign)
@@ -148,7 +163,7 @@ export default function CampaignsList({ user, onUserUpdate }: CampaignsListProps
         <DialogTitle>Leave Campaign</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to leave the campaign "{leavingCampaign?.name}"? 
+            Are you sure you want to leave the campaign &ldquo;{leavingCampaign?.name}&rdquo;? 
             You will need to be invited again by the gamemaster to rejoin.
           </Typography>
         </DialogContent>

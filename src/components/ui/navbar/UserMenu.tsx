@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Avatar, Menu, MenuItem } from "@mui/material"
 import Link from "next/link"
-import { logoutAction } from "@/lib/actions"
+import { handleLogout } from "@/lib/clientLogout"
 
 interface UserMenuProps {
   user: {
@@ -73,26 +73,13 @@ export function UserMenu({ user }: UserMenuProps) {
             Profile
           </Link>
         </MenuItem>
-        <MenuItem onClick={handleMenuClose} sx={{ p: 0 }}>
-          <form action={logoutAction} style={{ width: "100%" }}>
-            <button 
-              type="submit" 
-              style={{ 
-                background: "none",
-                border: "none",
-                color: "#ffffff",
-                textDecoration: "none",
-                width: "100%",
-                padding: "6px 16px",
-                textAlign: "left",
-                cursor: "pointer",
-                fontSize: "inherit",
-                fontFamily: "inherit"
-              }}
-            >
-              Logout
-            </button>
-          </form>
+        <MenuItem 
+          onClick={() => {
+            handleMenuClose()
+            handleLogout()
+          }}
+        >
+          Logout
         </MenuItem>
       </Menu>
     </>

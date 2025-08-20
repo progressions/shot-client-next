@@ -44,7 +44,7 @@ export function GenerateImageDialog({
   const { image_urls } = formState.data
   const { pending, generateImages } = useImageGeneration({
     client,
-    campaignId: campaign.id,
+    campaignId: campaign?.id,
     entity,
     dispatchForm,
   })

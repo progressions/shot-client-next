@@ -51,10 +51,20 @@ export default function LoginPage() {
       })
 
       // Verify the cookie was set
-      const setCookie = Cookies.get("jwtToken")
+      const _setCookie = Cookies.get("jwtToken")
 
       const temporaryClient = new Client({ jwt: token })
       const temporaryResponse = await temporaryClient.getCurrentUser()
+      
+      // NEW: Store user ID alongside JWT for cache validation
+      Cookies.set("userId", temporaryResponse.data.id, {
+        expires: 1,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Lax",
+        httpOnly: false,
+        path: "/",
+      })
+      
       dispatchCurrentUser({
         type: UserActions.USER,
         payload: temporaryResponse.data,

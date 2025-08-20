@@ -18,6 +18,8 @@ export async function logoutAction(): Promise<void> {
     }
   }
   
+  // Enhanced logout to clear all authentication data
   cookieStore.delete("jwtToken")
+  cookieStore.delete("userId") // NEW: Clear user ID cookie
   redirect("/login")
 }
