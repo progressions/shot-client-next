@@ -11,6 +11,7 @@ import {
   Weapon,
   Schtick,
   Faction,
+  Invitation,
 } from "@/types"
 
 class ApiV2 {
@@ -132,6 +133,16 @@ class ApiV2 {
 
   currentUser(): string {
     return `${this.api()}/users/current`
+  }
+
+  invitations(invitation?: Invitation | ID): string {
+    return invitation?.id
+      ? `${this.api()}/invitations/${invitation.id}`
+      : `${this.api()}/invitations`
+  }
+
+  invitationRedeem(invitation: Invitation | ID): string {
+    return `${this.invitations(invitation)}/redeem`
   }
 }
 
