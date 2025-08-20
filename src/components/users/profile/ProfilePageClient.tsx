@@ -5,7 +5,6 @@ import { FormControl, FormHelperText, Stack, Box, TextField, Typography } from "
 import type { User } from "@/types"
 import {
   Icon,
-  InfoLink,
   Alert,
   SectionHeader,
   HeroImage,
@@ -75,12 +74,13 @@ export default function ProfilePageClient({ user: initialUser }: ProfilePageClie
       })
       dispatchForm({ type: FormActions.SUCCESS })
       toastSuccess("Profile updated successfully")
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to update profile:", error)
+      const errorResponse = error as { response?: { data?: { errors?: Record<string, string[]> } } }
       dispatchForm({
         type: FormActions.ERROR,
-        payload: error.response?.data?.errors ? 
-          Object.values(error.response.data.errors).flat().join(", ") :
+        payload: errorResponse.response?.data?.errors ? 
+          Object.values(errorResponse.response.data.errors).flat().join(", ") :
           "Failed to update profile"
       })
       toastError("Failed to update profile")

@@ -30,9 +30,11 @@ export function createCampaignClient(deps: ClientDependencies) {
     user: User,
     campaign: Campaign
   ): Promise<AxiosResponse<Campaign>> {
-    return post(api.campaignMemberships(), {
-      campaign_id: campaign.id,
-      user_id: user.id,
+    return post(apiV2.campaignMemberships(), {
+      membership: {
+        campaign_id: campaign.id,
+        user_id: user.id,
+      }
     })
   }
 
@@ -40,7 +42,7 @@ export function createCampaignClient(deps: ClientDependencies) {
     user: User,
     campaign: Campaign
   ): Promise<AxiosResponse<void>> {
-    const url = `${api.campaignMemberships()}?campaign_id=${campaign.id}&user_id=${user.id}`
+    const url = `${apiV2.campaignMemberships()}?campaign_id=${campaign.id}&user_id=${user.id}`
     return delete_(url)
   }
 

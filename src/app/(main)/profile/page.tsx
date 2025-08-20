@@ -1,6 +1,5 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { getCurrentUser } from "@/lib"
-import type { User } from "@/types"
 import { Suspense } from "react"
 import { ProfilePageClient } from "@/components/users/profile"
 

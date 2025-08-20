@@ -188,6 +188,8 @@ export const defaultUser: User = {
   image_url: "",
   created_at: "",
   updated_at: "",
+  admin: false,
+  gamemaster: false,
 }
 
 export const defaultEffect: Effect = {

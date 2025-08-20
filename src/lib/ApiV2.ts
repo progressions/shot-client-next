@@ -122,6 +122,10 @@ class ApiV2 {
       : `${this.api()}/campaigns`
   }
 
+  campaignMemberships() {
+    return `${this.api()}/campaign_memberships`
+  }
+
   users(user?: User | ID): string {
     return user ? `${this.api()}/users/${user.id}` : `${this.api()}/users`
   }

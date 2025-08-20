@@ -133,8 +133,7 @@ export function MainMenu() {
             Campaigns
           </Link>
         </MenuItem>
-        {user.gamemaster ||
-          (user.admin && <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />)}
+        {user.admin && <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />}
         {user.admin && (
           <MenuItem onClick={handleMenuClose}>
             <Link
