@@ -6,7 +6,9 @@ import {
   Typography, 
   CircularProgress,
   Paper,
-  Stack
+  Stack,
+  Alert,
+  FormHelperText
 } from "@mui/material"
 import { Button } from "@/components/ui"
 import { useClient } from "@/contexts"
@@ -60,8 +62,12 @@ export default function InvitationRegistrationForm({
     
     if (!formState.data.password) {
       errors.password = "Password is required"
-    } else if (formState.data.password.length < 6) {
-      errors.password = "Password must be at least 6 characters"
+    } else if (formState.data.password.length < 8) {
+      errors.password = "Password must be at least 8 characters long"
+    } else if (!/[a-zA-Z]/.test(formState.data.password)) {
+      errors.password = "Password must contain letters"
+    } else if (!/[0-9]/.test(formState.data.password)) {
+      errors.password = "Password must contain numbers"
     }
     
     if (formState.data.password !== formState.data.password_confirmation) {
@@ -119,11 +125,21 @@ export default function InvitationRegistrationForm({
       }
       
       const errorMessage = error.response?.data?.error || "Failed to create account. Please try again."
-      dispatchForm({
-        type: FormActions.ERRORS,
-        payload: errorMessage
-      })
-      onError(errorMessage)
+      
+      // Handle single error message from backend validation
+      if (error.response?.data?.field) {
+        const field = error.response.data.field
+        dispatchForm({
+          type: FormActions.ERRORS,
+          payload: { [field]: errorMessage }
+        })
+      } else {
+        dispatchForm({
+          type: FormActions.ERRORS,
+          payload: { general: errorMessage }
+        })
+        onError(errorMessage)
+      }
     }
   }
 
@@ -145,29 +161,43 @@ export default function InvitationRegistrationForm({
           </Typography>
         </Box>
 
+        {formState.errors.general && (
+          <Alert severity="error">
+            {formState.errors.general}
+          </Alert>
+        )}
+
         <form onSubmit={handleSubmit}>
-          <Stack spacing={3}>
+          <Stack spacing={2}>
             <TextField
               label="First Name"
               value={formState.data.first_name}
               onChange={(e) => handleInputChange("first_name", e.target.value)}
               error={!!formState.errors.first_name}
-              helperText={formState.errors.first_name}
               required
               fullWidth
               disabled={formState.saving}
             />
+            {formState.errors.first_name && (
+              <FormHelperText error sx={{ mt: -1 }}>
+                {formState.errors.first_name}
+              </FormHelperText>
+            )}
 
             <TextField
               label="Last Name"
               value={formState.data.last_name}
               onChange={(e) => handleInputChange("last_name", e.target.value)}
               error={!!formState.errors.last_name}
-              helperText={formState.errors.last_name}
               required
               fullWidth
               disabled={formState.saving}
             />
+            {formState.errors.last_name && (
+              <FormHelperText error sx={{ mt: -1 }}>
+                {formState.errors.last_name}
+              </FormHelperText>
+            )}
 
             <TextField
               label="Password"
@@ -175,11 +205,16 @@ export default function InvitationRegistrationForm({
               value={formState.data.password}
               onChange={(e) => handleInputChange("password", e.target.value)}
               error={!!formState.errors.password}
-              helperText={formState.errors.password || "Minimum 6 characters"}
+              helperText={!formState.errors.password ? "Minimum 8 characters with letters and numbers" : undefined}
               required
               fullWidth
               disabled={formState.saving}
             />
+            {formState.errors.password && (
+              <FormHelperText error sx={{ mt: -1 }}>
+                {formState.errors.password}
+              </FormHelperText>
+            )}
 
             <TextField
               label="Confirm Password"
@@ -187,11 +222,15 @@ export default function InvitationRegistrationForm({
               value={formState.data.password_confirmation}
               onChange={(e) => handleInputChange("password_confirmation", e.target.value)}
               error={!!formState.errors.password_confirmation}
-              helperText={formState.errors.password_confirmation}
               required
               fullWidth
               disabled={formState.saving}
             />
+            {formState.errors.password_confirmation && (
+              <FormHelperText error sx={{ mt: -1 }}>
+                {formState.errors.password_confirmation}
+              </FormHelperText>
+            )}
 
             <Button
               type="submit"
