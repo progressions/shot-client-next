@@ -87,11 +87,7 @@ const iconMap: Record<Keyword, React.ReactElement> = {
   ),
   Fight: <GiSpikyExplosion />,
   Fighter: <GiSwordman />,
-  Character: (
-    <Box component="span">
-      <IoPeopleSharp />
-    </Box>
-  ),
+  Character: <IoPeopleSharp />,
   Party: <GroupIcon />,
   Faction: <FlagIcon />,
   Schtick: <VscGithubAction />,
