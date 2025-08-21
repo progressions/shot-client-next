@@ -14,8 +14,7 @@ import {
 import { Button } from "@/components/ui"
 import { useClient, useToast } from "@/contexts"
 import { ApiV2 } from "@/lib"
-import { Invitation, Campaign } from "@/types"
-import { InvitationRegistrationForm } from "@/components/invitations"
+import { Invitation, HttpError } from "@/types"
 
 enum UserState {
   NEW_USER = "NEW_USER",
@@ -86,9 +85,10 @@ export default function RedeemInvitationPage() {
         if (!userLoading) {
           setUserState(determineUserState(invitation))
         }
-      } catch (error: any) {
-        console.error("Error fetching invitation:", error)
-        if (error.response?.status === 404) {
+      } catch (error) {
+        const httpError = error as HttpError
+        console.error("Error fetching invitation:", httpError)
+        if (httpError.response?.status === 404) {
           setError("This invitation was not found or may have expired.")
         } else {
           setError("Unable to load invitation details.")
@@ -140,16 +140,17 @@ export default function RedeemInvitationPage() {
       } else {
         router.push("/")
       }
-    } catch (error: any) {
-      console.error("Error redeeming invitation:", error)
-      if (error.response?.status === 409) {
+    } catch (error) {
+      const httpError = error as HttpError
+      console.error("Error redeeming invitation:", httpError)
+      if (httpError.response?.status === 409) {
         setError("You are already a member of this campaign.")
-      } else if (error.response?.status === 404) {
+      } else if (httpError.response?.status === 404) {
         setError("This invitation is no longer valid.")
-      } else if (error.response?.status === 403) {
-        setError(error.response.data.error || "This invitation is not for your email address.")
+      } else if (httpError.response?.status === 403) {
+        setError(httpError.response.data.error || "This invitation is not for your email address.")
       } else {
-        setError(error.response?.data?.error || "Failed to join campaign.")
+        setError(httpError.response?.data?.error || "Failed to join campaign.")
       }
     } finally {
       setRedeeming(false)
@@ -286,7 +287,7 @@ export default function RedeemInvitationPage() {
                   Welcome!
                 </Typography>
                 <Typography variant="body1">
-                  You'll need to create an account to accept this invitation to join {invitation.campaign?.name}.
+                  You&apos;ll need to create an account to accept this invitation to join {invitation.campaign?.name}.
                 </Typography>
               </Box>
 

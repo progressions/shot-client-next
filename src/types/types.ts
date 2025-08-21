@@ -350,3 +350,28 @@ export interface FightChannelMessage {
 export interface ServerErrorResponse {
   errors: Partial<Record<keyof FormStateData, string[]>>
 }
+
+// API Error Response
+export interface ApiErrorResponse {
+  error?: string
+  errors?: string[]
+  message?: string
+}
+
+// HTTP Error with Response
+export interface HttpError extends Error {
+  response?: {
+    status: number
+    data: ApiErrorResponse
+  }
+}
+
+// Confirmation Response
+export interface ConfirmationResponse {
+  message: string
+  user?: User
+  token?: string
+  campaign_id?: string
+  error?: string
+  errors?: string[]
+}

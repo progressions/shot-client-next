@@ -11,9 +11,10 @@ export function middleware(request: NextRequest) {
 
   // Skip redirect for public routes
   if (
-    ["/login", "/confirm"].includes(pathname) ||
+    ["/login", "/confirm", "/forgot-password"].includes(pathname) ||
     pathname.startsWith("/redeem/") ||
     pathname.startsWith("/invitations/register/") ||
+    pathname.startsWith("/reset-password/") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/static")
   ) {

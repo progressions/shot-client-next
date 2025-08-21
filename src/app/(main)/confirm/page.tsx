@@ -6,18 +6,9 @@ import { Box, Paper, Typography, CircularProgress, Alert, Stack, Button } from "
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline"
 import { useApp } from "@/contexts"
-import { UserActions } from "@/reducers"
-import Cookies from "js-cookie"
 import { createClient } from "@/lib/client"
 
-interface ConfirmationResponse {
-  message: string
-  user?: any
-  token?: string
-  campaign_id?: string
-  error?: string
-  errors?: string[]
-}
+import type { ConfirmationResponse } from "@/types"
 
 export default function ConfirmPage() {
   const router = useRouter()

@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui"
 import { useClient } from "@/contexts"
 import { useForm, FormActions } from "@/reducers/formState"
-import { Invitation } from "@/types"
+import { Invitation, HttpError } from "@/types"
 
 interface InvitationRegistrationFormProps {
   invitation: Invitation
@@ -104,11 +104,12 @@ export default function InvitationRegistrationForm({
       
       onSuccess(response.data.message || "Account created! Please check your email to confirm your account and join the campaign.")
       
-    } catch (error: any) {
-      console.error("Registration error:", error)
+    } catch (error) {
+      const httpError = error as HttpError
+      console.error("Registration error:", httpError)
       
-      if (error.response?.status === 422) {
-        const errorData = error.response.data
+      if (httpError.response?.status === 422) {
+        const errorData = httpError.response.data
         
         if (errorData.has_account) {
           onError("An account already exists with this email address. Please log in instead.")
@@ -124,11 +125,11 @@ export default function InvitationRegistrationForm({
         }
       }
       
-      const errorMessage = error.response?.data?.error || "Failed to create account. Please try again."
+      const errorMessage = httpError.response?.data?.error || "Failed to create account. Please try again."
       
       // Handle single error message from backend validation
-      if (error.response?.data?.field) {
-        const field = error.response.data.field
+      if (httpError.response?.data?.field) {
+        const field = httpError.response.data.field
         dispatchForm({
           type: FormActions.ERRORS,
           payload: { [field]: errorMessage }
@@ -151,7 +152,7 @@ export default function InvitationRegistrationForm({
             Join {invitation.campaign?.name}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Create your account to accept this invitation. You'll receive a confirmation email to complete the process.
+            Create your account to accept this invitation. You&apos;ll receive a confirmation email to complete the process.
           </Typography>
         </Box>
 

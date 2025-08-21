@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Stack, Box, Typography, Alert, Container } from "@mui/material"
+import { Stack, Box, Typography, Alert, Container, Link as MuiLink } from "@mui/material"
+import Link from "next/link"
 import { Button, TextField } from "@/components/ui"
 import Cookies from "js-cookie"
 import { useClient } from "@/contexts"
@@ -13,6 +14,10 @@ export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [isUnconfirmed, setIsUnconfirmed] = useState(false)
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState("")
+  const [isResending, setIsResending] = useState(false)
+  const [resendMessage, setResendMessage] = useState<string | null>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
   const { dispatchCurrentUser } = useClient()
@@ -30,8 +35,20 @@ export default function LoginPage() {
           body: JSON.stringify({ user: { email, password } }),
         }
       )
+      
       if (!response.ok) {
-        throw new Error("Login failed")
+        // Parse error response
+        const errorData = await response.json()
+        
+        // Check if it's an unconfirmed account error
+        if (errorData.error_type === 'unconfirmed_account') {
+          setIsUnconfirmed(true)
+          setUnconfirmedEmail(errorData.email)
+          setError(null)
+          return
+        } else {
+          throw new Error(errorData.message || "Login failed")
+        }
       }
 
       const authHeader = response.headers.get("Authorization")
@@ -73,7 +90,40 @@ export default function LoginPage() {
       router.push(redirectTo)
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : "An error occurred")
+      setIsUnconfirmed(false)
       console.error("Login error:", error_)
+    }
+  }
+
+  const handleResendConfirmation = async () => {
+    if (!unconfirmedEmail) return
+
+    setIsResending(true)
+    setResendMessage(null)
+    setError(null)
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/confirmation/resend`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: unconfirmedEmail }),
+        }
+      )
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setResendMessage(data.message)
+      } else {
+        setError(data.error || "Failed to resend confirmation email")
+      }
+    } catch (error_) {
+      setError("Failed to resend confirmation email. Please try again.")
+      console.error("Resend confirmation error:", error_)
+    } finally {
+      setIsResending(false)
     }
   }
 
@@ -117,9 +167,48 @@ export default function LoginPage() {
             value={password}
             onChange={e => setPassword(e.target.value)}
           />
-          <Button type="submit" sx={{ mt: 3, mb: 2 }}>
+          <Box sx={{ textAlign: "right", mt: 1 }}>
+            <Link href="/forgot-password" passHref>
+              <MuiLink 
+                component="span" 
+                variant="body2" 
+                color="primary"
+                sx={{ textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
+              >
+                Forgot Password?
+              </MuiLink>
+            </Link>
+          </Box>
+          <Button type="submit" sx={{ mt: 2, mb: 2 }}>
             Sign In
           </Button>
+          
+          {/* Unconfirmed account message */}
+          {isUnconfirmed && (
+            <Alert severity="warning" sx={{ mt: 2 }}>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                Please confirm your email address before logging in.
+              </Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={handleResendConfirmation}
+                disabled={isResending}
+                sx={{ mt: 1 }}
+              >
+                {isResending ? "Sending..." : "Resend Confirmation Email"}
+              </Button>
+            </Alert>
+          )}
+
+          {/* Resend success message */}
+          {resendMessage && (
+            <Alert severity="success" sx={{ mt: 2 }}>
+              {resendMessage}
+            </Alert>
+          )}
+
+          {/* General error message */}
           {error && (
             <Alert severity="error" sx={{ mt: 2 }}>
               {error}
