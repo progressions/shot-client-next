@@ -103,7 +103,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
       scroll: false,
     })
     fetchCharacters(filters)
-  }, [filters, fetchCharacters, router])
+  }, [filters, fetchCharacters, router, viewMode])
 
   useEffect(() => {
     saveLocally("characterViewMode", viewMode)
