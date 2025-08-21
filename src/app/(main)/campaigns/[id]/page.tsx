@@ -10,6 +10,32 @@ type CampaignPageProperties = {
   params: Promise<{ id: string }>
 }
 
+export async function generateMetadata({ params }: CampaignPageProperties) {
+  const { id } = await params
+  const client = await getServerClient()
+  
+  if (!client) {
+    return {
+      title: "Campaign - Chi War",
+      description: "View campaign details"
+    }
+  }
+
+  try {
+    const response = await client.getCampaign({ id })
+    const campaign: Campaign = response.data
+    return {
+      title: `${campaign.name} - Chi War`,
+      description: `Campaign details for ${campaign.name}`
+    }
+  } catch (error) {
+    return {
+      title: "Campaign Not Found - Chi War",
+      description: "The requested campaign could not be found"
+    }
+  }
+}
+
 export default async function CampaignPage({ params }: CampaignPageProperties) {
   const { id } = await params
   const client = await getServerClient()

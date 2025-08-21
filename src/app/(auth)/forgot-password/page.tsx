@@ -2,6 +2,11 @@ import { Box, Typography, Container, Link as MuiLink } from "@mui/material"
 import Link from "next/link"
 import { ForgotPasswordClient } from "./ForgotPasswordClient"
 
+export const metadata = {
+  title: "Forgot Password - Chi War",
+  description: "Reset your Chi War account password"
+}
+
 export default function ForgotPasswordPage() {
   return (
     <Container maxWidth="sm">
