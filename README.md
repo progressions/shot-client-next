@@ -16,7 +16,46 @@ A frontend codebase for an RPG game manager focused on the roleplaying game Feng
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+1. **Backend Server**: Ensure the Shot Server (Rails API) is running on port 3000
+2. **Environment Configuration**: Create required environment files
+
+### Environment Setup
+
+Create a `.env.local` file in the project root with the following configuration:
+
+```bash
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:3000
+NEXT_PUBLIC_WS_URL=ws://localhost:3000/cable
+
+# Development settings
+NODE_ENV=development
+```
+
+For testing environments, also create a `.env.test` file:
+
+```bash
+# Test API Configuration  
+NEXT_PUBLIC_API_URL=http://localhost:3004
+NEXT_PUBLIC_WS_URL=ws://localhost:3004/cable
+
+# Test settings
+NODE_ENV=test
+```
+
+**⚠️ Important**: The `.env.local` file is required for the application to connect to the backend API. Without it, authentication and data loading will fail.
+
+### Development Server
+
+First, install dependencies:
+
+```bash
+npm install
+```
+
+Then run the development server:
 
 ```bash
 npm run dev
@@ -28,7 +67,7 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3001](http://localhost:3001) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
