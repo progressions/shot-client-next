@@ -11,7 +11,9 @@ export function middleware(request: NextRequest) {
 
   // Skip redirect for public routes
   if (
-    ["/login"].includes(pathname) ||
+    ["/login", "/confirm"].includes(pathname) ||
+    pathname.startsWith("/redeem/") ||
+    pathname.startsWith("/invitations/register/") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/static")
   ) {

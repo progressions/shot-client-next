@@ -20,6 +20,7 @@ export function createCampaignClient(deps: ClientDependencies) {
   const { api, apiV2, queryParams } = deps
   const {
     get,
+    getPublic,
     post,
     patch,
     delete: delete_,
@@ -50,7 +51,8 @@ export function createCampaignClient(deps: ClientDependencies) {
     invitation: Invitation | string,
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<Invitation>> {
-    return get(api.invitations(invitation as Invitation), {}, cacheOptions)
+    const id = typeof invitation === 'string' ? invitation : invitation.id
+    return getPublic(apiV2.invitations({ id } as Invitation), {}, cacheOptions)
   }
 
   async function createInvitation(
@@ -73,6 +75,18 @@ export function createCampaignClient(deps: ClientDependencies) {
     user: User | string
   ): Promise<AxiosResponse<User>> {
     return patch(`${api.invitations(invitation)}/redeem`, { user: user })
+  }
+
+  async function registerInvitation(
+    invitation: Invitation,
+    userData: {
+      first_name: string
+      last_name: string
+      password: string
+      password_confirmation: string
+    }
+  ): Promise<AxiosResponse<{ message: string }>> {
+    return post(apiV2.invitationRegister(invitation), userData)
   }
 
   async function resendInvitation(
@@ -134,6 +148,7 @@ export function createCampaignClient(deps: ClientDependencies) {
     createInvitation,
     deleteInvitation,
     redeemInvitation,
+    registerInvitation,
     resendInvitation,
     createCampaign,
     updateCampaign,

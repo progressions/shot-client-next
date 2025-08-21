@@ -17,7 +17,7 @@ interface ClientDependencies {
 
 export function createAuthClient(deps: ClientDependencies) {
   const { api, apiV2, queryParams } = deps
-  const { get, post, patch, delete: delete_, requestFormData } = createBaseClient(deps)
+  const { get, getPublic, post, patch, delete: delete_, requestFormData } = createBaseClient(deps)
 
   async function createUser(user: User): Promise<AxiosResponse<User>> {
     return post(api.registerUser(), { user: user })
@@ -69,6 +69,12 @@ export function createAuthClient(deps: ClientDependencies) {
     return post(api.confirmUser(), { confirmation_token: confirmation_token })
   }
 
+  async function confirmUserPublic(
+    confirmation_token: string
+  ): Promise<AxiosResponse<any>> {
+    return getPublic(`${api.confirmUser()}?confirmation_token=${confirmation_token}`)
+  }
+
   async function sendResetPasswordLink(
     email: string
   ): Promise<AxiosResponse<void>> {
@@ -117,6 +123,7 @@ export function createAuthClient(deps: ClientDependencies) {
     getCurrentUser,
     unlockUser,
     confirmUser,
+    confirmUserPublic,
     sendResetPasswordLink,
     resetUserPassword,
     getPlayers,

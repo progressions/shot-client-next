@@ -1,9 +1,9 @@
 "use server"
 
 import { cookies } from "next/headers"
-import { Client } from "@/lib"
+import { createClient } from "@/lib/client"
 
-export async function getServerClient(): Promise<Client | null> {
+export async function getServerClient() {
   const cookieStore = await cookies()
   const token = cookieStore.get("jwtToken")?.value
 
@@ -11,6 +11,6 @@ export async function getServerClient(): Promise<Client | null> {
     return null
   }
 
-  const client = new Client({ jwt: token })
+  const client = createClient({ jwt: token })
   return client
 }

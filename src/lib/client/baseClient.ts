@@ -42,6 +42,31 @@ export function createBaseClient({ jwt }: ClientDependencies) {
     return await axios(config)
   }
 
+  async function getPublic<T>(
+    url: string,
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<T>> {
+    const headers: { [key: string]: string } = {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    }
+    if (cacheOptions.cache === "no-store") {
+      headers["Cache-Control"] =
+        "no-store, no-cache, must-revalidate, proxy-revalidate"
+    } else if (cacheOptions.cache === "force-cache") {
+      headers["Cache-Control"] = `max-age=${cacheOptions.revalidate || 3600}`
+    }
+    const config: AxiosRequestConfig = {
+      url: url,
+      method: "GET",
+      params: parameters,
+      headers: headers,
+      proxy: false,
+    }
+    return await axios(config)
+  }
+
   async function post<T>(
     url: string,
     parameters: Parameters_ = {},
@@ -129,6 +154,7 @@ export function createBaseClient({ jwt }: ClientDependencies) {
 
   return {
     get,
+    getPublic,
     post,
     patch,
     delete: delete_,

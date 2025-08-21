@@ -144,6 +144,10 @@ class ApiV2 {
   invitationRedeem(invitation: Invitation | ID): string {
     return `${this.invitations(invitation)}/redeem`
   }
+
+  invitationRegister(invitation: Invitation | ID): string {
+    return `${this.invitations(invitation)}/register`
+  }
 }
 
 export default ApiV2
