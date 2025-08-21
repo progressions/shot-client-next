@@ -2,14 +2,19 @@ import { Box, Typography, Container, Link as MuiLink } from "@mui/material"
 import Link from "next/link"
 import { ResetPasswordClient } from "./ResetPasswordClient"
 
+export const metadata = {
+  title: "Reset Password - Chi War",
+  description: "Create a new password for your Chi War account"
+}
+
 interface ResetPasswordPageProps {
   params: {
     token: string
   }
 }
 
-export default function ResetPasswordPage({ params }: ResetPasswordPageProps) {
-  const { token } = params
+export default async function ResetPasswordPage({ params }: ResetPasswordPageProps) {
+  const { token } = await params
 
   return (
     <Container maxWidth="sm">
