@@ -6,6 +6,7 @@ import type {
   UsersResponse,
   CacheOptions,
   Parameters_,
+  ConfirmationResponse,
 } from "@/types"
 
 interface ClientDependencies {
@@ -71,7 +72,7 @@ export function createAuthClient(deps: ClientDependencies) {
 
   async function confirmUserPublic(
     confirmation_token: string
-  ): Promise<AxiosResponse<any>> {
+  ): Promise<AxiosResponse<ConfirmationResponse>> {
     return getPublic(`${api.confirmUser()}?confirmation_token=${confirmation_token}`)
   }
 

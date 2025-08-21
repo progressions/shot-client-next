@@ -11,7 +11,7 @@ import {
   Paper
 } from "@mui/material"
 import { useClient, useToast } from "@/contexts"
-import { Invitation } from "@/types"
+import { Invitation, HttpError } from "@/types"
 import { InvitationRegistrationForm } from "@/components/invitations"
 
 export default function InvitationRegisterPage() {
@@ -43,9 +43,10 @@ export default function InvitationRegisterPage() {
         }
         
         setInvitation(invitation)
-      } catch (error: any) {
-        console.error("Error fetching invitation:", error)
-        if (error.response?.status === 404) {
+      } catch (error) {
+        const httpError = error as HttpError
+        console.error("Error fetching invitation:", httpError)
+        if (httpError.response?.status === 404) {
           setError("This invitation was not found or may have expired.")
         } else {
           setError("Unable to load invitation details.")
