@@ -1,9 +1,10 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
-import { Box, CircularProgress } from "@mui/material"
+import { Box } from "@mui/material"
 import { getServerClient, getPageParameters } from "@/lib"
 import Breadcrumbs from "@/components/Breadcrumbs"
+import { ListPageSkeleton } from "@/components/ui/skeletons"
 import { User } from "@/types"
 
 interface ResourcePageProps<T> {
@@ -69,10 +70,18 @@ export default async function ResourcePage<T>({
         position: "relative",
       }}
     >
-      <Suspense fallback={<CircularProgress />}>
+      <Suspense fallback={<ListPageSkeleton entityType={resourceName} />}>
         <Breadcrumbs client={client} />
       </Suspense>
-      <Suspense fallback={<CircularProgress />}>
+      <Suspense fallback={
+        <ListPageSkeleton 
+          entityType={resourceName}
+          viewMode={initialIsMobile ? "mobile" : "table"}
+          showSearch={true}
+          showFilters={true}
+          itemCount={8}
+        />
+      }>
         <ListComponent
           initialFormData={initialFormData}
           initialIsMobile={initialIsMobile}
