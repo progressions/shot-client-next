@@ -54,7 +54,7 @@ interface AppProviderProperties {
 }
 
 const AppContext = createContext<AppContextType>({
-  client: new Client(),
+  client: Client(),
   jwt: "",
   user: defaultUser,
   campaign: null,
@@ -85,7 +85,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
     (typeof window !== "undefined" ? localStorage.getItem("jwtToken") : null) ||
     Cookies.get("jwtToken") ||
     ""
-  const client = useMemo(() => new Client({ jwt }), [jwt])
+  const client = useMemo(() => Client({ jwt }), [jwt])
   const hasFetched = useRef(false)
   const entityUpdateCallbacks = useRef<Map<string, Set<EntityUpdateCallback>>>(
     new Map()

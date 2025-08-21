@@ -6,7 +6,7 @@ import { Stack, Box, Typography, Alert, Container } from "@mui/material"
 import { Button, TextField } from "@/components/ui"
 import Cookies from "js-cookie"
 import { useClient } from "@/contexts"
-import { Client } from "@/lib"
+import { createClient } from "@/lib/client"
 import { UserActions } from "@/reducers"
 
 export default function LoginPage() {
@@ -53,7 +53,7 @@ export default function LoginPage() {
       // Verify the cookie was set
       const _setCookie = Cookies.get("jwtToken")
 
-      const temporaryClient = new Client({ jwt: token })
+      const temporaryClient = createClient({ jwt: token })
       const temporaryResponse = await temporaryClient.getCurrentUser()
       
       // NEW: Store user ID alongside JWT for cache validation
