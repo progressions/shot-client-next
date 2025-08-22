@@ -328,7 +328,7 @@ export default function DocumentationPage() {
           </Link>{" "}
           for additional resources, or check out the{" "}
           <Link
-            href="https://github.com/progressions/chi-war"
+            href="https://github.com/progressions/shot-counter"
             target="_blank"
             rel="noopener noreferrer"
             color="primary"

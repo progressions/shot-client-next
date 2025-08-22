@@ -81,7 +81,7 @@ export default function SupportPage() {
               <Button
                 variant="contained"
                 startIcon={<GitHubIcon />}
-                href="https://github.com/progressions/chi-war/issues/new?labels=bug&template=bug_report.md"
+                href="https://github.com/progressions/shot-counter/issues/new?labels=bug&template=bug_report.md"
                 target="_blank"
                 rel="noopener noreferrer"
                 fullWidth
@@ -117,7 +117,7 @@ export default function SupportPage() {
               <Button
                 variant="contained"
                 startIcon={<LightbulbIcon />}
-                href="https://github.com/progressions/chi-war/issues/new?labels=enhancement&template=feature_request.md"
+                href="https://github.com/progressions/shot-counter/issues/new?labels=enhancement&template=feature_request.md"
                 target="_blank"
                 rel="noopener noreferrer"
                 fullWidth
@@ -177,12 +177,12 @@ export default function SupportPage() {
               <Typography paragraph>
                 <strong>GitHub Repository:</strong>{" "}
                 <Link
-                  href="https://github.com/progressions/chi-war"
+                  href="https://github.com/progressions/shot-counter"
                   target="_blank"
                   rel="noopener noreferrer"
                   color="primary"
                 >
-                  github.com/progressions/chi-war
+                  github.com/progressions/shot-counter
                 </Link>
               </Typography>
               <Typography paragraph>

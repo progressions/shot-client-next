@@ -32,13 +32,13 @@ const footerColumns: FooterColumn[] = [
       { label: "Documentation", href: "/documentation" },
       {
         label: "GitHub",
-        href: "https://github.com/progressions/chi-war",
+        href: "https://github.com/progressions/shot-counter",
         target: "_blank",
         rel: "noopener noreferrer",
       },
       {
         label: "Report Issues",
-        href: "https://github.com/progressions/chi-war/issues",
+        href: "https://github.com/progressions/shot-counter/issues",
         target: "_blank",
         rel: "noopener noreferrer",
       },
