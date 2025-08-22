@@ -3,6 +3,8 @@ import { Container, Grid, Link, Typography } from "@mui/material"
 interface FooterLink {
   label: string
   href: string
+  target?: string
+  rel?: string
 }
 
 interface FooterColumn {
@@ -15,21 +17,52 @@ const footerColumns: FooterColumn[] = [
     title: "Chi War",
     links: [
       { label: "About Us", href: "/about" },
-      {
-        label: "Feng Shui 2",
-        href: "https://atlas-games.com/product_tables/AG4020/",
-        target: "_blank",
-        rel: "noopener noreferrer",
-      },
-      { label: "Contact", href: "/contact" },
+      { label: "Support", href: "/support" },
     ],
   },
   {
     title: "Resources",
     links: [
-      { label: "Blog", href: "/blog" },
-      { label: "Documentation", href: "/docs" },
-      { label: "Support", href: "/support" },
+      { label: "Documentation", href: "/documentation" },
+      {
+        label: "Blog",
+        href: "https://isaacpriestley.com/blog",
+        target: "_blank",
+        rel: "noopener noreferrer",
+      },
+      {
+        label: "GitHub",
+        href: "https://github.com/progressions/shot-counter",
+        target: "_blank",
+        rel: "noopener noreferrer",
+      },
+      {
+        label: "Report Issues",
+        href: "https://github.com/progressions/shot-counter/issues",
+        target: "_blank",
+        rel: "noopener noreferrer",
+      },
+    ],
+  },
+  {
+    title: "Community",
+    links: [
+      {
+        label: "Feng Shui 2 Official",
+        href: "https://atlas-games.com/fengshui/",
+        target: "_blank",
+        rel: "noopener noreferrer",
+      },
+      {
+        label: "Atlas Games",
+        href: "https://atlas-games.com/",
+        target: "_blank",
+        rel: "noopener noreferrer",
+      },
+      {
+        label: "Contact",
+        href: "mailto:admin@chiwar.com",
+      },
     ],
   },
 ]
