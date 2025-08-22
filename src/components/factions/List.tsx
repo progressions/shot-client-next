@@ -70,7 +70,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
       scroll: false,
     })
     fetchFactions(filters)
-  }, [filters, fetchFactions, router])
+  }, [filters, fetchFactions, router, viewMode])
 
   useEffect(() => {
     saveLocally("factionViewMode", viewMode)

@@ -78,7 +78,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
       scroll: false,
     })
     fetchCampaigns(filters)
-  }, [filters, fetchCampaigns, router])
+  }, [filters, fetchCampaigns, router, viewMode])
 
   useEffect(() => {
     saveLocally("campaignViewMode", viewMode)

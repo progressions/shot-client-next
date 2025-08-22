@@ -86,7 +86,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
       scroll: false,
     })
     fetchSchticks(filters)
-  }, [filters, fetchSchticks, router])
+  }, [filters, fetchSchticks, router, viewMode])
 
   useEffect(() => {
     saveLocally("schtickViewMode", viewMode)

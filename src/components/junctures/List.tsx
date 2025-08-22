@@ -93,7 +93,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
       scroll: false,
     })
     fetchJunctures(filters)
-  }, [filters, fetchJunctures, router])
+  }, [filters, fetchJunctures, router, viewMode])
 
   useEffect(() => {
     saveLocally("junctureViewMode", viewMode)

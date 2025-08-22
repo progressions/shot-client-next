@@ -87,7 +87,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
       scroll: false,
     })
     fetchWeapons(filters)
-  }, [filters, fetchWeapons, router])
+  }, [filters, fetchWeapons, router, viewMode])
 
   useEffect(() => {
     saveLocally("weaponViewMode", viewMode)

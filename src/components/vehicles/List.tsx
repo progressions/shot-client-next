@@ -88,7 +88,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
       scroll: false,
     })
     fetchVehicles(filters)
-  }, [filters, fetchVehicles, router])
+  }, [filters, fetchVehicles, router, viewMode])
 
   useEffect(() => {
     saveLocally("vehicleViewMode", viewMode)

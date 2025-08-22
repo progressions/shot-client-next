@@ -81,7 +81,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
       scroll: false,
     })
     fetchParties(filters)
-  }, [filters, fetchParties, router])
+  }, [filters, fetchParties, router, viewMode])
 
   useEffect(() => {
     saveLocally("partyViewMode", viewMode)
