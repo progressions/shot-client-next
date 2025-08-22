@@ -90,7 +90,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
       scroll: false,
     })
     fetchUsers(filters)
-  }, [filters, fetchUsers, router])
+  }, [filters, fetchUsers, router, viewMode])
 
   useEffect(() => {
     saveLocally("userViewMode", viewMode)

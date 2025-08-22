@@ -1,9 +1,5 @@
 import { defaultUser, type User } from "@/types"
-import {
-  UserActions,
-  UserStateType,
-  UserStateAction,
-} from "@/types"
+import { UserActions, UserStateType, UserStateAction } from "@/types"
 
 // Re-export types and enums for backward compatibility
 export { UserActions } from "@/types"

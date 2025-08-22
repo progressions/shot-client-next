@@ -110,7 +110,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
       scroll: false,
     })
     fetchFights(filters)
-  }, [filters, fetchFights, router])
+  }, [filters, fetchFights, router, viewMode])
 
   useEffect(() => {
     saveLocally("fightViewMode", viewMode)

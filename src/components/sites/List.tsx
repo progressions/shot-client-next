@@ -93,7 +93,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
       scroll: false,
     })
     fetchSites(filters)
-  }, [filters, fetchSites, router])
+  }, [filters, fetchSites, router, viewMode])
 
   useEffect(() => {
     saveLocally("siteViewMode", viewMode)
