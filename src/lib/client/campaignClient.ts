@@ -35,7 +35,7 @@ export function createCampaignClient(deps: ClientDependencies) {
       membership: {
         campaign_id: campaign.id,
         user_id: user.id,
-      }
+      },
     })
   }
 
@@ -51,7 +51,7 @@ export function createCampaignClient(deps: ClientDependencies) {
     invitation: Invitation | string,
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<Invitation>> {
-    const id = typeof invitation === 'string' ? invitation : invitation.id
+    const id = typeof invitation === "string" ? invitation : invitation.id
     return getPublic(apiV2.invitations({ id } as Invitation), {}, cacheOptions)
   }
 

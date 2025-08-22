@@ -22,10 +22,10 @@ export default function CampaignBadge({
 }: CampaignBadgeProperties) {
   const { campaign: currentCampaign } = useApp()
   const isActive = currentCampaign?.id === campaign.id
-  
+
   const memberCount = campaign.user_ids?.length || 0
   const roleText = role === "gamemaster" ? "GM" : "Player"
-  
+
   return (
     <Box sx={{ position: "relative", width: "100%", ...sx }}>
       <Badge

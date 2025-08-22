@@ -4,7 +4,7 @@ import { ResetPasswordClient } from "./ResetPasswordClient"
 
 export const metadata = {
   title: "Reset Password - Chi War",
-  description: "Create a new password for your Chi War account"
+  description: "Create a new password for your Chi War account",
 }
 
 interface ResetPasswordPageProps {
@@ -13,7 +13,9 @@ interface ResetPasswordPageProps {
   }
 }
 
-export default async function ResetPasswordPage({ params }: ResetPasswordPageProps) {
+export default async function ResetPasswordPage({
+  params,
+}: ResetPasswordPageProps) {
   const { token } = await params
 
   return (
@@ -34,17 +36,18 @@ export default async function ResetPasswordPage({ params }: ResetPasswordPagePro
         >
           Create New Password
         </Typography>
-        
+
         <Typography
           variant="body1"
-          sx={{ 
-            color: "text.secondary", 
-            textAlign: "center", 
+          sx={{
+            color: "text.secondary",
+            textAlign: "center",
             mb: 3,
-            maxWidth: 400 
+            maxWidth: 400,
           }}
         >
-          Please enter your new password below. Make sure it&apos;s strong and secure.
+          Please enter your new password below. Make sure it&apos;s strong and
+          secure.
         </Typography>
 
         <ResetPasswordClient token={token} />

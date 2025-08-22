@@ -20,7 +20,7 @@ export default function ForgotPasswordForm({
   loading = false,
   error = null,
   success = false,
-  rateLimitInfo
+  rateLimitInfo,
 }: ForgotPasswordFormProps) {
   const [email, setEmail] = useState("")
   const [emailError, setEmailError] = useState<string | null>(null)
@@ -49,7 +49,7 @@ export default function ForgotPasswordForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateEmail(email)) {
       return
     }
@@ -65,7 +65,7 @@ export default function ForgotPasswordForm({
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEmail = e.target.value
     setEmail(newEmail)
-    
+
     // Clear email error when user starts typing
     if (emailError) {
       setEmailError(null)
@@ -105,7 +105,11 @@ export default function ForgotPasswordForm({
         <FormHelperText error sx={{ mt: 1 }}>
           {rateLimitInfo.message || "Too many password reset attempts."}
           {rateLimitInfo.retryAfter && (
-            <> Please wait {formatRetryTime(rateLimitInfo.retryAfter)} before trying again.</>
+            <>
+              {" "}
+              Please wait {formatRetryTime(rateLimitInfo.retryAfter)} before
+              trying again.
+            </>
           )}
         </FormHelperText>
       )}
@@ -121,10 +125,12 @@ export default function ForgotPasswordForm({
       {success && (
         <Alert severity="success" sx={{ mt: 2 }}>
           <Typography variant="body2">
-            If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes.
+            If your email address exists in our database, you will receive a
+            password recovery link at your email address in a few minutes.
           </Typography>
           <Typography variant="body2" sx={{ mt: 1, fontSize: "0.875rem" }}>
-            Please check your email and follow the instructions to reset your password.
+            Please check your email and follow the instructions to reset your
+            password.
           </Typography>
         </Alert>
       )}
@@ -136,8 +142,9 @@ export default function ForgotPasswordForm({
       )}
 
       <Typography variant="body2" sx={{ mt: 2, color: "text.secondary" }}>
-        <strong>Security Notice:</strong> For your protection, we limit password reset requests to prevent abuse. 
-        If you don&apos;t receive an email, please check your spam folder or contact your campaign gamemaster.
+        <strong>Security Notice:</strong> For your protection, we limit password
+        reset requests to prevent abuse. If you don&apos;t receive an email,
+        please check your spam folder or contact your campaign gamemaster.
       </Typography>
     </Stack>
   )

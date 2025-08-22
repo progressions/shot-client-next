@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { 
-  Container, 
-  Box, 
-  Typography, 
-  Alert, 
+import {
+  Container,
+  Box,
+  Typography,
+  Alert,
   CircularProgress,
-  Paper
+  Paper,
 } from "@mui/material"
 import { useClient, useToast } from "@/contexts"
 import { Invitation, HttpError } from "@/types"
@@ -31,17 +31,18 @@ export default function InvitationRegisterPage() {
       try {
         const response = await client.getInvitation(invitationId)
         const invitation = response.data
-        
+
         // Check if user already has an account
         if (invitation.pending_user) {
           addToast({
             severity: "info",
-            message: "You already have an account. Please log in to accept this invitation."
+            message:
+              "You already have an account. Please log in to accept this invitation.",
           })
           router.push(`/login?redirect=/redeem/${invitationId}`)
           return
         }
-        
+
         setInvitation(invitation)
       } catch (error) {
         const httpError = error as HttpError
@@ -81,9 +82,7 @@ export default function InvitationRegisterPage() {
           }}
         >
           <CircularProgress />
-          <Typography sx={{ mt: 2 }}>
-            Loading invitation...
-          </Typography>
+          <Typography sx={{ mt: 2 }}>Loading invitation...</Typography>
         </Box>
       </Container>
     )
@@ -152,10 +151,11 @@ export default function InvitationRegisterPage() {
             <Alert severity="success" sx={{ mb: 3 }}>
               {successMessage}
             </Alert>
-            
+
             <Box sx={{ textAlign: "center" }}>
               <Typography variant="body1">
-                Check your email and click the confirmation link to complete your registration and join the campaign.
+                Check your email and click the confirmation link to complete
+                your registration and join the campaign.
               </Typography>
             </Box>
           </Paper>

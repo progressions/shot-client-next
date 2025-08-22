@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { 
-  Container, 
-  Box, 
-  Typography, 
-  Alert, 
+import {
+  Container,
+  Box,
+  Typography,
+  Alert,
   CircularProgress,
   Paper,
-  Stack
+  Stack,
 } from "@mui/material"
 import { Button } from "@/components/ui"
 import { useClient, useToast } from "@/contexts"
@@ -18,10 +18,10 @@ import { Invitation, HttpError } from "@/types"
 
 enum UserState {
   NEW_USER = "NEW_USER",
-  EXISTING_USER_NOT_LOGGED_IN = "EXISTING_USER_NOT_LOGGED_IN", 
+  EXISTING_USER_NOT_LOGGED_IN = "EXISTING_USER_NOT_LOGGED_IN",
   LOGGED_IN_CORRECT_USER = "LOGGED_IN_CORRECT_USER",
   LOGGED_IN_WRONG_USER = "LOGGED_IN_WRONG_USER",
-  LOGGED_IN_ALREADY_MEMBER = "LOGGED_IN_ALREADY_MEMBER"
+  LOGGED_IN_ALREADY_MEMBER = "LOGGED_IN_ALREADY_MEMBER",
 }
 
 export default function RedeemInvitationPage() {
@@ -47,9 +47,9 @@ export default function RedeemInvitationPage() {
       userLoading,
       hasCurrentUser: !!currentUser,
       currentUserId: currentUser?.id,
-      isDefaultUser: currentUser?.id === "" || !currentUser?.id
+      isDefaultUser: currentUser?.id === "" || !currentUser?.id,
     })
-    
+
     // Check if this is actually a default/empty user object
     if (!currentUser || !currentUser.id || currentUser.id === "") {
       // Check if there's a pending_user field to determine if account exists
@@ -59,17 +59,17 @@ export default function RedeemInvitationPage() {
         return UserState.NEW_USER
       }
     }
-    
+
     // User is logged in (with actual user data, not default)
     if (currentUser.email !== invitation.email) {
       return UserState.LOGGED_IN_WRONG_USER
     }
-    
+
     // Check if user is already a member of the campaign
     if (invitation.campaign?.users?.some(user => user.id === currentUser.id)) {
       return UserState.LOGGED_IN_ALREADY_MEMBER
     }
-    
+
     return UserState.LOGGED_IN_CORRECT_USER
   }
 
@@ -80,7 +80,7 @@ export default function RedeemInvitationPage() {
         const response = await client.getInvitation(invitationId)
         const invitation = response.data
         setInvitation(invitation)
-        
+
         // Only determine user state if user context has finished loading
         if (!userLoading) {
           setUserState(determineUserState(invitation))
@@ -128,10 +128,12 @@ export default function RedeemInvitationPage() {
 
     try {
       const response = await client.redeemInvitation(invitation, currentUser)
-      
+
       addToast({
         severity: "success",
-        message: response.data.message || `Successfully joined ${invitation.campaign?.name}!`,
+        message:
+          response.data.message ||
+          `Successfully joined ${invitation.campaign?.name}!`,
       })
 
       // Redirect to campaign page or homepage
@@ -148,7 +150,10 @@ export default function RedeemInvitationPage() {
       } else if (httpError.response?.status === 404) {
         setError("This invitation is no longer valid.")
       } else if (httpError.response?.status === 403) {
-        setError(httpError.response.data.error || "This invitation is not for your email address.")
+        setError(
+          httpError.response.data.error ||
+            "This invitation is not for your email address."
+        )
       } else {
         setError(httpError.response?.data?.error || "Failed to join campaign.")
       }
@@ -252,13 +257,12 @@ export default function RedeemInvitationPage() {
 
           <Paper sx={{ p: 4, width: "100%", mt: 3 }}>
             <Stack spacing={3}>
-              <Alert severity="success">
-                {successMessage}
-              </Alert>
-              
+              <Alert severity="success">{successMessage}</Alert>
+
               <Box sx={{ textAlign: "center" }}>
                 <Typography variant="body1">
-                  Check your email and click the confirmation link to complete your registration and join the campaign.
+                  Check your email and click the confirmation link to complete
+                  your registration and join the campaign.
                 </Typography>
               </Box>
 
@@ -287,13 +291,16 @@ export default function RedeemInvitationPage() {
                   Welcome!
                 </Typography>
                 <Typography variant="body1">
-                  You&apos;ll need to create an account to accept this invitation to join {invitation.campaign?.name}.
+                  You&apos;ll need to create an account to accept this
+                  invitation to join {invitation.campaign?.name}.
                 </Typography>
               </Box>
 
               <Box sx={{ textAlign: "center" }}>
                 <Button
-                  onClick={() => router.push(`/invitations/register/${invitationId}`)}
+                  onClick={() =>
+                    router.push(`/invitations/register/${invitationId}`)
+                  }
                   size="large"
                   sx={{ minWidth: 200 }}
                 >
@@ -313,13 +320,16 @@ export default function RedeemInvitationPage() {
                   Welcome back!
                 </Typography>
                 <Typography variant="body1">
-                  You have an existing account. Please log in to accept this invitation.
+                  You have an existing account. Please log in to accept this
+                  invitation.
                 </Typography>
               </Box>
 
               <Box sx={{ textAlign: "center" }}>
                 <Button
-                  onClick={() => router.push(`/login?redirect=/redeem/${invitationId}`)}
+                  onClick={() =>
+                    router.push(`/login?redirect=/redeem/${invitationId}`)
+                  }
                   size="large"
                   sx={{ minWidth: 200 }}
                 >
@@ -349,7 +359,8 @@ export default function RedeemInvitationPage() {
                 <Typography variant="body1">
                   You&apos;ve been invited by{" "}
                   <strong>
-                    {invitation.gamemaster?.first_name} {invitation.gamemaster?.last_name}
+                    {invitation.gamemaster?.first_name}{" "}
+                    {invitation.gamemaster?.last_name}
                   </strong>{" "}
                   to join this Chi War campaign.
                 </Typography>
@@ -381,7 +392,8 @@ export default function RedeemInvitationPage() {
           <Paper sx={{ p: 4, width: "100%" }}>
             <Stack spacing={3}>
               <Alert severity="warning">
-                This invitation is for <strong>{invitation.email}</strong>, but you&apos;re logged in as <strong>{currentUser?.email}</strong>.
+                This invitation is for <strong>{invitation.email}</strong>, but
+                you&apos;re logged in as <strong>{currentUser?.email}</strong>.
               </Alert>
 
               <Box sx={{ textAlign: "center" }}>
@@ -393,7 +405,9 @@ export default function RedeemInvitationPage() {
               <Stack spacing={2}>
                 {invitation.pending_user ? (
                   <Button
-                    onClick={() => router.push(`/login?redirect=/redeem/${invitationId}`)}
+                    onClick={() =>
+                      router.push(`/login?redirect=/redeem/${invitationId}`)
+                    }
                     size="large"
                     variant="outlined"
                   >
@@ -406,10 +420,11 @@ export default function RedeemInvitationPage() {
                       localStorage.removeItem("jwtToken")
                       localStorage.removeItem("user")
                       localStorage.removeItem("currentCampaign")
-                      
+
                       // Clear cookies
-                      document.cookie = "jwtToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
-                      
+                      document.cookie =
+                        "jwtToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+
                       // Redirect back to this same redeem page (not reload)
                       window.location.href = `/redeem/${invitationId}`
                     }}
@@ -419,7 +434,7 @@ export default function RedeemInvitationPage() {
                     Create account for {invitation.email}
                   </Button>
                 )}
-                
+
                 <Button
                   onClick={() => router.push("/")}
                   size="large"
@@ -437,12 +452,15 @@ export default function RedeemInvitationPage() {
           <Paper sx={{ p: 4, width: "100%" }}>
             <Stack spacing={3}>
               <Alert severity="info">
-                You&apos;re already a member of <strong>{invitation.campaign?.name}</strong>!
+                You&apos;re already a member of{" "}
+                <strong>{invitation.campaign?.name}</strong>!
               </Alert>
 
               <Box sx={{ textAlign: "center" }}>
                 <Button
-                  onClick={() => router.push(`/campaigns/${invitation.campaign?.id}`)}
+                  onClick={() =>
+                    router.push(`/campaigns/${invitation.campaign?.id}`)
+                  }
                   size="large"
                   sx={{ minWidth: 200 }}
                 >
@@ -484,8 +502,8 @@ export default function RedeemInvitationPage() {
         {renderContent()}
 
         <Box sx={{ textAlign: "center", mt: 3 }}>
-          <Button 
-            onClick={() => router.push("/")} 
+          <Button
+            onClick={() => router.push("/")}
             variant="outlined"
             size="small"
           >

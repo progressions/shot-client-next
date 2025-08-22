@@ -13,7 +13,7 @@ export function ForgotPasswordClient() {
     retryAfter?: number
     message?: string
   } | null>(null)
-  
+
   const { client } = useClient()
 
   const handleSubmit = async (email: string) => {
@@ -26,23 +26,34 @@ export function ForgotPasswordClient() {
       setSuccess(true)
     } catch (error_) {
       setLoading(false)
-      
+
       if (error_ instanceof Error && "response" in error_) {
-        const response = (error_ as { response?: { status?: number; data?: { error?: string; retry_after?: number } } }).response
-        
+        const response = (
+          error_ as {
+            response?: {
+              status?: number
+              data?: { error?: string; retry_after?: number }
+            }
+          }
+        ).response
+
         if (response?.status === 429) {
           // Rate limiting error
           const data = response.data
           setRateLimitInfo({
             retryAfter: data.retry_after,
-            message: data.error || "Too many password reset attempts. Please wait before trying again."
+            message:
+              data.error ||
+              "Too many password reset attempts. Please wait before trying again.",
           })
         } else if (response?.status === 422) {
           // Validation error
           const data = response.data
           setError(data.error || "Invalid email format")
         } else {
-          setError("Unable to send password reset email. Please try again later.")
+          setError(
+            "Unable to send password reset email. Please try again later."
+          )
         }
       } else {
         setError("An unexpected error occurred. Please try again later.")

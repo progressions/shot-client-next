@@ -5,7 +5,7 @@ import { ProfilePageClient } from "@/components/users/profile"
 
 export const metadata = {
   title: "Profile - Chi War",
-  description: "Manage your Chi War account profile"
+  description: "Manage your Chi War account profile",
 }
 
 export default async function ProfilePage() {
@@ -18,4 +18,3 @@ export default async function ProfilePage() {
     </Suspense>
   )
 }
-

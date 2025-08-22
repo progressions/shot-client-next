@@ -1,80 +1,84 @@
-import React from 'react';
-import { Box, Card, CardContent, Skeleton } from '@mui/material';
+import React from "react"
+import { Box, Card, CardContent, Skeleton } from "@mui/material"
 
 interface SkeletonCardProps {
-  height?: string;
-  className?: string;
-  children?: React.ReactNode;
+  height?: string
+  className?: string
+  children?: React.ReactNode
 }
 
-export const SkeletonCard: React.FC<SkeletonCardProps> = ({ 
-  height = "200px", 
+export const SkeletonCard: React.FC<SkeletonCardProps> = ({
+  height = "200px",
   className = "",
-  children 
+  children,
 }) => {
   return (
     <Card className={className} sx={{ height, mb: 2 }}>
       <CardContent>
-        {children || <Skeleton variant="rectangular" width="100%" height="100%" />}
+        {children || (
+          <Skeleton variant="rectangular" width="100%" height="100%" />
+        )}
       </CardContent>
     </Card>
-  );
-};
+  )
+}
 
 interface SkeletonTextProps {
-  width?: string | number;
-  height?: string | number;
-  variant?: 'text' | 'rectangular' | 'circular';
+  width?: string | number
+  height?: string | number
+  variant?: "text" | "rectangular" | "circular"
 }
 
-export const SkeletonText: React.FC<SkeletonTextProps> = ({ 
-  width = "100%", 
+export const SkeletonText: React.FC<SkeletonTextProps> = ({
+  width = "100%",
   height = 20,
-  variant = "text"
+  variant = "text",
 }) => {
-  return <Skeleton variant={variant} width={width} height={height} />;
-};
+  return <Skeleton variant={variant} width={width} height={height} />
+}
 
 interface SkeletonAvatarProps {
-  size?: number;
+  size?: number
 }
 
-export const SkeletonAvatar: React.FC<SkeletonAvatarProps> = ({ size = 40 }) => {
-  return <Skeleton variant="circular" width={size} height={size} />;
-};
+export const SkeletonAvatar: React.FC<SkeletonAvatarProps> = ({
+  size = 40,
+}) => {
+  return <Skeleton variant="circular" width={size} height={size} />
+}
 
 interface SkeletonButtonProps {
-  width?: string | number;
-  height?: string | number;
-  variant?: 'text' | 'outlined' | 'contained';
+  width?: string | number
+  height?: string | number
+  variant?: "text" | "outlined" | "contained"
 }
 
-export const SkeletonButton: React.FC<SkeletonButtonProps> = ({ 
-  width = 100, 
+export const SkeletonButton: React.FC<SkeletonButtonProps> = ({
+  width = 100,
   height = 36,
-  variant = "contained"
+  variant = "contained",
 }) => {
-  const borderRadius = variant === 'contained' ? 1 : 0;
+  const borderRadius = variant === "contained" ? 1 : 0
   return (
-    <Skeleton 
-      variant="rectangular" 
-      width={width} 
-      height={height} 
+    <Skeleton
+      variant="rectangular"
+      width={width}
+      height={height}
       sx={{ borderRadius }}
     />
-  );
-};
-
-interface SkeletonRowProps {
-  columns?: number;
-  showAvatar?: boolean;
-  height?: number;
+  )
 }
 
-export const SkeletonRow: React.FC<SkeletonRowProps> = ({ 
-  columns = 3, 
+interface SkeletonRowProps {
+  columns?: number
+  showAvatar?: boolean
+  height?: number
+}
+
+export const SkeletonRow: React.FC<SkeletonRowProps> = ({
+  columns = 3,
   showAvatar = false,
-  height = 20
+  height = 20,
 }) => {
   return (
     <Box display="flex" alignItems="center" gap={2} mb={1}>
@@ -85,26 +89,32 @@ export const SkeletonRow: React.FC<SkeletonRowProps> = ({
         </Box>
       ))}
     </Box>
-  );
-};
-
-interface SkeletonTableProps {
-  rows?: number;
-  columns?: number;
-  showHeader?: boolean;
-  showAvatar?: boolean;
+  )
 }
 
-export const SkeletonTable: React.FC<SkeletonTableProps> = ({ 
-  rows = 5, 
-  columns = 4, 
+interface SkeletonTableProps {
+  rows?: number
+  columns?: number
+  showHeader?: boolean
+  showAvatar?: boolean
+}
+
+export const SkeletonTable: React.FC<SkeletonTableProps> = ({
+  rows = 5,
+  columns = 4,
   showHeader = true,
-  showAvatar = false
+  showAvatar = false,
 }) => {
   return (
     <Box>
       {showHeader && (
-        <Box display="flex" gap={2} mb={2} pb={1} borderBottom="1px solid #e0e0e0">
+        <Box
+          display="flex"
+          gap={2}
+          mb={2}
+          pb={1}
+          borderBottom="1px solid #e0e0e0"
+        >
           {showAvatar && <Box width={40} />}
           {Array.from({ length: columns }).map((_, index) => (
             <Box key={`header-${index}`} flex={index === 0 ? 2 : 1}>
@@ -114,25 +124,25 @@ export const SkeletonTable: React.FC<SkeletonTableProps> = ({
         </Box>
       )}
       {Array.from({ length: rows }).map((_, index) => (
-        <SkeletonRow 
-          key={`row-${index}`} 
-          columns={columns} 
+        <SkeletonRow
+          key={`row-${index}`}
+          columns={columns}
           showAvatar={showAvatar}
           height={16}
         />
       ))}
     </Box>
-  );
-};
-
-interface SkeletonFormProps {
-  fields?: number;
-  showActions?: boolean;
+  )
 }
 
-export const SkeletonForm: React.FC<SkeletonFormProps> = ({ 
-  fields = 5, 
-  showActions = true 
+interface SkeletonFormProps {
+  fields?: number
+  showActions?: boolean
+}
+
+export const SkeletonForm: React.FC<SkeletonFormProps> = ({
+  fields = 5,
+  showActions = true,
 }) => {
   return (
     <Box>
@@ -151,5 +161,5 @@ export const SkeletonForm: React.FC<SkeletonFormProps> = ({
         </Box>
       )}
     </Box>
-  );
-};
+  )
+}
