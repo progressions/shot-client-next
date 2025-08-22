@@ -2,20 +2,32 @@
 
 import { redirect } from "next/navigation"
 import { useState, useEffect, useCallback } from "react"
-import { Alert, Typography, Box, Stack, FormControl, FormHelperText } from "@mui/material"
+import {
+  Alert,
+  Box,
+  Stack,
+} from "@mui/material"
 import type { User } from "@/types"
 import { useCampaign } from "@/contexts"
 import { EditUserForm } from "@/components/users"
 import RoleManagement from "@/components/users/RoleManagement"
 import { useClient, useToast } from "@/contexts"
-import { HeroImage, SpeedDialMenu, TextField, EmailChangeConfirmation } from "@/components/ui"
+import {
+  HeroImage,
+  SpeedDialMenu,
+  TextField,
+  EmailChangeConfirmation,
+} from "@/components/ui"
 
 interface ShowProperties {
   user: User
   initialIsMobile?: boolean
 }
 
-export default function Show({ user: initialUser, initialIsMobile }: ShowProperties) {
+export default function Show({
+  user: initialUser,
+  initialIsMobile,
+}: ShowProperties) {
   const { campaignData } = useCampaign()
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
@@ -24,7 +36,7 @@ export default function Show({ user: initialUser, initialIsMobile }: ShowPropert
   const [editOpen, setEditOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [updating, setUpdating] = useState<string | null>(null)
-  
+
   // Email change confirmation state
   const [originalEmail] = useState(initialUser.email)
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false)
@@ -59,32 +71,37 @@ export default function Show({ user: initialUser, initialIsMobile }: ShowPropert
   }
 
   // Update user field following the same pattern as RoleManagement
-  const updateUserField = useCallback(async (fieldName: string, fieldValue: string) => {
-    setUpdating(fieldName)
-    
-    try {
-      // Create FormData for the update
-      const formData = new FormData()
-      formData.append("user", JSON.stringify({ [fieldName]: fieldValue }))
-      
-      const updatedResponse = await client.updateUser(user.id, formData)
-      const updatedUser = updatedResponse.data
-      
-      setUser(updatedUser)
-      
-      // Format field name for display
-      const displayName = fieldName.replace('_', ' ')
-      const capitalizedName = displayName.charAt(0).toUpperCase() + displayName.slice(1)
-      toastSuccess(`${capitalizedName} updated successfully`)
-    } catch (error_) {
-      console.error(`Failed to update ${fieldName}:`, error_)
-      const displayName = fieldName.replace('_', ' ')
-      const capitalizedName = displayName.charAt(0).toUpperCase() + displayName.slice(1)
-      toastError(`Failed to update ${capitalizedName}. Please try again.`)
-    } finally {
-      setUpdating(null)
-    }
-  }, [client, user.id, toastSuccess, toastError])
+  const updateUserField = useCallback(
+    async (fieldName: string, fieldValue: string) => {
+      setUpdating(fieldName)
+
+      try {
+        // Create FormData for the update
+        const formData = new FormData()
+        formData.append("user", JSON.stringify({ [fieldName]: fieldValue }))
+
+        const updatedResponse = await client.updateUser(user.id, formData)
+        const updatedUser = updatedResponse.data
+
+        setUser(updatedUser)
+
+        // Format field name for display
+        const displayName = fieldName.replace("_", " ")
+        const capitalizedName =
+          displayName.charAt(0).toUpperCase() + displayName.slice(1)
+        toastSuccess(`${capitalizedName} updated successfully`)
+      } catch (error_) {
+        console.error(`Failed to update ${fieldName}:`, error_)
+        const displayName = fieldName.replace("_", " ")
+        const capitalizedName =
+          displayName.charAt(0).toUpperCase() + displayName.slice(1)
+        toastError(`Failed to update ${capitalizedName}. Please try again.`)
+      } finally {
+        setUpdating(null)
+      }
+    },
+    [client, user.id, toastSuccess, toastError]
+  )
 
   // Email change detection helper
   const detectEmailChange = useCallback(
@@ -97,7 +114,7 @@ export default function Show({ user: initialUser, initialIsMobile }: ShowPropert
   const handleFieldChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = event.target
-      
+
       // Update local state immediately for responsive UI
       setUser(prev => ({ ...prev, [name]: value }))
     },
@@ -126,7 +143,10 @@ export default function Show({ user: initialUser, initialIsMobile }: ShowPropert
     if (!pendingEmailChange) return
 
     setShowEmailConfirmation(false)
-    await updateUserField(pendingEmailChange.fieldName, pendingEmailChange.newValue)
+    await updateUserField(
+      pendingEmailChange.fieldName,
+      pendingEmailChange.newValue
+    )
     setPendingEmailChange(null)
   }, [pendingEmailChange, updateUserField])
 
@@ -210,7 +230,7 @@ export default function Show({ user: initialUser, initialIsMobile }: ShowPropert
           {error}
         </Alert>
       )}
-      
+
       <EmailChangeConfirmation
         open={showEmailConfirmation}
         currentEmail={originalEmail}

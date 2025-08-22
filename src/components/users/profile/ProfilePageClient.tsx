@@ -157,9 +157,11 @@ export default function ProfilePageClient({
       // Check if this is an email change that requires confirmation
       if (detectEmailChange(originalEmail, value)) {
         // Store the pending change and show confirmation dialog
-        setPendingEmailChange({ 
-          event: { target: { name: "email", value } } as React.ChangeEvent<HTMLInputElement>, 
-          newEmail: value 
+        setPendingEmailChange({
+          event: {
+            target: { name: "email", value },
+          } as React.ChangeEvent<HTMLInputElement>,
+          newEmail: value,
         })
         setShowEmailConfirmation(true)
         return
@@ -167,9 +169,9 @@ export default function ProfilePageClient({
 
       // If no significant change, process the field update normally
       const syntheticEvent = {
-        target: { name: "email", value }
+        target: { name: "email", value },
       } as React.ChangeEvent<HTMLInputElement>
-      
+
       await processFieldChange(syntheticEvent)
     },
     [originalEmail, detectEmailChange, processFieldChange]
@@ -180,15 +182,15 @@ export default function ProfilePageClient({
     if (!pendingEmailChange) return
 
     setShowEmailConfirmation(false)
-    
+
     // Create a new event object with the current email value from form state
     const syntheticEvent = {
       target: {
         name: "email",
-        value: pendingEmailChange.newEmail
-      }
+        value: pendingEmailChange.newEmail,
+      },
     } as React.ChangeEvent<HTMLInputElement>
-    
+
     await processFieldChange(syntheticEvent)
     setPendingEmailChange(null)
   }, [pendingEmailChange, processFieldChange])

@@ -1,4 +1,14 @@
-import { Typography, Container, Box, Card, CardContent, Grid, Link, Alert, Button } from "@mui/material"
+import {
+  Typography,
+  Container,
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  Link,
+  Alert,
+  Button,
+} from "@mui/material"
 import EmailIcon from "@mui/icons-material/Email"
 import GitHubIcon from "@mui/icons-material/GitHub"
 import BugReportIcon from "@mui/icons-material/BugReport"
@@ -7,10 +17,12 @@ import { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Support - Chi War",
-  description: "Get help, report bugs, and request features for Chi War, the Feng Shui 2 RPG campaign management system.",
+  description:
+    "Get help, report bugs, and request features for Chi War, the Feng Shui 2 RPG campaign management system.",
   openGraph: {
     title: "Support - Chi War",
-    description: "Get help, report bugs, and request features for Chi War, the Feng Shui 2 RPG campaign management system.",
+    description:
+      "Get help, report bugs, and request features for Chi War, the Feng Shui 2 RPG campaign management system.",
     type: "website",
   },
 }
@@ -22,7 +34,11 @@ export default function SupportPage() {
         <Typography variant="h2" component="h1" gutterBottom>
           Support
         </Typography>
-        <Typography variant="h5" color="text.secondary" sx={{ maxWidth: 800, mx: "auto" }}>
+        <Typography
+          variant="h5"
+          color="text.secondary"
+          sx={{ maxWidth: 800, mx: "auto" }}
+        >
           Get help, report issues, and help improve Chi War
         </Typography>
       </Box>
@@ -48,8 +64,9 @@ export default function SupportPage() {
                 </Typography>
               </Box>
               <Typography paragraph>
-                Found something that isn&apos;t working correctly? We want to fix it! Please report bugs 
-                through our GitHub issue tracker with as much detail as possible.
+                Found something that isn&apos;t working correctly? We want to
+                fix it! Please report bugs through our GitHub issue tracker with
+                as much detail as possible.
               </Typography>
               <Typography paragraph sx={{ fontWeight: "bold", mb: 2 }}>
                 What to include in your bug report:
@@ -84,8 +101,9 @@ export default function SupportPage() {
                 </Typography>
               </Box>
               <Typography paragraph>
-                Have an idea for improving Chi War? We&apos;d love to hear about it! Feature requests 
-                help us prioritize development and build tools that actually serve your needs.
+                Have an idea for improving Chi War? We&apos;d love to hear about
+                it! Feature requests help us prioritize development and build
+                tools that actually serve your needs.
               </Typography>
               <Typography paragraph sx={{ fontWeight: "bold", mb: 2 }}>
                 What to include in your feature request:
@@ -122,8 +140,9 @@ export default function SupportPage() {
                 </Typography>
               </Box>
               <Typography paragraph>
-                For general questions, account issues, or private concerns that don&apos;t belong 
-                in public GitHub issues, you can reach out directly.
+                For general questions, account issues, or private concerns that
+                don&apos;t belong in public GitHub issues, you can reach out
+                directly.
               </Typography>
               <Typography paragraph>
                 <strong>Email:</strong>{" "}
@@ -132,8 +151,9 @@ export default function SupportPage() {
                 </Link>
               </Typography>
               <Typography paragraph>
-                Please include &quot;Chi War Support&quot; in your subject line and provide as much 
-                context as possible about your question or issue.
+                Please include &quot;Chi War Support&quot; in your subject line
+                and provide as much context as possible about your question or
+                issue.
               </Typography>
               <Typography sx={{ fontStyle: "italic" }}>
                 Response time: Usually within 24-48 hours
@@ -151,23 +171,24 @@ export default function SupportPage() {
                 </Typography>
               </Box>
               <Typography paragraph>
-                Chi War is open source! You can view the code, contribute improvements, 
-                or learn more about how it works.
+                Chi War is open source! You can view the code, contribute
+                improvements, or learn more about how it works.
               </Typography>
               <Typography paragraph>
                 <strong>GitHub Repository:</strong>{" "}
-                <Link 
-                  href="https://github.com/progressions/chi-war" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <Link
+                  href="https://github.com/progressions/chi-war"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   color="primary"
                 >
                   github.com/progressions/chi-war
                 </Link>
               </Typography>
               <Typography paragraph>
-                <strong>Contribute:</strong> Developers can submit pull requests for bug fixes 
-                and new features. Check the repository&apos;s contributing guidelines for details.
+                <strong>Contribute:</strong> Developers can submit pull requests
+                for bug fixes and new features. Check the repository&apos;s
+                contributing guidelines for details.
               </Typography>
             </CardContent>
           </Card>
@@ -212,20 +233,24 @@ export default function SupportPage() {
             Frequently Reported Issues
           </Typography>
           <Typography paragraph>
-            <strong>Characters not saving:</strong> This is usually a temporary connection issue. 
-            Try refreshing the page and re-entering your changes.
+            <strong>Characters not saving:</strong> This is usually a temporary
+            connection issue. Try refreshing the page and re-entering your
+            changes.
           </Typography>
           <Typography paragraph>
-            <strong>Invitations not received:</strong> Check spam folders. If the email still 
-            hasn&apos;t arrived after 10 minutes, contact support.
+            <strong>Invitations not received:</strong> Check spam folders. If
+            the email still hasn&apos;t arrived after 10 minutes, contact
+            support.
           </Typography>
           <Typography paragraph>
-            <strong>Combat updates not syncing:</strong> Make sure all players have stable internet 
-            connections. The gamemaster can refresh the fight to re-sync everyone.
+            <strong>Combat updates not syncing:</strong> Make sure all players
+            have stable internet connections. The gamemaster can refresh the
+            fight to re-sync everyone.
           </Typography>
           <Typography paragraph>
-            <strong>Mobile display issues:</strong> Chi War is optimized for desktop and tablet use. 
-            Some features may have limited functionality on mobile phones.
+            <strong>Mobile display issues:</strong> Chi War is optimized for
+            desktop and tablet use. Some features may have limited functionality
+            on mobile phones.
           </Typography>
         </CardContent>
       </Card>

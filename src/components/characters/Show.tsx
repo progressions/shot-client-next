@@ -112,8 +112,8 @@ export default function Show({
         setEntity={setCharacter}
         updateEntity={updateCharacter}
       />
-      <EditOwner 
-        character={memoizedCharacter} 
+      <EditOwner
+        character={memoizedCharacter}
         updateCharacter={updateCharacter}
       />
       <SectionHeader

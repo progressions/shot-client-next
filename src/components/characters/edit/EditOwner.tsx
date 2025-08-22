@@ -26,13 +26,13 @@ export default function EditOwner({
   // Check if current user can edit ownership
   const canEditOwner = () => {
     if (!user || !campaign) return false
-    
+
     // Admin can edit any character
     if (user.admin) return true
-    
-    // Gamemaster can edit characters in their campaign  
+
+    // Gamemaster can edit characters in their campaign
     if (campaign.gamemaster?.id === user.id) return true
-    
+
     return false
   }
 
@@ -41,7 +41,7 @@ export default function EditOwner({
 
     const updatedCharacter = {
       ...character,
-      user_id: newUser.id
+      user_id: newUser.id,
     }
     setOwnerId(newUser.id)
     updateCharacter(updatedCharacter)

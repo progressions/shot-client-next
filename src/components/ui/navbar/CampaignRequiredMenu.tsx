@@ -50,7 +50,11 @@ export function CampaignRequiredMenu() {
           <MenuItem key="about" onClick={handleMenuClose}>
             <Link
               href="/about"
-              style={{ color: "#ffffff", textDecoration: "none", width: "100%" }}
+              style={{
+                color: "#ffffff",
+                textDecoration: "none",
+                width: "100%",
+              }}
             >
               About
             </Link>
@@ -58,7 +62,11 @@ export function CampaignRequiredMenu() {
           <MenuItem key="documentation" onClick={handleMenuClose}>
             <Link
               href="/documentation"
-              style={{ color: "#ffffff", textDecoration: "none", width: "100%" }}
+              style={{
+                color: "#ffffff",
+                textDecoration: "none",
+                width: "100%",
+              }}
             >
               Documentation
             </Link>
@@ -66,7 +74,11 @@ export function CampaignRequiredMenu() {
           <MenuItem key="support" onClick={handleMenuClose}>
             <Link
               href="/support"
-              style={{ color: "#ffffff", textDecoration: "none", width: "100%" }}
+              style={{
+                color: "#ffffff",
+                textDecoration: "none",
+                width: "100%",
+              }}
             >
               Support
             </Link>
