@@ -15,7 +15,7 @@ import {
 } from "@/components/ui"
 import {
   CharacterSpeedDial,
-  Owner,
+  EditOwner,
   ActionValuesEdit,
   Weapons,
   Description,
@@ -112,7 +112,10 @@ export default function Show({
         setEntity={setCharacter}
         updateEntity={updateCharacter}
       />
-      <Owner character={memoizedCharacter} />
+      <EditOwner 
+        character={memoizedCharacter} 
+        updateCharacter={updateCharacter}
+      />
       <SectionHeader
         title="Action Values"
         icon={<Icon keyword="Action Values" />}

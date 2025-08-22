@@ -11,6 +11,7 @@ type UserAutocompleteProperties = {
   options?: Option[]
   exclude?: string[]
   allowNone?: boolean
+  filters?: Record<string, any>
 }
 
 export default function UserAutocomplete({
@@ -19,6 +20,7 @@ export default function UserAutocomplete({
   exclude = [],
   onChange,
   allowNone = true,
+  filters = {},
 }: UserAutocompleteProperties) {
   const { client } = useClient()
   const [users, setUsers] = useState<User[]>([])
@@ -31,6 +33,7 @@ export default function UserAutocomplete({
           page: 1,
           sort: "name",
           order: "asc",
+          ...filters,
         })
         setUsers(response.data.users || [])
       } catch (error) {
@@ -41,7 +44,7 @@ export default function UserAutocomplete({
     fetchUsers().catch(error => {
       console.error("Error in useEffect fetchUsers:", error)
     })
-  }, [client])
+  }, [client, filters])
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
     if (options) {
@@ -54,11 +57,12 @@ export default function UserAutocomplete({
       return filteredOptions
     }
     return users
-      .filter(user =>
-        user.name.toLowerCase().includes(inputValue.toLowerCase())
-      )
+      .filter(user => {
+        const searchName = user.name || user.email || ""
+        return searchName.toLowerCase().includes(inputValue.toLowerCase())
+      })
       .map(user => ({
-        label: user.name,
+        label: user.name || user.email || "Unknown User",
         value: user.id,
       }))
   }
