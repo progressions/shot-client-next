@@ -17,12 +17,6 @@ const footerColumns: FooterColumn[] = [
     title: "Chi War",
     links: [
       { label: "About Us", href: "/about" },
-      {
-        label: "Feng Shui 2",
-        href: "https://atlas-games.com/product_tables/AG4020/",
-        target: "_blank",
-        rel: "noopener noreferrer",
-      },
       { label: "Support", href: "/support" },
     ],
   },
