@@ -17,13 +17,15 @@ import { FormatQuote } from "@mui/icons-material"
 
 const TestimonialsContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(8, 0),
-  backgroundColor: theme.palette.grey[50],
+  backgroundColor: theme.palette.background.default,
 }))
 
 const TestimonialCard = styled(Card)(({ theme }) => ({
   height: "100%",
   position: "relative",
   padding: theme.spacing(3),
+  backgroundColor: theme.palette.background.paper,
+  border: `1px solid ${theme.palette.divider}`,
   transition: "transform 0.3s ease, box-shadow 0.3s ease",
   "&:hover": {
     transform: "translateY(-4px)",
