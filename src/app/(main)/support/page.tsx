@@ -146,8 +146,8 @@ export default function SupportPage() {
               </Typography>
               <Typography paragraph>
                 <strong>Email:</strong>{" "}
-                <Link href="mailto:progressions@gmail.com" color="primary">
-                  progressions@gmail.com
+                <Link href="mailto:admin@chiwar.com" color="primary">
+                  admin@chiwar.com
                 </Link>
               </Typography>
               <Typography paragraph>

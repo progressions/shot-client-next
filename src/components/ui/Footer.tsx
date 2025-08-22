@@ -61,7 +61,7 @@ const footerColumns: FooterColumn[] = [
       },
       {
         label: "Contact",
-        href: "mailto:progressions@gmail.com",
+        href: "mailto:admin@chiwar.com",
       },
     ],
   },
