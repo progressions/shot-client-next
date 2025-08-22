@@ -1,9 +1,61 @@
-import {
-  Campaign,
-  CharacterType,
-  Person,
-  CharacterEffects,
+/**
+ * Legacy types.ts file - maintained for backward compatibility
+ *
+ * This file now re-exports types from the new organized structure:
+ * - API types from api.ts
+ * - UI types from ui.ts
+ * - Plus some types that remain here for now
+ */
+
+// Re-export API types
+export type {
+  ServerErrorResponse,
+  ApiErrorResponse,
+  HttpError,
+  ConfirmationResponse,
+  CampaignCableData,
+  CableData,
+  FightChannelMessage,
+  Viewer,
+  SessionData,
+  NotionPage,
+  ParametersType,
+  QueryType,
+} from "./api"
+
+// Re-export UI types
+export type {
+  EditorChangeEvent,
+  Toast,
+  Severity,
+  OptionType,
+  FilterParametersType,
+  InputParametersType,
+  PasswordWithConfirmation,
+  CharacterFilter,
+  ErrorMessages,
+  ImagePosition,
+  Location,
+  Shot,
+  Archetype,
+  WeaponCategory,
+  SchtickCategory,
+  SchtickPath,
+  Invitation,
+  FightEvent,
+  ShotType,
+  CollectionKey,
+  CollectionItemMap,
+  BaseEntity,
+  HasCollection,
+} from "./ui"
+
+// Re-export resource types
+export type {
+  Entity,
+  Character,
   User,
+  Campaign,
   Fight,
   Site,
   Vehicle,
@@ -12,366 +64,83 @@ import {
   Party,
   Weapon,
   Schtick,
-  Character,
+  CharacterType,
+  Person,
   ActionValues,
   SkillValues,
-} from "@/types"
+  Advancement,
+} from "./resources"
 
-type EntityReturnValue =
-  | string
-  | string[]
-  | boolean
-  | number
-  | number[]
-  | Entity
-  | Entity[]
-  | null
-  | undefined
-  | Invitation
-  | Invitation[]
-  | FightEvent
-  | FightEvent[]
-  | Advancement
-  | Advancement[]
-  | ErrorMessages
-  | ShotType
-  | ShotType[]
-  | CharacterEffects
-  | VehicleActionValues
-  | ActionValues
-  | SkillValues
+// Re-export character enums
+export { CharacterTypes } from "./character"
 
-export type ImagePosition = {
-  context: string
-  x_position: number
-  y_position: number
-}
-
-export type BaseEntity = {
-  [key: string]: EntityReturnValue
-  id: string
-  name: string
-  image_url: string
-  created_at: string
-  updated_at: string
-  image_positions: ImagePosition[]
-}
-
-export type Entity =
-  | Fight
-  | Character
-  | User
-  | Site
-  | (Vehicle & { action_values: VehicleActionValues })
-  | (Person & { action_values: ActionValues })
-  | Faction
-  | Juncture
-  | Party
-  | Weapon
-  | Schtick
-
-// Union type of possible collection keys (matches autocompleteMap and badgeMap in ListManager)
-export type CollectionKey =
-  | "characters"
-  | "parties"
-  | "junctures"
-  | "sites"
-  | "weapons"
-  | "factions"
-  | "schticks"
-
-// Maps each collection key to its corresponding item type
-export interface CollectionItemMap {
-  characters: Character
-  parties: Party
-  junctures: Juncture
-  sites: Site
-  weapons: Weapon
-  factions: Faction
-  schticks: Schtick
-}
-
-// Generic interface for entities that have a specific collection
-export interface HasCollection<K extends CollectionKey> extends BaseEntity {
-  [key: string]: EntityReturnValue // Allows additional properties to avoid conflicts with existing types
-  collectionItems?: CollectionItemMap[K][] // e.g., entity.collectionItems is Character[] for K="characters"
-  collectionIds?: string[] // e.g., entity.collectionIds is string[] for characters_ids
-}
-
-export type EditorChangeEvent = {
-  target: {
-    name: string
-    value: string
-  }
-}
-
-export type NotionPage = {
-  id: string
-}
-
-export interface CampaignCableData {
-  fight: Fight | null
-  character: Character | null
-  campaign: Campaign | null
-  user: User | null
-  vehicle: Vehicle | null
-  faction: Faction | null
-  juncture: Juncture | null
-  party: Party | null
-  site: Site | null
-  weapon: Weapon | null
-  schtick: Schtick | null
-  campaigns: Campaign[] | string | null
-  fights: Fight[] | string | null
-  junctures: Juncture[] | string | null
-  factions: Faction[] | string | null
-  characters: Character[] | string | null
-  vehicles: Vehicle[] | string | null
-  parties: Party[] | string | null
-  sites: Site[] | string | null
-  schticks: Schtick[] | string | null
-  weapons: Weapon[] | string | null
-}
-
-export interface CableData {
-  status: "preview_ready" | "error"
-  json?: CharacterJson
-  error?: string
-}
-
+// Types that remain in this file for now
 export interface CharacterJson {
   name: string
-  type: CharacterType
+  type: import("./resources").CharacterType
   description: string
   mainAttack: string
   attackValue: number
   defense: number
   toughness: number
   speed: number
-  damage: number
-  nicknames: string
-  age: string
-  height: string
-  weight: string
-  hairColor: string
-  eyeColor: string
-  styleOfDress: string
-  appearance: string
-  melodramaticHook: string
-  faction: string
+  fortune: number
+  task: string
+  keywords: string[]
+  skills: string[]
+  weapons: string[]
+  schticks: string[]
+  summary: string
+  wealth: number
+  created_at: string
   juncture: string
-  wealth: string
-}
-
-export interface PopupProperties {
-  id: string
-  data?: object | object[]
-}
-
-export interface VehicleArchetype {
-  name: string
-  Acceleration: number
-  Handling: number
-  Squeal: number
-  Frame: number
-  Crunch: number
-}
-
-export interface AttackRoll {
-  boxcars: boolean
-  wayAwfulFailure: boolean
-  swerve: number
-  actionResult: number
-  outcome?: number
-  success?: boolean
-  smackdown?: number
-  wounds?: number
-}
-
-export type ExplodingDiceRolls = [number[], number]
-
-export interface Swerve {
-  result: number
-  positiveRolls: number[]
-  negativeRolls: number[]
-  positive: number | null
-  negative: number | null
-  boxcars: boolean
-}
-
-export interface Location {
-  id?: string
-  name: string
-  shot?: Shot
-}
-
-export interface Shot {
-  id?: string
-  shot: number
-}
-
-export type Archetype = string
-
-export interface ErrorMessages {
-  [key: string]: string
-}
-
-export interface SessionData {
-  authorization: object
-  user?: User
-}
-
-export interface OptionType {
-  inputValue: string
-}
-
-export interface FilterParametersType {
-  getOptionLabel: (option: string | OptionType) => string
-  inputValue: string
-}
-
-export type Severity = "error" | "info" | "success" | "warning"
-
-export type WeaponCategory = string
-export type SchtickCategory = string
-export type SchtickPath = string
-
-export interface InputParametersType {
-  [key: string]: unknown
-}
-
-export interface PasswordWithConfirmation {
-  password: string
-  password_confirmation: string
-}
-
-export interface Toast {
-  open: boolean
-  message: string
-  severity: Severity
+  faction: string
+  campaign: string
+  color: string
+  active: boolean
 }
 
 export interface VehicleActionValues {
-  [key: string]:
-    | string
-    | number
-    | Position
-    | CharacterType
-    | undefined
-    | boolean
+  [key: string]: number | string
   Acceleration: number
-  Handling: number
-  Squeal: number
+  Maneuverability: number
+  TopSpeed: number
   Frame: number
   Crunch: number
-  "Chase Points": number
-  "Condition Points": number
-  Position: Position
-  Pursuer: Pursuer
-  Type: CharacterType
-}
-export enum Positions {
-  Near = "near",
-  Far = "far",
 }
 
-export type Position = "near" | "far"
-
-export type Pursuer = "true" | "false"
-
-export enum CharacterTypes {
-  PC = "PC",
-  Ally = "Ally",
-  Mook = "Mook",
-  FeaturedFoe = "Featured Foe",
-  Boss = "Boss",
-  UberBoss = "Uber-Boss",
+export interface VehicleDescription {
+  passengers: number
+  cargo_capacity: string
+  cost: number
+  fuel_type: string
+  mpg: number
+  availability: string
+  notes: string
 }
 
-export interface ID {
-  id: string
+export interface FormStateData {
+  drawerOpen: boolean
+  edit?: boolean
+  currentChar?: import("./resources").Character
+  showDeleteDialog?: boolean
+  saving?: boolean
+  errors?: { [key: string]: string }
+  success?: string
+  edited?: boolean
 }
 
-export interface Advancement {
-  id?: string
-  description: string
+export interface MetaType {
+  [key: string]: number
 }
 
-export type ShotType = [number, Character[]]
-
-export interface FightEvent {
-  id?: string
-  fight_id?: string
-  event_type: string
-  description: string
-  details?: object
-  created_at?: string
-}
-export interface Invitation {
-  id?: string
-  email?: string
-  campaign_id?: string
-  campaign?: Campaign
-  maximum_count: number
-  remaining_count: number
-  pending_user: User
+export interface PaginationMeta {
+  current_page: number
+  total_pages: number
+  per_page: number
+  total_count: number
 }
 
-export interface CharacterFilter {
-  type: string | null
-  name: string | null
-}
-
-export interface ParametersType {
+export interface CacheRefreshType {
   [key: string]: string
-  id: string
-}
-
-export interface QueryType {
-  [key: string]: string | undefined
-  confirmation_token?: string
-  reset_password_token?: string
-}
-
-export interface Viewer {
-  id: string
-  first_name?: string
-  last_name?: string
-  name: string
-  image_url?: string | null
-}
-
-export interface FightChannelMessage {
-  fight?: "updated" | Fight
-  users?: Viewer[]
-}
-
-// Define the shape of server error responses
-export interface ServerErrorResponse {
-  errors: Partial<Record<keyof FormStateData, string[]>>
-}
-
-// API Error Response
-export interface ApiErrorResponse {
-  error?: string
-  errors?: string[]
-  message?: string
-}
-
-// HTTP Error with Response
-export interface HttpError extends Error {
-  response?: {
-    status: number
-    data: ApiErrorResponse
-  }
-}
-
-// Confirmation Response
-export interface ConfirmationResponse {
-  message: string
-  user?: User
-  token?: string
-  campaign_id?: string
-  error?: string
-  errors?: string[]
 }

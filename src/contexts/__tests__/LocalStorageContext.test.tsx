@@ -6,32 +6,47 @@ import { LocalStorageProvider, useLocalStorage } from "../LocalStorageContext"
 const TestComponent = () => {
   const { saveLocally, getLocally } = useLocalStorage()
   const [value, setValue] = React.useState<unknown>(null)
-  
+
   const handleSave = (key: string, data: unknown) => {
     saveLocally(key, data)
   }
-  
+
   const handleGet = (key: string) => {
     const retrieved = getLocally(key)
     setValue(retrieved)
   }
-  
+
   return (
     <div>
       <div data-testid="value">{JSON.stringify(value)}</div>
-      <button data-testid="save-string" onClick={() => handleSave("test-string", "hello world")}>
+      <button
+        data-testid="save-string"
+        onClick={() => handleSave("test-string", "hello world")}
+      >
         Save String
       </button>
-      <button data-testid="save-object" onClick={() => handleSave("test-object", { name: "test", value: 123 })}>
+      <button
+        data-testid="save-object"
+        onClick={() => handleSave("test-object", { name: "test", value: 123 })}
+      >
         Save Object
       </button>
-      <button data-testid="save-array" onClick={() => handleSave("test-array", [1, 2, 3])}>
+      <button
+        data-testid="save-array"
+        onClick={() => handleSave("test-array", [1, 2, 3])}
+      >
         Save Array
       </button>
-      <button data-testid="save-boolean" onClick={() => handleSave("test-boolean", true)}>
+      <button
+        data-testid="save-boolean"
+        onClick={() => handleSave("test-boolean", true)}
+      >
         Save Boolean
       </button>
-      <button data-testid="save-number" onClick={() => handleSave("test-number", 42)}>
+      <button
+        data-testid="save-number"
+        onClick={() => handleSave("test-number", 42)}
+      >
         Save Number
       </button>
       <button data-testid="get-string" onClick={() => handleGet("test-string")}>
@@ -43,13 +58,19 @@ const TestComponent = () => {
       <button data-testid="get-array" onClick={() => handleGet("test-array")}>
         Get Array
       </button>
-      <button data-testid="get-boolean" onClick={() => handleGet("test-boolean")}>
+      <button
+        data-testid="get-boolean"
+        onClick={() => handleGet("test-boolean")}
+      >
         Get Boolean
       </button>
       <button data-testid="get-number" onClick={() => handleGet("test-number")}>
         Get Number
       </button>
-      <button data-testid="get-nonexistent" onClick={() => handleGet("nonexistent-key")}>
+      <button
+        data-testid="get-nonexistent"
+        onClick={() => handleGet("nonexistent-key")}
+      >
         Get Nonexistent
       </button>
     </div>
@@ -83,15 +104,17 @@ const mockLocalStorage = (() => {
 })()
 
 // Mock console.error to test error handling
-const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+const consoleErrorSpy = jest
+  .spyOn(console, "error")
+  .mockImplementation(() => {})
 
 describe("LocalStorageProvider", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockLocalStorage.clear()
-    
+
     // Ensure window exists and mock localStorage
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       Object.defineProperty(window, "localStorage", {
         value: mockLocalStorage,
         writable: true,
@@ -115,61 +138,73 @@ describe("LocalStorageProvider", () => {
   describe("saveLocally", () => {
     it("saves string values to localStorage", () => {
       renderWithProvider()
-      
+
       const saveButton = screen.getByTestId("save-string")
-      
+
       act(() => {
         saveButton.click()
       })
-      
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith("test-string", "\"hello world\"")
+
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+        "test-string",
+        '"hello world"'
+      )
     })
 
     it("saves object values to localStorage as JSON", () => {
       renderWithProvider()
-      
+
       const saveButton = screen.getByTestId("save-object")
-      
+
       act(() => {
         saveButton.click()
       })
-      
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith("test-object", "{\"name\":\"test\",\"value\":123}")
+
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+        "test-object",
+        '{"name":"test","value":123}'
+      )
     })
 
     it("saves array values to localStorage as JSON", () => {
       renderWithProvider()
-      
+
       const saveButton = screen.getByTestId("save-array")
-      
+
       act(() => {
         saveButton.click()
       })
-      
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith("test-array", "[1,2,3]")
+
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+        "test-array",
+        "[1,2,3]"
+      )
     })
 
     it("saves boolean values to localStorage", () => {
       renderWithProvider()
-      
+
       const saveButton = screen.getByTestId("save-boolean")
-      
+
       act(() => {
         saveButton.click()
       })
-      
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith("test-boolean", "true")
+
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+        "test-boolean",
+        "true"
+      )
     })
 
     it("saves number values to localStorage", () => {
       renderWithProvider()
-      
+
       const saveButton = screen.getByTestId("save-number")
-      
+
       act(() => {
         saveButton.click()
       })
-      
+
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith("test-number", "42")
     })
 
@@ -179,57 +214,59 @@ describe("LocalStorageProvider", () => {
       })
 
       renderWithProvider()
-      
+
       const saveButton = screen.getByTestId("save-string")
-      
+
       act(() => {
         saveButton.click()
       })
-      
+
       // Console error is logged but filtered by jest.setup.js, which is expected behavior
     })
   })
 
   describe("getLocally", () => {
     it("retrieves and parses string values from localStorage", () => {
-      mockLocalStorage.getItem.mockReturnValue("\"hello world\"")
+      mockLocalStorage.getItem.mockReturnValue('"hello world"')
 
       renderWithProvider()
-      
+
       const getButton = screen.getByTestId("get-string")
-      
+
       act(() => {
         getButton.click()
       })
-      
-      expect(screen.getByTestId("value")).toHaveTextContent("\"hello world\"")
+
+      expect(screen.getByTestId("value")).toHaveTextContent('"hello world"')
     })
 
     it("retrieves and parses object values from localStorage", () => {
-      mockLocalStorage.getItem.mockReturnValue("{\"name\":\"test\",\"value\":123}")
+      mockLocalStorage.getItem.mockReturnValue('{"name":"test","value":123}')
 
       renderWithProvider()
-      
+
       const getButton = screen.getByTestId("get-object")
-      
+
       act(() => {
         getButton.click()
       })
-      
-      expect(screen.getByTestId("value")).toHaveTextContent("{\"name\":\"test\",\"value\":123}")
+
+      expect(screen.getByTestId("value")).toHaveTextContent(
+        '{"name":"test","value":123}'
+      )
     })
 
     it("retrieves and parses array values from localStorage", () => {
       mockLocalStorage.getItem.mockReturnValue("[1,2,3]")
 
       renderWithProvider()
-      
+
       const getButton = screen.getByTestId("get-array")
-      
+
       act(() => {
         getButton.click()
       })
-      
+
       expect(screen.getByTestId("value")).toHaveTextContent("[1,2,3]")
     })
 
@@ -237,13 +274,13 @@ describe("LocalStorageProvider", () => {
       mockLocalStorage.getItem.mockReturnValue("true")
 
       renderWithProvider()
-      
+
       const getButton = screen.getByTestId("get-boolean")
-      
+
       act(() => {
         getButton.click()
       })
-      
+
       expect(screen.getByTestId("value")).toHaveTextContent("true")
     })
 
@@ -251,13 +288,13 @@ describe("LocalStorageProvider", () => {
       mockLocalStorage.getItem.mockReturnValue("42")
 
       renderWithProvider()
-      
+
       const getButton = screen.getByTestId("get-number")
-      
+
       act(() => {
         getButton.click()
       })
-      
+
       expect(screen.getByTestId("value")).toHaveTextContent("42")
     })
 
@@ -265,13 +302,13 @@ describe("LocalStorageProvider", () => {
       mockLocalStorage.getItem.mockReturnValue(null)
 
       renderWithProvider()
-      
+
       const getButton = screen.getByTestId("get-nonexistent")
-      
+
       act(() => {
         getButton.click()
       })
-      
+
       expect(screen.getByTestId("value")).toHaveTextContent("null")
     })
 
@@ -279,13 +316,13 @@ describe("LocalStorageProvider", () => {
       mockLocalStorage.getItem.mockReturnValue("")
 
       renderWithProvider()
-      
+
       const getButton = screen.getByTestId("get-string")
-      
+
       act(() => {
         getButton.click()
       })
-      
+
       expect(screen.getByTestId("value")).toHaveTextContent("null")
     })
 
@@ -293,13 +330,13 @@ describe("LocalStorageProvider", () => {
       mockLocalStorage.getItem.mockReturnValue("invalid-json{")
 
       renderWithProvider()
-      
+
       const getButton = screen.getByTestId("get-string")
-      
+
       act(() => {
         getButton.click()
       })
-      
+
       // Console error is logged but filtered by jest.setup.js, which is expected behavior
       expect(screen.getByTestId("value")).toHaveTextContent("null")
     })
@@ -310,13 +347,13 @@ describe("LocalStorageProvider", () => {
       })
 
       renderWithProvider()
-      
+
       const getButton = screen.getByTestId("get-string")
-      
+
       act(() => {
         getButton.click()
       })
-      
+
       // Console error is logged but filtered by jest.setup.js, which is expected behavior
       expect(screen.getByTestId("value")).toHaveTextContent("null")
     })
@@ -371,16 +408,16 @@ describe("LocalStorageProvider", () => {
       const ComplexTestComponent = () => {
         const { saveLocally, getLocally } = useLocalStorage()
         const [value, setValue] = React.useState<unknown>(null)
-        
+
         const handleSaveComplex = () => {
           saveLocally("complex-object", complexObject)
         }
-        
+
         const handleGetComplex = () => {
           const retrieved = getLocally("complex-object")
           setValue(retrieved)
         }
-        
+
         return (
           <div>
             <div data-testid="complex-value">{JSON.stringify(value)}</div>
@@ -414,7 +451,9 @@ describe("LocalStorageProvider", () => {
         getButton.click()
       })
 
-      const retrievedValue = JSON.parse(screen.getByTestId("complex-value").textContent || "null")
+      const retrievedValue = JSON.parse(
+        screen.getByTestId("complex-value").textContent || "null"
+      )
       expect(retrievedValue).toEqual(complexObject)
     })
 
@@ -431,16 +470,16 @@ describe("LocalStorageProvider", () => {
       const ArrayTestComponent = () => {
         const { saveLocally, getLocally } = useLocalStorage()
         const [value, setValue] = React.useState<unknown>(null)
-        
+
         const handleSaveMixed = () => {
           saveLocally("mixed-array", mixedArray)
         }
-        
+
         const handleGetMixed = () => {
           const retrieved = getLocally("mixed-array")
           setValue(retrieved)
         }
-        
+
         return (
           <div>
             <div data-testid="mixed-value">{JSON.stringify(value)}</div>
@@ -474,7 +513,9 @@ describe("LocalStorageProvider", () => {
         getButton.click()
       })
 
-      const retrievedValue = JSON.parse(screen.getByTestId("mixed-value").textContent || "null")
+      const retrievedValue = JSON.parse(
+        screen.getByTestId("mixed-value").textContent || "null"
+      )
       expect(retrievedValue).toEqual(mixedArray)
     })
   })
@@ -484,16 +525,16 @@ describe("LocalStorageProvider", () => {
       const UndefinedTestComponent = () => {
         const { saveLocally, getLocally } = useLocalStorage()
         const [value, setValue] = React.useState<unknown>("initial")
-        
+
         const handleSaveUndefined = () => {
           saveLocally("undefined-key", undefined)
         }
-        
+
         const handleGetUndefined = () => {
           const retrieved = getLocally("undefined-key")
           setValue(retrieved)
         }
-        
+
         return (
           <div>
             <div data-testid="undefined-value">{JSON.stringify(value)}</div>
@@ -520,23 +561,26 @@ describe("LocalStorageProvider", () => {
         saveButton.click()
       })
 
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith("undefined-key", undefined)
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+        "undefined-key",
+        undefined
+      )
     })
 
     it("handles null values correctly", () => {
       const NullTestComponent = () => {
         const { saveLocally, getLocally } = useLocalStorage()
         const [value, setValue] = React.useState<unknown>("initial")
-        
+
         const handleSaveNull = () => {
           saveLocally("null-key", null)
         }
-        
+
         const handleGetNull = () => {
           const retrieved = getLocally("null-key")
           setValue(retrieved)
         }
-        
+
         return (
           <div>
             <div data-testid="null-value">{JSON.stringify(value)}</div>
@@ -579,16 +623,16 @@ describe("LocalStorageProvider", () => {
       const EmptyKeyTestComponent = () => {
         const { saveLocally, getLocally } = useLocalStorage()
         const [value, setValue] = React.useState<unknown>(null)
-        
+
         const handleSaveEmpty = () => {
           saveLocally("", "empty key value")
         }
-        
+
         const handleGetEmpty = () => {
           const retrieved = getLocally("")
           setValue(retrieved)
         }
-        
+
         return (
           <div>
             <div data-testid="empty-key-value">{JSON.stringify(value)}</div>
@@ -614,7 +658,10 @@ describe("LocalStorageProvider", () => {
         saveButton.click()
       })
 
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith("", "\"empty key value\"")
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+        "",
+        '"empty key value"'
+      )
     })
   })
 })

@@ -1,4 +1,4 @@
-import type { Vehicle, Person } from "@/types"
+import type { Vehicle } from "@/types"
 import { defaultVehicle } from "@/types/defaults"
 import { brick, carolina, shing } from "./Characters"
 
@@ -9,8 +9,8 @@ export function pursuer(vehicle: Vehicle, position: string) {
     action_values: {
       ...vehicle.action_values,
       Pursuer: "true",
-      Position: position
-    }
+      Position: position,
+    },
   }
 }
 
@@ -19,9 +19,9 @@ export function evader(vehicle: Vehicle, position: string) {
     ...vehicle,
     action_values: {
       ...vehicle.action_values,
-      Pursuer: "false", 
-      Position: position
-    }
+      Pursuer: "false",
+      Position: position,
+    },
   }
 }
 
@@ -37,8 +37,8 @@ export const brickMobile: Vehicle = {
     Handling: 8,
     Squeal: 10,
     Frame: 6,
-    Crunch: 8
-  }
+    Crunch: 8,
+  },
 }
 
 export const copCar: Vehicle = {
@@ -53,8 +53,8 @@ export const copCar: Vehicle = {
     Handling: 8,
     Squeal: 10,
     Frame: 6,
-    Crunch: 8
-  }
+    Crunch: 8,
+  },
 }
 
 export const battleTruck: Vehicle = {
@@ -69,8 +69,8 @@ export const battleTruck: Vehicle = {
     Handling: 6,
     Squeal: 8,
     Frame: 10,
-    Crunch: 12
-  }
+    Crunch: 12,
+  },
 }
 
 export const motorcycles: Vehicle = {
@@ -85,13 +85,13 @@ export const motorcycles: Vehicle = {
     Handling: 8,
     Squeal: 10,
     Frame: 0,
-    Crunch: 0
-  }
+    Crunch: 0,
+  },
 }
 
 export const hondas: Vehicle = {
   ...defaultVehicle,
-  name: "Hondas", 
+  name: "Hondas",
   id: "hondas",
   count: 15,
   action_values: {
@@ -101,6 +101,6 @@ export const hondas: Vehicle = {
     Handling: 9,
     Squeal: 11,
     Frame: 5,
-    Crunch: 7
-  }
+    Crunch: 7,
+  },
 }

@@ -18,8 +18,8 @@ export const brick: Person = {
     FortuneType: "Fortune",
     "Max Fortune": 5,
     Fortune: 5,
-    Speed: 5
-  }
+    Speed: 5,
+  },
 }
 
 export const carolina: Person = {
@@ -39,13 +39,13 @@ export const carolina: Person = {
     Speed: 7,
     Fortune: 7,
     FortuneType: "Fortune",
-    "Max Fortune": 7
+    "Max Fortune": 7,
   },
   skills: {
     ...defaultCharacter.skills,
-    Driving: 13
+    Driving: 13,
   },
-  weapons: [derringer]
+  weapons: [derringer],
 }
 
 export const shing: Person = {
@@ -64,12 +64,12 @@ export const shing: Person = {
     Speed: 6,
     Fortune: 4,
     FortuneType: "Fortune",
-    "Max Fortune": 4
+    "Max Fortune": 4,
   },
   skills: {
-    Driving: 15
+    Driving: 15,
   },
-  weapons: [ak47]
+  weapons: [ak47],
 }
 
 export const huanKen: Person = {
@@ -88,7 +88,7 @@ export const huanKen: Person = {
     Speed: 5,
     Fortune: 6,
     FortuneType: "Chi",
-    "Max Fortune": 6
+    "Max Fortune": 6,
   },
 }
 
@@ -108,7 +108,7 @@ export const hitman: Person = {
     Speed: 6,
     Fortune: 3,
     FortuneType: "Fortune",
-    "Max Fortune": 3
+    "Max Fortune": 3,
   },
 }
 
@@ -126,7 +126,7 @@ export const zombies: Person = {
     Defense: 13,
     Damage: 7,
     Toughness: 5,
-    Speed: 4
+    Speed: 4,
     // Mooks don't get Fortune
-  }
+  },
 }

@@ -128,7 +128,9 @@ describe("queryParams", () => {
     })
 
     it("handles boolean values", () => {
-      expect(queryParams({ active: true, disabled: false })).toBe("active=true&disabled=false")
+      expect(queryParams({ active: true, disabled: false })).toBe(
+        "active=true&disabled=false"
+      )
     })
 
     it("handles null values as empty string", () => {
@@ -159,13 +161,17 @@ describe("queryParams", () => {
     })
 
     it("handles ampersands in values", () => {
-      expect(queryParams({ company: "Johnson & Johnson" })).toBe("company=Johnson & Johnson")
+      expect(queryParams({ company: "Johnson & Johnson" })).toBe(
+        "company=Johnson & Johnson"
+      )
     })
   })
 
   describe("object values", () => {
     it("converts objects to string representation", () => {
-      expect(queryParams({ data: { nested: true } })).toBe("data=[object Object]")
+      expect(queryParams({ data: { nested: true } })).toBe(
+        "data=[object Object]"
+      )
     })
 
     it("converts arrays to string representation", () => {
@@ -182,8 +188,12 @@ describe("queryParams", () => {
 
   describe("edge cases", () => {
     it("handles keys with special characters", () => {
-      expect(queryParams({ "key-with-dash": "value" })).toBe("key-with-dash=value")
-      expect(queryParams({ "key_with_underscore": "value" })).toBe("key_with_underscore=value")
+      expect(queryParams({ "key-with-dash": "value" })).toBe(
+        "key-with-dash=value"
+      )
+      expect(queryParams({ key_with_underscore: "value" })).toBe(
+        "key_with_underscore=value"
+      )
     })
 
     it("handles numeric keys", () => {
@@ -205,7 +215,7 @@ describe("filterConfigs", () => {
       const expectedEntities = [
         "Character",
         "Vehicle",
-        "Fight", 
+        "Fight",
         "Party",
         "Juncture",
         "User",
@@ -213,7 +223,7 @@ describe("filterConfigs", () => {
         "Campaign",
         "Faction",
         "Schtick",
-        "Weapon"
+        "Weapon",
       ]
 
       expectedEntities.forEach(entity => {
@@ -227,7 +237,7 @@ describe("filterConfigs", () => {
         expect(config).toHaveProperty("entityName")
         expect(config).toHaveProperty("fields")
         expect(config).toHaveProperty("responseKeys")
-        
+
         expect(typeof config.entityName).toBe("string")
         expect(Array.isArray(config.fields)).toBe(true)
         expect(typeof config.responseKeys).toBe("object")
@@ -261,7 +271,9 @@ describe("filterConfigs", () => {
 
     it("ensures search fields are consistently named", () => {
       Object.values(filterConfigs).forEach(config => {
-        const searchFields = config.fields.filter(field => field.type === "search")
+        const searchFields = config.fields.filter(
+          field => field.type === "search"
+        )
         searchFields.forEach(field => {
           expect(field.name).toBe("search")
         })
@@ -273,7 +285,7 @@ describe("filterConfigs", () => {
     it("Character config has expected fields", () => {
       const characterConfig = filterConfigs.Character
       const fieldNames = characterConfig.fields.map(f => f.name)
-      
+
       expect(fieldNames).toContain("character_type")
       expect(fieldNames).toContain("faction")
       expect(fieldNames).toContain("archetype")
@@ -283,24 +295,26 @@ describe("filterConfigs", () => {
 
     it("Character type field has correct static options", () => {
       const characterConfig = filterConfigs.Character
-      const typeField = characterConfig.fields.find(f => f.name === "character_type")
-      
+      const typeField = characterConfig.fields.find(
+        f => f.name === "character_type"
+      )
+
       expect(typeField).toBeDefined()
       expect(typeField!.type).toBe("static")
       expect(typeField!.staticOptions).toEqual([
         "Ally",
-        "PC", 
+        "PC",
         "Mook",
         "Featured Foe",
         "Boss",
-        "Uber-Boss"
+        "Uber-Boss",
       ])
     })
 
     it("Vehicle config has expected structure", () => {
       const vehicleConfig = filterConfigs.Vehicle
       const fieldNames = vehicleConfig.fields.map(f => f.name)
-      
+
       expect(fieldNames).toContain("type")
       expect(fieldNames).toContain("archetype")
       expect(fieldNames).toContain("faction")
@@ -311,10 +325,14 @@ describe("filterConfigs", () => {
     it("Fight config has status field with correct options", () => {
       const fightConfig = filterConfigs.Fight
       const statusField = fightConfig.fields.find(f => f.name === "status")
-      
+
       expect(statusField).toBeDefined()
       expect(statusField!.type).toBe("static")
-      expect(statusField!.staticOptions).toEqual(["Started", "Unstarted", "Ended"])
+      expect(statusField!.staticOptions).toEqual([
+        "Started",
+        "Unstarted",
+        "Ended",
+      ])
     })
   })
 
@@ -355,7 +373,7 @@ describe("filterConfigs", () => {
       Object.values(filterConfigs).forEach(config => {
         const fieldNames = config.fields.map(f => f.name)
         const uniqueFieldNames = [...new Set(fieldNames)]
-        
+
         expect(fieldNames.length).toBe(uniqueFieldNames.length)
       })
     })
@@ -363,7 +381,7 @@ describe("filterConfigs", () => {
     it("ensures all entity-type fields allow appropriate filtering", () => {
       Object.values(filterConfigs).forEach(config => {
         const entityFields = config.fields.filter(f => f.type === "entity")
-        
+
         entityFields.forEach(field => {
           // Most entity fields should be in responseKeys unless they're self-referential
           if (field.name !== config.entityName.toLowerCase()) {
@@ -379,8 +397,14 @@ describe("filterConfigs", () => {
   describe("configuration completeness", () => {
     it("ensures consistent field patterns across similar entities", () => {
       // Entities that should have faction fields
-      const factionEntities = ["Character", "Vehicle", "Party", "Juncture", "Site"]
-      
+      const factionEntities = [
+        "Character",
+        "Vehicle",
+        "Party",
+        "Juncture",
+        "Site",
+      ]
+
       factionEntities.forEach(entityName => {
         const config = filterConfigs[entityName]
         const hasFactionField = config.fields.some(f => f.name === "faction")
@@ -399,7 +423,7 @@ describe("filterConfigs", () => {
       Object.values(filterConfigs).forEach(config => {
         const entityName = config.entityName.toLowerCase()
         const primaryField = config.fields.find(f => f.name === entityName)
-        
+
         if (primaryField) {
           expect(primaryField.allowNone).toBe(false)
         }

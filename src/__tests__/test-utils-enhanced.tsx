@@ -89,7 +89,7 @@ export const createMockClient = (overrides = {}) => ({
 // Mock localStorage for testing
 export const createMockLocalStorage = () => {
   const store: Record<string, string> = {}
-  
+
   return {
     getItem: jest.fn((key: string) => store[key] || null),
     setItem: jest.fn((key: string, value: string) => {
@@ -107,7 +107,9 @@ export const createMockLocalStorage = () => {
 }
 
 // Mock cookies for testing
-export const createMockCookies = (initialValues: Record<string, string> = {}) => ({
+export const createMockCookies = (
+  initialValues: Record<string, string> = {}
+) => ({
   get: jest.fn((key: string) => initialValues[key]),
   set: jest.fn(),
   remove: jest.fn(),
@@ -120,17 +122,17 @@ export const createMockActionCableConsumer = () => ({
       const subscription = {
         unsubscribe: jest.fn(),
         send: jest.fn(),
-        channel: typeof channel === 'string' ? channel : channel,
+        channel: typeof channel === "string" ? channel : channel,
         callbacks: callbacks,
       }
-      
+
       // Store reference for manual triggering in tests
       ;(subscription as any).__triggerCallback = (name: string, data: any) => {
         if ((callbacks as any)[name]) {
-          (callbacks as any)[name](data)
+          ;(callbacks as any)[name](data)
         }
       }
-      
+
       return subscription
     }),
   },
@@ -141,20 +143,20 @@ interface EnhancedRenderOptions extends Omit<RenderOptions, "wrapper"> {
   initialUser?: User
   initialCampaign?: Campaign
   initialCampaigns?: Campaign[]
-  
+
   // Client options
   mockClient?: ReturnType<typeof createMockClient>
-  
+
   // Storage options
   mockLocalStorage?: ReturnType<typeof createMockLocalStorage>
   mockCookies?: ReturnType<typeof createMockCookies>
-  
+
   // WebSocket options
   mockConsumer?: ReturnType<typeof createMockActionCableConsumer>
-  
+
   // JWT token for authentication tests
   mockJWT?: string
-  
+
   // Provider options
   withRealProviders?: boolean // Use real providers instead of mocks
   skipProviders?: string[] // Skip specific providers
@@ -177,22 +179,24 @@ const EnhancedTestProviders = ({
   withRealProviders = false,
   skipProviders = [],
 }: TestProvidersProps) => {
-  
   // Set up mocks before rendering
   React.useEffect(() => {
     // Mock localStorage
-    Object.defineProperty(window, 'localStorage', {
+    Object.defineProperty(window, "localStorage", {
       value: mockLocalStorage,
       writable: true,
     })
-    
+
     // Set up initial localStorage state
     if (initialUser && mockJWT) {
       mockLocalStorage.setItem(`user_${mockJWT}`, JSON.stringify(initialUser))
-      mockLocalStorage.setItem('jwtToken', mockJWT)
+      mockLocalStorage.setItem("jwtToken", mockJWT)
     }
     if (initialCampaign) {
-      mockLocalStorage.setItem(`campaign_${initialUser.id}`, JSON.stringify(initialCampaign))
+      mockLocalStorage.setItem(
+        `campaign_${initialUser.id}`,
+        JSON.stringify(initialCampaign)
+      )
     }
   }, [])
 
@@ -202,22 +206,18 @@ const EnhancedTestProviders = ({
       <ThemeProvider theme={theme}>
         <LocalStorageProvider>
           <AppProvider>
-            <ToastProvider>
-              {children}
-            </ToastProvider>
+            <ToastProvider>{children}</ToastProvider>
           </AppProvider>
         </LocalStorageProvider>
       </ThemeProvider>
     )
 
     // Skip providers if requested
-    if (skipProviders.includes('AppProvider')) {
+    if (skipProviders.includes("AppProvider")) {
       providers = (
         <ThemeProvider theme={theme}>
           <LocalStorageProvider>
-            <ToastProvider>
-              {children}
-            </ToastProvider>
+            <ToastProvider>{children}</ToastProvider>
           </LocalStorageProvider>
         </ThemeProvider>
       )
@@ -243,7 +243,7 @@ const EnhancedTestProviders = ({
     logout: jest.fn(),
     isGamemaster: initialUser?.gamemaster || false,
     isAdmin: initialUser?.admin || false,
-    subscription: mockConsumer.subscriptions.create('CampaignChannel', {}),
+    subscription: mockConsumer.subscriptions.create("CampaignChannel", {}),
   }
 
   const mockToastContextValue = {
@@ -265,9 +265,7 @@ const EnhancedTestProviders = ({
     <ThemeProvider theme={theme}>
       <div data-testid="mock-localstorage-provider">
         <div data-testid="mock-app-provider">
-          <div data-testid="mock-toast-provider">
-            {children}
-          </div>
+          <div data-testid="mock-toast-provider">{children}</div>
         </div>
       </div>
     </ThemeProvider>
@@ -280,22 +278,22 @@ const renderWithEnhancedProviders = (
 ) => {
   return render(ui, {
     wrapper: ({ children }) => (
-      <EnhancedTestProviders {...options}>
-        {children}
-      </EnhancedTestProviders>
+      <EnhancedTestProviders {...options}>{children}</EnhancedTestProviders>
     ),
     ...options,
   })
 }
 
 // Utility functions for test setup
-export const setupMockEnvironment = (options: {
-  jwt?: string
-  user?: User
-  campaign?: Campaign
-  localStorage?: ReturnType<typeof createMockLocalStorage>
-  cookies?: ReturnType<typeof createMockCookies>
-} = {}) => {
+export const setupMockEnvironment = (
+  options: {
+    jwt?: string
+    user?: User
+    campaign?: Campaign
+    localStorage?: ReturnType<typeof createMockLocalStorage>
+    cookies?: ReturnType<typeof createMockCookies>
+  } = {}
+) => {
   const {
     jwt = "test-jwt-token",
     user = mockUser,
@@ -305,7 +303,7 @@ export const setupMockEnvironment = (options: {
   } = options
 
   // Setup localStorage
-  localStorage.setItem('jwtToken', jwt)
+  localStorage.setItem("jwtToken", jwt)
   localStorage.setItem(`user_${jwt}`, JSON.stringify(user))
   localStorage.setItem(`campaign_${user.id}`, JSON.stringify(campaign))
 
@@ -319,24 +317,36 @@ export const setupMockEnvironment = (options: {
 }
 
 // Authentication test utilities
-export const mockAuthenticationSuccess = (client: ReturnType<typeof createMockClient>, user = mockUser) => {
+export const mockAuthenticationSuccess = (
+  client: ReturnType<typeof createMockClient>,
+  user = mockUser
+) => {
   client.getCurrentUser.mockResolvedValue({ data: user })
   return user
 }
 
-export const mockAuthenticationFailure = (client: ReturnType<typeof createMockClient>, error = { response: { status: 401 } }) => {
+export const mockAuthenticationFailure = (
+  client: ReturnType<typeof createMockClient>,
+  error = { response: { status: 401 } }
+) => {
   client.getCurrentUser.mockRejectedValue(error)
   return error
 }
 
 // Campaign test utilities
-export const mockCampaignSuccess = (client: ReturnType<typeof createMockClient>, campaign = mockCampaign) => {
+export const mockCampaignSuccess = (
+  client: ReturnType<typeof createMockClient>,
+  campaign = mockCampaign
+) => {
   client.getCurrentCampaign.mockResolvedValue({ data: campaign })
   client.setCurrentCampaign.mockResolvedValue({ data: campaign })
   return campaign
 }
 
-export const mockCampaignFailure = (client: ReturnType<typeof createMockClient>, error = { response: { status: 404 } }) => {
+export const mockCampaignFailure = (
+  client: ReturnType<typeof createMockClient>,
+  error = { response: { status: 404 } }
+) => {
   client.getCurrentCampaign.mockRejectedValue(error)
   client.setCurrentCampaign.mockRejectedValue(error)
   return error

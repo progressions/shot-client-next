@@ -2,11 +2,7 @@
 
 import { redirect } from "next/navigation"
 import { useState, useEffect, useCallback } from "react"
-import {
-  Alert,
-  Box,
-  Stack,
-} from "@mui/material"
+import { Alert, Box, Stack } from "@mui/material"
 import type { User } from "@/types"
 import { useCampaign } from "@/contexts"
 import { EditUserForm } from "@/components/users"

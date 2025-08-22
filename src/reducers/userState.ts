@@ -1,38 +1,13 @@
 import { defaultUser, type User } from "@/types"
+import {
+  UserActions,
+  UserStateType,
+  UserStateAction,
+} from "@/types"
 
-export enum UserActions {
-  EDITED = "edited",
-  UPDATE = "update",
-  SUBMIT = "submit",
-  USER = "user",
-  RESET = "reset",
-}
-
-interface ActionNoPayload {
-  type: Extract<
-    UserActions,
-    UserActions.EDITED | UserActions.SUBMIT | UserActions.RESET
-  >
-}
-
-interface UpdateAction {
-  type: Extract<UserActions, UserActions.UPDATE>
-  name: string
-  value: string | boolean | number
-}
-
-interface PayloadAction {
-  type: Extract<UserActions, UserActions.USER>
-  payload: User
-}
-
-export interface UserStateType {
-  edited: boolean
-  saving: boolean
-  user: User
-}
-
-export type UserStateAction = ActionNoPayload | UpdateAction | PayloadAction
+// Re-export types and enums for backward compatibility
+export { UserActions } from "@/types"
+export type { UserStateType, UserStateAction } from "@/types"
 
 export const initialUserState: UserStateType = {
   edited: false,

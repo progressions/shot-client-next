@@ -1,15 +1,10 @@
 "use client"
 
-import type { Site } from "@/types"
+import type { SiteBadgeProps } from "@/types"
 import { CharacterLink, FactionLink, SiteLink } from "@/components/ui"
 import { Badge } from "@/components/badges"
 
-type SiteBadgeProperties = {
-  site: Site
-  size?: "sm" | "md" | "lg"
-}
-
-export default function SiteBadge({ site, size = "md" }: SiteBadgeProperties) {
+export default function SiteBadge({ site, size = "md" }: SiteBadgeProps) {
   return (
     <Badge
       name="site"

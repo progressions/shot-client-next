@@ -1,14 +1,14 @@
 "use client"
 
-import { 
-  Box, 
-  Container, 
-  Typography, 
-  Grid, 
-  Card, 
+import {
+  Box,
+  Container,
+  Typography,
+  Grid,
+  Card,
   CardContent,
   Avatar,
-  Stack
+  Stack,
 } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import {
@@ -17,7 +17,7 @@ import {
   SmartToy,
   Groups,
   AutoAwesome,
-  SportsKabaddi
+  SportsKabaddi,
 } from "@mui/icons-material"
 
 const FeatureSection = styled(Box)(({ theme }) => ({
@@ -53,39 +53,45 @@ const features = [
   {
     icon: <FlashOn sx={{ fontSize: 32 }} />,
     title: "Master the Art of Cinematic Combat",
-    description: "Real-time initiative tracking brings Hong Kong action movie excitement to your table. Manage complex fights with dynamic shot counters and dramatic timing.",
-    highlight: "Lightning-fast combat resolution"
+    description:
+      "Real-time initiative tracking brings Hong Kong action movie excitement to your table. Manage complex fights with dynamic shot counters and dramatic timing.",
+    highlight: "Lightning-fast combat resolution",
   },
   {
     icon: <Timeline sx={{ fontSize: 32 }} />,
     title: "Forge Legends Across Time",
-    description: "Create and manage characters across four distinct junctures: Ancient China, Colonial Hong Kong, Contemporary times, and the Cyberpunk future.",
-    highlight: "Cross-juncture character development"
+    description:
+      "Create and manage characters across four distinct junctures: Ancient China, Colonial Hong Kong, Contemporary times, and the Cyberpunk future.",
+    highlight: "Cross-juncture character development",
   },
   {
     icon: <SmartToy sx={{ fontSize: 32 }} />,
     title: "AI-Powered Character Creation",
-    description: "Generate compelling characters instantly with AI assistance. From mysterious Shaolin monks to cybernetic street samurai, bring your vision to life.",
-    highlight: "Intelligent character generation"
+    description:
+      "Generate compelling characters instantly with AI assistance. From mysterious Shaolin monks to cybernetic street samurai, bring your vision to life.",
+    highlight: "Intelligent character generation",
   },
   {
     icon: <Groups sx={{ fontSize: 32 }} />,
     title: "Command Epic Encounters",
-    description: "Orchestrate massive battles with multiple factions, vehicles, and named characters. Keep track of complex relationships and allegiances.",
-    highlight: "Dynamic encounter management"
+    description:
+      "Orchestrate massive battles with multiple factions, vehicles, and named characters. Keep track of complex relationships and allegiances.",
+    highlight: "Dynamic encounter management",
   },
   {
     icon: <AutoAwesome sx={{ fontSize: 32 }} />,
     title: "Unleash Ancient Powers",
-    description: "Manage supernatural abilities, martial arts schticks, and cutting-edge technology. Balance mystical chi powers with modern weaponry.",
-    highlight: "Supernatural ability tracking"
+    description:
+      "Manage supernatural abilities, martial arts schticks, and cutting-edge technology. Balance mystical chi powers with modern weaponry.",
+    highlight: "Supernatural ability tracking",
   },
   {
     icon: <SportsKabaddi sx={{ fontSize: 32 }} />,
     title: "Rally Your Heroes",
-    description: "Coordinate parties, factions, and allies across multiple campaigns. Discord integration keeps your team connected for remote sessions.",
-    highlight: "Collaborative storytelling tools"
-  }
+    description:
+      "Coordinate parties, factions, and allies across multiple campaigns. Discord integration keeps your team connected for remote sessions.",
+    highlight: "Collaborative storytelling tools",
+  },
 ]
 
 export function FeatureShowcase() {
@@ -94,21 +100,21 @@ export function FeatureShowcase() {
       <Container maxWidth="lg">
         <Stack spacing={6} alignItems="center">
           <Box textAlign="center">
-            <Typography 
-              variant="h2" 
-              component="h2" 
+            <Typography
+              variant="h2"
+              component="h2"
               gutterBottom
               sx={{ fontWeight: "bold", color: "primary.main" }}
             >
               Cinematic Adventures Await
             </Typography>
-            <Typography 
-              variant="h5" 
+            <Typography
+              variant="h5"
               color="text.secondary"
               sx={{ maxWidth: 800, mx: "auto" }}
             >
-              Everything you need to run epic Feng Shui 2 campaigns with 
-              the flair and excitement of Hong Kong action cinema.
+              Everything you need to run epic Feng Shui 2 campaigns with the
+              flair and excitement of Hong Kong action cinema.
             </Typography>
           </Box>
 
@@ -118,18 +124,16 @@ export function FeatureShowcase() {
                 <FeatureCard>
                   <CardContent>
                     <Stack spacing={2}>
-                      <FeatureIcon>
-                        {feature.icon}
-                      </FeatureIcon>
-                      
+                      <FeatureIcon>{feature.icon}</FeatureIcon>
+
                       <FeatureTitle variant="h5" component="h3">
                         {feature.title}
                       </FeatureTitle>
-                      
+
                       <Typography variant="body1" color="text.secondary">
                         {feature.description}
                       </Typography>
-                      
+
                       <Box
                         sx={{
                           mt: 2,
@@ -137,7 +141,7 @@ export function FeatureShowcase() {
                           borderRadius: 1,
                           backgroundColor: "primary.main",
                           color: "primary.contrastText",
-                          textAlign: "center"
+                          textAlign: "center",
                         }}
                       >
                         <Typography variant="body2" fontWeight="bold">

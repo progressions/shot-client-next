@@ -1,17 +1,4 @@
-interface FilterFieldConfig {
-  name: string
-  type: "entity" | "string" | "static" | "search"
-  staticOptions?: string[]
-  allowNone?: boolean
-  responseKey?: string
-  displayName?: string
-}
-
-interface FilterConfig {
-  entityName: string
-  fields: FilterFieldConfig[]
-  responseKeys: Record<string, string>
-}
+import type { FilterConfig } from "@/types"
 
 export const filterConfigs: Record<string, FilterConfig> = {
   Character: {

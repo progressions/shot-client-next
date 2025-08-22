@@ -6,11 +6,8 @@ export {
   expectAttack,
   expectNoChanges,
   expectAttackerUnharmed,
-  expectTargetUnharmed
+  expectTargetUnharmed,
 } from "./AttackHelpers"
 
 // Chase testing helpers
-export {
-  expectPursuitAttack,
-  expectChaseResults
-} from "./ChaseHelpers"
+export { expectPursuitAttack, expectChaseResults } from "./ChaseHelpers"

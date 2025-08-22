@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event"
 import { Autocomplete, Option } from "../Autocomplete"
 
 // Mock debounce to execute immediately in tests
-jest.mock("lodash.debounce", () => jest.fn((fn) => fn))
+jest.mock("lodash.debounce", () => jest.fn(fn => fn))
 
 describe("Autocomplete", () => {
   const mockOptions: Option[] = [
@@ -111,7 +111,7 @@ describe("Autocomplete", () => {
     await waitFor(() => {
       expect(defaultProps.fetchOptions).toHaveBeenCalled()
     })
-    
+
     expect(propsWithExclude.exclude).toEqual(["2", "4"])
   })
 
@@ -129,7 +129,7 @@ describe("Autocomplete", () => {
     await waitFor(() => {
       expect(defaultProps.fetchOptions).toHaveBeenCalled()
     })
-    
+
     expect(propsWithNone.allowNone).toBe(true)
   })
 
@@ -147,7 +147,7 @@ describe("Autocomplete", () => {
     await waitFor(() => {
       expect(defaultProps.fetchOptions).toHaveBeenCalled()
     })
-    
+
     expect(propsWithoutNone.allowNone).toBe(false)
   })
 
@@ -165,7 +165,7 @@ describe("Autocomplete", () => {
     await waitFor(() => {
       expect(defaultProps.fetchOptions).toHaveBeenCalled()
     })
-    
+
     expect(propsWithNone.onChange).toBeDefined()
   })
 
@@ -179,7 +179,7 @@ describe("Autocomplete", () => {
     await waitFor(() => {
       expect(defaultProps.fetchOptions).toHaveBeenCalled()
     })
-    
+
     // Check that our mock options have group information
     expect(mockOptions.some(option => option.group === "Group A")).toBe(true)
     expect(mockOptions.some(option => option.group === "Group B")).toBe(true)
@@ -214,7 +214,7 @@ describe("Autocomplete", () => {
     render(<Autocomplete {...freeSoloProps} />)
 
     const input = screen.getByLabelText("Test Autocomplete")
-    
+
     // Just verify that freeSolo prop is accepted
     expect(input).toBeInTheDocument()
     expect(freeSoloProps.freeSolo).toBe(true)
@@ -226,7 +226,7 @@ describe("Autocomplete", () => {
 
     // Just test the component renders - Material-UI may not show clear button immediately
     expect(screen.getByLabelText("Test Autocomplete")).toBeInTheDocument()
-    
+
     // Test the onChange functionality can be called with null
     expect(defaultProps.onChange).toBeDefined()
   })
@@ -246,7 +246,7 @@ describe("Autocomplete", () => {
     render(<Autocomplete {...defaultProps} />)
 
     const input = screen.getByLabelText("Test Autocomplete")
-    
+
     // Just check that the input exists and has basic accessibility
     expect(input).toBeInTheDocument()
     expect(input).toHaveAttribute("aria-autocomplete")
@@ -262,7 +262,7 @@ describe("Autocomplete", () => {
     await waitFor(() => {
       expect(defaultProps.fetchOptions).toHaveBeenCalled()
     })
-    
+
     // Material-UI may handle focus differently, just verify interaction works
     expect(input).toBeInTheDocument()
   })
@@ -272,7 +272,7 @@ describe("Autocomplete", () => {
       ...defaultProps,
       fetchOptions: jest.fn().mockResolvedValue([]),
     }
-    
+
     render(<Autocomplete {...emptyOptionsProps} />)
 
     const input = screen.getByLabelText("Test Autocomplete")

@@ -1,6 +1,10 @@
 "use client"
 import { GridColDef } from "@mui/x-data-grid"
-import { FormStateType, FormStateAction } from "@/reducers"
+import {
+  FormStateType,
+  FormStateAction,
+  CharactersTableFormState,
+} from "@/types"
 import {
   BaseDataGrid,
   ArchetypeLink,
@@ -10,20 +14,10 @@ import {
 } from "@/components/ui"
 import { CS } from "@/services"
 import { Avatar } from "@/components/avatars"
-import { PaginationMeta, Character } from "@/types"
-
-interface FormStateData {
-  meta: PaginationMeta
-  page: number
-  sort: string
-  order: string
-  characters: Character[]
-  drawerOpen: boolean
-}
 
 interface ViewProps {
-  formState: FormStateType<FormStateData>
-  dispatchForm: (action: FormStateAction<FormStateData>) => void
+  formState: FormStateType<CharactersTableFormState>
+  dispatchForm: (action: FormStateAction<CharactersTableFormState>) => void
 }
 
 const columns: GridColDef<Character>[] = [

@@ -65,7 +65,8 @@ describe("createBaseClient", () => {
       expect(mockedAxios).toHaveBeenCalledWith(
         expect.objectContaining({
           headers: expect.objectContaining({
-            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            "Cache-Control":
+              "no-store, no-cache, must-revalidate, proxy-revalidate",
           }),
         })
       )
@@ -84,7 +85,11 @@ describe("createBaseClient", () => {
     })
 
     it("handles force-cache option with custom revalidate", async () => {
-      await baseClient.get(mockURL, {}, { cache: "force-cache", revalidate: 1800 })
+      await baseClient.get(
+        mockURL,
+        {},
+        { cache: "force-cache", revalidate: 1800 }
+      )
 
       expect(mockedAxios).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -98,8 +103,13 @@ describe("createBaseClient", () => {
     it("throws error when no JWT provided", async () => {
       const clientWithoutJWT = createBaseClient({})
 
-      await expect(clientWithoutJWT.get(mockURL)).rejects.toThrow("No JWT provided")
-      expect(consoleErrorSpy).toHaveBeenCalledWith("No JWT provided, cannot make GET request", mockURL)
+      await expect(clientWithoutJWT.get(mockURL)).rejects.toThrow(
+        "No JWT provided"
+      )
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "No JWT provided, cannot make GET request",
+        mockURL
+      )
     })
 
     it("returns axios response", async () => {
@@ -149,7 +159,8 @@ describe("createBaseClient", () => {
       expect(mockedAxios).toHaveBeenCalledWith(
         expect.objectContaining({
           headers: expect.objectContaining({
-            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            "Cache-Control":
+              "no-store, no-cache, must-revalidate, proxy-revalidate",
           }),
         })
       )
@@ -157,7 +168,9 @@ describe("createBaseClient", () => {
 
     it("works even when client has no JWT", async () => {
       const clientWithoutJWT = createBaseClient({})
-      await expect(clientWithoutJWT.getPublic(mockURL)).resolves.toBe(mockResponse)
+      await expect(clientWithoutJWT.getPublic(mockURL)).resolves.toBe(
+        mockResponse
+      )
     })
   })
 
@@ -195,7 +208,8 @@ describe("createBaseClient", () => {
       expect(mockedAxios).toHaveBeenCalledWith(
         expect.objectContaining({
           headers: expect.objectContaining({
-            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            "Cache-Control":
+              "no-store, no-cache, must-revalidate, proxy-revalidate",
           }),
         })
       )
@@ -221,7 +235,11 @@ describe("createBaseClient", () => {
     })
 
     it("handles cache options", async () => {
-      await baseClient.patch(mockURL, {}, { cache: "force-cache", revalidate: 900 })
+      await baseClient.patch(
+        mockURL,
+        {},
+        { cache: "force-cache", revalidate: 900 }
+      )
 
       expect(mockedAxios).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -337,8 +355,13 @@ describe("createBaseClient", () => {
       const error = new Error("Upload failed")
       mockedAxios.mockRejectedValue(error)
 
-      await expect(baseClient.requestFormData("POST", mockURL, formData)).rejects.toThrow("Upload failed")
-      expect(consoleErrorSpy).toHaveBeenCalledWith("Error in requestFormData:", error)
+      await expect(
+        baseClient.requestFormData("POST", mockURL, formData)
+      ).rejects.toThrow("Upload failed")
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Error in requestFormData:",
+        error
+      )
     })
   })
 
@@ -369,36 +392,36 @@ describe("createBaseClient", () => {
     it("handles 401 authentication errors", async () => {
       const authError = {
         response: { status: 401, data: { error: "Unauthorized" } },
-        message: "Request failed with status code 401"
+        message: "Request failed with status code 401",
       } as AxiosError
       mockedAxios.mockRejectedValue(authError)
 
       await expect(baseClient.get(mockURL)).rejects.toMatchObject({
-        response: { status: 401 }
+        response: { status: 401 },
       })
     })
 
     it("handles 500 server errors", async () => {
       const serverError = {
         response: { status: 500, data: { error: "Internal Server Error" } },
-        message: "Request failed with status code 500"
+        message: "Request failed with status code 500",
       } as AxiosError
       mockedAxios.mockRejectedValue(serverError)
 
       await expect(baseClient.post(mockURL)).rejects.toMatchObject({
-        response: { status: 500 }
+        response: { status: 500 },
       })
     })
 
     it("handles network errors", async () => {
       const networkError = {
         message: "Network Error",
-        code: "NETWORK_ERROR"
+        code: "NETWORK_ERROR",
       } as AxiosError
       mockedAxios.mockRejectedValue(networkError)
 
       await expect(baseClient.patch(mockURL)).rejects.toMatchObject({
-        message: "Network Error"
+        message: "Network Error",
       })
     })
   })

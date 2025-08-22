@@ -1,16 +1,16 @@
 "use client"
 
-import { 
-  Box, 
-  Container, 
-  Typography, 
-  Grid, 
+import {
+  Box,
+  Container,
+  Typography,
+  Grid,
   Card,
   CardContent,
   Avatar,
   Stack,
   Rating,
-  Chip
+  Chip,
 } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import { FormatQuote } from "@mui/icons-material"
@@ -49,26 +49,29 @@ const testimonials = [
     campaign: "Shadow Warriors of Hong Kong",
     avatar: "SC",
     rating: 5,
-    quote: "Chi War transformed how I run Feng Shui 2 games. The real-time combat tracking keeps everyone engaged, and the AI character generation saves me hours of prep time. My players love the cinematic feel!",
-    highlight: "Real-time combat excellence"
+    quote:
+      "Chi War transformed how I run Feng Shui 2 games. The real-time combat tracking keeps everyone engaged, and the AI character generation saves me hours of prep time. My players love the cinematic feel!",
+    highlight: "Real-time combat excellence",
   },
   {
-    name: "Marcus Rodriguez", 
+    name: "Marcus Rodriguez",
     role: "Player & GM",
     campaign: "Temporal Guardians",
     avatar: "MR",
     rating: 5,
-    quote: "The cross-juncture character management is brilliant. I can seamlessly move my cyber-enhanced monk from 2056 back to Ancient China. The storytelling possibilities are endless.",
-    highlight: "Cross-time storytelling"
+    quote:
+      "The cross-juncture character management is brilliant. I can seamlessly move my cyber-enhanced monk from 2056 back to Ancient China. The storytelling possibilities are endless.",
+    highlight: "Cross-time storytelling",
   },
   {
     name: "Elena Volkov",
     role: "Professional GM",
     campaign: "Corporate Shadows",
-    avatar: "EV", 
+    avatar: "EV",
     rating: 5,
-    quote: "As someone who runs multiple Feng Shui 2 campaigns professionally, Chi War's organization tools are invaluable. Campaign management, Discord integration, and player coordination all in one place.",
-    highlight: "Professional-grade tools"
+    quote:
+      "As someone who runs multiple Feng Shui 2 campaigns professionally, Chi War's organization tools are invaluable. Campaign management, Discord integration, and player coordination all in one place.",
+    highlight: "Professional-grade tools",
   },
   {
     name: "David Park",
@@ -76,16 +79,17 @@ const testimonials = [
     campaign: "Dragon's Revenge",
     avatar: "DP",
     rating: 5,
-    quote: "The character sheet interface captures the cinematic spirit perfectly. Creating my Shaolin detective felt like directing my own action movie. The AI suggestions were spot-on!",
-    highlight: "Cinematic character creation"
-  }
+    quote:
+      "The character sheet interface captures the cinematic spirit perfectly. Creating my Shaolin detective felt like directing my own action movie. The AI suggestions were spot-on!",
+    highlight: "Cinematic character creation",
+  },
 ]
 
 const stats = [
   { number: "500+", label: "Active Campaigns" },
   { number: "2,000+", label: "Characters Created" },
   { number: "10,000+", label: "Combat Encounters" },
-  { number: "50+", label: "Gaming Groups" }
+  { number: "50+", label: "Gaming Groups" },
 ]
 
 export function TestimonialsSection() {
@@ -94,20 +98,21 @@ export function TestimonialsSection() {
       <Container maxWidth="lg">
         <Stack spacing={8}>
           <Box textAlign="center">
-            <Typography 
-              variant="h2" 
-              component="h2" 
+            <Typography
+              variant="h2"
+              component="h2"
               gutterBottom
               sx={{ fontWeight: "bold", color: "primary.main" }}
             >
               Trusted by Gamemasters Worldwide
             </Typography>
-            <Typography 
-              variant="h5" 
+            <Typography
+              variant="h5"
               color="text.secondary"
               sx={{ maxWidth: 800, mx: "auto" }}
             >
-              Join a growing community of storytellers bringing cinematic adventures to life
+              Join a growing community of storytellers bringing cinematic
+              adventures to life
             </Typography>
           </Box>
 
@@ -116,10 +121,10 @@ export function TestimonialsSection() {
             {stats.map((stat, index) => (
               <Grid item xs={6} sm={3} key={index}>
                 <Box textAlign="center">
-                  <Typography 
-                    variant="h3" 
-                    component="div" 
-                    fontWeight="bold" 
+                  <Typography
+                    variant="h3"
+                    component="div"
+                    fontWeight="bold"
                     color="primary.main"
                     gutterBottom
                   >
@@ -142,25 +147,29 @@ export function TestimonialsSection() {
                   <CardContent>
                     <Stack spacing={3}>
                       <Box>
-                        <Rating value={testimonial.rating} readOnly size="small" />
+                        <Rating
+                          value={testimonial.rating}
+                          readOnly
+                          size="small"
+                        />
                       </Box>
-                      
-                      <Typography 
-                        variant="body1" 
+
+                      <Typography
+                        variant="body1"
                         sx={{ fontStyle: "italic", lineHeight: 1.6 }}
                       >
                         &ldquo;{testimonial.quote}&rdquo;
                       </Typography>
-                      
+
                       <Box>
-                        <Chip 
-                          label={testimonial.highlight} 
-                          size="small" 
-                          color="primary" 
+                        <Chip
+                          label={testimonial.highlight}
+                          size="small"
+                          color="primary"
                           variant="outlined"
                         />
                       </Box>
-                      
+
                       <Stack direction="row" spacing={2} alignItems="center">
                         <Avatar sx={{ bgcolor: "primary.main" }}>
                           {testimonial.avatar}
@@ -180,13 +189,14 @@ export function TestimonialsSection() {
               </Grid>
             ))}
           </Grid>
-          
+
           <Box textAlign="center">
             <Typography variant="h6" color="primary.main" gutterBottom>
               Ready to Create Your Own Epic Adventures?
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Join thousands of gamemasters and players already using Chi War to run unforgettable Feng Shui 2 campaigns.
+              Join thousands of gamemasters and players already using Chi War to
+              run unforgettable Feng Shui 2 campaigns.
             </Typography>
           </Box>
         </Stack>

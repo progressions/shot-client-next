@@ -1,22 +1,12 @@
 "use client"
 import { GridColDef } from "@mui/x-data-grid"
-import { FormStateType, FormStateAction } from "@/reducers"
+import { FormStateType, FormStateAction, WeaponsTableFormState } from "@/types"
 import { BaseDataGrid, WeaponLink } from "@/components/ui"
 import { Avatar } from "@/components/avatars"
-import { PaginationMeta, Weapon } from "@/types"
-
-interface FormStateData {
-  meta: PaginationMeta
-  page: number
-  sort: string
-  order: string
-  weapons: Weapon[]
-  drawerOpen: boolean
-}
 
 interface ViewProps {
-  formState: FormStateType<FormStateData>
-  dispatchForm: (action: FormStateAction<FormStateData>) => void
+  formState: FormStateType<WeaponsTableFormState>
+  dispatchForm: (action: FormStateAction<WeaponsTableFormState>) => void
 }
 
 const columns: GridColDef<Weapon>[] = [

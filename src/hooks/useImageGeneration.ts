@@ -55,7 +55,10 @@ export function useImageGeneration({
                 sub.unsubscribe()
               } catch (parseError) {
                 console.error("Failed to parse image URLs JSON:", parseError)
-                handleError(new Error("Invalid JSON response from server"), dispatchForm)
+                handleError(
+                  new Error("Invalid JSON response from server"),
+                  dispatchForm
+                )
                 setPending(false)
                 sub.unsubscribe()
               }

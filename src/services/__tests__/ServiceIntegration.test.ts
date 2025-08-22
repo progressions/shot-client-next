@@ -1,7 +1,6 @@
 import CharacterService from "@/services/CharacterService"
 import VehicleService from "@/services/VehicleService"
 import DiceService from "@/services/DiceService"
-import SharedService from "@/services/SharedService"
 import { brick, carolina, shing } from "@/__tests__/factories/Characters"
 import type { Person, Vehicle, Swerve } from "@/types"
 
@@ -109,8 +108,16 @@ describe("Service Integration Tests", () => {
       } as Vehicle
 
       // Both CharacterService and VehicleService inherit from SharedService
-      const updatedCharacter = CharacterService.updateActionValue(carolina, "Toughness", 12)
-      const updatedVehicle = VehicleService.updateActionValue(testVehicle, "Acceleration", 5)
+      const updatedCharacter = CharacterService.updateActionValue(
+        carolina,
+        "Toughness",
+        12
+      )
+      const updatedVehicle = VehicleService.updateActionValue(
+        testVehicle,
+        "Acceleration",
+        5
+      )
 
       expect(updatedCharacter.action_values.Toughness).toBe(12)
       expect(updatedVehicle.action_values.Acceleration).toBe(5)
@@ -162,7 +169,8 @@ describe("Service Integration Tests", () => {
 
       // Mock dice for predictable combat
       const originalRollSwerve = DiceService.rollSwerve
-      DiceService.rollSwerve = jest.fn()
+      DiceService.rollSwerve = jest
+        .fn()
         .mockReturnValueOnce({
           result: 2, // Attacker's roll
           positiveRolls: [5],
@@ -194,11 +202,14 @@ describe("Service Integration Tests", () => {
 
       // Apply damage
       const damagedDefender = CharacterService.chain(defender, [
-        ["updateActionValue", ["Wounds", defender.action_values.Wounds + damage]],
+        [
+          "updateActionValue",
+          ["Wounds", defender.action_values.Wounds + damage],
+        ],
       ])
 
       expect(attackTotal).toBe(9) // 7 + 2
-      expect(defenseTotal).toBe(6) // 7 + (-1) 
+      expect(defenseTotal).toBe(6) // 7 + (-1)
       expect(damage).toBe(3) // 9 - 6
       expect(damagedDefender.action_values.Wounds).toBe(3)
 
@@ -278,21 +289,29 @@ describe("Service Integration Tests", () => {
       expect(CharacterService.isBoss(brick)).toBe(false)
       expect(CharacterService.isMook(brick)).toBe(false)
 
-      // Simulate character becoming an NPC  
-      const npcBrick = { 
-        ...brick, 
+      // Simulate character becoming an NPC
+      const npcBrick = {
+        ...brick,
         action_values: {
           ...brick.action_values,
-          Type: "NPC"
-        }
+          Type: "NPC",
+        },
       }
       expect(CharacterService.isPC(npcBrick)).toBe(false)
       expect(CharacterService.isBoss(npcBrick)).toBe(false)
       expect(CharacterService.isMook(npcBrick)).toBe(false)
 
       // Test healing behavior changes
-      const woundedBrick = CharacterService.updateActionValue(brick, "Wounds", 10)
-      const woundedNpcBrick = CharacterService.updateActionValue(npcBrick, "Wounds", 10)
+      const woundedBrick = CharacterService.updateActionValue(
+        brick,
+        "Wounds",
+        10
+      )
+      const woundedNpcBrick = CharacterService.updateActionValue(
+        npcBrick,
+        "Wounds",
+        10
+      )
 
       const healedPC = CharacterService.fullHeal(woundedBrick)
       const healedNPC = CharacterService.fullHeal(woundedNpcBrick)
@@ -311,10 +330,10 @@ describe("Service Integration Tests", () => {
       // Services should handle invalid data gracefully
       const skill = CharacterService.skill(invalidCharacter, "Martial Arts")
       const mainAttack = CharacterService.mainAttack(invalidCharacter)
-      
+
       expect(skill).toBe(7) // Default value
       expect(mainAttack).toBe("") // Returns empty string when action_values is null
-      
+
       // fullHeal will throw when trying to access null action_values
       expect(() => CharacterService.fullHeal(invalidCharacter)).toThrow()
 
@@ -350,7 +369,7 @@ describe("Service Integration Tests", () => {
   describe("Performance and Memory Integration", () => {
     it("handles bulk operations efficiently", () => {
       const characters = [brick, carolina, shing]
-      
+
       // Simulate bulk character updates
       const updatedCharacters = characters.map((char, index) => {
         return CharacterService.chain(char, [
@@ -399,8 +418,16 @@ describe("Service Integration Tests", () => {
 
       // Apply transformations
       const transformedData = {
-        character: CharacterService.updateActionValue(originalData.character, "Toughness", 15),
-        vehicle: VehicleService.updateActionValue(originalData.vehicle, "Handling", 5),
+        character: CharacterService.updateActionValue(
+          originalData.character,
+          "Toughness",
+          15
+        ),
+        vehicle: VehicleService.updateActionValue(
+          originalData.vehicle,
+          "Handling",
+          5
+        ),
       }
 
       // Verify transformations worked

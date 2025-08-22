@@ -1,9 +1,4 @@
-import { PaginationMeta } from "@/types"
-
-interface PaginatedResult<T> {
-  items: T[]
-  meta: PaginationMeta
-}
+import type { PaginatedResult } from "@/types"
 
 function paginateArray<T>(
   items: T[],

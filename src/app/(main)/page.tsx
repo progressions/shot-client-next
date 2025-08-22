@@ -8,7 +8,8 @@ import { MarketingLanding } from "@/components/marketing"
 
 export const metadata = {
   title: "Chi War - Master Epic Cinematic Adventures",
-  description: "The ultimate Feng Shui 2 campaign management platform. Real-time combat, AI character generation, and cross-juncture storytelling await.",
+  description:
+    "The ultimate Feng Shui 2 campaign management platform. Real-time combat, AI character generation, and cross-juncture storytelling await.",
 }
 
 export default async function HomePage() {

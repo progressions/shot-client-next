@@ -1,5 +1,5 @@
 export { HeroSection } from "./HeroSection"
-export { FeatureShowcase } from "./FeatureShowcase" 
+export { FeatureShowcase } from "./FeatureShowcase"
 export { ScreenshotGallery } from "./ScreenshotGallery"
 export { JunctureShowcase } from "./JunctureShowcase"
 export { TestimonialsSection } from "./TestimonialsSection"
