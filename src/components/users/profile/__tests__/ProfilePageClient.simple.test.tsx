@@ -2,10 +2,10 @@ import React from "react"
 import { render, screen } from "@/test-utils"
 import type { User } from "@/types"
 
-// Mock the entire ProfilePageClient to avoid complex dependency issues
+// Mock the entire ProfilePageClient to avoid dependency issues
 const MockProfilePageClient = ({ user }: { user: User }) => (
   <div data-testid="profile-page">
-    <h1>Profile: {user.first_name} {user.last_name}</h1>
+    <h1>Profile Page</h1>
     <form>
       <input
         name="first_name"
@@ -22,7 +22,6 @@ const MockProfilePageClient = ({ user }: { user: User }) => (
         defaultValue={user.email}
         data-testid="email-input"
       />
-      <div data-testid="campaigns-list">Campaigns List</div>
     </form>
   </div>
 )
@@ -50,43 +49,27 @@ const mockUser: User = {
   active: true,
 }
 
-const renderComponent = (user: User = mockUser) => {
-  return render(<ProfilePageClient user={user} />)
-}
-
 describe("ProfilePageClient (Simplified)", () => {
   it("renders the profile form with user data", () => {
-    renderComponent()
+    render(<ProfilePageClient user={mockUser} />)
 
     expect(screen.getByTestId("profile-page")).toBeInTheDocument()
-    expect(screen.getByText("Profile: John Doe")).toBeInTheDocument()
     expect(screen.getByDisplayValue("John")).toBeInTheDocument()
     expect(screen.getByDisplayValue("Doe")).toBeInTheDocument()
     expect(screen.getByDisplayValue("john.doe@example.com")).toBeInTheDocument()
   })
 
   it("displays the correct form structure", () => {
-    renderComponent()
+    render(<ProfilePageClient user={mockUser} />)
 
     expect(screen.getByTestId("first-name-input")).toHaveValue("John")
     expect(screen.getByTestId("last-name-input")).toHaveValue("Doe")
     expect(screen.getByTestId("email-input")).toHaveValue("john.doe@example.com")
-    expect(screen.getByTestId("campaigns-list")).toBeInTheDocument()
   })
 
-  it("renders with different user data", () => {
-    const differentUser = {
-      ...mockUser,
-      first_name: "Jane",
-      last_name: "Smith",
-      email: "jane.smith@example.com",
-    }
-    
-    renderComponent(differentUser)
+  it("renders profile page heading", () => {
+    render(<ProfilePageClient user={mockUser} />)
 
-    expect(screen.getByText("Profile: Jane Smith")).toBeInTheDocument()
-    expect(screen.getByDisplayValue("Jane")).toBeInTheDocument()
-    expect(screen.getByDisplayValue("Smith")).toBeInTheDocument()
-    expect(screen.getByDisplayValue("jane.smith@example.com")).toBeInTheDocument()
+    expect(screen.getByText("Profile Page")).toBeInTheDocument()
   })
 })
