@@ -3,20 +3,11 @@ import { GridColDef } from "@mui/x-data-grid"
 import { FormStateType, FormStateAction } from "@/reducers"
 import { BaseDataGrid, FactionLink, JunctureLink } from "@/components/ui"
 import { Avatar } from "@/components/avatars"
-import { PaginationMeta, Juncture } from "@/types"
-
-interface FormStateData {
-  meta: PaginationMeta
-  page: number
-  sort: string
-  order: string
-  junctures: Juncture[]
-  drawerOpen: boolean
-}
+import { JuncturesTableFormState } from "@/types/forms"
 
 interface ViewProps {
-  formState: FormStateType<FormStateData>
-  dispatchForm: (action: FormStateAction<FormStateData>) => void
+  formState: FormStateType<JuncturesTableFormState>
+  dispatchForm: (action: FormStateAction<JuncturesTableFormState>) => void
 }
 
 const columns: GridColDef<Juncture>[] = [

@@ -1,5 +1,4 @@
 import { paginateArray, type PaginatedResult } from "@/lib/paginateArray"
-import type { PaginationMeta } from "@/types"
 
 describe("paginateArray", () => {
   const sampleData = [
@@ -17,7 +16,8 @@ describe("paginateArray", () => {
 
   describe("basic pagination", () => {
     it("returns first page correctly", () => {
-      const result: PaginatedResult<{ id: number; name: string }> = paginateArray(sampleData, 1, 3)
+      const result: PaginatedResult<{ id: number; name: string }> =
+        paginateArray(sampleData, 1, 3)
 
       expect(result.items).toEqual([
         { id: 1, name: "Item 1" },
@@ -55,9 +55,7 @@ describe("paginateArray", () => {
     it("returns last page correctly", () => {
       const result = paginateArray(sampleData, 4, 3)
 
-      expect(result.items).toEqual([
-        { id: 10, name: "Item 10" },
-      ])
+      expect(result.items).toEqual([{ id: 10, name: "Item 10" }])
 
       expect(result.meta).toEqual({
         current_page: 4,
@@ -225,7 +223,9 @@ describe("paginateArray", () => {
       ]
 
       testCases.forEach(({ itemCount, perPage, expectedPages }) => {
-        const testData = Array.from({ length: itemCount }, (_, i) => ({ id: i + 1 }))
+        const testData = Array.from({ length: itemCount }, (_, i) => ({
+          id: i + 1,
+        }))
         const result = paginateArray(testData, 1, perPage)
 
         expect(result.meta.total_pages).toBe(expectedPages)
@@ -308,7 +308,9 @@ describe("paginateArray", () => {
 
   describe("performance and memory", () => {
     it("handles large arrays efficiently", () => {
-      const largeArray = Array.from({ length: 10000 }, (_, i) => ({ id: i + 1 }))
+      const largeArray = Array.from({ length: 10000 }, (_, i) => ({
+        id: i + 1,
+      }))
 
       const startTime = performance.now()
       const result = paginateArray(largeArray, 500, 20)

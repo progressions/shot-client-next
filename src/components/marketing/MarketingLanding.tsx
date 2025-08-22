@@ -1,13 +1,13 @@
 "use client"
 
 import { Box } from "@mui/material"
-import { 
+import {
   HeroSection,
-  FeatureShowcase, 
+  FeatureShowcase,
   ScreenshotGallery,
   JunctureShowcase,
   TestimonialsSection,
-  CallToAction
+  CallToAction,
 } from "."
 import { Footer } from "@/components/ui"
 

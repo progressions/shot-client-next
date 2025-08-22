@@ -58,7 +58,7 @@ beforeEach(() => {
   jest.clearAllMocks()
   localStorage.clear()
   ;(Cookies.get as jest.Mock).mockReturnValue(undefined)
-  
+
   const { Client } = require("@/lib")
   Client.mockReturnValue(mockClient)
 })
@@ -66,25 +66,25 @@ beforeEach(() => {
 describe("AppContext JWT Functionality", () => {
   it("reads JWT from localStorage", () => {
     localStorage.setItem("jwtToken", "test-jwt-localStorage")
-    
+
     renderApp()
-    
+
     expect(screen.getByTestId("jwt")).toHaveTextContent("test-jwt-localStorage")
   })
 
   it("reads JWT from cookies when localStorage is empty", () => {
-    ;(Cookies.get as jest.Mock).mockImplementation((key) => 
+    ;(Cookies.get as jest.Mock).mockImplementation(key =>
       key === "jwtToken" ? "test-jwt-cookies" : undefined
     )
-    
+
     renderApp()
-    
+
     expect(screen.getByTestId("jwt")).toHaveTextContent("test-jwt-cookies")
   })
 
   it("handles empty JWT gracefully", () => {
     renderApp()
-    
+
     expect(screen.getByTestId("jwt")).toHaveTextContent("")
     expect(screen.getByTestId("loading")).toHaveTextContent("true")
   })
@@ -92,9 +92,9 @@ describe("AppContext JWT Functionality", () => {
   it("clears JWT token on 401 authentication error", async () => {
     localStorage.setItem("jwtToken", "expired-token")
     mockGetCurrentUser.mockRejectedValue({ response: { status: 401 } })
-    
+
     renderApp()
-    
+
     await waitFor(() => {
       expect(Cookies.remove).toHaveBeenCalledWith("jwtToken")
     })
@@ -103,16 +103,16 @@ describe("AppContext JWT Functionality", () => {
   it("preserves JWT token on non-authentication errors", async () => {
     localStorage.setItem("jwtToken", "valid-token")
     mockGetCurrentUser.mockRejectedValue({ response: { status: 500 } })
-    
+
     renderApp()
-    
+
     // For server errors, the AppContext preserves JWT but may stay in loading state
     // Let's verify the key behavior: JWT is preserved and no cookies are removed
     await waitFor(() => {
       // The loading state behavior on server errors is complex, but JWT should be preserved
       expect(screen.getByTestId("jwt")).toHaveTextContent("valid-token")
     })
-    
+
     expect(Cookies.remove).not.toHaveBeenCalled()
   })
 })
@@ -121,12 +121,12 @@ describe("AppContext JWT Functionality", () => {
 describe("useClient Hook", () => {
   it("provides client context with JWT", () => {
     localStorage.setItem("jwtToken", "client-test-jwt")
-    
+
     const ClientTestComponent = () => {
       const { jwt } = require("@/contexts/AppContext").useClient()
       return <div data-testid="client-jwt">{jwt}</div>
     }
-    
+
     render(
       <ThemeProvider theme={theme}>
         <AppProvider>
@@ -134,8 +134,10 @@ describe("useClient Hook", () => {
         </AppProvider>
       </ThemeProvider>
     )
-    
-    expect(screen.getByTestId("client-jwt")).toHaveTextContent("client-test-jwt")
+
+    expect(screen.getByTestId("client-jwt")).toHaveTextContent(
+      "client-test-jwt"
+    )
   })
 })
 
@@ -146,7 +148,7 @@ describe("useCampaign Hook", () => {
       const { campaign } = require("@/contexts/AppContext").useCampaign()
       return <div data-testid="campaign-name">{campaign?.name || "none"}</div>
     }
-    
+
     render(
       <ThemeProvider theme={theme}>
         <AppProvider>
@@ -154,7 +156,7 @@ describe("useCampaign Hook", () => {
         </AppProvider>
       </ThemeProvider>
     )
-    
+
     expect(screen.getByTestId("campaign-name")).toHaveTextContent("none")
   })
 })
@@ -189,19 +191,19 @@ describe("Campaign Switching and Persistence", () => {
 
   const CampaignSwitchingComponent = () => {
     const { campaign, setCurrentCampaign } = useApp()
-    
+
     return (
       <div>
         <div data-testid="campaign-id">{campaign?.id || "none"}</div>
         <div data-testid="campaign-name">{campaign?.name || "none"}</div>
-        <button 
-          data-testid="switch-campaign" 
+        <button
+          data-testid="switch-campaign"
           onClick={() => setCurrentCampaign(mockCampaign)}
         >
           Switch Campaign
         </button>
-        <button 
-          data-testid="clear-campaign" 
+        <button
+          data-testid="clear-campaign"
           onClick={() => setCurrentCampaign(null)}
         >
           Clear Campaign
@@ -223,22 +225,22 @@ describe("Campaign Switching and Persistence", () => {
   beforeEach(() => {
     mockGetCurrentUser.mockResolvedValue({ data: mockUser })
     mockGetCurrentCampaign.mockResolvedValue({ data: mockCampaign })
-    
+
     const { Client } = require("@/lib")
     Client.mockReturnValue({
       ...mockClient,
-      setCurrentCampaign: jest.fn(async (camp) => ({ data: camp }))
+      setCurrentCampaign: jest.fn(async camp => ({ data: camp })),
     })
   })
 
   it("handles setCurrentCampaign with successful response", async () => {
     localStorage.setItem("jwtToken", "test-jwt")
-    const mockSetCampaign = jest.fn(async (camp) => ({ data: camp }))
-    
+    const mockSetCampaign = jest.fn(async camp => ({ data: camp }))
+
     const { Client } = require("@/lib")
     Client.mockReturnValue({
       ...mockClient,
-      setCurrentCampaign: mockSetCampaign
+      setCurrentCampaign: mockSetCampaign,
     })
 
     renderCampaignTest()
@@ -256,11 +258,11 @@ describe("Campaign Switching and Persistence", () => {
   it("handles clearing current campaign", async () => {
     localStorage.setItem("jwtToken", "test-jwt")
     const mockSetCampaign = jest.fn(async () => ({ data: null }))
-    
+
     const { Client } = require("@/lib")
     Client.mockReturnValue({
       ...mockClient,
-      setCurrentCampaign: mockSetCampaign
+      setCurrentCampaign: mockSetCampaign,
     })
 
     renderCampaignTest()
@@ -277,13 +279,13 @@ describe("Campaign Switching and Persistence", () => {
 
   it("stores campaign data in localStorage on successful switch", async () => {
     localStorage.setItem("jwtToken", "test-jwt")
-    const mockSetCampaign = jest.fn(async (camp) => ({ data: camp }))
-    
+    const mockSetCampaign = jest.fn(async camp => ({ data: camp }))
+
     const { Client } = require("@/lib")
     Client.mockReturnValue({
       ...mockClient,
       setCurrentCampaign: mockSetCampaign,
-      getCurrentUser: jest.fn(async () => ({ data: mockUser }))
+      getCurrentUser: jest.fn(async () => ({ data: mockUser })),
     })
 
     renderCampaignTest()
@@ -295,7 +297,9 @@ describe("Campaign Switching and Persistence", () => {
 
     await waitFor(() => {
       // Check if localStorage has the campaign data stored
-      const storedCampaign = localStorage.getItem(`currentCampaign-${mockUser.id}`)
+      const storedCampaign = localStorage.getItem(
+        `currentCampaign-${mockUser.id}`
+      )
       expect(storedCampaign).toBeTruthy()
     })
   })
@@ -305,12 +309,18 @@ describe("Campaign Switching and Persistence", () => {
 describe("WebSocket Subscription Management", () => {
   const WebSocketTestComponent = () => {
     const { subscription, campaignData, subscribeToEntity } = useApp()
-    
+
     return (
       <div>
-        <div data-testid="has-subscription">{subscription ? "true" : "false"}</div>
-        <div data-testid="campaign-data">{campaignData ? "has-data" : "no-data"}</div>
-        <div data-testid="has-subscribe-function">{subscribeToEntity ? "true" : "false"}</div>
+        <div data-testid="has-subscription">
+          {subscription ? "true" : "false"}
+        </div>
+        <div data-testid="campaign-data">
+          {campaignData ? "has-data" : "no-data"}
+        </div>
+        <div data-testid="has-subscribe-function">
+          {subscribeToEntity ? "true" : "false"}
+        </div>
       </div>
     )
   }
@@ -333,25 +343,31 @@ describe("WebSocket Subscription Management", () => {
 
   it("provides subscribeToEntity function in context", () => {
     renderWebSocketTest()
-    expect(screen.getByTestId("has-subscribe-function")).toHaveTextContent("true")
+    expect(screen.getByTestId("has-subscribe-function")).toHaveTextContent(
+      "true"
+    )
   })
 
   it("can handle subscribeToEntity callback registration", () => {
     const TestComponentWithCallback = () => {
       const { subscribeToEntity } = useApp()
       const [callbackRegistered, setCallbackRegistered] = React.useState(false)
-      
+
       React.useEffect(() => {
-        const unsubscribe = subscribeToEntity("characters", (data) => {
+        const unsubscribe = subscribeToEntity("characters", data => {
           // Mock callback
         })
         setCallbackRegistered(true)
         return unsubscribe
       }, [subscribeToEntity])
-      
-      return <div data-testid="callback-registered">{callbackRegistered ? "true" : "false"}</div>
+
+      return (
+        <div data-testid="callback-registered">
+          {callbackRegistered ? "true" : "false"}
+        </div>
+      )
     }
-    
+
     render(
       <ThemeProvider theme={theme}>
         <AppProvider>
@@ -359,7 +375,7 @@ describe("WebSocket Subscription Management", () => {
         </AppProvider>
       </ThemeProvider>
     )
-    
+
     expect(screen.getByTestId("callback-registered")).toHaveTextContent("true")
   })
 })

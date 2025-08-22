@@ -3,24 +3,19 @@ import { useState } from "react"
 import { GridColDef } from "@mui/x-data-grid"
 import { Button, Chip, Box } from "@mui/material"
 import { CheckCircle, PlayArrow, Stop } from "@mui/icons-material"
-import { FormStateType, FormStateAction, FormActions } from "@/reducers"
+import {
+  FormStateType,
+  FormStateAction,
+  FormActions,
+  CampaignsTableFormState,
+} from "@/types"
 import { BaseDataGrid, CampaignLink } from "@/components/ui"
 import { Avatar } from "@/components/avatars"
-import { PaginationMeta, Campaign } from "@/types"
 import { useClient, useApp, useToast } from "@/contexts"
 
-interface FormStateData {
-  meta: PaginationMeta
-  page: number
-  sort: string
-  order: string
-  campaigns: Campaign[]
-  drawerOpen: boolean
-}
-
 interface ViewProps {
-  formState: FormStateType<FormStateData>
-  dispatchForm: (action: FormStateAction<FormStateData>) => void
+  formState: FormStateType<CampaignsTableFormState>
+  dispatchForm: (action: FormStateAction<CampaignsTableFormState>) => void
 }
 
 export default function View({ formState, dispatchForm }: ViewProps) {

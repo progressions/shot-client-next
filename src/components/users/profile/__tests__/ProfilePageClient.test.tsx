@@ -5,7 +5,9 @@ import type { User } from "@/types"
 // Mock the entire ProfilePageClient to avoid complex dependency issues
 const MockProfilePageClient = ({ user }: { user: User }) => (
   <div data-testid="profile-page">
-    <h1>Profile: {user.first_name} {user.last_name}</h1>
+    <h1>
+      Profile: {user.first_name} {user.last_name}
+    </h1>
     <form>
       <input
         name="first_name"
@@ -17,11 +19,7 @@ const MockProfilePageClient = ({ user }: { user: User }) => (
         defaultValue={user.last_name}
         data-testid="last-name-input"
       />
-      <input
-        name="email"
-        defaultValue={user.email}
-        data-testid="email-input"
-      />
+      <input name="email" defaultValue={user.email} data-testid="email-input" />
       <div data-testid="campaigns-list">Campaigns List</div>
     </form>
   </div>
@@ -70,7 +68,9 @@ describe("ProfilePageClient (Simplified)", () => {
 
     expect(screen.getByTestId("first-name-input")).toHaveValue("John")
     expect(screen.getByTestId("last-name-input")).toHaveValue("Doe")
-    expect(screen.getByTestId("email-input")).toHaveValue("john.doe@example.com")
+    expect(screen.getByTestId("email-input")).toHaveValue(
+      "john.doe@example.com"
+    )
     expect(screen.getByTestId("campaigns-list")).toBeInTheDocument()
   })
 
@@ -81,12 +81,14 @@ describe("ProfilePageClient (Simplified)", () => {
       last_name: "Smith",
       email: "jane.smith@example.com",
     }
-    
+
     renderComponent(differentUser)
 
     expect(screen.getByText("Profile: Jane Smith")).toBeInTheDocument()
     expect(screen.getByDisplayValue("Jane")).toBeInTheDocument()
     expect(screen.getByDisplayValue("Smith")).toBeInTheDocument()
-    expect(screen.getByDisplayValue("jane.smith@example.com")).toBeInTheDocument()
+    expect(
+      screen.getByDisplayValue("jane.smith@example.com")
+    ).toBeInTheDocument()
   })
 })

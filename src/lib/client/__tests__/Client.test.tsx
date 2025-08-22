@@ -23,16 +23,18 @@ jest.mock("@/lib/client/aiClient")
 jest.mock("@/lib/client/editorClient")
 
 const mockCookies = Cookies as jest.Mocked<typeof Cookies>
-const mockCreateConsumer = createConsumer as jest.MockedFunction<typeof createConsumer>
+const mockCreateConsumer = createConsumer as jest.MockedFunction<
+  typeof createConsumer
+>
 
 describe("createClient", () => {
   // Mock API instances
   const mockApi = {
     cable: jest.fn(() => "ws://localhost:3000/cable"),
   }
-  
+
   const mockApiV2 = {}
-  
+
   const mockConsumer = {
     subscriptions: {
       create: jest.fn(),
@@ -105,21 +107,25 @@ describe("createClient", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    
+
     // Mock window.localStorage
-    Object.defineProperty(window, 'localStorage', {
+    Object.defineProperty(window, "localStorage", {
       value: mockLocalStorage,
-      writable: true
+      writable: true,
     })
 
     // Mock API constructors
-    ;(Api as jest.MockedClass<typeof Api>).mockImplementation(() => mockApi as any)
-    ;(ApiV2 as jest.MockedClass<typeof ApiV2>).mockImplementation(() => mockApiV2 as any)
-    
-    // Mock queryParams
-    ;(queryParams as jest.MockedFunction<typeof queryParams>).mockImplementation(
-      (params) => params
+    ;(Api as jest.MockedClass<typeof Api>).mockImplementation(
+      () => mockApi as any
     )
+    ;(ApiV2 as jest.MockedClass<typeof ApiV2>).mockImplementation(
+      () => mockApiV2 as any
+    )
+
+    // Mock queryParams
+    ;(
+      queryParams as jest.MockedFunction<typeof queryParams>
+    ).mockImplementation(params => params)
 
     // Mock createConsumer
     mockCreateConsumer.mockReturnValue(mockConsumer as any)
@@ -207,7 +213,9 @@ describe("createClient", () => {
       const client = createClient({})
 
       expect(client.jwt).toBeUndefined()
-      expect(consoleWarnSpy).toHaveBeenCalledWith("No JWT provided or found in localStorage/cookies")
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        "No JWT provided or found in localStorage/cookies"
+      )
     })
 
     it("handles server-side rendering (no window)", () => {
@@ -289,7 +297,9 @@ describe("createClient", () => {
       expect(authModule.createAuthClient).toHaveBeenCalledWith(commonDeps)
 
       const characterModule = require("@/lib/client/characterClient")
-      expect(characterModule.createCharacterClient).toHaveBeenCalledWith(commonDeps)
+      expect(characterModule.createCharacterClient).toHaveBeenCalledWith(
+        commonDeps
+      )
 
       const vehicleModule = require("@/lib/client/vehicleClient")
       expect(vehicleModule.createVehicleClient).toHaveBeenCalledWith(commonDeps)
@@ -301,7 +311,9 @@ describe("createClient", () => {
       expect(partyModule.createPartyClient).toHaveBeenCalledWith(commonDeps)
 
       const campaignModule = require("@/lib/client/campaignClient")
-      expect(campaignModule.createCampaignClient).toHaveBeenCalledWith(commonDeps)
+      expect(campaignModule.createCampaignClient).toHaveBeenCalledWith(
+        commonDeps
+      )
 
       const siteModule = require("@/lib/client/siteClient")
       expect(siteModule.createSiteClient).toHaveBeenCalledWith(commonDeps)
@@ -351,8 +363,12 @@ describe("createClient", () => {
 
       // Campaign client methods
       expect(client.getCampaigns).toBe(mockCampaignClient.getCampaigns)
-      expect(client.setCurrentCampaign).toBe(mockCampaignClient.setCurrentCampaign)
-      expect(client.getCurrentCampaign).toBe(mockCampaignClient.getCurrentCampaign)
+      expect(client.setCurrentCampaign).toBe(
+        mockCampaignClient.setCurrentCampaign
+      )
+      expect(client.getCurrentCampaign).toBe(
+        mockCampaignClient.getCurrentCampaign
+      )
 
       // Site client methods
       expect(client.getSites).toBe(mockSiteClient.getSites)
@@ -379,12 +395,14 @@ describe("createClient", () => {
       const jwt = "test-jwt"
       const client = createClient({ jwt })
 
-      expect(client).toEqual(expect.objectContaining({
-        jwt: jwt,
-        api: mockApi,
-        apiV2: mockApiV2,
-        consumer: expect.any(Function),
-      }))
+      expect(client).toEqual(
+        expect.objectContaining({
+          jwt: jwt,
+          api: mockApi,
+          apiV2: mockApiV2,
+          consumer: expect.any(Function),
+        })
+      )
     })
 
     it("includes methods from all client modules", () => {
@@ -418,7 +436,9 @@ describe("createClient", () => {
       expect(client.api).toBeDefined()
       expect(client.apiV2).toBeDefined()
       expect(client.consumer).toBeDefined()
-      expect(consoleWarnSpy).toHaveBeenCalledWith("No JWT provided or found in localStorage/cookies")
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        "No JWT provided or found in localStorage/cookies"
+      )
     })
 
     it("works with empty object", () => {

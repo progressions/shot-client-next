@@ -1,18 +1,13 @@
 "use client"
 
-import type { Faction } from "@/types"
+import type { FactionBadgeProps } from "@/types"
 import { CharacterLink, FactionLink } from "@/components/ui"
 import { Badge } from "@/components/badges"
-
-type FactionBadgeProperties = {
-  faction: Faction
-  size?: "sm" | "md" | "lg"
-}
 
 export default function FactionBadge({
   faction,
   size = "md",
-}: FactionBadgeProperties) {
+}: FactionBadgeProps) {
   return (
     <Badge
       name="faction"

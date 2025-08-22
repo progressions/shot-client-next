@@ -2,7 +2,7 @@ import React from "react"
 import { render, screen, waitFor, act } from "@testing-library/react"
 import { EncounterProvider, useEncounter } from "../EncounterContext"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
-import type { Encounter, Weapon, Schtick, Entity } from "@/types"
+import type { Encounter, Weapon, Schtick } from "@/types"
 
 // Mock uuid to avoid ESM import issues
 jest.mock("uuid", () => ({
@@ -131,20 +131,27 @@ const TestComponent = () => {
     ec,
   } = useEncounter()
 
-
   return (
     <div>
-      <div data-testid="encounter-name">{encounter?.name || "No encounter"}</div>
+      <div data-testid="encounter-name">
+        {encounter?.name || "No encounter"}
+      </div>
       <div data-testid="loading">{String(loading)}</div>
       <div data-testid="error">{error || "No error"}</div>
       <div data-testid="current-shot">{currentShot || "No shot"}</div>
       <div data-testid="weapons-count">{Object.keys(weapons).length}</div>
       <div data-testid="schticks-count">{Object.keys(schticks).length}</div>
-      <div data-testid="has-encounter-state">{encounterState ? "true" : "false"}</div>
-      <div data-testid="has-dispatch">{dispatchEncounter ? "true" : "false"}</div>
+      <div data-testid="has-encounter-state">
+        {encounterState ? "true" : "false"}
+      </div>
+      <div data-testid="has-dispatch">
+        {dispatchEncounter ? "true" : "false"}
+      </div>
       <div data-testid="has-update">{updateEncounter ? "true" : "false"}</div>
       <div data-testid="has-delete">{deleteEncounter ? "true" : "false"}</div>
-      <div data-testid="has-change-save">{changeAndSaveEncounter ? "true" : "false"}</div>
+      <div data-testid="has-change-save">
+        {changeAndSaveEncounter ? "true" : "false"}
+      </div>
       <div data-testid="has-encounter-client">{ec ? "true" : "false"}</div>
       <button
         data-testid="spend-shots"
@@ -169,19 +176,19 @@ const renderWithProvider = (encounter = mockEncounter) => {
 describe("EncounterProvider", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    
+
     // Reset mock campaign data
     mockCampaignData.encounter = null
-    
+
     // Default successful responses
     mockClient.getWeaponsBatch.mockResolvedValue({
       data: { weapons: [mockWeapon] },
     })
-    
+
     mockClient.getSchticksBatch.mockResolvedValue({
       data: { schticks: [mockSchtick] },
     })
-    
+
     mockClient.spendShots.mockResolvedValue({
       data: { ...mockEncounter, actionId: "action-123" },
     })
@@ -191,13 +198,19 @@ describe("EncounterProvider", () => {
     it("provides encounter context values", async () => {
       renderWithProvider()
 
-      expect(screen.getByTestId("encounter-name")).toHaveTextContent("Test Encounter")
-      expect(screen.getByTestId("has-encounter-state")).toHaveTextContent("true")
+      expect(screen.getByTestId("encounter-name")).toHaveTextContent(
+        "Test Encounter"
+      )
+      expect(screen.getByTestId("has-encounter-state")).toHaveTextContent(
+        "true"
+      )
       expect(screen.getByTestId("has-dispatch")).toHaveTextContent("true")
       expect(screen.getByTestId("has-update")).toHaveTextContent("true")
       expect(screen.getByTestId("has-delete")).toHaveTextContent("true")
       expect(screen.getByTestId("has-change-save")).toHaveTextContent("true")
-      expect(screen.getByTestId("has-encounter-client")).toHaveTextContent("true")
+      expect(screen.getByTestId("has-encounter-client")).toHaveTextContent(
+        "true"
+      )
     })
 
     it("calculates current shot from encounter data", () => {
@@ -355,8 +368,12 @@ describe("EncounterProvider", () => {
     })
 
     it("handles API errors gracefully", async () => {
-      mockClient.getWeaponsBatch.mockRejectedValue(new Error("Weapons API error"))
-      mockClient.getSchticksBatch.mockRejectedValue(new Error("Schticks API error"))
+      mockClient.getWeaponsBatch.mockRejectedValue(
+        new Error("Weapons API error")
+      )
+      mockClient.getSchticksBatch.mockRejectedValue(
+        new Error("Schticks API error")
+      )
 
       const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation()
 
@@ -369,14 +386,17 @@ describe("EncounterProvider", () => {
 
       // Verify the console.error was called (this works)
       await waitFor(() => {
-        expect(consoleErrorSpy).toHaveBeenCalledWith("Failed to load associations", expect.any(Error))
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          "Failed to load associations",
+          expect.any(Error)
+        )
       })
 
       // TODO: Same error state issue as other tests
       // await waitFor(() => {
       //   expect(screen.getByTestId("error")).toHaveTextContent("Failed to load associations")
       // })
-      
+
       consoleErrorSpy.mockRestore()
     })
   })
@@ -390,7 +410,7 @@ describe("EncounterProvider", () => {
       })
 
       const spendButton = screen.getByTestId("spend-shots")
-      
+
       await act(async () => {
         spendButton.click()
       })
@@ -416,13 +436,15 @@ describe("EncounterProvider", () => {
       })
 
       const spendButton = screen.getByTestId("spend-shots")
-      
+
       await act(async () => {
         spendButton.click()
       })
 
       await waitFor(() => {
-        expect(screen.getByTestId("encounter-name")).toHaveTextContent("Updated Encounter")
+        expect(screen.getByTestId("encounter-name")).toHaveTextContent(
+          "Updated Encounter"
+        )
       })
     })
 
@@ -437,14 +459,17 @@ describe("EncounterProvider", () => {
       })
 
       const spendButton = screen.getByTestId("spend-shots")
-      
+
       await act(async () => {
         spendButton.click()
       })
 
       // Since we confirmed the console.error is called, focus on that for now
       await waitFor(() => {
-        expect(consoleErrorSpy).toHaveBeenCalledWith("Error acting entity:", expect.any(Error))
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          "Error acting entity:",
+          expect.any(Error)
+        )
       })
 
       // TODO: The error state update isn't working properly in tests
@@ -468,14 +493,17 @@ describe("EncounterProvider", () => {
       })
 
       const spendButton = screen.getByTestId("spend-shots")
-      
+
       await act(async () => {
         spendButton.click()
       })
 
       // Verify the console.error is called (this works)
       await waitFor(() => {
-        expect(consoleErrorSpy).toHaveBeenCalledWith("Error acting entity:", expect.any(Error))
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          "Error acting entity:",
+          expect.any(Error)
+        )
       })
 
       // TODO: Same issue as previous test - error state doesn't update properly in tests
@@ -489,13 +517,18 @@ describe("EncounterProvider", () => {
 
   describe("campaign data integration", () => {
     it("updates encounter when campaign data changes", async () => {
-      const updatedEncounter = { ...mockEncounter, name: "Updated from Campaign" }
+      const updatedEncounter = {
+        ...mockEncounter,
+        name: "Updated from Campaign",
+      }
       mockCampaignData.encounter = updatedEncounter
 
       renderWithProvider()
 
       await waitFor(() => {
-        expect(screen.getByTestId("encounter-name")).toHaveTextContent("Updated from Campaign")
+        expect(screen.getByTestId("encounter-name")).toHaveTextContent(
+          "Updated from Campaign"
+        )
       })
     })
 
@@ -506,7 +539,9 @@ describe("EncounterProvider", () => {
       renderWithProvider()
 
       // Should maintain original encounter name
-      expect(screen.getByTestId("encounter-name")).toHaveTextContent("Test Encounter")
+      expect(screen.getByTestId("encounter-name")).toHaveTextContent(
+        "Test Encounter"
+      )
     })
 
     it("handles local action deduplication", async () => {
@@ -518,24 +553,26 @@ describe("EncounterProvider", () => {
 
       let callCount = 0
       // Mock spendShots to verify the action deduplication behavior
-      mockClient.spendShots.mockImplementation(async (encounter, entity, shots, actionId) => {
-        callCount++
-        
-        // Simulate campaign data update with same action ID
-        mockCampaignData.encounter = { 
-          ...mockEncounter, 
-          name: "Should be ignored",
-          actionId: actionId 
+      mockClient.spendShots.mockImplementation(
+        async (encounter, entity, shots, actionId) => {
+          callCount++
+
+          // Simulate campaign data update with same action ID
+          mockCampaignData.encounter = {
+            ...mockEncounter,
+            name: "Should be ignored",
+            actionId: actionId,
+          }
+
+          // Return API response
+          return Promise.resolve({
+            data: { ...mockEncounter, name: "Local Action Result", actionId },
+          })
         }
-        
-        // Return API response
-        return Promise.resolve({
-          data: { ...mockEncounter, name: "Local Action Result", actionId }
-        })
-      })
+      )
 
       const spendButton = screen.getByTestId("spend-shots")
-      
+
       await act(async () => {
         spendButton.click()
       })
@@ -556,7 +593,7 @@ describe("EncounterProvider", () => {
       const NoEncounterComponent = () => {
         const { ec } = useEncounter()
         const [error, setError] = React.useState<string>("")
-        
+
         const handleSpendWithoutEncounter = async () => {
           try {
             await ec.spendShots(null as any, 3)
@@ -564,11 +601,14 @@ describe("EncounterProvider", () => {
             setError("Error handled")
           }
         }
-        
+
         return (
           <div>
             <div data-testid="component-error">{error}</div>
-            <button data-testid="spend-without-encounter" onClick={handleSpendWithoutEncounter}>
+            <button
+              data-testid="spend-without-encounter"
+              onClick={handleSpendWithoutEncounter}
+            >
               Spend Without Encounter
             </button>
           </div>
@@ -584,7 +624,7 @@ describe("EncounterProvider", () => {
       )
 
       const button = screen.getByTestId("spend-without-encounter")
-      
+
       await act(async () => {
         button.click()
       })
@@ -719,7 +759,9 @@ describe("useEncounter hook", () => {
       </ThemeProvider>
     )
 
-    expect(screen.getByTestId("encounter-name")).toHaveTextContent("Test Encounter")
+    expect(screen.getByTestId("encounter-name")).toHaveTextContent(
+      "Test Encounter"
+    )
     expect(screen.getByTestId("has-encounter-state")).toHaveTextContent("true")
   })
 })

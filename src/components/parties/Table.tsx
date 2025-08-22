@@ -8,20 +8,11 @@ import {
   MembersGroup,
 } from "@/components/ui"
 import { Avatar } from "@/components/avatars"
-import { PaginationMeta, Party } from "@/types"
-
-interface FormStateData {
-  meta: PaginationMeta
-  page: number
-  sort: string
-  order: string
-  parties: Party[]
-  drawerOpen: boolean
-}
+import { PartiesTableFormState } from "@/types/forms"
 
 interface ViewProps {
-  formState: FormStateType<FormStateData>
-  dispatchForm: (action: FormStateAction<FormStateData>) => void
+  formState: FormStateType<PartiesTableFormState>
+  dispatchForm: (action: FormStateAction<PartiesTableFormState>) => void
 }
 
 const columns: GridColDef<Party>[] = [

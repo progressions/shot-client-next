@@ -1,6 +1,5 @@
 import React from "react"
 import { render, RenderOptions } from "@testing-library/react"
-import { AppProvider, ToastProvider } from "@/contexts"
 import { ThemeProvider } from "@mui/material/styles"
 import { createTheme } from "@mui/material/styles"
 import type { User, Campaign } from "@/types"

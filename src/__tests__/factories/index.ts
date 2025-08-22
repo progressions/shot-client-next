@@ -1,12 +1,5 @@
 // Character factories
-export {
-  brick,
-  carolina,
-  shing,
-  huanKen,
-  hitman,
-  zombies
-} from "./Characters"
+export { brick, carolina, shing, huanKen, hitman, zombies } from "./Characters"
 
 // Vehicle factories
 export {
@@ -16,11 +9,8 @@ export {
   motorcycles,
   hondas,
   pursuer,
-  evader
+  evader,
 } from "./Vehicles"
 
 // Weapon factories
-export {
-  derringer,
-  ak47
-} from "./Weapons"
+export { derringer, ak47 } from "./Weapons"

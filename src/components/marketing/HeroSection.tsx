@@ -95,30 +95,32 @@ export function HeroSection() {
           <HeroTitle variant="h1" component="h1">
             Master Epic Cinematic Adventures
           </HeroTitle>
-          
+
           <HeroSubtitle variant="h5" component="h2">
-            The ultimate Feng Shui 2 campaign management platform.<br />
-            Real-time combat, AI character generation, and cross-juncture storytelling await.
+            The ultimate Feng Shui 2 campaign management platform.
+            <br />
+            Real-time combat, AI character generation, and cross-juncture
+            storytelling await.
           </HeroSubtitle>
-          
-          <Stack 
-            direction={{ xs: "column", sm: "row" }} 
+
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
             spacing={2}
             alignItems="center"
           >
             <Link href="/users/sign_up" passHref>
-              <PrimaryCTA 
-                variant="contained" 
+              <PrimaryCTA
+                variant="contained"
                 size="large"
                 fullWidth={{ xs: true, sm: false }}
               >
                 Start Your Legendary Campaign
               </PrimaryCTA>
             </Link>
-            
+
             <Link href="/login" passHref>
-              <SecondaryCTA 
-                variant="outlined" 
+              <SecondaryCTA
+                variant="outlined"
                 size="large"
                 fullWidth={{ xs: true, sm: false }}
               >
@@ -126,9 +128,9 @@ export function HeroSection() {
               </SecondaryCTA>
             </Link>
           </Stack>
-          
+
           <Typography variant="body1" sx={{ opacity: 0.8, maxWidth: 600 }}>
-            Join gamemasters and players worldwide in creating unforgettable 
+            Join gamemasters and players worldwide in creating unforgettable
             action movie adventures across the four junctures of time.
           </Typography>
         </Stack>

@@ -8,20 +8,11 @@ import {
   SiteLink,
 } from "@/components/ui"
 import { Avatar } from "@/components/avatars"
-import type { PaginationMeta, Site } from "@/types"
-
-interface FormStateData {
-  meta: PaginationMeta
-  page: number
-  sort: string
-  order: string
-  sites: Site[]
-  drawerOpen: boolean
-}
+import { SitesTableFormState } from "@/types/forms"
 
 interface ViewProps {
-  formState: FormStateType<FormStateData<T>>
-  dispatchForm: (action: FormStateAction<FormStateData<T>>) => void
+  formState: FormStateType<SitesTableFormState>
+  dispatchForm: (action: FormStateAction<SitesTableFormState>) => void
 }
 
 const columns: GridColDef<Site>[] = [

@@ -1,6 +1,11 @@
 import CharacterService from "@/services/CharacterService"
 import type { Person } from "@/types"
-import { brick, carolina, shing, zombies } from "@/__tests__/factories/Characters"
+import {
+  brick,
+  carolina,
+  shing,
+  zombies,
+} from "@/__tests__/factories/Characters"
 
 // Alias for convenience
 const CS = CharacterService
@@ -20,7 +25,7 @@ describe("CharacterService", () => {
     it("should return a character's skill without a modifier", () => {
       const character: Person = {
         ...carolina,
-        impairments: 1
+        impairments: 1,
       }
       expect(CS.skill(character, "Driving")).toBe(13)
     })
@@ -70,9 +75,9 @@ describe("CharacterService", () => {
           ...brick.action_values,
           Wounds: 20,
           Fortune: 2,
-          "Marks of Death": 1
+          "Marks of Death": 1,
         },
-        impairments: 2
+        impairments: 2,
       }
 
       const healedCharacter = CS.fullHeal(woundedCharacter)
@@ -88,8 +93,8 @@ describe("CharacterService", () => {
         ...zombies,
         action_values: {
           ...zombies.action_values,
-          Wounds: 5
-        }
+          Wounds: 5,
+        },
       }
 
       const result = CS.fullHeal(woundedMook)
@@ -101,7 +106,7 @@ describe("CharacterService", () => {
     it("should execute a chain of operations", () => {
       const result = CS.chain(brick, [
         ["updateActionValue", ["Toughness", 9]],
-        ["updateActionValue", ["Fortune", 3]]
+        ["updateActionValue", ["Fortune", 3]],
       ])
 
       expect(result.action_values.Toughness).toBe(9)
@@ -114,9 +119,7 @@ describe("CharacterService", () => {
     })
 
     it("handles single chain operation", () => {
-      const result = CS.chain(carolina, [
-        ["updateActionValue", ["Wounds", 5]]
-      ])
+      const result = CS.chain(carolina, [["updateActionValue", ["Wounds", 5]]])
 
       expect(result.action_values.Wounds).toBe(5)
       expect(result.action_values.Driving).toBe(carolina.action_values.Driving) // Unchanged
@@ -124,12 +127,12 @@ describe("CharacterService", () => {
 
     it("maintains immutability during chain operations", () => {
       const original = { ...brick }
-      const result = CS.chain(brick, [
-        ["updateActionValue", ["Toughness", 99]]
-      ])
+      const result = CS.chain(brick, [["updateActionValue", ["Toughness", 99]]])
 
       expect(result.action_values.Toughness).toBe(99)
-      expect(brick.action_values.Toughness).toBe(original.action_values.Toughness) // Original unchanged
+      expect(brick.action_values.Toughness).toBe(
+        original.action_values.Toughness
+      ) // Original unchanged
       expect(result).not.toBe(brick) // Different object references
     })
 
@@ -138,7 +141,7 @@ describe("CharacterService", () => {
         ["updateActionValue", ["Wounds", 10]],
         ["updateActionValue", ["Fortune", 2]],
         ["updateActionValue", ["Toughness", 8]],
-        ["updateActionValue", ["Martial Arts", 15]]
+        ["updateActionValue", ["Martial Arts", 15]],
       ])
 
       expect(result.action_values.Wounds).toBe(10)
@@ -176,8 +179,8 @@ describe("CharacterService", () => {
           ...carolina,
           skills: {
             ...carolina.skills,
-            "Zero Skill": 0
-          }
+            "Zero Skill": 0,
+          },
         }
         const result = CS.skill(characterWithZeroSkill, "Zero Skill")
         expect(result).toBe(7) // Zero is falsy, so returns default 7
@@ -188,8 +191,8 @@ describe("CharacterService", () => {
           ...carolina,
           skills: {
             ...carolina.skills,
-            "Negative Skill": -5
-          }
+            "Negative Skill": -5,
+          },
         }
         const result = CS.skill(characterWithNegativeSkill, "Negative Skill")
         expect(result).toBe(-5) // Negative numbers are truthy, so returns actual value
@@ -198,42 +201,42 @@ describe("CharacterService", () => {
 
     describe("type checking edge cases", () => {
       it("handles character without type property", () => {
-        const characterWithoutType = { 
+        const characterWithoutType = {
           ...brick,
           action_values: {
             ...brick.action_values,
-            Type: undefined as any
-          }
+            Type: undefined as any,
+          },
         }
-        
+
         expect(CS.isPC(characterWithoutType)).toBe(false)
         expect(CS.isBoss(characterWithoutType)).toBe(false)
         expect(CS.isMook(characterWithoutType)).toBe(false)
       })
 
       it("handles character with null type", () => {
-        const characterWithNullType = { 
+        const characterWithNullType = {
           ...brick,
           action_values: {
             ...brick.action_values,
-            Type: null as any
-          }
+            Type: null as any,
+          },
         }
-        
+
         expect(CS.isPC(characterWithNullType)).toBe(false)
         expect(CS.isBoss(characterWithNullType)).toBe(false)
         expect(CS.isMook(characterWithNullType)).toBe(false)
       })
 
       it("handles character with invalid type", () => {
-        const characterWithInvalidType = { 
+        const characterWithInvalidType = {
           ...brick,
           action_values: {
             ...brick.action_values,
-            Type: "invalid_type" as any
-          }
+            Type: "invalid_type" as any,
+          },
         }
-        
+
         expect(CS.isPC(characterWithInvalidType)).toBe(false)
         expect(CS.isBoss(characterWithInvalidType)).toBe(false)
         expect(CS.isMook(characterWithInvalidType)).toBe(false)
@@ -241,27 +244,59 @@ describe("CharacterService", () => {
 
       it("handles all valid character types correctly", () => {
         const characterTypes = [
-          { type: "PC" as const, expectedPC: true, expectedBoss: false, expectedMook: false },
-          { type: "Boss" as const, expectedPC: false, expectedBoss: true, expectedMook: false },
-          { type: "Uber-Boss" as const, expectedPC: false, expectedBoss: false, expectedMook: false },
-          { type: "Featured Foe" as const, expectedPC: false, expectedBoss: false, expectedMook: false },
-          { type: "Mook" as const, expectedPC: false, expectedBoss: false, expectedMook: true },
-          { type: "Ally" as const, expectedPC: false, expectedBoss: false, expectedMook: false },
+          {
+            type: "PC" as const,
+            expectedPC: true,
+            expectedBoss: false,
+            expectedMook: false,
+          },
+          {
+            type: "Boss" as const,
+            expectedPC: false,
+            expectedBoss: true,
+            expectedMook: false,
+          },
+          {
+            type: "Uber-Boss" as const,
+            expectedPC: false,
+            expectedBoss: false,
+            expectedMook: false,
+          },
+          {
+            type: "Featured Foe" as const,
+            expectedPC: false,
+            expectedBoss: false,
+            expectedMook: false,
+          },
+          {
+            type: "Mook" as const,
+            expectedPC: false,
+            expectedBoss: false,
+            expectedMook: true,
+          },
+          {
+            type: "Ally" as const,
+            expectedPC: false,
+            expectedBoss: false,
+            expectedMook: false,
+          },
         ]
 
-        characterTypes.forEach(({ type, expectedPC, expectedBoss, expectedMook }) => {
-          const character = { 
-            ...brick,
-            action_values: {
-              ...brick.action_values,
-              Type: type
+        characterTypes.forEach(
+          ({ type, expectedPC, expectedBoss, expectedMook }) => {
+            const character = {
+              ...brick,
+              action_values: {
+                ...brick.action_values,
+                Type: type,
+              },
             }
+
+            expect(CS.isPC(character)).toBe(expectedPC)
+            expect(CS.isBoss(character)).toBe(expectedBoss)
+            expect(CS.isMook(character)).toBe(expectedMook)
           }
-          
-          expect(CS.isPC(character)).toBe(expectedPC)
-          expect(CS.isBoss(character)).toBe(expectedBoss)
-          expect(CS.isMook(character)).toBe(expectedMook)
-        })
+        )
       })
     })
 
@@ -269,7 +304,7 @@ describe("CharacterService", () => {
       it("handles character without action_values", () => {
         const invalidCharacter = { ...brick }
         delete (invalidCharacter as any).action_values
-        
+
         // fullHeal tries to access action_values.Max Fortune which will throw an error
         expect(() => CS.fullHeal(invalidCharacter as any)).toThrow()
       })
@@ -280,11 +315,11 @@ describe("CharacterService", () => {
           action_values: {
             Toughness: 8,
             // Missing Wounds, Fortune, Marks of Death
-          }
+          },
         }
-        
+
         const result = CS.fullHeal(partialCharacter)
-        
+
         // Should handle missing values gracefully
         expect(result.action_values.Toughness).toBe(8) // Unchanged
         expect(result.impairments).toBe(0) // Should be healed
@@ -293,7 +328,7 @@ describe("CharacterService", () => {
       it("handles character with undefined impairments", () => {
         const characterWithoutImpairments = { ...brick }
         delete (characterWithoutImpairments as any).impairments
-        
+
         const result = CS.fullHeal(characterWithoutImpairments as any)
         expect(result.impairments).toBe(0) // Should set to 0
       })
@@ -305,12 +340,12 @@ describe("CharacterService", () => {
             ...brick.action_values,
             Wounds: null as any,
             Fortune: null as any,
-            "Marks of Death": null as any
-          }
+            "Marks of Death": null as any,
+          },
         }
-        
+
         const result = CS.fullHeal(characterWithNullValues)
-        
+
         // Should handle null values gracefully
         expect(result.action_values.Wounds).toBe(0)
         expect(result.action_values.Fortune).toBe(5) // Max Fortune
@@ -324,13 +359,13 @@ describe("CharacterService", () => {
             ...brick.action_values,
             Wounds: 0,
             Fortune: 5,
-            "Marks of Death": 0
+            "Marks of Death": 0,
           },
-          impairments: 0
+          impairments: 0,
         }
-        
+
         const result = CS.fullHeal(healthyCharacter)
-        
+
         // Should maintain the same values
         expect(result.action_values.Wounds).toBe(0)
         expect(result.action_values.Fortune).toBe(5)
@@ -343,7 +378,7 @@ describe("CharacterService", () => {
       it("handles character without action_values", () => {
         const invalidCharacter = { ...carolina }
         delete (invalidCharacter as any).action_values
-        
+
         const result = CS.mainAttack(invalidCharacter as any)
         expect(result).toBe("") // otherActionValue returns empty string on error
       })
@@ -354,10 +389,10 @@ describe("CharacterService", () => {
           action_values: {
             ...carolina.action_values,
             Guns: 10,
-            "Martial Arts": 10
-          }
+            "Martial Arts": 10,
+          },
         }
-        
+
         const result = CS.mainAttack(equalSkillsCharacter)
         expect(["Guns", "Martial Arts"]).toContain(result) // Should return one of them
       })
@@ -369,9 +404,9 @@ describe("CharacterService", () => {
             Driving: 13,
             Toughness: 8,
             // No Guns or Martial Arts
-          }
+          },
         }
-        
+
         const result = CS.mainAttack(noAttackCharacter)
         expect(result).toBe("") // When MainAttack is undefined, returns empty string
       })
@@ -382,10 +417,10 @@ describe("CharacterService", () => {
           action_values: {
             ...carolina.action_values,
             Guns: 0,
-            "Martial Arts": 0
-          }
+            "Martial Arts": 0,
+          },
         }
-        
+
         const result = CS.mainAttack(zeroAttackCharacter)
         expect(result).toBe("Guns") // Should still return Guns as default
       })
@@ -395,26 +430,22 @@ describe("CharacterService", () => {
       it("handles non-existent function in chain", () => {
         // This should throw or handle gracefully depending on implementation
         expect(() => {
-          CS.chain(brick, [
-            ["nonExistentFunction", []]
-          ])
+          CS.chain(brick, [["nonExistentFunction", []]])
         }).toThrow() // Or handle gracefully if implementation allows
       })
 
       it("handles malformed chain arguments", () => {
         const result = CS.chain(brick, [
-          ["updateActionValue", []] // Missing required arguments
+          ["updateActionValue", []], // Missing required arguments
         ] as any)
-        
+
         // Should handle gracefully without crashing
         expect(result).toBeDefined()
       })
 
       it("handles null character in chain", () => {
         expect(() => {
-          CS.chain(null as any, [
-            ["updateActionValue", ["Toughness", 9]]
-          ])
+          CS.chain(null as any, [["updateActionValue", ["Toughness", 9]]])
         }).toThrow() // Should handle null character appropriately
       })
     })

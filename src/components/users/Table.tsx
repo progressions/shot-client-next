@@ -1,23 +1,8 @@
 "use client"
 import { GridColDef } from "@mui/x-data-grid"
-import { FormStateType, FormStateAction } from "@/reducers"
+import { UserTableProps } from "@/types"
 import { BaseDataGrid, UserLink } from "@/components/ui"
 import { Avatar } from "@/components/avatars"
-import { PaginationMeta, User } from "@/types"
-
-interface FormStateData {
-  meta: PaginationMeta
-  page: number
-  sort: string
-  order: string
-  users: User[]
-  drawerOpen: boolean
-}
-
-interface ViewProps {
-  formState: FormStateType<FormStateData>
-  dispatchForm: (action: FormStateAction<FormStateData>) => void
-}
 
 const columns: GridColDef<User>[] = [
   {
@@ -59,7 +44,7 @@ const columns: GridColDef<User>[] = [
   },
 ]
 
-export default function View({ formState, dispatchForm }: ViewProps) {
+export default function View({ formState, dispatchForm }: UserTableProps) {
   const { users } = formState.data
   const rows = users.map(user => ({
     ...user,

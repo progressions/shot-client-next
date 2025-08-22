@@ -34,7 +34,7 @@ jest.mock("axios", () => ({
     ) {
       return new MockAxiosError(message, code, config, request, response)
     }
-  }
+  },
 }))
 
 const { AxiosError } = require("axios")
@@ -45,7 +45,7 @@ describe("errorHandler", () => {
 
   beforeEach(() => {
     mockDispatchForm = jest.fn()
-    consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {})
   })
 
   afterEach(() => {
@@ -56,7 +56,7 @@ describe("errorHandler", () => {
   describe("AxiosError handling", () => {
     it("handles AxiosError with simple error field", () => {
       const backendError: BackendErrorResponse = {
-        error: "Invalid credentials"
+        error: "Invalid credentials",
       }
 
       const axiosError = new AxiosError(
@@ -69,7 +69,7 @@ describe("errorHandler", () => {
           status: 400,
           statusText: "Bad Request",
           headers: {},
-          config: {} as any
+          config: {} as any,
         }
       )
 
@@ -82,7 +82,7 @@ describe("errorHandler", () => {
       )
       expect(mockDispatchForm).toHaveBeenCalledWith({
         type: FormActions.ERROR,
-        payload: "Invalid credentials"
+        payload: "Invalid credentials",
       })
     })
 
@@ -91,8 +91,8 @@ describe("errorHandler", () => {
         errors: {
           name: ["is required", "is too short"],
           email: ["is invalid"],
-          password: ["must be at least 8 characters"]
-        }
+          password: ["must be at least 8 characters"],
+        },
       }
 
       const axiosError = new AxiosError(
@@ -105,14 +105,15 @@ describe("errorHandler", () => {
           status: 422,
           statusText: "Unprocessable Entity",
           headers: {},
-          config: {} as any
+          config: {} as any,
         }
       )
 
       handleError(axiosError, mockDispatchForm)
 
-      const expectedMessage = "is required, is too short, is invalid, must be at least 8 characters"
-      
+      const expectedMessage =
+        "is required, is too short, is invalid, must be at least 8 characters"
+
       expect(consoleSpy).toHaveBeenCalledWith(
         "Error:",
         expectedMessage,
@@ -120,13 +121,13 @@ describe("errorHandler", () => {
       )
       expect(mockDispatchForm).toHaveBeenCalledWith({
         type: FormActions.ERROR,
-        payload: expectedMessage
+        payload: expectedMessage,
       })
     })
 
     it("handles AxiosError with name array", () => {
       const backendError: BackendErrorResponse = {
-        name: ["Name is required", "Name must be unique"]
+        name: ["Name is required", "Name must be unique"],
       }
 
       const axiosError = new AxiosError(
@@ -137,9 +138,9 @@ describe("errorHandler", () => {
         {
           data: backendError,
           status: 422,
-          statusText: "Unprocessable Entity", 
+          statusText: "Unprocessable Entity",
           headers: {},
-          config: {} as any
+          config: {} as any,
         }
       )
 
@@ -152,7 +153,7 @@ describe("errorHandler", () => {
       )
       expect(mockDispatchForm).toHaveBeenCalledWith({
         type: FormActions.ERROR,
-        payload: "Name is required, Name must be unique"
+        payload: "Name is required, Name must be unique",
       })
     })
 
@@ -160,9 +161,9 @@ describe("errorHandler", () => {
       const backendError: BackendErrorResponse = {
         error: "Server error",
         errors: {
-          field: ["Field error"]
+          field: ["Field error"],
         },
-        name: ["Name error"]
+        name: ["Name error"],
       }
 
       const axiosError = new AxiosError(
@@ -175,7 +176,7 @@ describe("errorHandler", () => {
           status: 500,
           statusText: "Internal Server Error",
           headers: {},
-          config: {} as any
+          config: {} as any,
         }
       )
 
@@ -184,7 +185,7 @@ describe("errorHandler", () => {
       // Should prioritize 'error' field
       expect(mockDispatchForm).toHaveBeenCalledWith({
         type: FormActions.ERROR,
-        payload: "Server error"
+        payload: "Server error",
       })
     })
 
@@ -199,7 +200,7 @@ describe("errorHandler", () => {
           status: 0,
           statusText: "",
           headers: {},
-          config: {} as any
+          config: {} as any,
         }
       )
 
@@ -212,15 +213,12 @@ describe("errorHandler", () => {
       )
       expect(mockDispatchForm).toHaveBeenCalledWith({
         type: FormActions.ERROR,
-        payload: "An unexpected error occurred"
+        payload: "An unexpected error occurred",
       })
     })
 
     it("handles AxiosError without response", () => {
-      const axiosError = new AxiosError(
-        "Network timeout",
-        "ECONNABORTED"
-      )
+      const axiosError = new AxiosError("Network timeout", "ECONNABORTED")
       // No response property
 
       handleError(axiosError, mockDispatchForm)
@@ -232,7 +230,7 @@ describe("errorHandler", () => {
       )
       expect(mockDispatchForm).toHaveBeenCalledWith({
         type: FormActions.ERROR,
-        payload: "An unexpected error occurred"
+        payload: "An unexpected error occurred",
       })
     })
 
@@ -241,8 +239,8 @@ describe("errorHandler", () => {
         errors: {
           field1: "not an array", // Should be array but isn't
           field2: ["valid array"],
-          field3: null
-        }
+          field3: null,
+        },
       } as any
 
       const axiosError = new AxiosError(
@@ -255,7 +253,7 @@ describe("errorHandler", () => {
           status: 422,
           statusText: "Unprocessable Entity",
           headers: {},
-          config: {} as any
+          config: {} as any,
         }
       )
 
@@ -265,7 +263,7 @@ describe("errorHandler", () => {
       expect(mockDispatchForm).toHaveBeenCalled()
       const dispatchCall = mockDispatchForm.mock.calls[0][0]
       expect(dispatchCall.type).toBe(FormActions.ERROR)
-      expect(typeof dispatchCall.payload).toBe('string')
+      expect(typeof dispatchCall.payload).toBe("string")
     })
   })
 
@@ -282,7 +280,7 @@ describe("errorHandler", () => {
       )
       expect(mockDispatchForm).toHaveBeenCalledWith({
         type: FormActions.ERROR,
-        payload: "Something went wrong"
+        payload: "Something went wrong",
       })
     })
 
@@ -291,14 +289,10 @@ describe("errorHandler", () => {
 
       handleError(error, mockDispatchForm)
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "Error:",
-        "",
-        error
-      )
+      expect(consoleSpy).toHaveBeenCalledWith("Error:", "", error)
       expect(mockDispatchForm).toHaveBeenCalledWith({
         type: FormActions.ERROR,
-        payload: ""
+        payload: "",
       })
     })
 
@@ -314,7 +308,7 @@ describe("errorHandler", () => {
       )
       expect(mockDispatchForm).toHaveBeenCalledWith({
         type: FormActions.ERROR,
-        payload: "Cannot read property of undefined"
+        payload: "Cannot read property of undefined",
       })
     })
   })
@@ -332,7 +326,7 @@ describe("errorHandler", () => {
       )
       expect(mockDispatchForm).toHaveBeenCalledWith({
         type: FormActions.ERROR,
-        payload: "An unexpected error occurred"
+        payload: "An unexpected error occurred",
       })
     })
 
@@ -346,7 +340,7 @@ describe("errorHandler", () => {
       )
       expect(mockDispatchForm).toHaveBeenCalledWith({
         type: FormActions.ERROR,
-        payload: "An unexpected error occurred"
+        payload: "An unexpected error occurred",
       })
     })
 
@@ -360,7 +354,7 @@ describe("errorHandler", () => {
       )
       expect(mockDispatchForm).toHaveBeenCalledWith({
         type: FormActions.ERROR,
-        payload: "An unexpected error occurred"
+        payload: "An unexpected error occurred",
       })
     })
 
@@ -376,7 +370,7 @@ describe("errorHandler", () => {
       )
       expect(mockDispatchForm).toHaveBeenCalledWith({
         type: FormActions.ERROR,
-        payload: "An unexpected error occurred"
+        payload: "An unexpected error occurred",
       })
     })
   })
@@ -388,16 +382,12 @@ describe("errorHandler", () => {
       handleError(error, mockDispatchForm)
 
       expect(consoleSpy).toHaveBeenCalledTimes(1)
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "Error:",
-        "Test error",
-        error
-      )
+      expect(consoleSpy).toHaveBeenCalledWith("Error:", "Test error", error)
     })
 
     it("logs with extracted error message and original error object", () => {
       const backendError: BackendErrorResponse = {
-        error: "Backend validation failed"
+        error: "Backend validation failed",
       }
 
       const axiosError = new AxiosError(
@@ -410,7 +400,7 @@ describe("errorHandler", () => {
           status: 400,
           statusText: "Bad Request",
           headers: {},
-          config: {} as any
+          config: {} as any,
         }
       )
 
@@ -443,7 +433,7 @@ describe("errorHandler", () => {
       const dispatchedAction = mockDispatchForm.mock.calls[0][0]
       expect(dispatchedAction).toEqual({
         type: FormActions.ERROR,
-        payload: "Test error"
+        payload: "Test error",
       })
     })
 
@@ -460,11 +450,7 @@ describe("errorHandler", () => {
       }).toThrow("Dispatch failed")
 
       // Should still log the original error before dispatch fails
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "Error:",
-        "Original error",
-        error
-      )
+      expect(consoleSpy).toHaveBeenCalledWith("Error:", "Original error", error)
     })
   })
 })

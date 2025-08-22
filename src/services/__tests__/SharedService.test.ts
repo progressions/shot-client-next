@@ -1,8 +1,7 @@
-import { SS, CS, VS } from "@/services"
+import { SS } from "@/services"
 import type { Person, Vehicle } from "@/types"
 import { CharacterTypes } from "@/types"
 import { defaultCharacter, defaultVehicle } from "@/types/defaults"
-import { brick, carolina, shing } from "@/__tests__/factories/Characters"
 
 describe("SharedService", () => {
   describe("Character methods", () => {
@@ -10,7 +9,7 @@ describe("SharedService", () => {
       it("returns a character's name", () => {
         const character: Person = {
           ...defaultCharacter,
-          name: "Brick Manly"
+          name: "Brick Manly",
         }
 
         expect(SS.name(character)).toBe("Brick Manly")
@@ -21,7 +20,7 @@ describe("SharedService", () => {
       it("returns true if the character is hidden", () => {
         const character: Person = {
           ...defaultCharacter,
-          current_shot: undefined
+          current_shot: undefined,
         }
 
         expect(SS.hidden(character)).toBe(true)
@@ -30,7 +29,7 @@ describe("SharedService", () => {
       it("returns false if the character is on a shot", () => {
         const character: Person = {
           ...defaultCharacter,
-          current_shot: 1
+          current_shot: 1,
         }
 
         expect(SS.hidden(character)).toBe(false)
@@ -43,8 +42,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.PC
-          }
+            Type: CharacterTypes.PC,
+          },
         }
 
         expect(SS.type(character)).toBe(CharacterTypes.PC)
@@ -73,8 +72,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.PC
-          }
+            Type: CharacterTypes.PC,
+          },
         }
 
         expect(SS.isFriendly(character)).toBe(true)
@@ -85,8 +84,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.Ally
-          }
+            Type: CharacterTypes.Ally,
+          },
         }
 
         expect(SS.isFriendly(character)).toBe(true)
@@ -97,8 +96,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.UberBoss
-          }
+            Type: CharacterTypes.UberBoss,
+          },
         }
 
         expect(SS.isFriendly(character)).toBe(false)
@@ -109,8 +108,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.Boss
-          }
+            Type: CharacterTypes.Boss,
+          },
         }
 
         expect(SS.isFriendly(character)).toBe(false)
@@ -121,8 +120,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.FeaturedFoe
-          }
+            Type: CharacterTypes.FeaturedFoe,
+          },
         }
 
         expect(SS.isFriendly(character)).toBe(false)
@@ -133,8 +132,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.Mook
-          }
+            Type: CharacterTypes.Mook,
+          },
         }
 
         expect(SS.isFriendly(character)).toBe(false)
@@ -147,8 +146,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.PC
-          }
+            Type: CharacterTypes.PC,
+          },
         }
 
         expect(SS.isUnfriendly(character)).toBe(false)
@@ -159,8 +158,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.Ally
-          }
+            Type: CharacterTypes.Ally,
+          },
         }
 
         expect(SS.isUnfriendly(character)).toBe(false)
@@ -171,8 +170,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.UberBoss
-          }
+            Type: CharacterTypes.UberBoss,
+          },
         }
 
         expect(SS.isUnfriendly(character)).toBe(true)
@@ -183,8 +182,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.Boss
-          }
+            Type: CharacterTypes.Boss,
+          },
         }
 
         expect(SS.isUnfriendly(character)).toBe(true)
@@ -195,8 +194,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.FeaturedFoe
-          }
+            Type: CharacterTypes.FeaturedFoe,
+          },
         }
 
         expect(SS.isUnfriendly(character)).toBe(true)
@@ -207,8 +206,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.Mook
-          }
+            Type: CharacterTypes.Mook,
+          },
         }
 
         expect(SS.isUnfriendly(character)).toBe(true)
@@ -217,15 +216,46 @@ describe("SharedService", () => {
 
     describe("type checking methods", () => {
       const testCases = [
-        { type: CharacterTypes.Mook, method: "isMook", expected: [true, false, false, false, false, false] },
-        { type: CharacterTypes.PC, method: "isPC", expected: [false, true, false, false, false, false] },
-        { type: CharacterTypes.Ally, method: "isAlly", expected: [false, false, true, false, false, false] },
-        { type: CharacterTypes.Boss, method: "isBoss", expected: [false, false, false, true, false, false] },
-        { type: CharacterTypes.FeaturedFoe, method: "isFeaturedFoe", expected: [false, false, false, false, true, false] },
-        { type: CharacterTypes.UberBoss, method: "isUberBoss", expected: [false, false, false, false, false, true] }
+        {
+          type: CharacterTypes.Mook,
+          method: "isMook",
+          expected: [true, false, false, false, false, false],
+        },
+        {
+          type: CharacterTypes.PC,
+          method: "isPC",
+          expected: [false, true, false, false, false, false],
+        },
+        {
+          type: CharacterTypes.Ally,
+          method: "isAlly",
+          expected: [false, false, true, false, false, false],
+        },
+        {
+          type: CharacterTypes.Boss,
+          method: "isBoss",
+          expected: [false, false, false, true, false, false],
+        },
+        {
+          type: CharacterTypes.FeaturedFoe,
+          method: "isFeaturedFoe",
+          expected: [false, false, false, false, true, false],
+        },
+        {
+          type: CharacterTypes.UberBoss,
+          method: "isUberBoss",
+          expected: [false, false, false, false, false, true],
+        },
       ]
 
-      const types = [CharacterTypes.Mook, CharacterTypes.PC, CharacterTypes.Ally, CharacterTypes.Boss, CharacterTypes.FeaturedFoe, CharacterTypes.UberBoss]
+      const types = [
+        CharacterTypes.Mook,
+        CharacterTypes.PC,
+        CharacterTypes.Ally,
+        CharacterTypes.Boss,
+        CharacterTypes.FeaturedFoe,
+        CharacterTypes.UberBoss,
+      ]
 
       testCases.forEach(({ type: testType, method, expected }) => {
         describe(method, () => {
@@ -235,8 +265,8 @@ describe("SharedService", () => {
                 ...defaultCharacter,
                 action_values: {
                   ...defaultCharacter.action_values,
-                  Type: characterType
-                }
+                  Type: characterType,
+                },
               }
 
               expect((SS as any)[method](character)).toBe(expected[index])
@@ -250,7 +280,7 @@ describe("SharedService", () => {
       it("returns true for a Task", () => {
         const character: Person = {
           ...defaultCharacter,
-          task: true
+          task: true,
         }
 
         expect(SS.isTask(character)).toBe(true)
@@ -267,8 +297,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.Mook
-          }
+            Type: CharacterTypes.Mook,
+          },
         }
 
         expect(SS.isType(character, CharacterTypes.Mook)).toBe(true)
@@ -281,8 +311,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            "Guns": 13
-          }
+            Guns: 13,
+          },
         }
 
         expect(SS.actionValue(character, "Guns")).toBe(13)
@@ -293,9 +323,9 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            "Guns": 13
+            Guns: 13,
           },
-          impairments: 1
+          impairments: 1,
         }
 
         expect(SS.actionValue(character, "Guns")).toBe(12)
@@ -308,8 +338,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            "Guns": 13
-          }
+            Guns: 13,
+          },
         }
 
         expect(SS.rawActionValue(character, "Guns")).toBe(13)
@@ -320,9 +350,9 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            "Guns": 13
+            Guns: 13,
           },
-          impairments: 1
+          impairments: 1,
         }
 
         expect(SS.rawActionValue(character, "Guns")).toBe(13)
@@ -335,8 +365,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            "MainAttack": "Guns"
-          }
+            MainAttack: "Guns",
+          },
         }
 
         expect(SS.otherActionValue(character, "MainAttack")).toBe("Guns")
@@ -347,7 +377,7 @@ describe("SharedService", () => {
       it("returns the number of impairments", () => {
         const character: Person = {
           ...defaultCharacter,
-          impairments: 2
+          impairments: 2,
         }
 
         expect(SS.impairments(character)).toBe(2)
@@ -358,7 +388,7 @@ describe("SharedService", () => {
       it("returns true if the character has impairments", () => {
         const character: Person = {
           ...defaultCharacter,
-          impairments: 2
+          impairments: 2,
         }
 
         expect(SS.isImpaired(character)).toBe(true)
@@ -367,7 +397,7 @@ describe("SharedService", () => {
       it("returns false if the character has no impairments", () => {
         const character: Person = {
           ...defaultCharacter,
-          impairments: 0
+          impairments: 0,
         }
 
         expect(SS.isImpaired(character)).toBe(false)
@@ -378,7 +408,7 @@ describe("SharedService", () => {
       it("adds an impairment", () => {
         const character: Person = {
           ...defaultCharacter,
-          impairments: 0
+          impairments: 0,
         }
 
         const updatedCharacter = SS.addImpairments(character, 1)
@@ -392,8 +422,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.Mook
-          }
+            Type: CharacterTypes.Mook,
+          },
         }
 
         expect(SS.calculateImpairments(character, 24, 35)).toBe(0)
@@ -404,8 +434,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.UberBoss
-          }
+            Type: CharacterTypes.UberBoss,
+          },
         }
 
         expect(SS.calculateImpairments(character, 39, 40)).toBe(1)
@@ -416,8 +446,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.PC
-          }
+            Type: CharacterTypes.PC,
+          },
         }
 
         expect(SS.calculateImpairments(character, 24, 25)).toBe(1)
@@ -428,8 +458,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.PC
-          }
+            Type: CharacterTypes.PC,
+          },
         }
 
         expect(SS.calculateImpairments(character, 24, 30)).toBe(2)
@@ -442,11 +472,15 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            "Action Value": 24
-          }
+            "Action Value": 24,
+          },
         }
 
-        const updatedCharacter = SS.updateActionValue(character, "Action Value", 25)
+        const updatedCharacter = SS.updateActionValue(
+          character,
+          "Action Value",
+          25
+        )
 
         expect(updatedCharacter.action_values["Action Value"]).toBe(25)
       })
@@ -456,7 +490,7 @@ describe("SharedService", () => {
       it("updates a value", () => {
         const character: Person = {
           ...defaultCharacter,
-          impairments: 0
+          impairments: 0,
         }
 
         const updatedCharacter = SS.updateValue(character, "impairments", 2)
@@ -469,7 +503,7 @@ describe("SharedService", () => {
       it("sets the current shot, reducing it by the existing current shot", () => {
         const character: Person = {
           ...defaultCharacter,
-          current_shot: -1
+          current_shot: -1,
         }
 
         const updatedCharacter = SS.setInitiative(character, 5)
@@ -488,8 +522,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.Mook
-          }
+            Type: CharacterTypes.Mook,
+          },
         }
 
         expect(SS.seriousPoints(character, 50)).toBe(false)
@@ -500,8 +534,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.UberBoss
-          }
+            Type: CharacterTypes.UberBoss,
+          },
         }
 
         expect(SS.seriousPoints(character, 50)).toBe(true)
@@ -512,8 +546,8 @@ describe("SharedService", () => {
           ...defaultCharacter,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.PC
-          }
+            Type: CharacterTypes.PC,
+          },
         }
 
         expect(SS.seriousPoints(character, 35)).toBe(true)
@@ -527,8 +561,8 @@ describe("SharedService", () => {
           count: 15,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.Mook
-          }
+            Type: CharacterTypes.Mook,
+          },
         }
 
         expect(SS.mooks(character)).toBe(15)
@@ -546,8 +580,8 @@ describe("SharedService", () => {
           count: 15,
           action_values: {
             ...defaultCharacter.action_values,
-            Type: CharacterTypes.Mook
-          }
+            Type: CharacterTypes.Mook,
+          },
         }
 
         const updatedCharacter = SS.killMooks(character, 5)
@@ -561,7 +595,7 @@ describe("SharedService", () => {
       it("returns a vehicle's name", () => {
         const vehicle: Vehicle = {
           ...defaultVehicle,
-          name: "Battle Truck"
+          name: "Battle Truck",
         }
 
         expect(SS.name(vehicle)).toBe("Battle Truck")
@@ -572,7 +606,7 @@ describe("SharedService", () => {
       it("returns true if the vehicle is hidden", () => {
         const vehicle: Vehicle = {
           ...defaultVehicle,
-          current_shot: undefined
+          current_shot: undefined,
         }
 
         expect(SS.hidden(vehicle)).toBe(true)
@@ -581,7 +615,7 @@ describe("SharedService", () => {
       it("returns false if the vehicle is on a shot", () => {
         const vehicle: Vehicle = {
           ...defaultVehicle,
-          current_shot: 1
+          current_shot: 1,
         }
 
         expect(SS.hidden(vehicle)).toBe(false)

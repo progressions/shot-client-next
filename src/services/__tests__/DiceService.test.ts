@@ -66,7 +66,8 @@ describe("DiceService", () => {
 
     it("maintains consistency across multiple calls", () => {
       const originalMathRandom = Math.random
-      Math.random = jest.fn()
+      Math.random = jest
+        .fn()
         .mockReturnValueOnce(0.1)
         .mockReturnValueOnce(0.3)
         .mockReturnValueOnce(0.5)
@@ -88,11 +89,13 @@ describe("DiceService", () => {
 
   describe("rollExplodingDie", () => {
     it("returns rolls and total when no 6s are rolled", () => {
-      const mockRollDie = jest.fn()
+      const mockRollDie = jest
+        .fn()
         .mockReturnValueOnce(4) // First roll (gets ignored in implementation - bug?)
         .mockReturnValueOnce(3) // Actual roll
 
-      const result: ExplodingDiceRolls = DiceService.rollExplodingDie(mockRollDie)
+      const result: ExplodingDiceRolls =
+        DiceService.rollExplodingDie(mockRollDie)
 
       expect(result[0]).toEqual([3]) // Array of rolls
       expect(result[1]).toBe(3) // Sum of rolls
@@ -100,13 +103,15 @@ describe("DiceService", () => {
     })
 
     it("continues rolling when 6s are rolled", () => {
-      const mockRollDie = jest.fn()
+      const mockRollDie = jest
+        .fn()
         .mockReturnValueOnce(2) // First roll (gets ignored)
         .mockReturnValueOnce(6) // First actual roll - triggers explosion
         .mockReturnValueOnce(6) // Second roll - triggers another explosion
         .mockReturnValueOnce(4) // Third roll - stops explosion
 
-      const result: ExplodingDiceRolls = DiceService.rollExplodingDie(mockRollDie)
+      const result: ExplodingDiceRolls =
+        DiceService.rollExplodingDie(mockRollDie)
 
       expect(result[0]).toEqual([6, 6, 4]) // Array of rolls
       expect(result[1]).toBe(16) // Sum: 6 + 6 + 4
@@ -114,12 +119,14 @@ describe("DiceService", () => {
     })
 
     it("handles single 6 followed by non-6", () => {
-      const mockRollDie = jest.fn()
+      const mockRollDie = jest
+        .fn()
         .mockReturnValueOnce(1) // First roll (gets ignored)
         .mockReturnValueOnce(6) // Triggers explosion
         .mockReturnValueOnce(2) // Stops explosion
 
-      const result: ExplodingDiceRolls = DiceService.rollExplodingDie(mockRollDie)
+      const result: ExplodingDiceRolls =
+        DiceService.rollExplodingDie(mockRollDie)
 
       expect(result[0]).toEqual([6, 2])
       expect(result[1]).toBe(8)
@@ -135,7 +142,8 @@ describe("DiceService", () => {
     it("returns proper swerve structure with positive result", () => {
       // Mock rollExplodingDie to return predictable values
       const originalRollExplodingDie = DiceService.rollExplodingDie
-      DiceService.rollExplodingDie = jest.fn()
+      DiceService.rollExplodingDie = jest
+        .fn()
         .mockReturnValueOnce([[4], 4]) // Positive roll
         .mockReturnValueOnce([[2], 2]) // Negative roll
 
@@ -153,7 +161,8 @@ describe("DiceService", () => {
 
     it("returns proper swerve structure with negative result", () => {
       const originalRollExplodingDie = DiceService.rollExplodingDie
-      DiceService.rollExplodingDie = jest.fn()
+      DiceService.rollExplodingDie = jest
+        .fn()
         .mockReturnValueOnce([[2], 2]) // Positive roll
         .mockReturnValueOnce([[5], 5]) // Negative roll
 
@@ -171,7 +180,8 @@ describe("DiceService", () => {
 
     it("detects boxcars when both first rolls are 6", () => {
       const originalRollExplodingDie = DiceService.rollExplodingDie
-      DiceService.rollExplodingDie = jest.fn()
+      DiceService.rollExplodingDie = jest
+        .fn()
         .mockReturnValueOnce([[6, 3], 9]) // Positive: starts with 6
         .mockReturnValueOnce([[6, 1], 7]) // Negative: starts with 6
 
@@ -189,7 +199,8 @@ describe("DiceService", () => {
 
     it("does not detect boxcars when only positive starts with 6", () => {
       const originalRollExplodingDie = DiceService.rollExplodingDie
-      DiceService.rollExplodingDie = jest.fn()
+      DiceService.rollExplodingDie = jest
+        .fn()
         .mockReturnValueOnce([[6, 2], 8]) // Positive: starts with 6
         .mockReturnValueOnce([[4], 4]) // Negative: does not start with 6
 
@@ -202,7 +213,8 @@ describe("DiceService", () => {
 
     it("does not detect boxcars when only negative starts with 6", () => {
       const originalRollExplodingDie = DiceService.rollExplodingDie
-      DiceService.rollExplodingDie = jest.fn()
+      DiceService.rollExplodingDie = jest
+        .fn()
         .mockReturnValueOnce([[3], 3]) // Positive: does not start with 6
         .mockReturnValueOnce([[6, 5], 11]) // Negative: starts with 6
 
@@ -215,7 +227,8 @@ describe("DiceService", () => {
 
     it("handles zero result", () => {
       const originalRollExplodingDie = DiceService.rollExplodingDie
-      DiceService.rollExplodingDie = jest.fn()
+      DiceService.rollExplodingDie = jest
+        .fn()
         .mockReturnValueOnce([[5], 5]) // Positive roll
         .mockReturnValueOnce([[5], 5]) // Negative roll
 
@@ -229,10 +242,11 @@ describe("DiceService", () => {
 
     it("handles exploding dice with multiple 6s", () => {
       const originalRollExplodingDie = DiceService.rollExplodingDie
-      const mockFn = jest.fn()
+      const mockFn = jest
+        .fn()
         .mockReturnValueOnce([[6, 6, 6, 3], 21]) // Multiple 6s in positive
         .mockReturnValueOnce([[6, 1], 7]) // Negative also starts with 6 for boxcars
-      
+
       DiceService.rollExplodingDie = mockFn
 
       const result: Swerve = DiceService.rollSwerve()
@@ -252,21 +266,22 @@ describe("DiceService", () => {
     it("rollSwerve uses actual rollDie function", () => {
       // Mock rollDie to ensure predictable results for testing
       const originalRollDie = DiceService.rollDie
-      DiceService.rollDie = jest.fn()
+      DiceService.rollDie = jest
+        .fn()
         .mockReturnValueOnce(3) // Positive roll: ignored (do-while)
         .mockReturnValueOnce(4) // Positive roll: actual
-        .mockReturnValueOnce(2) // Negative roll: ignored (do-while) 
+        .mockReturnValueOnce(2) // Negative roll: ignored (do-while)
         .mockReturnValueOnce(1) // Negative roll: actual
 
       const result: Swerve = DiceService.rollSwerve()
 
       // Basic structure checks
-      expect(typeof result.result).toBe('number')
+      expect(typeof result.result).toBe("number")
       expect(Array.isArray(result.positiveRolls)).toBe(true)
       expect(Array.isArray(result.negativeRolls)).toBe(true)
-      expect(typeof result.positive).toBe('number')
-      expect(typeof result.negative).toBe('number')
-      expect(typeof result.boxcars).toBe('boolean')
+      expect(typeof result.positive).toBe("number")
+      expect(typeof result.negative).toBe("number")
+      expect(typeof result.boxcars).toBe("boolean")
 
       // All rolls should be between 1-6
       result.positiveRolls.forEach(roll => {
@@ -279,8 +294,14 @@ describe("DiceService", () => {
       })
 
       // Totals should match sum of rolls
-      const positiveSum = result.positiveRolls.reduce((sum, roll) => sum + roll, 0)
-      const negativeSum = result.negativeRolls.reduce((sum, roll) => sum + roll, 0)
+      const positiveSum = result.positiveRolls.reduce(
+        (sum, roll) => sum + roll,
+        0
+      )
+      const negativeSum = result.negativeRolls.reduce(
+        (sum, roll) => sum + roll,
+        0
+      )
       expect(result.positive).toBe(positiveSum)
       expect(result.negative).toBe(negativeSum)
       expect(result.result).toBe(positiveSum - negativeSum)
@@ -298,7 +319,9 @@ describe("DiceService", () => {
     it("multiple rollSwerve calls produce varying results", () => {
       // Mock predictable variation to ensure test reliability
       const originalRollDie = DiceService.rollDie
-      const mockValues = [1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 1, 3, 4, 5, 6, 1, 2]
+      const mockValues = [
+        1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 1, 3, 4, 5, 6, 1, 2,
+      ]
       let callCount = 0
       DiceService.rollDie = jest.fn(() => {
         const value = mockValues[callCount % mockValues.length]
@@ -307,21 +330,23 @@ describe("DiceService", () => {
       })
 
       const results = []
-      for (let i = 0; i < 5; i++) { // Reduced iterations for predictability
+      for (let i = 0; i < 5; i++) {
+        // Reduced iterations for predictability
         results.push(DiceService.rollSwerve())
       }
 
       // There should be some variation in results
       const uniqueResults = new Set(results.map(r => r.result))
       expect(uniqueResults.size).toBeGreaterThan(1)
-      
+
       DiceService.rollDie = originalRollDie
     })
   })
 
   describe("edge cases", () => {
     it("rollExplodingDie handles custom rollDie function", () => {
-      const customRollDie = jest.fn()
+      const customRollDie = jest
+        .fn()
         .mockReturnValueOnce(3) // First call (ignored in do-while loop)
         .mockReturnValueOnce(1) // Actual roll
 
@@ -333,11 +358,12 @@ describe("DiceService", () => {
     })
 
     it("rollExplodingDie with function that returns 6s then stops", () => {
-      const mockRoll = jest.fn()
+      const mockRoll = jest
+        .fn()
         .mockReturnValueOnce(2) // First call (ignored)
         .mockReturnValueOnce(6) // First actual roll - explodes
         .mockReturnValueOnce(6) // Second roll - explodes again
-        .mockReturnValueOnce(6) // Third roll - explodes again  
+        .mockReturnValueOnce(6) // Third roll - explodes again
         .mockReturnValueOnce(1) // Fourth roll - stops explosion
 
       const result = DiceService.rollExplodingDie(mockRoll)

@@ -4,20 +4,11 @@ import { FormStateType, FormStateAction } from "@/reducers"
 import { BaseDataGrid, FactionLink, VehicleLink } from "@/components/ui"
 import { VS } from "@/services"
 import { Avatar } from "@/components/avatars"
-import { PaginationMeta, Vehicle } from "@/types"
-
-interface FormStateData {
-  meta: PaginationMeta
-  page: number
-  sort: string
-  order: string
-  vehicles: Vehicle[]
-  drawerOpen: boolean
-}
+import { VehiclesTableFormState } from "@/types/forms"
 
 interface ViewProps {
-  formState: FormStateType<FormStateData>
-  dispatchForm: (action: FormStateAction<FormStateData>) => void
+  formState: FormStateType<VehiclesTableFormState>
+  dispatchForm: (action: FormStateAction<VehiclesTableFormState>) => void
 }
 
 const columns: GridColDef<Vehicle>[] = [

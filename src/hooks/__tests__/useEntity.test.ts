@@ -58,7 +58,9 @@ describe("useEntity", () => {
 
   describe("initialization", () => {
     it("derives correct function names from entity class", () => {
-      const { result } = renderHook(() => useEntity(mockEntity, mockDispatchForm))
+      const { result } = renderHook(() =>
+        useEntity(mockEntity, mockDispatchForm)
+      )
 
       // The hook should be set up with Character-specific methods
       expect(result.current).toBeDefined()
@@ -70,7 +72,7 @@ describe("useEntity", () => {
         entity_class: "Vehicle" as const,
       }
 
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useEntity(vehicleEntity, mockDispatchForm)
       )
 
@@ -85,7 +87,9 @@ describe("useEntity", () => {
       }
       mockClient.getCharacter.mockResolvedValue(mockResponse)
 
-      const { result } = renderHook(() => useEntity(mockEntity, mockDispatchForm))
+      const { result } = renderHook(() =>
+        useEntity(mockEntity, mockDispatchForm)
+      )
 
       let entities
       await act(async () => {
@@ -105,7 +109,9 @@ describe("useEntity", () => {
       const mockParams = { name: "test", active: true }
       mockClient.getCharacter.mockResolvedValue({ data: [] })
 
-      const { result } = renderHook(() => useEntity(mockEntity, mockDispatchForm))
+      const { result } = renderHook(() =>
+        useEntity(mockEntity, mockDispatchForm)
+      )
 
       await act(async () => {
         await result.current.getEntities(mockParams)
@@ -118,10 +124,14 @@ describe("useEntity", () => {
       const error = new Error("Network error")
       mockClient.getCharacter.mockRejectedValue(error)
 
-      const { result } = renderHook(() => useEntity(mockEntity, mockDispatchForm))
+      const { result } = renderHook(() =>
+        useEntity(mockEntity, mockDispatchForm)
+      )
 
       await act(async () => {
-        await expect(result.current.getEntities()).rejects.toThrow("Network error")
+        await expect(result.current.getEntities()).rejects.toThrow(
+          "Network error"
+        )
       })
 
       expect(mockDispatchForm).toHaveBeenCalledWith({
@@ -138,33 +148,48 @@ describe("useEntity", () => {
       const mockResponse = { data: updatedEntity }
       mockClient.updateCharacter.mockResolvedValue(mockResponse)
 
-      const { result } = renderHook(() => useEntity(mockEntity, mockDispatchForm))
+      const { result } = renderHook(() =>
+        useEntity(mockEntity, mockDispatchForm)
+      )
 
       await act(async () => {
         await result.current.updateEntity(updatedEntity)
       })
 
-      expect(mockClient.updateCharacter).toHaveBeenCalledWith(mockEntity.id, expect.any(FormData))
-      expect(mockToast.toastSuccess).toHaveBeenCalledWith("Character updated successfully")
+      expect(mockClient.updateCharacter).toHaveBeenCalledWith(
+        mockEntity.id,
+        expect.any(FormData)
+      )
+      expect(mockToast.toastSuccess).toHaveBeenCalledWith(
+        "Character updated successfully"
+      )
     })
 
     it("handles update error", async () => {
       const error = new Error("Update failed")
       mockClient.updateCharacter.mockRejectedValue(error)
 
-      const { result } = renderHook(() => useEntity(mockEntity, mockDispatchForm))
+      const { result } = renderHook(() =>
+        useEntity(mockEntity, mockDispatchForm)
+      )
 
       await act(async () => {
-        await expect(result.current.updateEntity(mockEntity)).rejects.toThrow("Update failed")
+        await expect(result.current.updateEntity(mockEntity)).rejects.toThrow(
+          "Update failed"
+        )
       })
 
-      expect(mockToast.toastError).toHaveBeenCalledWith("Error updating character.")
+      expect(mockToast.toastError).toHaveBeenCalledWith(
+        "Error updating character."
+      )
     })
 
     it("dispatches form actions during update", async () => {
       mockClient.updateCharacter.mockResolvedValue({ data: mockEntity })
 
-      const { result } = renderHook(() => useEntity(mockEntity, mockDispatchForm))
+      const { result } = renderHook(() =>
+        useEntity(mockEntity, mockDispatchForm)
+      )
 
       await act(async () => {
         await result.current.updateEntity(mockEntity)
@@ -183,14 +208,18 @@ describe("useEntity", () => {
     it("successfully deletes entity", async () => {
       mockClient.deleteCharacter.mockResolvedValue({ data: { success: true } })
 
-      const { result } = renderHook(() => useEntity(mockEntity, mockDispatchForm))
+      const { result } = renderHook(() =>
+        useEntity(mockEntity, mockDispatchForm)
+      )
 
       await act(async () => {
         await result.current.deleteEntity()
       })
 
       expect(mockClient.deleteCharacter).toHaveBeenCalledWith(mockEntity, {})
-      expect(mockToast.toastSuccess).toHaveBeenCalledWith("Character deleted successfully")
+      expect(mockToast.toastSuccess).toHaveBeenCalledWith(
+        "Character deleted successfully"
+      )
       expect(mockRouter.push).toHaveBeenCalledWith("/characters")
     })
 
@@ -198,13 +227,19 @@ describe("useEntity", () => {
       const error = new Error("Delete failed")
       mockClient.deleteCharacter.mockRejectedValue(error)
 
-      const { result } = renderHook(() => useEntity(mockEntity, mockDispatchForm))
+      const { result } = renderHook(() =>
+        useEntity(mockEntity, mockDispatchForm)
+      )
 
       await act(async () => {
-        await expect(result.current.deleteEntity()).rejects.toThrow("Delete failed")
+        await expect(result.current.deleteEntity()).rejects.toThrow(
+          "Delete failed"
+        )
       })
 
-      expect(mockToast.toastError).toHaveBeenCalledWith("Failed to delete entity. yeah")
+      expect(mockToast.toastError).toHaveBeenCalledWith(
+        "Failed to delete entity. yeah"
+      )
       expect(mockRouter.push).not.toHaveBeenCalled()
     })
 
@@ -212,7 +247,9 @@ describe("useEntity", () => {
       const vehicleEntity = { ...mockEntity, entity_class: "Vehicle" as const }
       mockClient.deleteVehicle.mockResolvedValue({ data: { success: true } })
 
-      const { result } = renderHook(() => useEntity(vehicleEntity, mockDispatchForm))
+      const { result } = renderHook(() =>
+        useEntity(vehicleEntity, mockDispatchForm)
+      )
 
       await act(async () => {
         await result.current.deleteEntity()
@@ -228,14 +265,20 @@ describe("useEntity", () => {
       const mockResponse = { data: newEntity }
       mockClient.createCharacter.mockResolvedValue(mockResponse)
 
-      const { result } = renderHook(() => useEntity(mockEntity, mockDispatchForm))
+      const { result } = renderHook(() =>
+        useEntity(mockEntity, mockDispatchForm)
+      )
 
       await act(async () => {
         await result.current.createEntity(newEntity, null)
       })
 
-      expect(mockClient.createCharacter).toHaveBeenCalledWith(expect.any(FormData))
-      expect(mockToast.toastSuccess).toHaveBeenCalledWith("Character created successfully")
+      expect(mockClient.createCharacter).toHaveBeenCalledWith(
+        expect.any(FormData)
+      )
+      expect(mockToast.toastSuccess).toHaveBeenCalledWith(
+        "Character created successfully"
+      )
     })
 
     it("handles create error", async () => {
@@ -243,13 +286,19 @@ describe("useEntity", () => {
       error.response = { data: { errors: { name: "is required" } } }
       mockClient.createCharacter.mockRejectedValue(error)
 
-      const { result } = renderHook(() => useEntity(mockEntity, mockDispatchForm))
+      const { result } = renderHook(() =>
+        useEntity(mockEntity, mockDispatchForm)
+      )
 
       await act(async () => {
-        await expect(result.current.createEntity(mockEntity, null)).rejects.toThrow("Create failed")
+        await expect(
+          result.current.createEntity(mockEntity, null)
+        ).rejects.toThrow("Create failed")
       })
 
-      expect(mockToast.toastError).toHaveBeenCalledWith("Error creating character.")
+      expect(mockToast.toastError).toHaveBeenCalledWith(
+        "Error creating character."
+      )
     })
   })
 
@@ -270,7 +319,9 @@ describe("useEntity", () => {
 
       testCases.forEach(({ entity_class, expectedPath }) => {
         const testEntity = { ...mockEntity, entity_class }
-        const { result } = renderHook(() => useEntity(testEntity, mockDispatchForm))
+        const { result } = renderHook(() =>
+          useEntity(testEntity, mockDispatchForm)
+        )
 
         expect(result.current).toBeDefined()
         // The hook should set up the correct pluralized path for navigation
@@ -282,7 +333,9 @@ describe("useEntity", () => {
     it("dispatches loading states correctly", async () => {
       mockClient.getCharacter.mockResolvedValue({ data: [mockEntity] })
 
-      const { result } = renderHook(() => useEntity(mockEntity, mockDispatchForm))
+      const { result } = renderHook(() =>
+        useEntity(mockEntity, mockDispatchForm)
+      )
 
       await act(async () => {
         await result.current.getEntities()
@@ -298,7 +351,9 @@ describe("useEntity", () => {
     it("integrates with form reducer actions", async () => {
       mockClient.updateCharacter.mockResolvedValue({ data: mockEntity })
 
-      const { result } = renderHook(() => useEntity(mockEntity, mockDispatchForm))
+      const { result } = renderHook(() =>
+        useEntity(mockEntity, mockDispatchForm)
+      )
 
       await act(async () => {
         await result.current.updateEntity(mockEntity)
@@ -313,38 +368,55 @@ describe("useEntity", () => {
     it("shows success toast for successful operations", async () => {
       mockClient.updateCharacter.mockResolvedValue({ data: mockEntity })
 
-      const { result } = renderHook(() => useEntity(mockEntity, mockDispatchForm))
+      const { result } = renderHook(() =>
+        useEntity(mockEntity, mockDispatchForm)
+      )
 
       await act(async () => {
         await result.current.updateEntity(mockEntity)
       })
 
-      expect(mockToast.toastSuccess).toHaveBeenCalledWith("Character updated successfully")
+      expect(mockToast.toastSuccess).toHaveBeenCalledWith(
+        "Character updated successfully"
+      )
     })
 
     it("shows error toast for failed operations", async () => {
       mockClient.updateCharacter.mockRejectedValue(new Error("Failed"))
 
-      const { result } = renderHook(() => useEntity(mockEntity, mockDispatchForm))
+      const { result } = renderHook(() =>
+        useEntity(mockEntity, mockDispatchForm)
+      )
 
       await act(async () => {
-        await expect(result.current.updateEntity(new FormData())).rejects.toThrow()
+        await expect(
+          result.current.updateEntity(new FormData())
+        ).rejects.toThrow()
       })
 
-      expect(mockToast.toastError).toHaveBeenCalledWith("Error updating character.")
+      expect(mockToast.toastError).toHaveBeenCalledWith(
+        "Error updating character."
+      )
     })
 
     it("customizes toast messages based on entity type", async () => {
-      const campaignEntity = { ...mockEntity, entity_class: "Campaign" as const }
+      const campaignEntity = {
+        ...mockEntity,
+        entity_class: "Campaign" as const,
+      }
       mockClient.updateCampaign.mockResolvedValue({ data: campaignEntity })
 
-      const { result } = renderHook(() => useEntity(campaignEntity, mockDispatchForm))
+      const { result } = renderHook(() =>
+        useEntity(campaignEntity, mockDispatchForm)
+      )
 
       await act(async () => {
         await result.current.updateEntity(mockEntity)
       })
 
-      expect(mockToast.toastSuccess).toHaveBeenCalledWith("Campaign updated successfully")
+      expect(mockToast.toastSuccess).toHaveBeenCalledWith(
+        "Campaign updated successfully"
+      )
     })
   })
 })

@@ -1,22 +1,17 @@
 "use client"
 
-import { 
-  Box, 
-  Container, 
-  Typography, 
+import {
+  Box,
+  Container,
+  Typography,
   Button,
   Stack,
   Grid,
-  Paper
+  Paper,
 } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import Link from "next/link"
-import {
-  RocketLaunch,
-  Login,
-  MenuBook,
-  Support
-} from "@mui/icons-material"
+import { RocketLaunch, Login, MenuBook, Support } from "@mui/icons-material"
 
 const CTASection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(10, 0),
@@ -93,18 +88,18 @@ const quickFeatures = [
   {
     icon: <RocketLaunch sx={{ fontSize: 40 }} />,
     title: "Quick Setup",
-    description: "Create your first campaign in under 5 minutes"
+    description: "Create your first campaign in under 5 minutes",
   },
   {
     icon: <MenuBook sx={{ fontSize: 40 }} />,
-    title: "Learn Fast", 
-    description: "Comprehensive documentation and tutorials"
+    title: "Learn Fast",
+    description: "Comprehensive documentation and tutorials",
   },
   {
     icon: <Support sx={{ fontSize: 40 }} />,
     title: "Expert Support",
-    description: "Active community and responsive help"
-  }
+    description: "Active community and responsive help",
+  },
 ]
 
 export function CallToAction() {
@@ -113,43 +108,42 @@ export function CallToAction() {
       <CTAContent maxWidth="lg">
         <Stack spacing={6}>
           <Box>
-            <Typography 
-              variant="h2" 
-              component="h2" 
+            <Typography
+              variant="h2"
+              component="h2"
               gutterBottom
-              sx={{ 
-                fontWeight: "bold", 
+              sx={{
+                fontWeight: "bold",
                 textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
-                mb: 3
+                mb: 3,
               }}
             >
               Your Epic Adventure Awaits
             </Typography>
-            
-            <Typography 
-              variant="h5" 
-              sx={{ 
+
+            <Typography
+              variant="h5"
+              sx={{
                 opacity: 0.9,
                 textShadow: "1px 1px 2px rgba(0, 0, 0, 0.5)",
-                maxWidth: 800, 
+                maxWidth: 800,
                 mx: "auto",
-                mb: 4
+                mb: 4,
               }}
             >
-              Join thousands of storytellers creating unforgettable cinematic campaigns. 
-              Experience the power of professional-grade RPG management tools.
+              Join thousands of storytellers creating unforgettable cinematic
+              campaigns. Experience the power of professional-grade RPG
+              management tools.
             </Typography>
           </Box>
-          
+
           {/* Quick Features */}
           <Grid container spacing={3}>
             {quickFeatures.map((feature, index) => (
               <Grid item xs={12} md={4} key={index}>
                 <FeatureHighlight elevation={0}>
                   <Stack spacing={2} alignItems="center">
-                    <Box sx={{ color: "white" }}>
-                      {feature.icon}
-                    </Box>
+                    <Box sx={{ color: "white" }}>{feature.icon}</Box>
                     <Typography variant="h6" fontWeight="bold">
                       {feature.title}
                     </Typography>
@@ -161,17 +155,17 @@ export function CallToAction() {
               </Grid>
             ))}
           </Grid>
-          
+
           {/* Main CTAs */}
-          <Stack 
-            direction={{ xs: "column", sm: "row" }} 
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
             spacing={3}
             justifyContent="center"
             alignItems="center"
           >
             <Link href="/users/sign_up" passHref>
-              <PrimaryCTA 
-                variant="contained" 
+              <PrimaryCTA
+                variant="contained"
                 size="large"
                 startIcon={<RocketLaunch />}
                 fullWidth={{ xs: true, sm: false }}
@@ -179,10 +173,10 @@ export function CallToAction() {
                 Start Your Legendary Campaign
               </PrimaryCTA>
             </Link>
-            
+
             <Link href="/login" passHref>
-              <SecondaryCTA 
-                variant="outlined" 
+              <SecondaryCTA
+                variant="outlined"
                 size="large"
                 startIcon={<Login />}
                 fullWidth={{ xs: true, sm: false }}
@@ -191,59 +185,60 @@ export function CallToAction() {
               </SecondaryCTA>
             </Link>
           </Stack>
-          
+
           {/* Secondary Actions */}
-          <Stack 
-            direction={{ xs: "column", sm: "row" }} 
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
             spacing={2}
             justifyContent="center"
             alignItems="center"
           >
             <Link href="/documentation" passHref>
-              <Button 
-                color="inherit" 
+              <Button
+                color="inherit"
                 sx={{ color: "white", textDecoration: "underline" }}
               >
                 Explore Documentation
               </Button>
             </Link>
-            
+
             <Typography variant="body2" sx={{ opacity: 0.7 }}>
               •
             </Typography>
-            
+
             <Link href="/support" passHref>
-              <Button 
-                color="inherit" 
+              <Button
+                color="inherit"
                 sx={{ color: "white", textDecoration: "underline" }}
               >
                 Get Support
               </Button>
             </Link>
-            
+
             <Typography variant="body2" sx={{ opacity: 0.7 }}>
               •
             </Typography>
-            
+
             <Link href="/about" passHref>
-              <Button 
-                color="inherit" 
+              <Button
+                color="inherit"
                 sx={{ color: "white", textDecoration: "underline" }}
               >
                 Learn About Chi War
               </Button>
             </Link>
           </Stack>
-          
+
           <Box>
-            <Typography 
-              variant="body1" 
-              sx={{ 
+            <Typography
+              variant="body1"
+              sx={{
                 opacity: 0.8,
-                fontStyle: "italic"
+                fontStyle: "italic",
               }}
             >
-              &ldquo;Master the Art of Cinematic Combat. Forge Legends Across Time.&rdquo;
+              &ldquo;Master the Art of Cinematic Combat. Forge Legends Across
+              Time.&rdquo;
             </Typography>
           </Box>
         </Stack>

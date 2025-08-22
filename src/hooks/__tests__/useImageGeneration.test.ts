@@ -65,7 +65,7 @@ describe("useImageGeneration", () => {
     })
 
     it("handles string campaignId", () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useImageGeneration({ ...defaultProps, campaignId: "string-campaign" })
       )
 
@@ -73,7 +73,7 @@ describe("useImageGeneration", () => {
     })
 
     it("handles numeric campaignId", () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useImageGeneration({ ...defaultProps, campaignId: 123 })
       )
 
@@ -93,7 +93,9 @@ describe("useImageGeneration", () => {
         await result.current.generateImages()
       })
 
-      expect(mockClient.generateAiImages).toHaveBeenCalledWith({ entity: mockEntity })
+      expect(mockClient.generateAiImages).toHaveBeenCalledWith({
+        entity: mockEntity,
+      })
     })
 
     it("dispatches form actions for image generation start", async () => {
@@ -159,15 +161,20 @@ describe("useImageGeneration", () => {
 
     beforeEach(() => {
       mockClient.generateAiImages.mockResolvedValue({ data: { success: true } })
-      mockConsumerInstance.subscriptions.create.mockImplementation((channel, handlers) => {
-        receivedCallback = handlers.received
-        return mockSubscription
-      })
+      mockConsumerInstance.subscriptions.create.mockImplementation(
+        (channel, handlers) => {
+          receivedCallback = handlers.received
+          return mockSubscription
+        }
+      )
     })
 
     it("handles preview_ready message with image URLs", async () => {
       const { result } = renderHook(() => useImageGeneration(defaultProps))
-      const testImageUrls = ["http://example.com/image1.jpg", "http://example.com/image2.jpg"]
+      const testImageUrls = [
+        "http://example.com/image1.jpg",
+        "http://example.com/image2.jpg",
+      ]
 
       await act(async () => {
         await result.current.generateImages()
@@ -282,7 +289,9 @@ describe("useImageGeneration", () => {
 
   describe("subscription cleanup", () => {
     it("unsubscribes on component unmount", async () => {
-      const { result, unmount } = renderHook(() => useImageGeneration(defaultProps))
+      const { result, unmount } = renderHook(() =>
+        useImageGeneration(defaultProps)
+      )
 
       await act(async () => {
         await result.current.generateImages()
@@ -294,7 +303,9 @@ describe("useImageGeneration", () => {
     })
 
     it("handles multiple subscription cleanup calls safely", async () => {
-      const { result, unmount } = renderHook(() => useImageGeneration(defaultProps))
+      const { result, unmount } = renderHook(() =>
+        useImageGeneration(defaultProps)
+      )
 
       await act(async () => {
         await result.current.generateImages()
@@ -334,7 +345,7 @@ describe("useImageGeneration", () => {
         entity_class: "Vehicle" as const,
       }
 
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useImageGeneration({ ...defaultProps, entity: vehicleEntity })
       )
 
@@ -342,7 +353,9 @@ describe("useImageGeneration", () => {
         await result.current.generateImages()
       })
 
-      expect(mockClient.generateAiImages).toHaveBeenCalledWith({ entity: vehicleEntity })
+      expect(mockClient.generateAiImages).toHaveBeenCalledWith({
+        entity: vehicleEntity,
+      })
     })
 
     it("handles missing entity properties gracefully", async () => {
@@ -354,7 +367,7 @@ describe("useImageGeneration", () => {
         updated_at: "2023-01-01T00:00:00.000Z",
       }
 
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useImageGeneration({ ...defaultProps, entity: minimalEntity })
       )
 
@@ -362,7 +375,9 @@ describe("useImageGeneration", () => {
         await result.current.generateImages()
       })
 
-      expect(mockClient.generateAiImages).toHaveBeenCalledWith({ entity: minimalEntity })
+      expect(mockClient.generateAiImages).toHaveBeenCalledWith({
+        entity: minimalEntity,
+      })
     })
 
     it("maintains pending state correctly through error scenarios", async () => {

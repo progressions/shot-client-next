@@ -8,6 +8,15 @@ export type CharacterType =
   | "Boss"
   | "Uber-Boss"
 
+export enum CharacterTypes {
+  PC = "PC",
+  Ally = "Ally",
+  Mook = "Mook",
+  FeaturedFoe = "Featured Foe",
+  Boss = "Boss",
+  UberBoss = "Uber-Boss",
+}
+
 export enum DescriptionKeys {
   Nicknames = "Nicknames",
   Age = "Age",

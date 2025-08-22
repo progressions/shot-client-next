@@ -1,23 +1,8 @@
 "use client"
 import { GridColDef } from "@mui/x-data-grid"
-import { FormStateType, FormStateAction } from "@/reducers"
+import { FightTableProps } from "@/types"
 import { MembersGroup, BaseDataGrid, FightLink } from "@/components/ui"
 import { Avatar } from "@/components/avatars"
-import { PaginationMeta, Fight } from "@/types"
-
-interface FormStateData {
-  meta: PaginationMeta
-  page: number
-  sort: string
-  order: string
-  fights: Fight[]
-  drawerOpen: boolean
-}
-
-interface ViewProps {
-  formState: FormStateType<FormStateData>
-  dispatchForm: (action: FormStateAction<FormStateData>) => void
-}
 
 const columns: GridColDef<Fight>[] = [
   {
@@ -87,7 +72,7 @@ const columns: GridColDef<Fight>[] = [
   },
 ]
 
-export default function View({ formState, dispatchForm }: ViewProps) {
+export default function View({ formState, dispatchForm }: FightTableProps) {
   const { fights } = formState.data
   const rows = fights.map(fight => ({
     ...fight,

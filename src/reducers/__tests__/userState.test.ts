@@ -495,7 +495,7 @@ describe("userState reducer", () => {
       state = userReducer(state, {
         type: UserActions.RESET,
       })
-      
+
       expect(state.saving).toBe(false)
       expect(state.user).toBe(mockUser)
       expect(state.edited).toBe(false)

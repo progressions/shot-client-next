@@ -1,20 +1,9 @@
 "use client"
 
 import { Avatar, Typography, Stack } from "@mui/material"
-import type { Entity } from "@/types"
-import type { SystemStyleObject, Theme } from "@mui/system"
+import type { BadgeProps, Entity } from "@/types"
 import { useCampaign } from "@/contexts"
 import { useState, useEffect } from "react"
-
-type BadgeProperties = {
-  name?: string
-  entity: Entity
-  size?: "sm" | "md" | "lg"
-  title: React.ReactNode
-  children: React.ReactNode
-  disableAvatar?: boolean
-  sx?: SystemStyleObject<Theme>
-}
 
 const sizes = {
   sm: {
@@ -42,7 +31,7 @@ export default function Badge({
   children,
   disableAvatar = false,
   sx = {},
-}: BadgeProperties) {
+}: BadgeProps) {
   const { campaignData } = useCampaign()
   const [entity, setEntity] = useState<Entity>(initialEntity)
   const { avatar, titleFont, subtitleFont } = sizes[size]

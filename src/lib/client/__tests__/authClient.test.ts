@@ -1,18 +1,27 @@
 import { AxiosResponse } from "axios"
 import { createAuthClient } from "../authClient"
 import { createBaseClient } from "../baseClient"
-import type { User, PasswordWithConfirmation, UsersResponse, ConfirmationResponse } from "@/types"
+import type {
+  User,
+  PasswordWithConfirmation,
+  UsersResponse,
+  ConfirmationResponse,
+} from "@/types"
 
 // Mock the baseClient
 jest.mock("../baseClient")
-const mockCreateBaseClient = createBaseClient as jest.MockedFunction<typeof createBaseClient>
+const mockCreateBaseClient = createBaseClient as jest.MockedFunction<
+  typeof createBaseClient
+>
 
 describe("createAuthClient", () => {
   // Mock API objects
   const mockApi = {
     registerUser: jest.fn(() => "/api/v1/users"),
-    adminUsers: jest.fn((user: User | string) => 
-      typeof user === 'string' ? `/api/v1/admin/users/${user}` : `/api/v1/admin/users/${user.id}`
+    adminUsers: jest.fn((user: User | string) =>
+      typeof user === "string"
+        ? `/api/v1/admin/users/${user}`
+        : `/api/v1/admin/users/${user.id}`
     ),
     unlockUser: jest.fn(() => "/api/v1/users/unlock"),
     confirmUser: jest.fn(() => "/api/v1/users/confirm"),
@@ -20,7 +29,7 @@ describe("createAuthClient", () => {
   }
 
   const mockApiV2 = {
-    users: jest.fn((user?: User | { id: string }) => 
+    users: jest.fn((user?: User | { id: string }) =>
       user ? `/api/v2/users/${user.id}` : "/api/v2/users"
     ),
     currentUser: jest.fn(() => "/api/v2/users/current"),
@@ -29,7 +38,7 @@ describe("createAuthClient", () => {
   const mockQueryParams = jest.fn((params: Record<string, unknown>) => {
     return Object.entries(params)
       .map(([key, value]) => `${key}=${value}`)
-      .join('&')
+      .join("&")
   })
 
   // Mock base client methods
@@ -87,7 +96,7 @@ describe("createAuthClient", () => {
     jest.clearAllMocks()
     mockCreateBaseClient.mockReturnValue(mockBaseClient)
     authClient = createAuthClient(deps)
-    
+
     // Default successful responses
     mockGet.mockResolvedValue(mockResponse)
     mockGetPublic.mockResolvedValue(mockResponse)
@@ -116,27 +125,38 @@ describe("createAuthClient", () => {
       await authClient.updateUser(mockUser)
 
       expect(mockApi.adminUsers).toHaveBeenCalledWith(mockUser)
-      expect(mockPatch).toHaveBeenCalledWith(`/api/v1/admin/users/${mockUser.id}`, { user: mockUser })
+      expect(mockPatch).toHaveBeenCalledWith(
+        `/api/v1/admin/users/${mockUser.id}`,
+        { user: mockUser }
+      )
     })
 
     it("updates user via V2 API with FormData", async () => {
       const formData = new FormData()
       formData.append("first_name", "Updated")
-      
+
       await authClient.updateUser(mockUser.id, formData)
 
       expect(mockApiV2.users).toHaveBeenCalledWith({ id: mockUser.id })
-      expect(mockRequestFormData).toHaveBeenCalledWith("PATCH", `/api/v2/users/${mockUser.id}`, formData)
+      expect(mockRequestFormData).toHaveBeenCalledWith(
+        "PATCH",
+        `/api/v2/users/${mockUser.id}`,
+        formData
+      )
     })
 
     it("handles string ID parameter correctly", async () => {
       const userId = "user-456"
       const formData = new FormData()
-      
+
       await authClient.updateUser(userId, formData)
 
       expect(mockApiV2.users).toHaveBeenCalledWith({ id: userId })
-      expect(mockRequestFormData).toHaveBeenCalledWith("PATCH", `/api/v2/users/${userId}`, formData)
+      expect(mockRequestFormData).toHaveBeenCalledWith(
+        "PATCH",
+        `/api/v2/users/${userId}`,
+        formData
+      )
     })
   })
 
@@ -154,7 +174,9 @@ describe("createAuthClient", () => {
       await authClient.deleteUserImage(mockUser)
 
       expect(mockApiV2.users).toHaveBeenCalledWith(mockUser)
-      expect(mockDelete).toHaveBeenCalledWith(`/api/v2/users/${mockUser.id}/image`)
+      expect(mockDelete).toHaveBeenCalledWith(
+        `/api/v2/users/${mockUser.id}/image`
+      )
     })
   })
 
@@ -163,7 +185,11 @@ describe("createAuthClient", () => {
       await authClient.getUser(mockUser)
 
       expect(mockApi.adminUsers).toHaveBeenCalledWith(mockUser)
-      expect(mockGet).toHaveBeenCalledWith(`/api/v1/admin/users/${mockUser.id}`, {}, {})
+      expect(mockGet).toHaveBeenCalledWith(
+        `/api/v1/admin/users/${mockUser.id}`,
+        {},
+        {}
+      )
     })
 
     it("handles string user parameter", async () => {
@@ -171,7 +197,11 @@ describe("createAuthClient", () => {
       await authClient.getUser(userId)
 
       expect(mockApi.adminUsers).toHaveBeenCalledWith(userId)
-      expect(mockGet).toHaveBeenCalledWith(`/api/v1/admin/users/${userId}`, {}, {})
+      expect(mockGet).toHaveBeenCalledWith(
+        `/api/v1/admin/users/${userId}`,
+        {},
+        {}
+      )
     })
 
     it("passes cache options", async () => {
@@ -179,8 +209,8 @@ describe("createAuthClient", () => {
       await authClient.getUser(mockUser, cacheOptions)
 
       expect(mockGet).toHaveBeenCalledWith(
-        `/api/v1/admin/users/${mockUser.id}`, 
-        {}, 
+        `/api/v1/admin/users/${mockUser.id}`,
+        {},
         cacheOptions
       )
     })
@@ -198,7 +228,11 @@ describe("createAuthClient", () => {
       const cacheOptions = { cache: "no-store" as const }
       await authClient.getCurrentUser(cacheOptions)
 
-      expect(mockGet).toHaveBeenCalledWith("/api/v2/users/current", {}, cacheOptions)
+      expect(mockGet).toHaveBeenCalledWith(
+        "/api/v2/users/current",
+        {},
+        cacheOptions
+      )
     })
   })
 
@@ -208,7 +242,9 @@ describe("createAuthClient", () => {
       await authClient.unlockUser(unlockToken)
 
       expect(mockApi.unlockUser).toHaveBeenCalled()
-      expect(mockGet).toHaveBeenCalledWith("/api/v1/users/unlock?unlock_token=unlock-123")
+      expect(mockGet).toHaveBeenCalledWith(
+        "/api/v1/users/unlock?unlock_token=unlock-123"
+      )
     })
   })
 
@@ -218,8 +254,8 @@ describe("createAuthClient", () => {
       await authClient.confirmUser(confirmationToken)
 
       expect(mockApi.confirmUser).toHaveBeenCalled()
-      expect(mockPost).toHaveBeenCalledWith("/api/v1/users/confirm", { 
-        confirmation_token: confirmationToken 
+      expect(mockPost).toHaveBeenCalledWith("/api/v1/users/confirm", {
+        confirmation_token: confirmationToken,
       })
     })
   })
@@ -251,8 +287,8 @@ describe("createAuthClient", () => {
       await authClient.sendResetPasswordLink(email)
 
       expect(mockApi.resetUserPassword).toHaveBeenCalled()
-      expect(mockPost).toHaveBeenCalledWith("/api/v1/users/password", { 
-        user: { email: email } 
+      expect(mockPost).toHaveBeenCalledWith("/api/v1/users/password", {
+        user: { email: email },
       })
     })
   })
@@ -262,17 +298,17 @@ describe("createAuthClient", () => {
       const resetToken = "reset-123"
       const password: PasswordWithConfirmation = {
         password: "newpassword123",
-        password_confirmation: "newpassword123"
+        password_confirmation: "newpassword123",
       }
 
       await authClient.resetUserPassword(resetToken, password)
 
       expect(mockApi.resetUserPassword).toHaveBeenCalled()
       expect(mockPatch).toHaveBeenCalledWith("/api/v1/users/password", {
-        user: { 
-          ...password, 
-          reset_password_token: resetToken 
-        }
+        user: {
+          ...password,
+          reset_password_token: resetToken,
+        },
       })
     })
   })
@@ -303,7 +339,11 @@ describe("createAuthClient", () => {
       await authClient.getPlayers(parameters)
 
       expect(mockQueryParams).toHaveBeenCalledWith(parameters)
-      expect(mockGet).toHaveBeenCalledWith("/api/v2/users?page=2&limit=10&gamemaster=false", {}, {})
+      expect(mockGet).toHaveBeenCalledWith(
+        "/api/v2/users?page=2&limit=10&gamemaster=false",
+        {},
+        {}
+      )
     })
 
     it("passes cache options", async () => {
@@ -330,11 +370,15 @@ describe("createAuthClient", () => {
     it("gets current users with parameters and cache options", async () => {
       const parameters = { active: true }
       const cacheOptions = { cache: "no-store" as const }
-      
+
       await authClient.getCurrentUsers(parameters, cacheOptions)
 
       expect(mockQueryParams).toHaveBeenCalledWith(parameters)
-      expect(mockGet).toHaveBeenCalledWith("/api/v2/users?active=true", {}, cacheOptions)
+      expect(mockGet).toHaveBeenCalledWith(
+        "/api/v2/users?active=true",
+        {},
+        cacheOptions
+      )
     })
   })
 
@@ -353,11 +397,15 @@ describe("createAuthClient", () => {
 
     it("gets all users with query parameters", async () => {
       const parameters = { search: "test", sort: "name" }
-      
+
       await authClient.getUsers(parameters)
 
       expect(mockQueryParams).toHaveBeenCalledWith(parameters)
-      expect(mockGet).toHaveBeenCalledWith("/api/v2/users?search=test&sort=name", {}, {})
+      expect(mockGet).toHaveBeenCalledWith(
+        "/api/v2/users?search=test&sort=name",
+        {},
+        {}
+      )
     })
   })
 
@@ -391,7 +439,9 @@ describe("createAuthClient", () => {
       const authError = new Error("Unauthorized")
       mockPost.mockRejectedValue(authError)
 
-      await expect(authClient.createUser(mockUser)).rejects.toThrow("Unauthorized")
+      await expect(authClient.createUser(mockUser)).rejects.toThrow(
+        "Unauthorized"
+      )
     })
 
     it("propagates network errors from getCurrentUser", async () => {
@@ -408,11 +458,12 @@ describe("createAuthClient", () => {
       const resetToken = "reset-123"
       const password: PasswordWithConfirmation = {
         password: "new123",
-        password_confirmation: "different123"
+        password_confirmation: "different123",
       }
 
-      await expect(authClient.resetUserPassword(resetToken, password))
-        .rejects.toThrow("Password confirmation doesn't match")
+      await expect(
+        authClient.resetUserPassword(resetToken, password)
+      ).rejects.toThrow("Password confirmation doesn't match")
     })
 
     it("propagates form data upload errors from updateUser", async () => {
@@ -420,9 +471,10 @@ describe("createAuthClient", () => {
       mockRequestFormData.mockRejectedValue(uploadError)
 
       const formData = new FormData()
-      
-      await expect(authClient.updateUser(mockUser.id, formData))
-        .rejects.toThrow("File too large")
+
+      await expect(
+        authClient.updateUser(mockUser.id, formData)
+      ).rejects.toThrow("File too large")
     })
   })
 })

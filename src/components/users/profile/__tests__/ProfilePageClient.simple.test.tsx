@@ -17,11 +17,7 @@ const MockProfilePageClient = ({ user }: { user: User }) => (
         defaultValue={user.last_name}
         data-testid="last-name-input"
       />
-      <input
-        name="email"
-        defaultValue={user.email}
-        data-testid="email-input"
-      />
+      <input name="email" defaultValue={user.email} data-testid="email-input" />
     </form>
   </div>
 )
@@ -64,7 +60,9 @@ describe("ProfilePageClient (Simplified)", () => {
 
     expect(screen.getByTestId("first-name-input")).toHaveValue("John")
     expect(screen.getByTestId("last-name-input")).toHaveValue("Doe")
-    expect(screen.getByTestId("email-input")).toHaveValue("john.doe@example.com")
+    expect(screen.getByTestId("email-input")).toHaveValue(
+      "john.doe@example.com"
+    )
   })
 
   it("renders profile page heading", () => {

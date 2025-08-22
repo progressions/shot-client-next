@@ -2,103 +2,15 @@
 
 // @/reducers/index.tsx
 import { useReducer, useMemo } from "react"
+import {
+  FormActions,
+  FormStateType,
+  FormStateAction,
+} from "@/types"
 
-export enum FormActions {
-  EDIT = "edit",
-  OPEN = "open",
-  SUBMIT = "submit",
-  DISABLE = "disable",
-  LOADING = "loading",
-  ERROR = "error",
-  ERRORS = "errors",
-  STATUS = "status",
-  SUCCESS = "success",
-  UPDATE = "update",
-  RESET = "reset",
-}
-
-interface EditAction {
-  type: FormActions.EDIT
-  name?: string
-  value?: string | boolean | number
-}
-
-interface SubmitAction {
-  type: FormActions.SUBMIT
-}
-
-interface UpdateAction {
-  type: FormActions.UPDATE
-  name: string
-  value: unknown
-}
-
-interface OpenAction {
-  type: FormActions.OPEN
-  payload: boolean
-}
-
-interface DisableAction {
-  type: FormActions.DISABLE
-  payload: boolean
-}
-
-interface LoadingAction {
-  type: FormActions.LOADING
-  payload: boolean
-}
-
-interface ErrorAction {
-  type: FormActions.ERROR
-  name: string
-  value: string | null
-}
-
-interface ErrorsAction {
-  type: FormActions.ERRORS
-  payload: string | null
-}
-
-interface StatusAction {
-  type: FormActions.STATUS
-  severity: string
-  message: unknown
-}
-
-interface SuccessAction {
-  type: FormActions.SUCCESS
-  payload: string | null
-}
-
-interface ResetAction<T> {
-  type: FormActions.RESET
-  payload: FormStateType<T>
-}
-
-export interface FormStateType<T> {
-  edited: boolean
-  loading: boolean
-  saving: boolean
-  disabled: boolean
-  open: boolean
-  errors: { [key: string]: string }
-  status: { severity: string; message: string } | null
-  success: string | null
-  data: T
-}
-
-export type FormStateAction<T> =
-  | EditAction
-  | SubmitAction
-  | UpdateAction
-  | OpenAction
-  | DisableAction
-  | LoadingAction
-  | ErrorAction
-  | ErrorsAction
-  | StatusAction
-  | SuccessAction
-  | ResetAction<T>
+// Re-export types for backward compatibility
+export { FormActions } from "@/types"
+export type { FormStateType, FormStateAction } from "@/types"
 
 export function initializeFormState<T extends Record<string, unknown>>(
   data: T | null = null
@@ -242,7 +154,18 @@ export function useForm<T extends Record<string, unknown>>(initialData: T) {
       ...formState,
       data: formState.data,
     }),
-    [formState.data, formState.loading, formState.error, formState.edited, formState.saving, formState.disabled, formState.open, formState.errors, formState.status, formState.success]
+    [
+      formState.data,
+      formState.loading,
+      formState.error,
+      formState.edited,
+      formState.saving,
+      formState.disabled,
+      formState.open,
+      formState.errors,
+      formState.status,
+      formState.success,
+    ]
   )
   return { formState: memoizedFormState, dispatchForm, initialFormState }
 }

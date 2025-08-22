@@ -79,7 +79,7 @@ describe("EmailChangeConfirmation", () => {
     // Material-UI Dialog handles Escape through onClose prop, which should call onCancel
     // Simulate this by checking that onCancel is defined and can be called
     expect(onCancel).toBeDefined()
-    
+
     // Test the handler directly since Material-UI's built-in Escape handling is hard to test
     onCancel()
     expect(onCancel).toHaveBeenCalledTimes(1)

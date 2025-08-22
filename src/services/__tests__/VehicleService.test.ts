@@ -1,8 +1,13 @@
-import { VS, CS } from "@/services"
+import { VS } from "@/services"
 import type { Vehicle, Person } from "@/types"
 import { defaultVehicle } from "@/types/defaults"
-import { brickMobile, copCar, battleTruck, motorcycles } from "@/__tests__/factories/Vehicles"
-import { brick, carolina, shing } from "@/__tests__/factories/Characters"
+import {
+  brickMobile,
+  copCar,
+  battleTruck,
+  motorcycles,
+} from "@/__tests__/factories/Vehicles"
+import { brick, shing } from "@/__tests__/factories/Characters"
 
 describe("VehicleService", () => {
   describe("mainAttackValue", () => {
@@ -13,7 +18,7 @@ describe("VehicleService", () => {
     it("returns 7 if there's no driver", () => {
       const vehicleWithoutDriver: Vehicle = {
         ...defaultVehicle,
-        driver: undefined
+        driver: undefined,
       }
       expect(VS.mainAttackValue(vehicleWithoutDriver)).toBe(7)
     })
@@ -21,7 +26,7 @@ describe("VehicleService", () => {
     it("returns the driver's Driving skill modified by impairments", () => {
       const impairedVehicle: Vehicle = {
         ...brickMobile,
-        impairments: 1
+        impairments: 1,
       }
       // Brick doesn't have explicit Driving skill, so defaults to 7, minus 1 impairment = 6
       expect(VS.mainAttackValue(impairedVehicle)).toBe(6)
@@ -37,7 +42,7 @@ describe("VehicleService", () => {
     it("returns Acceleration without impairment modification", () => {
       const impairedVehicle: Vehicle = {
         ...brickMobile,
-        impairments: 2
+        impairments: 2,
       }
       expect(VS.speed(impairedVehicle)).toBe(8) // Speed not affected by impairments
     })
@@ -74,13 +79,21 @@ describe("VehicleService", () => {
 
   describe("position and role", () => {
     it("should identify pursuer vehicles", () => {
-      const pursuerVehicle = VS.updateActionValue(brickMobile, "Pursuer", "true")
+      const pursuerVehicle = VS.updateActionValue(
+        brickMobile,
+        "Pursuer",
+        "true"
+      )
       expect(VS.isPursuer(pursuerVehicle)).toBe(true)
       expect(VS.isEvader(pursuerVehicle)).toBe(false)
     })
 
     it("should identify evader vehicles", () => {
-      const evaderVehicle = VS.updateActionValue(brickMobile, "Pursuer", "false")
+      const evaderVehicle = VS.updateActionValue(
+        brickMobile,
+        "Pursuer",
+        "false"
+      )
       expect(VS.isEvader(evaderVehicle)).toBe(true)
       expect(VS.isPursuer(evaderVehicle)).toBe(false)
     })
@@ -99,12 +112,20 @@ describe("VehicleService", () => {
 
   describe("chase and condition points", () => {
     it("should return chase points", () => {
-      const vehicleWithPoints = VS.updateActionValue(brickMobile, "Chase Points", 15)
+      const vehicleWithPoints = VS.updateActionValue(
+        brickMobile,
+        "Chase Points",
+        15
+      )
       expect(VS.chasePoints(vehicleWithPoints)).toBe(15)
     })
 
     it("should return condition points", () => {
-      const vehicleWithPoints = VS.updateActionValue(brickMobile, "Condition Points", 8)
+      const vehicleWithPoints = VS.updateActionValue(
+        brickMobile,
+        "Condition Points",
+        8
+      )
       expect(VS.conditionPoints(vehicleWithPoints)).toBe(8)
     })
   })
@@ -127,50 +148,50 @@ describe("VehicleService", () => {
     it("should combine driver and vehicle impairments", () => {
       const impairedDriver: Person = {
         ...brick,
-        impairments: 1
+        impairments: 1,
       }
       const impairedVehicle: Vehicle = {
         ...brickMobile,
         driver: impairedDriver,
-        impairments: 1
+        impairments: 1,
       }
-      
+
       expect(VS.totalImpairments(impairedVehicle)).toBe(2)
     })
 
     it("should cap impairments at 2", () => {
       const veryImpairedDriver: Person = {
         ...brick,
-        impairments: 3
+        impairments: 3,
       }
       const veryImpairedVehicle: Vehicle = {
         ...brickMobile,
         driver: veryImpairedDriver,
-        impairments: 3
+        impairments: 3,
       }
-      
+
       expect(VS.totalImpairments(veryImpairedVehicle)).toBe(2)
     })
 
     it("should ignore impairments for boss vehicles", () => {
       const impairedBoss: Vehicle = {
         ...battleTruck,
-        impairments: 2
+        impairments: 2,
       }
-      
+
       expect(VS.totalImpairments(impairedBoss)).toBe(0)
     })
 
     it("should ignore impairments for vehicles with boss drivers", () => {
       const bossDriver: Person = {
-        ...shing // shing is a Boss
+        ...shing, // shing is a Boss
       }
       const vehicleWithBossDriver: Vehicle = {
         ...brickMobile,
         driver: bossDriver,
-        impairments: 2
+        impairments: 2,
       }
-      
+
       expect(VS.totalImpairments(vehicleWithBossDriver)).toBe(0)
     })
   })
@@ -178,22 +199,30 @@ describe("VehicleService", () => {
   describe("chase actions", () => {
     it("should handle evade action", () => {
       const [updatedAttacker, updatedTarget] = VS.evade(brickMobile, 10, copCar)
-      
+
       expect(updatedAttacker).toEqual(brickMobile) // Attacker unchanged
       expect(VS.chasePoints(updatedTarget)).toBe(2) // 10 - 8 handling = 2 chase points
     })
 
     it("should handle narrowTheGap action", () => {
-      const [updatedAttacker, updatedTarget] = VS.narrowTheGap(brickMobile, 10, copCar)
-      
+      const [updatedAttacker, updatedTarget] = VS.narrowTheGap(
+        brickMobile,
+        10,
+        copCar
+      )
+
       expect(VS.position(updatedAttacker)).toBe("near")
       expect(VS.position(updatedTarget)).toBe("near")
       expect(VS.chasePoints(updatedTarget)).toBe(2) // 10 - 8 handling = 2 chase points
     })
 
     it("should handle widenTheGap action", () => {
-      const [updatedAttacker, updatedTarget] = VS.widenTheGap(brickMobile, 10, copCar)
-      
+      const [updatedAttacker, updatedTarget] = VS.widenTheGap(
+        brickMobile,
+        10,
+        copCar
+      )
+
       expect(VS.position(updatedAttacker)).toBe("far")
       expect(VS.position(updatedTarget)).toBe("far")
       expect(VS.chasePoints(updatedTarget)).toBe(2) // 10 - 8 handling = 2 chase points
