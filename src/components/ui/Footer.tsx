@@ -25,6 +25,12 @@ const footerColumns: FooterColumn[] = [
     links: [
       { label: "Documentation", href: "/documentation" },
       {
+        label: "Blog",
+        href: "https://isaacpriestley.com/blog",
+        target: "_blank",
+        rel: "noopener noreferrer",
+      },
+      {
         label: "GitHub",
         href: "https://github.com/progressions/shot-counter",
         target: "_blank",
