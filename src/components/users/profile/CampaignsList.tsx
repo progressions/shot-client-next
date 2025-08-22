@@ -1,7 +1,18 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { Box, Stack, Typography, Button, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip } from "@mui/material"
+import {
+  Box,
+  Stack,
+  Typography,
+  Button,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Tooltip,
+} from "@mui/material"
 import CancelIcon from "@mui/icons-material/Cancel"
 import { CampaignBadge } from "@/components/badges"
 import { SectionHeader, Icon } from "@/components/ui"
@@ -13,7 +24,10 @@ interface CampaignsListProps {
   onUserUpdate: (user: User) => void
 }
 
-export default function CampaignsList({ user, onUserUpdate }: CampaignsListProps) {
+export default function CampaignsList({
+  user,
+  onUserUpdate,
+}: CampaignsListProps) {
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
   const { campaign: currentCampaign, setCurrentCampaign } = useCampaign()
@@ -23,43 +37,60 @@ export default function CampaignsList({ user, onUserUpdate }: CampaignsListProps
   const campaigns = user.campaigns || []
   const playerCampaigns = user.player_campaigns || []
 
-  const handleLeaveCampaign = useCallback(async (campaign: Campaign) => {
-    if (!campaign) return
-    
-    setIsLeaving(true)
-    try {
-      await client.removePlayer(user, campaign)
-      
-      // Check if leaving campaign is the current active campaign
-      const isLeavingCurrentCampaign = currentCampaign?.id === campaign.id
-      
-      // Clear current campaign if user is leaving their active campaign
-      if (isLeavingCurrentCampaign) {
-        await setCurrentCampaign(null)
+  const handleLeaveCampaign = useCallback(
+    async (campaign: Campaign) => {
+      if (!campaign) return
+
+      setIsLeaving(true)
+      try {
+        await client.removePlayer(user, campaign)
+
+        // Check if leaving campaign is the current active campaign
+        const isLeavingCurrentCampaign = currentCampaign?.id === campaign.id
+
+        // Clear current campaign if user is leaving their active campaign
+        if (isLeavingCurrentCampaign) {
+          await setCurrentCampaign(null)
+        }
+
+        // Update user object by removing the campaign from player_campaigns
+        const updatedUser = {
+          ...user,
+          player_campaigns: playerCampaigns.filter(c => c.id !== campaign.id),
+        }
+
+        onUserUpdate(updatedUser)
+        toastSuccess(`Left campaign "${campaign.name}"`)
+        setLeavingCampaign(null)
+      } catch (error: unknown) {
+        console.error("Failed to leave campaign:", error)
+
+        // Handle specific error for gamemasters trying to leave their own campaigns
+        if (
+          (error as { response?: { status?: number } })?.response?.status ===
+          403
+        ) {
+          toastError(
+            "Gamemasters cannot leave their own campaigns. Transfer ownership or archive the campaign instead."
+          )
+        } else {
+          toastError("Failed to leave campaign")
+        }
+      } finally {
+        setIsLeaving(false)
       }
-      
-      // Update user object by removing the campaign from player_campaigns
-      const updatedUser = {
-        ...user,
-        player_campaigns: playerCampaigns.filter(c => c.id !== campaign.id)
-      }
-      
-      onUserUpdate(updatedUser)
-      toastSuccess(`Left campaign "${campaign.name}"`)
-      setLeavingCampaign(null)
-    } catch (error: unknown) {
-      console.error("Failed to leave campaign:", error)
-      
-      // Handle specific error for gamemasters trying to leave their own campaigns
-      if ((error as { response?: { status?: number } })?.response?.status === 403) {
-        toastError("Gamemasters cannot leave their own campaigns. Transfer ownership or archive the campaign instead.")
-      } else {
-        toastError("Failed to leave campaign")
-      }
-    } finally {
-      setIsLeaving(false)
-    }
-  }, [client, user, playerCampaigns, currentCampaign, setCurrentCampaign, onUserUpdate, toastSuccess, toastError])
+    },
+    [
+      client,
+      user,
+      playerCampaigns,
+      currentCampaign,
+      setCurrentCampaign,
+      onUserUpdate,
+      toastSuccess,
+      toastError,
+    ]
+  )
 
   const handleLeaveClick = (campaign: Campaign) => {
     setLeavingCampaign(campaign)
@@ -77,9 +108,14 @@ export default function CampaignsList({ user, onUserUpdate }: CampaignsListProps
           icon={<Icon keyword="Campaign" />}
           sx={{ mb: 2 }}
         >
-          You are not currently part of any campaigns. Ask a gamemaster to invite you!
+          You are not currently part of any campaigns. Ask a gamemaster to
+          invite you!
         </SectionHeader>
-        <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", py: 4 }}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ textAlign: "center", py: 4 }}
+        >
           No campaigns yet
         </Typography>
       </Box>
@@ -96,7 +132,7 @@ export default function CampaignsList({ user, onUserUpdate }: CampaignsListProps
         >
           All campaigns you participate in, either as gamemaster or player.
         </SectionHeader>
-        
+
         {campaigns.length > 0 && (
           <Box sx={{ mb: 3 }}>
             <Typography variant="h6" sx={{ mb: 2, fontSize: "1.125rem" }}>
@@ -163,14 +199,17 @@ export default function CampaignsList({ user, onUserUpdate }: CampaignsListProps
         <DialogTitle>Leave Campaign</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to leave the campaign &ldquo;{leavingCampaign?.name}&rdquo;? 
-            You will need to be invited again by the gamemaster to rejoin.
+            Are you sure you want to leave the campaign &ldquo;
+            {leavingCampaign?.name}&rdquo;? You will need to be invited again by
+            the gamemaster to rejoin.
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCancelLeave}>Cancel</Button>
           <Button
-            onClick={() => leavingCampaign && handleLeaveCampaign(leavingCampaign)}
+            onClick={() =>
+              leavingCampaign && handleLeaveCampaign(leavingCampaign)
+            }
             color="error"
             variant="contained"
             disabled={isLeaving}

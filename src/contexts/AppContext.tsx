@@ -166,9 +166,13 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         if (cachedUser) {
           const parsedUser = JSON.parse(cachedUser)
           const expectedUserId = Cookies.get("userId")
-          
+
           // NEW: Validate cached user matches expected user
-          if (parsedUser && parsedUser.id !== defaultUser.id && parsedUser.id === expectedUserId) {
+          if (
+            parsedUser &&
+            parsedUser.id !== defaultUser.id &&
+            parsedUser.id === expectedUserId
+          ) {
             dispatch({ type: UserActions.USER, payload: parsedUser })
             const cachedCampaign = localStorage.getItem(
               `currentCampaign-${parsedUser.id}`
@@ -181,7 +185,11 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
                 return
               }
             }
-          } else if (parsedUser && expectedUserId && parsedUser.id !== expectedUserId) {
+          } else if (
+            parsedUser &&
+            expectedUserId &&
+            parsedUser.id !== expectedUserId
+          ) {
             // Cache mismatch detected - clear and fetch fresh
             console.warn("🔧 Cache mismatch detected, clearing user cache")
             localStorage.removeItem(`currentUser-${jwt}`)

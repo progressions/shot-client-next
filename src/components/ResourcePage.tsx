@@ -73,15 +73,17 @@ export default async function ResourcePage<T>({
       <Suspense fallback={<ListPageSkeleton entityType={resourceName} />}>
         <Breadcrumbs client={client} />
       </Suspense>
-      <Suspense fallback={
-        <ListPageSkeleton 
-          entityType={resourceName}
-          viewMode={initialIsMobile ? "mobile" : "table"}
-          showSearch={true}
-          showFilters={true}
-          itemCount={8}
-        />
-      }>
+      <Suspense
+        fallback={
+          <ListPageSkeleton
+            entityType={resourceName}
+            viewMode={initialIsMobile ? "mobile" : "table"}
+            showSearch={true}
+            showFilters={true}
+            itemCount={8}
+          />
+        }
+      >
         <ListComponent
           initialFormData={initialFormData}
           initialIsMobile={initialIsMobile}

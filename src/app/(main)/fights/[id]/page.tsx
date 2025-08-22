@@ -13,11 +13,11 @@ type FightPageProperties = {
 export async function generateMetadata({ params }: FightPageProperties) {
   const { id } = await params
   const client = await getServerClient()
-  
+
   if (!client) {
     return {
       title: "Fight - Chi War",
-      description: "View fight details"
+      description: "View fight details",
     }
   }
 
@@ -25,13 +25,13 @@ export async function generateMetadata({ params }: FightPageProperties) {
     const response = await client.getFight({ id })
     const fight: Fight = response.data
     return {
-      title: `${fight.name || 'Fight'} - Chi War`,
-      description: `Fight details${fight.name ? ` for ${fight.name}` : ''}`
+      title: `${fight.name || "Fight"} - Chi War`,
+      description: `Fight details${fight.name ? ` for ${fight.name}` : ""}`,
     }
   } catch (error) {
     return {
       title: "Fight Not Found - Chi War",
-      description: "The requested fight could not be found"
+      description: "The requested fight could not be found",
     }
   }
 }

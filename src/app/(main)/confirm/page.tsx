@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Box, Paper, Typography, CircularProgress, Alert, Stack, Button } from "@mui/material"
+import {
+  Box,
+  Paper,
+  Typography,
+  CircularProgress,
+  Alert,
+  Stack,
+  Button,
+} from "@mui/material"
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline"
 import { useApp } from "@/contexts"
@@ -17,29 +25,29 @@ export default function ConfirmPage() {
   const [loading, setLoading] = useState(true)
   const [response, setResponse] = useState<ConfirmationResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
-  
+
   const confirmationToken = searchParams.get("confirmation_token")
-  
+
   useEffect(() => {
     if (!confirmationToken) {
       setError("No confirmation token provided")
       setLoading(false)
       return
     }
-    
+
     confirmAccount()
   }, [confirmationToken])
-  
+
   const confirmAccount = async () => {
     try {
       // Create a client without JWT for public access
       const client = createClient()
       const res = await client.confirmUserPublic(confirmationToken)
       const data = res.data
-      
+
       if (res.status === 200) {
         setResponse(data)
-        
+
         // Redirect to login page after 3 seconds
         setTimeout(() => {
           router.push("/login")
@@ -55,10 +63,17 @@ export default function ConfirmPage() {
       setLoading(false)
     }
   }
-  
+
   if (loading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "60vh",
+        }}
+      >
         <Stack spacing={3} alignItems="center">
           <CircularProgress />
           <Typography variant="h6">Confirming your account...</Typography>
@@ -66,10 +81,17 @@ export default function ConfirmPage() {
       </Box>
     )
   }
-  
+
   if (error) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "60vh",
+        }}
+      >
         <Paper sx={{ p: 4, maxWidth: 500, width: "100%" }}>
           <Stack spacing={3} alignItems="center">
             <ErrorOutlineIcon sx={{ fontSize: 60, color: "error.main" }} />
@@ -86,8 +108,8 @@ export default function ConfirmPage() {
                 </ul>
               )}
             </Alert>
-            <Button 
-              variant="contained" 
+            <Button
+              variant="contained"
               onClick={() => router.push("/login")}
               fullWidth
             >
@@ -98,23 +120,35 @@ export default function ConfirmPage() {
       </Box>
     )
   }
-  
+
   return (
-    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "60vh",
+      }}
+    >
       <Paper sx={{ p: 4, maxWidth: 500, width: "100%" }}>
         <Stack spacing={3} alignItems="center">
-          <CheckCircleOutlineIcon sx={{ fontSize: 60, color: "success.main" }} />
+          <CheckCircleOutlineIcon
+            sx={{ fontSize: 60, color: "success.main" }}
+          />
           <Typography variant="h5" gutterBottom>
-            {response?.message === "Account already confirmed" ? "Account Already Confirmed" : "Account Confirmed!"}
+            {response?.message === "Account already confirmed"
+              ? "Account Already Confirmed"
+              : "Account Confirmed!"}
           </Typography>
-          
+
           {response?.message === "Account already confirmed" ? (
             <>
               <Typography variant="body1" textAlign="center">
-                Your account has already been confirmed. You can log in to access your campaigns.
+                Your account has already been confirmed. You can log in to
+                access your campaigns.
               </Typography>
-              <Button 
-                variant="contained" 
+              <Button
+                variant="contained"
                 onClick={() => router.push("/login")}
                 fullWidth
               >
@@ -124,19 +158,21 @@ export default function ConfirmPage() {
           ) : (
             <>
               <Typography variant="body1" textAlign="center">
-                Welcome to the Chi War! Your account has been successfully confirmed.
-                {response?.token && " You'll be redirected to your dashboard in a few seconds..."}
+                Welcome to the Chi War! Your account has been successfully
+                confirmed.
+                {response?.token &&
+                  " You'll be redirected to your dashboard in a few seconds..."}
               </Typography>
-              
+
               {response?.user && (
                 <Alert severity="success" sx={{ width: "100%" }}>
                   Logged in as {response.user.email}
                 </Alert>
               )}
-              
+
               {!response?.token && (
-                <Button 
-                  variant="contained" 
+                <Button
+                  variant="contained"
                   onClick={() => router.push("/login")}
                   fullWidth
                 >

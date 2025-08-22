@@ -11,7 +11,7 @@ import {
   Avatar,
   IconButton,
   FormControl,
-  FormHelperText
+  FormHelperText,
 } from "@mui/material"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useClient, useToast } from "@/contexts"
@@ -32,7 +32,7 @@ export default function ProfileForm({ user, onSave }: ProfileFormProps) {
   const { toastSuccess, toastError } = useToast()
   const { formState, dispatchForm } = useForm<FormStateData>({
     ...user,
-    image: null
+    image: null,
   })
   const { disabled, error, errors, data } = formState
   const { first_name, last_name, email, image } = data
@@ -40,10 +40,18 @@ export default function ProfileForm({ user, onSave }: ProfileFormProps) {
   useEffect(() => {
     if (image) {
       const previewUrl = URL.createObjectURL(image)
-      dispatchForm({ type: FormActions.UPDATE, name: "imagePreview", value: previewUrl })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "imagePreview",
+        value: previewUrl,
+      })
       return () => URL.revokeObjectURL(previewUrl)
     } else {
-      dispatchForm({ type: FormActions.UPDATE, name: "imagePreview", value: null })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "imagePreview",
+        value: null,
+      })
     }
   }, [image, dispatchForm])
 
@@ -70,54 +78,68 @@ export default function ProfileForm({ user, onSave }: ProfileFormProps) {
 
   const handleSave = async () => {
     if (disabled) return
-    
+
     dispatchForm({ type: FormActions.SUBMIT })
-    
+
     try {
       const formData = new FormData()
       const userData = {
         first_name: data.first_name,
-        last_name: data.last_name, 
-        email: data.email
+        last_name: data.last_name,
+        email: data.email,
       }
       formData.set("user", JSON.stringify(userData))
-      
+
       if (image) {
         formData.set("image", image)
       }
-      
+
       const response = await client.updateUser(user.id, formData)
-      
+
       dispatchForm({ type: FormActions.SUCCESS })
       dispatchForm({ type: FormActions.UPDATE, name: "image", value: null })
       toastSuccess("Profile updated successfully")
-      
+
       if (onSave) {
         onSave(response.data)
       }
     } catch (error: unknown) {
       console.error("Failed to update profile:", error)
-      const errorResponse = error as { response?: { data?: { errors?: Record<string, string[]> } } }
+      const errorResponse = error as {
+        response?: { data?: { errors?: Record<string, string[]> } }
+      }
       dispatchForm({
         type: FormActions.ERROR,
-        payload: errorResponse.response?.data?.errors ? 
-          Object.values(errorResponse.response.data.errors).flat().join(", ") :
-          "Failed to update profile"
+        payload: errorResponse.response?.data?.errors
+          ? Object.values(errorResponse.response.data.errors).flat().join(", ")
+          : "Failed to update profile",
       })
       toastError("Failed to update profile")
     }
   }
 
-  const hasChanges = 
+  const hasChanges =
     data.first_name !== (user.first_name || "") ||
     data.last_name !== (user.last_name || "") ||
     data.email !== (user.email || "") ||
     image !== null
 
   const handleReset = () => {
-    dispatchForm({ type: FormActions.UPDATE, name: "first_name", value: user.first_name || "" })
-    dispatchForm({ type: FormActions.UPDATE, name: "last_name", value: user.last_name || "" })
-    dispatchForm({ type: FormActions.UPDATE, name: "email", value: user.email || "" })
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "first_name",
+      value: user.first_name || "",
+    })
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "last_name",
+      value: user.last_name || "",
+    })
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "email",
+      value: user.email || "",
+    })
     dispatchForm({ type: FormActions.UPDATE, name: "image", value: null })
     dispatchForm({ type: FormActions.CLEAR_ERROR })
   }
@@ -135,13 +157,11 @@ export default function ProfileForm({ user, onSave }: ProfileFormProps) {
               src={data.imagePreview || user.image_url}
               sx={{ width: 80, height: 80, mb: 2 }}
             >
-              {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
+              {user.name
+                ? user.name.charAt(0).toUpperCase()
+                : user.email.charAt(0).toUpperCase()}
             </Avatar>
-            <IconButton
-              component="label"
-              sx={{ mb: 1 }}
-              disabled={disabled}
-            >
+            <IconButton component="label" sx={{ mb: 1 }} disabled={disabled}>
               <AddPhotoAlternateIcon />
               <input
                 type="file"

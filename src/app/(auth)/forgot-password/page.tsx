@@ -4,7 +4,7 @@ import { ForgotPasswordClient } from "./ForgotPasswordClient"
 
 export const metadata = {
   title: "Forgot Password - Chi War",
-  description: "Reset your Chi War account password"
+  description: "Reset your Chi War account password",
 }
 
 export default function ForgotPasswordPage() {
@@ -26,17 +26,18 @@ export default function ForgotPasswordPage() {
         >
           Reset Your Password
         </Typography>
-        
+
         <Typography
           variant="body1"
-          sx={{ 
-            color: "text.secondary", 
-            textAlign: "center", 
+          sx={{
+            color: "text.secondary",
+            textAlign: "center",
             mb: 3,
-            maxWidth: 400 
+            maxWidth: 400,
           }}
         >
-          Enter your email address and we&apos;ll send you a link to reset your password.
+          Enter your email address and we&apos;ll send you a link to reset your
+          password.
         </Typography>
 
         <ForgotPasswordClient />

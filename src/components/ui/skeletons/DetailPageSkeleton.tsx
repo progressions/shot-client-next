@@ -1,32 +1,27 @@
-import React from 'react';
-import { Box, FormControl, Stack } from '@mui/material';
-import { 
-  SkeletonText, 
-  SkeletonButton, 
+import React from "react"
+import { Box, FormControl, Stack } from "@mui/material"
+import {
+  SkeletonText,
+  SkeletonButton,
   SkeletonAvatar,
-  SkeletonForm
-} from './BaseSkeleton';
+  SkeletonForm,
+} from "./BaseSkeleton"
 
 interface DetailPageSkeletonProps {
-  entityType: string;
-  hasAvatar?: boolean;
-  hasHeroImage?: boolean;
-  fieldCount?: number;
-  hasActions?: boolean;
-  hasRelatedSections?: boolean;
-  relatedSectionCount?: number;
+  entityType: string
+  hasAvatar?: boolean
+  hasHeroImage?: boolean
+  fieldCount?: number
+  hasActions?: boolean
+  hasRelatedSections?: boolean
+  relatedSectionCount?: number
 }
 
 const SpeedDialSkeleton: React.FC = () => (
-  <Box 
-    position="fixed" 
-    bottom={24} 
-    right={24} 
-    zIndex={1000}
-  >
+  <Box position="fixed" bottom={24} right={24} zIndex={1000}>
     <SkeletonButton width={56} height={56} />
   </Box>
-);
+)
 
 const HeroImageSkeleton: React.FC = () => (
   <Box
@@ -41,21 +36,17 @@ const HeroImageSkeleton: React.FC = () => (
   >
     <SkeletonText width="100%" height="100%" variant="rectangular" />
     {/* Hero image action buttons */}
-    <Box
-      position="absolute"
-      top={16}
-      right={16}
-      display="flex"
-      gap={1}
-    >
+    <Box position="absolute" top={16} right={16} display="flex" gap={1}>
       <SkeletonButton width={40} height={40} />
       <SkeletonButton width={40} height={40} />
       <SkeletonButton width={40} height={40} />
     </Box>
   </Box>
-);
+)
 
-const NameEditorSkeleton: React.FC<{ hasAvatar?: boolean }> = ({ hasAvatar }) => (
+const NameEditorSkeleton: React.FC<{ hasAvatar?: boolean }> = ({
+  hasAvatar,
+}) => (
   <FormControl fullWidth margin="normal">
     <Box display="flex" alignItems="center" gap={2}>
       {hasAvatar && <SkeletonAvatar size={48} />}
@@ -64,9 +55,11 @@ const NameEditorSkeleton: React.FC<{ hasAvatar?: boolean }> = ({ hasAvatar }) =>
       </Box>
     </Box>
   </FormControl>
-);
+)
 
-const SectionHeaderSkeleton: React.FC<{ title?: string }> = ({ title = "Section" }) => (
+const SectionHeaderSkeleton: React.FC<{ title?: string }> = ({
+  title = "Section",
+}) => (
   <Box sx={{ mb: 2 }}>
     <Box display="flex" alignItems="center" gap={1} mb={1}>
       <SkeletonAvatar size={24} />
@@ -75,7 +68,7 @@ const SectionHeaderSkeleton: React.FC<{ title?: string }> = ({ title = "Section"
     <SkeletonText width="80%" height={16} />
     <SkeletonText width="70%" height={16} />
   </Box>
-);
+)
 
 const EditableRichTextSkeleton: React.FC = () => (
   <Box
@@ -93,7 +86,7 @@ const EditableRichTextSkeleton: React.FC = () => (
     <SkeletonText width="92%" height={16} />
     <SkeletonText width="60%" height={16} />
   </Box>
-);
+)
 
 const ManagerSkeleton: React.FC<{ title: string }> = ({ title }) => (
   <Box>
@@ -103,18 +96,29 @@ const ManagerSkeleton: React.FC<{ title: string }> = ({ title }) => (
     </Box>
     <SkeletonText width="90%" height={16} />
     <SkeletonText width="85%" height={16} />
-    
+
     {/* Manager content */}
     <Box mt={2}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+      >
         <SkeletonText width={150} height={20} />
         <SkeletonButton width={80} height={36} />
       </Box>
-      
+
       {/* List of managed items */}
       <Stack spacing={1}>
         {Array.from({ length: 3 }).map((_, index) => (
-          <Box key={`managed-${index}`} display="flex" alignItems="center" gap={2} p={1}>
+          <Box
+            key={`managed-${index}`}
+            display="flex"
+            alignItems="center"
+            gap={2}
+            p={1}
+          >
             <SkeletonAvatar size={32} />
             <Box flex={1}>
               <SkeletonText width="70%" height={18} />
@@ -126,20 +130,20 @@ const ManagerSkeleton: React.FC<{ title: string }> = ({ title }) => (
       </Stack>
     </Box>
   </Box>
-);
+)
 
 const AlertSkeleton: React.FC = () => (
-  <Box 
+  <Box
     sx={{
       mb: 2,
       p: 1,
       borderRadius: 1,
-      backgroundColor: 'rgba(0, 0, 0, 0.04)',
+      backgroundColor: "rgba(0, 0, 0, 0.04)",
     }}
   >
     <SkeletonText width="100%" height={40} />
   </Box>
-);
+)
 
 export const DetailPageSkeleton: React.FC<DetailPageSkeletonProps> = ({
   entityType,
@@ -148,50 +152,50 @@ export const DetailPageSkeleton: React.FC<DetailPageSkeletonProps> = ({
   fieldCount = 3,
   hasActions = true,
   hasRelatedSections = true,
-  relatedSectionCount = 1
+  relatedSectionCount = 1,
 }) => {
   // Determine entity-specific features
   const getEntityFeatures = (entityType: string) => {
     switch (entityType.toLowerCase()) {
-      case 'campaigns':
+      case "campaigns":
         return {
           hasAvatar: false,
           hasHeroImage: true,
-          sections: ['Members'],
-          hasDescription: true
-        };
-      case 'characters':
+          sections: ["Members"],
+          hasDescription: true,
+        }
+      case "characters":
         return {
           hasAvatar: true,
           hasHeroImage: true,
-          sections: ['Schticks', 'Weapons', 'Parties'],
-          hasDescription: true
-        };
-      case 'fights':
+          sections: ["Schticks", "Weapons", "Parties"],
+          hasDescription: true,
+        }
+      case "fights":
         return {
           hasAvatar: false,
           hasHeroImage: false,
-          sections: ['Participants', 'Shots'],
-          hasDescription: true
-        };
-      case 'vehicles':
+          sections: ["Participants", "Shots"],
+          hasDescription: true,
+        }
+      case "vehicles":
         return {
           hasAvatar: false,
           hasHeroImage: true,
-          sections: ['Characters'],
-          hasDescription: true
-        };
+          sections: ["Characters"],
+          hasDescription: true,
+        }
       default:
         return {
           hasAvatar: hasAvatar,
           hasHeroImage: hasHeroImage,
-          sections: ['Related Items'],
-          hasDescription: true
-        };
+          sections: ["Related Items"],
+          hasDescription: true,
+        }
     }
-  };
+  }
 
-  const features = getEntityFeatures(entityType);
+  const features = getEntityFeatures(entityType)
 
   return (
     <Box
@@ -241,5 +245,5 @@ export const DetailPageSkeleton: React.FC<DetailPageSkeletonProps> = ({
         </Stack>
       )}
     </Box>
-  );
-};
+  )
+}

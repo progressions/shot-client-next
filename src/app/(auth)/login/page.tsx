@@ -2,7 +2,14 @@
 
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Stack, Box, Typography, Alert, Container, Link as MuiLink } from "@mui/material"
+import {
+  Stack,
+  Box,
+  Typography,
+  Alert,
+  Container,
+  Link as MuiLink,
+} from "@mui/material"
 import Link from "next/link"
 import { Button, TextField } from "@/components/ui"
 import Cookies from "js-cookie"
@@ -35,13 +42,13 @@ export default function LoginPage() {
           body: JSON.stringify({ user: { email, password } }),
         }
       )
-      
+
       if (!response.ok) {
         // Parse error response
         const errorData = await response.json()
-        
+
         // Check if it's an unconfirmed account error
-        if (errorData.error_type === 'unconfirmed_account') {
+        if (errorData.error_type === "unconfirmed_account") {
           setIsUnconfirmed(true)
           setUnconfirmedEmail(errorData.email)
           setError(null)
@@ -72,7 +79,7 @@ export default function LoginPage() {
 
       const temporaryClient = createClient({ jwt: token })
       const temporaryResponse = await temporaryClient.getCurrentUser()
-      
+
       // NEW: Store user ID alongside JWT for cache validation
       Cookies.set("userId", temporaryResponse.data.id, {
         expires: 1,
@@ -81,7 +88,7 @@ export default function LoginPage() {
         httpOnly: false,
         path: "/",
       })
-      
+
       dispatchCurrentUser({
         type: UserActions.USER,
         payload: temporaryResponse.data,
@@ -169,11 +176,14 @@ export default function LoginPage() {
           />
           <Box sx={{ textAlign: "right", mt: 1 }}>
             <Link href="/forgot-password" passHref>
-              <MuiLink 
-                component="span" 
-                variant="body2" 
+              <MuiLink
+                component="span"
+                variant="body2"
                 color="primary"
-                sx={{ textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
+                sx={{
+                  textDecoration: "none",
+                  "&:hover": { textDecoration: "underline" },
+                }}
               >
                 Forgot Password?
               </MuiLink>
@@ -182,7 +192,7 @@ export default function LoginPage() {
           <Button type="submit" sx={{ mt: 2, mb: 2 }}>
             Sign In
           </Button>
-          
+
           {/* Unconfirmed account message */}
           {isUnconfirmed && (
             <Alert severity="warning" sx={{ mt: 2 }}>

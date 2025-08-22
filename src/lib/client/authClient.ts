@@ -18,18 +18,35 @@ interface ClientDependencies {
 
 export function createAuthClient(deps: ClientDependencies) {
   const { api, apiV2, queryParams } = deps
-  const { get, getPublic, post, patch, delete: delete_, requestFormData } = createBaseClient(deps)
+  const {
+    get,
+    getPublic,
+    post,
+    patch,
+    delete: delete_,
+    requestFormData,
+  } = createBaseClient(deps)
 
   async function createUser(user: User): Promise<AxiosResponse<User>> {
     return post(api.registerUser(), { user: user })
   }
 
   async function updateUser(user: User): Promise<AxiosResponse<User>>
-  async function updateUser(id: string, formData: FormData): Promise<AxiosResponse<User>>
-  async function updateUser(userOrId: User | string, formData?: FormData): Promise<AxiosResponse<User>> {
-    if (typeof userOrId === 'string' && formData) {
+  async function updateUser(
+    id: string,
+    formData: FormData
+  ): Promise<AxiosResponse<User>>
+  async function updateUser(
+    userOrId: User | string,
+    formData?: FormData
+  ): Promise<AxiosResponse<User>> {
+    if (typeof userOrId === "string" && formData) {
       // V2 API with FormData - follows same pattern as updateSite, updateFight, etc.
-      return requestFormData("PATCH", `${apiV2.users({ id: userOrId })}`, formData)
+      return requestFormData(
+        "PATCH",
+        `${apiV2.users({ id: userOrId })}`,
+        formData
+      )
     } else {
       // V1 API with User object
       const user = userOrId as User
@@ -73,7 +90,9 @@ export function createAuthClient(deps: ClientDependencies) {
   async function confirmUserPublic(
     confirmation_token: string
   ): Promise<AxiosResponse<ConfirmationResponse>> {
-    return getPublic(`${api.confirmUser()}?confirmation_token=${confirmation_token}`)
+    return getPublic(
+      `${api.confirmUser()}?confirmation_token=${confirmation_token}`
+    )
   }
 
   async function sendResetPasswordLink(

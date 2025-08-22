@@ -1,7 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Stack, Alert, Typography, FormHelperText, LinearProgress, Box } from "@mui/material"
+import {
+  Stack,
+  Alert,
+  Typography,
+  FormHelperText,
+  LinearProgress,
+  Box,
+} from "@mui/material"
 import { Button, TextField } from "@/components/ui"
 
 interface ResetPasswordFormProps {
@@ -27,16 +34,18 @@ export default function ResetPasswordForm({
   error = null,
   success = false,
   tokenValid = true,
-  tokenExpired = false
+  tokenExpired = false,
 }: ResetPasswordFormProps) {
   const [password, setPassword] = useState("")
   const [passwordConfirmation, setPasswordConfirmation] = useState("")
   const [passwordError, setPasswordError] = useState<string | null>(null)
-  const [confirmationError, setConfirmationError] = useState<string | null>(null)
+  const [confirmationError, setConfirmationError] = useState<string | null>(
+    null
+  )
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>({
     score: 0,
     message: "",
-    color: "error"
+    color: "error",
   })
 
   const checkPasswordStrength = (password: string): PasswordStrength => {
@@ -77,7 +86,10 @@ export default function ResetPasswordForm({
     let color: "error" | "warning" | "success" = "error"
 
     if (score < 50) {
-      message = issues.length > 0 ? `Password must contain ${issues.join(", ")}` : "Password is too weak"
+      message =
+        issues.length > 0
+          ? `Password must contain ${issues.join(", ")}`
+          : "Password is too weak"
       color = "error"
     } else if (score < 75) {
       message = "Password strength: Good"
@@ -110,7 +122,10 @@ export default function ResetPasswordForm({
     return true
   }
 
-  const validatePasswordConfirmation = (password: string, confirmation: string): boolean => {
+  const validatePasswordConfirmation = (
+    password: string,
+    confirmation: string
+  ): boolean => {
     if (confirmation && password !== confirmation) {
       setConfirmationError("Password confirmation doesn't match password")
       return false
@@ -123,11 +138,11 @@ export default function ResetPasswordForm({
   useEffect(() => {
     const strength = checkPasswordStrength(password)
     setPasswordStrength(strength)
-    
+
     if (password) {
       validatePassword(password)
     }
-    
+
     if (passwordConfirmation) {
       validatePasswordConfirmation(password, passwordConfirmation)
     }
@@ -135,10 +150,13 @@ export default function ResetPasswordForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     const isPasswordValid = validatePassword(password)
-    const isConfirmationValid = validatePasswordConfirmation(password, passwordConfirmation)
-    
+    const isConfirmationValid = validatePasswordConfirmation(
+      password,
+      passwordConfirmation
+    )
+
     if (!isPasswordValid || !isConfirmationValid) {
       return
     }
@@ -159,16 +177,15 @@ export default function ResetPasswordForm({
             {tokenExpired ? "Reset Link Expired" : "Invalid Reset Link"}
           </Typography>
           <Typography variant="body2">
-            {tokenExpired 
+            {tokenExpired
               ? "This password reset link has expired. Password reset links are valid for 2 hours for security reasons."
-              : "This password reset link is invalid or has already been used."
-            }
+              : "This password reset link is invalid or has already been used."}
           </Typography>
           <Typography variant="body2" sx={{ mt: 1 }}>
             Please request a new password reset to continue.
           </Typography>
         </Alert>
-        
+
         <Button
           variant="outlined"
           href="/forgot-password"
@@ -193,7 +210,7 @@ export default function ResetPasswordForm({
         label="New Password"
         type="password"
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={e => setPassword(e.target.value)}
         autoFocus
         disabled={loading || success}
         error={!!passwordError}
@@ -209,7 +226,9 @@ export default function ResetPasswordForm({
             color={passwordStrength.color}
             sx={{ height: 6, borderRadius: 3 }}
           />
-          <FormHelperText sx={{ color: `${passwordStrength.color}.main`, mt: 0.5 }}>
+          <FormHelperText
+            sx={{ color: `${passwordStrength.color}.main`, mt: 0.5 }}
+          >
             {passwordStrength.message}
           </FormHelperText>
         </Box>
@@ -221,7 +240,7 @@ export default function ResetPasswordForm({
         label="Confirm New Password"
         type="password"
         value={passwordConfirmation}
-        onChange={(e) => setPasswordConfirmation(e.target.value)}
+        onChange={e => setPasswordConfirmation(e.target.value)}
         disabled={loading || success}
         error={!!confirmationError}
         helperText={confirmationError}
@@ -230,7 +249,13 @@ export default function ResetPasswordForm({
 
       <Button
         type="submit"
-        disabled={loading || success || !!passwordError || !!confirmationError || passwordStrength.score < 50}
+        disabled={
+          loading ||
+          success ||
+          !!passwordError ||
+          !!confirmationError ||
+          passwordStrength.score < 50
+        }
         sx={{ mt: 3, mb: 2 }}
       >
         {loading ? "Resetting..." : "Reset Password"}
@@ -239,7 +264,8 @@ export default function ResetPasswordForm({
       {success && (
         <Alert severity="success" sx={{ mt: 2 }}>
           <Typography variant="body2">
-            Your password has been changed successfully! You can now log in with your new password.
+            Your password has been changed successfully! You can now log in with
+            your new password.
           </Typography>
         </Alert>
       )}
@@ -251,8 +277,9 @@ export default function ResetPasswordForm({
       )}
 
       <Typography variant="body2" sx={{ mt: 2, color: "text.secondary" }}>
-        <strong>Password Requirements:</strong> Must be at least 8 characters long and contain both letters and numbers.
-        Special characters and longer passwords provide additional security.
+        <strong>Password Requirements:</strong> Must be at least 8 characters
+        long and contain both letters and numbers. Special characters and longer
+        passwords provide additional security.
       </Typography>
     </Stack>
   )

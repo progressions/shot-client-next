@@ -31,13 +31,13 @@ export function UserMenu({ user }: UserMenuProps) {
         src={user.image_url ?? undefined}
         alt={user.name}
         onClick={handleMenuOpen}
-        sx={{ 
-          width: 32, 
-          height: 32, 
+        sx={{
+          width: 32,
+          height: 32,
           cursor: "pointer",
           "&:hover": {
-            opacity: 0.8
-          }
+            opacity: 0.8,
+          },
         }}
       />
       <Menu
@@ -45,12 +45,12 @@ export function UserMenu({ user }: UserMenuProps) {
         open={open}
         onClose={handleMenuClose}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
+          vertical: "bottom",
+          horizontal: "right",
         }}
         transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
+          vertical: "top",
+          horizontal: "right",
         }}
         PaperProps={{
           sx: {
@@ -73,7 +73,7 @@ export function UserMenu({ user }: UserMenuProps) {
             Profile
           </Link>
         </MenuItem>
-        <MenuItem 
+        <MenuItem
           onClick={() => {
             handleMenuClose()
             handleLogout()
