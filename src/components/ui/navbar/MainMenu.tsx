@@ -123,6 +123,31 @@ export function MainMenu() {
         <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />
         <MenuItem onClick={handleMenuClose}>
           <Link
+            href="/about"
+            style={{ color: "#ffffff", textDecoration: "none", width: "100%" }}
+          >
+            About
+          </Link>
+        </MenuItem>
+        <MenuItem onClick={handleMenuClose}>
+          <Link
+            href="/documentation"
+            style={{ color: "#ffffff", textDecoration: "none", width: "100%" }}
+          >
+            Documentation
+          </Link>
+        </MenuItem>
+        <MenuItem onClick={handleMenuClose}>
+          <Link
+            href="/support"
+            style={{ color: "#ffffff", textDecoration: "none", width: "100%" }}
+          >
+            Support
+          </Link>
+        </MenuItem>
+        <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />
+        <MenuItem onClick={handleMenuClose}>
+          <Link
             href="/campaigns"
             style={{
               color: "#ffffff",
