@@ -9,11 +9,11 @@ export function handleError(
   let errorMessage = "An unexpected error occurred"
   if (err instanceof AxiosError) {
     const backendError = err.response?.data as BackendErrorResponse
-    if (backendError.error) {
+    if (backendError?.error) {
       errorMessage = backendError.error
-    } else if (backendError.errors) {
+    } else if (backendError?.errors) {
       errorMessage = Object.values(backendError.errors).flat().join(", ")
-    } else if (backendError.name) {
+    } else if (backendError?.name) {
       errorMessage = backendError.name.join(", ")
     }
   } else if (err instanceof Error) {
