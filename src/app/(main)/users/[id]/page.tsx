@@ -17,11 +17,12 @@ export default async function UserPage({ params }: UserPageProperties) {
   const currentUser = await getCurrentUser()
   if (!client || !currentUser) return <Typography>Not logged in</Typography>
 
+  // Check admin access first before making any API calls
+  if (!currentUser.admin) redirect("/")
+
   try {
     const response = await client.getUser({ id })
     const user: User = response.data
-
-    if (!currentUser.admin) redirect("/")
 
     // Detect mobile device on the server
     const headersState = await headers()

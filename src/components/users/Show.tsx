@@ -7,20 +7,29 @@ import type { User } from "@/types"
 import { RichTextRenderer } from "@/components/editor"
 import { useCampaign } from "@/contexts"
 import { EditUserForm } from "@/components/users"
+import RoleManagement from "@/components/users/RoleManagement"
 import { useClient } from "@/contexts"
 import { HeroImage, SpeedDialMenu } from "@/components/ui"
 
 interface ShowProperties {
   user: User
+  initialIsMobile?: boolean
 }
 
-export default function Show({ user: initialUser }: ShowProperties) {
+export default function Show({ user: initialUser, initialIsMobile }: ShowProperties) {
   const { campaignData } = useCampaign()
   const { client } = useClient()
 
   const [user, setUser] = useState<User>(initialUser)
   const [editOpen, setEditOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Check if current user is admin - if not, redirect silently
+  useEffect(() => {
+    if (campaignData?.user && !campaignData.user.admin) {
+      redirect("/")
+    }
+  }, [campaignData])
 
   useEffect(() => {
     document.title = user.name ? `${user.name} - Chi War` : "Chi War"
@@ -36,6 +45,10 @@ export default function Show({ user: initialUser }: ShowProperties) {
     setEditOpen(false)
   }
 
+  const handleUserUpdate = (updatedUser: User) => {
+    setUser(updatedUser)
+  }
+
   const handleDelete = async () => {
     if (!user?.id) return
     if (!confirm(`Are you sure you want to delete the user: ${user.name}?`))
@@ -43,7 +56,6 @@ export default function Show({ user: initialUser }: ShowProperties) {
 
     try {
       await client.deleteUser(user)
-      handleMenuClose()
       redirect("/users")
     } catch (error_) {
       console.error("Failed to delete user:", error_)
@@ -77,6 +89,7 @@ export default function Show({ user: initialUser }: ShowProperties) {
           sx={{ mb: 2 }}
         />
       </Box>
+      <RoleManagement user={user} onUserUpdate={handleUserUpdate} />
       <EditUserForm
         key={JSON.stringify(user)}
         open={editOpen}
