@@ -143,13 +143,13 @@ export function EncounterProvider({
                 per_page: 1000,
                 ids: Array.from(weaponIds).join(","),
               })
-            : Promise.resolve({ data: [] }),
+            : Promise.resolve({ data: { weapons: [] } }),
           schtickIds.size > 0
             ? client.getSchticksBatch({
                 per_page: 1000,
                 ids: Array.from(schtickIds).join(","),
               })
-            : Promise.resolve({ data: [] }),
+            : Promise.resolve({ data: { schticks: [] } }),
         ])
         const weaponsMap = weaponsResponse.data.weapons.reduce(
           (acc: { [id: string]: Weapon }, weapon: Weapon) => ({

@@ -148,6 +148,51 @@ describe("formReducer", () => {
       expect(newState.saving).toBe(false)
       expect(newState.data.email).toBe("new@example.com")
     })
+    
+    it("handles object values for EncounterContext use case", () => {
+      interface EncounterData {
+        encounter: any
+        weapons: { [id: string]: any }
+        schticks: { [id: string]: any }
+      }
+      
+      const initialEncounterData = {
+        encounter: null,
+        weapons: {},
+        schticks: {},
+      }
+      
+      const initialState = initializeFormState<EncounterData>(initialEncounterData)
+      
+      const weaponsMap = {
+        'weapon-1': { id: 'weapon-1', name: 'Test Weapon' }
+      }
+      
+      const schticksMap = {
+        'schtick-1': { id: 'schtick-1', name: 'Test Schtick' }
+      }
+      
+      // Update weapons
+      let newState = formReducer(initialState, {
+        type: FormActions.UPDATE,
+        name: 'weapons',
+        value: weaponsMap,
+      })
+      
+      expect(Object.keys(newState.data.weapons)).toHaveLength(1)
+      expect(newState.data.weapons['weapon-1']).toEqual({ id: 'weapon-1', name: 'Test Weapon' })
+      
+      // Update schticks
+      newState = formReducer(newState, {
+        type: FormActions.UPDATE,
+        name: 'schticks',
+        value: schticksMap,
+      })
+      
+      expect(Object.keys(newState.data.weapons)).toHaveLength(1)
+      expect(Object.keys(newState.data.schticks)).toHaveLength(1)
+      expect(newState.data.schticks['schtick-1']).toEqual({ id: 'schtick-1', name: 'Test Schtick' })
+    })
   })
 
   describe("OPEN action", () => {

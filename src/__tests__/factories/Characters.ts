@@ -35,8 +35,11 @@ export const carolina: Person = {
     Guns: 14,
     "Martial Arts": 12,
     Defense: 13,
+    Toughness: 8,
     Speed: 7,
-    Fortune: 7
+    Fortune: 7,
+    FortuneType: "Fortune",
+    "Max Fortune": 7
   },
   skills: {
     ...defaultCharacter.skills,
@@ -57,7 +60,11 @@ export const shing: Person = {
     Guns: 17,
     Defense: 14,
     Damage: 9,
-    Toughness: 7
+    Toughness: 7,
+    Speed: 6,
+    Fortune: 4,
+    FortuneType: "Fortune",
+    "Max Fortune": 4
   },
   skills: {
     Driving: 15
@@ -77,7 +84,11 @@ export const huanKen: Person = {
     Sorcery: 19,
     Defense: 17,
     Damage: 12,
-    Toughness: 8
+    Toughness: 8,
+    Speed: 5,
+    Fortune: 6,
+    FortuneType: "Chi",
+    "Max Fortune": 6
   },
 }
 
@@ -94,6 +105,10 @@ export const hitman: Person = {
     Defense: 13,
     Toughness: 7,
     Damage: 9,
+    Speed: 6,
+    Fortune: 3,
+    FortuneType: "Fortune",
+    "Max Fortune": 3
   },
 }
 
@@ -109,6 +124,9 @@ export const zombies: Person = {
     SecondaryAttack: null,
     Creature: 8,
     Defense: 13,
-    Damage: 7
+    Damage: 7,
+    Toughness: 5,
+    Speed: 4
+    // Mooks don't get Fortune
   }
 }

@@ -40,18 +40,25 @@ export function useImageGeneration({
         {
           received: (data: CableData) => {
             if (data.status === "preview_ready" && data.json) {
-              const imageUrls: string[] = JSON.parse(data.json)
-              dispatchForm({
-                type: FormActions.UPDATE,
-                name: "image_urls",
-                value: imageUrls,
-              })
-              dispatchForm({
-                type: FormActions.SUCCESS,
-                payload: "Images generated successfully",
-              })
-              setPending(false)
-              sub.unsubscribe()
+              try {
+                const imageUrls: string[] = JSON.parse(data.json)
+                dispatchForm({
+                  type: FormActions.UPDATE,
+                  name: "image_urls",
+                  value: imageUrls,
+                })
+                dispatchForm({
+                  type: FormActions.SUCCESS,
+                  payload: "Images generated successfully",
+                })
+                setPending(false)
+                sub.unsubscribe()
+              } catch (parseError) {
+                console.error("Failed to parse image URLs JSON:", parseError)
+                handleError(new Error("Invalid JSON response from server"), dispatchForm)
+                setPending(false)
+                sub.unsubscribe()
+              }
             } else if (data.status === "error" && data.error) {
               console.error("WebSocket error:", data.error)
               handleError(new Error(data.error), dispatchForm)

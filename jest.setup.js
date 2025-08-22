@@ -77,15 +77,59 @@ jest.mock("axios", () => ({
   delete: jest.fn(() => Promise.resolve({ data: {} })),
 }))
 
-// Mock @rails/actioncable
+// Enhanced @rails/actioncable mock for context testing
 jest.mock("@rails/actioncable", () => ({
-  createConsumer: jest.fn(() => ({
-    subscriptions: {
-      create: jest.fn(() => ({
-        unsubscribe: jest.fn(),
-      })),
-    },
-  })),
+  createConsumer: jest.fn((url) => {
+    const subscriptions = new Map()
+    const consumer = {
+      url,
+      subscriptions: {
+        create: jest.fn((channelName, callbacks = {}) => {
+          const subscription = {
+            identifier: JSON.stringify(channelName),
+            unsubscribe: jest.fn(() => {
+              subscriptions.delete(subscription.identifier)
+            }),
+            send: jest.fn(),
+            perform: jest.fn(),
+            // Store callbacks for manual triggering in tests
+            _callbacks: callbacks,
+            // Helper to trigger callbacks manually in tests
+            _trigger: (callbackName, data) => {
+              if (callbacks[callbackName]) {
+                callbacks[callbackName](data)
+              }
+            },
+          }
+          
+          subscriptions.set(subscription.identifier, subscription)
+          
+          // Auto-trigger connected callback after subscription
+          setTimeout(() => {
+            if (callbacks.connected) {
+              callbacks.connected()
+            }
+          }, 0)
+          
+          return subscription
+        }),
+        // Helper to get subscription for testing
+        _getSubscription: (channelName) => {
+          return subscriptions.get(JSON.stringify(channelName))
+        },
+        _getAllSubscriptions: () => Array.from(subscriptions.values()),
+      },
+      // Consumer connection state for testing
+      _connected: true,
+      _connect: jest.fn(),
+      _disconnect: jest.fn(),
+    }
+    
+    // Store consumer instance for test access
+    global._mockActionCableConsumer = consumer
+    
+    return consumer
+  }),
 }))
 
 // Mock lodash.debounce
@@ -137,4 +181,59 @@ beforeAll(() => {
 
 afterAll(() => {
   console.error = originalError
+})
+
+// Enhanced localStorage mock for context testing
+const createMockStorage = () => {
+  const store = new Map()
+  
+  return {
+    getItem: jest.fn((key) => store.get(key) || null),
+    setItem: jest.fn((key, value) => {
+      store.set(key, String(value))
+    }),
+    removeItem: jest.fn((key) => {
+      store.delete(key)
+    }),
+    clear: jest.fn(() => {
+      store.clear()
+    }),
+    get length() {
+      return store.size
+    },
+    key: jest.fn((index) => {
+      const keys = Array.from(store.keys())
+      return keys[index] || null
+    }),
+    // Helper methods for testing
+    _getStore: () => store,
+    _reset: () => store.clear(),
+  }
+}
+
+// Setup enhanced localStorage mock
+const mockLocalStorage = createMockStorage()
+const mockSessionStorage = createMockStorage()
+
+Object.defineProperty(window, 'localStorage', {
+  value: mockLocalStorage,
+  writable: true,
+})
+
+Object.defineProperty(window, 'sessionStorage', {
+  value: mockSessionStorage,
+  writable: true,
+})
+
+// Store references for test access
+global._mockLocalStorage = mockLocalStorage
+global._mockSessionStorage = mockSessionStorage
+
+// Reset storage between tests
+beforeEach(() => {
+  mockLocalStorage._reset()
+  mockSessionStorage._reset()
+  
+  // Clear all mock function calls
+  jest.clearAllMocks()
 })
