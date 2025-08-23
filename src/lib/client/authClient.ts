@@ -8,6 +8,7 @@ import type {
   Parameters_,
   ConfirmationResponse,
 } from "@/types"
+import type { RegistrationData, RegistrationResponse } from "@/types/auth"
 
 interface ClientDependencies {
   jwt?: string
@@ -29,6 +30,10 @@ export function createAuthClient(deps: ClientDependencies) {
 
   async function createUser(user: User): Promise<AxiosResponse<User>> {
     return post(api.registerUser(), { user: user })
+  }
+
+  async function registerUser(data: RegistrationData): Promise<AxiosResponse<RegistrationResponse>> {
+    return post(apiV2.usersRegister(), { user: data })
   }
 
   async function updateUser(user: User): Promise<AxiosResponse<User>>
@@ -136,6 +141,7 @@ export function createAuthClient(deps: ClientDependencies) {
 
   return {
     createUser,
+    registerUser,
     updateUser,
     deleteUser,
     deleteUserImage,

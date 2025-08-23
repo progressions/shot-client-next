@@ -108,7 +108,7 @@ export function HeroSection() {
             spacing={2}
             alignItems="center"
           >
-            <Link href="/users/sign_up" passHref>
+            <Link href="/register" passHref>
               <PrimaryCTA
                 variant="contained"
                 size="large"
