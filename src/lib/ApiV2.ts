@@ -131,6 +131,10 @@ class ApiV2 {
     return user ? `${this.api()}/users/${user.id}` : `${this.api()}/users`
   }
 
+  usersRegister(): string {
+    return `${this.api()}/users/register`
+  }
+
   currentUser(): string {
     return `${this.api()}/users/current`
   }

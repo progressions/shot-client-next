@@ -163,7 +163,7 @@ export function CallToAction() {
             justifyContent="center"
             alignItems="center"
           >
-            <Link href="/users/sign_up" passHref>
+            <Link href="/register" passHref>
               <PrimaryCTA
                 variant="contained"
                 size="large"
