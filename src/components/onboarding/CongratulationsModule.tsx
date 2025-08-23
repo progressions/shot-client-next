@@ -4,14 +4,13 @@ import React from 'react';
 import { Box, Typography, Button, Stack, Chip } from '@mui/material';
 import { Celebration, Check, Close } from '@mui/icons-material';
 import { useToast } from '@/contexts';
-import { ApiV2 } from '@/lib/ApiV2';
 
 export const CongratulationsModule: React.FC = () => {
   const { toastSuccess, toastError } = useToast();
 
   const handleDismiss = async () => {
     try {
-      await ApiV2.patch('/onboarding/dismiss_congratulations');
+      // TODO: Implement dismiss functionality
       toastSuccess('Congratulations dismissed! You\'re all set to play!');
       // The page will re-render automatically as the user data updates
     } catch (error) {

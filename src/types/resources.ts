@@ -14,6 +14,7 @@ import {
   SchtickCategory,
   SchtickPath,
 } from "@/types"
+import { OnboardingProgress } from "@/lib/onboarding"
 
 export enum VehicleDescriptionKeys {
   Size = "Size",
@@ -144,6 +145,7 @@ export interface User extends BaseEntity {
   gamemaster?: boolean
   admin?: boolean
   image_url: string
+  onboarding_progress?: OnboardingProgress
 }
 
 export interface Site extends BaseEntity {

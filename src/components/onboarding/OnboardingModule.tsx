@@ -10,21 +10,22 @@ import { CongratulationsModule } from './CongratulationsModule';
 
 export interface OnboardingModuleProps {
   user: {
-    onboardingProgress: OnboardingProgress;
+    onboarding_progress: OnboardingProgress;
   };
 }
 
 export const OnboardingModule: React.FC<OnboardingModuleProps> = ({ user }) => {
   const pathname = usePathname();
-  const { onboardingProgress } = user;
+  const { onboarding_progress } = user;
+  if (!onboarding_progress) return
 
   // Don't show anything if onboarding is complete
-  if (onboardingProgress.onboardingComplete) {
+  if (onboarding_progress.onboarding_complete) {
     return null;
   }
 
   // Show congratulations if all milestones complete but not dismissed
-  if (onboardingProgress.readyForCongratulations) {
+  if (onboarding_progress.ready_for_congratulations) {
     return (
       <Slide in={true} direction="down" timeout={500}>
         <Box sx={{ p: 2 }}>
@@ -48,7 +49,7 @@ export const OnboardingModule: React.FC<OnboardingModuleProps> = ({ user }) => {
   }
 
   // Show single CTA for pre-campaign users
-  if (!onboardingProgress.firstCampaignCreatedAt) {
+  if (!onboarding_progress.first_campaign_created_at) {
     return (
       <Slide in={true} direction="down" timeout={500}>
         <Box sx={{ p: 2 }}>
@@ -102,7 +103,7 @@ export const OnboardingModule: React.FC<OnboardingModuleProps> = ({ user }) => {
             }
           }}
         >
-          <OnboardingCarousel progress={onboardingProgress} currentPath={pathname} />
+          <OnboardingCarousel progress={onboarding_progress} currentPath={pathname} />
         </Paper>
       </Box>
     </Slide>

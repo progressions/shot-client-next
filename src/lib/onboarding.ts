@@ -10,17 +10,17 @@ export interface OnboardingMilestone {
 
 export interface OnboardingProgress {
   id: string;
-  firstCampaignCreatedAt?: string;
-  firstCharacterCreatedAt?: string;
-  firstFightCreatedAt?: string;
-  firstFactionCreatedAt?: string;
-  firstPartyCreatedAt?: string;
-  firstSiteCreatedAt?: string;
-  congratulationsDismissedAt?: string;
-  allMilestonesComplete: boolean;
-  onboardingComplete: boolean;
-  readyForCongratulations: boolean;
-  nextMilestone?: OnboardingMilestone;
+  first_campaign_created_at?: string;
+  first_character_created_at?: string;
+  first_fight_created_at?: string;
+  first_faction_created_at?: string;
+  first_party_created_at?: string;
+  first_site_created_at?: string;
+  congratulations_dismissed_at?: string;
+  all_milestones_complete: boolean;
+  onboarding_complete: boolean;
+  ready_for_congratulations: boolean;
+  next_milestone?: OnboardingMilestone;
 }
 
 export const ONBOARDING_MILESTONES: OnboardingMilestone[] = [
@@ -30,7 +30,7 @@ export const ONBOARDING_MILESTONES: OnboardingMilestone[] = [
     description: 'Campaigns organize your RPG sessions and characters.',
     targetPages: ['/campaigns'],
     targetElement: 'speed-dial-create',
-    timestampField: 'firstCampaignCreatedAt'
+    timestampField: 'first_campaign_created_at'
   },
   {
     key: 'character',
@@ -38,7 +38,7 @@ export const ONBOARDING_MILESTONES: OnboardingMilestone[] = [
     description: 'Characters are the heroes and villains of your story.',
     targetPages: ['/characters', '/campaigns/[id]/characters'],
     targetElement: 'speed-dial-create',
-    timestampField: 'firstCharacterCreatedAt'
+    timestampField: 'first_character_created_at'
   },
   {
     key: 'faction',
@@ -46,7 +46,7 @@ export const ONBOARDING_MILESTONES: OnboardingMilestone[] = [
     description: 'Factions group characters by allegiance. Start with the heroes.',
     targetPages: ['/factions'],
     targetElement: 'speed-dial-create',
-    timestampField: 'firstFactionCreatedAt',
+    timestampField: 'first_faction_created_at',
     suggestedName: 'The Dragons'
   },
   {
@@ -55,7 +55,7 @@ export const ONBOARDING_MILESTONES: OnboardingMilestone[] = [
     description: 'Fights manage combat initiative and character actions.',
     targetPages: ['/fights'],
     targetElement: 'speed-dial-create',
-    timestampField: 'firstFightCreatedAt'
+    timestampField: 'first_fight_created_at'
   },
   {
     key: 'party',
@@ -63,7 +63,7 @@ export const ONBOARDING_MILESTONES: OnboardingMilestone[] = [
     description: 'Parties group characters for adventures and missions.',
     targetPages: ['/parties'],
     targetElement: 'speed-dial-create',
-    timestampField: 'firstPartyCreatedAt'
+    timestampField: 'first_party_created_at'
   },
   {
     key: 'site',
@@ -71,7 +71,7 @@ export const ONBOARDING_MILESTONES: OnboardingMilestone[] = [
     description: 'Sites are the places where your adventures unfold.',
     targetPages: ['/sites'],
     targetElement: 'speed-dial-create',
-    timestampField: 'firstSiteCreatedAt'
+    timestampField: 'first_site_created_at'
   }
 ];
 
@@ -79,12 +79,12 @@ export const ONBOARDING_MILESTONES: OnboardingMilestone[] = [
  * Get the current milestone based on onboarding progress
  */
 export function getCurrentMilestone(progress: OnboardingProgress): OnboardingMilestone | null {
-  if (progress.onboardingComplete) {
+  if (progress.onboarding_complete) {
     return null;
   }
 
   // If no campaign created yet, always show campaign milestone
-  if (!progress.firstCampaignCreatedAt) {
+  if (!progress.first_campaign_created_at) {
     return ONBOARDING_MILESTONES[0];
   }
 
