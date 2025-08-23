@@ -2,7 +2,7 @@ import React from "react"
 import ThemeRegistry from "@/components/ThemeRegistry"
 import { AppProvider, LocalStorageProvider, ToastProvider } from "@/contexts"
 import { Navbar, Footer } from "@/components/ui"
-import { OnboardingModule } from "@/components/onboarding"
+import { OnboardingClientWrapper } from "@/components/onboarding"
 import { getCurrentUser } from "@/lib"
 import "@/styles/global.scss"
 import { Container } from "@mui/material"
@@ -22,7 +22,7 @@ export default async function RootLayout({
             <AppProvider initialUser={user}>
               <ToastProvider>
                 <Navbar user={user} />
-                {user && <OnboardingModule user={user} />}
+                <OnboardingClientWrapper />
                 <Container
                   maxWidth="md"
                   sx={{ paddingTop: 2, paddingBottom: 2 }}

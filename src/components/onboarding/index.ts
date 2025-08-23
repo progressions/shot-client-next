@@ -1,4 +1,5 @@
 export { OnboardingModule } from './OnboardingModule';
+export { OnboardingClientWrapper } from './OnboardingClientWrapper';
 export { CampaignOnboarding } from './CampaignOnboarding';
 export { OnboardingCarousel } from './OnboardingCarousel';
 export { CongratulationsModule } from './CongratulationsModule';

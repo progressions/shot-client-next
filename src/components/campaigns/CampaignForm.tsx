@@ -24,6 +24,7 @@ import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
 import { useEntity } from "@/hooks"
+import { useApp } from "@/contexts"
 
 type FormStateData = Campaign & {
   [key: string]: unknown
@@ -54,6 +55,7 @@ export default function CampaignForm({
     defaultCampaign,
     dispatchForm
   )
+  const { refreshUser } = useApp()
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
@@ -123,6 +125,7 @@ export default function CampaignForm({
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()
+    console.log("🚀 Campaign form submit started", { name: name.trim(), disabled })
     if (disabled) return
     if (!name.trim()) {
       dispatchForm({ type: FormActions.ERROR, payload: "Name is required" })
@@ -130,10 +133,16 @@ export default function CampaignForm({
     }
     dispatchForm({ type: FormActions.SUBMIT })
     try {
+      console.log("📝 Creating campaign...", data)
       await createEntity(data, image)
+      console.log("✅ Campaign created successfully, refreshing user data...")
+      // Refresh user data to update onboarding progress
+      await refreshUser()
+      console.log("🔄 User data refreshed, calling onCampaignCreated callback...")
       onCampaignCreated?.()
       handleClose()
     } catch (error) {
+      console.error("❌ Campaign creation failed:", error)
       handleFormErrors(error)
     }
   }
