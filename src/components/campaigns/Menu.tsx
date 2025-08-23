@@ -53,6 +53,11 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
     setDrawerOpen(false)
   }
 
+  function handleCampaignCreated() {
+    // Dispatch custom event to refresh campaigns list
+    window.dispatchEvent(new CustomEvent('campaignCreated'))
+  }
+
   return (
     <>
       <SpeedDial actions={actions} />
@@ -60,6 +65,7 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
         open={drawerOpen}
         onClose={handleCloseCreateDrawer}
         title="Create Campaign"
+        onCampaignCreated={handleCampaignCreated}
       />
     </>
   )

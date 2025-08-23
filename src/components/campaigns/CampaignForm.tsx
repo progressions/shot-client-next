@@ -34,12 +34,14 @@ interface CampaignFormProperties {
   open: boolean
   onClose: () => void
   title: string
+  onCampaignCreated?: () => void
 }
 
 export default function CampaignForm({
   open,
   onClose,
   title,
+  onCampaignCreated,
 }: CampaignFormProperties) {
   const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
     ...defaultCampaign,
@@ -129,6 +131,7 @@ export default function CampaignForm({
     dispatchForm({ type: FormActions.SUBMIT })
     try {
       await createEntity(data, image)
+      onCampaignCreated?.()
       handleClose()
     } catch (error) {
       handleFormErrors(error)

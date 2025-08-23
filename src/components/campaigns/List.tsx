@@ -80,6 +80,19 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
     fetchCampaigns(filters)
   }, [filters, fetchCampaigns, router, viewMode])
 
+  // Listen for campaign creation events to refresh the list
+  useEffect(() => {
+    const handleCampaignCreated = () => {
+      fetchCampaigns(filters)
+    }
+
+    window.addEventListener('campaignCreated', handleCampaignCreated)
+    
+    return () => {
+      window.removeEventListener('campaignCreated', handleCampaignCreated)
+    }
+  }, [fetchCampaigns, filters])
+
   useEffect(() => {
     saveLocally("campaignViewMode", viewMode)
   }, [viewMode, saveLocally])
