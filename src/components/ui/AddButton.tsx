@@ -15,6 +15,7 @@ export function AddButton({ onClick, disabled = false }: AddButtonProps) {
       size="small"
       disabled={disabled}
       sx={{ height: "2.5rem", px: 2 }}
+      aria-label="Add Party to Fight"
     >
       <PersonAddIcon />
     </Button>

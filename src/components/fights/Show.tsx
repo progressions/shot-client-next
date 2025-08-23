@@ -148,11 +148,13 @@ export default function Show({ fight: initialFight }: ShowProperties) {
       console.log("Adding party to fight:", party.name)
       console.log("Selected party object:", party)
       console.log("Party character IDs:", party.character_ids)
+      console.log("Party vehicle IDs:", party.vehicle_ids)
       
-      // Merge party's character_ids with fight's existing character_ids
+      // Merge party's character_ids and vehicle_ids with fight's existing ones
       const updatedFight = {
         ...fight,
         character_ids: [...(fight.character_ids || []), ...(party.character_ids || [])],
+        vehicle_ids: [...(fight.vehicle_ids || []), ...(party.vehicle_ids || [])],
       }
       
       await updateEntity(updatedFight)
