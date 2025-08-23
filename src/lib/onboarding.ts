@@ -11,6 +11,7 @@ export interface OnboardingMilestone {
 export interface OnboardingProgress {
   id: string;
   first_campaign_created_at?: string;
+  first_campaign_activated_at?: string;
   first_character_created_at?: string;
   first_fight_created_at?: string;
   first_faction_created_at?: string;
@@ -31,6 +32,14 @@ export const ONBOARDING_MILESTONES: OnboardingMilestone[] = [
     targetPages: ['/campaigns'],
     targetElement: 'speed-dial-create',
     timestampField: 'first_campaign_created_at'
+  },
+  {
+    key: 'activate-campaign',
+    title: '✨ Activate your Campaign!',
+    description: 'Set your campaign as active to start building characters and adventures.',
+    targetPages: ['/campaigns'],
+    targetElement: 'campaign-activate-button',
+    timestampField: 'first_campaign_activated_at'
   },
   {
     key: 'character',
@@ -86,6 +95,11 @@ export function getCurrentMilestone(progress: OnboardingProgress): OnboardingMil
   // If no campaign created yet, always show campaign milestone
   if (!progress.first_campaign_created_at) {
     return ONBOARDING_MILESTONES[0];
+  }
+
+  // If campaign created but not activated, show activation milestone
+  if (progress.first_campaign_created_at && !progress.first_campaign_activated_at) {
+    return ONBOARDING_MILESTONES[1]; // activate-campaign milestone
   }
 
   // Find the next uncompleted milestone

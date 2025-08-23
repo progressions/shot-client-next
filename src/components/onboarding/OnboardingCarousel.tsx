@@ -38,6 +38,7 @@ export interface OnboardingCarouselProps {
 }
 
 const MILESTONE_ICONS: Record<string, React.ReactElement> = {
+  'activate-campaign': <CheckCircle sx={{ fontSize: 24, width: 24, height: 24 }} />,
   character: <Person />,
   fight: <SportsKabaddi />,
   faction: <Flag />,
@@ -153,10 +154,17 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({ progress
         <Stack direction="row" alignItems="center" spacing={2}>
           <Box 
             sx={{ 
-              p: 1.5, 
+              p: 1, 
               borderRadius: '50%', 
               backgroundColor: 'info.main',
-              color: 'white'
+              color: 'white',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 48,
+              height: 48,
+              minWidth: 48,
+              minHeight: 48
             }}
           >
             {MILESTONE_ICONS[currentMilestone.key] || <CheckCircle sx={{ fontSize: 32 }} />}
@@ -194,12 +202,23 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({ progress
             textTransform: 'none'
           }}
         >
-          {isOnRelevantPage ? `Create ${currentMilestone.key}` : `Go to ${currentMilestone.key}s`}
+          {currentMilestone.key === 'activate-campaign' 
+            ? 'Activate Campaign'
+            : isOnRelevantPage 
+              ? `Create ${currentMilestone.key}` 
+              : `Go to ${currentMilestone.key}s`
+          }
         </Button>
         
-        {!isOnRelevantPage && (
+        {!isOnRelevantPage && currentMilestone.key !== 'activate-campaign' && (
           <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
             Look for the create button (⊕) when you get there!
+          </Typography>
+        )}
+        
+        {!isOnRelevantPage && currentMilestone.key === 'activate-campaign' && (
+          <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+            Look for the "Activate" button on your campaign!
           </Typography>
         )}
       </Stack>
@@ -216,7 +235,10 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({ progress
           }}
         >
           <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            🎯 <strong>You're here!</strong> Use the floating action button (⊕) at the bottom right to create your {currentMilestone.key}.
+            🎯 <strong>You're here!</strong> {currentMilestone.key === 'activate-campaign' 
+              ? 'Click the "Activate" button on your campaign to activate it.'
+              : `Use the floating action button (⊕) at the bottom right to create your ${currentMilestone.key}.`
+            }
           </Typography>
         </Box>
       )}
@@ -228,13 +250,12 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({ progress
             ✅ Completed:
           </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap">
-            <Chip label="Campaign" size="small" color="success" />
-            {ONBOARDING_MILESTONES.slice(1).filter(milestone => 
+            {ONBOARDING_MILESTONES.filter(milestone => 
               progress[milestone.timestampField]
             ).map(milestone => (
               <Chip 
                 key={milestone.key} 
-                label={milestone.key} 
+                label={milestone.key === 'activate-campaign' ? 'Campaign Active' : milestone.key} 
                 size="small" 
                 color="success" 
               />
