@@ -139,6 +139,12 @@ export default function CampaignForm({
       // Refresh user data to update onboarding progress
       await refreshUser()
       console.log("🔄 User data refreshed, calling onCampaignCreated callback...")
+      
+      // Dispatch custom event to notify campaigns list to reload
+      const campaignCreatedEvent = new CustomEvent('campaignCreated')
+      window.dispatchEvent(campaignCreatedEvent)
+      console.log("📡 Dispatched campaignCreated event")
+      
       onCampaignCreated?.()
       handleClose()
     } catch (error) {

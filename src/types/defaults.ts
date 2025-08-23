@@ -214,6 +214,7 @@ export const defaultCampaign: Campaign = {
   id: "",
   name: "",
   description: "",
+  active: true,
   gamemaster: defaultUser,
   players: [],
   player_ids: [],
