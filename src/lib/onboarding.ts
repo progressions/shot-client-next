@@ -27,8 +27,8 @@ export interface OnboardingProgress {
 export const ONBOARDING_MILESTONES: OnboardingMilestone[] = [
   {
     key: 'campaign',
-    title: '🎯 Ready to start your first campaign?',
-    description: 'Campaigns organize your RPG sessions and characters.',
+    title: '🎯 Ready to start your first Campaign?',
+    description: 'Campaigns organize your RPG sessions and Characters.',
     targetPages: ['/campaigns'],
     targetElement: 'speed-dial-create',
     timestampField: 'first_campaign_created_at'
@@ -36,14 +36,14 @@ export const ONBOARDING_MILESTONES: OnboardingMilestone[] = [
   {
     key: 'activate-campaign',
     title: '✨ Activate your Campaign!',
-    description: 'Set your campaign as active to start building characters and adventures.',
+    description: 'Set your Campaign as active to start building Characters and adventures.',
     targetPages: ['/campaigns'],
     targetElement: 'campaign-activate-button',
     timestampField: 'first_campaign_activated_at'
   },
   {
     key: 'character',
-    title: '👤 Create your first character!',
+    title: '👤 Create your first Character!',
     description: 'Characters are the heroes and villains of your story.',
     targetPages: ['/characters', '/campaigns/[id]/characters'],
     targetElement: 'speed-dial-create',
@@ -51,8 +51,8 @@ export const ONBOARDING_MILESTONES: OnboardingMilestone[] = [
   },
   {
     key: 'faction',
-    title: '🏴 Create "The Dragons" faction!',
-    description: 'Factions group characters by allegiance. Start with the heroes.',
+    title: '🏴 Create "The Dragons" Faction!',
+    description: 'Factions group Characters by allegiance. Start with the heroes.',
     targetPages: ['/factions'],
     targetElement: 'speed-dial-create',
     timestampField: 'first_faction_created_at',
@@ -60,23 +60,23 @@ export const ONBOARDING_MILESTONES: OnboardingMilestone[] = [
   },
   {
     key: 'fight',
-    title: '⚔️ Start your first fight!',
-    description: 'Fights manage combat initiative and character actions.',
+    title: '⚔️ Start your first Fight!',
+    description: 'Fights manage combat initiative and Character actions.',
     targetPages: ['/fights'],
     targetElement: 'speed-dial-create',
     timestampField: 'first_fight_created_at'
   },
   {
     key: 'party',
-    title: '👥 Organize a party!',
-    description: 'Parties group characters for adventures and missions.',
+    title: '👥 Organize a Party!',
+    description: 'Parties group Characters for adventures and missions.',
     targetPages: ['/parties'],
     targetElement: 'speed-dial-create',
     timestampField: 'first_party_created_at'
   },
   {
     key: 'site',
-    title: '🏛️ Create your first location!',
+    title: '🏛️ Create your first Site!',
     description: 'Sites are the places where your adventures unfold.',
     targetPages: ['/sites'],
     targetElement: 'speed-dial-create',

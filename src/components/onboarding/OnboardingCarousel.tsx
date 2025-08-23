@@ -205,8 +205,8 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({ progress
           {currentMilestone.key === 'activate-campaign' 
             ? 'Activate Campaign'
             : isOnRelevantPage 
-              ? `Create ${currentMilestone.key}` 
-              : `Go to ${currentMilestone.key}s`
+              ? `Create ${currentMilestone.key.charAt(0).toUpperCase() + currentMilestone.key.slice(1)}` 
+              : `Go to ${currentMilestone.key.charAt(0).toUpperCase() + currentMilestone.key.slice(1)}s`
           }
         </Button>
         
@@ -218,7 +218,7 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({ progress
         
         {!isOnRelevantPage && currentMilestone.key === 'activate-campaign' && (
           <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-            Look for the "Activate" button on your campaign!
+            Look for the "Activate" button on your Campaign!
           </Typography>
         )}
       </Stack>
@@ -236,8 +236,8 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({ progress
         >
           <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             🎯 <strong>You're here!</strong> {currentMilestone.key === 'activate-campaign' 
-              ? 'Click the "Activate" button on your campaign to activate it.'
-              : `Use the floating action button (⊕) at the bottom right to create your ${currentMilestone.key}.`
+              ? 'Click the "Activate" button on your Campaign to activate it.'
+              : `Use the floating action button (⊕) at the bottom right to create your ${currentMilestone.key.charAt(0).toUpperCase() + currentMilestone.key.slice(1)}.`
             }
           </Typography>
         </Box>
@@ -255,7 +255,7 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({ progress
             ).map(milestone => (
               <Chip 
                 key={milestone.key} 
-                label={milestone.key === 'activate-campaign' ? 'Campaign Active' : milestone.key} 
+                label={milestone.key === 'activate-campaign' ? 'Campaign Active' : milestone.key.charAt(0).toUpperCase() + milestone.key.slice(1)} 
                 size="small" 
                 color="success" 
               />
