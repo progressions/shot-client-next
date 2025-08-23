@@ -11,13 +11,27 @@ export async function requireCampaign(): Promise<void> {
   }
 
   try {
-    const response = await client.getCurrentCampaign()
-    const campaign = response?.data
+    // Check if user has a current campaign
+    const campaignResponse = await client.getCurrentCampaign()
+    const campaign = campaignResponse?.data
 
-    // If no campaign or campaign has empty id, redirect to campaigns
-    if (!campaign || !campaign.id || campaign.id.trim() === "") {
-      redirect("/campaigns")
+    // If user has a campaign, they're good to go
+    if (campaign && campaign.id && campaign.id.trim() !== "") {
+      return
     }
+
+    // No campaign - check if user is still in onboarding
+    const userResponse = await client.getCurrentUser()
+    const user = userResponse?.data
+    const onboardingProgress = user?.onboarding_progress
+
+    // If user hasn't completed onboarding, allow them to stay on homepage
+    if (onboardingProgress && !onboardingProgress.onboarding_complete) {
+      return // Allow access to homepage for onboarding users
+    }
+
+    // User has completed onboarding but has no campaign - redirect to campaigns
+    redirect("/campaigns")
   } catch (error: unknown) {
     // If it's an authentication error (401), redirect to login
     if (
