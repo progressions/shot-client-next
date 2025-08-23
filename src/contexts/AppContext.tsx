@@ -43,6 +43,7 @@ interface AppContextType {
     entityType: string,
     callback: EntityUpdateCallback
   ) => () => void
+  refreshUser: () => Promise<void>
   loading: boolean
   error: string | null
   hasCampaign: boolean
@@ -84,8 +85,8 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
   const jwt =
     (typeof window !== "undefined" ? localStorage.getItem("jwtToken") : null) ||
     Cookies.get("jwtToken") ||
-    ""
-  const client = useMemo(() => Client({ jwt }), [jwt])
+    null
+  const client = useMemo(() => Client({ jwt: jwt || undefined }), [jwt])
   const hasFetched = useRef(false)
   const entityUpdateCallbacks = useRef<Map<string, Set<EntityUpdateCallback>>>(
     new Map()
@@ -302,6 +303,30 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
     })
   }, [campaignData])
 
+  const refreshUser = useCallback(async () => {
+    if (!jwt) {
+      console.log("⚠️ No JWT token available for user refresh")
+      return
+    }
+    
+    try {
+      console.log("🔄 Refreshing user data for onboarding progress...")
+      const userResponse = await client.getCurrentUser()
+      const { data: userData } = userResponse || {}
+      
+      if (userData) {
+        console.log("✅ User data refreshed successfully")
+        console.log("📊 Onboarding progress:", userData.onboarding_progress)
+        dispatch({ type: UserActions.USER, payload: userData })
+        localStorage.setItem(`currentUser-${jwt}`, JSON.stringify(userData))
+      } else {
+        console.log("⚠️ No user data returned from API")
+      }
+    } catch (error) {
+      console.error("⚠️ Failed to refresh user data:", error)
+    }
+  }, [jwt, client, dispatch])
+
   const hasCampaign = Boolean(campaign?.id && campaign.id.trim() !== "")
 
   return (
@@ -317,6 +342,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         dispatchCurrentUser: dispatch,
         setCurrentCampaign,
         subscribeToEntity,
+        refreshUser,
         loading,
         error,
         hasCampaign,

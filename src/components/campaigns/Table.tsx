@@ -21,7 +21,7 @@ interface ViewProps {
 export default function View({ formState, dispatchForm }: ViewProps) {
   const { campaigns } = formState.data
   const { client } = useClient()
-  const { campaign: currentCampaign, setCurrentCampaign } = useApp()
+  const { campaign: currentCampaign, setCurrentCampaign, refreshUser } = useApp()
   const { toastSuccess, toastError } = useToast()
   const [loadingCampaignId, setLoadingCampaignId] = useState<string | null>(
     null
@@ -32,8 +32,15 @@ export default function View({ formState, dispatchForm }: ViewProps) {
 
     setLoadingCampaignId(campaign.id)
     try {
+      console.log("🚀 Starting campaign activation...")
       await client.setCurrentCampaign(campaign)
+      console.log("✅ Campaign set via client")
       await setCurrentCampaign(campaign)
+      console.log("✅ Campaign set via context")
+      // Refresh user data to update onboarding progress after campaign activation
+      console.log("🔄 Calling refreshUser...")
+      await refreshUser()
+      console.log("✅ RefreshUser completed")
       toastSuccess(`Campaign "${campaign.name}" activated`)
     } catch (error) {
       console.error("Failed to activate campaign:", error)

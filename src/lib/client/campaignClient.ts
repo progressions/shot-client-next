@@ -132,7 +132,10 @@ export function createCampaignClient(deps: ClientDependencies) {
   async function setCurrentCampaign(
     campaign: Campaign | null
   ): Promise<AxiosResponse<Campaign | null>> {
-    return post(apiV2.currentCampaign(), { id: campaign?.id })
+    if (campaign === null) {
+      return patch(`${apiV2.campaigns()}/set`, { id: null })
+    }
+    return patch(`${apiV2.campaigns(campaign)}/set`, { id: campaign.id })
   }
 
   async function getCurrentCampaign(

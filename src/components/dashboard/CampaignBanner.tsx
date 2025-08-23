@@ -28,7 +28,7 @@ export default function CampaignBanner({ campaign }: CampaignProperties) {
           left: 0,
           right: 0,
           height: "100%",
-          backgroundImage: `url(${campaign.image_url || "/default-campaign-banner.jpg"})`,
+          backgroundImage: campaign.image_url ? `url(${campaign.image_url})` : "none",
           backgroundSize: "cover",
           backgroundPosition: "center",
           zIndex: 1,

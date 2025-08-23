@@ -24,6 +24,7 @@ import { Editor } from "@/components/editor"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
 import { useEntity } from "@/hooks"
+import { useApp } from "@/contexts"
 
 type FormStateData = Campaign & {
   [key: string]: unknown
@@ -34,12 +35,14 @@ interface CampaignFormProperties {
   open: boolean
   onClose: () => void
   title: string
+  onCampaignCreated?: () => void
 }
 
 export default function CampaignForm({
   open,
   onClose,
   title,
+  onCampaignCreated,
 }: CampaignFormProperties) {
   const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
     ...defaultCampaign,
@@ -52,6 +55,7 @@ export default function CampaignForm({
     defaultCampaign,
     dispatchForm
   )
+  const { refreshUser } = useApp()
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
@@ -121,6 +125,7 @@ export default function CampaignForm({
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()
+    console.log("🚀 Campaign form submit started", { name: name.trim(), disabled })
     if (disabled) return
     if (!name.trim()) {
       dispatchForm({ type: FormActions.ERROR, payload: "Name is required" })
@@ -129,8 +134,23 @@ export default function CampaignForm({
     dispatchForm({ type: FormActions.SUBMIT })
     try {
       await createEntity(data, image)
+      // Refresh user data to update onboarding progress
+      await refreshUser()
+      
+      // Dispatch custom event to notify campaigns list to reload
+      const campaignCreatedEvent = new CustomEvent('campaignCreated')
+      window.dispatchEvent(campaignCreatedEvent)
+      
+      // Additional event dispatch with delay to ensure event listeners are ready
+      setTimeout(() => {
+        const delayedEvent = new CustomEvent('campaignCreated')
+        window.dispatchEvent(delayedEvent)
+      }, 500)
+      
+      onCampaignCreated?.()
       handleClose()
     } catch (error) {
+      console.error("❌ Campaign creation failed:", error)
       handleFormErrors(error)
     }
   }

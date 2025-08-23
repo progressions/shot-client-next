@@ -34,12 +34,14 @@ interface VehicleFormProperties {
   open: boolean
   onClose: () => void
   title: string
+  onVehicleCreated?: () => void
 }
 
 export default function VehicleForm({
   open,
   onClose,
   title,
+  onVehicleCreated,
 }: VehicleFormProperties) {
   const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
     ...defaultVehicle,
@@ -106,6 +108,7 @@ export default function VehicleForm({
     dispatchForm({ type: FormActions.SUBMIT })
     try {
       await createEntity(data, image)
+      onVehicleCreated?.()
       handleClose()
     } catch (error) {
       handleFormErrors(error)

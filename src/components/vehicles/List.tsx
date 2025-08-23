@@ -90,6 +90,19 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
     fetchVehicles(filters)
   }, [filters, fetchVehicles, router, viewMode])
 
+  // Listen for vehicle creation events to refresh the list
+  useEffect(() => {
+    const handleVehicleCreated = () => {
+      fetchVehicles(filters)
+    }
+
+    window.addEventListener('vehicleCreated', handleVehicleCreated)
+    
+    return () => {
+      window.removeEventListener('vehicleCreated', handleVehicleCreated)
+    }
+  }, [fetchVehicles, filters])
+
   useEffect(() => {
     saveLocally("vehicleViewMode", viewMode)
   }, [viewMode, saveLocally])

@@ -82,7 +82,7 @@ export function SpeedDialMenu({
 
   return (
     <SpeedDial
-      ariaLabel="Weapon actions"
+      ariaLabel="More actions"
       sx={{
         position: "absolute",
         right: 0,
