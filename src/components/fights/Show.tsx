@@ -116,7 +116,7 @@ export default function Show({ fight: initialFight }: ShowProperties) {
   // Fetch parties for AddParty component
   const fetchParties = useCallback(async () => {
     try {
-      const response = await client.getParties()
+      const response = await client.getParties({ autocomplete: true })
       setPartyFormState(prev => ({
         ...prev,
         data: {
@@ -145,12 +145,21 @@ export default function Show({ fight: initialFight }: ShowProperties) {
   // Handle adding party to fight
   const handlePartyAdd = useCallback(async (party: Party) => {
     try {
-      // TODO: Implement API call to add party to fight
       console.log("Adding party to fight:", party.name)
+      console.log("Selected party object:", party)
+      console.log("Party character IDs:", party.character_ids)
+      
+      // Merge party's character_ids with fight's existing character_ids
+      const updatedFight = {
+        ...fight,
+        character_ids: [...(fight.character_ids || []), ...(party.character_ids || [])],
+      }
+      
+      await updateEntity(updatedFight)
     } catch (error) {
       console.error("Failed to add party to fight:", error)
     }
-  }, [])
+  }, [fight, updateEntity])
 
   // Fetch parties on component mount
   useEffect(() => {
@@ -237,11 +246,21 @@ export default function Show({ fight: initialFight }: ShowProperties) {
           </FormControl>
         </Stack>
       </Box>
-      <AddParty 
-        formState={partyFormState}
-        onFiltersUpdate={handlePartyFiltersUpdate}
-        onPartyAdd={handlePartyAdd}
-      />
+      <Box>
+        <SectionHeader
+          title="Parties"
+          icon={<Icon keyword="Parties" />}
+        >
+          Quickly add all members of a <InfoLink href="/parties" info="Party" />{" "}
+          to this fight at once. All characters and vehicles in the selected{" "}
+          party will be added to the encounter.
+        </SectionHeader>
+        <AddParty 
+          formState={partyFormState}
+          onFiltersUpdate={handlePartyFiltersUpdate}
+          onPartyAdd={handlePartyAdd}
+        />
+      </Box>
       <Stack direction="column" spacing={2}>
         <Manager
           icon={<Icon keyword="Fighters" size="24" />}
