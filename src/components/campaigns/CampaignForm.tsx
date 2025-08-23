@@ -133,17 +133,19 @@ export default function CampaignForm({
     }
     dispatchForm({ type: FormActions.SUBMIT })
     try {
-      console.log("📝 Creating campaign...", data)
       await createEntity(data, image)
-      console.log("✅ Campaign created successfully, refreshing user data...")
       // Refresh user data to update onboarding progress
       await refreshUser()
-      console.log("🔄 User data refreshed, calling onCampaignCreated callback...")
       
       // Dispatch custom event to notify campaigns list to reload
       const campaignCreatedEvent = new CustomEvent('campaignCreated')
       window.dispatchEvent(campaignCreatedEvent)
-      console.log("📡 Dispatched campaignCreated event")
+      
+      // Additional event dispatch with delay to ensure event listeners are ready
+      setTimeout(() => {
+        const delayedEvent = new CustomEvent('campaignCreated')
+        window.dispatchEvent(delayedEvent)
+      }, 500)
       
       onCampaignCreated?.()
       handleClose()
