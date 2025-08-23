@@ -11,11 +11,18 @@ export async function getCurrentUser() {
   try {
     const { data } = await client.getCurrentUser()
     if (!data) {
-      throw new Error("Failed to fetch user data")
+      // Don't throw error, just return null for missing data
+      console.log("No user data returned from API")
+      return null
     }
     return data
-  } catch (error) {
-    console.error(error)
+  } catch (error: any) {
+    // Handle authentication errors gracefully during SSR
+    if (error?.response?.status === 401 || error?.response?.status === 400) {
+      console.log("Authentication error during SSR, returning null user")
+      return null
+    }
+    console.error("Unexpected error in getCurrentUser:", error)
     return null
   }
 }

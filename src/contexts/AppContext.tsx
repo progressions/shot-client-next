@@ -85,8 +85,8 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
   const jwt =
     (typeof window !== "undefined" ? localStorage.getItem("jwtToken") : null) ||
     Cookies.get("jwtToken") ||
-    ""
-  const client = useMemo(() => Client({ jwt }), [jwt])
+    null
+  const client = useMemo(() => Client({ jwt: jwt || undefined }), [jwt])
   const hasFetched = useRef(false)
   const entityUpdateCallbacks = useRef<Map<string, Set<EntityUpdateCallback>>>(
     new Map()
