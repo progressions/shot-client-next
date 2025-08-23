@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState, useCallback } from "react"
 import {
   Typography,
   FormControl,
@@ -8,7 +8,7 @@ import {
   Stack,
   Box,
 } from "@mui/material"
-import type { Fight } from "@/types"
+import type { Fight, Party, Faction } from "@/types"
 import {
   JoinFightButton,
   StartFightButton,
@@ -23,8 +23,8 @@ import {
   Icon,
   Manager,
 } from "@/components/ui"
-import { useCampaign } from "@/contexts"
-import { FightChips } from "@/components/fights"
+import { useCampaign, useClient } from "@/contexts"
+import { FightChips, AddParty } from "@/components/fights"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -40,9 +40,19 @@ interface ShowProperties {
 
 export default function Show({ fight: initialFight }: ShowProperties) {
   const { subscribeToEntity } = useCampaign()
+  const { client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialFight,
     errors: {},
+  })
+  
+  // Party state for AddParty component
+  const [partyFormState, setPartyFormState] = useState({
+    data: {
+      filters: {},
+      parties: [] as Party[],
+      factions: [] as Faction[]
+    }
   })
   const { errors, status, data } = formState
   const fight = data.entity
@@ -102,6 +112,50 @@ export default function Show({ fight: initialFight }: ShowProperties) {
       value: { ...fight, [name]: value },
     })
   }
+
+  // Fetch parties for AddParty component
+  const fetchParties = useCallback(async () => {
+    try {
+      const response = await client.getParties()
+      setPartyFormState(prev => ({
+        ...prev,
+        data: {
+          filters: prev.data.filters,
+          parties: response.data.parties || [],
+          factions: response.data.factions || []
+        }
+      }))
+    } catch (error) {
+      console.error("Failed to fetch parties:", error)
+    }
+  }, [client])
+
+  // Handle party filter updates
+  const handlePartyFiltersUpdate = useCallback((filters: Record<string, any>) => {
+    setPartyFormState(prev => ({
+      ...prev,
+      data: {
+        filters,
+        parties: prev.data.parties,
+        factions: prev.data.factions
+      }
+    }))
+  }, [])
+
+  // Handle adding party to fight
+  const handlePartyAdd = useCallback(async (party: Party) => {
+    try {
+      // TODO: Implement API call to add party to fight
+      console.log("Adding party to fight:", party.name)
+    } catch (error) {
+      console.error("Failed to add party to fight:", error)
+    }
+  }, [])
+
+  // Fetch parties on component mount
+  useEffect(() => {
+    fetchParties()
+  }, [fetchParties])
 
   return (
     <Box
@@ -183,6 +237,11 @@ export default function Show({ fight: initialFight }: ShowProperties) {
           </FormControl>
         </Stack>
       </Box>
+      <AddParty 
+        formState={partyFormState}
+        onFiltersUpdate={handlePartyFiltersUpdate}
+        onPartyAdd={handlePartyAdd}
+      />
       <Stack direction="column" spacing={2}>
         <Manager
           icon={<Icon keyword="Fighters" size="24" />}
