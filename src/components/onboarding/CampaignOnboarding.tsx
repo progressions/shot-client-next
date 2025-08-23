@@ -16,7 +16,14 @@ export const CampaignOnboarding: React.FC<CampaignOnboardingProps> = ({ currentP
   const isOnRelevantPage = isRelevantPage(campaignMilestone, currentPath);
 
   const handleCreateCampaign = () => {
-    router.push('/campaigns');
+    // If already on campaigns page, trigger drawer opening
+    if (currentPath === '/campaigns') {
+      // Dispatch custom event to open campaign creation drawer
+      window.dispatchEvent(new CustomEvent('openCampaignDrawer'));
+    } else {
+      // Navigate to campaigns page
+      router.push('/campaigns');
+    }
   };
 
   return (

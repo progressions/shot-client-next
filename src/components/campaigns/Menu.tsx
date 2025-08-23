@@ -4,7 +4,7 @@ import { GridView, ViewList } from "@mui/icons-material"
 import { CampaignForm } from "@/components/campaigns"
 import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface MenuProps {
   viewMode: "table" | "mobile"
@@ -13,6 +13,19 @@ interface MenuProps {
 
 export default function Menu({ viewMode, setViewMode }: MenuProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
+
+  // Listen for onboarding CTA events to open campaign drawer
+  useEffect(() => {
+    const handleOpenDrawerEvent = () => {
+      setDrawerOpen(true)
+    }
+
+    window.addEventListener('openCampaignDrawer', handleOpenDrawerEvent)
+    
+    return () => {
+      window.removeEventListener('openCampaignDrawer', handleOpenDrawerEvent)
+    }
+  }, [])
 
   const handleToggleView = () => {
     setViewMode(viewMode === "table" ? "mobile" : "table")
