@@ -48,6 +48,7 @@ export const CampaignOnboarding: React.FC<CampaignOnboardingProps> = ({ currentP
           size="large"
           endIcon={<ArrowForward />}
           onClick={handleCreateCampaign}
+          data-testid="campaign-onboarding-cta"
           sx={{ 
             px: 4, 
             py: 1.5,
