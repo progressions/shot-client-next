@@ -25,9 +25,9 @@ export async function requireCampaign(): Promise<void> {
     const user = userResponse?.data
     const onboardingProgress = user?.onboarding_progress
 
-    // If user hasn't created their first campaign yet, allow them to stay on homepage
-    if (onboardingProgress && !onboardingProgress.first_campaign_created_at) {
-      return // Allow access to homepage for users who haven't created a campaign yet
+    // If user hasn't completed onboarding, allow them to stay on homepage
+    if (onboardingProgress && !onboardingProgress.onboarding_complete) {
+      return // Allow access to homepage for onboarding users
     }
 
     // User has completed onboarding but has no campaign - redirect to campaigns
