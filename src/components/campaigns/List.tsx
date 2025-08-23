@@ -32,7 +32,7 @@ export type FormStateData = {
 
 export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { client } = useClient()
-  const { subscribeToEntity } = useCampaign()
+  const { subscribeToEntity, campaignData } = useCampaign()
   const { saveLocally } = useLocalStorage()
   const router = useRouter()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
@@ -62,7 +62,15 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
     [client, dispatchForm]
   )
 
-  // Subscribe to campaign updates
+  // Subscribe to campaign updates using campaignData (same pattern as factions)
+  useEffect(() => {
+    if (!campaignData) return
+    if (campaignData.campaigns === "reload") {
+      fetchCampaigns(filters)
+    }
+  }, [campaignData, fetchCampaigns, filters])
+
+  // Also keep the subscribeToEntity pattern for backwards compatibility
   useEffect(() => {
     const unsubscribe = subscribeToEntity("campaigns", data => {
       if (data === "reload") {
@@ -83,7 +91,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   // Listen for campaign creation events to refresh the list
   useEffect(() => {
     const handleCampaignCreated = () => {
-      fetchCampaigns(filters)
+      fetchCampaigns(formState.data.filters)
     }
 
     window.addEventListener('campaignCreated', handleCampaignCreated)
@@ -91,7 +99,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
     return () => {
       window.removeEventListener('campaignCreated', handleCampaignCreated)
     }
-  }, [fetchCampaigns, filters])
+  }, [fetchCampaigns, formState.data.filters])
 
   useEffect(() => {
     saveLocally("campaignViewMode", viewMode)

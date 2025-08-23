@@ -161,6 +161,7 @@ export default function LoginPage() {
           <TextField
             margin="normal"
             required
+            name="email"
             label="Email Address"
             value={email}
             onChange={e => setEmail(e.target.value)}
@@ -169,6 +170,7 @@ export default function LoginPage() {
           <TextField
             margin="normal"
             required
+            name="password"
             label="Password"
             type="password"
             value={password}
