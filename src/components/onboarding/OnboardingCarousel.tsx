@@ -1,0 +1,247 @@
+'use client';
+
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { 
+  Box, 
+  Typography, 
+  Button, 
+  Stack, 
+  Chip, 
+  IconButton,
+  LinearProgress,
+  Tooltip
+} from '@mui/material';
+import { 
+  ArrowForward, 
+  ArrowBack,
+  ArrowForwardIos,
+  CheckCircle,
+  Person,
+  SportsKabaddi,
+  Flag,
+  Groups,
+  LocationCity
+} from '@mui/icons-material';
+import { 
+  OnboardingProgress, 
+  ONBOARDING_MILESTONES, 
+  getMilestonesForPage,
+  getCompletedCount,
+  getCompletionPercentage,
+  isRelevantPage
+} from '@/lib/onboarding';
+
+export interface OnboardingCarouselProps {
+  progress: OnboardingProgress;
+  currentPath: string;
+}
+
+const MILESTONE_ICONS: Record<string, React.ReactElement> = {
+  character: <Person />,
+  fight: <SportsKabaddi />,
+  faction: <Flag />,
+  party: <Groups />,
+  site: <LocationCity />
+};
+
+export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({ progress, currentPath }) => {
+  const router = useRouter();
+  
+  // Get remaining milestones (skip campaign since it's done)
+  const remainingMilestones = ONBOARDING_MILESTONES.slice(1).filter(milestone => 
+    !progress[milestone.timestampField]
+  );
+  
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const currentMilestone = remainingMilestones[currentIndex];
+  
+  if (!currentMilestone) {
+    return null; // All milestones complete
+  }
+
+  const completedCount = getCompletedCount(progress);
+  const completionPercentage = getCompletionPercentage(progress);
+  const isOnRelevantPage = isRelevantPage(currentMilestone, currentPath);
+
+  const handlePrevious = () => {
+    setCurrentIndex(Math.max(0, currentIndex - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex(Math.min(remainingMilestones.length - 1, currentIndex + 1));
+  };
+
+  const handleNavigateToMilestone = () => {
+    const targetPage = currentMilestone.targetPages[0];
+    router.push(targetPage);
+  };
+
+  return (
+    <Box>
+      <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
+        <Box>
+          <Typography variant="h6" sx={{ fontWeight: 600, color: 'info.main' }}>
+            🎉 Great! Now build your world:
+          </Typography>
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Progress: {completedCount}/6 milestones
+            </Typography>
+            <LinearProgress 
+              variant="determinate" 
+              value={completionPercentage} 
+              sx={{ 
+                flex: 1, 
+                height: 8, 
+                borderRadius: 4,
+                backgroundColor: 'grey.200',
+                '& .MuiLinearProgress-bar': {
+                  backgroundColor: 'success.main'
+                }
+              }} 
+            />
+            <Typography variant="body2" color="text.secondary">
+              {completionPercentage}%
+            </Typography>
+          </Stack>
+        </Box>
+      </Stack>
+
+      <Box sx={{ position: 'relative', mb: 3 }}>
+        {/* Navigation arrows */}
+        <Stack 
+          direction="row" 
+          justifyContent="space-between" 
+          alignItems="center"
+          sx={{ mb: 2 }}
+        >
+          <IconButton 
+            onClick={handlePrevious}
+            disabled={currentIndex === 0}
+            size="small"
+          >
+            <ArrowBack />
+          </IconButton>
+          
+          <Stack direction="row" spacing={1}>
+            {remainingMilestones.map((_, index) => (
+              <Box
+                key={index}
+                sx={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  backgroundColor: index === currentIndex ? 'info.main' : 'grey.300',
+                  cursor: 'pointer'
+                }}
+                onClick={() => setCurrentIndex(index)}
+              />
+            ))}
+          </Stack>
+          
+          <IconButton 
+            onClick={handleNext}
+            disabled={currentIndex === remainingMilestones.length - 1}
+            size="small"
+          >
+            <ArrowForwardIos />
+          </IconButton>
+        </Stack>
+
+        {/* Current milestone */}
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <Box 
+            sx={{ 
+              p: 1.5, 
+              borderRadius: '50%', 
+              backgroundColor: 'info.main',
+              color: 'white'
+            }}
+          >
+            {MILESTONE_ICONS[currentMilestone.key] || <CheckCircle sx={{ fontSize: 32 }} />}
+          </Box>
+          
+          <Box flex={1}>
+            <Typography variant="h6" component="h3" sx={{ fontWeight: 600 }}>
+              {currentMilestone.title}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              {currentMilestone.description}
+            </Typography>
+            
+            {currentMilestone.suggestedName && (
+              <Chip 
+                label={`Try: "${currentMilestone.suggestedName}"`}
+                size="small" 
+                variant="outlined"
+                sx={{ mt: 1 }}
+              />
+            )}
+          </Box>
+        </Stack>
+      </Box>
+
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+        <Button
+          variant="contained"
+          endIcon={<ArrowForward />}
+          onClick={handleNavigateToMilestone}
+          sx={{ 
+            px: 3, 
+            py: 1,
+            fontWeight: 600,
+            textTransform: 'none'
+          }}
+        >
+          {isOnRelevantPage ? `Create ${currentMilestone.key}` : `Go to ${currentMilestone.key}s`}
+        </Button>
+        
+        {!isOnRelevantPage && (
+          <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+            Look for the create button (⊕) when you get there!
+          </Typography>
+        )}
+      </Stack>
+
+      {isOnRelevantPage && (
+        <Box 
+          sx={{ 
+            mt: 3, 
+            p: 2, 
+            borderRadius: 1, 
+            backgroundColor: 'info.50',
+            border: '1px solid',
+            borderColor: 'info.200'
+          }}
+        >
+          <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            🎯 <strong>You're here!</strong> Use the floating action button (⊕) at the bottom right to create your {currentMilestone.key}.
+          </Typography>
+        </Box>
+      )}
+
+      {/* Show completed milestones */}
+      {completedCount > 1 && (
+        <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid', borderColor: 'grey.200' }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 500 }}>
+            ✅ Completed:
+          </Typography>
+          <Stack direction="row" spacing={1} flexWrap="wrap">
+            <Chip label="Campaign" size="small" color="success" />
+            {ONBOARDING_MILESTONES.slice(1).filter(milestone => 
+              progress[milestone.timestampField]
+            ).map(milestone => (
+              <Chip 
+                key={milestone.key} 
+                label={milestone.key} 
+                size="small" 
+                color="success" 
+              />
+            ))}
+          </Stack>
+        </Box>
+      )}
+    </Box>
+  );
+};
