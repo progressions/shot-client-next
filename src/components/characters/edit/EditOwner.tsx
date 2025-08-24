@@ -36,14 +36,14 @@ export default function EditOwner({
     return false
   }
 
-  const handleOwnerChange = async (newUser: any) => {
-    if (!newUser) return
+  const handleOwnerChange = async (newUserId: string | null) => {
+    if (!newUserId) return
 
     const updatedCharacter = {
       ...character,
-      user_id: newUser.id,
+      user_id: newUserId,
     }
-    setOwnerId(newUser.id)
+    setOwnerId(newUserId)
     updateCharacter(updatedCharacter)
   }
 

@@ -58,18 +58,22 @@ export default function UserAutocomplete({
     }
     return users
       .filter(user => {
-        const searchName = user.name || user.email || ""
-        return searchName.toLowerCase().includes(inputValue.toLowerCase())
+        const searchName = user.name || ""
+        const searchEmail = user.email || ""
+        const query = inputValue.toLowerCase()
+        return searchName.toLowerCase().includes(query) || 
+               searchEmail.toLowerCase().includes(query)
       })
       .map(user => ({
-        label: user.name || user.email || "Unknown User",
+        label: user.name 
+          ? `${user.name} (${user.email})`
+          : user.email || "Unknown User",
         value: user.id,
       }))
   }
 
-  const handleChange = (selectedOption: Option | null) => {
-    const user = users.find(s => s.id === selectedOption)
-    onChange(user)
+  const handleChange = (selectedOption: string | null) => {
+    onChange(selectedOption)
   }
 
   return (
