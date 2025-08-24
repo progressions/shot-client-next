@@ -24,6 +24,12 @@ export const OnboardingPointer: React.FC<OnboardingPointerProps> = ({
 }) => {
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null)
   const [isVisible, setIsVisible] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Client-side mounting check
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   useEffect(() => {
     const findAndPositionTarget = () => {
@@ -71,7 +77,7 @@ export const OnboardingPointer: React.FC<OnboardingPointerProps> = ({
     onDismiss?.()
   }
 
-  if (!targetRect || !isVisible) {
+  if (!targetRect || !isVisible || !isMounted) {
     return null
   }
 
@@ -178,6 +184,11 @@ export const OnboardingPointer: React.FC<OnboardingPointerProps> = ({
   }
 
   const pointerPosition = getPointerPosition()
+
+  // Safely create portal only when document.body is available
+  if (typeof document === 'undefined' || !document.body) {
+    return null
+  }
 
   return createPortal(
     <>
