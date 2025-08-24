@@ -1,7 +1,7 @@
 "use client"
 
 import { defaultFight, type Fight } from "@/types"
-import { useClient } from "@/contexts"
+import { useClient, useApp } from "@/contexts"
 import FightForm from "./FightForm"
 
 interface CreateFightFormProperties {
@@ -16,11 +16,16 @@ export default function CreateFightForm({
   onSave,
 }: CreateFightFormProperties) {
   const { client } = useClient()
+  const { refreshUser } = useApp()
 
   const handleSave = async (formData: FormData, fightData: Fight) => {
     const fight = { ...defaultFight, ...fightData } as Fight
     formData.set("fight", JSON.stringify(fight))
     const response = await client.createFight(formData)
+
+    // Refresh user data to update onboarding progress
+    await refreshUser()
+
     onSave?.(response.data)
   }
 

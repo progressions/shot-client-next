@@ -186,7 +186,7 @@ export const OnboardingPointer: React.FC<OnboardingPointerProps> = ({
   const pointerPosition = getPointerPosition()
 
   // Safely create portal only when document.body is available
-  if (typeof document === 'undefined' || !document.body) {
+  if (typeof document === "undefined" || !document.body) {
     return null
   }
 

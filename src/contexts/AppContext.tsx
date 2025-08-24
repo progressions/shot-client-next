@@ -288,7 +288,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
   // Subscribe to user-specific channel for campaign list updates
   useEffect(() => {
     if (!state.user.id) return
-    
+
     const userSub = client.consumer().subscriptions.create(
       { channel: "UserChannel", id: state.user.id },
       {
@@ -301,7 +301,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         },
       }
     )
-    
+
     return () => {
       userSub.unsubscribe()
     }

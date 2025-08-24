@@ -146,17 +146,18 @@ export function GenericFilter({
       const responseKey = config.responseKeys[field.name]
       const entityName =
         responseKey.charAt(0).toUpperCase() + responseKey.slice(1)
-      
+
       // Special handling for Users to show email addresses
       if (responseKey === "users") {
         const records = data[responseKey] || []
         const userOptions = records.map((user: any) => ({
           id: user.id,
-          name: user.name && user.email
-            ? `${user.name} (${user.email})`
-            : user.name || user.email || "Unknown User"
+          name:
+            user.name && user.email
+              ? `${user.name} (${user.email})`
+              : user.name || user.email || "Unknown User",
         }))
-        
+
         const Autocomplete = createAutocomplete(entityName)
         return (
           <Autocomplete
@@ -173,7 +174,7 @@ export function GenericFilter({
           />
         )
       }
-      
+
       const Autocomplete = createAutocomplete(entityName)
       return (
         <Autocomplete

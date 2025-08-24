@@ -9,7 +9,7 @@ import {
   useTheme,
   CircularProgress,
 } from "@mui/material"
-import { useCampaign, useClient } from "@/contexts"
+import { useCampaign, useClient, useApp } from "@/contexts"
 import type {
   BackendErrorResponse,
   CableData,
@@ -33,6 +33,7 @@ type FormStateData = {
 
 export default function GeneratePage() {
   const { client } = useClient()
+  const { refreshUser } = useApp()
   const theme = useTheme()
   const consumer = client.consumer()
   const { campaign } = useCampaign()
@@ -114,6 +115,13 @@ export default function GeneratePage() {
       }
 
       const response = await client.createCharacter({ ...characterFromJson })
+
+      console.log(
+        `🎯 Character created via GeneratePage - calling refreshUser() to update onboarding progress`
+      )
+
+      // Refresh user data to update onboarding progress
+      await refreshUser()
 
       dispatchForm({
         type: FormActions.UPDATE,

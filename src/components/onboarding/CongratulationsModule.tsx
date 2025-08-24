@@ -3,16 +3,20 @@
 import React from "react"
 import { Box, Typography, Button, Stack, Chip } from "@mui/material"
 import { Celebration, Check, Close } from "@mui/icons-material"
-import { useToast } from "@/contexts"
+import { useToast, useClient, useApp } from "@/contexts"
 
 export const CongratulationsModule: React.FC = () => {
   const { toastSuccess, toastError } = useToast()
+  const { client } = useClient()
+  const { refreshUser } = useApp()
 
   const handleDismiss = async () => {
     try {
-      // TODO: Implement dismiss functionality
+      await client.patch("/api/v1/onboarding/dismiss_congratulations")
       toastSuccess("Congratulations dismissed! You're all set to play!")
-      // The page will re-render automatically as the user data updates
+
+      // Refresh user data to update onboarding progress state
+      await refreshUser()
     } catch (error) {
       console.error("Failed to dismiss congratulations:", error)
       toastError("Failed to dismiss congratulations. Please try again.")

@@ -1,6 +1,6 @@
 "use client"
 
-import { useToast, useClient } from "@/contexts"
+import { useToast, useClient, useApp } from "@/contexts"
 import type { Entity } from "@/types"
 import pluralize from "pluralize"
 import { FormActions } from "@/reducers"
@@ -31,6 +31,7 @@ export function useEntity(
 ) {
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
+  const { refreshUser } = useApp()
   const entityClass = entity.entity_class
   const name = entity.entity_class.toLowerCase()
 
@@ -111,6 +112,25 @@ export function useEntity(
     try {
       await client[createFunction](formData)
       toastSuccess(`${entityClass} created successfully`)
+
+      // Refresh user data to update onboarding progress for milestone-tracked entities
+      const milestoneEntities = [
+        "character",
+        "fight",
+        "faction",
+        "party",
+        "site",
+      ]
+      if (milestoneEntities.includes(name)) {
+        console.log(
+          `🎯 Entity created: ${name} - calling refreshUser() to update onboarding progress`
+        )
+        await refreshUser()
+      } else {
+        console.log(
+          `ℹ️ Entity created: ${name} - not a milestone entity, skipping refreshUser()`
+        )
+      }
     } catch (error) {
       console.error("Error creating entity:", error.response.data.errors)
       toastError(`Error creating ${name}.`)
