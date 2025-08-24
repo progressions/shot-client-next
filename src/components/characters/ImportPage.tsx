@@ -13,7 +13,7 @@ import {
 import CloudUploadIcon from "@mui/icons-material/CloudUpload"
 import CheckIcon from "@mui/icons-material/Check"
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline"
-import { useClient } from "@/contexts"
+import { useClient, useApp } from "@/contexts"
 import type { Character } from "@/types/types"
 import { FormActions, useForm } from "@/reducers/formState"
 import { AxiosError } from "axios"
@@ -40,6 +40,7 @@ type BackendErrorResponse = {
 
 export default function UploadForm() {
   const { client } = useClient()
+  const { refreshUser } = useApp()
   const theme = useTheme()
 
   const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
@@ -211,6 +212,10 @@ export default function UploadForm() {
         type: FormActions.SUCCESS,
         payload: `${uploadedCharacters.length} character${uploadedCharacters.length > 1 ? "s" : ""} created successfully!`,
       })
+      
+      // Refresh user data to update onboarding progress
+      console.log(`🎯 Characters imported via PDF - calling refreshUser() to update onboarding progress`)
+      await refreshUser()
     }
 
     if (fileInputRef.current) {
