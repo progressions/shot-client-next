@@ -69,8 +69,8 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
 }) => {
   const router = useRouter()
 
-  // Get remaining milestones (skip campaign since it's done)
-  const remainingMilestones = ONBOARDING_MILESTONES.slice(1).filter(
+  // Get remaining milestones (only show incomplete ones, but don't skip campaign creation by default)
+  const remainingMilestones = ONBOARDING_MILESTONES.filter(
     milestone => !progress[milestone.timestampField]
   )
 
