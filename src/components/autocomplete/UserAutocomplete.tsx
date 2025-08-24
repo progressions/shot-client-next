@@ -65,9 +65,9 @@ export default function UserAutocomplete({
                searchEmail.toLowerCase().includes(query)
       })
       .map(user => ({
-        label: user.name 
+        label: user.name && user.email
           ? `${user.name} (${user.email})`
-          : user.email || "Unknown User",
+          : user.name || user.email || "Unknown User",
         value: user.id,
       }))
   }
