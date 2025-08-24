@@ -141,6 +141,10 @@ export function createAuthClient(deps: ClientDependencies) {
     return get(`${apiV2.users()}?${query}`, {}, cacheOptions)
   }
 
+  async function dismissCongratulations(): Promise<AxiosResponse<User>> {
+    return patch(api.dismissCongratulations())
+  }
+
   return {
     createUser,
     registerUser,
@@ -157,5 +161,6 @@ export function createAuthClient(deps: ClientDependencies) {
     getPlayers,
     getCurrentUsers,
     getUsers,
+    dismissCongratulations,
   }
 }
