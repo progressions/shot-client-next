@@ -6,7 +6,7 @@ import { Box, Typography } from "@mui/material"
 import { HeroTitle, Carousel } from "@/components/ui"
 import { Template, SpeedDial } from "@/components/characters"
 import { ConfirmDialog } from "@/components/ui"
-import { useClient } from "@/contexts"
+import { useClient, useApp } from "@/contexts"
 import type { Character } from "@/types"
 
 type CreatePageProps = {
@@ -16,6 +16,7 @@ type CreatePageProps = {
 export default function CreatePage({ templates: templates }: CreatePageProps) {
   const router = useRouter()
   const { client } = useClient()
+  const { refreshUser } = useApp()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<Character | null>(
     null
@@ -56,6 +57,10 @@ export default function CreatePage({ templates: templates }: CreatePageProps) {
     try {
       const response = await client.duplicateCharacter(character)
       const newCharacter = response.data
+      
+      // Refresh user data to update onboarding progress
+      await refreshUser()
+      
       router.push(`/characters/${newCharacter.id}`)
     } catch (error_) {
       console.error("Failed to duplicate character:", error_)

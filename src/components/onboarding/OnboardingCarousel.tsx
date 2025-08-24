@@ -309,7 +309,7 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
             {currentMilestone.key === "activate-campaign"
               ? 'Click the "Activate" button on your Campaign to activate it.'
               : currentMilestone.key === "character"
-                ? 'Click the "Create Character" button above to create your first Character.'
+                ? 'Choose one of the character templates below to create your first Character.'
                 : `Use the floating action button (⊕) at the bottom right to create your ${currentMilestone.key.charAt(0).toUpperCase() + currentMilestone.key.slice(1)}.`}
           </Typography>
         </Box>
