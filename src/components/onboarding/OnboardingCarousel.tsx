@@ -78,7 +78,30 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
 
   const handleNavigateToMilestone = () => {
     const targetPage = currentMilestone.targetPages[0]
-    router.push(targetPage)
+    
+    // If already on the relevant page, trigger drawer opening
+    if (isOnRelevantPage) {
+      const eventMap = {
+        'activate-campaign': null, // Campaign activation doesn't use a drawer
+        'character': null, // Characters navigate to create page
+        'faction': 'openFactionDrawer',
+        'fight': 'openFightDrawer',
+        'party': 'openPartyDrawer',
+        'site': 'openSiteDrawer',
+      }
+      
+      const eventName = eventMap[currentMilestone.key]
+      if (eventName) {
+        // Dispatch custom event to open the relevant creation drawer
+        window.dispatchEvent(new CustomEvent(eventName))
+      } else {
+        // For milestones without drawer events, navigate normally
+        router.push(targetPage)
+      }
+    } else {
+      // Navigate to the target page
+      router.push(targetPage)
+    }
   }
 
   return (

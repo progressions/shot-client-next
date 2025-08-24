@@ -4,7 +4,7 @@ import { GridView, ViewList } from "@mui/icons-material"
 import { CreateSiteForm } from "@/components/sites"
 import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface MenuProps {
   viewMode: "table" | "mobile"
@@ -13,6 +13,20 @@ interface MenuProps {
 
 export default function Menu({ viewMode, setViewMode }: MenuProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
+
+  // Listen for onboarding CTA events to open site drawer
+  useEffect(() => {
+    const handleOpenDrawerEvent = () => {
+      setDrawerOpen(true)
+    }
+
+    window.addEventListener("openSiteDrawer", handleOpenDrawerEvent)
+
+    return () => {
+      window.removeEventListener("openSiteDrawer", handleOpenDrawerEvent)
+    }
+  }, [])
+
   const handleToggleView = () => {
     setViewMode(viewMode === "table" ? "mobile" : "table")
   }

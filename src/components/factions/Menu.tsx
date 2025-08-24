@@ -1,10 +1,10 @@
 "use client"
 
 import { GridView, ViewList } from "@mui/icons-material"
-import { CreateFactionForm } from "@/components/factions"
+import { FactionForm } from "@/components/factions"
 import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface MenuProps {
   viewMode: "table" | "mobile"
@@ -13,6 +13,20 @@ interface MenuProps {
 
 export default function Menu({ viewMode, setViewMode }: MenuProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
+
+  // Listen for onboarding CTA events to open faction drawer
+  useEffect(() => {
+    const handleOpenDrawerEvent = () => {
+      setDrawerOpen(true)
+    }
+
+    window.addEventListener("openFactionDrawer", handleOpenDrawerEvent)
+
+    return () => {
+      window.removeEventListener("openFactionDrawer", handleOpenDrawerEvent)
+    }
+  }, [])
+
   const handleToggleView = () => {
     setViewMode(viewMode === "table" ? "mobile" : "table")
   }
@@ -42,7 +56,11 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
   return (
     <>
       <SpeedDial actions={actions} />
-      <CreateFactionForm open={drawerOpen} onClose={handleCloseCreateDrawer} />
+      <FactionForm
+        open={drawerOpen}
+        onClose={handleCloseCreateDrawer}
+        title="Create Faction"
+      />
     </>
   )
 }

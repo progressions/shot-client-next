@@ -4,7 +4,7 @@ import { GridView, ViewList } from "@mui/icons-material"
 import { CreatePartyForm } from "@/components/parties"
 import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface MenuProps {
   viewMode: "table" | "mobile"
@@ -13,6 +13,20 @@ interface MenuProps {
 
 export default function Menu({ viewMode, setViewMode }: MenuProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
+
+  // Listen for onboarding CTA events to open party drawer
+  useEffect(() => {
+    const handleOpenDrawerEvent = () => {
+      setDrawerOpen(true)
+    }
+
+    window.addEventListener("openPartyDrawer", handleOpenDrawerEvent)
+
+    return () => {
+      window.removeEventListener("openPartyDrawer", handleOpenDrawerEvent)
+    }
+  }, [])
+
   const handleToggleView = () => {
     setViewMode(viewMode === "table" ? "mobile" : "table")
   }
