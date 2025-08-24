@@ -62,6 +62,8 @@ export function Carousel({ items, onSelect }: CarouselProps) {
               {onSelect && (
                 <IconButton
                   onClick={() => onSelect(item)}
+                  data-testid="carousel-select-button"
+                  aria-label="Select this template"
                   sx={{
                     position: "absolute",
                     top: 16,

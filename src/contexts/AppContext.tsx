@@ -311,11 +311,14 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
   useEffect(() => {
     if (!campaignData) return
 
+    console.log("🔄 AppContext: Processing campaignData:", campaignData)
     Object.entries(campaignData).forEach(([key, value]) => {
       const callbacks = entityUpdateCallbacks.current.get(key)
+      console.log(`🔄 AppContext: Entity '${key}' - value: ${value}, callbacks: ${callbacks?.size || 0}`)
       if (callbacks && callbacks.size > 0) {
         callbacks.forEach(callback => {
           try {
+            console.log(`🔄 AppContext: Calling callback for '${key}' with value:`, value)
             callback(value)
           } catch (error) {
             console.error(`Error in ${key} callback:`, error)

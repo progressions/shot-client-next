@@ -92,8 +92,11 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
 
   // Subscribe to fight updates
   useEffect(() => {
+    console.log("🔄 FightsList: Setting up WebSocket subscription for 'fights'")
     const unsubscribe = subscribeToEntity("fights", data => {
+      console.log("🔄 FightsList: Received WebSocket data for 'fights':", data)
       if (data === "reload") {
+        console.log("🔄 FightsList: Received 'reload' signal, calling fetchFights")
         fetchFights(filters)
       }
     })
