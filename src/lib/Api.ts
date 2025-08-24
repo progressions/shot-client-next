@@ -232,9 +232,6 @@ class Api {
     return `${this.base()}/users`
   }
 
-  dismissCongratulations(): string {
-    return `${this.api()}/onboarding/dismiss_congratulations`
-  }
 
   factions(faction?: Faction | ID): string {
     return faction?.id

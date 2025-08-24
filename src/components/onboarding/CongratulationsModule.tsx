@@ -12,7 +12,7 @@ export const CongratulationsModule: React.FC = () => {
 
   const handleDismiss = async () => {
     try {
-      await client.patch("/api/v1/onboarding/dismiss_congratulations")
+      await client.dismissCongratulations()
       toastSuccess("Congratulations dismissed! You're all set to play!")
 
       // Refresh user data to update onboarding progress state

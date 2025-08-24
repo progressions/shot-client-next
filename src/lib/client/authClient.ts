@@ -142,7 +142,7 @@ export function createAuthClient(deps: ClientDependencies) {
   }
 
   async function dismissCongratulations(): Promise<AxiosResponse<User>> {
-    return patch(api.dismissCongratulations())
+    return patch(apiV2.dismissCongratulations())
   }
 
   return {
