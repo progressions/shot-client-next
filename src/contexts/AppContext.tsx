@@ -285,6 +285,28 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
     }
   }, [state.user.id, campaign?.id, client])
 
+  // Subscribe to user-specific channel for campaign list updates
+  useEffect(() => {
+    if (!state.user.id) return
+    
+    const userSub = client.consumer().subscriptions.create(
+      { channel: "UserChannel", id: state.user.id },
+      {
+        connected: () => {}, // Connected to UserChannel
+        disconnected: () => {}, // Disconnected from UserChannel
+        received: (data: CampaignCableData) => {
+          if (data) {
+            setCampaignData(data)
+          }
+        },
+      }
+    )
+    
+    return () => {
+      userSub.unsubscribe()
+    }
+  }, [state.user.id, client])
+
   // Process campaignData and trigger callbacks
   useEffect(() => {
     if (!campaignData) return
