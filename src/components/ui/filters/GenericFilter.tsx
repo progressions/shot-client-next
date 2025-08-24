@@ -146,6 +146,34 @@ export function GenericFilter({
       const responseKey = config.responseKeys[field.name]
       const entityName =
         responseKey.charAt(0).toUpperCase() + responseKey.slice(1)
+      
+      // Special handling for Users to show email addresses
+      if (responseKey === "users") {
+        const records = data[responseKey] || []
+        const userOptions = records.map((user: any) => ({
+          id: user.id,
+          name: user.name && user.email
+            ? `${user.name} (${user.email})`
+            : user.name || user.email || "Unknown User"
+        }))
+        
+        const Autocomplete = createAutocomplete(entityName)
+        return (
+          <Autocomplete
+            key={field.name}
+            value={filters?.[field.name] as AutocompleteOption | null}
+            onChange={newValue =>
+              changeFilter(field.name + "_id", newValue, true)
+            }
+            records={userOptions}
+            allowNone={field.allowNone ?? true}
+            sx={{ width: 200 }}
+            placeholder={displayName}
+            excludeIds={isPrimaryField ? excludeIds : undefined}
+          />
+        )
+      }
+      
       const Autocomplete = createAutocomplete(entityName)
       return (
         <Autocomplete
