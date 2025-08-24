@@ -61,14 +61,6 @@ export const ONBOARDING_MILESTONES: OnboardingMilestone[] = [
     suggestedName: "The Dragons",
   },
   {
-    key: "fight",
-    title: "⚔️ Start your first Fight!",
-    description: "Fights manage combat initiative and Character actions.",
-    targetPages: ["/fights"],
-    targetElement: "speed-dial-create",
-    timestampField: "first_fight_created_at",
-  },
-  {
     key: "party",
     title: "👥 Organize a Party!",
     description: "Parties group Characters for adventures and missions.",
@@ -83,6 +75,14 @@ export const ONBOARDING_MILESTONES: OnboardingMilestone[] = [
     targetPages: ["/sites"],
     targetElement: "speed-dial-create",
     timestampField: "first_site_created_at",
+  },
+  {
+    key: "fight",
+    title: "⚔️ Start your first Fight!",
+    description: "Fights manage combat initiative and Character actions.",
+    targetPages: ["/fights"],
+    targetElement: "speed-dial-create",
+    timestampField: "first_fight_created_at",
   },
 ]
 
