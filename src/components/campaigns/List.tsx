@@ -44,7 +44,9 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const fetchCampaigns = useCallback(
     async filters => {
       try {
+        console.log("🔄 Fetching campaigns with filters:", filters)
         const response = await client.getCampaigns(filters)
+        console.log("✅ Campaigns API response:", response.data)
         dispatchForm({
           type: FormActions.UPDATE,
           name: "campaigns",
@@ -56,7 +58,8 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
           value: response.data.meta,
         })
       } catch (error) {
-        console.error("Fetch campaigns error:", error)
+        console.error("❌ Fetch campaigns error:", error)
+        console.error("Error details:", error.response?.data || error.message)
       }
     },
     [client, dispatchForm]
@@ -91,6 +94,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   // Listen for campaign creation events to refresh the list
   useEffect(() => {
     const handleCampaignCreated = () => {
+      console.log("📢 Campaign created event received, refreshing list...")
       fetchCampaigns(formState.data.filters)
     }
 
