@@ -1,5 +1,6 @@
 import { CircularProgress } from "@mui/material"
 import { headers } from "next/headers"
+import { redirect } from "next/navigation"
 import { CreatePage } from "@/components/characters"
 import { getCurrentUser, getServerClient } from "@/lib"
 import { Suspense } from "react"
@@ -24,6 +25,8 @@ export default async function CharacterCreatePage() {
     per_page: 50,
   })
   const { characters } = response.data
+  
+  console.log("Template characters fetched:", characters?.length || 0)
 
   // Detect mobile device on the server
   const headersState = await headers()

@@ -62,16 +62,27 @@ export default function CreatePage({ templates: templates }: CreatePageProps) {
     }
   }
 
-  if (!templates?.length) return null
-
   return (
     <Box sx={{ position: "relative" }}>
       <SpeedDial />
       <HeroTitle>Create</HeroTitle>
-      <Typography variant="body1" sx={{ mt: 2 }}>
-        Choose your Archetype:
-      </Typography>
-      <Carousel items={items} onSelect={handleSelect} />
+      {!templates?.length ? (
+        <Box sx={{ mt: 4, p: 3, textAlign: "center" }}>
+          <Typography variant="h6" color="text.secondary">
+            No character templates available
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            Character templates need to be created in the database with is_template: true
+          </Typography>
+        </Box>
+      ) : (
+        <>
+          <Typography variant="body1" sx={{ mt: 2 }}>
+            Choose your Archetype:
+          </Typography>
+          <Carousel items={items} onSelect={handleSelect} />
+        </>
+      )}
       <ConfirmDialog
         open={dialogOpen}
         onClose={handleClose}

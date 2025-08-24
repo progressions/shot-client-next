@@ -96,11 +96,16 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
   const handleNavigateToMilestone = () => {
     const targetPage = currentMilestone.targetPages[0]
     
+    // Special handling for character creation - always navigate to /characters/create
+    if (currentMilestone.key === 'character') {
+      router.push('/characters/create')
+      return
+    }
+    
     // If already on the relevant page, trigger drawer opening
     if (isOnRelevantPage) {
       const eventMap = {
         'activate-campaign': null, // Campaign activation doesn't use a drawer
-        'character': null, // Characters navigate to create page
         'faction': 'openFactionDrawer',
         'fight': 'openFightDrawer',
         'party': 'openPartyDrawer',
@@ -254,9 +259,13 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
         >
           {currentMilestone.key === "activate-campaign"
             ? "Activate Campaign"
-            : isOnRelevantPage
-              ? `Create ${currentMilestone.key.charAt(0).toUpperCase() + currentMilestone.key.slice(1)}`
-              : `Go to ${getPluralName(currentMilestone.key)}`}
+            : currentMilestone.key === "character"
+              ? isOnRelevantPage
+                ? "Create Character"
+                : "Go to Characters"
+              : isOnRelevantPage
+                ? `Create ${currentMilestone.key.charAt(0).toUpperCase() + currentMilestone.key.slice(1)}`
+                : `Go to ${getPluralName(currentMilestone.key)}`}
         </Button>
 
         {!isOnRelevantPage && currentMilestone.key !== "activate-campaign" && (
@@ -299,7 +308,9 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
             🎯 <strong>You're here!</strong>{" "}
             {currentMilestone.key === "activate-campaign"
               ? 'Click the "Activate" button on your Campaign to activate it.'
-              : `Use the floating action button (⊕) at the bottom right to create your ${currentMilestone.key.charAt(0).toUpperCase() + currentMilestone.key.slice(1)}.`}
+              : currentMilestone.key === "character"
+                ? 'Click the "Create Character" button above to create your first Character.'
+                : `Use the floating action button (⊕) at the bottom right to create your ${currentMilestone.key.charAt(0).toUpperCase() + currentMilestone.key.slice(1)}.`}
           </Typography>
         </Box>
       )}
