@@ -1,15 +1,15 @@
-'use client';
+"use client"
 
-import React from 'react';
-import { useApp } from '@/contexts';
-import { OnboardingModule } from './OnboardingModule';
+import React from "react"
+import { useApp } from "@/contexts"
+import { OnboardingModule } from "./OnboardingModule"
 
 export const OnboardingClientWrapper: React.FC = () => {
-  const { user, loading } = useApp();
+  const { user, loading } = useApp()
 
   if (loading || !user || !user.onboarding_progress) {
-    return null;
+    return null
   }
 
-  return <OnboardingModule user={user} />;
-};
+  return <OnboardingModule user={user} />
+}

@@ -16,7 +16,7 @@ import type { Weapon } from "@/types"
 import { FormActions, useForm, type FormStateType } from "@/reducers"
 
 type FormStateData = {
-  weapon: Weapon
+  entity: Weapon
 }
 
 type StatsProps = {
@@ -32,23 +32,23 @@ export default function Stats({
 }: StatsProps) {
   // internal state for these stats values
   const { formState, dispatchForm } = useForm<FormStateData>({
-    weapon: initialWeapon,
+    entity: initialWeapon,
   })
 
   // Sync local state with weapon prop changes from WebSocket
   useEffect(() => {
     dispatchForm({
       type: FormActions.RESET,
-      value: { weapon: initialWeapon },
+      value: { entity: initialWeapon },
     })
   }, [initialWeapon, dispatchForm])
 
   // Safety check to prevent undefined errors
-  if (!formState?.data?.weapon) {
+  if (!formState?.data?.entity) {
     return null
   }
 
-  const weapon = formState.data.weapon
+  const weapon = formState.data.entity
   const { kachunk, mook_bonus, damage, concealment, reload_value } = weapon
 
   // external state for overall form

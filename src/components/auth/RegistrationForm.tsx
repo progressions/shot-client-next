@@ -5,57 +5,61 @@ import { Box, Stack, Alert, InputAdornment, IconButton } from "@mui/material"
 import { Visibility, VisibilityOff } from "@mui/icons-material"
 import { Button, TextField } from "@/components/ui"
 import { useClient } from "@/contexts"
-import type { RegistrationData, RegistrationError } from "@/types/auth"
+import type { RegistrationData } from "@/types/auth"
 
 interface RegistrationFormProps {
   onSuccess: () => void
   onError?: (error: string) => void
 }
 
-export function RegistrationForm({ onSuccess, onError }: RegistrationFormProps) {
+export function RegistrationForm({
+  onSuccess,
+  onError,
+}: RegistrationFormProps) {
   const [formData, setFormData] = useState<RegistrationData>({
     email: "",
     password: "",
     password_confirmation: "",
     first_name: "",
-    last_name: ""
+    last_name: "",
   })
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false)
+  const [showPasswordConfirmation, setShowPasswordConfirmation] =
+    useState(false)
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [generalError, setGeneralError] = useState<string | null>(null)
-  
+
   const { client } = useClient()
-  
-  const handleChange = (field: keyof RegistrationData) => (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setFormData({ ...formData, [field]: event.target.value })
-    // Clear field-specific errors when user starts typing
-    if (errors[field]) {
-      const newErrors = { ...errors }
-      delete newErrors[field]
-      setErrors(newErrors)
+
+  const handleChange =
+    (field: keyof RegistrationData) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setFormData({ ...formData, [field]: event.target.value })
+      // Clear field-specific errors when user starts typing
+      if (errors[field]) {
+        const newErrors = { ...errors }
+        delete newErrors[field]
+        setErrors(newErrors)
+      }
+      // Clear general error when user makes changes
+      if (generalError) {
+        setGeneralError(null)
+      }
     }
-    // Clear general error when user makes changes
-    if (generalError) {
-      setGeneralError(null)
-    }
-  }
-  
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     setLoading(true)
     setErrors({})
     setGeneralError(null)
-    
+
     try {
       await client.registerUser(formData)
       onSuccess()
     } catch (error: any) {
       console.error("Registration error:", error)
-      
+
       if (error.response?.status === 422 && error.response?.data?.errors) {
         // Handle validation errors from backend
         setErrors(error.response.data.errors)
@@ -73,15 +77,15 @@ export function RegistrationForm({ onSuccess, onError }: RegistrationFormProps) 
       setLoading(false)
     }
   }
-  
+
   const getFieldError = (field: string): string => {
     return errors[field]?.[0] || ""
   }
-  
+
   const hasFieldError = (field: string): boolean => {
     return errors[field]?.length > 0
   }
-  
+
   return (
     <Box component="form" onSubmit={handleSubmit}>
       <Stack spacing={2}>
@@ -107,7 +111,7 @@ export function RegistrationForm({ onSuccess, onError }: RegistrationFormProps) 
             required
           />
         </Stack>
-        
+
         <TextField
           fullWidth
           label="Email Address"
@@ -119,7 +123,7 @@ export function RegistrationForm({ onSuccess, onError }: RegistrationFormProps) 
           disabled={loading}
           required
         />
-        
+
         <TextField
           fullWidth
           label="Password"
@@ -142,15 +146,15 @@ export function RegistrationForm({ onSuccess, onError }: RegistrationFormProps) 
                   {showPassword ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
               </InputAdornment>
-            )
+            ),
           }}
           slotProps={{
             input: {
-              suppressHydrationWarning: true
-            }
+              suppressHydrationWarning: true,
+            },
           }}
         />
-        
+
         <TextField
           fullWidth
           label="Confirm Password"
@@ -166,36 +170,38 @@ export function RegistrationForm({ onSuccess, onError }: RegistrationFormProps) 
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
-                  onClick={() => setShowPasswordConfirmation(!showPasswordConfirmation)}
+                  onClick={() =>
+                    setShowPasswordConfirmation(!showPasswordConfirmation)
+                  }
                   edge="end"
                   disabled={loading}
                 >
-                  {showPasswordConfirmation ? <VisibilityOff /> : <Visibility />}
+                  {showPasswordConfirmation ? (
+                    <VisibilityOff />
+                  ) : (
+                    <Visibility />
+                  )}
                 </IconButton>
               </InputAdornment>
-            )
+            ),
           }}
           slotProps={{
             input: {
-              suppressHydrationWarning: true
-            }
+              suppressHydrationWarning: true,
+            },
           }}
         />
-        
+
         {/* General error message */}
-        {generalError && (
-          <Alert severity="error">
-            {generalError}
-          </Alert>
-        )}
-        
+        {generalError && <Alert severity="error">{generalError}</Alert>}
+
         {/* Validation errors summary */}
         {Object.keys(errors).length > 0 && !generalError && (
           <Alert severity="error">
             Please correct the errors above and try again.
           </Alert>
         )}
-        
+
         <Button
           type="submit"
           fullWidth

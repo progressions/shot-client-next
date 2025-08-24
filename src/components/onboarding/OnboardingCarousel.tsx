@@ -1,19 +1,18 @@
-'use client';
+"use client"
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { 
-  Box, 
-  Typography, 
-  Button, 
-  Stack, 
-  Chip, 
+import React, { useState } from "react"
+import { useRouter } from "next/navigation"
+import {
+  Box,
+  Typography,
+  Button,
+  Stack,
+  Chip,
   IconButton,
   LinearProgress,
-  Tooltip
-} from '@mui/material';
-import { 
-  ArrowForward, 
+} from "@mui/material"
+import {
+  ArrowForward,
   ArrowBack,
   ArrowForwardIos,
   CheckCircle,
@@ -21,86 +20,90 @@ import {
   SportsKabaddi,
   Flag,
   Groups,
-  LocationCity
-} from '@mui/icons-material';
-import { 
-  OnboardingProgress, 
-  ONBOARDING_MILESTONES, 
-  getMilestonesForPage,
+  LocationCity,
+} from "@mui/icons-material"
+import {
+  OnboardingProgress,
+  ONBOARDING_MILESTONES,
   getCompletedCount,
   getCompletionPercentage,
-  isRelevantPage
-} from '@/lib/onboarding';
+  isRelevantPage,
+} from "@/lib/onboarding"
 
 export interface OnboardingCarouselProps {
-  progress: OnboardingProgress;
-  currentPath: string;
+  progress: OnboardingProgress
+  currentPath: string
 }
 
 const MILESTONE_ICONS: Record<string, React.ReactElement> = {
-  'activate-campaign': <CheckCircle sx={{ fontSize: 24, width: 24, height: 24 }} />,
+  "activate-campaign": (
+    <CheckCircle sx={{ fontSize: 24, width: 24, height: 24 }} />
+  ),
   character: <Person />,
   fight: <SportsKabaddi />,
   faction: <Flag />,
   party: <Groups />,
-  site: <LocationCity />
-};
+  site: <LocationCity />,
+}
 
-export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({ progress, currentPath }) => {
-  const router = useRouter();
-  
+export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
+  progress,
+  currentPath,
+}) => {
+  const router = useRouter()
+
   // Get remaining milestones (skip campaign since it's done)
-  const remainingMilestones = ONBOARDING_MILESTONES.slice(1).filter(milestone => 
-    !progress[milestone.timestampField]
-  );
-  
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const currentMilestone = remainingMilestones[currentIndex];
-  
+  const remainingMilestones = ONBOARDING_MILESTONES.slice(1).filter(
+    milestone => !progress[milestone.timestampField]
+  )
+
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const currentMilestone = remainingMilestones[currentIndex]
+
   if (!currentMilestone) {
-    return null; // All milestones complete
+    return null // All milestones complete
   }
 
-  const completedCount = getCompletedCount(progress);
-  const completionPercentage = getCompletionPercentage(progress);
-  const isOnRelevantPage = isRelevantPage(currentMilestone, currentPath);
+  const completedCount = getCompletedCount(progress)
+  const completionPercentage = getCompletionPercentage(progress)
+  const isOnRelevantPage = isRelevantPage(currentMilestone, currentPath)
 
   const handlePrevious = () => {
-    setCurrentIndex(Math.max(0, currentIndex - 1));
-  };
+    setCurrentIndex(Math.max(0, currentIndex - 1))
+  }
 
   const handleNext = () => {
-    setCurrentIndex(Math.min(remainingMilestones.length - 1, currentIndex + 1));
-  };
+    setCurrentIndex(Math.min(remainingMilestones.length - 1, currentIndex + 1))
+  }
 
   const handleNavigateToMilestone = () => {
-    const targetPage = currentMilestone.targetPages[0];
-    router.push(targetPage);
-  };
+    const targetPage = currentMilestone.targetPages[0]
+    router.push(targetPage)
+  }
 
   return (
     <Box>
       <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
         <Box>
-          <Typography variant="h6" sx={{ fontWeight: 600, color: 'info.main' }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, color: "info.main" }}>
             🎉 Great! Now build your world:
           </Typography>
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 1 }}>
             <Typography variant="body2" color="text.secondary">
               Progress: {completedCount}/6 milestones
             </Typography>
-            <LinearProgress 
-              variant="determinate" 
-              value={completionPercentage} 
-              sx={{ 
-                flex: 1, 
-                height: 8, 
+            <LinearProgress
+              variant="determinate"
+              value={completionPercentage}
+              sx={{
+                flex: 1,
+                height: 8,
                 borderRadius: 4,
-                backgroundColor: 'grey.200',
-                '& .MuiLinearProgress-bar': {
-                  backgroundColor: 'success.main'
-                }
-              }} 
+                backgroundColor: "grey.200",
+                "& .MuiLinearProgress-bar": {
+                  backgroundColor: "success.main",
+                },
+              }}
             />
             <Typography variant="body2" color="text.secondary">
               {completionPercentage}%
@@ -109,22 +112,22 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({ progress
         </Box>
       </Stack>
 
-      <Box sx={{ position: 'relative', mb: 3 }}>
+      <Box sx={{ position: "relative", mb: 3 }}>
         {/* Navigation arrows */}
-        <Stack 
-          direction="row" 
-          justifyContent="space-between" 
+        <Stack
+          direction="row"
+          justifyContent="space-between"
           alignItems="center"
           sx={{ mb: 2 }}
         >
-          <IconButton 
+          <IconButton
             onClick={handlePrevious}
             disabled={currentIndex === 0}
             size="small"
           >
             <ArrowBack />
           </IconButton>
-          
+
           <Stack direction="row" spacing={1}>
             {remainingMilestones.map((_, index) => (
               <Box
@@ -132,16 +135,17 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({ progress
                 sx={{
                   width: 8,
                   height: 8,
-                  borderRadius: '50%',
-                  backgroundColor: index === currentIndex ? 'info.main' : 'grey.300',
-                  cursor: 'pointer'
+                  borderRadius: "50%",
+                  backgroundColor:
+                    index === currentIndex ? "info.main" : "grey.300",
+                  cursor: "pointer",
                 }}
                 onClick={() => setCurrentIndex(index)}
               />
             ))}
           </Stack>
-          
-          <IconButton 
+
+          <IconButton
             onClick={handleNext}
             disabled={currentIndex === remainingMilestones.length - 1}
             size="small"
@@ -152,24 +156,26 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({ progress
 
         {/* Current milestone */}
         <Stack direction="row" alignItems="center" spacing={2}>
-          <Box 
-            sx={{ 
-              p: 1, 
-              borderRadius: '50%', 
-              backgroundColor: 'info.main',
-              color: 'white',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+          <Box
+            sx={{
+              p: 1,
+              borderRadius: "50%",
+              backgroundColor: "info.main",
+              color: "white",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               width: 48,
               height: 48,
               minWidth: 48,
-              minHeight: 48
+              minHeight: 48,
             }}
           >
-            {MILESTONE_ICONS[currentMilestone.key] || <CheckCircle sx={{ fontSize: 32 }} />}
+            {MILESTONE_ICONS[currentMilestone.key] || (
+              <CheckCircle sx={{ fontSize: 32 }} />
+            )}
           </Box>
-          
+
           <Box flex={1}>
             <Typography variant="h6" component="h3" sx={{ fontWeight: 600 }}>
               {currentMilestone.title}
@@ -177,11 +183,11 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({ progress
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
               {currentMilestone.description}
             </Typography>
-            
+
             {currentMilestone.suggestedName && (
-              <Chip 
+              <Chip
                 label={`Try: "${currentMilestone.suggestedName}"`}
-                size="small" 
+                size="small"
                 variant="outlined"
                 sx={{ mt: 1 }}
               />
@@ -190,79 +196,105 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({ progress
         </Stack>
       </Box>
 
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={2}
+        alignItems="center"
+      >
         <Button
           variant="contained"
           endIcon={<ArrowForward />}
           onClick={handleNavigateToMilestone}
-          sx={{ 
-            px: 3, 
+          sx={{
+            px: 3,
             py: 1,
             fontWeight: 600,
-            textTransform: 'none'
+            textTransform: "none",
           }}
         >
-          {currentMilestone.key === 'activate-campaign' 
-            ? 'Activate Campaign'
-            : isOnRelevantPage 
-              ? `Create ${currentMilestone.key.charAt(0).toUpperCase() + currentMilestone.key.slice(1)}` 
-              : `Go to ${currentMilestone.key.charAt(0).toUpperCase() + currentMilestone.key.slice(1)}s`
-          }
+          {currentMilestone.key === "activate-campaign"
+            ? "Activate Campaign"
+            : isOnRelevantPage
+              ? `Create ${currentMilestone.key.charAt(0).toUpperCase() + currentMilestone.key.slice(1)}`
+              : `Go to ${currentMilestone.key.charAt(0).toUpperCase() + currentMilestone.key.slice(1)}s`}
         </Button>
-        
-        {!isOnRelevantPage && currentMilestone.key !== 'activate-campaign' && (
-          <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+
+        {!isOnRelevantPage && currentMilestone.key !== "activate-campaign" && (
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ fontStyle: "italic" }}
+          >
             Look for the create button (⊕) when you get there!
           </Typography>
         )}
-        
-        {!isOnRelevantPage && currentMilestone.key === 'activate-campaign' && (
-          <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+
+        {!isOnRelevantPage && currentMilestone.key === "activate-campaign" && (
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ fontStyle: "italic" }}
+          >
             Look for the "Activate" button on your Campaign!
           </Typography>
         )}
       </Stack>
 
       {isOnRelevantPage && (
-        <Box 
-          sx={{ 
-            mt: 3, 
-            p: 2, 
-            borderRadius: 1, 
-            backgroundColor: 'info.50',
-            border: '1px solid',
-            borderColor: 'info.200'
+        <Box
+          sx={{
+            mt: 3,
+            p: 2,
+            borderRadius: 1,
+            backgroundColor: "info.50",
+            border: "1px solid",
+            borderColor: "info.200",
           }}
         >
-          <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            🎯 <strong>You're here!</strong> {currentMilestone.key === 'activate-campaign' 
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+          >
+            🎯 <strong>You're here!</strong>{" "}
+            {currentMilestone.key === "activate-campaign"
               ? 'Click the "Activate" button on your Campaign to activate it.'
-              : `Use the floating action button (⊕) at the bottom right to create your ${currentMilestone.key.charAt(0).toUpperCase() + currentMilestone.key.slice(1)}.`
-            }
+              : `Use the floating action button (⊕) at the bottom right to create your ${currentMilestone.key.charAt(0).toUpperCase() + currentMilestone.key.slice(1)}.`}
           </Typography>
         </Box>
       )}
 
       {/* Show completed milestones */}
       {completedCount > 1 && (
-        <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid', borderColor: 'grey.200' }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 500 }}>
+        <Box
+          sx={{ mt: 3, pt: 2, borderTop: "1px solid", borderColor: "grey.200" }}
+        >
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ mb: 1, fontWeight: 500 }}
+          >
             ✅ Completed:
           </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap">
-            {ONBOARDING_MILESTONES.filter(milestone => 
-              progress[milestone.timestampField]
+            {ONBOARDING_MILESTONES.filter(
+              milestone => progress[milestone.timestampField]
             ).map(milestone => (
-              <Chip 
-                key={milestone.key} 
-                label={milestone.key === 'activate-campaign' ? 'Campaign Active' : milestone.key.charAt(0).toUpperCase() + milestone.key.slice(1)} 
-                size="small" 
-                color="success" 
+              <Chip
+                key={milestone.key}
+                label={
+                  milestone.key === "activate-campaign"
+                    ? "Campaign Active"
+                    : milestone.key.charAt(0).toUpperCase() +
+                      milestone.key.slice(1)
+                }
+                size="small"
+                color="success"
               />
             ))}
           </Stack>
         </Box>
       )}
     </Box>
-  );
-};
+  )
+}

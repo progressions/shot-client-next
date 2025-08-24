@@ -13,5 +13,12 @@ export default function CreateVehicleForm({
   onClose,
   onVehicleCreated,
 }: CreateVehicleFormProperties) {
-  return <VehicleForm open={open} onClose={onClose} title="New Vehicle" onVehicleCreated={onVehicleCreated} />
+  return (
+    <VehicleForm
+      open={open}
+      onClose={onClose}
+      title="New Vehicle"
+      onVehicleCreated={onVehicleCreated}
+    />
+  )
 }

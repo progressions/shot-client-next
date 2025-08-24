@@ -94,10 +94,10 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
       fetchCampaigns(formState.data.filters)
     }
 
-    window.addEventListener('campaignCreated', handleCampaignCreated)
-    
+    window.addEventListener("campaignCreated", handleCampaignCreated)
+
     return () => {
-      window.removeEventListener('campaignCreated', handleCampaignCreated)
+      window.removeEventListener("campaignCreated", handleCampaignCreated)
     }
   }, [fetchCampaigns, formState.data.filters])
 

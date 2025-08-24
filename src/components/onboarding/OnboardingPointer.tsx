@@ -1,16 +1,16 @@
-'use client'
+"use client"
 
-import React, { useEffect, useState } from 'react'
-import { Box, Typography, Paper, IconButton } from '@mui/material'
-import { Close } from '@mui/icons-material'
-import { createPortal } from 'react-dom'
+import React, { useEffect, useState } from "react"
+import { Box, Typography, Paper, IconButton } from "@mui/material"
+import { Close } from "@mui/icons-material"
+import { createPortal } from "react-dom"
 
 export interface OnboardingPointerProps {
   targetElement: string
   title: string
   description: string
   onDismiss?: () => void
-  position?: 'top' | 'bottom' | 'left' | 'right'
+  position?: "top" | "bottom" | "left" | "right"
   offset?: number
 }
 
@@ -19,17 +19,18 @@ export const OnboardingPointer: React.FC<OnboardingPointerProps> = ({
   title,
   description,
   onDismiss,
-  position = 'top',
-  offset = 16
+  position = "top",
+  offset = 16,
 }) => {
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null)
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     const findAndPositionTarget = () => {
-      const element = document.querySelector(`[data-onboarding="${targetElement}"]`) ||
-                    document.getElementById(targetElement) ||
-                    document.querySelector(`.${targetElement}`)
+      const element =
+        document.querySelector(`[data-onboarding="${targetElement}"]`) ||
+        document.getElementById(targetElement) ||
+        document.querySelector(`.${targetElement}`)
 
       if (element) {
         const rect = element.getBoundingClientRect()
@@ -37,10 +38,10 @@ export const OnboardingPointer: React.FC<OnboardingPointerProps> = ({
         setIsVisible(true)
 
         // Add highlight effect to target element
-        element.classList.add('onboarding-highlight')
-        
+        element.classList.add("onboarding-highlight")
+
         return () => {
-          element.classList.remove('onboarding-highlight')
+          element.classList.remove("onboarding-highlight")
         }
       }
     }
@@ -56,12 +57,12 @@ export const OnboardingPointer: React.FC<OnboardingPointerProps> = ({
       findAndPositionTarget()
     }
 
-    window.addEventListener('resize', handleResize)
+    window.addEventListener("resize", handleResize)
 
     return () => {
       cleanup?.()
       clearTimeout(timeoutId)
-      window.removeEventListener('resize', handleResize)
+      window.removeEventListener("resize", handleResize)
     }
   }, [targetElement])
 
@@ -79,35 +80,35 @@ export const OnboardingPointer: React.FC<OnboardingPointerProps> = ({
     const scrollY = window.scrollY
 
     switch (position) {
-      case 'top':
+      case "top":
         return {
           left: scrollX + targetRect.left + targetRect.width / 2,
           top: scrollY + targetRect.top - offset,
-          transform: 'translateX(-50%) translateY(-100%)'
+          transform: "translateX(-50%) translateY(-100%)",
         }
-      case 'bottom':
+      case "bottom":
         return {
           left: scrollX + targetRect.left + targetRect.width / 2,
           top: scrollY + targetRect.bottom + offset,
-          transform: 'translateX(-50%)'
+          transform: "translateX(-50%)",
         }
-      case 'left':
+      case "left":
         return {
           left: scrollX + targetRect.left - offset,
           top: scrollY + targetRect.top + targetRect.height / 2,
-          transform: 'translateX(-100%) translateY(-50%)'
+          transform: "translateX(-100%) translateY(-50%)",
         }
-      case 'right':
+      case "right":
         return {
           left: scrollX + targetRect.right + offset,
           top: scrollY + targetRect.top + targetRect.height / 2,
-          transform: 'translateY(-50%)'
+          transform: "translateY(-50%)",
         }
       default:
         return {
           left: scrollX + targetRect.left + targetRect.width / 2,
           top: scrollY + targetRect.top - offset,
-          transform: 'translateX(-50%) translateY(-100%)'
+          transform: "translateX(-50%) translateY(-100%)",
         }
     }
   }
@@ -115,61 +116,61 @@ export const OnboardingPointer: React.FC<OnboardingPointerProps> = ({
   const getArrowStyles = () => {
     const arrowSize = 8
     switch (position) {
-      case 'top':
+      case "top":
         return {
           content: '""',
-          position: 'absolute' as const,
-          top: '100%',
-          left: '50%',
-          transform: 'translateX(-50%)',
+          position: "absolute" as const,
+          top: "100%",
+          left: "50%",
+          transform: "translateX(-50%)",
           width: 0,
           height: 0,
           borderLeft: `${arrowSize}px solid transparent`,
           borderRight: `${arrowSize}px solid transparent`,
           borderTop: `${arrowSize}px solid`,
-          borderTopColor: 'inherit'
+          borderTopColor: "inherit",
         }
-      case 'bottom':
+      case "bottom":
         return {
           content: '""',
-          position: 'absolute' as const,
-          bottom: '100%',
-          left: '50%',
-          transform: 'translateX(-50%)',
+          position: "absolute" as const,
+          bottom: "100%",
+          left: "50%",
+          transform: "translateX(-50%)",
           width: 0,
           height: 0,
           borderLeft: `${arrowSize}px solid transparent`,
           borderRight: `${arrowSize}px solid transparent`,
           borderBottom: `${arrowSize}px solid`,
-          borderBottomColor: 'inherit'
+          borderBottomColor: "inherit",
         }
-      case 'left':
+      case "left":
         return {
           content: '""',
-          position: 'absolute' as const,
-          left: '100%',
-          top: '50%',
-          transform: 'translateY(-50%)',
+          position: "absolute" as const,
+          left: "100%",
+          top: "50%",
+          transform: "translateY(-50%)",
           width: 0,
           height: 0,
           borderTop: `${arrowSize}px solid transparent`,
           borderBottom: `${arrowSize}px solid transparent`,
           borderLeft: `${arrowSize}px solid`,
-          borderLeftColor: 'inherit'
+          borderLeftColor: "inherit",
         }
-      case 'right':
+      case "right":
         return {
           content: '""',
-          position: 'absolute' as const,
-          right: '100%',
-          top: '50%',
-          transform: 'translateY(-50%)',
+          position: "absolute" as const,
+          right: "100%",
+          top: "50%",
+          transform: "translateY(-50%)",
           width: 0,
           height: 0,
           borderTop: `${arrowSize}px solid transparent`,
           borderBottom: `${arrowSize}px solid transparent`,
           borderRight: `${arrowSize}px solid`,
-          borderRightColor: 'inherit'
+          borderRightColor: "inherit",
         }
       default:
         return {}
@@ -183,50 +184,50 @@ export const OnboardingPointer: React.FC<OnboardingPointerProps> = ({
       {/* Overlay backdrop */}
       <Box
         sx={{
-          position: 'fixed',
+          position: "fixed",
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+          backgroundColor: "rgba(0, 0, 0, 0.4)",
           zIndex: 9998,
-          pointerEvents: 'none'
+          pointerEvents: "none",
         }}
       />
 
       {/* Pointer tooltip */}
       <Box
         sx={{
-          position: 'absolute',
+          position: "absolute",
           zIndex: 9999,
           maxWidth: 320,
           minWidth: 240,
           ...pointerPosition,
-          animation: 'onboardingFadeIn 0.3s ease-out',
-          '@keyframes onboardingFadeIn': {
-            '0%': {
+          animation: "onboardingFadeIn 0.3s ease-out",
+          "@keyframes onboardingFadeIn": {
+            "0%": {
               opacity: 0,
-              transform: `${pointerPosition.transform} scale(0.9)`
+              transform: `${pointerPosition.transform} scale(0.9)`,
             },
-            '100%': {
+            "100%": {
               opacity: 1,
-              transform: pointerPosition.transform
-            }
-          }
+              transform: pointerPosition.transform,
+            },
+          },
         }}
       >
         <Paper
           elevation={8}
           sx={{
             p: 2,
-            backgroundColor: 'info.main',
-            color: 'white',
+            backgroundColor: "info.main",
+            color: "white",
             borderRadius: 2,
-            position: 'relative',
-            '&::before': getArrowStyles()
+            position: "relative",
+            "&::before": getArrowStyles(),
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
             <Box sx={{ flex: 1 }}>
               <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
                 {title}
@@ -240,11 +241,11 @@ export const OnboardingPointer: React.FC<OnboardingPointerProps> = ({
                 size="small"
                 onClick={handleDismiss}
                 sx={{
-                  color: 'white',
+                  color: "white",
                   ml: 1,
-                  '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                  }
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  },
                 }}
               >
                 <Close fontSize="small" />
@@ -262,7 +263,7 @@ export const OnboardingPointer: React.FC<OnboardingPointerProps> = ({
         }
 
         .onboarding-highlight::before {
-          content: '';
+          content: "";
           position: absolute;
           top: -4px;
           left: -4px;

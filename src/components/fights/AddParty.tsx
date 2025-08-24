@@ -14,12 +14,19 @@ interface AddPartyProps {
   onPartyAdd: (party: Party) => void
 }
 
-export default function AddParty({ formState, onFiltersUpdate, onPartyAdd }: AddPartyProps) {
-  const handleAdd = useCallback((party: Party | null) => {
-    if (party) {
-      onPartyAdd(party)
-    }
-  }, [onPartyAdd])
+export default function AddParty({
+  formState,
+  onFiltersUpdate,
+  onPartyAdd,
+}: AddPartyProps) {
+  const handleAdd = useCallback(
+    (party: Party | null) => {
+      if (party) {
+        onPartyAdd(party)
+      }
+    },
+    [onPartyAdd]
+  )
 
   return (
     <GenericFilter

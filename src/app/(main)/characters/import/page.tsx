@@ -2,6 +2,7 @@ import { ImportPage } from "@/components/characters"
 import { headers } from "next/headers"
 import { Suspense } from "react"
 import { CircularProgress } from "@mui/material"
+import { getServerClient } from "@/lib"
 import Breadcrumbs from "@/components/Breadcrumbs"
 
 export const metadata = {
@@ -9,6 +10,8 @@ export const metadata = {
 }
 
 export default async function CharacterImportPage() {
+  const client = await getServerClient()
+
   // Detect mobile device on the server
   const headersState = await headers()
   const userAgent = headersState.get("user-agent") || ""

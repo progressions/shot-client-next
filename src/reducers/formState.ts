@@ -144,24 +144,15 @@ export function formReducer<T extends Record<string, unknown>>(
 export function useForm<T extends Record<string, unknown>>(initialData: T) {
   const initialFormState = initializeFormState<T>(initialData)
   const [formState, dispatchForm] = useReducer(formReducer<T>, initialFormState)
+
   // Memoize formState to ensure stability, but make sure data changes trigger updates
   const memoizedFormState = useMemo(
     () => ({
       ...formState,
       data: formState.data,
     }),
-    [
-      formState.data,
-      formState.loading,
-      formState.error,
-      formState.edited,
-      formState.saving,
-      formState.disabled,
-      formState.open,
-      formState.errors,
-      formState.status,
-      formState.success,
-    ]
+    [formState]
   )
+
   return { formState: memoizedFormState, dispatchForm, initialFormState }
 }

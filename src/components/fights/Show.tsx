@@ -45,14 +45,14 @@ export default function Show({ fight: initialFight }: ShowProperties) {
     entity: initialFight,
     errors: {},
   })
-  
+
   // Party state for AddParty component
   const [partyFormState, setPartyFormState] = useState({
     data: {
       filters: {},
       parties: [] as Party[],
-      factions: [] as Faction[]
-    }
+      factions: [] as Faction[],
+    },
   })
   const { errors, status, data } = formState
   const fight = data.entity
@@ -122,8 +122,8 @@ export default function Show({ fight: initialFight }: ShowProperties) {
         data: {
           filters: prev.data.filters,
           parties: response.data.parties || [],
-          factions: response.data.factions || []
-        }
+          factions: response.data.factions || [],
+        },
       }))
     } catch (error) {
       console.error("Failed to fetch parties:", error)
@@ -131,37 +131,49 @@ export default function Show({ fight: initialFight }: ShowProperties) {
   }, [client])
 
   // Handle party filter updates
-  const handlePartyFiltersUpdate = useCallback((filters: Record<string, any>) => {
-    setPartyFormState(prev => ({
-      ...prev,
-      data: {
-        filters,
-        parties: prev.data.parties,
-        factions: prev.data.factions
-      }
-    }))
-  }, [])
+  const handlePartyFiltersUpdate = useCallback(
+    (filters: Record<string, any>) => {
+      setPartyFormState(prev => ({
+        ...prev,
+        data: {
+          filters,
+          parties: prev.data.parties,
+          factions: prev.data.factions,
+        },
+      }))
+    },
+    []
+  )
 
   // Handle adding party to fight
-  const handlePartyAdd = useCallback(async (party: Party) => {
-    try {
-      console.log("Adding party to fight:", party.name)
-      console.log("Selected party object:", party)
-      console.log("Party character IDs:", party.character_ids)
-      console.log("Party vehicle IDs:", party.vehicle_ids)
-      
-      // Merge party's character_ids and vehicle_ids with fight's existing ones
-      const updatedFight = {
-        ...fight,
-        character_ids: [...(fight.character_ids || []), ...(party.character_ids || [])],
-        vehicle_ids: [...(fight.vehicle_ids || []), ...(party.vehicle_ids || [])],
+  const handlePartyAdd = useCallback(
+    async (party: Party) => {
+      try {
+        console.log("Adding party to fight:", party.name)
+        console.log("Selected party object:", party)
+        console.log("Party character IDs:", party.character_ids)
+        console.log("Party vehicle IDs:", party.vehicle_ids)
+
+        // Merge party's character_ids and vehicle_ids with fight's existing ones
+        const updatedFight = {
+          ...fight,
+          character_ids: [
+            ...(fight.character_ids || []),
+            ...(party.character_ids || []),
+          ],
+          vehicle_ids: [
+            ...(fight.vehicle_ids || []),
+            ...(party.vehicle_ids || []),
+          ],
+        }
+
+        await updateEntity(updatedFight)
+      } catch (error) {
+        console.error("Failed to add party to fight:", error)
       }
-      
-      await updateEntity(updatedFight)
-    } catch (error) {
-      console.error("Failed to add party to fight:", error)
-    }
-  }, [fight, updateEntity])
+    },
+    [fight, updateEntity]
+  )
 
   // Fetch parties on component mount
   useEffect(() => {
@@ -249,15 +261,12 @@ export default function Show({ fight: initialFight }: ShowProperties) {
         </Stack>
       </Box>
       <Box>
-        <SectionHeader
-          title="Parties"
-          icon={<Icon keyword="Parties" />}
-        >
+        <SectionHeader title="Parties" icon={<Icon keyword="Parties" />}>
           Quickly add all members of a <InfoLink href="/parties" info="Party" />{" "}
           to this fight at once. All characters and vehicles in the selected{" "}
           party will be added to the encounter.
         </SectionHeader>
-        <AddParty 
+        <AddParty
           formState={partyFormState}
           onFiltersUpdate={handlePartyFiltersUpdate}
           onPartyAdd={handlePartyAdd}

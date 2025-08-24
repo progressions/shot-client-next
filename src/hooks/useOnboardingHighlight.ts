@@ -1,21 +1,21 @@
-'use client'
+"use client"
 
-import { useEffect, useState } from 'react'
-import { usePathname } from 'next/navigation'
-import { OnboardingMilestone, isRelevantPage } from '@/lib/onboarding'
+import { useEffect, useState } from "react"
+import { usePathname } from "next/navigation"
+import { OnboardingMilestone, isRelevantPage } from "@/lib/onboarding"
 
 export interface UseOnboardingHighlightProps {
   currentMilestone: OnboardingMilestone | null
   shouldHighlight?: boolean
 }
 
-export function useOnboardingHighlight({ 
-  currentMilestone, 
-  shouldHighlight = true 
+export function useOnboardingHighlight({
+  currentMilestone,
+  shouldHighlight = true,
 }: UseOnboardingHighlightProps) {
   const pathname = usePathname()
   const [isHighlighting, setIsHighlighting] = useState(false)
-  
+
   useEffect(() => {
     if (!shouldHighlight || !currentMilestone) {
       setIsHighlighting(false)
@@ -23,13 +23,13 @@ export function useOnboardingHighlight({
     }
 
     const isOnTargetPage = isRelevantPage(currentMilestone, pathname)
-    
+
     if (isOnTargetPage) {
       // Small delay to ensure the target element is rendered
       const timeoutId = setTimeout(() => {
         setIsHighlighting(true)
       }, 500)
-      
+
       return () => clearTimeout(timeoutId)
     } else {
       setIsHighlighting(false)
@@ -43,6 +43,6 @@ export function useOnboardingHighlight({
   return {
     isHighlighting: isHighlighting && !!currentMilestone,
     currentMilestone,
-    dismissHighlight
+    dismissHighlight,
   }
 }

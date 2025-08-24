@@ -227,7 +227,7 @@ export default function LoginPage() {
             </Alert>
           )}
         </Stack>
-        
+
         <Box sx={{ mt: 3, textAlign: "center" }}>
           <Typography variant="body2" sx={{ color: "#cccccc" }}>
             Don't have an account?{" "}

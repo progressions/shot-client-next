@@ -20,10 +20,10 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
       setDrawerOpen(true)
     }
 
-    window.addEventListener('openCampaignDrawer', handleOpenDrawerEvent)
-    
+    window.addEventListener("openCampaignDrawer", handleOpenDrawerEvent)
+
     return () => {
-      window.removeEventListener('openCampaignDrawer', handleOpenDrawerEvent)
+      window.removeEventListener("openCampaignDrawer", handleOpenDrawerEvent)
     }
   }, [])
 
@@ -55,7 +55,7 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
 
   function handleCampaignCreated() {
     // Dispatch custom event to refresh campaigns list
-    window.dispatchEvent(new CustomEvent('campaignCreated'))
+    window.dispatchEvent(new CustomEvent("campaignCreated"))
   }
 
   return (

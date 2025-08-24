@@ -308,12 +308,12 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
       console.log("⚠️ No JWT token available for user refresh")
       return
     }
-    
+
     try {
       console.log("🔄 Refreshing user data for onboarding progress...")
       const userResponse = await client.getCurrentUser()
       const { data: userData } = userResponse || {}
-      
+
       if (userData) {
         console.log("✅ User data refreshed successfully")
         console.log("📊 Onboarding progress:", userData.onboarding_progress)

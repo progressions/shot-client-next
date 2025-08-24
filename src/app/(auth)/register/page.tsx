@@ -15,20 +15,22 @@ import { RegistrationForm } from "@/components/auth"
 export default function RegisterPage() {
   const router = useRouter()
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
-  
+
   const handleRegistrationSuccess = () => {
-    setSuccessMessage("Registration successful! Please check your email to confirm your account, then you can sign in.")
+    setSuccessMessage(
+      "Registration successful! Please check your email to confirm your account, then you can sign in."
+    )
     // Redirect to login after a short delay to show the success message
     setTimeout(() => {
       router.push("/login")
     }, 3000)
   }
-  
+
   const handleRegistrationError = (error: string) => {
     // Error is handled within the RegistrationForm component
     console.error("Registration error:", error)
   }
-  
+
   return (
     <Container maxWidth="sm">
       <Box
@@ -47,21 +49,19 @@ export default function RegisterPage() {
         >
           Create Account
         </Typography>
-        
-        <Typography 
-          variant="body2" 
-          color="text.secondary" 
-          align="center" 
+
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          align="center"
           sx={{ mb: 3, color: "#cccccc" }}
         >
           Join Chi War to manage your Feng Shui 2 campaigns
         </Typography>
-        
+
         {successMessage ? (
           <Alert severity="success" sx={{ mt: 2, width: "100%" }}>
-            <Typography variant="body2">
-              {successMessage}
-            </Typography>
+            <Typography variant="body2">{successMessage}</Typography>
           </Alert>
         ) : (
           <>
@@ -71,7 +71,7 @@ export default function RegisterPage() {
                 onError={handleRegistrationError}
               />
             </Box>
-            
+
             <Box sx={{ mt: 3, textAlign: "center" }}>
               <Typography variant="body2" sx={{ color: "#cccccc" }}>
                 Already have an account?{" "}

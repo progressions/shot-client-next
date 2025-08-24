@@ -21,7 +21,11 @@ interface ViewProps {
 export default function View({ formState, dispatchForm }: ViewProps) {
   const { campaigns } = formState.data
   const { client } = useClient()
-  const { campaign: currentCampaign, setCurrentCampaign, refreshUser } = useApp()
+  const {
+    campaign: currentCampaign,
+    setCurrentCampaign,
+    refreshUser,
+  } = useApp()
   const { toastSuccess, toastError } = useToast()
   const [loadingCampaignId, setLoadingCampaignId] = useState<string | null>(
     null

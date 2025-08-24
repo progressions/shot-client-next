@@ -32,7 +32,9 @@ export function createAuthClient(deps: ClientDependencies) {
     return post(api.registerUser(), { user: user })
   }
 
-  async function registerUser(data: RegistrationData): Promise<AxiosResponse<RegistrationResponse>> {
+  async function registerUser(
+    data: RegistrationData
+  ): Promise<AxiosResponse<RegistrationResponse>> {
     return post(apiV2.usersRegister(), { user: data })
   }
 

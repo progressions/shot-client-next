@@ -96,10 +96,10 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
       fetchVehicles(filters)
     }
 
-    window.addEventListener('vehicleCreated', handleVehicleCreated)
-    
+    window.addEventListener("vehicleCreated", handleVehicleCreated)
+
     return () => {
-      window.removeEventListener('vehicleCreated', handleVehicleCreated)
+      window.removeEventListener("vehicleCreated", handleVehicleCreated)
     }
   }, [fetchVehicles, filters])
 

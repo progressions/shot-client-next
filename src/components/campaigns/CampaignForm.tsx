@@ -125,7 +125,10 @@ export default function CampaignForm({
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()
-    console.log("🚀 Campaign form submit started", { name: name.trim(), disabled })
+    console.log("🚀 Campaign form submit started", {
+      name: name.trim(),
+      disabled,
+    })
     if (disabled) return
     if (!name.trim()) {
       dispatchForm({ type: FormActions.ERROR, payload: "Name is required" })
@@ -136,17 +139,17 @@ export default function CampaignForm({
       await createEntity(data, image)
       // Refresh user data to update onboarding progress
       await refreshUser()
-      
+
       // Dispatch custom event to notify campaigns list to reload
-      const campaignCreatedEvent = new CustomEvent('campaignCreated')
+      const campaignCreatedEvent = new CustomEvent("campaignCreated")
       window.dispatchEvent(campaignCreatedEvent)
-      
+
       // Additional event dispatch with delay to ensure event listeners are ready
       setTimeout(() => {
-        const delayedEvent = new CustomEvent('campaignCreated')
+        const delayedEvent = new CustomEvent("campaignCreated")
         window.dispatchEvent(delayedEvent)
       }, 500)
-      
+
       onCampaignCreated?.()
       handleClose()
     } catch (error) {

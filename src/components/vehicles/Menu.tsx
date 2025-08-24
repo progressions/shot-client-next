@@ -41,13 +41,17 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
 
   function handleVehicleCreated() {
     // Dispatch custom event to refresh vehicles list
-    window.dispatchEvent(new CustomEvent('vehicleCreated'))
+    window.dispatchEvent(new CustomEvent("vehicleCreated"))
   }
 
   return (
     <>
       <SpeedDial actions={actions} />
-      <CreateVehicleForm open={drawerOpen} onClose={handleCloseCreateDrawer} onVehicleCreated={handleVehicleCreated} />
+      <CreateVehicleForm
+        open={drawerOpen}
+        onClose={handleCloseCreateDrawer}
+        onVehicleCreated={handleVehicleCreated}
+      />
     </>
   )
 }
