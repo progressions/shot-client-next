@@ -167,7 +167,7 @@ export function GenericFilter({
             }
             records={userOptions}
             allowNone={field.allowNone ?? true}
-            sx={{ width: 200 }}
+            sx={{ width: 300 }}
             placeholder={displayName}
             excludeIds={isPrimaryField ? excludeIds : undefined}
           />
