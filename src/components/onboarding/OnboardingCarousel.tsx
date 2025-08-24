@@ -29,6 +29,7 @@ import {
   getCompletionPercentage,
   isRelevantPage,
 } from "@/lib/onboarding"
+import { collectionNames } from "@/lib/maps"
 
 export interface OnboardingCarouselProps {
   progress: OnboardingProgress
@@ -44,6 +45,22 @@ const MILESTONE_ICONS: Record<string, React.ReactElement> = {
   faction: <Flag />,
   party: <Groups />,
   site: <LocationCity />,
+}
+
+const getPluralName = (key: string): string => {
+  const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1)
+  const pluralForm = collectionNames[capitalizedKey]
+  
+  if (pluralForm) {
+    // Capitalize the first letter of the plural form from maps
+    return pluralForm.charAt(0).toUpperCase() + pluralForm.slice(1)
+  }
+  
+  return `${capitalizedKey}s`
+}
+
+const getSingularName = (key: string): string => {
+  return key.charAt(0).toUpperCase() + key.slice(1)
 }
 
 export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
@@ -239,7 +256,7 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
             ? "Activate Campaign"
             : isOnRelevantPage
               ? `Create ${currentMilestone.key.charAt(0).toUpperCase() + currentMilestone.key.slice(1)}`
-              : `Go to ${currentMilestone.key.charAt(0).toUpperCase() + currentMilestone.key.slice(1)}s`}
+              : `Go to ${getPluralName(currentMilestone.key)}`}
         </Button>
 
         {!isOnRelevantPage && currentMilestone.key !== "activate-campaign" && (
@@ -308,8 +325,7 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
                 label={
                   milestone.key === "activate-campaign"
                     ? "Campaign Active"
-                    : milestone.key.charAt(0).toUpperCase() +
-                      milestone.key.slice(1)
+                    : getSingularName(milestone.key)
                 }
                 size="small"
                 color="success"
