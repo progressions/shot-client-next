@@ -153,6 +153,10 @@ export function createAuthClient(deps: ClientDependencies) {
     })
   }
 
+  async function logout(): Promise<AxiosResponse<void>> {
+    return delete_(`${api.base()}/logout`)
+  }
+
   return {
     createUser,
     registerUser,
@@ -171,5 +175,6 @@ export function createAuthClient(deps: ClientDependencies) {
     getUsers,
     dismissCongratulations,
     updateOnboardingProgress,
+    logout,
   }
 }

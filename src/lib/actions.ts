@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
+import { Client } from "@/lib"
 
 export async function logoutAction(): Promise<void> {
   const cookieStore = await cookies()
@@ -9,10 +10,8 @@ export async function logoutAction(): Promise<void> {
 
   if (jwtToken) {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/logout`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${jwtToken}` },
-      })
+      const client = Client({ jwt: jwtToken })
+      await client.logout()
     } catch (error) {
       console.error("Failed to logout on server:", error)
     }
