@@ -282,23 +282,12 @@ export default function GMCTemplatesPage() {
 
     setCreatingFrom(template.id)
     try {
-      // Get full template data
-      const fullTemplate = await client.getCharacter(template.id)
+      // Use the duplicate API to create a new character from the template
+      const response = await client.duplicateCharacter(template)
+      const newCharacter = response.data
 
-      // Create new character from template
-      const newCharacterData = {
-        ...fullTemplate.data,
-        id: undefined, // Remove ID so a new one is generated
-        is_template: false,
-        name: `${template.name} (Copy)`, // Add (Copy) suffix to differentiate
-      }
-
-      const response = await client.createCharacter({
-        character: newCharacterData,
-      })
-
-      toastSuccess(`Created new GMC from template: ${template.name}`)
-      router.push(`/characters/${response.data.id}`)
+      toastSuccess(`Created new GMC: ${newCharacter.name}`)
+      router.push(`/characters/${newCharacter.id}`)
     } catch (error) {
       console.error("Error creating character from template:", error)
       toastError("Failed to create GMC from template")
