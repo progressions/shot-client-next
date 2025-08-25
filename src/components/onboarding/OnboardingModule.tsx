@@ -2,11 +2,13 @@
 
 import React from "react"
 import { usePathname } from "next/navigation"
-import { Box, Paper, Slide } from "@mui/material"
+import { Box, Paper, Slide, IconButton } from "@mui/material"
+import { Close } from "@mui/icons-material"
 import { OnboardingProgress } from "@/lib/onboarding"
 import { CampaignOnboarding } from "./CampaignOnboarding"
 import { OnboardingCarousel } from "./OnboardingCarousel"
 import { CongratulationsModule } from "./CongratulationsModule"
+import { useClient, useToast, useApp } from "@/contexts"
 
 export interface OnboardingModuleProps {
   user: {
@@ -16,13 +18,52 @@ export interface OnboardingModuleProps {
 
 export const OnboardingModule: React.FC<OnboardingModuleProps> = ({ user }) => {
   const pathname = usePathname()
+  const { client } = useClient()
+  const { toastSuccess, toastError } = useToast()
+  const { refreshUser } = useApp()
   const { onboarding_progress } = user
   if (!onboarding_progress) return
+
+  const handleDismissOnboarding = async () => {
+    try {
+      await client.updateOnboardingProgress(onboarding_progress.id, {
+        congratulations_dismissed_at: new Date().toISOString()
+      })
+      toastSuccess("Onboarding dismissed! You're all set!")
+      await refreshUser()
+    } catch (error) {
+      console.error("Failed to dismiss onboarding:", error)
+      toastError("Failed to dismiss onboarding. Please try again.")
+    }
+  }
 
   // Don't show anything if onboarding is complete
   if (onboarding_progress.onboarding_complete) {
     return null
   }
+
+  // Reusable dismiss button component
+  const DismissButton = () => (
+    <IconButton
+      onClick={handleDismissOnboarding}
+      sx={{
+        position: "absolute",
+        top: 8,
+        right: 8,
+        backgroundColor: "background.paper",
+        border: "1px solid",
+        borderColor: "grey.300",
+        zIndex: 1,
+        "&:hover": {
+          backgroundColor: "grey.50",
+        },
+      }}
+      size="small"
+      title="Dismiss onboarding"
+    >
+      <Close fontSize="small" />
+    </IconButton>
+  )
 
   // Show congratulations if all milestones complete but not dismissed
   if (onboarding_progress.ready_for_congratulations) {
@@ -41,6 +82,7 @@ export const OnboardingModule: React.FC<OnboardingModuleProps> = ({ user }) => {
               overflow: "hidden",
             }}
           >
+            <DismissButton />
             <CongratulationsModule />
           </Paper>
         </Box>
@@ -65,6 +107,7 @@ export const OnboardingModule: React.FC<OnboardingModuleProps> = ({ user }) => {
               overflow: "hidden",
             }}
           >
+            <DismissButton />
             <CampaignOnboarding currentPath={pathname} />
           </Paper>
         </Box>
@@ -104,6 +147,7 @@ export const OnboardingModule: React.FC<OnboardingModuleProps> = ({ user }) => {
             },
           }}
         >
+          <DismissButton />
           <OnboardingCarousel
             progress={onboarding_progress}
             currentPath={pathname}

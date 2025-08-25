@@ -21,6 +21,7 @@ import {
   Flag,
   Groups,
   LocationCity,
+  Close,
 } from "@mui/icons-material"
 import {
   OnboardingProgress,
@@ -30,6 +31,7 @@ import {
   isRelevantPage,
 } from "@/lib/onboarding"
 import { collectionNames } from "@/lib/maps"
+import { useClient, useToast, useApp } from "@/contexts"
 
 export interface OnboardingCarouselProps {
   progress: OnboardingProgress
@@ -68,6 +70,9 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
   currentPath,
 }) => {
   const router = useRouter()
+  const { client } = useClient()
+  const { toastSuccess, toastError } = useToast()
+  const { refreshUser } = useApp()
 
   // Get remaining milestones (only show incomplete ones, but don't skip campaign creation by default)
   const remainingMilestones = ONBOARDING_MILESTONES.filter(
@@ -92,6 +97,7 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
   const handleNext = () => {
     setCurrentIndex(Math.min(remainingMilestones.length - 1, currentIndex + 1))
   }
+
 
   const handleNavigateToMilestone = () => {
     const targetPage = currentMilestone.targetPages[0]
@@ -200,8 +206,10 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
         </Stack>
 
         {/* Current milestone */}
-        <Stack direction="row" alignItems="center" spacing={2}>
-          <Box
+        <Box>
+          
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <Box
             sx={{
               p: 1,
               borderRadius: "50%",
@@ -237,14 +245,15 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
                 sx={{ mt: 1 }}
               />
             )}
-          </Box>
-        </Stack>
-      </Box>
+            </Box>
+          </Stack>
+        </Box>
 
       <Stack
         direction={{ xs: "column", sm: "row" }}
         spacing={2}
         alignItems="center"
+        sx={{ mt: 3 }}
       >
         <Button
           variant="contained"
@@ -346,6 +355,7 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
           </Stack>
         </Box>
       )}
+    </Box>
     </Box>
   )
 }

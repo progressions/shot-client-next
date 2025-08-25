@@ -143,6 +143,10 @@ class ApiV2 {
     return `${this.api()}/onboarding/dismiss_congratulations`
   }
 
+  onboarding(): string {
+    return `${this.api()}/onboarding`
+  }
+
   invitations(invitation?: Invitation | ID): string {
     return invitation?.id
       ? `${this.api()}/invitations/${invitation.id}`

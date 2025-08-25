@@ -145,6 +145,18 @@ export function createAuthClient(deps: ClientDependencies) {
     return patch(apiV2.dismissCongratulations())
   }
 
+  async function updateOnboardingProgress(
+    id: string,
+    progressData: Record<string, string | null>
+  ): Promise<AxiosResponse<User>> {
+    return patch(apiV2.onboarding(), {
+      onboarding_progress: {
+        id: id,
+        ...progressData,
+      },
+    })
+  }
+
   return {
     createUser,
     registerUser,
@@ -162,5 +174,6 @@ export function createAuthClient(deps: ClientDependencies) {
     getCurrentUsers,
     getUsers,
     dismissCongratulations,
+    updateOnboardingProgress,
   }
 }
