@@ -20,6 +20,8 @@ import {
 import { useClient, useCampaign, useToast } from "@/contexts"
 import { MainHeader, Icon } from "@/components/ui"
 import { SpeedDial } from "@/components/characters"
+import { RichTextRenderer } from "@/components/editor"
+import { CS } from "@/services"
 import type { Character } from "@/types"
 
 // GMC Types in Feng Shui 2
@@ -38,62 +40,190 @@ interface TemplatePreviewCardProps {
 
 function TemplatePreviewCard({ template, onSelect }: TemplatePreviewCardProps) {
   const actionValues = template.action_values || {}
+  const isMook = actionValues["Type"] === "Mook"
+  
+  // Determine which attack value to show
+  const mainAttack = actionValues["Martial Arts"] || actionValues["Guns"] || 
+                     actionValues["Sorcery"] || actionValues["Creature Powers"] || 0
+  const mainAttackLabel = actionValues["Martial Arts"] > 0 ? "Martial Arts" :
+                          actionValues["Guns"] > 0 ? "Guns" :
+                          actionValues["Sorcery"] > 0 ? "Sorcery" :
+                          actionValues["Creature Powers"] > 0 ? "Creature Powers" : "Attack"
 
-  // Extract key combat and defensive values
-  const primaryStats = [
-    { label: "Martial Arts", value: actionValues["Martial Arts"] },
-    { label: "Guns", value: actionValues["Guns"] },
-    { label: "Sorcery", value: actionValues["Sorcery"] },
-    { label: "Creature Powers", value: actionValues["Creature Powers"] },
-    { label: "Defense", value: actionValues["Defense"] },
-    { label: "Toughness", value: actionValues["Toughness"] },
-    { label: "Speed", value: actionValues["Speed"] },
-    { label: "Fortune", value: actionValues["Fortune"] },
-  ].filter(stat => stat.value && stat.value > 0)
+  const secondaryAttack = actionValues["Guns"] > 0 && actionValues["Martial Arts"] > 0 ? actionValues["Guns"] :
+                          actionValues["Sorcery"] > 0 && actionValues["Martial Arts"] > 0 ? actionValues["Sorcery"] : 0
+  const secondaryAttackLabel = secondaryAttack > 0 && actionValues["Guns"] === secondaryAttack ? "Guns" :
+                               secondaryAttack > 0 && actionValues["Sorcery"] === secondaryAttack ? "Sorcery" : ""
 
   return (
-    <Card sx={{ height: "100%" }}>
-      <CardActionArea onClick={() => onSelect(template)} sx={{ height: "100%" }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            {template.name}
-          </Typography>
-          <Chip
-            label={actionValues["Type"] || "GMC"}
-            color="primary"
-            size="small"
-            sx={{ mb: 2 }}
-          />
-
-          <Box sx={{ mt: 1 }}>
-            {primaryStats.map(stat => (
-              <Box
-                key={stat.label}
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  mb: 0.5,
-                }}
-              >
-                <Typography variant="body2" color="text.secondary">
-                  {stat.label}:
-                </Typography>
-                <Typography variant="body2" fontWeight="bold">
-                  {stat.value}
-                </Typography>
-              </Box>
-            ))}
+    <Card 
+      sx={{ 
+        height: "100%",
+        bgcolor: "background.paper",
+        border: "1px solid",
+        borderColor: "divider",
+      }}
+    >
+      <CardActionArea onClick={() => onSelect(template)} sx={{ height: "100%", p: 0 }}>
+        <CardContent sx={{ p: 2 }}>
+          {/* Name Section */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+              {template.name}
+            </Typography>
           </Box>
 
-          {template.description && (
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ mt: 2, fontStyle: "italic" }}
-              noWrap
-            >
-              {template.description}
+          {/* Action Values Section */}
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
+              Action Values
             </Typography>
+            
+            <Grid container spacing={1}>
+              {/* Main Attack */}
+              <Grid item xs={2}>
+                <Box sx={{ 
+                  border: "1px solid",
+                  borderColor: "divider",
+                  borderRadius: 1,
+                  p: 1,
+                  textAlign: "center",
+                  bgcolor: "background.default",
+                  minHeight: "80px"
+                }}>
+                  <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                    {mainAttackLabel}
+                  </Typography>
+                  <Typography variant="h5">
+                    {mainAttack}
+                  </Typography>
+                </Box>
+              </Grid>
+
+              {/* Secondary Attack - not for Mooks */}
+              {!isMook && (
+                <Grid item xs={2}>
+                  <Box sx={{ 
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 1,
+                    p: 1,
+                    textAlign: "center",
+                    bgcolor: "background.default",
+                    minHeight: "80px"
+                  }}>
+                    <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                      {secondaryAttackLabel || "—"}
+                    </Typography>
+                    <Typography variant="h5">
+                      {secondaryAttack || "—"}
+                    </Typography>
+                  </Box>
+                </Grid>
+              )}
+
+              {/* Defense */}
+              <Grid item xs={2}>
+                <Box sx={{ 
+                  border: "1px solid",
+                  borderColor: "divider",
+                  borderRadius: 1,
+                  p: 1,
+                  textAlign: "center",
+                  bgcolor: "background.default",
+                  minHeight: "80px"
+                }}>
+                  <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                    Defense
+                  </Typography>
+                  <Typography variant="h5">
+                    {actionValues["Defense"] || 0}
+                  </Typography>
+                </Box>
+              </Grid>
+
+              {/* Toughness - not for Mooks */}
+              {!isMook && (
+                <Grid item xs={2}>
+                  <Box sx={{ 
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 1,
+                    p: 1,
+                    textAlign: "center",
+                    bgcolor: "background.default",
+                    minHeight: "80px"
+                  }}>
+                    <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                      Toughness
+                    </Typography>
+                    <Typography variant="h5">
+                      {actionValues["Toughness"] || 0}
+                    </Typography>
+                  </Box>
+                </Grid>
+              )}
+
+              {/* Speed */}
+              <Grid item xs={2}>
+                <Box sx={{ 
+                  border: "1px solid",
+                  borderColor: "divider",
+                  borderRadius: 1,
+                  p: 1,
+                  textAlign: "center",
+                  bgcolor: "background.default",
+                  minHeight: "80px"
+                }}>
+                  <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                    Speed
+                  </Typography>
+                  <Typography variant="h5">
+                    {actionValues["Speed"] || 0}
+                  </Typography>
+                </Box>
+              </Grid>
+
+              {/* Damage for NPCs */}
+              <Grid item xs={2}>
+                <Box sx={{ 
+                  border: "1px solid",
+                  borderColor: "divider",
+                  borderRadius: 1,
+                  p: 1,
+                  textAlign: "center",
+                  bgcolor: "background.default",
+                  minHeight: "80px"
+                }}>
+                  <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                    Damage
+                  </Typography>
+                  <Typography variant="h5">
+                    {actionValues["Damage"] || 0}
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
+          </Box>
+
+          {/* Description - if available */}
+          {CS.appearance(template) && (
+            <Box sx={{ 
+              mt: 2, 
+              pt: 2, 
+              borderTop: "1px solid", 
+              borderColor: "divider",
+              "& .tiptap": {
+                fontSize: "1rem",
+                lineHeight: 1.5,
+                color: "text.secondary",
+                "& p": {
+                  margin: 0,
+                }
+              }
+            }}>
+              <RichTextRenderer html={CS.appearance(template) || ""} />
+            </Box>
           )}
         </CardContent>
       </CardActionArea>
@@ -110,6 +240,11 @@ export default function GMCTemplatesPage() {
   const [templatesByType, setTemplatesByType] = useState<Record<string, Character[]>>({})
   const [loading, setLoading] = useState(true)
   const [creatingFrom, setCreatingFrom] = useState<string | null>(null)
+
+  // Set page title
+  useEffect(() => {
+    document.title = "Create GMC - Chi War"
+  }, [])
 
   useEffect(() => {
     const loadTemplates = async () => {
