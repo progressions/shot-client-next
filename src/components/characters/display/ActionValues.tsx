@@ -9,6 +9,8 @@ type ActionValuesProps = {
 }
 
 export default function ActionValues({ character, size }: ActionValuesProps) {
+  const isMook = CS.isMook(character)
+  
   return (
     <Box sx={{ display: "flex", justifyContent: "center" }}>
       <Stack
@@ -25,17 +27,21 @@ export default function ActionValues({ character, size }: ActionValuesProps) {
           value={CS.mainAttackValue(character)}
           size={size}
         />
-        <ActionValue
-          name={CS.secondaryAttack(character)}
-          value={CS.secondaryAttackValue(character)}
-          size={size}
-        />
+        {!isMook && (
+          <ActionValue
+            name={CS.secondaryAttack(character)}
+            value={CS.secondaryAttackValue(character)}
+            size={size}
+          />
+        )}
         <ActionValue name="Defense" value={CS.defense(character)} size={size} />
-        <ActionValue
-          name="Toughness"
-          value={CS.toughness(character)}
-          size={size}
-        />
+        {!isMook && (
+          <ActionValue
+            name="Toughness"
+            value={CS.toughness(character)}
+            size={size}
+          />
+        )}
         <ActionValue name="Speed" value={CS.speed(character)} size={size} />
         {CS.isPC(character) && (
           <ActionValue

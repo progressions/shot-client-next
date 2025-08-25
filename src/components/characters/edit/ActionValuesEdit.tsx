@@ -19,6 +19,8 @@ export default function ActionValuesEdit({
   setCharacter,
   updateCharacter,
 }: ActionValuesEditProps) {
+  const isMook = CS.isMook(character)
+  
   return (
     <Box sx={{ display: "flex", justifyContent: "center" }}>
       <Stack direction={{ xs: "column", md: "row" }} spacing={2} mb={2}>
@@ -32,15 +34,17 @@ export default function ActionValuesEdit({
             setCharacter={setCharacter}
             updateCharacter={updateCharacter}
           />
-          <AttackValueEdit
-            attack="SecondaryAttack"
-            name={CS.secondaryAttack(character)}
-            value={CS.secondaryAttackValue(character)}
-            size={size}
-            character={character}
-            setCharacter={setCharacter}
-            updateCharacter={updateCharacter}
-          />
+          {!isMook && (
+            <AttackValueEdit
+              attack="SecondaryAttack"
+              name={CS.secondaryAttack(character)}
+              value={CS.secondaryAttackValue(character)}
+              size={size}
+              character={character}
+              setCharacter={setCharacter}
+              updateCharacter={updateCharacter}
+            />
+          )}
           <ActionValue
             name="Defense"
             value={CS.defense(character)}
@@ -51,14 +55,16 @@ export default function ActionValuesEdit({
           />
         </Stack>
         <Stack direction="row" spacing={2}>
-          <ActionValue
-            name="Toughness"
-            value={CS.toughness(character)}
-            size={size}
-            character={character}
-            setCharacter={setCharacter}
-            updateCharacter={updateCharacter}
-          />
+          {!isMook && (
+            <ActionValue
+              name="Toughness"
+              value={CS.toughness(character)}
+              size={size}
+              character={character}
+              setCharacter={setCharacter}
+              updateCharacter={updateCharacter}
+            />
+          )}
           <ActionValue
             name="Speed"
             value={CS.speed(character)}
