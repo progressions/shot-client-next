@@ -21,7 +21,6 @@ import {
   Flag,
   Groups,
   LocationCity,
-  Close,
 } from "@mui/icons-material"
 import {
   OnboardingProgress,
