@@ -31,13 +31,11 @@ export default function EditWealth({
   }
 
   const handleWealthChange = async (value: string | null) => {
-    if (!value) return
-
     const updatedCharacter = {
       ...character,
-      wealth: value,
+      wealth: value || null,
     }
-    setCharacterWealth(value)
+    setCharacterWealth(value || null)
     updateCharacter(updatedCharacter)
   }
 
@@ -47,7 +45,7 @@ export default function EditWealth({
       value={characterWealth || ""}
       fetchOptions={fetchCharacterWealths}
       onChange={handleWealthChange}
-      allowNone={false}
+      allowNone={true}
     />
   )
 }
