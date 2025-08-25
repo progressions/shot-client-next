@@ -69,7 +69,8 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   useEffect(() => {
     if (!campaignData) return
     if (campaignData.campaigns === "reload") {
-      fetchCampaigns(filters)
+      // Use cache_buster for WebSocket-triggered reloads
+      fetchCampaigns({ ...filters, cache_buster: "true" })
     }
   }, [campaignData, fetchCampaigns, filters])
 
@@ -77,7 +78,8 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   useEffect(() => {
     const unsubscribe = subscribeToEntity("campaigns", data => {
       if (data === "reload") {
-        fetchCampaigns(filters)
+        // Use cache_buster for WebSocket-triggered reloads
+        fetchCampaigns({ ...filters, cache_buster: "true" })
       }
     })
     return unsubscribe
@@ -94,8 +96,9 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   // Listen for campaign creation events to refresh the list
   useEffect(() => {
     const handleCampaignCreated = () => {
-      console.log("📢 Campaign created event received, refreshing list...")
-      fetchCampaigns(formState.data.filters)
+      console.log("📢 Campaign created event received, refreshing list with cache buster...")
+      // Add cache_buster to force fresh data after campaign creation
+      fetchCampaigns({ ...formState.data.filters, cache_buster: "true" })
     }
 
     window.addEventListener("campaignCreated", handleCampaignCreated)

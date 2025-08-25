@@ -250,6 +250,7 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
           variant="contained"
           endIcon={<ArrowForward />}
           onClick={handleNavigateToMilestone}
+          data-testid={`${currentMilestone.key}-onboarding-cta`}
           sx={{
             px: 3,
             py: 1,

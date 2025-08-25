@@ -96,8 +96,9 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
     const unsubscribe = subscribeToEntity("fights", data => {
       console.log("🔄 FightsList: Received WebSocket data for 'fights':", data)
       if (data === "reload") {
-        console.log("🔄 FightsList: Received 'reload' signal, calling fetchFights")
-        fetchFights(filters)
+        console.log("🔄 FightsList: Received 'reload' signal, calling fetchFights with cache_buster")
+        // Use cache_buster for WebSocket-triggered reloads
+        fetchFights({ ...filters, cache_buster: "true" })
       }
     })
     return unsubscribe

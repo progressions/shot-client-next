@@ -27,7 +27,7 @@ export type FormStateData = {
 
 export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { client } = useClient()
-  const { campaignData } = useCampaign()
+  const { subscribeToEntity } = useCampaign()
   const { saveLocally } = useLocalStorage()
   const router = useRouter()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
@@ -57,12 +57,16 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
     [client, dispatchForm]
   )
 
+  // Subscribe to faction updates
   useEffect(() => {
-    if (!campaignData) return
-    if (campaignData.factions === "reload") {
-      fetchFactions(filters)
-    }
-  }, [campaignData, fetchFactions, filters])
+    const unsubscribe = subscribeToEntity("factions", data => {
+      if (data === "reload") {
+        // Use cache_buster for WebSocket-triggered reloads
+        fetchFactions({ ...filters, cache_buster: "true" })
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, fetchFactions, filters])
 
   useEffect(() => {
     const url = `/factions?${queryParams(filters)}`

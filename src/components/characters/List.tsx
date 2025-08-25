@@ -87,7 +87,8 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   useEffect(() => {
     const unsubscribe = subscribeToEntity("characters", data => {
       if (data === "reload") {
-        fetchCharacters(filters)
+        // Use cache_buster for WebSocket-triggered reloads
+        fetchCharacters({ ...filters, cache_buster: "true" })
       }
     })
     return unsubscribe

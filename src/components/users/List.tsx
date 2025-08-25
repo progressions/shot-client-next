@@ -32,7 +32,7 @@ export type FormStateData = {
 
 export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { client } = useClient()
-  const { campaignData } = useCampaign()
+  const { campaignData, subscribeToEntity } = useCampaign()
   const { saveLocally } = useLocalStorage()
   const router = useRouter()
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
@@ -76,6 +76,17 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
     },
     [client, dispatchForm]
   )
+
+  // Subscribe to user updates
+  useEffect(() => {
+    const unsubscribe = subscribeToEntity("users", data => {
+      if (data === "reload") {
+        // Use cache_buster for WebSocket-triggered reloads
+        fetchUsers({ ...filters, cache_buster: "true" })
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, fetchUsers, filters])
 
   useEffect(() => {
     if (!campaignData) return
