@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import {
   Stack,
@@ -30,6 +30,41 @@ export default function LoginPage() {
   const { dispatchCurrentUser } = useClient()
 
   const redirectTo = searchParams.get("redirect") || "/"
+  const authError = searchParams.get("error")
+
+  // Clear cookies when there's an auth error from server component
+  useEffect(() => {
+    if (authError === "invalid_token" || authError === "unauthorized" || authError === "auth_failed") {
+      console.log("🔄 Clearing invalid authentication data due to:", authError)
+      
+      // Clear cookies
+      Cookies.remove("jwtToken")
+      Cookies.remove("userId")
+      
+      // Clear localStorage
+      if (typeof window !== "undefined") {
+        const keysToRemove = []
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i)
+          if (key && (key.startsWith("currentUser-") || 
+                     key.startsWith("currentCampaign-") ||
+                     key.includes("jwt") ||
+                     key.includes("token"))) {
+            keysToRemove.push(key)
+          }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key))
+        sessionStorage.clear()
+      }
+      
+      // Show appropriate error message
+      if (authError === "invalid_token") {
+        setError("Your session has expired. Please log in again.")
+      } else if (authError === "unauthorized") {
+        setError("Authentication failed. Please log in again.")
+      }
+    }
+  }, [authError])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

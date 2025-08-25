@@ -39,14 +39,11 @@ export async function getServerClient() {
           
           // Handle 401 Unauthorized errors
           if (error?.response?.status === 401) {
-            console.log("🔥 401 error detected in server component - clearing auth and redirecting")
+            console.log("🔥 401 error detected in server component - redirecting to login")
             
-            // Clear authentication cookies
-            cookieStore.delete("jwtToken")
-            cookieStore.delete("userId")
-            
-            // Redirect to login page
-            redirect("/login")
+            // Can't modify cookies in Server Component, just redirect
+            // The login page or middleware will handle clearing the invalid token
+            redirect("/login?error=unauthorized")
           }
           
           // Handle 400 errors from API endpoints (invalid/expired JWT)
@@ -55,14 +52,11 @@ export async function getServerClient() {
               (error?.config?.url?.includes('/api/v2/users/current') ||
                error?.config?.url?.includes('/api/v2/campaigns') ||
                error?.config?.url?.includes('/api/v2/'))) {
-            console.log("🔥 400 error from API - invalid JWT, clearing auth and redirecting")
+            console.log("🔥 400 error from API - invalid JWT, redirecting to login")
             
-            // Clear authentication cookies
-            cookieStore.delete("jwtToken")
-            cookieStore.delete("userId")
-            
-            // Redirect to login page
-            redirect("/login")
+            // Can't modify cookies in Server Component, just redirect
+            // The login page or middleware will handle clearing the invalid token
+            redirect("/login?error=invalid_token")
           }
           
           // Handle 400 error from sign_in endpoint (happens after 401)
@@ -71,12 +65,8 @@ export async function getServerClient() {
               error?.response?.config?.url?.includes('/users/sign_in.json')) {
             console.log("🔥 400 error from sign_in endpoint - auth failure, redirecting to login")
             
-            // Clear authentication cookies
-            cookieStore.delete("jwtToken")
-            cookieStore.delete("userId")
-            
-            // Redirect to login page
-            redirect("/login")
+            // Can't modify cookies in Server Component, just redirect
+            redirect("/login?error=auth_failed")
           }
           
           // Re-throw other errors
