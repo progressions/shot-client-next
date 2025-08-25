@@ -146,14 +146,10 @@ export function createAuthClient(deps: ClientDependencies) {
   }
 
   async function updateOnboardingProgress(
-    id: string,
     progressData: Record<string, string | null>
   ): Promise<AxiosResponse<User>> {
     return patch(apiV2.onboarding(), {
-      onboarding_progress: {
-        id: id,
-        ...progressData,
-      },
+      onboarding_progress: progressData,
     })
   }
 
