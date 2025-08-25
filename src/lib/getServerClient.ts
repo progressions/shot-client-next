@@ -49,6 +49,22 @@ export async function getServerClient() {
             redirect("/login")
           }
           
+          // Handle 400 errors from API endpoints (invalid/expired JWT)
+          // This happens when the JWT exists but is invalid for the current environment
+          if (error?.response?.status === 400 && 
+              (error?.config?.url?.includes('/api/v2/users/current') ||
+               error?.config?.url?.includes('/api/v2/campaigns') ||
+               error?.config?.url?.includes('/api/v2/'))) {
+            console.log("🔥 400 error from API - invalid JWT, clearing auth and redirecting")
+            
+            // Clear authentication cookies
+            cookieStore.delete("jwtToken")
+            cookieStore.delete("userId")
+            
+            // Redirect to login page
+            redirect("/login")
+          }
+          
           // Handle 400 error from sign_in endpoint (happens after 401)
           // This occurs when axios follows a redirect from 401 to sign_in.json
           if (error?.response?.status === 400 && 
