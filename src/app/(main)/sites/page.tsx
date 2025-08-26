@@ -16,6 +16,8 @@ export default async function SitesPage({
     sort?: string
     order?: string
     search?: string
+    show_hidden?: string
+    [key: string]: string | undefined
   }>
 }) {
   // Server-side campaign check - will redirect if no campaign
@@ -26,7 +28,14 @@ export default async function SitesPage({
       resourceName="sites"
       fetchData={async (client, params) => client.getSites(params)}
       validSorts={["name", "created_at", "updated_at"]}
-      getInitialFormData={(data: SitesResponse, page, sort, order, search) => ({
+      getInitialFormData={(
+        data: SitesResponse,
+        page,
+        sort,
+        order,
+        search,
+        additionalParams
+      ) => ({
         sites: data.sites,
         factions: data.factions,
         meta: data.meta,
@@ -36,6 +45,7 @@ export default async function SitesPage({
           page,
           search,
           faction_id: "",
+          show_hidden: additionalParams?.show_hidden || false,
         },
       })}
       ListComponent={List}

@@ -3,8 +3,15 @@ import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, CharacterDetail } from "@/components/characters"
-import { GenericFilter, GridView, SortControls } from "@/components/ui"
+import {
+  GenericFilter,
+  EntityFilters,
+  GridView,
+  SortControls,
+} from "@/components/ui"
+import { useApp } from "@/contexts"
 import type { FormStateData } from "@/components/characters/List"
+import type { FilterOption } from "@/components/ui/filters/EntityFilters"
 
 interface ViewProps {
   viewMode: "table" | "mobile"
@@ -13,6 +20,8 @@ interface ViewProps {
 }
 
 export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
+  const { user } = useApp()
+
   const updateFilters = useCallback(
     filters => {
       dispatchForm({
@@ -27,8 +36,49 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
     [dispatchForm, formState.data.filters]
   )
 
+  // Build filter options based on user role
+  const filterOptions: FilterOption[] = [
+    {
+      name: "show_hidden",
+      label: "Show Hidden",
+      defaultValue: false,
+      type: "checkbox",
+    },
+  ]
+
+  // Add template filter for admin users only
+  if (user?.admin) {
+    filterOptions.push({
+      name: "template_filter",
+      label: "Template Filter",
+      type: "dropdown",
+      defaultValue: "non-templates",
+      options: [
+        { value: "non-templates", label: "Non-Templates Only" },
+        { value: "templates", label: "Templates Only" },
+        { value: "all", label: "All Characters" },
+      ],
+    })
+  }
+
+  // Build current filter values
+  const currentFilters: Record<string, boolean | string> = {
+    show_hidden: formState.data.filters.show_hidden || false,
+  }
+
+  // Add template_filter value if admin
+  if (user?.admin) {
+    currentFilters.template_filter =
+      formState.data.filters.template_filter || "non-templates"
+  }
+
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
+      <EntityFilters
+        filters={currentFilters}
+        options={filterOptions}
+        onFiltersUpdate={updateFilters}
+      />
       <SortControls
         route="/characters"
         isMobile={viewMode === "mobile"}

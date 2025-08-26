@@ -22,6 +22,7 @@ export type FormStateData = {
     order: string
     page: number
     search: string
+    show_hidden?: boolean
   }
 }
 

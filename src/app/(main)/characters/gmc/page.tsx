@@ -5,7 +5,6 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import {
   Box,
-  Container,
   Typography,
   Tabs,
   Tab,
@@ -13,7 +12,6 @@ import {
   Card,
   CardContent,
   CardActionArea,
-  Chip,
   CircularProgress,
   Alert,
 } from "@mui/material"
@@ -28,7 +26,11 @@ import type { Character } from "@/types"
 const GMC_TYPES = [
   { value: "Ally", label: "Ally", description: "Helpful NPCs" },
   { value: "Mook", label: "Mook", description: "Standard enemies" },
-  { value: "Featured Foe", label: "Featured Foe", description: "Notable enemies" },
+  {
+    value: "Featured Foe",
+    label: "Featured Foe",
+    description: "Notable enemies",
+  },
   { value: "Boss", label: "Boss", description: "Major villains" },
   { value: "Uber-Boss", label: "Uber-Boss", description: "Epic threats" },
 ]
@@ -41,30 +43,51 @@ interface TemplatePreviewCardProps {
 function TemplatePreviewCard({ template, onSelect }: TemplatePreviewCardProps) {
   const actionValues = template.action_values || {}
   const isMook = actionValues["Type"] === "Mook"
-  
-  // Determine which attack value to show
-  const mainAttack = actionValues["Martial Arts"] || actionValues["Guns"] || 
-                     actionValues["Sorcery"] || actionValues["Creature Powers"] || 0
-  const mainAttackLabel = actionValues["Martial Arts"] > 0 ? "Martial Arts" :
-                          actionValues["Guns"] > 0 ? "Guns" :
-                          actionValues["Sorcery"] > 0 ? "Sorcery" :
-                          actionValues["Creature Powers"] > 0 ? "Creature Powers" : "Attack"
 
-  const secondaryAttack = actionValues["Guns"] > 0 && actionValues["Martial Arts"] > 0 ? actionValues["Guns"] :
-                          actionValues["Sorcery"] > 0 && actionValues["Martial Arts"] > 0 ? actionValues["Sorcery"] : 0
-  const secondaryAttackLabel = secondaryAttack > 0 && actionValues["Guns"] === secondaryAttack ? "Guns" :
-                               secondaryAttack > 0 && actionValues["Sorcery"] === secondaryAttack ? "Sorcery" : ""
+  // Determine which attack value to show
+  const mainAttack =
+    actionValues["Martial Arts"] ||
+    actionValues["Guns"] ||
+    actionValues["Sorcery"] ||
+    actionValues["Creature Powers"] ||
+    0
+  const mainAttackLabel =
+    actionValues["Martial Arts"] > 0
+      ? "Martial Arts"
+      : actionValues["Guns"] > 0
+        ? "Guns"
+        : actionValues["Sorcery"] > 0
+          ? "Sorcery"
+          : actionValues["Creature Powers"] > 0
+            ? "Creature Powers"
+            : "Attack"
+
+  const secondaryAttack =
+    actionValues["Guns"] > 0 && actionValues["Martial Arts"] > 0
+      ? actionValues["Guns"]
+      : actionValues["Sorcery"] > 0 && actionValues["Martial Arts"] > 0
+        ? actionValues["Sorcery"]
+        : 0
+  const secondaryAttackLabel =
+    secondaryAttack > 0 && actionValues["Guns"] === secondaryAttack
+      ? "Guns"
+      : secondaryAttack > 0 && actionValues["Sorcery"] === secondaryAttack
+        ? "Sorcery"
+        : ""
 
   return (
-    <Card 
-      sx={{ 
+    <Card
+      sx={{
         height: "100%",
         bgcolor: "background.paper",
         border: "1px solid",
         borderColor: "divider",
       }}
     >
-      <CardActionArea onClick={() => onSelect(template)} sx={{ height: "100%", p: 0 }}>
+      <CardActionArea
+        onClick={() => onSelect(template)}
+        sx={{ height: "100%", p: 0 }}
+      >
         <CardContent sx={{ p: 2 }}>
           {/* Name Section */}
           <Box sx={{ mb: 3 }}>
@@ -78,41 +101,49 @@ function TemplatePreviewCard({ template, onSelect }: TemplatePreviewCardProps) {
             <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
               Action Values
             </Typography>
-            
+
             <Grid container spacing={1}>
               {/* Main Attack */}
               <Grid item xs={2}>
-                <Box sx={{ 
-                  border: "1px solid",
-                  borderColor: "divider",
-                  borderRadius: 1,
-                  p: 1,
-                  textAlign: "center",
-                  bgcolor: "background.default",
-                  minHeight: "80px"
-                }}>
-                  <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
-                    {mainAttackLabel}
-                  </Typography>
-                  <Typography variant="h5">
-                    {mainAttack}
-                  </Typography>
-                </Box>
-              </Grid>
-
-              {/* Secondary Attack - not for Mooks */}
-              {!isMook && (
-                <Grid item xs={2}>
-                  <Box sx={{ 
+                <Box
+                  sx={{
                     border: "1px solid",
                     borderColor: "divider",
                     borderRadius: 1,
                     p: 1,
                     textAlign: "center",
                     bgcolor: "background.default",
-                    minHeight: "80px"
-                  }}>
-                    <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                    minHeight: "80px",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ display: "block", mb: 0.5 }}
+                  >
+                    {mainAttackLabel}
+                  </Typography>
+                  <Typography variant="h5">{mainAttack}</Typography>
+                </Box>
+              </Grid>
+
+              {/* Secondary Attack - not for Mooks */}
+              {!isMook && (
+                <Grid item xs={2}>
+                  <Box
+                    sx={{
+                      border: "1px solid",
+                      borderColor: "divider",
+                      borderRadius: 1,
+                      p: 1,
+                      textAlign: "center",
+                      bgcolor: "background.default",
+                      minHeight: "80px",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{ display: "block", mb: 0.5 }}
+                    >
                       {secondaryAttackLabel || "—"}
                     </Typography>
                     <Typography variant="h5">
@@ -124,16 +155,21 @@ function TemplatePreviewCard({ template, onSelect }: TemplatePreviewCardProps) {
 
               {/* Defense */}
               <Grid item xs={2}>
-                <Box sx={{ 
-                  border: "1px solid",
-                  borderColor: "divider",
-                  borderRadius: 1,
-                  p: 1,
-                  textAlign: "center",
-                  bgcolor: "background.default",
-                  minHeight: "80px"
-                }}>
-                  <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                <Box
+                  sx={{
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 1,
+                    p: 1,
+                    textAlign: "center",
+                    bgcolor: "background.default",
+                    minHeight: "80px",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ display: "block", mb: 0.5 }}
+                  >
                     Defense
                   </Typography>
                   <Typography variant="h5">
@@ -145,16 +181,21 @@ function TemplatePreviewCard({ template, onSelect }: TemplatePreviewCardProps) {
               {/* Toughness - not for Mooks */}
               {!isMook && (
                 <Grid item xs={2}>
-                  <Box sx={{ 
-                    border: "1px solid",
-                    borderColor: "divider",
-                    borderRadius: 1,
-                    p: 1,
-                    textAlign: "center",
-                    bgcolor: "background.default",
-                    minHeight: "80px"
-                  }}>
-                    <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                  <Box
+                    sx={{
+                      border: "1px solid",
+                      borderColor: "divider",
+                      borderRadius: 1,
+                      p: 1,
+                      textAlign: "center",
+                      bgcolor: "background.default",
+                      minHeight: "80px",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{ display: "block", mb: 0.5 }}
+                    >
                       Toughness
                     </Typography>
                     <Typography variant="h5">
@@ -166,16 +207,21 @@ function TemplatePreviewCard({ template, onSelect }: TemplatePreviewCardProps) {
 
               {/* Speed */}
               <Grid item xs={2}>
-                <Box sx={{ 
-                  border: "1px solid",
-                  borderColor: "divider",
-                  borderRadius: 1,
-                  p: 1,
-                  textAlign: "center",
-                  bgcolor: "background.default",
-                  minHeight: "80px"
-                }}>
-                  <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                <Box
+                  sx={{
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 1,
+                    p: 1,
+                    textAlign: "center",
+                    bgcolor: "background.default",
+                    minHeight: "80px",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ display: "block", mb: 0.5 }}
+                  >
                     Speed
                   </Typography>
                   <Typography variant="h5">
@@ -186,16 +232,21 @@ function TemplatePreviewCard({ template, onSelect }: TemplatePreviewCardProps) {
 
               {/* Damage for NPCs */}
               <Grid item xs={2}>
-                <Box sx={{ 
-                  border: "1px solid",
-                  borderColor: "divider",
-                  borderRadius: 1,
-                  p: 1,
-                  textAlign: "center",
-                  bgcolor: "background.default",
-                  minHeight: "80px"
-                }}>
-                  <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                <Box
+                  sx={{
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 1,
+                    p: 1,
+                    textAlign: "center",
+                    bgcolor: "background.default",
+                    minHeight: "80px",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ display: "block", mb: 0.5 }}
+                  >
                     Damage
                   </Typography>
                   <Typography variant="h5">
@@ -208,20 +259,22 @@ function TemplatePreviewCard({ template, onSelect }: TemplatePreviewCardProps) {
 
           {/* Description - if available */}
           {CS.appearance(template) && (
-            <Box sx={{ 
-              mt: 2, 
-              pt: 2, 
-              borderTop: "1px solid", 
-              borderColor: "divider",
-              "& .tiptap": {
-                fontSize: "1rem",
-                lineHeight: 1.5,
-                color: "text.secondary",
-                "& p": {
-                  margin: 0,
-                }
-              }
-            }}>
+            <Box
+              sx={{
+                mt: 2,
+                pt: 2,
+                borderTop: "1px solid",
+                borderColor: "divider",
+                "& .tiptap": {
+                  fontSize: "1rem",
+                  lineHeight: 1.5,
+                  color: "text.secondary",
+                  "& p": {
+                    margin: 0,
+                  },
+                },
+              }}
+            >
               <RichTextRenderer html={CS.appearance(template) || ""} />
             </Box>
           )}
@@ -237,7 +290,9 @@ export default function GMCTemplatesPage() {
   const { toastSuccess, toastError } = useToast()
   const router = useRouter()
   const [selectedType, setSelectedType] = useState(0)
-  const [templatesByType, setTemplatesByType] = useState<Record<string, Character[]>>({})
+  const [templatesByType, setTemplatesByType] = useState<
+    Record<string, Character[]>
+  >({})
   const [loading, setLoading] = useState(true)
   const [creatingFrom, setCreatingFrom] = useState<string | null>(null)
 
@@ -275,7 +330,6 @@ export default function GMCTemplatesPage() {
 
     loadTemplates()
   }, [campaign, client, toastError])
-
 
   const handleSelectTemplate = async (template: Character) => {
     if (creatingFrom) return // Prevent double-clicking
@@ -337,7 +391,7 @@ export default function GMCTemplatesPage() {
               variant="scrollable"
               scrollButtons="auto"
             >
-              {GMC_TYPES.map((type) => (
+              {GMC_TYPES.map(type => (
                 <Tab
                   key={type.value}
                   label={
@@ -355,8 +409,9 @@ export default function GMCTemplatesPage() {
 
           {currentTemplates.length === 0 ? (
             <Alert severity="info" sx={{ mt: 2 }}>
-              No {currentType?.label} templates available in this campaign. Templates
-              will be available after they are created in the Master Campaign.
+              No {currentType?.label} templates available in this campaign.
+              Templates will be available after they are created in the Master
+              Campaign.
             </Alert>
           ) : (
             <Grid container spacing={3}>

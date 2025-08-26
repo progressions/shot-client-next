@@ -27,42 +27,52 @@ export const OnboardingModule: React.FC<OnboardingModuleProps> = ({ user }) => {
   const handleDismissOnboarding = async () => {
     try {
       // Debug logging
-      console.log('Onboarding progress state:', {
-        first_campaign_created_at: onboarding_progress.first_campaign_created_at,
-        ready_for_congratulations: onboarding_progress.ready_for_congratulations,
+      console.log("Onboarding progress state:", {
+        first_campaign_created_at:
+          onboarding_progress.first_campaign_created_at,
+        ready_for_congratulations:
+          onboarding_progress.ready_for_congratulations,
         onboarding_complete: onboarding_progress.onboarding_complete,
-        all_milestones_complete: onboarding_progress.all_milestones_complete
+        all_milestones_complete: onboarding_progress.all_milestones_complete,
       })
-      
+
       // Determine which field to set based on which module is currently displayed
-      let dismissField = 'congratulations_dismissed_at' // Default
-      
+      let dismissField = "congratulations_dismissed_at" // Default
+
       // Check which module is being shown (using same logic as the render conditions)
       if (!onboarding_progress.first_campaign_created_at) {
         // CampaignOnboarding module is shown - dismiss by completing campaign creation step
-        dismissField = 'first_campaign_created_at'
-        console.log('Dismissing CampaignOnboarding module by setting first_campaign_created_at')
+        dismissField = "first_campaign_created_at"
+        console.log(
+          "Dismissing CampaignOnboarding module by setting first_campaign_created_at"
+        )
       } else if (onboarding_progress.ready_for_congratulations) {
         // CongratulationsModule is shown - dismiss congratulations
-        dismissField = 'congratulations_dismissed_at'
-        console.log('Dismissing CongratulationsModule by setting congratulations_dismissed_at')
+        dismissField = "congratulations_dismissed_at"
+        console.log(
+          "Dismissing CongratulationsModule by setting congratulations_dismissed_at"
+        )
       } else {
         // OnboardingCarousel is shown - dismiss current milestone or entire onboarding
         if (onboarding_progress.next_milestone?.timestamp_field) {
           // Dismiss current milestone by setting its timestamp field
           dismissField = onboarding_progress.next_milestone.timestamp_field
-          console.log(`Dismissing current milestone (${onboarding_progress.next_milestone.key}) by setting ${dismissField}`)
+          console.log(
+            `Dismissing current milestone (${onboarding_progress.next_milestone.key}) by setting ${dismissField}`
+          )
         } else {
           // No specific milestone, dismiss entire onboarding
-          dismissField = 'congratulations_dismissed_at'
-          console.log('Dismissing entire onboarding by setting congratulations_dismissed_at')
+          dismissField = "congratulations_dismissed_at"
+          console.log(
+            "Dismissing entire onboarding by setting congratulations_dismissed_at"
+          )
         }
       }
-      
+
       console.log(`Setting ${dismissField} to dismiss onboarding`)
-      
+
       await client.updateOnboardingProgress({
-        [dismissField]: new Date().toISOString()
+        [dismissField]: new Date().toISOString(),
       })
       toastSuccess("Onboarding dismissed! You're all set!")
       await refreshUser()

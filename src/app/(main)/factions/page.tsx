@@ -16,6 +16,8 @@ export default async function FactionsPage({
     sort?: string
     order?: string
     search?: string
+    show_hidden?: string
+    [key: string]: string | undefined
   }>
 }) {
   // Server-side campaign check - will redirect if no campaign
@@ -31,7 +33,8 @@ export default async function FactionsPage({
         page,
         sort,
         order,
-        search
+        search,
+        additionalParams
       ) => ({
         factions: data.factions,
         meta: data.meta,
@@ -40,6 +43,7 @@ export default async function FactionsPage({
           order,
           page,
           search,
+          show_hidden: additionalParams?.show_hidden || false,
         },
         drawerOpen: false,
       })}

@@ -11,7 +11,7 @@ interface ResourcePageProps<T> {
   resourceName: string
   fetchData: (
     client: ReturnType<typeof getServerClient>,
-    params: { page: number; sort: string; order: string }
+    params: Record<string, any>
   ) => Promise<{ data: T }>
   validSorts: string[]
   getInitialFormData: (
@@ -19,7 +19,8 @@ interface ResourcePageProps<T> {
     page: number,
     sort: string,
     order: string,
-    search?: string
+    search?: string,
+    additionalParams?: Record<string, any>
   ) => object
   ListComponent: React.ComponentType<{
     initialFormData: object
@@ -37,30 +38,38 @@ export default async function ResourcePage<T>({
   searchParams,
   user: _user,
 }: ResourcePageProps<T> & {
-  searchParams: Promise<{ page?: string; sort?: string; order?: string }>
+  searchParams: Promise<Record<string, string | undefined>>
 }) {
   const client = await getServerClient()
   // Validate parameters with fixed defaults
-  const { page, sort, order, search } = await getPageParameters(searchParams, {
+  const params = await getPageParameters(searchParams, {
     validSorts,
     defaultSort: "created_at",
     defaultOrder: "desc",
   })
+  const { page, sort, order, search, ...additionalParams } = params
   // Redirect if page is invalid
   if (page <= 0) {
     redirect(
       `/${resourceName}?page=1&sort=created_at&order=desc&search=${search}`
     )
   }
-  // Fetch data
-  const response = await fetchData(client, { page, sort, order, search })
+  // Fetch data with all parameters
+  const response = await fetchData(client, params)
   const data = response.data
   // Detect mobile device
   const headersState = await headers()
   const userAgent = headersState.get("user-agent") || ""
   const initialIsMobile = /mobile/i.test(userAgent)
   // Prepare initial form data
-  const initialFormData = getInitialFormData(data, page, sort, order, search)
+  const initialFormData = getInitialFormData(
+    data,
+    page,
+    sort,
+    order,
+    search,
+    additionalParams
+  )
   return (
     <Box
       sx={{

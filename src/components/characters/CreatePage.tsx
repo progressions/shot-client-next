@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation"
 import { useState, useMemo } from "react"
-import { 
-  Box, 
+import {
+  Box,
   Typography,
   TextField,
   InputAdornment,
@@ -11,7 +11,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Button,
   Grid,
   CircularProgress,
 } from "@mui/material"
@@ -30,11 +29,11 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
   const { client } = useClient()
   const { refreshUser } = useApp()
   const { toastSuccess, toastError } = useToast()
-  
+
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedArchetype, setSelectedArchetype] = useState("")
-  
+
   // Loading state
   const [creatingFrom, setCreatingFrom] = useState<string | null>(null)
 
@@ -48,30 +47,33 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
   const filteredTemplates = useMemo(() => {
     return templates.filter(template => {
       // Search filter
-      if (searchTerm && !template.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+      if (
+        searchTerm &&
+        !template.name.toLowerCase().includes(searchTerm.toLowerCase())
+      ) {
         return false
       }
-      
+
       // Archetype filter
       if (selectedArchetype && template.archetype !== selectedArchetype) {
         return false
       }
-      
+
       return true
     })
   }, [templates, searchTerm, selectedArchetype])
 
   const handleSelectTemplate = async (template: Character) => {
     if (creatingFrom) return // Prevent double-clicking
-    
+
     setCreatingFrom(template.id)
     try {
       const response = await client.duplicateCharacter(template)
       const newCharacter = response.data
-      
+
       // Refresh user data to update onboarding progress
       await refreshUser()
-      
+
       toastSuccess(`Created new character: ${newCharacter.name}`)
       router.push(`/characters/${newCharacter.id}`)
     } catch (error) {
@@ -81,7 +83,6 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
       setCreatingFrom(null)
     }
   }
-
 
   return (
     <Box sx={{ position: "relative" }}>
@@ -98,7 +99,8 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
             No character templates available
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            Character templates need to be created in the database with is_template: true
+            Character templates need to be created in the database with
+            is_template: true
           </Typography>
         </Box>
       ) : (
@@ -112,7 +114,7 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
                   variant="outlined"
                   placeholder="Search templates..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={e => setSearchTerm(e.target.value)}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -122,18 +124,20 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
                   }}
                 />
               </Grid>
-              
+
               <Grid item xs={12} sm={6} md={4}>
                 <FormControl fullWidth>
                   <InputLabel>Archetype</InputLabel>
                   <Select
                     value={selectedArchetype}
-                    onChange={(e) => setSelectedArchetype(e.target.value)}
+                    onChange={e => setSelectedArchetype(e.target.value)}
                     label="Archetype"
                   >
                     <MenuItem value="">All Archetypes</MenuItem>
                     {archetypes.map(arch => (
-                      <MenuItem key={arch} value={arch}>{arch}</MenuItem>
+                      <MenuItem key={arch} value={arch}>
+                        {arch}
+                      </MenuItem>
                     ))}
                   </Select>
                 </FormControl>

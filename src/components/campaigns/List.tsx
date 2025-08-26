@@ -96,7 +96,9 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   // Listen for campaign creation events to refresh the list
   useEffect(() => {
     const handleCampaignCreated = () => {
-      console.log("📢 Campaign created event received, refreshing list with cache buster...")
+      console.log(
+        "📢 Campaign created event received, refreshing list with cache buster..."
+      )
       // Add cache_buster to force fresh data after campaign creation
       fetchCampaigns({ ...formState.data.filters, cache_buster: "true" })
     }

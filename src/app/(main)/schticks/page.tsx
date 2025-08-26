@@ -11,7 +11,14 @@ export const metadata = {
 export default async function SchticksPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; sort?: string; order?: string }>
+  searchParams: Promise<{
+    page?: string
+    sort?: string
+    order?: string
+    search?: string
+    show_hidden?: string
+    [key: string]: string | undefined
+  }>
 }) {
   // Server-side campaign check - will redirect if no campaign
   await requireCampaign()
@@ -26,7 +33,8 @@ export default async function SchticksPage({
         page,
         sort,
         order,
-        search
+        search,
+        additionalParams
       ) => ({
         schticks: data.schticks,
         categories: data.categories,
@@ -39,6 +47,7 @@ export default async function SchticksPage({
           search,
           category: "",
           path: "",
+          show_hidden: additionalParams?.show_hidden || false,
         },
         drawerOpen: false,
       })}
