@@ -1,5 +1,4 @@
 import { CircularProgress } from "@mui/material"
-import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { CreatePage } from "@/components/characters"
 import { getCurrentUser, getServerClient } from "@/lib"
@@ -26,7 +25,7 @@ export default async function CharacterCreatePage() {
     per_page: 50,
   })
   const { characters } = response.data
-  
+
   console.log("PC Template characters fetched:", characters?.length || 0)
 
   return (

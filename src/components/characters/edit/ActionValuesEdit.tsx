@@ -20,7 +20,7 @@ export default function ActionValuesEdit({
   updateCharacter,
 }: ActionValuesEditProps) {
   const isMook = CS.isMook(character)
-  
+
   return (
     <Box sx={{ display: "flex", justifyContent: "center" }}>
       <Stack direction={{ xs: "column", md: "row" }} spacing={2} mb={2}>

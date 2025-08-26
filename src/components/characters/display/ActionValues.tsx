@@ -10,7 +10,7 @@ type ActionValuesProps = {
 
 export default function ActionValues({ character, size }: ActionValuesProps) {
   const isMook = CS.isMook(character)
-  
+
   return (
     <Box sx={{ display: "flex", justifyContent: "center" }}>
       <Stack

@@ -16,6 +16,8 @@ export default async function CharactersPage({
     sort?: string
     order?: string
     search?: string
+    show_hidden?: string
+    [key: string]: string | undefined
   }>
 }) {
   // Server-side campaign check - will redirect if no campaign
@@ -31,7 +33,8 @@ export default async function CharactersPage({
         page,
         sort,
         order,
-        search
+        search,
+        additionalParams
       ) => ({
         characters: data.characters,
         factions: data.factions,
@@ -45,6 +48,7 @@ export default async function CharactersPage({
           character_type: "",
           archetype: "",
           faction_id: "",
+          show_hidden: additionalParams?.show_hidden || false,
         },
       })}
       ListComponent={List}

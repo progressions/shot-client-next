@@ -36,7 +36,11 @@ export default function EditType({
   }
 
   const handleTypeChange = async (value: string | null) => {
-    const updatedCharacter = CS.updateActionValue(character, "Archetype", value || null)
+    const updatedCharacter = CS.updateActionValue(
+      character,
+      "Archetype",
+      value || null
+    )
     setArchetype(value || null)
     updateCharacter(updatedCharacter)
   }

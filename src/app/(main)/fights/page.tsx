@@ -16,6 +16,8 @@ export default async function FightsPage({
     sort?: string
     order?: string
     search?: string
+    show_hidden?: string
+    [key: string]: string | undefined
   }>
 }) {
   // Server-side campaign check - will redirect if no campaign
@@ -31,7 +33,8 @@ export default async function FightsPage({
         page,
         sort,
         order,
-        search
+        search,
+        additionalParams
       ) => ({
         fights: data.fights,
         seasons: data.seasons || [],
@@ -43,6 +46,7 @@ export default async function FightsPage({
           search: search || "",
           season: "",
           status: "",
+          show_hidden: additionalParams?.show_hidden || false,
         },
         drawerOpen: false,
       })}

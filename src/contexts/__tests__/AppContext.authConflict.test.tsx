@@ -37,7 +37,7 @@ describe("AppContext - Authentication Conflict Detection", () => {
     jest.clearAllMocks()
     localStorage.clear()
     sessionStorage.clear()
-    
+
     // Setup mock client
     mockClient = {
       getCurrentUser: jest.fn(),
@@ -53,7 +53,7 @@ describe("AppContext - Authentication Conflict Detection", () => {
       })),
     }
     ;(Client as jest.Mock).mockReturnValue(mockClient)
-    
+
     // Setup mock router
     mockRouter = {
       push: jest.fn(),
@@ -76,7 +76,7 @@ describe("AppContext - Authentication Conflict Detection", () => {
         name: "User One",
       }
       const backendUser = {
-        id: "user-2", 
+        id: "user-2",
         email: "user2@test.com",
         name: "User Two",
       }
@@ -119,24 +119,26 @@ describe("AppContext - Authentication Conflict Detection", () => {
         // Should have called getCurrentUser to check backend
         expect(mockClient.getCurrentUser).toHaveBeenCalled()
       })
-      
+
       // Wait for the conflict resolution to complete
       await waitFor(() => {
         // Check that handleAuthConflictResolution was triggered by verifying logout was called
         expect(mockClient.logout).toHaveBeenCalled()
       })
-      
+
       // After conflict resolution runs:
       // Should redirect to login
       expect(window.location.href).toBe("/login")
       // Verify localStorage was cleared (these are cleared synchronously before redirect)
       expect(localStorage.getItem(`currentUser-${jwtToken}`)).toBeNull()
-      expect(localStorage.getItem(`currentCampaign-${localStorageUser.id}`)).toBeNull()
-      
+      expect(
+        localStorage.getItem(`currentCampaign-${localStorageUser.id}`)
+      ).toBeNull()
+
       // Verify cookies were cleared
       expect(Cookies.remove).toHaveBeenCalledWith("jwtToken")
       expect(Cookies.remove).toHaveBeenCalledWith("userId")
-      
+
       // Verify logout API was called via client
       expect(mockClient.logout).toHaveBeenCalled()
     })
@@ -144,7 +146,7 @@ describe("AppContext - Authentication Conflict Detection", () => {
     it("should not trigger conflict resolution when users match", async () => {
       const matchingUser = {
         id: "user-1",
-        email: "user@test.com", 
+        email: "user@test.com",
         name: "Test User",
       }
 
@@ -190,9 +192,7 @@ describe("AppContext - Authentication Conflict Detection", () => {
       })
 
       // Mock API failure
-      mockClient.getCurrentUser.mockRejectedValue(
-        new Error("Network error")
-      )
+      mockClient.getCurrentUser.mockRejectedValue(new Error("Network error"))
 
       const TestComponent = () => {
         return <div>Test App</div>
@@ -215,8 +215,16 @@ describe("AppContext - Authentication Conflict Detection", () => {
 
   describe("Cleanup Functionality", () => {
     it("should clear all authentication data on conflict", async () => {
-      const localUser = { id: "user-1", email: "user1@test.com", name: "User 1" }
-      const backendUser = { id: "user-2", email: "user2@test.com", name: "User 2" }
+      const localUser = {
+        id: "user-1",
+        email: "user1@test.com",
+        name: "User 1",
+      }
+      const backendUser = {
+        id: "user-2",
+        email: "user2@test.com",
+        name: "User 2",
+      }
       const jwtToken = "test-jwt-token"
 
       ;(Cookies.get as jest.Mock).mockImplementation((key: string) => {
@@ -226,7 +234,10 @@ describe("AppContext - Authentication Conflict Detection", () => {
 
       // Setup localStorage with conflicting data
       localStorage.setItem(`currentUser-${jwtToken}`, JSON.stringify(localUser))
-      localStorage.setItem(`currentCampaign-${localUser.id}`, JSON.stringify({ id: "camp-1" }))
+      localStorage.setItem(
+        `currentCampaign-${localUser.id}`,
+        JSON.stringify({ id: "camp-1" })
+      )
       sessionStorage.setItem("tempData", "test")
 
       mockClient.getCurrentUser.mockResolvedValue({ data: backendUser })
