@@ -1,0 +1,86 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@5.2.0
+
+jobs:
+  test:
+    docker:
+      - image: cimg/node:20.11.0
+    steps:
+      - checkout
+      
+      # Cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            - v1-dependencies-
+      
+      # Install dependencies
+      - run:
+          name: Install dependencies
+          command: npm ci
+      
+      # Save cache
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package-lock.json" }}
+      
+      # Run TypeScript type check
+      - run:
+          name: TypeScript check
+          command: npx tsc --noEmit
+      
+      # Run linting
+      - run:
+          name: Lint
+          command: npm run lint
+      
+      # Run tests
+      - run:
+          name: Run tests
+          command: npm run test:ci
+      
+      # Store test results
+      - store_test_results:
+          path: coverage
+      
+      # Store coverage artifacts
+      - store_artifacts:
+          path: coverage
+
+  build:
+    docker:
+      - image: cimg/node:20.11.0
+    steps:
+      - checkout
+      
+      # Cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            - v1-dependencies-
+      
+      # Install dependencies
+      - run:
+          name: Install dependencies
+          command: npm ci
+      
+      # Build the application
+      - run:
+          name: Build
+          command: npm run build
+      
+      # Store build artifacts
+      - store_artifacts:
+          path: .next
+
+workflows:
+  version: 2
+  test_and_build:
+    jobs:
+      - test
+      - build:
+          requires:
+            - test
