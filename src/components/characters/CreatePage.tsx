@@ -11,8 +11,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  FormControlLabel,
-  Checkbox,
   Button,
   Grid,
   CircularProgress,
@@ -36,8 +34,6 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedArchetype, setSelectedArchetype] = useState("")
-  const [hasWeapons, setHasWeapons] = useState(false)
-  const [hasSchticks, setHasSchticks] = useState(false)
   
   // Loading state
   const [creatingFrom, setCreatingFrom] = useState<string | null>(null)
@@ -61,19 +57,9 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
         return false
       }
       
-      // Has weapons filter
-      if (hasWeapons && (!template.weapons || template.weapons.length === 0)) {
-        return false
-      }
-      
-      // Has schticks filter
-      if (hasSchticks && (!template.schticks || template.schticks.length === 0)) {
-        return false
-      }
-      
       return true
     })
-  }, [templates, searchTerm, selectedArchetype, hasWeapons, hasSchticks])
+  }, [templates, searchTerm, selectedArchetype])
 
   const handleSelectTemplate = async (template: Character) => {
     if (creatingFrom) return // Prevent double-clicking
@@ -96,12 +82,6 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
     }
   }
 
-  const clearFilters = () => {
-    setSearchTerm("")
-    setSelectedArchetype("")
-    setHasWeapons(false)
-    setHasSchticks(false)
-  }
 
   return (
     <Box sx={{ position: "relative" }}>
@@ -143,7 +123,7 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
                 />
               </Grid>
               
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={4}>
                 <FormControl fullWidth>
                   <InputLabel>Archetype</InputLabel>
                   <Select
@@ -157,36 +137,6 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
                     ))}
                   </Select>
                 </FormControl>
-              </Grid>
-
-              <Grid item xs={12} md={5}>
-                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={hasWeapons}
-                        onChange={(e) => setHasWeapons(e.target.checked)}
-                      />
-                    }
-                    label="Has Weapons"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={hasSchticks}
-                        onChange={(e) => setHasSchticks(e.target.checked)}
-                      />
-                    }
-                    label="Has Schticks"
-                  />
-                  <Button
-                    variant="text"
-                    onClick={clearFilters}
-                    disabled={!searchTerm && !selectedArchetype && !hasWeapons && !hasSchticks}
-                  >
-                    Clear Filters
-                  </Button>
-                </Box>
               </Grid>
             </Grid>
           </Box>
@@ -202,9 +152,9 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
               <Typography variant="h6" color="text.secondary">
                 No templates match your filters
               </Typography>
-              <Button variant="text" onClick={clearFilters} sx={{ mt: 2 }}>
-                Clear Filters
-              </Button>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                Try adjusting your search or archetype selection
+              </Typography>
             </Box>
           ) : (
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
