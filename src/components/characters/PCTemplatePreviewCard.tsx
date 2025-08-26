@@ -12,6 +12,7 @@ import {
   Avatar
 } from "@mui/material"
 import { RichTextRenderer } from "@/components/editor"
+import { SchtickLink } from "@/components/ui"
 import { CS } from "@/services"
 import type { Character } from "@/types"
 
@@ -274,51 +275,113 @@ export default function PCTemplatePreviewCard({
             </Box>
           )}
 
-          {/* Schticks Section - Critical for PC decision making */}
-          {template.schticks && template.schticks.length > 0 && (
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
-                Schticks (Powers & Abilities)
-              </Typography>
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {template.schticks.map(schtick => (
-                  <Chip 
-                    key={schtick.id}
-                    label={schtick.name}
-                    size="small"
-                    color="primary"
-                    variant="outlined"
-                    sx={{ fontSize: "0.75rem" }}
-                  />
-                ))}
-              </Box>
+          {/* Schticks Section - With hover popups for details */}
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="overline" sx={{ display: "block", mb: 1, color: "text.secondary" }}>
+              Schticks (Powers & Abilities)
+            </Typography>
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+              {template.schticks && template.schticks.length > 0 ? (
+                // Real schticks from template (once they're added to the database)
+                template.schticks.map(schtick => (
+                  <SchtickLink key={schtick.id} schtick={schtick}>
+                    <Chip 
+                      label={schtick.name}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      sx={{ 
+                        fontSize: "0.75rem",
+                        cursor: "pointer",
+                        "&:hover": {
+                          bgcolor: "primary.main",
+                          color: "primary.contrastText"
+                        }
+                      }}
+                    />
+                  </SchtickLink>
+                ))
+              ) : (
+                // TEMPORARY: Mock schticks for visualization until templates have real schticks
+                // Using real schtick IDs so hover popups work
+                [
+                  { id: "0f2b51c0-80c0-4f5f-b55f-76186903df3e", name: "Lightning Reload", entity_class: "Schtick" },
+                  { id: "0f2b51c0-80c0-4f5f-b55f-76186903df3e", name: "Hair-Trigger", entity_class: "Schtick" },
+                  { id: "0f2b51c0-80c0-4f5f-b55f-76186903df3e", name: "Carnival of Carnage", entity_class: "Schtick" },
+                  { id: "0f2b51c0-80c0-4f5f-b55f-76186903df3e", name: "Both Guns Blazing", entity_class: "Schtick" },
+                  { id: "0f2b51c0-80c0-4f5f-b55f-76186903df3e", name: "Fast Draw", entity_class: "Schtick" }
+                ].map((schtick) => (
+                  <SchtickLink key={schtick.id} schtick={schtick}>
+                    <Chip 
+                      label={schtick.name}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      sx={{ 
+                        fontSize: "0.75rem",
+                        cursor: "pointer",
+                        "&:hover": {
+                          bgcolor: "primary.main",
+                          color: "primary.contrastText",
+                          transform: "scale(1.05)",
+                          transition: "all 0.2s"
+                        }
+                      }}
+                    />
+                  </SchtickLink>
+                ))
+              )}
             </Box>
-          )}
+          </Box>
 
           {/* Weapons Section */}
-          {template.weapons && template.weapons.length > 0 && (
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
-                Weapons
-              </Typography>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-                {template.weapons.slice(0, 3).map(weapon => (
-                  <Typography key={weapon.id} variant="caption" sx={{ 
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="overline" sx={{ display: "block", mb: 1, color: "text.secondary" }}>
+              Weapons
+            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+              {template.weapons && template.weapons.length > 0 ? (
+                <>
+                  {template.weapons.slice(0, 3).map(weapon => (
+                    <Typography key={weapon.id} variant="caption" sx={{ 
+                      bgcolor: "background.default",
+                      p: 0.5,
+                      borderRadius: 1,
+                    }}>
+                      {weapon.name} ({weapon.damage || 0}/{weapon.concealment || 0}/{weapon.reload || 0})
+                    </Typography>
+                  ))}
+                  {template.weapons.length > 3 && (
+                    <Typography variant="caption" color="text.secondary">
+                      +{template.weapons.length - 3} more weapons
+                    </Typography>
+                  )}
+                </>
+              ) : (
+                // Mock weapons for visualization when template has none
+                [
+                  { name: "Desert Eagle (.50 AE)", damage: 11, concealment: 1, reload: 2 },
+                  { name: "Mossberg 500", damage: 13, concealment: 5, reload: 1 },
+                  { name: "Colt 1911A", damage: 10, concealment: 1, reload: 3 },
+                  { name: "Sig Sauer P226", damage: 10, concealment: 2, reload: 1 }
+                ].slice(0, 3).map((weapon, index) => (
+                  <Typography key={index} variant="caption" sx={{ 
                     bgcolor: "background.default",
                     p: 0.5,
                     borderRadius: 1,
                   }}>
-                    {weapon.name} ({weapon.damage || 0}/{weapon.concealment || 0}/{weapon.reload || 0})
+                    {weapon.name} ({weapon.damage}/{weapon.concealment}/{weapon.reload})
                   </Typography>
-                ))}
-                {template.weapons.length > 3 && (
-                  <Typography variant="caption" color="text.secondary">
-                    +{template.weapons.length - 3} more weapons
-                  </Typography>
-                )}
-              </Box>
+                ))
+              )}
+              {/* Mock "more weapons" indicator */}
+              {(!template.weapons || template.weapons.length === 0) && (
+                <Typography variant="caption" color="text.secondary">
+                  +1 more weapon
+                </Typography>
+              )}
             </Box>
-          )}
+          </Box>
 
           {/* Description - Full content */}
           {background && (
