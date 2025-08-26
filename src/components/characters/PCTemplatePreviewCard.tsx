@@ -12,7 +12,7 @@ import {
   Avatar
 } from "@mui/material"
 import { RichTextRenderer } from "@/components/editor"
-import { SchtickLink } from "@/components/ui"
+import { SchtickLink, WeaponLink } from "@/components/ui"
 import { CS } from "@/services"
 import type { Character } from "@/types"
 
@@ -339,46 +339,70 @@ export default function PCTemplatePreviewCard({
             <Typography variant="overline" sx={{ display: "block", mb: 1, color: "text.secondary" }}>
               Weapons
             </Typography>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
               {template.weapons && template.weapons.length > 0 ? (
-                <>
-                  {template.weapons.slice(0, 3).map(weapon => (
-                    <Typography key={weapon.id} variant="caption" sx={{ 
-                      bgcolor: "background.default",
-                      p: 0.5,
-                      borderRadius: 1,
-                    }}>
-                      {weapon.name} ({weapon.damage || 0}/{weapon.concealment || 0}/{weapon.reload || 0})
-                    </Typography>
-                  ))}
-                  {template.weapons.length > 3 && (
-                    <Typography variant="caption" color="text.secondary">
-                      +{template.weapons.length - 3} more weapons
-                    </Typography>
-                  )}
-                </>
+                // Real weapons from template
+                template.weapons.map(weapon => (
+                  <WeaponLink key={weapon.id} weapon={weapon}>
+                    <Chip 
+                      label={`${weapon.name} (${weapon.damage || 0}/${weapon.concealment || 0}/${weapon.reload || 0})`}
+                      size="small"
+                      color="secondary"
+                      variant="outlined"
+                      sx={{ 
+                        fontSize: "0.75rem",
+                        cursor: "pointer",
+                        "&:hover": {
+                          bgcolor: "secondary.main",
+                          color: "secondary.contrastText",
+                          transform: "scale(1.05)",
+                          transition: "all 0.2s"
+                        }
+                      }}
+                    />
+                  </WeaponLink>
+                ))
               ) : (
-                // Mock weapons for visualization when template has none
+                // TEMPORARY: Mock weapons for visualization until templates have real weapons
+                // Using real weapon ID so hover popups work
                 [
-                  { name: "Desert Eagle (.50 AE)", damage: 11, concealment: 1, reload: 2 },
-                  { name: "Mossberg 500", damage: 13, concealment: 5, reload: 1 },
-                  { name: "Colt 1911A", damage: 10, concealment: 1, reload: 3 },
-                  { name: "Sig Sauer P226", damage: 10, concealment: 2, reload: 1 }
-                ].slice(0, 3).map((weapon, index) => (
-                  <Typography key={index} variant="caption" sx={{ 
-                    bgcolor: "background.default",
-                    p: 0.5,
-                    borderRadius: 1,
-                  }}>
-                    {weapon.name} ({weapon.damage}/{weapon.concealment}/{weapon.reload})
-                  </Typography>
+                  { id: "000c4fa8-ee94-44a3-9dac-47c3fe87703e", name: "Desert Eagle (.50 AE)", damage: 11, concealment: 1, reload: 2, entity_class: "Weapon" },
+                  { id: "000c4fa8-ee94-44a3-9dac-47c3fe87703e", name: "Mossberg 500", damage: 13, concealment: 5, reload: 1, entity_class: "Weapon" },
+                  { id: "000c4fa8-ee94-44a3-9dac-47c3fe87703e", name: "Colt 1911A", damage: 10, concealment: 1, reload: 3, entity_class: "Weapon" },
+                  { id: "000c4fa8-ee94-44a3-9dac-47c3fe87703e", name: "Sig Sauer P226", damage: 10, concealment: 2, reload: 1, entity_class: "Weapon" }
+                ].slice(0, 3).map((weapon) => (
+                  <WeaponLink key={`${weapon.id}-${weapon.name}`} weapon={weapon}>
+                    <Chip 
+                      label={`${weapon.name} (${weapon.damage}/${weapon.concealment}/${weapon.reload})`}
+                      size="small"
+                      color="secondary"
+                      variant="outlined"
+                      sx={{ 
+                        fontSize: "0.75rem",
+                        cursor: "pointer",
+                        "&:hover": {
+                          bgcolor: "secondary.main",
+                          color: "secondary.contrastText",
+                          transform: "scale(1.05)",
+                          transition: "all 0.2s"
+                        }
+                      }}
+                    />
+                  </WeaponLink>
                 ))
               )}
               {/* Mock "more weapons" indicator */}
               {(!template.weapons || template.weapons.length === 0) && (
-                <Typography variant="caption" color="text.secondary">
-                  +1 more weapon
-                </Typography>
+                <Chip
+                  label="+1 more weapon"
+                  size="small"
+                  variant="filled"
+                  sx={{ 
+                    fontSize: "0.75rem",
+                    bgcolor: "action.disabledBackground",
+                    color: "text.secondary"
+                  }}
+                />
               )}
             </Box>
           </Box>
