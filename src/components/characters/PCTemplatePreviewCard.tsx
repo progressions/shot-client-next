@@ -39,13 +39,15 @@ export default function PCTemplatePreviewCard({
     <Card 
       sx={{ 
         height: "100%",
-        bgcolor: "background.paper",
+        bgcolor: "#ffffff", // Explicit white background
         border: "1px solid",
         borderColor: "divider",
         opacity: isLoading ? 0.5 : 1,
         pointerEvents: isLoading ? "none" : "auto",
         transition: "opacity 0.2s",
         overflow: "hidden", // Ensure nothing spills out
+        p: 0, // Ensure no padding on the card itself
+        m: 0, // Ensure no margin
       }}
     >
       <CardActionArea 
@@ -65,7 +67,7 @@ export default function PCTemplatePreviewCard({
           sx={{
             position: "relative",
             paddingTop: "56.25%", // 16:9 aspect ratio
-            bgcolor: "grey.100",
+            bgcolor: "#f5f5f5", // Use explicit color instead of theme color
             overflow: "hidden",
             margin: 0,
             flexShrink: 0, // Prevent shrinking
@@ -114,7 +116,7 @@ export default function PCTemplatePreviewCard({
           )}
         </Box>
         
-        <CardContent sx={{ p: 2 }}>
+        <CardContent sx={{ p: 2, bgcolor: "#ffffff" }}>
           {/* Name and Archetype Section */}
           <Box sx={{ mb: 3 }}>
             <Typography variant="h5" sx={{ fontWeight: "bold" }}>
