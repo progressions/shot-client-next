@@ -3,7 +3,12 @@ import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, WeaponDetail } from "@/components/weapons"
-import { GenericFilter, GridView, SortControls } from "@/components/ui"
+import {
+  GenericFilter,
+  EntityFilters,
+  GridView,
+  SortControls,
+} from "@/components/ui"
 import type { FormStateData } from "@/components/weapons/List"
 
 interface ViewProps {
@@ -29,6 +34,19 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
 
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
+      <EntityFilters
+        filters={{
+          show_hidden: formState.data.filters.show_hidden || false,
+        }}
+        options={[
+          {
+            name: "show_hidden",
+            label: "Show Hidden",
+            defaultValue: false,
+          },
+        ]}
+        onFiltersUpdate={updateFilters}
+      />
       <SortControls
         route="/weapons"
         isMobile={viewMode === "mobile"}

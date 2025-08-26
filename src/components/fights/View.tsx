@@ -3,7 +3,12 @@ import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType } from "@/reducers"
 import { FightDetail, Table } from "@/components/fights"
-import { GenericFilter, EntityFilters, GridView, SortControls } from "@/components/ui"
+import {
+  GenericFilter,
+  EntityFilters,
+  GridView,
+  SortControls,
+} from "@/components/ui"
 import type { FormStateData } from "@/components/fights/List"
 
 interface ViewProps {

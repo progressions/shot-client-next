@@ -11,7 +11,14 @@ export const metadata = {
 export default async function WeaponsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; sort?: string; order?: string }>
+  searchParams: Promise<{
+    page?: string
+    sort?: string
+    order?: string
+    search?: string
+    show_hidden?: string
+    [key: string]: string | undefined
+  }>
 }) {
   // Server-side campaign check - will redirect if no campaign
   await requireCampaign()
@@ -26,7 +33,8 @@ export default async function WeaponsPage({
         page,
         sort,
         order,
-        search
+        search,
+        additionalParams
       ) => ({
         weapons: data.weapons,
         categories: data.categories,
@@ -39,6 +47,7 @@ export default async function WeaponsPage({
           search,
           category: "",
           juncture: "",
+          show_hidden: additionalParams?.show_hidden || false,
         },
       })}
       ListComponent={List}
