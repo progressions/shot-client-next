@@ -4,6 +4,7 @@ import {
   Card,
   CardActionArea,
   CardContent,
+  CardMedia,
   Box,
   Typography,
   Grid,
@@ -39,84 +40,52 @@ export default function PCTemplatePreviewCard({
     <Card 
       sx={{ 
         height: "100%",
-        bgcolor: "#ffffff", // Explicit white background
         border: "1px solid",
         borderColor: "divider",
         opacity: isLoading ? 0.5 : 1,
         pointerEvents: isLoading ? "none" : "auto",
         transition: "opacity 0.2s",
-        overflow: "hidden", // Ensure nothing spills out
-        p: 0, // Ensure no padding on the card itself
-        m: 0, // Ensure no margin
+        overflow: "hidden"
       }}
     >
       <CardActionArea 
         onClick={() => onSelect(template)} 
-        sx={{ 
-          height: "100%", 
-          p: 0,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "stretch",
-          justifyContent: "flex-start"
-        }}
+        sx={{ height: "100%" }}
         disabled={isLoading}
       >
-        {/* Character Image */}
-        <Box
-          sx={{
-            position: "relative",
-            paddingTop: "56.25%", // 16:9 aspect ratio
-            bgcolor: "#f5f5f5", // Use explicit color instead of theme color
-            overflow: "hidden",
-            margin: 0,
-            flexShrink: 0, // Prevent shrinking
-            width: "100%"
-          }}
-        >
-          {template.image_url ? (
-            <Box
-              component="img"
-              src={template.image_url}
-              alt={template.name}
-              sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                objectPosition: "center center" // Center the image focus
-              }}
-            />
-          ) : (
-            <Box
-              sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
+        {/* Character Image using CardMedia */}
+        {template.image_url ? (
+          <CardMedia
+            component="img"
+            height="200"
+            image={template.image_url}
+            alt={template.name}
+            sx={{ objectFit: "cover" }}
+          />
+        ) : (
+          <CardMedia
+            sx={{
+              height: 200,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              bgcolor: "grey.100"
+            }}
+          >
+            <Avatar
+              sx={{ 
+                width: 80, 
+                height: 80,
+                fontSize: "2rem",
+                bgcolor: "primary.main"
               }}
             >
-              <Avatar
-                sx={{ 
-                  width: 80, 
-                  height: 80,
-                  fontSize: "2rem",
-                  bgcolor: "primary.main"
-                }}
-              >
-                {template.name?.split(" ").map(word => word[0]).join("").substring(0, 2)}
-              </Avatar>
-            </Box>
-          )}
-        </Box>
+              {template.name?.split(" ").map(word => word[0]).join("").substring(0, 2)}
+            </Avatar>
+          </CardMedia>
+        )}
         
-        <CardContent sx={{ p: 2, bgcolor: "#ffffff" }}>
+        <CardContent sx={{ p: 2 }}>
           {/* Name and Archetype Section */}
           <Box sx={{ mb: 3 }}>
             <Typography variant="h5" sx={{ fontWeight: "bold" }}>
