@@ -4,7 +4,7 @@
  */
 
 import React from "react"
-import { render, waitFor, screen } from "@testing-library/react"
+import { render, waitFor } from "@testing-library/react"
 import { AppProvider } from "../AppContext"
 import Cookies from "js-cookie"
 import { Client } from "@/lib"

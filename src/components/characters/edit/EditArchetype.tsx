@@ -36,10 +36,8 @@ export default function EditType({
   }
 
   const handleTypeChange = async (value: string | null) => {
-    if (!value) return
-
-    const updatedCharacter = CS.updateActionValue(character, "Archetype", value)
-    setArchetype(value)
+    const updatedCharacter = CS.updateActionValue(character, "Archetype", value || null)
+    setArchetype(value || null)
     updateCharacter(updatedCharacter)
   }
 
@@ -50,7 +48,7 @@ export default function EditType({
       value={archetype || ""}
       fetchOptions={fetchArchetypes}
       onChange={handleTypeChange}
-      allowNone={false}
+      allowNone={true}
     />
   )
 }

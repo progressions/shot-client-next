@@ -37,13 +37,11 @@ export default function EditOwner({
   }
 
   const handleOwnerChange = async (newUserId: string | null) => {
-    if (!newUserId) return
-
     const updatedCharacter = {
       ...character,
-      user_id: newUserId,
+      user_id: newUserId || null,
     }
-    setOwnerId(newUserId)
+    setOwnerId(newUserId || "")
     updateCharacter(updatedCharacter)
   }
 
@@ -57,7 +55,7 @@ export default function EditOwner({
       value={ownerId}
       onChange={handleOwnerChange}
       filters={{ campaign_id: campaign?.id }}
-      allowNone={false}
+      allowNone={true}
     />
   )
 }
