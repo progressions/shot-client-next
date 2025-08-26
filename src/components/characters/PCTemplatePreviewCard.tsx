@@ -45,11 +45,19 @@ export default function PCTemplatePreviewCard({
         opacity: isLoading ? 0.5 : 1,
         pointerEvents: isLoading ? "none" : "auto",
         transition: "opacity 0.2s",
+        overflow: "hidden", // Ensure nothing spills out
       }}
     >
       <CardActionArea 
         onClick={() => onSelect(template)} 
-        sx={{ height: "100%", p: 0 }}
+        sx={{ 
+          height: "100%", 
+          p: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "stretch",
+          justifyContent: "flex-start"
+        }}
         disabled={isLoading}
       >
         {/* Character Image */}
@@ -58,7 +66,10 @@ export default function PCTemplatePreviewCard({
             position: "relative",
             paddingTop: "56.25%", // 16:9 aspect ratio
             bgcolor: "grey.100",
-            overflow: "hidden"
+            overflow: "hidden",
+            margin: 0,
+            flexShrink: 0, // Prevent shrinking
+            width: "100%"
           }}
         >
           {template.image_url ? (
@@ -72,7 +83,8 @@ export default function PCTemplatePreviewCard({
                 left: 0,
                 width: "100%",
                 height: "100%",
-                objectFit: "cover"
+                objectFit: "cover",
+                objectPosition: "center center" // Center the image focus
               }}
             />
           ) : (
