@@ -17,6 +17,7 @@ export default async function CharactersPage({
     order?: string
     search?: string
     show_hidden?: string
+    template_filter?: string
     [key: string]: string | undefined
   }>
 }) {
@@ -49,6 +50,7 @@ export default async function CharactersPage({
           archetype: "",
           faction_id: "",
           show_hidden: additionalParams?.show_hidden || false,
+          template_filter: additionalParams?.template_filter || "non-templates",
         },
       })}
       ListComponent={List}

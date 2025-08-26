@@ -5,7 +5,8 @@ import { queryParams } from "@/lib"
 export interface EntityFilterConfig {
   name: string
   label: string
-  defaultValue?: boolean
+  defaultValue?: boolean | string
+  type?: "checkbox" | "dropdown"
 }
 
 interface UseEntityFiltersOptions {
@@ -26,13 +27,20 @@ export function useEntityFilters({
 
   // Initialize filters from URL params
   const initializeFilters = useCallback(() => {
-    const filters: Record<string, boolean> = {}
+    const filters: Record<string, boolean | string> = {}
     filterConfigs.forEach(config => {
       const urlValue = searchParams.get(config.name)
-      if (urlValue !== null) {
-        filters[config.name] = urlValue === "true"
+      if (config.type === "dropdown") {
+        // For dropdowns, use the URL value or default
+        filters[config.name] =
+          urlValue !== null ? urlValue : config.defaultValue || ""
       } else {
-        filters[config.name] = config.defaultValue || false
+        // For checkboxes, parse as boolean
+        if (urlValue !== null) {
+          filters[config.name] = urlValue === "true"
+        } else {
+          filters[config.name] = config.defaultValue || false
+        }
       }
     })
     return filters
@@ -60,14 +68,16 @@ export function useEntityFilters({
         {} as Record<string, any>
       )
 
-      // Update internal state for boolean filters only
-      const booleanFilters: Record<string, boolean> = {}
+      // Update internal state for all filter types
+      const updatedFilters: Record<string, boolean | string> = {}
       filterConfigs.forEach(config => {
         if (config.name in newFilters) {
-          booleanFilters[config.name] = newFilters[config.name] as boolean
+          updatedFilters[config.name] = newFilters[config.name] as
+            | boolean
+            | string
         }
       })
-      setFilters(prev => ({ ...prev, ...booleanFilters }))
+      setFilters(prev => ({ ...prev, ...updatedFilters }))
 
       // Update URL
       const url = `${basePath}?${queryParams(cleanFilters)}`
@@ -81,15 +91,28 @@ export function useEntityFilters({
 
   // Reset filters to defaults
   const resetFilters = useCallback(() => {
-    const defaultFilters: Record<string, boolean> = {}
+    const defaultFilters: Record<string, boolean | string> = {}
     filterConfigs.forEach(config => {
-      defaultFilters[config.name] = config.defaultValue || false
+      defaultFilters[config.name] =
+        config.defaultValue || (config.type === "dropdown" ? "" : false)
     })
     updateFilters(defaultFilters)
   }, [filterConfigs, updateFilters])
 
-  // Get active filter count
-  const activeFilterCount = Object.values(filters).filter(Boolean).length
+  // Get active filter count - for dropdowns, count non-default values
+  const activeFilterCount = filterConfigs.reduce((count, config) => {
+    const value = filters[config.name]
+    if (config.type === "dropdown") {
+      return (
+        count +
+        (value !== config.defaultValue && value !== undefined && value !== ""
+          ? 1
+          : 0)
+      )
+    } else {
+      return count + (value === true ? 1 : 0)
+    }
+  }, 0)
 
   return {
     filters,
