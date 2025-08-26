@@ -1,5 +1,4 @@
 import { CircularProgress } from "@mui/material"
-import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { CreatePage } from "@/components/characters"
 import { getCurrentUser, getServerClient } from "@/lib"

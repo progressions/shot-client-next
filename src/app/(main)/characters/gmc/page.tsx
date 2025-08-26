@@ -5,7 +5,6 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import {
   Box,
-  Container,
   Typography,
   Tabs,
   Tab,
@@ -13,7 +12,6 @@ import {
   Card,
   CardContent,
   CardActionArea,
-  Chip,
   CircularProgress,
   Alert,
 } from "@mui/material"
