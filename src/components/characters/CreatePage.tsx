@@ -2,75 +2,116 @@
 
 import { useRouter } from "next/navigation"
 import { useState, useMemo } from "react"
-import { Box, Typography } from "@mui/material"
-import { HeroTitle, Carousel } from "@/components/ui"
-import { Template, SpeedDial } from "@/components/characters"
-import { ConfirmDialog } from "@/components/ui"
-import { useClient, useApp } from "@/contexts"
+import { 
+  Box, 
+  Typography,
+  TextField,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormControlLabel,
+  Checkbox,
+  Button,
+  Grid,
+  CircularProgress,
+} from "@mui/material"
+import SearchIcon from "@mui/icons-material/Search"
+import { MainHeader, Icon } from "@/components/ui"
+import { SpeedDial, PCTemplatePreviewCard } from "@/components/characters"
+import { useClient, useApp, useToast } from "@/contexts"
 import type { Character } from "@/types"
 
 type CreatePageProps = {
   templates?: Character[]
 }
 
-export default function CreatePage({ templates: templates }: CreatePageProps) {
+export default function CreatePage({ templates = [] }: CreatePageProps) {
   const router = useRouter()
   const { client } = useClient()
   const { refreshUser } = useApp()
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<Character | null>(
-    null
-  )
+  const { toastSuccess, toastError } = useToast()
+  
+  // Search and filter state
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedArchetype, setSelectedArchetype] = useState("")
+  const [hasWeapons, setHasWeapons] = useState(false)
+  const [hasSchticks, setHasSchticks] = useState(false)
+  
+  // Loading state
+  const [creatingFrom, setCreatingFrom] = useState<string | null>(null)
 
-  const items = useMemo(
-    () =>
-      templates.map(template => ({
-        id: template.id,
-        content: <Template template={template} />,
-      })),
-    [templates]
-  )
+  // Get unique archetypes from templates
+  const archetypes = useMemo(() => {
+    const unique = [...new Set(templates.map(t => t.archetype).filter(Boolean))]
+    return unique.sort()
+  }, [templates])
 
-  const handleSelect = item => {
-    const template = templates.find(t => t.id === item.id)
-    if (template) {
-      setSelectedTemplate(template)
-      setDialogOpen(true)
-    }
-  }
+  // Filter templates based on search and filters
+  const filteredTemplates = useMemo(() => {
+    return templates.filter(template => {
+      // Search filter
+      if (searchTerm && !template.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return false
+      }
+      
+      // Archetype filter
+      if (selectedArchetype && template.archetype !== selectedArchetype) {
+        return false
+      }
+      
+      // Has weapons filter
+      if (hasWeapons && (!template.weapons || template.weapons.length === 0)) {
+        return false
+      }
+      
+      // Has schticks filter
+      if (hasSchticks && (!template.schticks || template.schticks.length === 0)) {
+        return false
+      }
+      
+      return true
+    })
+  }, [templates, searchTerm, selectedArchetype, hasWeapons, hasSchticks])
 
-  const handleConfirm = async () => {
-    if (selectedTemplate) {
-      await handleDuplicate(selectedTemplate)
-    }
-    setDialogOpen(false)
-    setSelectedTemplate(null)
-  }
-
-  const handleClose = () => {
-    setDialogOpen(false)
-    setSelectedTemplate(null)
-  }
-
-  const handleDuplicate = async (character: Character) => {
-    if (!character?.id) return
+  const handleSelectTemplate = async (template: Character) => {
+    if (creatingFrom) return // Prevent double-clicking
+    
+    setCreatingFrom(template.id)
     try {
-      const response = await client.duplicateCharacter(character)
+      const response = await client.duplicateCharacter(template)
       const newCharacter = response.data
       
       // Refresh user data to update onboarding progress
       await refreshUser()
       
+      toastSuccess(`Created new character: ${newCharacter.name}`)
       router.push(`/characters/${newCharacter.id}`)
-    } catch (error_) {
-      console.error("Failed to duplicate character:", error_)
+    } catch (error) {
+      console.error("Error creating character from template:", error)
+      toastError("Failed to create character from template")
+    } finally {
+      setCreatingFrom(null)
     }
+  }
+
+  const clearFilters = () => {
+    setSearchTerm("")
+    setSelectedArchetype("")
+    setHasWeapons(false)
+    setHasSchticks(false)
   }
 
   return (
     <Box sx={{ position: "relative" }}>
       <SpeedDial />
-      <HeroTitle>Create</HeroTitle>
+      <MainHeader
+        title="Create Player Character"
+        icon={<Icon keyword="Characters" size="36" />}
+        subtitle="Choose an archetype to create your character"
+      />
+
       {!templates?.length ? (
         <Box sx={{ mt: 4, p: 3, textAlign: "center" }}>
           <Typography variant="h6" color="text.secondary">
@@ -82,23 +123,136 @@ export default function CreatePage({ templates: templates }: CreatePageProps) {
         </Box>
       ) : (
         <>
-          <Typography variant="body1" sx={{ mt: 2 }}>
-            Choose your Archetype:
+          {/* Search and Filter Bar */}
+          <Box sx={{ mb: 3 }}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={6} md={4}>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Search templates..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth>
+                  <InputLabel>Archetype</InputLabel>
+                  <Select
+                    value={selectedArchetype}
+                    onChange={(e) => setSelectedArchetype(e.target.value)}
+                    label="Archetype"
+                  >
+                    <MenuItem value="">All Archetypes</MenuItem>
+                    {archetypes.map(arch => (
+                      <MenuItem key={arch} value={arch}>{arch}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12} md={5}>
+                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={hasWeapons}
+                        onChange={(e) => setHasWeapons(e.target.checked)}
+                      />
+                    }
+                    label="Has Weapons"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={hasSchticks}
+                        onChange={(e) => setHasSchticks(e.target.checked)}
+                      />
+                    }
+                    label="Has Schticks"
+                  />
+                  <Button
+                    variant="text"
+                    onClick={clearFilters}
+                    disabled={!searchTerm && !selectedArchetype && !hasWeapons && !hasSchticks}
+                  >
+                    Clear Filters
+                  </Button>
+                </Box>
+              </Grid>
+            </Grid>
+          </Box>
+
+          {/* Results Count */}
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Showing {filteredTemplates.length} of {templates.length} templates
           </Typography>
-          <Carousel items={items} onSelect={handleSelect} />
+
+          {/* Template Layout - flexible design, not necessarily a grid */}
+          {filteredTemplates.length === 0 ? (
+            <Box sx={{ mt: 4, p: 3, textAlign: "center" }}>
+              <Typography variant="h6" color="text.secondary">
+                No templates match your filters
+              </Typography>
+              <Button variant="text" onClick={clearFilters} sx={{ mt: 2 }}>
+                Clear Filters
+              </Button>
+            </Box>
+          ) : (
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
+              {filteredTemplates.map(template => (
+                <Box
+                  key={template.id}
+                  sx={{
+                    width: {
+                      xs: "100%",
+                      sm: "calc(50% - 12px)",
+                      md: "calc(33.333% - 16px)",
+                      lg: "calc(25% - 18px)",
+                    },
+                    minWidth: { xs: "100%", sm: 300 },
+                    maxWidth: { xs: "100%", sm: 400 },
+                  }}
+                >
+                  <PCTemplatePreviewCard
+                    template={template}
+                    onSelect={handleSelectTemplate}
+                    isLoading={creatingFrom === template.id}
+                  />
+                </Box>
+              ))}
+            </Box>
+          )}
+
+          {/* Loading Overlay */}
+          {creatingFrom && (
+            <Box
+              sx={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                bgcolor: "rgba(0,0,0,0.5)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 9999,
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          )}
         </>
       )}
-      <ConfirmDialog
-        open={dialogOpen}
-        onClose={handleClose}
-        onConfirm={handleConfirm}
-        title="Confirm Character Creation"
-      >
-        <Typography>
-          Create a character based on the &quot;{selectedTemplate?.name || ""}
-          &quot; archetype?
-        </Typography>
-      </ConfirmDialog>
     </Box>
   )
 }

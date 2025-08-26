@@ -20,24 +20,20 @@ export default async function CharacterCreatePage() {
 
   const response = await client.getCharacters({
     is_template: true,
+    character_type: "PC",
     sort: "name",
     order: "asc",
     per_page: 50,
   })
   const { characters } = response.data
   
-  console.log("Template characters fetched:", characters?.length || 0)
-
-  // Detect mobile device on the server
-  const headersState = await headers()
-  const userAgent = headersState.get("user-agent") || ""
-  const initialIsMobile = /mobile/i.test(userAgent)
+  console.log("PC Template characters fetched:", characters?.length || 0)
 
   return (
     <>
       <Breadcrumbs client={client} />
       <Suspense fallback={<CircularProgress />}>
-        <CreatePage templates={characters} initialIsMobile={initialIsMobile} />
+        <CreatePage templates={characters} />
       </Suspense>
     </>
   )
