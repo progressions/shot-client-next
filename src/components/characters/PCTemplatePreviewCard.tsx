@@ -4,7 +4,6 @@ import {
   Card,
   CardActionArea,
   CardContent,
-  CardMedia,
   Box,
   Typography,
   Grid,
@@ -54,39 +53,54 @@ export default function PCTemplatePreviewCard({
         disabled={isLoading}
       >
         {/* Character Image */}
-        {template.image_url ? (
-          <CardMedia
-            component="img"
-            height="200"
-            image={template.image_url}
-            alt={template.name}
-            sx={{ 
-              objectFit: "cover",
-              bgcolor: "grey.100"
-            }}
-          />
-        ) : (
-          <Box 
-            sx={{ 
-              height: 200, 
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "center",
-              bgcolor: "grey.100"
-            }}
-          >
-            <Avatar
-              sx={{ 
-                width: 80, 
-                height: 80,
-                fontSize: "2rem",
-                bgcolor: "primary.main"
+        <Box
+          sx={{
+            position: "relative",
+            paddingTop: "56.25%", // 16:9 aspect ratio
+            bgcolor: "grey.100",
+            overflow: "hidden"
+          }}
+        >
+          {template.image_url ? (
+            <Box
+              component="img"
+              src={template.image_url}
+              alt={template.name}
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover"
+              }}
+            />
+          ) : (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
               }}
             >
-              {template.name?.split(" ").map(word => word[0]).join("").substring(0, 2)}
-            </Avatar>
-          </Box>
-        )}
+              <Avatar
+                sx={{ 
+                  width: 80, 
+                  height: 80,
+                  fontSize: "2rem",
+                  bgcolor: "primary.main"
+                }}
+              >
+                {template.name?.split(" ").map(word => word[0]).join("").substring(0, 2)}
+              </Avatar>
+            </Box>
+          )}
+        </Box>
         
         <CardContent sx={{ p: 2 }}>
           {/* Name and Archetype Section */}
