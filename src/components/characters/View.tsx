@@ -39,10 +39,15 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
   // Build filter options based on user role
   const filterOptions: FilterOption[] = [
     {
-      name: "show_hidden",
-      label: "Show Hidden",
-      defaultValue: false,
-      type: "checkbox",
+      name: "visibility",
+      label: "Visibility",
+      type: "dropdown",
+      defaultValue: "visible",
+      options: [
+        { value: "visible", label: "Visible" },
+        { value: "hidden", label: "Hidden" },
+        { value: "all", label: "All" },
+      ],
     },
   ]
 
@@ -63,7 +68,9 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
 
   // Build current filter values
   const currentFilters: Record<string, boolean | string> = {
-    show_hidden: formState.data.filters.show_hidden || false,
+    visibility:
+      formState.data.filters.visibility ||
+      (formState.data.filters.show_hidden === true ? "all" : "visible"),
   }
 
   // Add template_filter value if admin

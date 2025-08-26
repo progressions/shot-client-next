@@ -36,13 +36,21 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
     <Box sx={{ width: "100%", mb: 2 }}>
       <EntityFilters
         filters={{
-          show_hidden: formState.data.filters.show_hidden || false,
+          visibility:
+            formState.data.filters.visibility ||
+            (formState.data.filters.show_hidden === true ? "all" : "visible"),
         }}
         options={[
           {
-            name: "show_hidden",
-            label: "Show Hidden",
-            defaultValue: false,
+            name: "visibility",
+            label: "Visibility",
+            type: "dropdown",
+            defaultValue: "visible",
+            options: [
+              { value: "visible", label: "Visible" },
+              { value: "hidden", label: "Hidden" },
+              { value: "all", label: "All" },
+            ],
           },
         ]}
         onFiltersUpdate={updateFilters}
