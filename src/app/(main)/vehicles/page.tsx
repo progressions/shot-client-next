@@ -11,7 +11,14 @@ export const metadata = {
 export default async function VehiclesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; sort?: string; order?: string }>
+  searchParams: Promise<{
+    page?: string
+    sort?: string
+    order?: string
+    search?: string
+    show_hidden?: string
+    [key: string]: string | undefined
+  }>
 }) {
   // Server-side campaign check - will redirect if no campaign
   await requireCampaign()
@@ -26,7 +33,8 @@ export default async function VehiclesPage({
         page,
         sort,
         order,
-        search
+        search,
+        additionalParams
       ) => ({
         vehicles: data.vehicles,
         factions: data.factions,
@@ -40,6 +48,7 @@ export default async function VehiclesPage({
           vehicle_type: "",
           archetype: "",
           faction_id: "",
+          show_hidden: additionalParams?.show_hidden || false,
         },
         drawerOpen: false,
       })}

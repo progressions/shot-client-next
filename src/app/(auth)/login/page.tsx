@@ -34,29 +34,36 @@ export default function LoginPage() {
 
   // Clear cookies when there's an auth error from server component
   useEffect(() => {
-    if (authError === "invalid_token" || authError === "unauthorized" || authError === "auth_failed") {
+    if (
+      authError === "invalid_token" ||
+      authError === "unauthorized" ||
+      authError === "auth_failed"
+    ) {
       console.log("🔄 Clearing invalid authentication data due to:", authError)
-      
+
       // Clear cookies
       Cookies.remove("jwtToken")
       Cookies.remove("userId")
-      
+
       // Clear localStorage
       if (typeof window !== "undefined") {
         const keysToRemove = []
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i)
-          if (key && (key.startsWith("currentUser-") || 
-                     key.startsWith("currentCampaign-") ||
-                     key.includes("jwt") ||
-                     key.includes("token"))) {
+          if (
+            key &&
+            (key.startsWith("currentUser-") ||
+              key.startsWith("currentCampaign-") ||
+              key.includes("jwt") ||
+              key.includes("token"))
+          ) {
             keysToRemove.push(key)
           }
         }
         keysToRemove.forEach(key => localStorage.removeItem(key))
         sessionStorage.clear()
       }
-      
+
       // Show appropriate error message
       if (authError === "invalid_token") {
         setError("Your session has expired. Please log in again.")

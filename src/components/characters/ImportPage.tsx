@@ -212,9 +212,11 @@ export default function UploadForm() {
         type: FormActions.SUCCESS,
         payload: `${uploadedCharacters.length} character${uploadedCharacters.length > 1 ? "s" : ""} created successfully!`,
       })
-      
+
       // Refresh user data to update onboarding progress
-      console.log(`🎯 Characters imported via PDF - calling refreshUser() to update onboarding progress`)
+      console.log(
+        `🎯 Characters imported via PDF - calling refreshUser() to update onboarding progress`
+      )
       await refreshUser()
     }
 

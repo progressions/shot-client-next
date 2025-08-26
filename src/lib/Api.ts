@@ -232,7 +232,6 @@ class Api {
     return `${this.base()}/users`
   }
 
-
   factions(faction?: Faction | ID): string {
     return faction?.id
       ? `${this.api()}/factions/${faction.id}`

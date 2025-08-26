@@ -2,6 +2,8 @@ interface PageParameters {
   page: number
   sort: string
   order: "asc" | "desc"
+  search: string
+  [key: string]: any // Allow additional parameters
 }
 
 interface GetPageParametersOptions {
@@ -11,7 +13,7 @@ interface GetPageParametersOptions {
 }
 
 export async function getPageParameters(
-  searchParams: Promise<{ page?: string; sort?: string; order?: string }>,
+  searchParams: Promise<Record<string, string | undefined>>,
   options: GetPageParametersOptions
 ): Promise<PageParameters> {
   const { validSorts, defaultSort, defaultOrder = "desc" } = options
@@ -20,9 +22,7 @@ export async function getPageParameters(
   // Validate page parameter
   const pageParameter = parameters.page
   const page = pageParameter ? Number.parseInt(pageParameter, 10) : 1
-  if (isNaN(page) || page <= 0) {
-    return { page: 1, sort: defaultSort, order: defaultOrder }
-  }
+  const validPage = isNaN(page) || page <= 0 ? 1 : page
 
   // Validate sort parameter
   const sort =
@@ -39,5 +39,23 @@ export async function getPageParameters(
 
   const search = parameters.search || ""
 
-  return { page, sort, order, search }
+  // Pass through any additional parameters (like show_hidden)
+  const additionalParams: Record<string, any> = {}
+  for (const [key, value] of Object.entries(parameters)) {
+    if (
+      !["page", "sort", "order", "search"].includes(key) &&
+      value !== undefined
+    ) {
+      // Convert "true"/"false" strings to booleans
+      if (value === "true") {
+        additionalParams[key] = true
+      } else if (value === "false") {
+        additionalParams[key] = false
+      } else {
+        additionalParams[key] = value
+      }
+    }
+  }
+
+  return { page: validPage, sort, order, search, ...additionalParams }
 }

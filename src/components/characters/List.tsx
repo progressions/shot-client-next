@@ -27,6 +27,7 @@ export type FormStateData = {
     faction_id: string
     page: number
     search: string
+    show_hidden?: boolean
   }
 }
 

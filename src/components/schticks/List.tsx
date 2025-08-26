@@ -25,6 +25,8 @@ export type FormStateData = {
     category: string
     path: string
     page: number
+    search?: string
+    show_hidden?: boolean
   }
 }
 

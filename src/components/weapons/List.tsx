@@ -26,6 +26,7 @@ export type FormStateData = {
     search: string
     category: string
     juncture: string
+    show_hidden?: boolean
   }
 }
 
