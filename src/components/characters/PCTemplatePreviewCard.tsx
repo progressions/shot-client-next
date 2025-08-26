@@ -4,10 +4,12 @@ import {
   Card,
   CardActionArea,
   CardContent,
+  CardMedia,
   Box,
   Typography,
   Grid,
-  Chip
+  Chip,
+  Avatar
 } from "@mui/material"
 import { RichTextRenderer } from "@/components/editor"
 import { CS } from "@/services"
@@ -51,6 +53,41 @@ export default function PCTemplatePreviewCard({
         sx={{ height: "100%", p: 0 }}
         disabled={isLoading}
       >
+        {/* Character Image */}
+        {template.image_url ? (
+          <CardMedia
+            component="img"
+            height="200"
+            image={template.image_url}
+            alt={template.name}
+            sx={{ 
+              objectFit: "cover",
+              bgcolor: "grey.100"
+            }}
+          />
+        ) : (
+          <Box 
+            sx={{ 
+              height: 200, 
+              display: "flex", 
+              alignItems: "center", 
+              justifyContent: "center",
+              bgcolor: "grey.100"
+            }}
+          >
+            <Avatar
+              sx={{ 
+                width: 80, 
+                height: 80,
+                fontSize: "2rem",
+                bgcolor: "primary.main"
+              }}
+            >
+              {template.name?.split(" ").map(word => word[0]).join("").substring(0, 2)}
+            </Avatar>
+          </Box>
+        )}
+        
         <CardContent sx={{ p: 2 }}>
           {/* Name and Archetype Section */}
           <Box sx={{ mb: 3 }}>

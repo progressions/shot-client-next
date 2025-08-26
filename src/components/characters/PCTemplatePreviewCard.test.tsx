@@ -24,6 +24,7 @@ describe("PCTemplatePreviewCard", () => {
   const mockTemplate: Character = {
     id: "1",
     name: "Master Archer",
+    image_url: "https://example.com/archer.jpg",
     action_values: {
       "Martial Arts": 15,
       Defense: 14,
@@ -148,5 +149,21 @@ describe("PCTemplatePreviewCard", () => {
     render(<PCTemplatePreviewCard template={mockTemplate} onSelect={mockOnSelect} />)
     
     expect(screen.getByText(/A skilled archer from ancient times/)).toBeInTheDocument()
+  })
+
+  it("displays character image when available", () => {
+    render(<PCTemplatePreviewCard template={mockTemplate} onSelect={mockOnSelect} />)
+    
+    const image = screen.getByAltText("Master Archer")
+    expect(image).toBeInTheDocument()
+    expect(image).toHaveAttribute("src", "https://example.com/archer.jpg")
+  })
+
+  it("displays avatar with initials when no image available", () => {
+    const templateWithoutImage = { ...mockTemplate, image_url: undefined }
+    render(<PCTemplatePreviewCard template={templateWithoutImage} onSelect={mockOnSelect} />)
+    
+    // Should show avatar with initials "MA" for Master Archer
+    expect(screen.getByText("MA")).toBeInTheDocument()
   })
 })
