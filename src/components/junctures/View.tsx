@@ -3,7 +3,7 @@ import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, JunctureDetail } from "@/components/junctures"
-import { GenericFilter, GridView, SortControls } from "@/components/ui"
+import { FilterAccordion, GridView, SortControls } from "@/components/ui"
 import type { FormStateData } from "@/components/junctures/List"
 
 interface ViewProps {
@@ -29,20 +29,38 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
 
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
+      <FilterAccordion
+        filters={{
+          visibility:
+            formState.data.filters.visibility ||
+            (formState.data.filters.show_hidden === true ? "all" : "visible"),
+          ...formState.data.filters,
+        }}
+        filterOptions={[
+          {
+            name: "visibility",
+            label: "Visibility",
+            type: "dropdown",
+            defaultValue: "visible",
+            options: [
+              { value: "visible", label: "Visible" },
+              { value: "hidden", label: "Hidden" },
+              { value: "all", label: "All" },
+            ],
+          },
+        ]}
+        onFiltersUpdate={updateFilters}
+        entity="Juncture"
+        formState={formState}
+        omit={["add", "juncture"]}
+        title="Filters"
+      />
       <SortControls
         route="/junctures"
         isMobile={viewMode === "mobile"}
         validSorts={["name", "created_at", "updated_at"]}
         dispatchForm={dispatchForm}
         formState={formState}
-        filter={
-          <GenericFilter
-            entity="Juncture"
-            formState={formState}
-            omit={["add", "juncture"]}
-            onFiltersUpdate={updateFilters}
-          />
-        }
       >
         {viewMode === "mobile" ? (
           <GridView

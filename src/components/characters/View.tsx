@@ -3,12 +3,7 @@ import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, CharacterDetail } from "@/components/characters"
-import {
-  GenericFilter,
-  EntityFilters,
-  GridView,
-  SortControls,
-} from "@/components/ui"
+import { FilterAccordion, GridView, SortControls } from "@/components/ui"
 import { useApp } from "@/contexts"
 import type { FormStateData } from "@/components/characters/List"
 import type { FilterOption } from "@/components/ui/filters/EntityFilters"
@@ -66,11 +61,12 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
     })
   }
 
-  // Build current filter values
-  const currentFilters: Record<string, boolean | string> = {
+  // Build current filter values including search and other GenericFilter fields
+  const currentFilters: Record<string, boolean | string | null> = {
     visibility:
       formState.data.filters.visibility ||
       (formState.data.filters.show_hidden === true ? "all" : "visible"),
+    ...formState.data.filters, // Include all filters for GenericFilter fields
   }
 
   // Add template_filter value if admin
@@ -81,10 +77,14 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
 
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
-      <EntityFilters
+      <FilterAccordion
         filters={currentFilters}
-        options={filterOptions}
+        filterOptions={filterOptions}
         onFiltersUpdate={updateFilters}
+        entity="Character"
+        formState={formState}
+        omit={["add", "character"]}
+        title="Filters"
       />
       <SortControls
         route="/characters"
@@ -92,14 +92,6 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         validSorts={["name", "created_at", "updated_at"]}
         dispatchForm={dispatchForm}
         formState={formState}
-        filter={
-          <GenericFilter
-            entity="Character"
-            formState={formState}
-            omit={["add", "character"]}
-            onFiltersUpdate={updateFilters}
-          />
-        }
       >
         {viewMode === "mobile" ? (
           <GridView

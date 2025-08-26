@@ -3,12 +3,7 @@ import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType } from "@/reducers"
 import { FightDetail, Table } from "@/components/fights"
-import {
-  GenericFilter,
-  EntityFilters,
-  GridView,
-  SortControls,
-} from "@/components/ui"
+import { FilterAccordion, GridView, SortControls } from "@/components/ui"
 import type { FormStateData } from "@/components/fights/List"
 
 interface ViewProps {
@@ -33,13 +28,14 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
   )
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
-      <EntityFilters
+      <FilterAccordion
         filters={{
           visibility:
             formState.data.filters.visibility ||
             (formState.data.filters.show_hidden === true ? "all" : "visible"),
+          ...formState.data.filters,
         }}
-        options={[
+        filterOptions={[
           {
             name: "visibility",
             label: "Visibility",
@@ -53,20 +49,16 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
           },
         ]}
         onFiltersUpdate={updateFilters}
+        entity="Fight"
+        formState={formState}
+        omit={["add", "fight"]}
+        title="Filters"
       />
       <SortControls
         isMobile={viewMode === "mobile"}
         validSorts={["name", "season", "session", "created_at", "updated_at"]}
         dispatchForm={dispatchForm}
         formState={formState}
-        filter={
-          <GenericFilter
-            entity="Fight"
-            formState={formState}
-            onFiltersUpdate={updateFilters}
-            omit={["add", "fight"]}
-          />
-        }
       >
         {viewMode === "mobile" ? (
           <GridView

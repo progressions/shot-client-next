@@ -3,7 +3,7 @@ import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, CampaignDetail } from "@/components/campaigns"
-import { GenericFilter, GridView, SortControls } from "@/components/ui"
+import { FilterAccordion, GridView, SortControls } from "@/components/ui"
 import type { FormStateData } from "@/components/campaigns/List"
 
 interface ViewProps {
@@ -29,20 +29,38 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
 
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
+      <FilterAccordion
+        filters={{
+          visibility:
+            formState.data.filters.visibility ||
+            (formState.data.filters.show_hidden === true ? "all" : "visible"),
+          ...formState.data.filters,
+        }}
+        filterOptions={[
+          {
+            name: "visibility",
+            label: "Visibility",
+            type: "dropdown",
+            defaultValue: "visible",
+            options: [
+              { value: "visible", label: "Active" },
+              { value: "hidden", label: "Inactive" },
+              { value: "all", label: "All" },
+            ],
+          },
+        ]}
+        onFiltersUpdate={updateFilters}
+        entity="Campaign"
+        formState={formState}
+        omit={["add", "campaign"]}
+        title="Filters"
+      />
       <SortControls
         route="/campaigns"
         isMobile={viewMode === "mobile"}
         validSorts={["name", "created_at", "updated_at"]}
         dispatchForm={dispatchForm}
         formState={formState}
-        filter={
-          <GenericFilter
-            entity="Campaign"
-            formState={formState}
-            omit={["add", "campaign"]}
-            onFiltersUpdate={updateFilters}
-          />
-        }
       >
         {viewMode === "mobile" ? (
           <GridView

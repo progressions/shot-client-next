@@ -3,12 +3,7 @@ import { useCallback } from "react"
 import { Box } from "@mui/material"
 import { FormActions, FormStateType, FormStateAction } from "@/reducers"
 import { Table, WeaponDetail } from "@/components/weapons"
-import {
-  GenericFilter,
-  EntityFilters,
-  GridView,
-  SortControls,
-} from "@/components/ui"
+import { FilterAccordion, GridView, SortControls } from "@/components/ui"
 import type { FormStateData } from "@/components/weapons/List"
 
 interface ViewProps {
@@ -34,13 +29,14 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
 
   return (
     <Box sx={{ width: "100%", mb: 2 }}>
-      <EntityFilters
+      <FilterAccordion
         filters={{
           visibility:
             formState.data.filters.visibility ||
             (formState.data.filters.show_hidden === true ? "all" : "visible"),
+          ...formState.data.filters,
         }}
-        options={[
+        filterOptions={[
           {
             name: "visibility",
             label: "Visibility",
@@ -54,6 +50,10 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
           },
         ]}
         onFiltersUpdate={updateFilters}
+        entity="Weapon"
+        formState={formState}
+        omit={["add", "weapon"]}
+        title="Filters"
       />
       <SortControls
         route="/weapons"
@@ -68,14 +68,6 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
         ]}
         dispatchForm={dispatchForm}
         formState={formState}
-        filter={
-          <GenericFilter
-            entity="Weapon"
-            formState={formState}
-            omit={["add", "weapon"]}
-            onFiltersUpdate={updateFilters}
-          />
-        }
       >
         {viewMode === "mobile" ? (
           <GridView
