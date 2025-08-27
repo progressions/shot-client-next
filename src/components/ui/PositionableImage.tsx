@@ -9,6 +9,7 @@ import {
   GenerateButton,
   RepositionButton,
   SaveCancelMiniButtons,
+  ImageViewerModal,
 } from "@/components/ui"
 import { GenerateImageDialog, UploadImageDialog } from "@/components/generate"
 import { useToast, useClient } from "@/contexts"
@@ -36,6 +37,7 @@ export function PositionableImage({
 
   const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false)
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false)
 
   const { toastSuccess, toastError } = useToast()
   const context = `${isMobile ? "mobile" : "desktop"}_${pageContext}`
@@ -198,6 +200,17 @@ export function PositionableImage({
     setIsUploadDialogOpen(false)
   }
 
+  const handleImageClick = () => {
+    // Only open viewer if not in repositioning mode
+    if (!isRepositioning && entity.image_url) {
+      setIsImageViewerOpen(true)
+    }
+  }
+
+  const handleImageViewerClose = () => {
+    setIsImageViewerOpen(false)
+  }
+
   return (
     <Box
       sx={{
@@ -221,6 +234,7 @@ export function PositionableImage({
         currentX={currentX}
         currentY={currentY}
         isDragging={isDragging}
+        onClick={handleImageClick}
       />
       {isRepositioning && entity.image_url && (
         <SaveCancelMiniButtons
@@ -275,6 +289,15 @@ export function PositionableImage({
         entity={entity}
         setEntity={setEntity}
       />
+      {entity.image_url && (
+        <ImageViewerModal
+          open={isImageViewerOpen}
+          onClose={handleImageViewerClose}
+          imageUrl={entity.image_url}
+          altText={entity.name}
+          entity={entity}
+        />
+      )}
     </Box>
   )
 }
