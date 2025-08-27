@@ -28,7 +28,7 @@ type ModelAutocompleteProps = {
   sx?: Record<string, unknown>
 }
 
-export function createAutocomplete(model: string) {
+function createAutocomplete(model: string) {
   return function ModelAutocomplete({
     value,
     onChange,
@@ -135,3 +135,5 @@ export function createAutocomplete(model: string) {
     )
   }
 }
+
+export { createAutocomplete }
