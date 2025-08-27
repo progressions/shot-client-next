@@ -2,7 +2,7 @@ import { CircularProgress, Box, Typography, Stack } from "@mui/material"
 import type { PopupProps, User } from "@/types"
 import { defaultUser } from "@/types"
 import { useState, useEffect } from "react"
-import { UserAvatar } from "@/components/avatars"
+import { EntityAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
 import { UserLink } from "@/components/ui"
 
@@ -49,7 +49,7 @@ export default function UserPopup({ id }: PopupProps) {
   return (
     <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
-        <UserAvatar user={user} disablePopup={true} />
+        <EntityAvatar entity={user} disablePopup={true} />
         <Typography>
           <UserLink user={user} disablePopup={true} />
         </Typography>

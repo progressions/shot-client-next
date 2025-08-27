@@ -2,7 +2,7 @@
 import { GridColDef } from "@mui/x-data-grid"
 import { FightTableProps } from "@/types"
 import { MembersGroup, BaseDataGrid, FightLink } from "@/components/ui"
-import { Avatar } from "@/components/avatars"
+import { EntityAvatar } from "@/components/avatars"
 
 const columns: GridColDef<Fight>[] = [
   {
@@ -11,7 +11,7 @@ const columns: GridColDef<Fight>[] = [
     width: 70,
     editable: false,
     sortable: false,
-    renderCell: params => <Avatar entity={params.row} />,
+    renderCell: params => <EntityAvatar entity={params.row} />,
   },
   {
     field: "name",

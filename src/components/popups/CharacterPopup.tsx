@@ -2,7 +2,7 @@ import { CircularProgress, Box, Typography, Stack } from "@mui/material"
 import type { PopupProps, Faction, Character } from "@/types"
 import { defaultCharacter } from "@/types"
 import { useState, useEffect } from "react"
-import { CharacterAvatar } from "@/components/avatars"
+import { EntityAvatar } from "@/components/avatars"
 import CS from "@/services/CharacterService"
 import GamemasterOnly from "@/components/GamemasterOnly"
 import { RichTextRenderer } from "@/components/editor"
@@ -60,7 +60,7 @@ export default function CharacterPopup({ id }: PopupProps) {
   return (
     <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
-        <CharacterAvatar character={character} disablePopup={true} />
+        <EntityAvatar entity={character} disablePopup={true} />
         <Typography variant="h6">
           <CharacterLink character={character} disablePopup={true} />
         </Typography>

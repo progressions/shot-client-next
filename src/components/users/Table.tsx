@@ -2,7 +2,7 @@
 import { GridColDef } from "@mui/x-data-grid"
 import { UserTableProps } from "@/types"
 import { BaseDataGrid, UserLink } from "@/components/ui"
-import { Avatar } from "@/components/avatars"
+import { EntityAvatar } from "@/components/avatars"
 
 const columns: GridColDef<User>[] = [
   {
@@ -11,7 +11,7 @@ const columns: GridColDef<User>[] = [
     width: 70,
     editable: false,
     sortable: false,
-    renderCell: params => <Avatar entity={params.row} />,
+    renderCell: params => <EntityAvatar entity={params.row} />,
   },
   {
     field: "email",

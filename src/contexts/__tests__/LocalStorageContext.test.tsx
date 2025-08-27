@@ -123,7 +123,7 @@ describe("LocalStorageProvider", () => {
       // Create window if it doesn't exist (SSR scenario)
       global.window = {
         localStorage: mockLocalStorage,
-      } as any
+      } as unknown
     }
   })
 
@@ -360,12 +360,12 @@ describe("LocalStorageProvider", () => {
   })
 
   describe("server-side rendering (SSR) handling", () => {
-    let originalWindow: any
+    let originalWindow: unknown
 
     beforeEach(() => {
       // Store original window and remove it to simulate SSR
       originalWindow = global.window
-      delete (global as any).window
+      delete (global as unknown).window
     })
 
     afterEach(() => {

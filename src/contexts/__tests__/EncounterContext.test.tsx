@@ -597,7 +597,7 @@ describe("EncounterProvider", () => {
 
         const handleSpendWithoutEncounter = async () => {
           try {
-            await ec.spendShots(null as any, 3)
+            await ec.spendShots(null as unknown as Character, 3)
           } catch (err) {
             setError("Error handled")
           }

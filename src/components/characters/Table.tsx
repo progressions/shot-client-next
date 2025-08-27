@@ -13,7 +13,7 @@ import {
   CharacterLink,
 } from "@/components/ui"
 import { CS } from "@/services"
-import { Avatar } from "@/components/avatars"
+import { EntityAvatar } from "@/components/avatars"
 
 interface ViewProps {
   formState: FormStateType<CharactersTableFormState>
@@ -27,7 +27,7 @@ const columns: GridColDef<Character>[] = [
     width: 70,
     editable: false,
     sortable: false,
-    renderCell: params => <Avatar entity={params.row} />,
+    renderCell: params => <EntityAvatar entity={params.row} />,
   },
   {
     field: "name",

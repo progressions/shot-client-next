@@ -325,7 +325,7 @@ describe("Service Integration Tests", () => {
   describe("Service Error Handling Integration", () => {
     it("handles cascading errors gracefully across services", () => {
       // Test invalid character data propagation
-      const invalidCharacter = { ...brick, action_values: null } as any
+      const invalidCharacter = { ...brick, action_values: null } as Character
 
       // Services should handle invalid data gracefully
       const skill = CharacterService.skill(invalidCharacter, "Martial Arts")

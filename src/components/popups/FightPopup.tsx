@@ -3,7 +3,7 @@ import type { PopupProps, Fight } from "@/types"
 import { defaultFight } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
-import FightAvatar from "@/components/avatars/FightAvatar"
+import { EntityAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
 import { FightLink } from "@/components/ui"
 
@@ -51,7 +51,7 @@ export default function FightPopup({ id }: PopupProps) {
   return (
     <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
-        <FightAvatar fight={fight} disablePopup={true} />
+        <EntityAvatar entity={fight} disablePopup={true} />
         <Typography>
           <FightLink fight={fight} disablePopup={true} />
         </Typography>

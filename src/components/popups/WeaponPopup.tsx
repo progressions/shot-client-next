@@ -4,7 +4,7 @@ import { defaultWeapon } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
 import { WeaponLink } from "@/components/ui"
-import { WeaponAvatar } from "@/components/avatars"
+import { EntityAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
 
 export default function WeaponPopup({ id }: PopupProps) {
@@ -50,7 +50,7 @@ export default function WeaponPopup({ id }: PopupProps) {
   return (
     <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
-        <WeaponAvatar weapon={weapon} />
+        <EntityAvatar entity={weapon} />
         <WeaponLink weapon={weapon} disablePopup={true} />
       </Stack>
       <Typography variant="caption" sx={{ textTransform: "uppercase" }}>

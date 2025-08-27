@@ -186,6 +186,7 @@ export interface BaseEntity {
   created_at: string
   updated_at: string
   image_positions: ImagePosition[]
+  entity_class?: string
 }
 
 // Generic interface for entities that have a specific collection

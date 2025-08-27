@@ -151,9 +151,9 @@ describe("formReducer", () => {
 
     it("handles object values for EncounterContext use case", () => {
       interface EncounterData {
-        encounter: any
-        weapons: { [id: string]: any }
-        schticks: { [id: string]: any }
+        encounter: unknown
+        weapons: { [id: string]: unknown }
+        schticks: { [id: string]: unknown }
       }
 
       const initialEncounterData = {
@@ -455,7 +455,7 @@ describe("formReducer", () => {
 
   describe("unknown action", () => {
     it("returns current state unchanged", () => {
-      const unknownAction = { type: "UNKNOWN_ACTION" } as any
+      const unknownAction = { type: "UNKNOWN_ACTION" } as unknown
 
       const newState = formReducer(initialState, unknownAction)
 

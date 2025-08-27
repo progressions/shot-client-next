@@ -3,7 +3,7 @@ import { GridColDef } from "@mui/x-data-grid"
 import { FormStateType, FormStateAction } from "@/reducers"
 import { BaseDataGrid, FactionLink, VehicleLink } from "@/components/ui"
 import { VS } from "@/services"
-import { Avatar } from "@/components/avatars"
+import { EntityAvatar } from "@/components/avatars"
 import { VehiclesTableFormState } from "@/types/forms"
 
 interface ViewProps {
@@ -18,7 +18,7 @@ const columns: GridColDef<Vehicle>[] = [
     width: 70,
     editable: false,
     sortable: false,
-    renderCell: params => <Avatar entity={params.row} />,
+    renderCell: params => <EntityAvatar entity={params.row} />,
   },
   {
     field: "name",

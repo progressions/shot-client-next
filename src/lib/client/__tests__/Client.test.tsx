@@ -116,10 +116,10 @@ describe("createClient", () => {
 
     // Mock API constructors
     ;(Api as jest.MockedClass<typeof Api>).mockImplementation(
-      () => mockApi as any
+      () => mockApi as unknown
     )
     ;(ApiV2 as jest.MockedClass<typeof ApiV2>).mockImplementation(
-      () => mockApiV2 as any
+      () => mockApiV2 as unknown
     )
 
     // Mock queryParams
@@ -128,7 +128,7 @@ describe("createClient", () => {
     ).mockImplementation(params => params)
 
     // Mock createConsumer
-    mockCreateConsumer.mockReturnValue(mockConsumer as any)
+    mockCreateConsumer.mockReturnValue(mockConsumer as unknown)
 
     // Mock all client creation functions
     const authModule = require("@/lib/client/authClient")
@@ -221,7 +221,7 @@ describe("createClient", () => {
     it("handles server-side rendering (no window)", () => {
       // Mock window as undefined to simulate SSR
       const originalWindow = global.window
-      delete (global as any).window
+      delete (global as unknown).window
 
       const jwt = "param-jwt-token"
       const client = createClient({ jwt })

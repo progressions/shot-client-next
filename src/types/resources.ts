@@ -267,3 +267,18 @@ export interface Person extends BaseEntity {
   juncture_id: string | null
   juncture: Juncture | null
 }
+
+// Entity union type - all entity types that can be displayed with avatars
+export type Entity =
+  | Campaign
+  | Character
+  | Fight
+  | Site
+  | Vehicle
+  | Faction
+  | Juncture
+  | Party
+  | Weapon
+  | Schtick
+  | User
+  | Person

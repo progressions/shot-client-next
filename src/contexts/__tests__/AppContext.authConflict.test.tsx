@@ -22,15 +22,15 @@ jest.mock("next/navigation", () => ({
 }))
 
 // Mock window.location
-delete (window as any).location
-window.location = { href: "" } as any
+delete (window as unknown).location
+window.location = { href: "" } as unknown
 
 // Mock fetch for logout API
 global.fetch = jest.fn()
 
 describe("AppContext - Authentication Conflict Detection", () => {
-  let mockClient: any
-  let mockRouter: any
+  let mockClient: unknown
+  let mockRouter: unknown
 
   beforeEach(() => {
     // Clear all mocks and storage

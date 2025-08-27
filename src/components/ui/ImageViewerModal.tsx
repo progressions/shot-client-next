@@ -61,13 +61,9 @@ export function ImageViewerModal({
 
     if (open) {
       document.addEventListener("keydown", handleEscape)
-      // Prevent body scroll when modal is open
-      document.body.style.overflow = "hidden"
-    }
-
-    return () => {
-      document.removeEventListener("keydown", handleEscape)
-      document.body.style.overflow = "unset"
+      return () => {
+        document.removeEventListener("keydown", handleEscape)
+      }
     }
   }, [open, onClose])
 
@@ -137,6 +133,7 @@ export function ImageViewerModal({
       onClose={onClose}
       maxWidth={false}
       fullScreen
+      disableScrollLock={false}
       PaperProps={{
         sx: {
           backgroundColor: "transparent",
