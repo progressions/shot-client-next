@@ -195,8 +195,31 @@ export function PositionableImage({
         sent: { x: currentX, y: currentY },
         received: { x: response.data.x_position, y: response.data.y_position }
       })
+      
+      // Update local state with saved position
       setCurrentX(response.data.x_position)
       setCurrentY(response.data.y_position)
+      
+      // Update the entity's image_positions array if setEntity is provided
+      if (setEntity && response.data) {
+        const updatedPositions = entity.image_positions || []
+        const existingIndex = updatedPositions.findIndex(
+          pos => pos.context === context
+        )
+        
+        if (existingIndex >= 0) {
+          updatedPositions[existingIndex] = response.data
+        } else {
+          updatedPositions.push(response.data)
+        }
+        
+        console.log("💾 UPDATING ENTITY WITH NEW POSITIONS:", updatedPositions)
+        setEntity({
+          ...entity,
+          image_positions: updatedPositions
+        })
+      }
+      
       setIsRepositioning(false)
       console.log("💾 SAVE COMPLETE - STATE UPDATED")
       toastSuccess("Image position saved successfully")
