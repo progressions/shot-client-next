@@ -2,10 +2,10 @@
 import { Stack } from "@mui/material"
 import {
   AddButton,
-  createAutocomplete,
+  ModelAutocomplete,
+  StringAutocomplete,
   SearchInput,
 } from "@/components/ui"
-import { createStringAutocomplete } from "@/components/ui/createStringAutocomplete"
 import { useCallback } from "react"
 import { filterConfigs } from "@/lib/filterConfigs"
 
@@ -109,25 +109,24 @@ export function GenericFilter({
     const isPrimaryField = field.name.toLowerCase() === entity.toLowerCase()
 
     if (field.type === "static") {
-      const Autocomplete = createStringAutocomplete(displayName)
       return (
-        <Autocomplete
+        <StringAutocomplete
           key={field.name}
+          model={displayName}
           value={filters?.[field.name] as string}
           onChange={newValue => changeFilter(field.name, newValue)}
           records={field.staticOptions || []}
           allowNone={field.allowNone ?? true}
           sx={{ width: 200 }}
-          placeholder={displayName}
         />
       )
     }
 
     if (field.type === "string") {
-      const Autocomplete = createStringAutocomplete(displayName)
       return (
-        <Autocomplete
+        <StringAutocomplete
           key={field.name}
+          model={displayName}
           value={filters?.[field.name] as string}
           onChange={newValue => changeFilter(field.name, newValue)}
           records={
@@ -137,7 +136,6 @@ export function GenericFilter({
           }
           allowNone={field.allowNone ?? true}
           sx={{ width: 200 }}
-          placeholder={displayName}
         />
       )
     }
@@ -160,36 +158,34 @@ export function GenericFilter({
           })
         )
 
-        const Autocomplete = createAutocomplete(entityName)
         return (
-          <Autocomplete
+          <ModelAutocomplete
             key={field.name}
+            model={entityName}
             value={filters?.[field.name] as AutocompleteOption | null}
             onChange={newValue =>
               changeFilter(field.name + "_id", newValue, true)
             }
+            filters={{}}
             records={userOptions}
             allowNone={field.allowNone ?? true}
             sx={{ width: 300 }}
-            placeholder={displayName}
-            excludeIds={isPrimaryField ? excludeIds : undefined}
           />
         )
       }
 
-      const Autocomplete = createAutocomplete(entityName)
       return (
-        <Autocomplete
+        <ModelAutocomplete
           key={field.name}
+          model={entityName}
           value={filters?.[field.name] as AutocompleteOption | null}
           onChange={newValue =>
             changeFilter(field.name + "_id", newValue, true)
           }
+          filters={{}}
           records={data[responseKey] || []}
           allowNone={field.allowNone ?? true}
           sx={{ width: 200 }}
-          placeholder={displayName}
-          excludeIds={isPrimaryField ? excludeIds : undefined}
         />
       )
     }
