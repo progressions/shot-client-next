@@ -26,7 +26,7 @@ jest.mock("@/components/editor", () => ({
 jest.mock("@mui/material/CardMedia", () => {
   return {
     __esModule: true,
-    default: ({ children, component, ...props }: any) => {
+    default: ({ children, component, ...props }: { children?: React.ReactNode; component?: string; [key: string]: unknown }) => {
       // Always render as div to avoid void element issues
       return <div {...props}>{children}</div>
     },

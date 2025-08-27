@@ -175,13 +175,13 @@ describe("userState reducer", () => {
 
       const action: UserStateAction = {
         type: UserActions.UPDATE,
-        name: "some_numeric_field" as any, // Type assertion for test
+        name: "some_numeric_field" as unknown, // Type assertion for test
         value: 42,
       }
 
       const newState = userReducer(initialState, action)
 
-      expect((newState.user as any).some_numeric_field).toBe(42)
+      expect((newState.user as unknown).some_numeric_field).toBe(42)
       expect(newState.edited).toBe(true)
     })
 
@@ -372,7 +372,7 @@ describe("userState reducer", () => {
         user: mockUser,
       }
 
-      const unknownAction = { type: "UNKNOWN_ACTION" } as any
+      const unknownAction = { type: "UNKNOWN_ACTION" } as unknown
 
       const newState = userReducer(customState, unknownAction)
 
@@ -389,7 +389,7 @@ describe("userState reducer", () => {
         user: mockUser,
       }
 
-      const unknownAction = { type: "UNKNOWN_ACTION" } as any
+      const unknownAction = { type: "UNKNOWN_ACTION" } as unknown
 
       const newState = userReducer(customState, unknownAction)
 

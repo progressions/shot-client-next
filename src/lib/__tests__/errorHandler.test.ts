@@ -3,19 +3,36 @@ import { FormActions } from "@/reducers"
 import type { BackendErrorResponse } from "@/types"
 
 // Mock axios and AxiosError
+interface MockAxiosResponse {
+  status?: number
+  statusText?: string
+  data?: unknown
+  headers?: Record<string, string>
+  config?: Record<string, unknown>
+}
+
+interface MockAxiosRequestConfig {
+  url?: string
+  method?: string
+  baseURL?: string
+  headers?: Record<string, string>
+  params?: unknown
+  data?: unknown
+}
+
 jest.mock("axios", () => ({
   AxiosError: class MockAxiosError extends Error {
-    public response?: any
-    public request?: any
-    public config?: any
+    public response?: MockAxiosResponse
+    public request?: XMLHttpRequest
+    public config?: MockAxiosRequestConfig
     public code?: string
 
     constructor(
       message?: string,
       code?: string,
-      config?: any,
-      request?: any,
-      response?: any
+      config?: MockAxiosRequestConfig,
+      request?: XMLHttpRequest,
+      response?: MockAxiosResponse
     ) {
       super(message)
       this.name = "AxiosError"
@@ -28,9 +45,9 @@ jest.mock("axios", () => ({
     static create(
       message?: string,
       code?: string,
-      config?: any,
-      request?: any,
-      response?: any
+      config?: MockAxiosRequestConfig,
+      request?: XMLHttpRequest,
+      response?: MockAxiosResponse
     ) {
       return new MockAxiosError(message, code, config, request, response)
     }
@@ -69,7 +86,7 @@ describe("errorHandler", () => {
           status: 400,
           statusText: "Bad Request",
           headers: {},
-          config: {} as any,
+          config: {} as MockAxiosRequestConfig,
         }
       )
 
@@ -105,7 +122,7 @@ describe("errorHandler", () => {
           status: 422,
           statusText: "Unprocessable Entity",
           headers: {},
-          config: {} as any,
+          config: {} as MockAxiosRequestConfig,
         }
       )
 
@@ -140,7 +157,7 @@ describe("errorHandler", () => {
           status: 422,
           statusText: "Unprocessable Entity",
           headers: {},
-          config: {} as any,
+          config: {} as MockAxiosRequestConfig,
         }
       )
 
@@ -176,7 +193,7 @@ describe("errorHandler", () => {
           status: 500,
           statusText: "Internal Server Error",
           headers: {},
-          config: {} as any,
+          config: {} as MockAxiosRequestConfig,
         }
       )
 
@@ -200,7 +217,7 @@ describe("errorHandler", () => {
           status: 0,
           statusText: "",
           headers: {},
-          config: {} as any,
+          config: {} as MockAxiosRequestConfig,
         }
       )
 
@@ -241,7 +258,7 @@ describe("errorHandler", () => {
           field2: ["valid array"],
           field3: null,
         },
-      } as any
+      } as BackendErrorResponse
 
       const axiosError = new AxiosError(
         "Malformed response",
@@ -253,7 +270,7 @@ describe("errorHandler", () => {
           status: 422,
           statusText: "Unprocessable Entity",
           headers: {},
-          config: {} as any,
+          config: {} as MockAxiosRequestConfig,
         }
       )
 
@@ -400,7 +417,7 @@ describe("errorHandler", () => {
           status: 400,
           statusText: "Bad Request",
           headers: {},
-          config: {} as any,
+          config: {} as MockAxiosRequestConfig,
         }
       )
 

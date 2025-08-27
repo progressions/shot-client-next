@@ -61,26 +61,26 @@ describe("parseToNumber", () => {
 
   describe("edge cases", () => {
     it("returns 0 for null input", () => {
-      expect(parseToNumber(null as any)).toBe(0)
+      expect(parseToNumber(null as unknown as string | number)).toBe(0)
     })
 
     it("returns 0 for undefined input", () => {
-      expect(parseToNumber(undefined as any)).toBe(0)
+      expect(parseToNumber(undefined as unknown as string | number)).toBe(0)
     })
 
     it("returns 0 for boolean inputs", () => {
-      expect(parseToNumber(true as any)).toBe(0)
-      expect(parseToNumber(false as any)).toBe(0)
+      expect(parseToNumber(true as unknown as string | number)).toBe(0)
+      expect(parseToNumber(false as unknown as string | number)).toBe(0)
     })
 
     it("returns 0 for object inputs", () => {
-      expect(parseToNumber({} as any)).toBe(0)
-      expect(parseToNumber([] as any)).toBe(0)
-      expect(parseToNumber({ value: 42 } as any)).toBe(0)
+      expect(parseToNumber({} as unknown as string | number)).toBe(0)
+      expect(parseToNumber([] as unknown as string | number)).toBe(0)
+      expect(parseToNumber({ value: 42 } as unknown as string | number)).toBe(0)
     })
 
     it("returns 0 for function inputs", () => {
-      expect(parseToNumber((() => 42) as any)).toBe(0)
+      expect(parseToNumber((() => 42) as unknown as string | number)).toBe(0)
     })
   })
 

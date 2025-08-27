@@ -269,7 +269,7 @@ describe("SharedService", () => {
                 },
               }
 
-              expect((SS as any)[method](character)).toBe(expected[index])
+              expect((SS as Record<string, (character: Person) => number>)[method](character)).toBe(expected[index])
             })
           })
         })

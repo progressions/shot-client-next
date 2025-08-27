@@ -155,17 +155,17 @@ describe("CharacterService", () => {
     describe("skill function edge cases", () => {
       it("handles character without action_values", () => {
         const invalidCharacter = { ...carolina, action_values: undefined }
-        const result = CS.skill(invalidCharacter as any, "Driving")
+        const result = CS.skill(invalidCharacter as unknown, "Driving")
         expect(result).toBe(13) // Carolina has Driving: 13 in skills, which skill() checks
       })
 
       it("handles null skill name", () => {
-        const result = CS.skill(carolina, null as any)
+        const result = CS.skill(carolina, null as unknown as string | number)
         expect(result).toBe(7) // Should return default
       })
 
       it("handles undefined skill name", () => {
-        const result = CS.skill(carolina, undefined as any)
+        const result = CS.skill(carolina, undefined as unknown as string | number)
         expect(result).toBe(7) // Should return default
       })
 
@@ -205,7 +205,7 @@ describe("CharacterService", () => {
           ...brick,
           action_values: {
             ...brick.action_values,
-            Type: undefined as any,
+            Type: undefined as unknown as string | number,
           },
         }
 
@@ -219,7 +219,7 @@ describe("CharacterService", () => {
           ...brick,
           action_values: {
             ...brick.action_values,
-            Type: null as any,
+            Type: null as unknown as string | number,
           },
         }
 
@@ -233,7 +233,7 @@ describe("CharacterService", () => {
           ...brick,
           action_values: {
             ...brick.action_values,
-            Type: "invalid_type" as any,
+            Type: "invalid_type" as unknown,
           },
         }
 
@@ -303,10 +303,10 @@ describe("CharacterService", () => {
     describe("fullHeal edge cases", () => {
       it("handles character without action_values", () => {
         const invalidCharacter = { ...brick }
-        delete (invalidCharacter as any).action_values
+        delete (invalidCharacter as unknown).action_values
 
         // fullHeal tries to access action_values.Max Fortune which will throw an error
-        expect(() => CS.fullHeal(invalidCharacter as any)).toThrow()
+        expect(() => CS.fullHeal(invalidCharacter as unknown)).toThrow()
       })
 
       it("handles character with missing specific action values", () => {
@@ -327,9 +327,9 @@ describe("CharacterService", () => {
 
       it("handles character with undefined impairments", () => {
         const characterWithoutImpairments = { ...brick }
-        delete (characterWithoutImpairments as any).impairments
+        delete (characterWithoutImpairments as unknown).impairments
 
-        const result = CS.fullHeal(characterWithoutImpairments as any)
+        const result = CS.fullHeal(characterWithoutImpairments as unknown)
         expect(result.impairments).toBe(0) // Should set to 0
       })
 
@@ -338,9 +338,9 @@ describe("CharacterService", () => {
           ...brick,
           action_values: {
             ...brick.action_values,
-            Wounds: null as any,
-            Fortune: null as any,
-            "Marks of Death": null as any,
+            Wounds: null as unknown as string | number,
+            Fortune: null as unknown as string | number,
+            "Marks of Death": null as unknown as string | number,
           },
         }
 
@@ -377,9 +377,9 @@ describe("CharacterService", () => {
     describe("mainAttack edge cases", () => {
       it("handles character without action_values", () => {
         const invalidCharacter = { ...carolina }
-        delete (invalidCharacter as any).action_values
+        delete (invalidCharacter as unknown).action_values
 
-        const result = CS.mainAttack(invalidCharacter as any)
+        const result = CS.mainAttack(invalidCharacter as unknown)
         expect(result).toBe("") // otherActionValue returns empty string on error
       })
 
@@ -437,7 +437,7 @@ describe("CharacterService", () => {
       it("handles malformed chain arguments", () => {
         const result = CS.chain(brick, [
           ["updateActionValue", []], // Missing required arguments
-        ] as any)
+        ] as unknown)
 
         // Should handle gracefully without crashing
         expect(result).toBeDefined()
@@ -445,7 +445,7 @@ describe("CharacterService", () => {
 
       it("handles null character in chain", () => {
         expect(() => {
-          CS.chain(null as any, [["updateActionValue", ["Toughness", 9]]])
+          CS.chain(null as unknown as string | number, [["updateActionValue", ["Toughness", 9]]])
         }).toThrow() // Should handle null character appropriately
       })
     })
