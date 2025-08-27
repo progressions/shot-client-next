@@ -2,7 +2,7 @@
 import { GridColDef } from "@mui/x-data-grid"
 import { FormStateType, FormStateAction, WeaponsTableFormState } from "@/types"
 import { BaseDataGrid, WeaponLink } from "@/components/ui"
-import { Avatar } from "@/components/avatars"
+import { EntityAvatar } from "@/components/avatars"
 
 interface ViewProps {
   formState: FormStateType<WeaponsTableFormState>
@@ -16,7 +16,7 @@ const columns: GridColDef<Weapon>[] = [
     width: 70,
     editable: false,
     sortable: false,
-    renderCell: params => <Avatar entity={params.row} />,
+    renderCell: params => <EntityAvatar entity={params.row} />,
   },
   {
     field: "name",

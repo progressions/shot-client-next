@@ -1,5 +1,5 @@
 import { AvatarGroup, Box } from "@mui/material"
-import { Avatar } from "@/components/avatars"
+import { EntityAvatar } from "@/components/avatars"
 import { SystemStyleObject, Theme } from "@mui/system"
 import pluralize from "pluralize"
 

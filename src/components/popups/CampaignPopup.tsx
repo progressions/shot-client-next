@@ -3,7 +3,7 @@ import type { PopupProps, Campaign } from "@/types"
 import { defaultCampaign } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
-import { CampaignAvatar } from "@/components/avatars"
+import { EntityAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
 import { CampaignLink } from "@/components/ui"
 
@@ -48,7 +48,7 @@ export default function CampaignPopup({ id }: PopupProps) {
   return (
     <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
-        <CampaignAvatar campaign={campaign} disablePopup={true} />
+        <EntityAvatar entity={campaign} disablePopup={true} />
         <Typography>
           <CampaignLink campaign={campaign} disablePopup={true} />
         </Typography>

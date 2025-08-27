@@ -3,7 +3,7 @@ import type { PopupProps, Site } from "@/types"
 import { defaultSite } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
-import { SiteAvatar } from "@/components/avatars"
+import { EntityAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
 import { MembersGroup, FactionLink, SiteLink } from "@/components/ui"
 
@@ -48,7 +48,7 @@ export default function SitePopup({ id }: PopupProps) {
   return (
     <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
-        <SiteAvatar site={site} disablePopup={true} />
+        <EntityAvatar entity={site} disablePopup={true} />
         <Typography>
           <SiteLink site={site} disablePopup={true} />
         </Typography>

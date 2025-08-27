@@ -10,7 +10,7 @@ import {
   CampaignsTableFormState,
 } from "@/types"
 import { BaseDataGrid, CampaignLink } from "@/components/ui"
-import { Avatar } from "@/components/avatars"
+import { EntityAvatar } from "@/components/avatars"
 import { useClient, useApp, useToast } from "@/contexts"
 
 interface ViewProps {
@@ -95,7 +95,7 @@ export default function View({ formState, dispatchForm }: ViewProps) {
       width: 70,
       editable: false,
       sortable: false,
-      renderCell: params => <Avatar entity={params.row} />,
+      renderCell: params => <EntityAvatar entity={params.row} />,
       align: "center",
       headerAlign: "center",
     },

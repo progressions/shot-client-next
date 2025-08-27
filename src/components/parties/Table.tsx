@@ -7,7 +7,7 @@ import {
   PartyLink,
   MembersGroup,
 } from "@/components/ui"
-import { Avatar } from "@/components/avatars"
+import { EntityAvatar } from "@/components/avatars"
 import { PartiesTableFormState } from "@/types/forms"
 
 interface ViewProps {
@@ -22,7 +22,7 @@ const columns: GridColDef<Party>[] = [
     width: 70,
     editable: false,
     sortable: false,
-    renderCell: params => <Avatar entity={params.row} />,
+    renderCell: params => <EntityAvatar entity={params.row} />,
   },
   {
     field: "name",

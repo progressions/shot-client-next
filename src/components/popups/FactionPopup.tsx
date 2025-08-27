@@ -3,7 +3,7 @@ import type { PopupProps, Faction } from "@/types"
 import { defaultFaction } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
-import { FactionAvatar } from "@/components/avatars"
+import { EntityAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
 import { MembersGroup, FactionLink } from "@/components/ui"
 
@@ -49,7 +49,7 @@ export default function FactionPopup({ id }: PopupProps) {
   return (
     <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
-        <FactionAvatar faction={faction} disablePopup={true} />
+        <EntityAvatar entity={faction} disablePopup={true} />
         <Typography>
           <FactionLink faction={faction} disablePopup={true} />
         </Typography>

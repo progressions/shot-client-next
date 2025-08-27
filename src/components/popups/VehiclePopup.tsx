@@ -2,7 +2,7 @@ import { CircularProgress, Box, Typography, Stack } from "@mui/material"
 import type { PopupProps, Faction, Vehicle } from "@/types"
 import { defaultVehicle } from "@/types"
 import { useState, useEffect } from "react"
-import { VehicleAvatar } from "@/components/avatars"
+import { EntityAvatar } from "@/components/avatars"
 import VS from "@/services/VehicleService"
 import GamemasterOnly from "@/components/GamemasterOnly"
 import { useClient } from "@/contexts"
@@ -55,7 +55,7 @@ export default function VehiclePopup({ id }: PopupProps) {
   return (
     <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
-        <VehicleAvatar vehicle={vehicle} disablePopup={true} />
+        <EntityAvatar entity={vehicle} disablePopup={true} />
         <Typography variant="h6">
           <VehicleLink vehicle={vehicle} disablePopup={true} />
         </Typography>

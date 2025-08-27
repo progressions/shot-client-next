@@ -3,7 +3,7 @@ import type { PopupProps, Party } from "@/types"
 import { defaultParty } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
-import { PartyAvatar } from "@/components/avatars"
+import { EntityAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
 import { MembersGroup, FactionLink, PartyLink } from "@/components/ui"
 
@@ -48,7 +48,7 @@ export default function PartyPopup({ id }: PopupProps) {
   return (
     <Box sx={{ py: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={1}>
-        <PartyAvatar party={party} disablePopup={true} />
+        <EntityAvatar entity={party} disablePopup={true} />
         <Typography>
           <PartyLink party={party} disablePopup={true} />
         </Typography>

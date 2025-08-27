@@ -7,7 +7,7 @@ import {
   FactionLink,
   SiteLink,
 } from "@/components/ui"
-import { Avatar } from "@/components/avatars"
+import { EntityAvatar } from "@/components/avatars"
 import { SitesTableFormState } from "@/types/forms"
 
 interface ViewProps {
@@ -22,7 +22,7 @@ const columns: GridColDef<Site>[] = [
     width: 70,
     editable: false,
     sortable: false,
-    renderCell: params => <Avatar entity={params.row} sx={{ mt: 0.5 }} />,
+    renderCell: params => <EntityAvatar entity={params.row} sx={{ mt: 0.5 }} />,
   },
   {
     field: "name",
