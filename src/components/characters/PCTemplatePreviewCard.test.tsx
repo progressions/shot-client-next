@@ -209,7 +209,9 @@ describe("PCTemplatePreviewCard", () => {
     )
 
     // Since CardMedia is mocked as a div, check for the image URL in the props
-    const cardMedia = screen.getByText("Master Archer").closest("div")?.parentElement
+    const cardMedia = screen
+      .getByText("Master Archer")
+      .closest("div")?.parentElement
     expect(cardMedia).toBeInTheDocument()
   })
 

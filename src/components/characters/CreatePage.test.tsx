@@ -120,9 +120,15 @@ describe("CreatePage", () => {
       render(<CreatePage templates={mockTemplates} />)
 
       // All templates should be visible
-      expect(screen.getByRole("article", { name: "Archer" })).toBeInTheDocument()
-      expect(screen.getByRole("article", { name: "Big Bruiser" })).toBeInTheDocument()
-      expect(screen.getByRole("article", { name: "Cyborg" })).toBeInTheDocument()
+      expect(
+        screen.getByRole("article", { name: "Archer" })
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole("article", { name: "Big Bruiser" })
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole("article", { name: "Cyborg" })
+      ).toBeInTheDocument()
 
       // No carousel controls
       expect(
@@ -159,9 +165,15 @@ describe("CreatePage", () => {
       const searchInput = screen.getByPlaceholderText(/search templates/i)
       fireEvent.change(searchInput, { target: { value: "Archer" } })
 
-      expect(screen.getByRole("article", { name: "Archer" })).toBeInTheDocument()
-      expect(screen.queryByRole("article", { name: "Big Bruiser" })).not.toBeInTheDocument()
-      expect(screen.queryByRole("article", { name: "Cyborg" })).not.toBeInTheDocument()
+      expect(
+        screen.getByRole("article", { name: "Archer" })
+      ).toBeInTheDocument()
+      expect(
+        screen.queryByRole("article", { name: "Big Bruiser" })
+      ).not.toBeInTheDocument()
+      expect(
+        screen.queryByRole("article", { name: "Cyborg" })
+      ).not.toBeInTheDocument()
     })
 
     it("shows archetype filter dropdown", () => {
@@ -184,9 +196,13 @@ describe("CreatePage", () => {
       render(<CreatePage templates={mockTemplates} />)
 
       const searchInput = screen.getByPlaceholderText(/search templates/i)
-      fireEvent.change(searchInput, { target: { value: "NonExistentTemplate" } })
+      fireEvent.change(searchInput, {
+        target: { value: "NonExistentTemplate" },
+      })
 
-      expect(screen.getByText(/No templates match your filters/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(/No templates match your filters/i)
+      ).toBeInTheDocument()
     })
   })
 
