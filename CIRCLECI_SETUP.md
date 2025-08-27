@@ -46,6 +46,33 @@ In GitHub repository settings:
    - `test`
    - `build`
 
+## Playwright E2E Tests
+
+The configuration includes Playwright end-to-end tests that run against the production site:
+
+### Setup
+1. Tests are in the `e2e/` directory
+2. Configuration in `playwright.config.ts`
+3. Runs smoke tests to verify core functionality
+
+### Running Locally
+```bash
+# Install Playwright browsers (one time)
+npx playwright install
+
+# Run tests
+npm run e2e          # Run all tests
+npm run e2e:ui       # Run with UI mode
+npm run e2e:debug    # Debug mode
+```
+
+### CI Behavior
+- Tests run in the `e2e-tests` job
+- Uses official Playwright Docker image
+- Tests against production site (shot-client-next.fly.dev)
+- Stores screenshots and videos on failure
+- Will fail the build if tests don't pass
+
 ## Configuration Overview
 
 The `.circleci/config.yml` includes:
@@ -53,7 +80,7 @@ The `.circleci/config.yml` includes:
 ### Jobs
 
 1. **test**: Runs formatting check, linting, TypeScript check, and Jest tests
-   - All checks are set to not fail the build (using `|| true`) to allow gradual improvement
+   - All checks will fail the build if they don't pass
    
 2. **build**: Builds the Next.js application
    - Sets environment variables for API endpoints
@@ -87,9 +114,9 @@ The `test_build_deploy` workflow:
 - Ensure Node version matches local development (20.11.0)
 
 ### If tests fail:
-- Tests are currently set to not fail the build (`|| true`)
-- Review test output to fix issues gradually
-- Remove `|| true` once tests are stable
+- Tests will fail the build and prevent deployment
+- Review test output to identify and fix issues
+- Failed test artifacts are stored in CircleCI for debugging
 
 ## Local Testing
 
@@ -107,8 +134,7 @@ circleci local execute --job test
 
 ## Notes
 
-- TypeScript checks and linting are currently non-blocking (using `|| true`)
-- This allows the pipeline to pass while you fix type errors
-- Remove `|| true` from these steps once issues are resolved
-- The deploy job only runs on the main branch
+- All quality checks (TypeScript, linting, tests) will fail the build if they don't pass
+- This ensures code quality standards are maintained
+- The deploy job only runs on the main branch after all tests pass
 - Build artifacts are stored for debugging purposes
