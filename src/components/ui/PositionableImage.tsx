@@ -56,7 +56,16 @@ export function PositionableImage({
   
   // Sync position state with entity data (but only when not actively repositioning or saving)
   useEffect(() => {
+    console.log("🔄 POSITION SYNC CHECK:", {
+      isRepositioning,
+      isDragging,
+      isSaving,
+      willUpdate: !isRepositioning && !isDragging && !isSaving,
+      currentState: { currentX, currentY },
+      entityPosition: { x: position.x_position, y: position.y_position }
+    })
     if (!isRepositioning && !isDragging && !isSaving) {
+      console.log("🔄 POSITION SYNC TRIGGERED - UPDATING STATE")
       setCurrentX(position.x_position)
       setCurrentY(position.y_position)
     }
@@ -166,6 +175,7 @@ export function PositionableImage({
 
   const handleSave = async () => {
     if (!entity.id) return
+    console.log("💾 SAVE START:", { currentX, currentY, context })
     setIsSaving(true)
     try {
       const response = await client.updateImagePosition(entity, {
@@ -173,14 +183,20 @@ export function PositionableImage({
         y_position: currentY,
         context,
       })
+      console.log("💾 SAVE RESPONSE:", { 
+        sent: { x: currentX, y: currentY },
+        received: { x: response.data.x_position, y: response.data.y_position }
+      })
       setCurrentX(response.data.x_position)
       setCurrentY(response.data.y_position)
       setIsRepositioning(false)
+      console.log("💾 SAVE COMPLETE - STATE UPDATED")
       toastSuccess("Image position saved successfully")
     } catch (err: unknown) {
       console.error("Failed to save image position:", err)
       toastError("Failed to save image position")
     } finally {
+      console.log("💾 SETTING isSaving = false")
       setIsSaving(false)
     }
   }
