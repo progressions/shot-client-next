@@ -30,7 +30,9 @@ export async function getServerClient() {
           return await original.apply(target, args)
         } catch (error: unknown) {
           // Log the full error for debugging
-          const axiosError = error as { response?: { status?: number; data?: unknown } }
+          const axiosError = error as {
+            response?: { status?: number; data?: unknown }
+          }
           console.log("🔍 Error in server component:", {
             status: axiosError?.response?.status,
             url: (error as { config?: { url?: string } })?.config?.url,
