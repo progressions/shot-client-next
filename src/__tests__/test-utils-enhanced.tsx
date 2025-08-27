@@ -127,9 +127,16 @@ export const createMockActionCableConsumer = () => ({
       }
 
       // Store reference for manual triggering in tests
-      ;(subscription as Record<string, unknown>).__triggerCallback = (name: string, data: unknown) => {
+      ;(subscription as Record<string, unknown>).__triggerCallback = (
+        name: string,
+        data: unknown
+      ) => {
         if ((callbacks as Record<string, unknown>)[name]) {
-          ;((callbacks as Record<string, unknown>)[name] as (data: unknown) => void)(data)
+          ;(
+            (callbacks as Record<string, unknown>)[name] as (
+              data: unknown
+            ) => void
+          )(data)
         }
       }
 

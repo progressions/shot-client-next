@@ -163,8 +163,8 @@ export default function InvitationRegistrationForm({
             Join {invitation.campaign?.name}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Create your account to accept this invitation. You&rsquo;ll receive a
-            confirmation email to complete the process.
+            Create your account to accept this invitation. You&rsquo;ll receive
+            a confirmation email to complete the process.
           </Typography>
         </Box>
 

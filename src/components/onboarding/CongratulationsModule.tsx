@@ -140,8 +140,8 @@ export const CongratulationsModule: React.FC = () => {
           adventures and missions
           <br />• <strong>Build your world:</strong> Add more factions, sites,
           and campaign details
-          <br />• <strong>Have fun:</strong> You&rsquo;re ready to play Feng Shui
-          2!
+          <br />• <strong>Have fun:</strong> You&rsquo;re ready to play Feng
+          Shui 2!
         </Typography>
       </Box>
 

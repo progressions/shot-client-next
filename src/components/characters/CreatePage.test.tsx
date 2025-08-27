@@ -49,7 +49,15 @@ jest.mock("@/components/characters/SpeedDial", () => ({
 
 jest.mock("@/components/characters/PCTemplatePreviewCard", () => ({
   __esModule: true,
-  default: ({ template, onSelect, isLoading }: { template: unknown; onSelect: (t: unknown) => void; isLoading: boolean }) => (
+  default: ({
+    template,
+    onSelect,
+    isLoading,
+  }: {
+    template: unknown
+    onSelect: (t: unknown) => void
+    isLoading: boolean
+  }) => (
     <div
       onClick={() => !isLoading && onSelect(template)}
       role="article"

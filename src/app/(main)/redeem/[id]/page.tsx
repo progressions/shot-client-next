@@ -27,7 +27,12 @@ enum UserState {
 export default function RedeemInvitationPage() {
   const params = useParams()
   const router = useRouter()
-  const { user: currentUser, jwt: _jwt, client, loading: userLoading } = useClient()
+  const {
+    user: currentUser,
+    jwt: _jwt,
+    client,
+    loading: userLoading,
+  } = useClient()
   const { addToast } = useToast()
   const [invitation, setInvitation] = useState<Invitation | null>(null)
   const [loading, setLoading] = useState(true)
@@ -39,39 +44,44 @@ export default function RedeemInvitationPage() {
   const invitationId = params.id as string
   const _apiV2 = new ApiV2()
 
-  const determineUserState = useCallback((invitation: Invitation): UserState => {
-    console.log("🔍 determineUserState called with:", {
-      currentUser,
-      currentUserEmail: currentUser?.email,
-      invitationEmail: invitation.email,
-      userLoading,
-      hasCurrentUser: !!currentUser,
-      currentUserId: currentUser?.id,
-      isDefaultUser: currentUser?.id === "" || !currentUser?.id,
-    })
+  const determineUserState = useCallback(
+    (invitation: Invitation): UserState => {
+      console.log("🔍 determineUserState called with:", {
+        currentUser,
+        currentUserEmail: currentUser?.email,
+        invitationEmail: invitation.email,
+        userLoading,
+        hasCurrentUser: !!currentUser,
+        currentUserId: currentUser?.id,
+        isDefaultUser: currentUser?.id === "" || !currentUser?.id,
+      })
 
-    // Check if this is actually a default/empty user object
-    if (!currentUser || !currentUser.id || currentUser.id === "") {
-      // Check if there&rsquo;s a pending_user field to determine if account exists
-      if (invitation.pending_user) {
-        return UserState.EXISTING_USER_NOT_LOGGED_IN
-      } else {
-        return UserState.NEW_USER
+      // Check if this is actually a default/empty user object
+      if (!currentUser || !currentUser.id || currentUser.id === "") {
+        // Check if there&rsquo;s a pending_user field to determine if account exists
+        if (invitation.pending_user) {
+          return UserState.EXISTING_USER_NOT_LOGGED_IN
+        } else {
+          return UserState.NEW_USER
+        }
       }
-    }
 
-    // User is logged in (with actual user data, not default)
-    if (currentUser.email !== invitation.email) {
-      return UserState.LOGGED_IN_WRONG_USER
-    }
+      // User is logged in (with actual user data, not default)
+      if (currentUser.email !== invitation.email) {
+        return UserState.LOGGED_IN_WRONG_USER
+      }
 
-    // Check if user is already a member of the campaign
-    if (invitation.campaign?.users?.some(user => user.id === currentUser.id)) {
-      return UserState.LOGGED_IN_ALREADY_MEMBER
-    }
+      // Check if user is already a member of the campaign
+      if (
+        invitation.campaign?.users?.some(user => user.id === currentUser.id)
+      ) {
+        return UserState.LOGGED_IN_ALREADY_MEMBER
+      }
 
-    return UserState.LOGGED_IN_CORRECT_USER
-  }, [currentUser, userLoading])
+      return UserState.LOGGED_IN_CORRECT_USER
+    },
+    [currentUser, userLoading]
+  )
 
   useEffect(() => {
     const fetchInvitation = async () => {

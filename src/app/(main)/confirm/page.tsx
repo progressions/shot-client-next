@@ -21,7 +21,10 @@ import type { ConfirmationResponse } from "@/types"
 export default function ConfirmPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { dispatchCurrentUser: _dispatchCurrentUser, setCurrentCampaign: _setCurrentCampaign } = useApp()
+  const {
+    dispatchCurrentUser: _dispatchCurrentUser,
+    setCurrentCampaign: _setCurrentCampaign,
+  } = useApp()
   const [loading, setLoading] = useState(true)
   const [response, setResponse] = useState<ConfirmationResponse | null>(null)
   const [error, setError] = useState<string | null>(null)

@@ -60,8 +60,16 @@ export function RegistrationForm({
     } catch (error: unknown) {
       console.error("Registration error:", error)
 
-      const axiosError = error as { response?: { status: number; data: { errors?: Record<string, string[]>; message?: string } } }
-      if (axiosError.response?.status === 422 && axiosError.response?.data?.errors) {
+      const axiosError = error as {
+        response?: {
+          status: number
+          data: { errors?: Record<string, string[]>; message?: string }
+        }
+      }
+      if (
+        axiosError.response?.status === 422 &&
+        axiosError.response?.data?.errors
+      ) {
         // Handle validation errors from backend
         setErrors(axiosError.response.data.errors)
       } else if (axiosError.response?.data?.message) {
