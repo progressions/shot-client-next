@@ -42,6 +42,14 @@ export function PositionableImage({
   const position = entity.image_positions?.find(
     pos => pos.context === context
   ) || { x_position: 0, y_position: 0 }
+  
+  console.log("🏁 COMPONENT RENDER:", {
+    entityId: entity.id,
+    context,
+    position,
+    allPositions: entity.image_positions
+  })
+  
   const [currentX, setCurrentX] = useState(position.x_position)
   const [currentY, setCurrentY] = useState(position.y_position)
   
@@ -72,6 +80,17 @@ export function PositionableImage({
     const startY = "touches" in e ? e.touches[0].clientY : e.clientY
     const startTranslateX = currentX
     const startTranslateY = currentY
+    
+    console.log("🎯 DRAG START:", {
+      currentX,
+      currentY,
+      startTranslateX,
+      startTranslateY,
+      startX,
+      startY,
+      entityPositions: entity.image_positions,
+      context
+    })
     const { naturalWidth, naturalHeight } = imgRef.current
     const scaledWidth = boxWidth
     const scaledHeight = (naturalHeight / naturalWidth) * boxWidth
@@ -85,8 +104,16 @@ export function PositionableImage({
       const newY = startTranslateY + deltaY
       const maxX = (scaledWidth - boxWidth) / 2
       const maxY = (scaledHeight - boxHeight) / 2
-      setCurrentX(Math.max(-maxX, Math.min(maxX, newX)))
-      setCurrentY(Math.max(-maxY, Math.min(maxY, newY)))
+      const finalX = Math.max(-maxX, Math.min(maxX, newX))
+      const finalY = Math.max(-maxY, Math.min(maxY, newY))
+      
+      console.log("🔄 DRAG MOVE:", {
+        deltaX, deltaY, newX, newY, maxX, maxY, finalX, finalY,
+        scaledWidth, boxWidth, scaledHeight, boxHeight
+      })
+      
+      setCurrentX(finalX)
+      setCurrentY(finalY)
     }
     const handleEnd = () => {
       setIsDragging(false)
