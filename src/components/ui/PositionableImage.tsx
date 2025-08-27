@@ -66,13 +66,40 @@ export function PositionableImage({
   useEffect(() => {
     const updateBoxWidth = () => {
       if (imgRef.current?.parentElement) {
-        setBoxWidth(imgRef.current.parentElement.clientWidth)
+        const width = imgRef.current.parentElement.clientWidth
+        console.log("📐 UPDATE BOX WIDTH:", {
+          hasParent: !!imgRef.current?.parentElement,
+          parentWidth: width,
+          currentBoxWidth: boxWidth,
+          imgElement: !!imgRef.current,
+          imageUrl: entity.image_url
+        })
+        setBoxWidth(width)
+      } else {
+        console.log("📐 NO PARENT ELEMENT:", {
+          hasImgRef: !!imgRef.current,
+          hasParent: !!imgRef.current?.parentElement,
+          imageUrl: entity.image_url
+        })
       }
     }
     updateBoxWidth()
     window.addEventListener("resize", updateBoxWidth)
     return () => window.removeEventListener("resize", updateBoxWidth)
   }, [])
+
+  // Re-calculate box width when image URL changes
+  useEffect(() => {
+    if (entity.image_url && imgRef.current?.parentElement) {
+      const width = imgRef.current.parentElement.clientWidth
+      console.log("📐 IMAGE URL CHANGED - UPDATE BOX WIDTH:", {
+        imageUrl: entity.image_url,
+        parentWidth: width,
+        currentBoxWidth: boxWidth
+      })
+      setBoxWidth(width)
+    }
+  }, [entity.image_url])
 
 
   const boxHeight = entity.image_url ? height : 100
