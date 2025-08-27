@@ -3,9 +3,9 @@ import { Stack } from "@mui/material"
 import {
   AddButton,
   createAutocomplete,
-  createStringAutocomplete,
   SearchInput,
 } from "@/components/ui"
+import { createStringAutocomplete } from "@/components/ui/createStringAutocomplete"
 import { useCallback } from "react"
 import { filterConfigs } from "@/lib/filterConfigs"
 

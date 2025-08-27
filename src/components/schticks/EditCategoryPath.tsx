@@ -9,7 +9,7 @@ import {
   Divider,
 } from "@mui/material"
 import { InfoLink, SectionHeader } from "@/components/ui"
-import { createStringAutocomplete } from "@/components/ui"
+import { createStringAutocomplete } from "@/components/ui/createStringAutocomplete"
 import { useClient } from "@/contexts"
 import { useState, useCallback, useEffect } from "react"
 import { useForm, FormActions } from "@/reducers"
