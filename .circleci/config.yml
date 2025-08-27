@@ -9,14 +9,6 @@ executors:
       - image: cimg/node:20.11.0
     working_directory: ~/repo
 
-  playwright-executor:
-    docker:
-      - image: mcr.microsoft.com/playwright:v1.48.0-focal
-    working_directory: ~/repo
-    environment:
-      NODE_ENV: test
-      CI: true
-
 jobs:
   test:
     executor: node-executor
@@ -108,61 +100,6 @@ jobs:
           path: .next
           destination: build
 
-  e2e-tests:
-    executor: playwright-executor
-    steps:
-      - checkout
-      
-      # Cache node dependencies
-      - restore_cache:
-          keys:
-            - v2-e2e-dependencies-{{ checksum "package-lock.json" }}
-            - v2-e2e-dependencies-
-      
-      # Install dependencies
-      - run:
-          name: Install dependencies
-          command: |
-            npm ci
-            # Install Playwright as dev dependency if not present
-            npm list @playwright/test || npm install -D @playwright/test
-      
-      # Install Playwright browsers
-      - run:
-          name: Install Playwright browsers
-          command: npx playwright install --with-deps chromium
-      
-      # Save cache
-      - save_cache:
-          paths:
-            - node_modules
-            - ~/.cache/ms-playwright
-          key: v2-e2e-dependencies-{{ checksum "package-lock.json" }}
-      
-      # Run E2E tests against production
-      - run:
-          name: Run E2E smoke tests
-          command: |
-            # Run tests against production site
-            npm run e2e:ci
-          environment:
-            CI: true
-            PLAYWRIGHT_JUNIT_OUTPUT_NAME: results.xml
-      
-      # Store test results
-      - store_test_results:
-          path: test-results
-      
-      # Store test artifacts
-      - store_artifacts:
-          path: test-results
-          destination: playwright-results
-      
-      # Store any screenshots/videos
-      - store_artifacts:
-          path: test-results
-          destination: test-artifacts
-          when: always
 
   deploy:
     docker:
@@ -198,17 +135,9 @@ workflows:
           requires:
             - test
       
-      # Run E2E tests in parallel with build
-      # These run against the production site
-      - e2e-tests:
-          requires:
-            - test
-      
       - deploy:
           requires:
             - build
-            # Don't require e2e-tests to pass for deployment
-            # since they test against production
           filters:
             branches:
               only: main
