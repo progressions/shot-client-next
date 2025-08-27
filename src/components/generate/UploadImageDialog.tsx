@@ -151,7 +151,7 @@ export function UploadImageDialog({
           name: "uploadStatus",
           value: "success",
         })
-        toastSuccess("Image uploaded successfully")
+        toastSuccess("Image uploaded successfully - positioning reset")
         handleConfirmClose()
       } catch (error) {
         console.error("Error uploading image:", error)
