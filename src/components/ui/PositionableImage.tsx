@@ -43,37 +43,14 @@ export function PositionableImage({
     pos => pos.context === context
   ) || { x_position: 0, y_position: 0 }
   
-  console.log("🏁 COMPONENT RENDER:", {
-    entityId: entity.id,
-    context,
-    position,
-    allPositions: entity.image_positions
-  })
-  
   // Initialize state from calculated position
-  const [currentX, setCurrentX] = useState(() => {
-    console.log("🎯 INITIAL X STATE:", position.x_position)
-    return position.x_position
-  })
-  const [currentY, setCurrentY] = useState(() => {
-    console.log("🎯 INITIAL Y STATE:", position.y_position)
-    return position.y_position
-  })
+  const [currentX, setCurrentX] = useState(() => position.x_position)
+  const [currentY, setCurrentY] = useState(() => position.y_position)
   const [isDragging, setIsDragging] = useState(false)
   
   // Sync position state with entity data (but only when not actively repositioning or saving)
   useEffect(() => {
-    console.log("🔄 POSITION SYNC CHECK:", {
-      isRepositioning,
-      isDragging,
-      isSaving,
-      willUpdate: !isRepositioning && !isDragging && !isSaving,
-      currentState: { currentX, currentY },
-      entityPosition: { x: position.x_position, y: position.y_position },
-      positionsExist: entity.image_positions?.length > 0
-    })
     if (!isRepositioning && !isDragging && !isSaving) {
-      console.log("🔄 POSITION SYNC TRIGGERED - UPDATING STATE")
       setCurrentX(position.x_position)
       setCurrentY(position.y_position)
     }
@@ -82,21 +59,7 @@ export function PositionableImage({
   useEffect(() => {
     const updateBoxWidth = () => {
       if (imgRef.current?.parentElement) {
-        const width = imgRef.current.parentElement.clientWidth
-        console.log("📐 UPDATE BOX WIDTH:", {
-          hasParent: !!imgRef.current?.parentElement,
-          parentWidth: width,
-          currentBoxWidth: boxWidth,
-          imgElement: !!imgRef.current,
-          imageUrl: entity.image_url
-        })
-        setBoxWidth(width)
-      } else {
-        console.log("📐 NO PARENT ELEMENT:", {
-          hasImgRef: !!imgRef.current,
-          hasParent: !!imgRef.current?.parentElement,
-          imageUrl: entity.image_url
-        })
+        setBoxWidth(imgRef.current.parentElement.clientWidth)
       }
     }
     updateBoxWidth()
@@ -107,13 +70,7 @@ export function PositionableImage({
   // Re-calculate box width when image URL changes
   useEffect(() => {
     if (entity.image_url && imgRef.current?.parentElement) {
-      const width = imgRef.current.parentElement.clientWidth
-      console.log("📐 IMAGE URL CHANGED - UPDATE BOX WIDTH:", {
-        imageUrl: entity.image_url,
-        parentWidth: width,
-        currentBoxWidth: boxWidth
-      })
-      setBoxWidth(width)
+      setBoxWidth(imgRef.current.parentElement.clientWidth)
     }
   }, [entity.image_url])
 
@@ -132,16 +89,6 @@ export function PositionableImage({
     const startTranslateX = currentX
     const startTranslateY = currentY
     
-    console.log("🎯 DRAG START:", {
-      currentX,
-      currentY,
-      startTranslateX,
-      startTranslateY,
-      startX,
-      startY,
-      entityPositions: entity.image_positions,
-      context
-    })
     const { naturalWidth, naturalHeight } = imgRef.current
     const scaledWidth = boxWidth
     const scaledHeight = (naturalHeight / naturalWidth) * boxWidth
@@ -157,11 +104,6 @@ export function PositionableImage({
       const maxY = (scaledHeight - boxHeight) / 2
       const finalX = Math.max(-maxX, Math.min(maxX, newX))
       const finalY = Math.max(-maxY, Math.min(maxY, newY))
-      
-      console.log("🔄 DRAG MOVE:", {
-        deltaX, deltaY, newX, newY, maxX, maxY, finalX, finalY,
-        scaledWidth, boxWidth, scaledHeight, boxHeight
-      })
       
       setCurrentX(finalX)
       setCurrentY(finalY)
@@ -183,17 +125,12 @@ export function PositionableImage({
 
   const handleSave = async () => {
     if (!entity.id) return
-    console.log("💾 SAVE START:", { currentX, currentY, context })
     setIsSaving(true)
     try {
       const response = await client.updateImagePosition(entity, {
         x_position: currentX,
         y_position: currentY,
         context,
-      })
-      console.log("💾 SAVE RESPONSE:", { 
-        sent: { x: currentX, y: currentY },
-        received: { x: response.data.x_position, y: response.data.y_position }
       })
       
       // Update local state with saved position
@@ -213,7 +150,6 @@ export function PositionableImage({
           updatedPositions.push(response.data)
         }
         
-        console.log("💾 UPDATING ENTITY WITH NEW POSITIONS:", updatedPositions)
         setEntity({
           ...entity,
           image_positions: updatedPositions
@@ -221,13 +157,11 @@ export function PositionableImage({
       }
       
       setIsRepositioning(false)
-      console.log("💾 SAVE COMPLETE - STATE UPDATED")
       toastSuccess("Image position saved successfully")
     } catch (err: unknown) {
       console.error("Failed to save image position:", err)
       toastError("Failed to save image position")
     } finally {
-      console.log("💾 SETTING isSaving = false")
       setIsSaving(false)
     }
   }
