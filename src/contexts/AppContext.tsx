@@ -30,7 +30,7 @@ import { Subscription } from "@rails/actioncable"
 type EntityUpdateCallback = (data: unknown) => void
 
 /**
- * Handles authentication conflict resolution when localStorage and backend users don't match
+ * Handles authentication conflict resolution when localStorage and backend users don&apos;t match
  * Clears all frontend authentication data, calls backend logout, and redirects to login
  */
 function handleAuthConflictResolution(
@@ -80,7 +80,7 @@ function handleAuthConflictResolution(
 
   // 3. Attempt stateless backend logout (fire and forget)
   if (jwt) {
-    // Fire the logout request but don't wait for it
+    // Fire the logout request but don&apos;t wait for it
     client.logout().catch(() => {
       // Silently ignore logout errors during conflict resolution
       console.log("  Backend logout request failed (continuing anyway)")
@@ -196,7 +196,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         )
         return data
       } catch (error) {
-        // Only clear JWT token if it's an authentication error
+        // Only clear JWT token if it&apos;s an authentication error
         if (
           (error as { response?: { status?: number } })?.response?.status ===
           401
@@ -329,7 +329,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
           // 404 on current campaign just means no current campaign set - this is normal
           setCampaign(defaultCampaign)
         } else {
-          // Other errors - don't clear JWT but log them
+          // Other errors - don&apos;t clear JWT but log them
           console.error(
             "⚠️ Error fetching campaign (keeping authentication):",
             error

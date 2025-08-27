@@ -1,5 +1,5 @@
 "use client"
-import { Autocomplete, TextField, CircularProgress } from "@mui/material"
+import { Autocomplete, TextField, CircularProgress, AutocompleteRenderGroupParams } from "@mui/material"
 import { useClient } from "@/contexts"
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { debounce } from "lodash"
@@ -23,7 +23,7 @@ type ModelAutocompleteProps = {
   sx?: Record<string, unknown>
 }
 
-export function createAutocomplete(model: string) {
+function createAutocomplete(model: string) {
   return function ModelAutocomplete({
     value,
     onChange,
@@ -117,7 +117,7 @@ export function createAutocomplete(model: string) {
   }
 }
 
-export function createStringAutocomplete(model: string) {
+function createStringAutocomplete(model: string) {
   return function StringAutocomplete({
     value,
     onChange,
@@ -173,3 +173,5 @@ export function createStringAutocomplete(model: string) {
     )
   }
 }
+
+export { createAutocomplete, createStringAutocomplete }

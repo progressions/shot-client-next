@@ -115,7 +115,7 @@ export default function CampaignForm({
   }
 
   const handleNameEntitySave = async (updatedCampaign: Campaign) => {
-    // For form, we just update local state, don't save
+    // For form, we just update local state, don&apos;t save
     dispatchForm({
       type: FormActions.UPDATE,
       name: "name",

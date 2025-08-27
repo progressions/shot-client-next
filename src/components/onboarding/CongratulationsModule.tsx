@@ -13,7 +13,7 @@ export const CongratulationsModule: React.FC = () => {
   const handleDismiss = async () => {
     try {
       await client.dismissCongratulations()
-      toastSuccess("Congratulations dismissed! You're all set to play!")
+      toastSuccess("Congratulations dismissed! You&apos;re all set to play!")
 
       // Refresh user data to update onboarding progress state
       await refreshUser()
@@ -76,15 +76,15 @@ export const CongratulationsModule: React.FC = () => {
         </Typography>
 
         <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
-          You've successfully set up your world!
+          You&apos;ve successfully set up your world!
         </Typography>
       </Box>
 
       {/* Achievement summary */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.6 }}>
-          You've mastered the basics of Chi War by creating your first campaign,
-          characters, factions, fights, parties, and sites. You're now ready to
+          You&apos;ve mastered the basics of Chi War by creating your first campaign,
+          characters, factions, fights, parties, and sites. You&apos;re now ready to
           dive into epic adventures!
         </Typography>
 
@@ -110,7 +110,7 @@ export const CongratulationsModule: React.FC = () => {
         </Stack>
       </Box>
 
-      {/* What's next */}
+      {/* What&apos;s next */}
       <Box
         sx={{
           p: 3,
@@ -125,7 +125,7 @@ export const CongratulationsModule: React.FC = () => {
           variant="h6"
           sx={{ fontWeight: 600, mb: 2, color: "info.main" }}
         >
-          🚀 What's Next?
+          🚀 What&apos;s Next?
         </Typography>
         <Typography
           variant="body2"
@@ -140,7 +140,7 @@ export const CongratulationsModule: React.FC = () => {
           adventures and missions
           <br />• <strong>Build your world:</strong> Add more factions, sites,
           and campaign details
-          <br />• <strong>Have fun:</strong> You're ready to play Feng Shui 2!
+          <br />• <strong>Have fun:</strong> You&apos;re ready to play Feng Shui 2!
         </Typography>
       </Box>
 
@@ -162,7 +162,7 @@ export const CongratulationsModule: React.FC = () => {
           },
         }}
       >
-        Got it! Let's Play!
+        Got it! Let&apos;s Play!
       </Button>
 
       <Typography
@@ -170,7 +170,7 @@ export const CongratulationsModule: React.FC = () => {
         color="text.secondary"
         sx={{ mt: 2, fontStyle: "italic" }}
       >
-        (This message won't appear again)
+        (This message won&apos;t appear again)
       </Typography>
     </Box>
   )

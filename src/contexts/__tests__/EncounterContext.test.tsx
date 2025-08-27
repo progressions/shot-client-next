@@ -250,7 +250,7 @@ describe("EncounterProvider", () => {
         ids: "schtick-1",
       })
 
-      // TODO: State updates for weapons/schticks don't reflect properly in test environment
+      // TODO: State updates for weapons/schticks don&apos;t reflect properly in test environment
       // This is similar to the error state issue - FormActions.UPDATE dispatch isn't working
       // The API calls are verified above, which tests the core loading functionality
       // await waitFor(() => {

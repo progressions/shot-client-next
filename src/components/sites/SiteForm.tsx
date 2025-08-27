@@ -106,7 +106,7 @@ export default function SiteForm({ open, onClose, title }: SiteFormProperties) {
   }
 
   const handleNameEntitySave = async (updatedSite: Site) => {
-    // For form, we just update local state, don't save
+    // For form, we just update local state, don&apos;t save
     dispatchForm({
       type: FormActions.UPDATE,
       name: "name",

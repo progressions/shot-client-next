@@ -73,7 +73,7 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
   const { toastSuccess, toastError } = useToast()
   const { refreshUser } = useApp()
 
-  // Get remaining milestones (only show incomplete ones, but don't skip campaign creation by default)
+  // Get remaining milestones (only show incomplete ones, but don&apos;t skip campaign creation by default)
   const remainingMilestones = ONBOARDING_MILESTONES.filter(
     milestone => !progress[milestone.timestampField]
   )
@@ -318,7 +318,7 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
               color="text.secondary"
               sx={{ display: "flex", alignItems: "center", gap: 1 }}
             >
-              🎯 <strong>You're here!</strong>{" "}
+              🎯 <strong>You&apos;re here!</strong>{" "}
               {currentMilestone.key === "activate-campaign"
                 ? 'Click the "Activate" button on your Campaign to activate it.'
                 : currentMilestone.key === "character"

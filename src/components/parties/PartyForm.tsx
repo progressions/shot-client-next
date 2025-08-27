@@ -110,7 +110,7 @@ export default function PartyForm({
   }
 
   const handleNameEntitySave = async (updatedParty: Party) => {
-    // For form, we just update local state, don't save
+    // For form, we just update local state, don&apos;t save
     dispatchForm({
       type: FormActions.UPDATE,
       name: "name",

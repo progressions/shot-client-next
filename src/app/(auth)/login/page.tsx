@@ -32,7 +32,7 @@ export default function LoginPage() {
   const redirectTo = searchParams.get("redirect") || "/"
   const authError = searchParams.get("error")
 
-  // Clear cookies when there's an auth error from server component
+  // Clear cookies when there&apos;s an auth error from server component
   useEffect(() => {
     if (
       authError === "invalid_token" ||
@@ -89,7 +89,7 @@ export default function LoginPage() {
         // Parse error response
         const errorData = await response.json()
 
-        // Check if it's an unconfirmed account error
+        // Check if it&apos;s an unconfirmed account error
         if (errorData.error_type === "unconfirmed_account") {
           setIsUnconfirmed(true)
           setUnconfirmedEmail(errorData.email)

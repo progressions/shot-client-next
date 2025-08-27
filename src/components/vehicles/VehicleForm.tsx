@@ -132,7 +132,7 @@ export default function VehicleForm({
   }
 
   const handleNameEntitySave = async (updatedVehicle: Vehicle) => {
-    // For form, we just update local state, don't save
+    // For form, we just update local state, don&apos;t save
     dispatchForm({
       type: FormActions.UPDATE,
       name: "name",
@@ -212,7 +212,7 @@ export default function VehicleForm({
             })
           }}
           updateEntity={async updatedVehicle => {
-            // For form, we just update local state, don't save
+            // For form, we just update local state, don&apos;t save
             dispatchForm({
               type: FormActions.UPDATE,
               name: "data",

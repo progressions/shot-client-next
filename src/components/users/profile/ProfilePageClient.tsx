@@ -134,7 +134,7 @@ export default function ProfilePageClient({
     async (event: React.ChangeEvent<HTMLInputElement>) => {
       const { name } = event.target
 
-      // For email changes, only update UI immediately - don't process yet
+      // For email changes, only update UI immediately - don&apos;t process yet
       if (name === "email") {
         dispatchForm({
           type: FormActions.UPDATE,

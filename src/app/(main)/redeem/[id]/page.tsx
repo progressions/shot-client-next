@@ -52,7 +52,7 @@ export default function RedeemInvitationPage() {
 
     // Check if this is actually a default/empty user object
     if (!currentUser || !currentUser.id || currentUser.id === "") {
-      // Check if there's a pending_user field to determine if account exists
+      // Check if there&apos;s a pending_user field to determine if account exists
       if (invitation.pending_user) {
         return UserState.EXISTING_USER_NOT_LOGGED_IN
       } else {

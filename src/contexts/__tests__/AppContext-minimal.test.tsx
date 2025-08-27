@@ -107,7 +107,7 @@ describe("AppContext JWT Functionality", () => {
     renderApp()
 
     // For server errors, the AppContext preserves JWT but may stay in loading state
-    // Let's verify the key behavior: JWT is preserved and no cookies are removed
+    // Let&apos;s verify the key behavior: JWT is preserved and no cookies are removed
     await waitFor(() => {
       // The loading state behavior on server errors is complex, but JWT should be preserved
       expect(screen.getByTestId("jwt")).toHaveTextContent("valid-token")
