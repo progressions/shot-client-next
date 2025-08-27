@@ -19,7 +19,7 @@ COPY . .
 # Build the Next.js app
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
-# Cache bust: 2025-08-27-fix-export
+# Cache bust: 2025-08-27-fix-split-autocomplete
 
 # Build arguments for environment variables
 ARG NEXT_PUBLIC_API_BASE_URL

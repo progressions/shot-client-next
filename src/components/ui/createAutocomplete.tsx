@@ -28,7 +28,7 @@ type ModelAutocompleteProps = {
   sx?: Record<string, unknown>
 }
 
-function createAutocomplete(model: string) {
+export function createAutocomplete(model: string) {
   return function ModelAutocomplete({
     value,
     onChange,
@@ -48,54 +48,68 @@ function createAutocomplete(model: string) {
     const noneOption: AutocompleteOption = { id: NONE_VALUE, name: "None" }
 
     const fetchRecords = useCallback(
-      debounce(async () => {
+      async () => {
+        if (disabled || (!model && !records?.length)) {
+          return
+        }
+
+        setLoading(true)
         try {
-          setLoading(true)
-          const response = await client[
-            `get${pluralize(model)}` as keyof typeof client
-          ]({
-            autocomplete: true,
-            per_page: 200,
-            ...filters,
-          })
-          const fetchedOptions =
-            response.data[pluralize(model.toLowerCase())] || []
-          if (allowNone) {
-            setOptions([noneOption, ...fetchedOptions])
+          const pluralModel = pluralize(model.toLowerCase())
+          let response: any
+
+          const clientMethod = (client as any)[pluralModel]
+          if (typeof clientMethod === "object" && "index" in clientMethod) {
+            response = await clientMethod.index({
+              filters: filters || {},
+            })
+          } else if (typeof client[pluralModel as keyof typeof client] === "function") {
+            response = await (client as any)[pluralModel]({
+              filters: filters || {},
+            })
           } else {
-            setOptions(fetchedOptions)
+            console.warn(`No client method found for ${pluralModel}`)
+            setOptions(allowNone ? [noneOption, ...(records as AutocompleteOption[])] : (records as AutocompleteOption[]))
+            setLoading(false)
+            return
+          }
+
+          if (response?.data) {
+            const newOptions = response.data.map((record: any) => ({
+              id: record.id,
+              name: record.name || record.title || record.id,
+            }))
+            setOptions(allowNone ? [noneOption, ...newOptions] : newOptions)
+          } else {
+            setOptions(allowNone ? [noneOption, ...(records as AutocompleteOption[])] : (records as AutocompleteOption[]))
           }
         } catch (error) {
-          console.error(
-            `Failed to fetch ${pluralize(model.toLowerCase())}:`,
-            error
-          )
+          console.error(`Error fetching ${model} records:`, error)
+          setOptions(allowNone ? [noneOption, ...(records as AutocompleteOption[])] : (records as AutocompleteOption[]))
         } finally {
           setLoading(false)
         }
-      }, 300),
-      [client, filters]
+      },
+      [client, model, filters, records, allowNone, disabled]
+    )
+
+    const debouncedFetch = useMemo(
+      () => debounce(fetchRecords, 100),
+      [fetchRecords]
     )
 
     useEffect(() => {
-      if (allowNone) {
-        setOptions([noneOption, ...records] as AutocompleteOption[])
-      } else {
-        setOptions(records as AutocompleteOption[])
-      }
-      if (!records.length) {
-        fetchRecords()
-      }
+      debouncedFetch()
       return () => {
-        fetchRecords.cancel()
+        debouncedFetch.cancel()
       }
-    }, [fetchRecords, records])
+    }, [debouncedFetch])
 
     return (
       <Autocomplete
         options={options}
         getOptionLabel={option => option.name}
-        value={value as AutocompleteOption | null}
+        value={options.find(option => option.id === value) || null}
         onChange={(event, newValue) => onChange(newValue)}
         onInputChange={onInputChange}
         isOptionEqualToValue={(option, val) => option.id === val.id}
@@ -121,62 +135,3 @@ function createAutocomplete(model: string) {
     )
   }
 }
-
-function createStringAutocomplete(model: string) {
-  return function StringAutocomplete({
-    value,
-    onChange,
-    records,
-    sx,
-    allowNone,
-    groupBy,
-    renderGroup,
-    disabled = false,
-  }: Omit<ModelAutocompleteProps, "onInputChange" | "filters"> & {
-    allowNone?: boolean
-    groupBy?: (option: AutocompleteOption) => string
-    renderGroup?: (params: AutocompleteRenderGroupParams) => React.ReactNode
-  }) {
-    const noneOption: AutocompleteOption = { id: NONE_VALUE, name: "None" }
-    const options = useMemo(() => {
-      const opts = allowNone
-        ? [
-            noneOption,
-            ...records.map(item => ({
-              id: String(item),
-              name: String(item),
-            })),
-          ]
-        : records
-            .filter(item => item)
-            .map(item => ({
-              id: String(item),
-              name: String(item),
-            }))
-      return opts
-    }, [records, allowNone])
-    return (
-      <Autocomplete
-        options={options}
-        getOptionLabel={option => String(option.name)}
-        value={options.find(option => option.id === value) || null}
-        onChange={(event, newValue) => onChange(newValue ? newValue.id : null)}
-        isOptionEqualToValue={(option, val) => option.id === val.id}
-        groupBy={groupBy}
-        renderGroup={renderGroup}
-        renderInput={params => (
-          <TextField
-            {...params}
-            label={`${model}`}
-            variant="outlined"
-            InputProps={{ ...params.InputProps }}
-          />
-        )}
-        sx={sx}
-        disabled={disabled}
-      />
-    )
-  }
-}
-
-export { createAutocomplete, createStringAutocomplete }
