@@ -75,5 +75,19 @@ const config = [
       "@typescript-eslint/strict-boolean-expressions": "error",
     },
   },
+  {
+    // Less strict rules for test files
+    files: ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "**/test-utils*.tsx", "**/__tests__/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/strict-boolean-expressions": "off",
+    },
+  },
 ]
 export default config

@@ -65,7 +65,7 @@ export function useEntityFilters({
           }
           return acc
         },
-        {} as Record<string, any>
+        {} as Record<string, unknown>
       )
 
       // Update internal state for all filter types

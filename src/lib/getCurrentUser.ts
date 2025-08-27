@@ -16,9 +16,10 @@ export async function getCurrentUser() {
       return null
     }
     return data
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Handle authentication errors gracefully during SSR
-    if (error?.response?.status === 401 || error?.response?.status === 400) {
+    const axiosError = error as { response?: { status?: number } }
+    if (axiosError?.response?.status === 401 || axiosError?.response?.status === 400) {
       console.log("Authentication error during SSR, returning null user")
       return null
     }

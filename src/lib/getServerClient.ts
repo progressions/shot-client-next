@@ -25,20 +25,21 @@ export async function getServerClient() {
       }
 
       // Return wrapped function that handles auth errors
-      return async (...args: any[]) => {
+      return async (...args: unknown[]) => {
         try {
           return await original.apply(target, args)
-        } catch (error: any) {
+        } catch (error: unknown) {
           // Log the full error for debugging
+          const axiosError = error as { response?: { status?: number; data?: unknown } }
           console.log("🔍 Error in server component:", {
-            status: error?.response?.status,
-            url: error?.config?.url,
-            message: error?.message,
-            code: error?.code,
+            status: axiosError?.response?.status,
+            url: (error as { config?: { url?: string } })?.config?.url,
+            message: (error as { message?: string })?.message,
+            code: (error as { code?: string })?.code,
           })
 
           // Handle 401 Unauthorized errors
-          if (error?.response?.status === 401) {
+          if (axiosError?.response?.status === 401) {
             console.log(
               "🔥 401 error detected in server component - redirecting to login"
             )

@@ -3,7 +3,7 @@ interface PageParameters {
   sort: string
   order: "asc" | "desc"
   search: string
-  [key: string]: any // Allow additional parameters
+  [key: string]: string | number | boolean // Allow additional parameters
 }
 
 interface GetPageParametersOptions {
@@ -40,7 +40,7 @@ export async function getPageParameters(
   const search = parameters.search || ""
 
   // Pass through any additional parameters (like show_hidden)
-  const additionalParams: Record<string, any> = {}
+  const additionalParams: Record<string, string | number | boolean> = {}
   for (const [key, value] of Object.entries(parameters)) {
     if (
       !["page", "sort", "order", "search"].includes(key) &&
