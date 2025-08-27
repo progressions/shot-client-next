@@ -65,7 +65,7 @@ export function PositionableImage({
 
     setCurrentX(newPosition.x_position)
     setCurrentY(newPosition.y_position)
-  }, [entity.image_url, entity.image_positions, context])
+  }, [entity.image_url, context])
 
   const boxHeight = entity.image_url ? height : 100
 
