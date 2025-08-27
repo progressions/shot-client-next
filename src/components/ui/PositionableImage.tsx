@@ -50,8 +50,15 @@ export function PositionableImage({
     allPositions: entity.image_positions
   })
   
-  const [currentX, setCurrentX] = useState(position.x_position)
-  const [currentY, setCurrentY] = useState(position.y_position)
+  // Initialize state from calculated position
+  const [currentX, setCurrentX] = useState(() => {
+    console.log("🎯 INITIAL X STATE:", position.x_position)
+    return position.x_position
+  })
+  const [currentY, setCurrentY] = useState(() => {
+    console.log("🎯 INITIAL Y STATE:", position.y_position)
+    return position.y_position
+  })
   const [isDragging, setIsDragging] = useState(false)
   
   // Sync position state with entity data (but only when not actively repositioning or saving)
@@ -62,14 +69,15 @@ export function PositionableImage({
       isSaving,
       willUpdate: !isRepositioning && !isDragging && !isSaving,
       currentState: { currentX, currentY },
-      entityPosition: { x: position.x_position, y: position.y_position }
+      entityPosition: { x: position.x_position, y: position.y_position },
+      positionsExist: entity.image_positions?.length > 0
     })
     if (!isRepositioning && !isDragging && !isSaving) {
       console.log("🔄 POSITION SYNC TRIGGERED - UPDATING STATE")
       setCurrentX(position.x_position)
       setCurrentY(position.y_position)
     }
-  }, [position.x_position, position.y_position, isRepositioning, isDragging, isSaving])
+  }, [position.x_position, position.y_position, isRepositioning, isDragging, isSaving, entity.image_positions?.length])
 
   useEffect(() => {
     const updateBoxWidth = () => {
