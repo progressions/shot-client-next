@@ -45,7 +45,7 @@ export default function EditOwner({
     updateCharacter(updatedCharacter)
   }
 
-  // Don't show if user can&apos;t edit
+  // Don't show if user can&rsquo;t edit
   if (!canEditOwner()) {
     return null
   }

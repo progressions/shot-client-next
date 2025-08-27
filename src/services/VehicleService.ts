@@ -322,7 +322,7 @@ const VehicleService = {
           Crunch: archetype["Crunch"],
         },
       } as Vehicle
-    } catch (error) {
+    } catch (_error) {
       return vehicle
     }
   },

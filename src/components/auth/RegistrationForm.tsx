@@ -57,16 +57,17 @@ export function RegistrationForm({
     try {
       await client.registerUser(formData)
       onSuccess()
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Registration error:", error)
 
-      if (error.response?.status === 422 && error.response?.data?.errors) {
+      const axiosError = error as { response?: { status: number; data: { errors?: Record<string, string[]>; message?: string } } }
+      if (axiosError.response?.status === 422 && axiosError.response?.data?.errors) {
         // Handle validation errors from backend
-        setErrors(error.response.data.errors)
-      } else if (error.response?.data?.message) {
+        setErrors(axiosError.response.data.errors)
+      } else if (axiosError.response?.data?.message) {
         // Handle other backend errors with specific messages
-        setGeneralError(error.response.data.message)
-        onError?.(error.response.data.message)
+        setGeneralError(axiosError.response.data.message)
+        onError?.(axiosError.response.data.message)
       } else {
         // Handle network or other errors
         const errorMessage = "Registration failed. Please try again."

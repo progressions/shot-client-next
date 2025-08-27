@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useParams, useRouter } from "next/navigation"
 import {
   Container,
@@ -27,7 +27,7 @@ enum UserState {
 export default function RedeemInvitationPage() {
   const params = useParams()
   const router = useRouter()
-  const { user: currentUser, jwt, client, loading: userLoading } = useClient()
+  const { user: currentUser, jwt: _jwt, client, loading: userLoading } = useClient()
   const { addToast } = useToast()
   const [invitation, setInvitation] = useState<Invitation | null>(null)
   const [loading, setLoading] = useState(true)
@@ -37,9 +37,9 @@ export default function RedeemInvitationPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   const invitationId = params.id as string
-  const apiV2 = new ApiV2()
+  const _apiV2 = new ApiV2()
 
-  const determineUserState = (invitation: Invitation): UserState => {
+  const determineUserState = useCallback((invitation: Invitation): UserState => {
     console.log("🔍 determineUserState called with:", {
       currentUser,
       currentUserEmail: currentUser?.email,
@@ -52,7 +52,7 @@ export default function RedeemInvitationPage() {
 
     // Check if this is actually a default/empty user object
     if (!currentUser || !currentUser.id || currentUser.id === "") {
-      // Check if there&apos;s a pending_user field to determine if account exists
+      // Check if there&rsquo;s a pending_user field to determine if account exists
       if (invitation.pending_user) {
         return UserState.EXISTING_USER_NOT_LOGGED_IN
       } else {
@@ -71,7 +71,7 @@ export default function RedeemInvitationPage() {
     }
 
     return UserState.LOGGED_IN_CORRECT_USER
-  }
+  }, [currentUser, userLoading])
 
   useEffect(() => {
     const fetchInvitation = async () => {
@@ -104,7 +104,7 @@ export default function RedeemInvitationPage() {
     if (invitationId) {
       fetchInvitation()
     }
-  }, [invitationId, currentUser, userLoading])
+  }, [invitationId, currentUser, userLoading, client, determineUserState])
 
   // Update user state when user context finishes loading
   useEffect(() => {
@@ -112,7 +112,7 @@ export default function RedeemInvitationPage() {
       setUserState(determineUserState(invitation))
       setLoading(false)
     }
-  }, [invitation, userLoading, userState])
+  }, [invitation, userLoading, userState, determineUserState])
 
   const handleRedeem = async () => {
     if (!currentUser?.id) {
@@ -162,11 +162,11 @@ export default function RedeemInvitationPage() {
     }
   }
 
-  const handleRegistrationSuccess = (message: string) => {
+  const _handleRegistrationSuccess = (message: string) => {
     setSuccessMessage(message)
   }
 
-  const handleRegistrationError = (error: string) => {
+  const _handleRegistrationError = (error: string) => {
     setError(error)
   }
 

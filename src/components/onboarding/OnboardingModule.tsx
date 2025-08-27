@@ -74,7 +74,7 @@ export const OnboardingModule: React.FC<OnboardingModuleProps> = ({ user }) => {
       await client.updateOnboardingProgress({
         [dismissField]: new Date().toISOString(),
       })
-      toastSuccess("Onboarding dismissed! You&apos;re all set!")
+      toastSuccess("Onboarding dismissed! You&rsquo;re all set!")
       await refreshUser()
     } catch (error) {
       console.error("Failed to dismiss onboarding:", error)

@@ -13,7 +13,7 @@ interface RichTextRendererProperties {
 }
 
 export default function RichTextRenderer({ html }: RichTextRendererProperties) {
-  // Preprocess the HTML just like in the editor (reuse your preprocessContent if it&apos;s in a shared util)
+  // Preprocess the HTML just like in the editor (reuse your preprocessContent if it&rsquo;s in a shared util)
   const preprocessContent = (inputHtml: string) => {
     if (!inputHtml) return ""
     let processed = inputHtml.replaceAll(

@@ -14,7 +14,7 @@ export interface BaseProps {
 
 export interface BaseInputProps {
   name: string
-  value: any
+  value: string | number | boolean | null
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void
   error?: boolean

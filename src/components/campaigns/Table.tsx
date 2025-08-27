@@ -64,7 +64,7 @@ export default function View({ formState, dispatchForm }: ViewProps) {
 
     setLoadingCampaignId(campaign.id)
     try {
-      // Clear the current campaign - just unset it as current, don&apos;t change the campaign's active status
+      // Clear the current campaign - just unset it as current, don&rsquo;t change the campaign's active status
       await setCurrentCampaign(null)
       toastSuccess(
         `Campaign "${campaign.name}" is no longer your current campaign`

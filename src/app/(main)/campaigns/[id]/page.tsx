@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: CampaignPageProperties) {
       title: `${campaign.name} - Chi War`,
       description: `Campaign details for ${campaign.name}`,
     }
-  } catch (error) {
+  } catch (_error) {
     return {
       title: "Campaign Not Found - Chi War",
       description: "The requested campaign could not be found",

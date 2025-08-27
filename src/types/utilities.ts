@@ -53,7 +53,7 @@ export interface SortConfig {
  */
 export interface SearchParams {
   query?: string
-  filters?: Record<string, any>
+  filters?: Record<string, unknown>
   sort?: string
   order?: string
   page?: number
@@ -125,22 +125,24 @@ export type CacheStrategy = "memory" | "localStorage" | "sessionStorage"
 /**
  * Event handling utility types
  */
-export interface EventHandler<T = any> {
+export interface EventHandler<T = unknown> {
   (event: T): void | Promise<void>
 }
 
-export interface AsyncEventHandler<T = any> {
+export interface AsyncEventHandler<T = unknown> {
   (event: T): Promise<void>
 }
 
 /**
  * Utility function types
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Debounced<T extends (...args: any[]) => any> = T & {
   cancel: () => void
   flush: () => void
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Throttled<T extends (...args: any[]) => any> = T & {
   cancel: () => void
 }
@@ -159,7 +161,7 @@ export interface ApiError {
   message: string
   status: number
   code?: string
-  details?: Record<string, any>
+  details?: Record<string, unknown>
 }
 
 /**

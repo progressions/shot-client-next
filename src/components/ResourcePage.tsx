@@ -11,7 +11,7 @@ interface ResourcePageProps<T> {
   resourceName: string
   fetchData: (
     client: ReturnType<typeof getServerClient>,
-    params: Record<string, any>
+    params: Record<string, unknown>
   ) => Promise<{ data: T }>
   validSorts: string[]
   getInitialFormData: (
@@ -20,7 +20,7 @@ interface ResourcePageProps<T> {
     sort: string,
     order: string,
     search?: string,
-    additionalParams?: Record<string, any>
+    additionalParams?: Record<string, unknown>
   ) => object
   ListComponent: React.ComponentType<{
     initialFormData: object

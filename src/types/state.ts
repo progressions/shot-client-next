@@ -31,7 +31,7 @@ export interface SubmitAction {
 
 export interface UpdateAction {
   type: FormActions.UPDATE
-  payload: any
+  payload: Record<string, unknown>
 }
 
 export interface OpenAction {
@@ -177,6 +177,6 @@ export interface LocalStorageState {
   }
   cache: {
     timestamp: number
-    data: Record<string, any>
+    data: Record<string, unknown>
   }
 }

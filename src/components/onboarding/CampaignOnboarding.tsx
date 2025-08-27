@@ -85,7 +85,7 @@ export const CampaignOnboarding: React.FC<CampaignOnboardingProps> = ({
             color="text.secondary"
             sx={{ fontStyle: "italic" }}
           >
-            You'll find the create button (⊕) when you get there!
+            You&rsquo;ll find the create button (⊕) when you get there!
           </Typography>
         )}
       </Stack>

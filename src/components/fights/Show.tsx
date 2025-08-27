@@ -132,7 +132,7 @@ export default function Show({ fight: initialFight }: ShowProperties) {
 
   // Handle party filter updates
   const handlePartyFiltersUpdate = useCallback(
-    (filters: Record<string, any>) => {
+    (filters: Record<string, unknown>) => {
       setPartyFormState(prev => ({
         ...prev,
         data: {

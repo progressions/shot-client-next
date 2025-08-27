@@ -7,10 +7,10 @@ interface AddPartyProps {
     data: {
       parties: Party[]
       factions: Faction[]
-      filters: Record<string, any>
+      filters: Record<string, unknown>
     }
   }
-  onFiltersUpdate: (filters: Record<string, any>) => void
+  onFiltersUpdate: (filters: Record<string, unknown>) => void
   onPartyAdd: (party: Party) => void
 }
 

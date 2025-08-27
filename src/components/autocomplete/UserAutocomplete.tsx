@@ -11,7 +11,7 @@ type UserAutocompleteProperties = {
   options?: Option[]
   exclude?: string[]
   allowNone?: boolean
-  filters?: Record<string, any>
+  filters?: Record<string, unknown>
 }
 
 export default function UserAutocomplete({

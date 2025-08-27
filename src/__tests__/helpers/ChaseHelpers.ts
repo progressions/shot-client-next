@@ -33,10 +33,10 @@ export function expectPursuitAttack(
   }
 }
 
-export function expectChaseResults(
-  initialState: any,
-  finalState: any,
-  expectedValues: any
+export function expectChaseResults<T>(
+  initialState: T,
+  finalState: T,
+  _expectedValues: T
 ) {
   // Utility to verify chase results
   // Will be implemented based on actual chase mechanics

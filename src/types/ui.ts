@@ -59,7 +59,7 @@ export interface AutocompleteOption {
   id: string
   name: string
   label?: string
-  value?: any
+  value?: string | number | boolean | null
 }
 
 /**

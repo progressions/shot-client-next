@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import {
   Box,
@@ -21,7 +21,7 @@ import type { ConfirmationResponse } from "@/types"
 export default function ConfirmPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { dispatchCurrentUser, setCurrentCampaign } = useApp()
+  const { dispatchCurrentUser: _dispatchCurrentUser, setCurrentCampaign: _setCurrentCampaign } = useApp()
   const [loading, setLoading] = useState(true)
   const [response, setResponse] = useState<ConfirmationResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -36,9 +36,9 @@ export default function ConfirmPage() {
     }
 
     confirmAccount()
-  }, [confirmationToken])
+  }, [confirmationToken, confirmAccount])
 
-  const confirmAccount = async () => {
+  const confirmAccount = useCallback(async () => {
     try {
       // Create a client without JWT for public access
       const client = createClient()
@@ -62,7 +62,7 @@ export default function ConfirmPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [confirmationToken, router])
 
   if (loading) {
     return (

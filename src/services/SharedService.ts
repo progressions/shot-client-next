@@ -131,7 +131,7 @@ const SharedService = {
   ): string {
     try {
       return (character.action_values[key] as string) || ""
-    } catch (error) {
+    } catch (_error) {
       return ""
     }
   },

@@ -127,9 +127,9 @@ export const createMockActionCableConsumer = () => ({
       }
 
       // Store reference for manual triggering in tests
-      ;(subscription as any).__triggerCallback = (name: string, data: any) => {
-        if ((callbacks as any)[name]) {
-          ;(callbacks as any)[name](data)
+      ;(subscription as Record<string, unknown>).__triggerCallback = (name: string, data: unknown) => {
+        if ((callbacks as Record<string, unknown>)[name]) {
+          ;((callbacks as Record<string, unknown>)[name] as (data: unknown) => void)(data)
         }
       }
 
@@ -173,7 +173,7 @@ const EnhancedTestProviders = ({
   initialCampaigns = [mockCampaign],
   mockClient = createMockClient(),
   mockLocalStorage = createMockLocalStorage(),
-  mockCookies = createMockCookies(),
+  _mockCookies = createMockCookies(),
   mockConsumer = createMockActionCableConsumer(),
   mockJWT = "test-jwt-token",
   withRealProviders = false,
@@ -198,7 +198,7 @@ const EnhancedTestProviders = ({
         JSON.stringify(initialCampaign)
       )
     }
-  }, [])
+  }, [initialCampaign, initialUser, mockJWT, mockLocalStorage])
 
   if (withRealProviders) {
     // Use real providers for integration testing
@@ -227,7 +227,7 @@ const EnhancedTestProviders = ({
   }
 
   // Mock provider context values for unit testing
-  const mockAppContextValue = {
+  const _mockAppContextValue = {
     user: initialUser,
     currentCampaign: initialCampaign,
     campaigns: initialCampaigns,
@@ -246,7 +246,7 @@ const EnhancedTestProviders = ({
     subscription: mockConsumer.subscriptions.create("CampaignChannel", {}),
   }
 
-  const mockToastContextValue = {
+  const _mockToastContextValue = {
     toast: { success: null, error: null, info: null, warning: null },
     toastSuccess: jest.fn(),
     toastError: jest.fn(),
@@ -254,7 +254,7 @@ const EnhancedTestProviders = ({
     toastWarning: jest.fn(),
   }
 
-  const mockLocalStorageContextValue = {
+  const _mockLocalStorageContextValue = {
     getLocalStorageItem: mockLocalStorage.getItem,
     setLocalStorageItem: mockLocalStorage.setItem,
     removeLocalStorageItem: mockLocalStorage.removeItem,

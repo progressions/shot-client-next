@@ -12,8 +12,8 @@ export interface EntityFilterConfig {
 interface UseEntityFiltersOptions {
   filterConfigs: EntityFilterConfig[]
   basePath: string
-  otherFilters?: Record<string, any>
-  onFiltersChange?: (filters: Record<string, any>) => void
+  otherFilters?: Record<string, unknown>
+  onFiltersChange?: (filters: Record<string, unknown>) => void
 }
 
 export function useEntityFilters({

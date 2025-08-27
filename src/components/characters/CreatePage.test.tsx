@@ -32,13 +32,13 @@ jest.mock("@/contexts", () => ({
 
 // Mock UI components
 jest.mock("@/components/ui", () => ({
-  MainHeader: ({ title, subtitle }: any) => (
+  MainHeader: ({ title, subtitle }: { title: string; subtitle: string }) => (
     <div>
       <h1>{title}</h1>
       <p>{subtitle}</p>
     </div>
   ),
-  Icon: ({ keyword }: any) => <span>Icon: {keyword}</span>,
+  Icon: ({ keyword }: { keyword: string }) => <span>Icon: {keyword}</span>,
 }))
 
 // Mock character components
@@ -49,7 +49,7 @@ jest.mock("@/components/characters/SpeedDial", () => ({
 
 jest.mock("@/components/characters/PCTemplatePreviewCard", () => ({
   __esModule: true,
-  default: ({ template, onSelect, isLoading }: any) => (
+  default: ({ template, onSelect, isLoading }: { template: unknown; onSelect: (t: unknown) => void; isLoading: boolean }) => (
     <div
       onClick={() => !isLoading && onSelect(template)}
       role="article"

@@ -26,7 +26,7 @@ export function expectAttack(
   }
 }
 
-export function expectNoChanges(initialState: any, finalState: any) {
+export function expectNoChanges<T>(initialState: T, finalState: T) {
   // Utility to verify no changes occurred
   expect(finalState).toEqual(initialState)
 }

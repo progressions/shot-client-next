@@ -150,7 +150,7 @@ export function GenericFilter({
       // Special handling for Users to show email addresses
       if (responseKey === "users") {
         const records = data[responseKey] || []
-        const userOptions = records.map((user: any) => ({
+        const userOptions = records.map((user: { id: string; name?: string; email?: string }) => ({
           id: user.id,
           name:
             user.name && user.email
