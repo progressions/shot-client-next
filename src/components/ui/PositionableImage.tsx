@@ -57,6 +57,16 @@ export function PositionableImage({
     return () => window.removeEventListener("resize", updateBoxWidth)
   }, [])
 
+  // Reset position state when image URL changes (after upload)
+  useEffect(() => {
+    const newPosition = entity.image_positions?.find(
+      pos => pos.context === context
+    ) || { x_position: 0, y_position: 0 }
+    
+    setCurrentX(newPosition.x_position)
+    setCurrentY(newPosition.y_position)
+  }, [entity.image_url, entity.image_positions, context])
+
   const boxHeight = entity.image_url ? height : 100
 
   const handleDragStart = (
