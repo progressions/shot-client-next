@@ -6,7 +6,9 @@ import type { Entity } from "@/types"
 type ImageBoxProps = {
   entity: Entity
   imgRef: React.RefObject<HTMLImageElement>
-  handleDragStart: (e: React.MouseEvent<HTMLImageElement> | React.TouchEvent<HTMLImageElement>) => void
+  handleDragStart: (
+    e: React.MouseEvent<HTMLImageElement> | React.TouchEvent<HTMLImageElement>
+  ) => void
   isRepositioning: boolean
   currentX?: number
   currentY?: number
@@ -58,7 +60,7 @@ export function ImageBox({
       onClick={handleClick}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
-      onDragStart={(e) => e.preventDefault()} // Prevent browser's default drag
+      onDragStart={e => e.preventDefault()} // Prevent browser's default drag
       draggable={false} // Disable HTML5 drag
       sx={{
         width: "100%",
@@ -66,7 +68,13 @@ export function ImageBox({
         objectFit: "cover",
         display: "block",
         transform: `translate(${currentX}px, ${currentY}px)`,
-        cursor: isRepositioning ? (isDragging ? "move" : "grab") : (onClick && !isRepositioning) ? "pointer" : "default",
+        cursor: isRepositioning
+          ? isDragging
+            ? "move"
+            : "grab"
+          : onClick && !isRepositioning
+            ? "pointer"
+            : "default",
         userSelect: "none",
         touchAction: isRepositioning ? "none" : "auto",
         WebkitUserDrag: "none", // Prevent drag on Safari/Chrome

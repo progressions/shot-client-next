@@ -37,7 +37,10 @@ export function ImageViewerModal({
   const [displayMode, setDisplayMode] = useState<DisplayMode>("fit")
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
-  const [imageNaturalSize, setImageNaturalSize] = useState({ width: 0, height: 0 })
+  const [imageNaturalSize, setImageNaturalSize] = useState({
+    width: 0,
+    height: 0,
+  })
 
   // Reset states when modal opens with new image
   useEffect(() => {
@@ -68,14 +71,17 @@ export function ImageViewerModal({
     }
   }, [open, onClose])
 
-  const handleImageLoad = useCallback((event: React.SyntheticEvent<HTMLImageElement>) => {
-    const img = event.currentTarget
-    setImageNaturalSize({
-      width: img.naturalWidth,
-      height: img.naturalHeight,
-    })
-    setIsLoading(false)
-  }, [])
+  const handleImageLoad = useCallback(
+    (event: React.SyntheticEvent<HTMLImageElement>) => {
+      const img = event.currentTarget
+      setImageNaturalSize({
+        width: img.naturalWidth,
+        height: img.naturalHeight,
+      })
+      setIsLoading(false)
+    },
+    []
+  )
 
   const handleImageError = useCallback(() => {
     setIsLoading(false)
@@ -199,7 +205,10 @@ export function ImageViewerModal({
             <ToggleButton
               value="fit"
               aria-label="Fit to screen"
-              sx={{ color: "white", "&.Mui-selected": { color: "primary.main" } }}
+              sx={{
+                color: "white",
+                "&.Mui-selected": { color: "primary.main" },
+              }}
             >
               <FitScreenIcon sx={{ mr: 0.5 }} />
               Fit to Screen
@@ -207,7 +216,10 @@ export function ImageViewerModal({
             <ToggleButton
               value="original"
               aria-label="Original size"
-              sx={{ color: "white", "&.Mui-selected": { color: "primary.main" } }}
+              sx={{
+                color: "white",
+                "&.Mui-selected": { color: "primary.main" },
+              }}
             >
               <ZoomOutMapIcon sx={{ mr: 0.5 }} />
               Original Size
@@ -251,7 +263,7 @@ export function ImageViewerModal({
             onLoad={handleImageLoad}
             onError={handleImageError}
             sx={getImageStyles()}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
             role="img"
             aria-label={`Full size view of ${altText || entity?.name || "image"}`}
           />
