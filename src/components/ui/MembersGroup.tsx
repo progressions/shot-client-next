@@ -1,7 +1,7 @@
 import { AvatarGroup, Box } from "@mui/material"
-import { EntityAvatar } from "@/components/avatars"
 import { SystemStyleObject, Theme } from "@mui/system"
 import pluralize from "pluralize"
+import { EntityAvatar } from "@/components/avatars"
 
 // Define a generic type for the items and props
 interface MembersGroupProps<T> {
@@ -36,7 +36,7 @@ export function MembersGroup<T>({ items, max = 5, sx }: MembersGroupProps<T>) {
       )}
     >
       {items.map(item => (
-        <Avatar
+        <EntityAvatar
           entity={item}
           href={
             item.id

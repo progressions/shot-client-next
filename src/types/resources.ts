@@ -269,16 +269,16 @@ export interface Person extends BaseEntity {
 }
 
 // Entity union type - all entity types that can be displayed with avatars
-export type Entity = 
-  | Campaign 
-  | Character 
-  | Fight 
-  | Site 
-  | Vehicle 
-  | Faction 
-  | Juncture 
-  | Party 
-  | Weapon 
-  | Schtick 
+export type Entity =
+  | Campaign
+  | Character
+  | Fight
+  | Site
+  | Vehicle
+  | Faction
+  | Juncture
+  | Party
+  | Weapon
+  | Schtick
   | User
   | Person
