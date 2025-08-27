@@ -1,15 +1,17 @@
 "use client"
 
 import { Avatar, Link } from "@mui/material"
-import { RefObject, useRef } from "react"
+import { RefObject, useRef, useState, useCallback } from "react"
 import type { Faction } from "@/types"
 import { SystemStyleObject, Theme } from "@mui/system"
+import { ImageViewerModal } from "@/components/ui/ImageViewerModal"
 
 interface FactionAvatarProperties {
   faction: Faction
   href?: string
   disablePopup?: boolean
   sx?: SystemStyleObject<Theme>
+  disableImageViewer?: boolean
 }
 
 const FactionAvatar = ({
@@ -17,8 +19,40 @@ const FactionAvatar = ({
   href,
   disablePopup,
   sx = {},
+  disableImageViewer = false,
 }: FactionAvatarProperties) => {
   const avatarReference: RefObject<HTMLDivElement | null> = useRef(null)
+  const [imageViewerOpen, setImageViewerOpen] = useState(false)
+
+  const handleAvatarClick = useCallback(
+    (event: React.MouseEvent) => {
+      if (!disableImageViewer && faction?.image_url) {
+        event.preventDefault()
+        event.stopPropagation()
+        setImageViewerOpen(true)
+      }
+    },
+    [faction?.image_url, disableImageViewer]
+  )
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (
+        !disableImageViewer &&
+        faction.image_url &&
+        (event.key === "Enter" || event.key === " ")
+      ) {
+        event.preventDefault()
+        event.stopPropagation()
+        setImageViewerOpen(true)
+      }
+    },
+    [faction?.image_url, disableImageViewer]
+  )
+
+  const handleCloseImageViewer = useCallback(() => {
+    setImageViewerOpen(false)
+  }, [])
 
   if (!faction?.id) {
     return <></>
@@ -31,24 +65,58 @@ const FactionAvatar = ({
         .join("")
     : ""
 
+  const hasClickableImage = !disableImageViewer && faction?.image_url
+
+  const avatarSx = {
+    ...sx,
+    ...(hasClickableImage && {
+      cursor: "pointer",
+      transition: "transform 0.2s ease, opacity 0.2s ease",
+      "&:hover": {
+        transform: "scale(1.05)",
+        opacity: 0.9,
+      },
+    }),
+  }
+
   const baseAvatar = (
     <Avatar
       alt={faction.name}
       src={faction.image_url || ""}
       ref={avatarReference}
-      data-mention-id={faction.id}
-      data-mention-class-name="Faction"
-      sx={sx}
+      sx={avatarSx}
+      onClick={hasClickableImage ? handleAvatarClick : undefined}
+      onKeyDown={hasClickableImage ? handleKeyDown : undefined}
+      role={hasClickableImage ? "button" : undefined}
+      tabIndex={hasClickableImage ? 0 : undefined}
+      aria-label={
+        hasClickableImage ? `View full image of ${faction.name}` : faction.name
+      }
     >
       {initials}
     </Avatar>
   )
 
+  const avatarWithViewer = (
+    <>
+      {baseAvatar}
+      {faction.image_url && (
+        <ImageViewerModal
+          open={imageViewerOpen}
+          onClose={handleCloseImageViewer}
+          imageUrl={faction.image_url}
+          altText={faction.name}
+          entity={faction}
+        />
+      )}
+    </>
+  )
+
   if (disablePopup) {
-    return baseAvatar
+    return avatarWithViewer
   }
 
-  if (href) {
+  if (href && !hasClickableImage) {
     return (
       <Link
         href={href}
@@ -62,7 +130,7 @@ const FactionAvatar = ({
     )
   }
 
-  return baseAvatar
+  return avatarWithViewer
 }
 
 export default FactionAvatar
