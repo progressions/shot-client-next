@@ -35,6 +35,7 @@ const mockRouter = {
 jest.mock("@/contexts", () => ({
   useClient: () => ({ client: mockClient }),
   useToast: () => mockToast,
+  useApp: () => ({ refreshUser: jest.fn() }),
 }))
 
 jest.mock("next/navigation", () => ({

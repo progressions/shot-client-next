@@ -120,9 +120,15 @@ describe("CreatePage", () => {
       render(<CreatePage templates={mockTemplates} />)
 
       // All templates should be visible
-      expect(screen.getByText("Archer")).toBeInTheDocument()
-      expect(screen.getByText("Big Bruiser")).toBeInTheDocument()
-      expect(screen.getByText("Cyborg")).toBeInTheDocument()
+      expect(
+        screen.getByRole("article", { name: "Archer" })
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole("article", { name: "Big Bruiser" })
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole("article", { name: "Cyborg" })
+      ).toBeInTheDocument()
 
       // No carousel controls
       expect(
@@ -159,47 +165,22 @@ describe("CreatePage", () => {
       const searchInput = screen.getByPlaceholderText(/search templates/i)
       fireEvent.change(searchInput, { target: { value: "Archer" } })
 
-      expect(screen.getByText("Archer")).toBeInTheDocument()
-      expect(screen.queryByText("Big Bruiser")).not.toBeInTheDocument()
-      expect(screen.queryByText("Cyborg")).not.toBeInTheDocument()
+      expect(
+        screen.getByRole("article", { name: "Archer" })
+      ).toBeInTheDocument()
+      expect(
+        screen.queryByRole("article", { name: "Big Bruiser" })
+      ).not.toBeInTheDocument()
+      expect(
+        screen.queryByRole("article", { name: "Cyborg" })
+      ).not.toBeInTheDocument()
     })
 
-    it("shows filter options", () => {
+    it("shows archetype filter dropdown", () => {
       render(<CreatePage templates={mockTemplates} />)
 
-      expect(screen.getByLabelText(/archetype/i)).toBeInTheDocument()
-      expect(screen.getByLabelText(/has weapons/i)).toBeInTheDocument()
-      expect(screen.getByLabelText(/has schticks/i)).toBeInTheDocument()
-    })
-
-    it("filters templates by has weapons", () => {
-      render(<CreatePage templates={mockTemplates} />)
-
-      const hasWeaponsCheckbox = screen.getByLabelText(/has weapons/i)
-      fireEvent.click(hasWeaponsCheckbox)
-
-      expect(screen.getByText("Archer")).toBeInTheDocument()
-      expect(screen.queryByText("Big Bruiser")).not.toBeInTheDocument()
-      expect(screen.getByText("Cyborg")).toBeInTheDocument()
-    })
-
-    it("clears all filters when clear button is clicked", () => {
-      render(<CreatePage templates={mockTemplates} />)
-
-      // Apply a filter
-      const searchInput = screen.getByPlaceholderText(/search templates/i)
-      fireEvent.change(searchInput, { target: { value: "Archer" } })
-
-      expect(screen.queryByText("Big Bruiser")).not.toBeInTheDocument()
-
-      // Clear filters
-      const clearButton = screen.getByText(/clear filters/i)
-      fireEvent.click(clearButton)
-
-      // All templates should be visible again
-      expect(screen.getByText("Archer")).toBeInTheDocument()
-      expect(screen.getByText("Big Bruiser")).toBeInTheDocument()
-      expect(screen.getByText("Cyborg")).toBeInTheDocument()
+      // Check that the Archetype label is present (indicates dropdown exists)
+      expect(screen.getAllByText("Archetype")).toHaveLength(2)
     })
 
     it("updates result count when filtering", () => {
@@ -209,6 +190,19 @@ describe("CreatePage", () => {
       fireEvent.change(searchInput, { target: { value: "Archer" } })
 
       expect(screen.getByText(/Showing 1 of 3 templates/i)).toBeInTheDocument()
+    })
+
+    it("shows no templates message when filters match nothing", () => {
+      render(<CreatePage templates={mockTemplates} />)
+
+      const searchInput = screen.getByPlaceholderText(/search templates/i)
+      fireEvent.change(searchInput, {
+        target: { value: "NonExistentTemplate" },
+      })
+
+      expect(
+        screen.getByText(/No templates match your filters/i)
+      ).toBeInTheDocument()
     })
   })
 

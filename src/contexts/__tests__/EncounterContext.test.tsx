@@ -52,6 +52,7 @@ jest.mock("@/contexts", () => ({
   useClient: () => ({ client: mockClient, user: mockUser }),
   useCampaign: () => ({ campaignData: mockCampaignData }),
   useToast: () => mockToast,
+  useApp: () => ({ refreshUser: jest.fn() }),
 }))
 
 jest.mock("next/navigation", () => ({
