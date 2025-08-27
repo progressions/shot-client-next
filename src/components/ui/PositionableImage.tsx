@@ -53,6 +53,14 @@ export function PositionableImage({
   const [currentX, setCurrentX] = useState(position.x_position)
   const [currentY, setCurrentY] = useState(position.y_position)
   
+  // Sync position state with entity data (but only when not actively repositioning)
+  useEffect(() => {
+    if (!isRepositioning && !isDragging) {
+      setCurrentX(position.x_position)
+      setCurrentY(position.y_position)
+    }
+  }, [position.x_position, position.y_position, isRepositioning, isDragging])
+  
   const [isDragging, setIsDragging] = useState(false)
 
   useEffect(() => {
