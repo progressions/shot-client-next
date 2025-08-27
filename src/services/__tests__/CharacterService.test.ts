@@ -165,7 +165,10 @@ describe("CharacterService", () => {
       })
 
       it("handles undefined skill name", () => {
-        const result = CS.skill(carolina, undefined as unknown as string | number)
+        const result = CS.skill(
+          carolina,
+          undefined as unknown as string | number
+        )
         expect(result).toBe(7) // Should return default
       })
 
@@ -445,7 +448,9 @@ describe("CharacterService", () => {
 
       it("handles null character in chain", () => {
         expect(() => {
-          CS.chain(null as unknown as string | number, [["updateActionValue", ["Toughness", 9]]])
+          CS.chain(null as unknown as string | number, [
+            ["updateActionValue", ["Toughness", 9]],
+          ])
         }).toThrow() // Should handle null character appropriately
       })
     })

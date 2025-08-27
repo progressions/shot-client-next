@@ -1,6 +1,11 @@
 "use client"
 import { GridColDef } from "@mui/x-data-grid"
-import { FormStateType, FormStateAction, WeaponsTableFormState, Weapon } from "@/types"
+import {
+  FormStateType,
+  FormStateAction,
+  WeaponsTableFormState,
+  Weapon,
+} from "@/types"
 import { BaseDataGrid, WeaponLink } from "@/components/ui"
 import { EntityAvatar } from "@/components/avatars"
 
