@@ -62,7 +62,7 @@ export function PositionableImage({
     const newPosition = entity.image_positions?.find(
       pos => pos.context === context
     ) || { x_position: 0, y_position: 0 }
-    
+
     setCurrentX(newPosition.x_position)
     setCurrentY(newPosition.y_position)
   }, [entity.image_url, entity.image_positions, context])
