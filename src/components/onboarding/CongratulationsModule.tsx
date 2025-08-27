@@ -83,9 +83,9 @@ export const CongratulationsModule: React.FC = () => {
       {/* Achievement summary */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.6 }}>
-          You&apos;ve mastered the basics of Chi War by creating your first campaign,
-          characters, factions, fights, parties, and sites. You&apos;re now ready to
-          dive into epic adventures!
+          You&apos;ve mastered the basics of Chi War by creating your first
+          campaign, characters, factions, fights, parties, and sites.
+          You&apos;re now ready to dive into epic adventures!
         </Typography>
 
         <Stack
@@ -140,7 +140,8 @@ export const CongratulationsModule: React.FC = () => {
           adventures and missions
           <br />• <strong>Build your world:</strong> Add more factions, sites,
           and campaign details
-          <br />• <strong>Have fun:</strong> You&apos;re ready to play Feng Shui 2!
+          <br />• <strong>Have fun:</strong> You&apos;re ready to play Feng Shui
+          2!
         </Typography>
       </Box>
 
