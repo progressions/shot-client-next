@@ -42,9 +42,26 @@ export function PositionableImage({
   const position = entity.image_positions?.find(
     pos => pos.context === context
   ) || { x_position: 0, y_position: 0 }
-  const [currentX, setCurrentX] = useState(position.x_position)
-  const [currentY, setCurrentY] = useState(position.y_position)
+
+  // Initialize state from calculated position
+  const [currentX, setCurrentX] = useState(() => position.x_position)
+  const [currentY, setCurrentY] = useState(() => position.y_position)
   const [isDragging, setIsDragging] = useState(false)
+
+  // Sync position state with entity data (but only when not actively repositioning or saving)
+  useEffect(() => {
+    if (!isRepositioning && !isDragging && !isSaving) {
+      setCurrentX(position.x_position)
+      setCurrentY(position.y_position)
+    }
+  }, [
+    position.x_position,
+    position.y_position,
+    isRepositioning,
+    isDragging,
+    isSaving,
+    entity.image_positions?.length,
+  ])
 
   useEffect(() => {
     const updateBoxWidth = () => {
@@ -56,6 +73,13 @@ export function PositionableImage({
     window.addEventListener("resize", updateBoxWidth)
     return () => window.removeEventListener("resize", updateBoxWidth)
   }, [])
+
+  // Re-calculate box width when image URL changes
+  useEffect(() => {
+    if (entity.image_url && imgRef.current?.parentElement) {
+      setBoxWidth(imgRef.current.parentElement.clientWidth)
+    }
+  }, [entity.image_url])
 
   const boxHeight = entity.image_url ? height : 100
 
@@ -70,6 +94,7 @@ export function PositionableImage({
     const startY = "touches" in e ? e.touches[0].clientY : e.clientY
     const startTranslateX = currentX
     const startTranslateY = currentY
+
     const { naturalWidth, naturalHeight } = imgRef.current
     const scaledWidth = boxWidth
     const scaledHeight = (naturalHeight / naturalWidth) * boxWidth
@@ -83,8 +108,11 @@ export function PositionableImage({
       const newY = startTranslateY + deltaY
       const maxX = (scaledWidth - boxWidth) / 2
       const maxY = (scaledHeight - boxHeight) / 2
-      setCurrentX(Math.max(-maxX, Math.min(maxX, newX)))
-      setCurrentY(Math.max(-maxY, Math.min(maxY, newY)))
+      const finalX = Math.max(-maxX, Math.min(maxX, newX))
+      const finalY = Math.max(-maxY, Math.min(maxY, newY))
+
+      setCurrentX(finalX)
+      setCurrentY(finalY)
     }
     const handleEnd = () => {
       setIsDragging(false)
@@ -110,8 +138,30 @@ export function PositionableImage({
         y_position: currentY,
         context,
       })
+
+      // Update local state with saved position
       setCurrentX(response.data.x_position)
       setCurrentY(response.data.y_position)
+
+      // Update the entity's image_positions array if setEntity is provided
+      if (setEntity && response.data) {
+        const updatedPositions = entity.image_positions || []
+        const existingIndex = updatedPositions.findIndex(
+          pos => pos.context === context
+        )
+
+        if (existingIndex >= 0) {
+          updatedPositions[existingIndex] = response.data
+        } else {
+          updatedPositions.push(response.data)
+        }
+
+        setEntity({
+          ...entity,
+          image_positions: updatedPositions,
+        })
+      }
+
       setIsRepositioning(false)
       toastSuccess("Image position saved successfully")
     } catch (err: unknown) {
