@@ -125,7 +125,8 @@ export default function View({ formState, dispatchForm }: ViewProps) {
       editable: false,
       sortable: false,
       renderCell: params => {
-        const isActive = params.row.id === currentCampaign?.id
+        const isCurrentCampaign = params.row.id === currentCampaign?.id
+        const isActive = params.row.active !== false // active can be true or null/undefined
         return (
           <Box
             sx={{
@@ -135,13 +136,15 @@ export default function View({ formState, dispatchForm }: ViewProps) {
               height: "100%",
             }}
           >
-            {isActive ? (
+            {isCurrentCampaign ? (
               <Chip
                 icon={<CheckCircle />}
-                label="Active"
+                label="Current"
                 color="success"
                 size="small"
               />
+            ) : isActive ? (
+              <Chip label="Active" color="primary" size="small" />
             ) : (
               <Chip label="Inactive" color="default" size="small" />
             )}
