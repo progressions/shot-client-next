@@ -246,10 +246,15 @@ export interface Person extends BaseEntity {
   action_values: ActionValues
   description: DescriptionValues
   schticks: Schtick[]
+  schtick_ids?: string[]
   skills: SkillValues
   advancements: Advancement[]
+  advancement_ids?: string[]
   sites: Site[]
+  site_ids?: string[]
   weapons: Weapon[]
+  weapon_ids?: string[]
+  party_ids?: string[]
   user?: User
   user_id: string
   created_at: string
@@ -266,6 +271,7 @@ export interface Person extends BaseEntity {
   wealth: string
   juncture_id: string | null
   juncture: Juncture | null
+  is_template?: boolean
 }
 
 // Entity union type - all entity types that can be displayed with avatars

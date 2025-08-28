@@ -41,7 +41,7 @@ export function ListManager({
   const collection = collectionNames[childEntityName]
   const pluralChildEntityName = pluralize(childEntityName)
   const [childEntities, setChildEntities] = useState(
-    parentEntity.characters || []
+    parentEntity[collection] || []
   )
   const { client } = useClient()
   const [currentPage, setCurrentPage] = useState(1)
