@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import { FormControl, FormHelperText, Box } from "@mui/material"
 import type { Schtick } from "@/types"
-import { useCampaign } from "@/contexts"
+import { useCampaign, useClient } from "@/contexts"
 import { EditCategoryPath, SchtickChips } from "@/components/schticks"
 import {
   Alert,
@@ -15,6 +15,7 @@ import {
   InfoLink,
   Icon,
 } from "@/components/ui"
+import { EntityActiveToggle } from "@/components/common"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -29,7 +30,8 @@ type FormStateData = {
 }
 
 export default function Show({ schtick: initialSchtick }: ShowProperties) {
-  const { subscribeToEntity } = useCampaign()
+  const { subscribeToEntity, campaign } = useCampaign()
+  const { user } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialSchtick,
   })
@@ -104,6 +106,20 @@ export default function Show({ schtick: initialSchtick }: ShowProperties) {
         onChange={handleChangeAndSave}
         fallback="No description available."
       />
+      {(user?.admin || (campaign && user?.id === campaign.gamemaster_id)) && (
+        <>
+          <SectionHeader
+            title="Administrative Controls"
+            icon={<Icon keyword="Administration" />}
+          >
+            Manage the visibility and status of this schtick.
+          </SectionHeader>
+          <EntityActiveToggle
+            entity={schtick}
+            handleChangeAndSave={handleChangeAndSave}
+          />
+        </>
+      )}
     </Box>
   )
 }

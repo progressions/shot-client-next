@@ -4,7 +4,7 @@ import { VscGithubAction } from "react-icons/vsc"
 import { useEffect } from "react"
 import { FormControl, FormHelperText, Box } from "@mui/material"
 import type { Weapon } from "@/types"
-import { useCampaign } from "@/contexts"
+import { useCampaign, useClient } from "@/contexts"
 import { WeaponChips, Stats, EditJunctureCategory } from "@/components/weapons"
 import { useToast } from "@/contexts"
 import {
@@ -14,7 +14,9 @@ import {
   HeroImage,
   SpeedDialMenu,
   NameEditor,
+  Icon,
 } from "@/components/ui"
+import { EntityActiveToggle } from "@/components/common"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -55,7 +57,8 @@ type FormStateData = {
 }
 
 export default function Show({ weapon: initialWeapon }: ShowProperties) {
-  const { subscribeToEntity } = useCampaign()
+  const { subscribeToEntity, campaign } = useCampaign()
+  const { user } = useClient()
   const { toastError } = useToast()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialWeapon,
@@ -160,6 +163,20 @@ export default function Show({ weapon: initialWeapon }: ShowProperties) {
         updateWeapon={updateEntity}
         state={formState}
       />
+      {(user?.admin || (campaign && user?.id === campaign.gamemaster_id)) && (
+        <>
+          <SectionHeader
+            title="Administrative Controls"
+            icon={<Icon keyword="Administration" />}
+          >
+            Manage the visibility and status of this weapon.
+          </SectionHeader>
+          <EntityActiveToggle
+            entity={weapon}
+            handleChangeAndSave={handleChangeAndSave}
+          />
+        </>
+      )}
     </Box>
   )
 }

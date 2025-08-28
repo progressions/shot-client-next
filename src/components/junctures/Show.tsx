@@ -3,7 +3,7 @@
 import { useCallback, useEffect } from "react"
 import { Stack, Box } from "@mui/material"
 import type { Juncture } from "@/types"
-import { useCampaign } from "@/contexts"
+import { useCampaign, useClient } from "@/contexts"
 import {
   Alert,
   Manager,
@@ -15,6 +15,7 @@ import {
   InfoLink,
   Icon,
 } from "@/components/ui"
+import { EntityActiveToggle } from "@/components/common"
 import { useEntity } from "@/hooks"
 import { EditFaction } from "@/components/factions"
 import { FormActions, useForm } from "@/reducers"
@@ -30,7 +31,8 @@ type FormStateData = {
 }
 
 export default function Show({ juncture: initialJuncture }: ShowProperties) {
-  const { subscribeToEntity } = useCampaign()
+  const { subscribeToEntity, campaign } = useCampaign()
+  const { user } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialJuncture,
   })
@@ -138,6 +140,20 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
           onListUpdate={updateEntity}
         />
       </Stack>
+      {(user?.admin || (campaign && user?.id === campaign.gamemaster_id)) && (
+        <>
+          <SectionHeader
+            title="Administrative Controls"
+            icon={<Icon keyword="Administration" />}
+          >
+            Manage the visibility and status of this juncture.
+          </SectionHeader>
+          <EntityActiveToggle
+            entity={juncture}
+            handleChangeAndSave={handleChangeAndSave}
+          />
+        </>
+      )}
     </Box>
   )
 }

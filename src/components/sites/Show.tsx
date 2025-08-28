@@ -3,7 +3,7 @@
 import { useCallback, useEffect } from "react"
 import { FormControl, FormHelperText, Stack, Box } from "@mui/material"
 import type { Site } from "@/types"
-import { useCampaign } from "@/contexts"
+import { useCampaign, useClient } from "@/contexts"
 import {
   Manager,
   Icon,
@@ -15,6 +15,7 @@ import {
   HeroImage,
   SpeedDialMenu,
 } from "@/components/ui"
+import { EntityActiveToggle } from "@/components/common"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import { EditFaction } from "@/components/factions"
@@ -30,7 +31,8 @@ type FormStateData = {
 }
 
 export default function Show({ site: initialSite }: ShowProperties) {
-  const { subscribeToEntity } = useCampaign()
+  const { subscribeToEntity, campaign } = useCampaign()
+  const { user } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialSite,
   })
@@ -41,6 +43,10 @@ export default function Show({ site: initialSite }: ShowProperties) {
     site,
     dispatchForm
   )
+
+  // Check permissions for administrative controls
+  const hasAdminPermission =
+    user?.admin || (campaign && user?.id === campaign.gamemaster_id)
 
   const setSite = useCallback(
     (site: Site) => {
@@ -136,6 +142,21 @@ export default function Show({ site: initialSite }: ShowProperties) {
           onListUpdate={updateEntity}
         />
       </Stack>
+
+      {hasAdminPermission && (
+        <>
+          <SectionHeader
+            title="Administrative Controls"
+            icon={<Icon keyword="Administration" />}
+          >
+            Manage the visibility and status of this site.
+          </SectionHeader>
+          <EntityActiveToggle
+            entity={site}
+            handleChangeAndSave={handleChangeAndSave}
+          />
+        </>
+      )}
     </Box>
   )
 }
