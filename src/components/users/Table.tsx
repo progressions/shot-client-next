@@ -1,5 +1,6 @@
 "use client"
 import { GridColDef } from "@mui/x-data-grid"
+import { Box } from "@mui/material"
 import { UserTableProps } from "@/types"
 import { BaseDataGrid, UserLink } from "@/components/ui"
 import { EntityAvatar } from "@/components/avatars"
@@ -11,7 +12,11 @@ const columns: GridColDef<User>[] = [
     width: 70,
     editable: false,
     sortable: false,
-    renderCell: params => <EntityAvatar entity={params.row} />,
+    renderCell: params => (
+      <Box sx={{ display: "flex", alignItems: "center", height: "100%" }}>
+        <EntityAvatar entity={params.row} />
+      </Box>
+    ),
   },
   {
     field: "email",
