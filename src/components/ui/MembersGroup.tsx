@@ -11,7 +11,12 @@ interface MembersGroupProps<T> {
   disableImageViewer?: boolean
 }
 
-export function MembersGroup<T>({ items, max = 5, sx, disableImageViewer = true }: MembersGroupProps<T>) {
+export function MembersGroup<T>({
+  items,
+  max = 5,
+  sx,
+  disableImageViewer = true,
+}: MembersGroupProps<T>) {
   return (
     <AvatarGroup
       sx={sx}
