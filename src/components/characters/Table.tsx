@@ -12,6 +12,7 @@ import {
   FactionLink,
   CharacterLink,
 } from "@/components/ui"
+import { Box } from "@mui/material"
 import { CS } from "@/services"
 import { EntityAvatar } from "@/components/avatars"
 
@@ -27,7 +28,11 @@ const columns: GridColDef<Character>[] = [
     width: 70,
     editable: false,
     sortable: false,
-    renderCell: params => <EntityAvatar entity={params.row} />,
+    renderCell: params => (
+      <Box sx={{ display: "flex", alignItems: "center", height: "100%" }}>
+        <EntityAvatar entity={params.row} />
+      </Box>
+    ),
   },
   {
     field: "name",

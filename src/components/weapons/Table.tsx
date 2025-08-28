@@ -1,5 +1,6 @@
 "use client"
 import { GridColDef } from "@mui/x-data-grid"
+import { Box } from "@mui/material"
 import {
   FormStateType,
   FormStateAction,
@@ -21,7 +22,11 @@ const columns: GridColDef<Weapon>[] = [
     width: 70,
     editable: false,
     sortable: false,
-    renderCell: params => <EntityAvatar entity={params.row} />,
+    renderCell: params => (
+      <Box sx={{ display: "flex", alignItems: "center", height: "100%" }}>
+        <EntityAvatar entity={params.row} />
+      </Box>
+    ),
   },
   {
     field: "name",

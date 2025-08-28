@@ -1,5 +1,6 @@
 "use client"
 import { GridColDef } from "@mui/x-data-grid"
+import { Box } from "@mui/material"
 import { FightTableProps } from "@/types"
 import { MembersGroup, BaseDataGrid, FightLink } from "@/components/ui"
 import { EntityAvatar } from "@/components/avatars"
@@ -11,7 +12,11 @@ const columns: GridColDef<Fight>[] = [
     width: 70,
     editable: false,
     sortable: false,
-    renderCell: params => <EntityAvatar entity={params.row} />,
+    renderCell: params => (
+      <Box sx={{ display: "flex", alignItems: "center", height: "100%" }}>
+        <EntityAvatar entity={params.row} />
+      </Box>
+    ),
   },
   {
     field: "name",
@@ -42,11 +47,9 @@ const columns: GridColDef<Fight>[] = [
     editable: false,
     sortable: false,
     renderCell: params => (
-      <MembersGroup
-        items={params.row.characters || []}
-        max={3}
-        sx={{ mt: 1 }}
-      />
+      <Box sx={{ display: "flex", alignItems: "center", height: "100%" }}>
+        <MembersGroup items={params.row.characters || []} max={3} />
+      </Box>
     ),
   },
   {
