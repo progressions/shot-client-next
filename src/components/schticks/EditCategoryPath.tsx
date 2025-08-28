@@ -28,7 +28,6 @@ interface EditCategoryPathProps {
   errors?: Record<string, string> // For form mode
 }
 
-
 export default function EditCategoryPath({
   schtick,
   updateEntity,

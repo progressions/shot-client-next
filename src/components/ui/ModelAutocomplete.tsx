@@ -1,9 +1,5 @@
 "use client"
-import {
-  Autocomplete,
-  TextField,
-  CircularProgress,
-} from "@mui/material"
+import { Autocomplete, TextField, CircularProgress } from "@mui/material"
 import { useClient } from "@/contexts"
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { debounce } from "lodash"
@@ -47,51 +43,62 @@ export function ModelAutocomplete({
 
   const noneOption: AutocompleteOption = { id: NONE_VALUE, name: "None" }
 
-  const fetchRecords = useCallback(
-    async () => {
-      if (disabled || (!model && !records?.length)) {
+  const fetchRecords = useCallback(async () => {
+    if (disabled || (!model && !records?.length)) {
+      return
+    }
+
+    setLoading(true)
+    try {
+      const pluralModel = pluralize(model.toLowerCase())
+      let response: any
+
+      const clientMethod = (client as any)[pluralModel]
+      if (typeof clientMethod === "object" && "index" in clientMethod) {
+        response = await clientMethod.index({
+          filters: filters || {},
+        })
+      } else if (
+        typeof client[pluralModel as keyof typeof client] === "function"
+      ) {
+        response = await (client as any)[pluralModel]({
+          filters: filters || {},
+        })
+      } else {
+        console.warn(`No client method found for ${pluralModel}`)
+        setOptions(
+          allowNone
+            ? [noneOption, ...(records as AutocompleteOption[])]
+            : (records as AutocompleteOption[])
+        )
+        setLoading(false)
         return
       }
 
-      setLoading(true)
-      try {
-        const pluralModel = pluralize(model.toLowerCase())
-        let response: any
-
-        const clientMethod = (client as any)[pluralModel]
-        if (typeof clientMethod === "object" && "index" in clientMethod) {
-          response = await clientMethod.index({
-            filters: filters || {},
-          })
-        } else if (typeof client[pluralModel as keyof typeof client] === "function") {
-          response = await (client as any)[pluralModel]({
-            filters: filters || {},
-          })
-        } else {
-          console.warn(`No client method found for ${pluralModel}`)
-          setOptions(allowNone ? [noneOption, ...(records as AutocompleteOption[])] : (records as AutocompleteOption[]))
-          setLoading(false)
-          return
-        }
-
-        if (response?.data) {
-          const newOptions = response.data.map((record: any) => ({
-            id: record.id,
-            name: record.name || record.title || record.id,
-          }))
-          setOptions(allowNone ? [noneOption, ...newOptions] : newOptions)
-        } else {
-          setOptions(allowNone ? [noneOption, ...(records as AutocompleteOption[])] : (records as AutocompleteOption[]))
-        }
-      } catch (error) {
-        console.error(`Error fetching ${model} records:`, error)
-        setOptions(allowNone ? [noneOption, ...(records as AutocompleteOption[])] : (records as AutocompleteOption[]))
-      } finally {
-        setLoading(false)
+      if (response?.data) {
+        const newOptions = response.data.map((record: any) => ({
+          id: record.id,
+          name: record.name || record.title || record.id,
+        }))
+        setOptions(allowNone ? [noneOption, ...newOptions] : newOptions)
+      } else {
+        setOptions(
+          allowNone
+            ? [noneOption, ...(records as AutocompleteOption[])]
+            : (records as AutocompleteOption[])
+        )
       }
-    },
-    [client, model, filters, records, allowNone, disabled]
-  )
+    } catch (error) {
+      console.error(`Error fetching ${model} records:`, error)
+      setOptions(
+        allowNone
+          ? [noneOption, ...(records as AutocompleteOption[])]
+          : (records as AutocompleteOption[])
+      )
+    } finally {
+      setLoading(false)
+    }
+  }, [client, model, filters, records, allowNone, disabled])
 
   const debouncedFetch = useMemo(
     () => debounce(fetchRecords, 100),

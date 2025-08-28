@@ -37,7 +37,7 @@ export function StringAutocomplete({
   disabled = false,
 }: StringAutocompleteProps) {
   const noneOption: AutocompleteOption = { id: NONE_VALUE, name: "None" }
-  
+
   const options = useMemo(() => {
     const opts = allowNone
       ? [
@@ -55,7 +55,7 @@ export function StringAutocomplete({
           }))
     return opts
   }, [records, allowNone])
-  
+
   return (
     <Autocomplete
       options={options}
