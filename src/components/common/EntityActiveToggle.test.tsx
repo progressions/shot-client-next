@@ -196,10 +196,10 @@ describe("EntityActiveToggle", () => {
       const toggle = screen.getByRole("checkbox", {
         name: /Toggle Character active status/i,
       })
-      
+
       // Initially should be checked
       expect(toggle).toBeChecked()
-      
+
       fireEvent.click(toggle)
 
       // Wait for the error to be handled
@@ -229,18 +229,18 @@ describe("EntityActiveToggle", () => {
       const toggle = screen.getByRole("checkbox", {
         name: /Toggle Character active status/i,
       })
-      
+
       // Initially should be enabled
       expect(toggle).not.toBeDisabled()
-      
+
       fireEvent.click(toggle)
 
       // Should be disabled during update
       expect(toggle).toBeDisabled()
-      
+
       // Resolve the promise to complete the update
       resolvePromise()
-      
+
       // Wait for loading to finish
       await waitFor(() => {
         expect(mockToastSuccess).toHaveBeenCalled()
