@@ -90,6 +90,7 @@ export function ForgotPasswordClient() {
                 border: "none",
                 cursor: "pointer",
                 padding: 0,
+                font: "inherit",
               }}
               onClick={() => {
                 setSuccess(false)

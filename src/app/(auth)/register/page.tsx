@@ -6,7 +6,6 @@ import {
   Box,
   Container,
   Typography,
-  Link as MuiLink,
   Alert,
 } from "@mui/material"
 import Link from "next/link"
@@ -75,17 +74,23 @@ export default function RegisterPage() {
             <Box sx={{ mt: 3, textAlign: "center" }}>
               <Typography variant="body2" sx={{ color: "#cccccc" }}>
                 Already have an account?{" "}
-                <Link href="/login" passHref>
-                  <MuiLink
+                <Link
+                  href="/login"
+                  style={{
+                    color: "inherit",
+                    textDecoration: "none",
+                  }}
+                >
+                  <Typography
                     component="span"
                     sx={{
                       color: "primary.main",
                       textDecoration: "none",
                       "&:hover": { textDecoration: "underline" },
-                    }
+                    }}
                   >
                     Sign in
-                  </MuiLink>
+                  </Typography>
                 </Link>
               </Typography>
             </Box>
