@@ -51,17 +51,50 @@ export function ModelAutocomplete({
     setLoading(true)
     try {
       const pluralModel = pluralize(model.toLowerCase())
-      let response: { data?: Array<{ id: number | string; name?: string; title?: string }> } | undefined
+      let response:
+        | {
+            data?: Array<{ id: number | string; name?: string; title?: string }>
+          }
+        | undefined
 
       const clientMethod = (client as Record<string, unknown>)[pluralModel]
-      if (typeof clientMethod === "object" && clientMethod !== null && "index" in clientMethod) {
-        response = await (clientMethod as { index: (params: { filters: Record<string, unknown> }) => Promise<{ data?: Array<{ id: number | string; name?: string; title?: string }> }> }).index({
+      if (
+        typeof clientMethod === "object" &&
+        clientMethod !== null &&
+        "index" in clientMethod
+      ) {
+        response = await (
+          clientMethod as {
+            index: (params: {
+              filters: Record<string, unknown>
+            }) => Promise<{
+              data?: Array<{
+                id: number | string
+                name?: string
+                title?: string
+              }>
+            }>
+          }
+        ).index({
           filters: filters || {},
         })
       } else if (
         typeof client[pluralModel as keyof typeof client] === "function"
       ) {
-        response = await (client as Record<string, (params: { filters: Record<string, unknown> }) => Promise<{ data?: Array<{ id: number | string; name?: string; title?: string }> }>>)[pluralModel]({
+        response = await (
+          client as Record<
+            string,
+            (params: {
+              filters: Record<string, unknown>
+            }) => Promise<{
+              data?: Array<{
+                id: number | string
+                name?: string
+                title?: string
+              }>
+            }>
+          >
+        )[pluralModel]({
           filters: filters || {},
         })
       } else {
@@ -76,7 +109,7 @@ export function ModelAutocomplete({
       }
 
       if (response?.data) {
-        const newOptions = response.data.map((record) => ({
+        const newOptions = response.data.map(record => ({
           id: record.id,
           name: record.name || record.title || String(record.id),
         }))
