@@ -8,8 +8,7 @@ import {
   Typography,
   Divider,
 } from "@mui/material"
-import { InfoLink, SectionHeader } from "@/components/ui"
-import { createStringAutocomplete } from "@/components/ui"
+import { InfoLink, SectionHeader, StringAutocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
 import { useState, useCallback, useEffect } from "react"
 import { useForm, FormActions } from "@/reducers"
@@ -28,9 +27,6 @@ interface EditCategoryPathProps {
   state?: { saving: boolean; errors: Record<string, string> } // Optional for forms
   errors?: Record<string, string> // For form mode
 }
-
-const CategoryAutocomplete = createStringAutocomplete("Category")
-const PathAutocomplete = createStringAutocomplete("Path")
 
 export default function EditCategoryPath({
   schtick,
@@ -184,7 +180,8 @@ export default function EditCategoryPath({
       </SectionHeader>
       <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
         <FormControl fullWidth error={!!actualErrors.category}>
-          <CategoryAutocomplete
+          <StringAutocomplete
+            model="Category"
             value={category || ""}
             onChange={handleCategoryChange}
             records={categories}
@@ -222,10 +219,10 @@ export default function EditCategoryPath({
               </Typography>
             </Box>
           ) : category ? (
-            <PathAutocomplete
+            <StringAutocomplete
+              model="Path"
               value={path || ""}
               onChange={handlePathChange}
-              fetchOptions={fetchPaths}
               records={paths}
               sx={{ width: "100%" }}
               allowNone={false}
