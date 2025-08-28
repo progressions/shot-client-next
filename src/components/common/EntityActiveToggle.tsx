@@ -5,24 +5,25 @@ import { Switch, FormControlLabel, CircularProgress, Box } from "@mui/material"
 import { useClient, useCampaign, useToast } from "@/contexts"
 
 interface EntityActiveToggleProps {
-  entityType: string
-  entityId: string
-  currentActive: boolean
+  entity: {
+    id: string
+    entity_class: string
+    active?: boolean
+  }
   handleChangeAndSave: (
     event: React.ChangeEvent<HTMLInputElement>
   ) => Promise<void>
 }
 
 export function EntityActiveToggle({
-  entityType,
-  currentActive,
+  entity,
   handleChangeAndSave,
 }: EntityActiveToggleProps) {
   const { user } = useClient()
   const { campaign } = useCampaign()
   const { toastSuccess, toastError } = useToast()
 
-  const [isActive, setIsActive] = useState(currentActive)
+  const [isActive, setIsActive] = useState(entity.active ?? true)
   const [loading, setLoading] = useState(false)
 
   const handleToggle = useCallback(
@@ -45,17 +46,17 @@ export function EntityActiveToggle({
         } as React.ChangeEvent<HTMLInputElement>
 
         await handleChangeAndSave(syntheticEvent)
-        toastSuccess(`${entityType} updated successfully`)
+        toastSuccess(`${entity.entity_class} updated successfully`)
       } catch (error) {
         // Revert on error
         setIsActive(!newValue)
-        toastError(`Failed to update ${entityType}`)
+        toastError(`Failed to update ${entity.entity_class}`)
         console.error("Error updating entity active status:", error)
       } finally {
         setLoading(false)
       }
     },
-    [entityType, handleChangeAndSave, toastSuccess, toastError]
+    [entity.entity_class, handleChangeAndSave, toastSuccess, toastError]
   )
 
   // Check permissions: admin OR gamemaster of current campaign
@@ -77,7 +78,7 @@ export function EntityActiveToggle({
             disabled={loading}
             name="active"
             inputProps={{
-              "aria-label": `Toggle ${entityType} active status`,
+              "aria-label": `Toggle ${entity.entity_class} active status`,
               role: "checkbox",
             }}
           />

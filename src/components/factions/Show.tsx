@@ -135,9 +135,7 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
             Manage the visibility and status of this faction.
           </SectionHeader>
           <EntityActiveToggle
-            entityType="Faction"
-            entityId={faction.id}
-            currentActive={faction.active ?? true}
+            entity={faction}
             handleChangeAndSave={handleChangeAndSave}
           />
         </>

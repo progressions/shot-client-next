@@ -115,9 +115,7 @@ export default function Show({ schtick: initialSchtick }: ShowProperties) {
             Manage the visibility and status of this schtick.
           </SectionHeader>
           <EntityActiveToggle
-            entityType="Schtick"
-            entityId={schtick.id}
-            currentActive={schtick.active ?? true}
+            entity={schtick}
             handleChangeAndSave={handleChangeAndSave}
           />
         </>

@@ -316,9 +316,7 @@ export default function Show({ fight: initialFight }: ShowProperties) {
             Manage the visibility and status of this fight.
           </SectionHeader>
           <EntityActiveToggle
-            entityType="Fight"
-            entityId={fight.id}
-            currentActive={fight.active ?? true}
+            entity={fight}
             handleChangeAndSave={handleChangeAndSave}
           />
         </>

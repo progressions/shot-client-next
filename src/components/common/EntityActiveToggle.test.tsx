@@ -35,9 +35,7 @@ describe("EntityActiveToggle", () => {
     it("should not render for regular users", () => {
       render(
         <EntityActiveToggle
-          entityType="Character"
-          entityId="123"
-          currentActive={true}
+          entity={{ id: "123", entity_class: "Character", active: true }}
           handleChangeAndSave={mockHandleChangeAndSave}
         />
       )
@@ -50,9 +48,7 @@ describe("EntityActiveToggle", () => {
 
       render(
         <EntityActiveToggle
-          entityType="Character"
-          entityId="123"
-          currentActive={true}
+          entity={{ id: "123", entity_class: "Character", active: true }}
           handleChangeAndSave={mockHandleChangeAndSave}
         />
       )
@@ -67,9 +63,7 @@ describe("EntityActiveToggle", () => {
 
       render(
         <EntityActiveToggle
-          entityType="Character"
-          entityId="123"
-          currentActive={true}
+          entity={{ id: "123", entity_class: "Character", active: true }}
           handleChangeAndSave={mockHandleChangeAndSave}
         />
       )
@@ -84,9 +78,7 @@ describe("EntityActiveToggle", () => {
 
       render(
         <EntityActiveToggle
-          entityType="Character"
-          entityId="123"
-          currentActive={false}
+          entity={{ id: "123", entity_class: "Character", active: false }}
           handleChangeAndSave={mockHandleChangeAndSave}
         />
       )
@@ -103,9 +95,7 @@ describe("EntityActiveToggle", () => {
     it("should display correct initial state when active", () => {
       render(
         <EntityActiveToggle
-          entityType="Character"
-          entityId="123"
-          currentActive={true}
+          entity={{ id: "123", entity_class: "Character", active: true }}
           handleChangeAndSave={mockHandleChangeAndSave}
         />
       )
@@ -117,9 +107,7 @@ describe("EntityActiveToggle", () => {
     it("should display correct initial state when inactive", () => {
       render(
         <EntityActiveToggle
-          entityType="Character"
-          entityId="123"
-          currentActive={false}
+          entity={{ id: "123", entity_class: "Character", active: false }}
           handleChangeAndSave={mockHandleChangeAndSave}
         />
       )
@@ -133,9 +121,7 @@ describe("EntityActiveToggle", () => {
 
       render(
         <EntityActiveToggle
-          entityType="Character"
-          entityId="123"
-          currentActive={true}
+          entity={{ id: "123", entity_class: "Character", active: true }}
           handleChangeAndSave={mockHandleChangeAndSave}
         />
       )
@@ -160,9 +146,7 @@ describe("EntityActiveToggle", () => {
 
       render(
         <EntityActiveToggle
-          entityType="Character"
-          entityId="123"
-          currentActive={true}
+          entity={{ id: "123", entity_class: "Character", active: true }}
           handleChangeAndSave={mockHandleChangeAndSave}
         />
       )
@@ -182,9 +166,7 @@ describe("EntityActiveToggle", () => {
 
       render(
         <EntityActiveToggle
-          entityType="Character"
-          entityId="123"
-          currentActive={true}
+          entity={{ id: "123", entity_class: "Character", active: true }}
           handleChangeAndSave={mockHandleChangeAndSave}
         />
       )
@@ -211,9 +193,7 @@ describe("EntityActiveToggle", () => {
 
       render(
         <EntityActiveToggle
-          entityType="Character"
-          entityId="123"
-          currentActive={true}
+          entity={{ id: "123", entity_class: "Character", active: true }}
           handleChangeAndSave={mockHandleChangeAndSave}
         />
       )
@@ -246,9 +226,7 @@ describe("EntityActiveToggle", () => {
 
       render(
         <EntityActiveToggle
-          entityType="Character"
-          entityId="123"
-          currentActive={true}
+          entity={{ id: "123", entity_class: "Character", active: true }}
           handleChangeAndSave={mockHandleChangeAndSave}
         />
       )

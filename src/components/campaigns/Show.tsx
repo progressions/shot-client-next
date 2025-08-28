@@ -137,9 +137,7 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
             Manage the visibility and status of this campaign.
           </SectionHeader>
           <EntityActiveToggle
-            entityType="Campaign"
-            entityId={campaign.id}
-            currentActive={campaign.active ?? true}
+            entity={campaign}
             handleChangeAndSave={handleChangeAndSave}
           />
         </>

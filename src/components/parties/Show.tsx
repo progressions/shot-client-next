@@ -147,9 +147,7 @@ export default function Show({ party: initialParty }: ShowProperties) {
             Manage the visibility and status of this party.
           </SectionHeader>
           <EntityActiveToggle
-            entityType="Party"
-            entityId={party.id}
-            currentActive={party.active ?? true}
+            entity={party}
             handleChangeAndSave={handleChangeAndSave}
           />
         </>

@@ -149,9 +149,7 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
             Manage the visibility and status of this juncture.
           </SectionHeader>
           <EntityActiveToggle
-            entityType="Juncture"
-            entityId={juncture.id}
-            currentActive={juncture.active ?? true}
+            entity={juncture}
             handleChangeAndSave={handleChangeAndSave}
           />
         </>

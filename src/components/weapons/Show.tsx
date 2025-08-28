@@ -172,9 +172,7 @@ export default function Show({ weapon: initialWeapon }: ShowProperties) {
             Manage the visibility and status of this weapon.
           </SectionHeader>
           <EntityActiveToggle
-            entityType="Weapon"
-            entityId={weapon.id}
-            currentActive={weapon.active ?? true}
+            entity={weapon}
             handleChangeAndSave={handleChangeAndSave}
           />
         </>

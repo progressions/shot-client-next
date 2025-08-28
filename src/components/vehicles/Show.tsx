@@ -124,9 +124,7 @@ export default function Show({ vehicle: initialVehicle }: ShowProperties) {
             Manage the visibility and status of this vehicle.
           </SectionHeader>
           <EntityActiveToggle
-            entityType="Vehicle"
-            entityId={vehicle.id}
-            currentActive={vehicle.active ?? true}
+            entity={vehicle}
             handleChangeAndSave={handleChangeAndSave}
           />
         </>

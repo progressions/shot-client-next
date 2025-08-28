@@ -225,9 +225,7 @@ export default function Show({
             Manage the visibility and status of this character.
           </SectionHeader>
           <EntityActiveToggle
-            entityType="Character"
-            entityId={memoizedCharacter.id}
-            currentActive={memoizedCharacter.active ?? true}
+            entity={memoizedCharacter}
             handleChangeAndSave={handleChangeAndSave}
           />
         </>

@@ -152,9 +152,7 @@ export default function Show({ site: initialSite }: ShowProperties) {
             Manage the visibility and status of this site.
           </SectionHeader>
           <EntityActiveToggle
-            entityType="Site"
-            entityId={site.id}
-            currentActive={site.active ?? true}
+            entity={site}
             handleChangeAndSave={handleChangeAndSave}
           />
         </>
