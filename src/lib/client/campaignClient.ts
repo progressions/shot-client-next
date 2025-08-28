@@ -124,9 +124,10 @@ export function createCampaignClient(deps: ClientDependencies) {
   }
 
   async function deleteCampaign(
-    campaign: Campaign
+    campaign: Campaign,
+    params = {}
   ): Promise<AxiosResponse<void>> {
-    return delete_(apiV2.campaigns(campaign))
+    return delete_(apiV2.campaigns(campaign), params)
   }
 
   async function setCurrentCampaign(

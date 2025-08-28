@@ -12,9 +12,10 @@ import {
 import type { Campaign } from "@/types"
 import Link from "next/link"
 import { CampaignDescription } from "@/components/campaigns"
-import { useCampaign, useClient } from "@/contexts"
+import { useCampaign, useClient, useToast } from "@/contexts"
 import { UserName } from "@/components/names"
 import DetailButtons from "@/components/DetailButtons"
+import { handleEntityDeletion } from "@/lib/deletionHandler"
 
 interface CampaignDetailProperties {
   campaign: Campaign
@@ -29,6 +30,7 @@ export default function CampaignDetail({
 }: CampaignDetailProperties) {
   const { user, client } = useClient()
   const { subscribeToEntity } = useCampaign()
+  const { toastSuccess, toastError } = useToast()
   const [error, setError] = useState<string | null>(null)
   const [campaign, setCampaign] = useState<Campaign>(initialCampaign)
 
@@ -47,23 +49,19 @@ export default function CampaignDetail({
 
   const handleDelete = async () => {
     if (!campaign?.id) return
-    if (
-      !confirm(
-        `Are you sure you want to delete the campaign: ${campaign.name}?`
-      )
-    )
-      return
-
-    try {
-      await client.deleteCampaign(campaign)
-      onDelete(campaign.id)
-      setError(null)
-    } catch (error_) {
-      setError(
-        error_ instanceof Error ? error_.message : "Failed to delete campaign"
-      )
-      console.error("Delete campaign error:", error_)
-    }
+    
+    await handleEntityDeletion(campaign, client.deleteCampaign, {
+      entityName: "campaign",
+      onSuccess: () => {
+        onDelete(campaign.id)
+        setError(null)
+        toastSuccess("Campaign deleted successfully")
+      },
+      onError: (message) => {
+        setError(message)
+        toastError(message)
+      }
+    })
   }
 
   const handleEdit = () => {

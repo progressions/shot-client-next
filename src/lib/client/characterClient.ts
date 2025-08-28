@@ -169,11 +169,12 @@ export function createCharacterClient(deps: ClientDependencies) {
 
   async function deleteCharacter(
     character: Character,
-    fight?: Fight | null
+    fight?: Fight | null,
+    params = {}
   ): Promise<AxiosResponse<void>> {
     return fight?.id
-      ? delete_(api.characters(fight, { id: character.shot_id } as Character))
-      : delete_(apiV2.characters(character))
+      ? delete_(api.characters(fight, { id: character.shot_id } as Character), params)
+      : delete_(apiV2.characters(character), params)
   }
 
   async function deleteCharacterImage(
