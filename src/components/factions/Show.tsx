@@ -3,7 +3,7 @@
 import { useCallback, useEffect } from "react"
 import { Stack, Box } from "@mui/material"
 import type { Faction } from "@/types"
-import { useCampaign } from "@/contexts"
+import { useCampaign, useClient } from "@/contexts"
 import { JuncturesList, SitesList, PartiesList } from "@/components/factions"
 import {
   Icon,
@@ -16,6 +16,7 @@ import {
   EditableRichText,
   SectionHeader,
 } from "@/components/ui"
+import { EntityActiveToggle } from "@/components/common"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -30,7 +31,8 @@ type FormStateData = {
 }
 
 export default function Show({ faction: initialFaction }: ShowProperties) {
-  const { campaignData } = useCampaign()
+  const { campaignData, campaign } = useCampaign()
+  const { user } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialFaction,
   })
@@ -124,6 +126,22 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
         <SitesList entity={faction} updateEntity={updateEntity} />
         <JuncturesList entity={faction} updateEntity={updateEntity} />
       </Stack>
+      {(user?.admin || (campaign && user?.id === campaign.gamemaster_id)) && (
+        <>
+          <SectionHeader
+            title="Administrative Controls"
+            icon={<Icon keyword="Administration" />}
+          >
+            Manage the visibility and status of this faction.
+          </SectionHeader>
+          <EntityActiveToggle
+            entityType="Faction"
+            entityId={faction.id}
+            currentActive={faction.active ?? true}
+            handleChangeAndSave={handleChangeAndSave}
+          />
+        </>
+      )}
     </Box>
   )
 }

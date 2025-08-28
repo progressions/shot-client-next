@@ -3,7 +3,7 @@
 import { useCallback, useEffect } from "react"
 import { FormControl, FormHelperText, Stack, Box } from "@mui/material"
 import type { Party } from "@/types"
-import { useCampaign } from "@/contexts"
+import { useCampaign, useClient } from "@/contexts"
 import {
   Manager,
   Icon,
@@ -15,6 +15,7 @@ import {
   HeroImage,
   SpeedDialMenu,
 } from "@/components/ui"
+import { EntityActiveToggle } from "@/components/common"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import { EditFaction } from "@/components/factions"
@@ -30,7 +31,8 @@ type FormStateData = {
 }
 
 export default function Show({ party: initialParty }: ShowProperties) {
-  const { subscribeToEntity } = useCampaign()
+  const { subscribeToEntity, campaign } = useCampaign()
+  const { user } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialParty,
   })
@@ -136,6 +138,22 @@ export default function Show({ party: initialParty }: ShowProperties) {
           onListUpdate={updateEntity}
         />
       </Stack>
+      {(user?.admin || (campaign && user?.id === campaign.gamemaster_id)) && (
+        <>
+          <SectionHeader
+            title="Administrative Controls"
+            icon={<Icon keyword="Administration" />}
+          >
+            Manage the visibility and status of this party.
+          </SectionHeader>
+          <EntityActiveToggle
+            entityType="Party"
+            entityId={party.id}
+            currentActive={party.active ?? true}
+            handleChangeAndSave={handleChangeAndSave}
+          />
+        </>
+      )}
     </Box>
   )
 }

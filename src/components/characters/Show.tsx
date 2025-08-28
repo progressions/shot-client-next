@@ -2,7 +2,7 @@
 
 import type { Character } from "@/types"
 import { useToast, useClient, useCampaign } from "@/contexts"
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { useMediaQuery, Box, Stack } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import { CS } from "@/services"
@@ -29,6 +29,7 @@ import {
   SkillsManager,
 } from "@/components/characters"
 import { EditFaction } from "@/components/factions"
+import { EntityActiveToggle } from "@/components/common"
 
 type ShowProps = {
   character: Character
@@ -39,8 +40,8 @@ export default function Show({
   character: initialCharacter,
   initialIsMobile = false,
 }: ShowProps) {
-  const { subscribeToEntity } = useCampaign()
-  const { client } = useClient()
+  const { subscribeToEntity, campaign } = useCampaign()
+  const { client, user } = useClient()
   const { toastSuccess } = useToast()
   const theme = useTheme()
   const smallScreen = useMediaQuery(theme.breakpoints.down("sm"))
@@ -85,8 +86,23 @@ export default function Show({
     }
   }
 
+  // Handle change and save for EntityActiveToggle
+  const handleChangeAndSave = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const updatedCharacter = {
+        ...character,
+        [event.target.name]: event.target.value,
+      }
+      await updateCharacter(updatedCharacter)
+    },
+    [character, updateCharacter]
+  )
+
   // Memoize character to prevent unnecessary re-renders
   const memoizedCharacter = useMemo(() => character, [character])
+
+  // Check permissions for administrative controls
+  const hasAdminPermission = user?.admin || (campaign && user?.id === campaign.gamemaster_id)
 
   return (
     <Box
@@ -197,6 +213,23 @@ export default function Show({
           setCharacter={setCharacter}
           updateCharacter={updateCharacter}
         />
+      )}
+      
+      {hasAdminPermission && (
+        <>
+          <SectionHeader
+            title="Administrative Controls"
+            icon={<Icon keyword="Administration" />}
+          >
+            Manage the visibility and status of this character.
+          </SectionHeader>
+          <EntityActiveToggle
+            entityType="Character"
+            entityId={memoizedCharacter.id}
+            currentActive={memoizedCharacter.active ?? true}
+            handleChangeAndSave={handleChangeAndSave}
+          />
+        </>
       )}
     </Box>
   )

@@ -23,6 +23,7 @@ import {
   Icon,
   Manager,
 } from "@/components/ui"
+import { EntityActiveToggle } from "@/components/common"
 import { useCampaign, useClient } from "@/contexts"
 import { FightChips, AddParty } from "@/components/fights"
 import { useEntity } from "@/hooks"
@@ -39,8 +40,8 @@ interface ShowProperties {
 }
 
 export default function Show({ fight: initialFight }: ShowProperties) {
-  const { subscribeToEntity } = useCampaign()
-  const { client } = useClient()
+  const { subscribeToEntity, campaign } = useCampaign()
+  const { client, user } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialFight,
     errors: {},
@@ -306,6 +307,22 @@ export default function Show({ fight: initialFight }: ShowProperties) {
           excludeIds={fight.vehicle_ids || []}
         />
       </Stack>
+      {(user?.admin || (campaign && user?.id === campaign.gamemaster_id)) && (
+        <>
+          <SectionHeader
+            title="Administrative Controls"
+            icon={<Icon keyword="Administration" />}
+          >
+            Manage the visibility and status of this fight.
+          </SectionHeader>
+          <EntityActiveToggle
+            entityType="Fight"
+            entityId={fight.id}
+            currentActive={fight.active ?? true}
+            handleChangeAndSave={handleChangeAndSave}
+          />
+        </>
+      )}
     </Box>
   )
 }

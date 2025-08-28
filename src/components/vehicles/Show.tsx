@@ -12,7 +12,8 @@ import {
   HeroImage,
   SpeedDialMenu,
 } from "@/components/ui"
-import { useCampaign } from "@/contexts"
+import { EntityActiveToggle } from "@/components/common"
+import { useCampaign, useClient } from "@/contexts"
 import {
   ActionValuesEdit,
   VehicleChips,
@@ -34,13 +35,14 @@ interface ShowProperties {
 }
 
 export default function Show({ vehicle: initialVehicle }: ShowProperties) {
-  const { subscribeToEntity } = useCampaign()
+  const { subscribeToEntity, campaign } = useCampaign()
+  const { user } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialVehicle,
   })
   const { errors, status, data } = formState
   const vehicle = data.entity
-  const { updateEntity, deleteEntity } = useEntity(vehicle, dispatchForm)
+  const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(vehicle, dispatchForm)
 
   useEffect(() => {
     document.title = vehicle.name ? `${vehicle.name} - Chi War` : "Chi War"
@@ -110,6 +112,22 @@ export default function Show({ vehicle: initialVehicle }: ShowProperties) {
           <EditFaction entity={vehicle} updateEntity={updateEntity} />
         </Box>
       </Stack>
+      {(user?.admin || (campaign && user?.id === campaign.gamemaster_id)) && (
+        <>
+          <SectionHeader
+            title="Administrative Controls"
+            icon={<Icon keyword="Administration" />}
+          >
+            Manage the visibility and status of this vehicle.
+          </SectionHeader>
+          <EntityActiveToggle
+            entityType="Vehicle"
+            entityId={vehicle.id}
+            currentActive={vehicle.active ?? true}
+            handleChangeAndSave={handleChangeAndSave}
+          />
+        </>
+      )}
     </Box>
   )
 }

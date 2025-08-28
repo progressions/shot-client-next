@@ -23,6 +23,7 @@ import GroupIcon from "@mui/icons-material/Group"
 import FlagIcon from "@mui/icons-material/Flag"
 import DescriptionIcon from "@mui/icons-material/Description"
 import BuildIcon from "@mui/icons-material/Build"
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings"
 import { iconColorMap, type Category } from "@/components/ui/iconColors"
 
 // Define the keyword type
@@ -49,6 +50,7 @@ type Keyword =
   | "Juncture"
   | "Add Character"
   | "Add Vehicle"
+  | "Administration"
 
 // Map keywords to categories
 const categoryMap: Record<Keyword, Category> = {
@@ -74,6 +76,7 @@ const categoryMap: Record<Keyword, Category> = {
   Action: "Interface",
   "Add Character": "Utility",
   "Add Vehicle": "Utility",
+  Administration: "Interface",
 }
 
 // Map keywords to JSX icon elements
@@ -112,6 +115,7 @@ const iconMap: Record<Keyword, React.ReactElement> = {
       <DirectionsCarIcon />
     </Box>
   ),
+  Administration: <AdminPanelSettingsIcon />,
 }
 
 interface IconProps extends SvgIconProps {
