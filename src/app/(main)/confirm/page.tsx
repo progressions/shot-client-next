@@ -31,17 +31,9 @@ export default function ConfirmPage() {
 
   const confirmationToken = searchParams.get("confirmation_token")
 
-  useEffect(() => {
-    if (!confirmationToken) {
-      setError("No confirmation token provided")
-      setLoading(false)
-      return
-    }
-
-    confirmAccount()
-  }, [confirmationToken, confirmAccount])
-
   const confirmAccount = useCallback(async () => {
+    if (!confirmationToken) return
+
     try {
       // Create a client without JWT for public access
       const client = createClient()
@@ -66,6 +58,16 @@ export default function ConfirmPage() {
       setLoading(false)
     }
   }, [confirmationToken, router])
+
+  useEffect(() => {
+    if (!confirmationToken) {
+      setError("No confirmation token provided")
+      setLoading(false)
+      return
+    }
+
+    confirmAccount()
+  }, [confirmationToken, confirmAccount])
 
   if (loading) {
     return (
