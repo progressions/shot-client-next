@@ -2,13 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import {
-  Box,
-  Container,
-  Typography,
-  Link as MuiLink,
-  Alert,
-} from "@mui/material"
+import { Box, Container, Typography, Alert } from "@mui/material"
 import Link from "next/link"
 import { RegistrationForm } from "@/components/auth"
 
@@ -75,17 +69,23 @@ export default function RegisterPage() {
             <Box sx={{ mt: 3, textAlign: "center" }}>
               <Typography variant="body2" sx={{ color: "#cccccc" }}>
                 Already have an account?{" "}
-                <Link href="/login" passHref>
-                  <MuiLink
+                <Link
+                  href="/login"
+                  style={{
+                    color: "inherit",
+                    textDecoration: "none",
+                  }}
+                >
+                  <Typography
                     component="span"
-                    color="primary"
                     sx={{
+                      color: "primary.main",
                       textDecoration: "none",
                       "&:hover": { textDecoration: "underline" },
                     }}
                   >
                     Sign in
-                  </MuiLink>
+                  </Typography>
                 </Link>
               </Typography>
             </Box>

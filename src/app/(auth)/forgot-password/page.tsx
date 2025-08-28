@@ -1,4 +1,4 @@
-import { Box, Typography, Container, Link as MuiLink } from "@mui/material"
+import { Box, Typography, Container } from "@mui/material"
 import Link from "next/link"
 import { ForgotPasswordClient } from "./ForgotPasswordClient"
 
@@ -45,10 +45,23 @@ export default function ForgotPasswordPage() {
         <Box sx={{ mt: 3, textAlign: "center" }}>
           <Typography variant="body2" sx={{ color: "text.secondary" }}>
             Remember your password?{" "}
-            <Link href="/login" passHref>
-              <MuiLink component="span" color="primary">
+            <Link
+              href="/login"
+              style={{
+                color: "inherit",
+                textDecoration: "none",
+              }}
+            >
+              <Typography
+                component="span"
+                sx={{
+                  color: "primary.main",
+                  textDecoration: "none",
+                  "&:hover": { textDecoration: "underline" },
+                }}
+              >
                 Back to Login
-              </MuiLink>
+              </Typography>
             </Link>
           </Typography>
         </Box>

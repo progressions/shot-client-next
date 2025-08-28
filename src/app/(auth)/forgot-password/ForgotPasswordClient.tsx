@@ -84,11 +84,13 @@ export function ForgotPasswordClient() {
               variant="body2"
               sx={{
                 color: "primary.main",
-                textDecoration: "underline",
+                textDecoration: "none",
+                "&:hover": { textDecoration: "underline" },
                 background: "none",
                 border: "none",
                 cursor: "pointer",
                 padding: 0,
+                font: "inherit",
               }}
               onClick={() => {
                 setSuccess(false)

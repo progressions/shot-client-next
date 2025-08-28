@@ -2,14 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import {
-  Stack,
-  Box,
-  Typography,
-  Alert,
-  Container,
-  Link as MuiLink,
-} from "@mui/material"
+import { Stack, Box, Typography, Alert, Container } from "@mui/material"
 import Link from "next/link"
 import { Button, TextField } from "@/components/ui"
 import Cookies from "js-cookie"
@@ -219,18 +212,26 @@ export default function LoginPage() {
             onChange={e => setPassword(e.target.value)}
           />
           <Box sx={{ textAlign: "right", mt: 1 }}>
-            <Link href="/forgot-password" passHref>
-              <MuiLink
-                component="span"
+            <Link
+              href="/forgot-password"
+              style={{
+                color: "inherit",
+                textDecoration: "none",
+              }}
+            >
+              <Typography
                 variant="body2"
-                color="primary"
+                component="span"
                 sx={{
+                  color: "primary.main",
                   textDecoration: "none",
-                  "&:hover": { textDecoration: "underline" },
+                  "&:hover": {
+                    textDecoration: "underline",
+                  },
                 }}
               >
                 Forgot Password?
-              </MuiLink>
+              </Typography>
             </Link>
           </Box>
           <Button type="submit" sx={{ mt: 2, mb: 2 }}>
@@ -273,17 +274,25 @@ export default function LoginPage() {
         <Box sx={{ mt: 3, textAlign: "center" }}>
           <Typography variant="body2" sx={{ color: "#cccccc" }}>
             Don&rsquo;t have an account?{" "}
-            <Link href="/register" passHref>
-              <MuiLink
+            <Link
+              href="/register"
+              style={{
+                color: "inherit",
+                textDecoration: "none",
+              }}
+            >
+              <Typography
                 component="span"
-                color="primary"
                 sx={{
+                  color: "primary.main",
                   textDecoration: "none",
-                  "&:hover": { textDecoration: "underline" },
+                  "&:hover": {
+                    textDecoration: "underline",
+                  },
                 }}
               >
                 Create account
-              </MuiLink>
+              </Typography>
             </Link>
           </Typography>
         </Box>
