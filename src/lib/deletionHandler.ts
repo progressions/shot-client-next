@@ -21,7 +21,7 @@ export function isDeletionConstraintError(
   const axiosError = error as AxiosError
   if (!axiosError.response?.data) return false
 
-  const data = axiosError.response.data as any
+  const data = axiosError.response.data as { error_type?: string }
   return data.error_type === "associations_exist"
 }
 
@@ -44,7 +44,7 @@ export async function handleEntityDeletion<
   T extends { id: string; name?: string },
 >(
   entity: T,
-  deleteFunction: (entity: T, params?: any) => Promise<any>,
+  deleteFunction: (entity: T, params?: { force?: boolean }) => Promise<void>,
   options: {
     entityName: string
     onSuccess: () => void

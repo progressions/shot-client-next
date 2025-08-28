@@ -155,7 +155,7 @@ export function useEntity(
   }
 
   const handleFormErrors = (error: unknown) => {
-    const axiosError = error as AxiosError<any>
+    const axiosError = error as AxiosError<{ errors: Record<string, string[]> }>
     if (axiosError.response?.status === 422) {
       const serverErrors = axiosError.response.data.errors
       const formattedErrors: Record<string, string> = {}
