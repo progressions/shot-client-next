@@ -42,7 +42,10 @@ export default function Show({ vehicle: initialVehicle }: ShowProperties) {
   })
   const { errors, status, data } = formState
   const vehicle = data.entity
-  const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(vehicle, dispatchForm)
+  const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
+    vehicle,
+    dispatchForm
+  )
 
   useEffect(() => {
     document.title = vehicle.name ? `${vehicle.name} - Chi War` : "Chi War"

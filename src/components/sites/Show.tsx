@@ -45,7 +45,8 @@ export default function Show({ site: initialSite }: ShowProperties) {
   )
 
   // Check permissions for administrative controls
-  const hasAdminPermission = user?.admin || (campaign && user?.id === campaign.gamemaster_id)
+  const hasAdminPermission =
+    user?.admin || (campaign && user?.id === campaign.gamemaster_id)
 
   const setSite = useCallback(
     (site: Site) => {
@@ -141,7 +142,7 @@ export default function Show({ site: initialSite }: ShowProperties) {
           onListUpdate={updateEntity}
         />
       </Stack>
-      
+
       {hasAdminPermission && (
         <>
           <SectionHeader

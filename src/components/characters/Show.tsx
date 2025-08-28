@@ -102,7 +102,8 @@ export default function Show({
   const memoizedCharacter = useMemo(() => character, [character])
 
   // Check permissions for administrative controls
-  const hasAdminPermission = user?.admin || (campaign && user?.id === campaign.gamemaster_id)
+  const hasAdminPermission =
+    user?.admin || (campaign && user?.id === campaign.gamemaster_id)
 
   return (
     <Box
@@ -214,7 +215,7 @@ export default function Show({
           updateCharacter={updateCharacter}
         />
       )}
-      
+
       {hasAdminPermission && (
         <>
           <SectionHeader

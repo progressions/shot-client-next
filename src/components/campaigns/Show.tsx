@@ -44,7 +44,9 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
   )
 
   // Check permissions for administrative controls
-  const hasAdminPermission = user?.admin || (currentCampaign && user?.id === currentCampaign.gamemaster_id)
+  const hasAdminPermission =
+    user?.admin ||
+    (currentCampaign && user?.id === currentCampaign.gamemaster_id)
 
   const setCampaign = useCallback(
     (campaign: Campaign) => {
@@ -125,7 +127,7 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
           onListUpdate={updateEntity}
         />
       </Stack>
-      
+
       {hasAdminPermission && (
         <>
           <SectionHeader
