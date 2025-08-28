@@ -173,7 +173,10 @@ export function createCharacterClient(deps: ClientDependencies) {
     params = {}
   ): Promise<AxiosResponse<void>> {
     return fight?.id
-      ? delete_(api.characters(fight, { id: character.shot_id } as Character), params)
+      ? delete_(
+          api.characters(fight, { id: character.shot_id } as Character),
+          params
+        )
       : delete_(apiV2.characters(character), params)
   }
 

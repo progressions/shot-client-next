@@ -70,7 +70,10 @@ export function createSchtickClient(deps: ClientDependencies) {
     return requestFormData("PATCH", `${apiV2.schticks({ id })}`, formData)
   }
 
-  async function deleteSchtick(schtick: Schtick, params = {}): Promise<AxiosResponse<void>> {
+  async function deleteSchtick(
+    schtick: Schtick,
+    params = {}
+  ): Promise<AxiosResponse<void>> {
     return delete_(apiV2.schticks(schtick), params)
   }
 

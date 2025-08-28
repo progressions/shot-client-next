@@ -44,7 +44,7 @@ export default function WeaponDetail({
 
   const handleDelete = async () => {
     if (!weapon?.id) return
-    
+
     await handleEntityDeletion(weapon, client.deleteWeapon, {
       entityName: "weapon",
       onSuccess: () => {
@@ -52,10 +52,10 @@ export default function WeaponDetail({
         setError(null)
         toastSuccess("Weapon deleted successfully")
       },
-      onError: (message) => {
+      onError: message => {
         setError(message)
         toastError(message)
-      }
+      },
     })
   }
 

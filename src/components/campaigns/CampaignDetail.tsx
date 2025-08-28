@@ -49,7 +49,7 @@ export default function CampaignDetail({
 
   const handleDelete = async () => {
     if (!campaign?.id) return
-    
+
     await handleEntityDeletion(campaign, client.deleteCampaign, {
       entityName: "campaign",
       onSuccess: () => {
@@ -57,10 +57,10 @@ export default function CampaignDetail({
         setError(null)
         toastSuccess("Campaign deleted successfully")
       },
-      onError: (message) => {
+      onError: message => {
         setError(message)
         toastError(message)
-      }
+      },
     })
   }
 

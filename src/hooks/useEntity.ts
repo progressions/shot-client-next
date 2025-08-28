@@ -99,9 +99,9 @@ export function useEntity(
           router.push(`/${pluralName}`)
           toastSuccess(`${entityClass} deleted successfully`)
         },
-        onError: (message) => {
+        onError: message => {
           toastError(message)
-        }
+        },
       }
     )
   }
