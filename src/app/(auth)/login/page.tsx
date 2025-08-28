@@ -2,13 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import {
-  Stack,
-  Box,
-  Typography,
-  Alert,
-  Container,
-} from "@mui/material"
+import { Stack, Box, Typography, Alert, Container } from "@mui/material"
 import Link from "next/link"
 import { Button, TextField } from "@/components/ui"
 import Cookies from "js-cookie"
@@ -231,7 +225,7 @@ export default function LoginPage() {
                 sx={{
                   color: "primary.main",
                   textDecoration: "none",
-                  "&:hover": { 
+                  "&:hover": {
                     textDecoration: "underline",
                   },
                 }}
@@ -292,7 +286,7 @@ export default function LoginPage() {
                 sx={{
                   color: "primary.main",
                   textDecoration: "none",
-                  "&:hover": { 
+                  "&:hover": {
                     textDecoration: "underline",
                   },
                 }}

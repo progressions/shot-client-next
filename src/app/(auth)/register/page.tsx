@@ -2,12 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import {
-  Box,
-  Container,
-  Typography,
-  Alert,
-} from "@mui/material"
+import { Box, Container, Typography, Alert } from "@mui/material"
 import Link from "next/link"
 import { RegistrationForm } from "@/components/auth"
 
