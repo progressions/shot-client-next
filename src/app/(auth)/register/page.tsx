@@ -78,11 +78,11 @@ export default function RegisterPage() {
                 <Link href="/login" passHref>
                   <MuiLink
                     component="span"
-                    color="primary"
                     sx={{
+                      color: "primary.main",
                       textDecoration: "none",
                       "&:hover": { textDecoration: "underline" },
-                    }}
+                    }
                   >
                     Sign in
                   </MuiLink>

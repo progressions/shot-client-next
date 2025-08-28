@@ -223,8 +223,8 @@ export default function LoginPage() {
               <MuiLink
                 component="span"
                 variant="body2"
-                color="primary"
                 sx={{
+                  color: "primary.main",
                   textDecoration: "none",
                   "&:hover": { textDecoration: "underline" },
                 }}
@@ -276,8 +276,8 @@ export default function LoginPage() {
             <Link href="/register" passHref>
               <MuiLink
                 component="span"
-                color="primary"
                 sx={{
+                  color: "primary.main",
                   textDecoration: "none",
                   "&:hover": { textDecoration: "underline" },
                 }}

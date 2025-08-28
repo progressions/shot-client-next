@@ -56,7 +56,14 @@ export default async function ResetPasswordPage({
           <Typography variant="body2" sx={{ color: "text.secondary" }}>
             Need a new reset link?{" "}
             <Link href="/forgot-password" passHref>
-              <MuiLink component="span" color="primary">
+              <MuiLink
+                component="span"
+                sx={{
+                  color: "primary.main",
+                  textDecoration: "none",
+                  "&:hover": { textDecoration: "underline" },
+                }}
+              >
                 Request Password Reset
               </MuiLink>
             </Link>
@@ -67,7 +74,14 @@ export default async function ResetPasswordPage({
           <Typography variant="body2" sx={{ color: "text.secondary" }}>
             Remember your password?{" "}
             <Link href="/login" passHref>
-              <MuiLink component="span" color="primary">
+              <MuiLink
+                component="span"
+                sx={{
+                  color: "primary.main",
+                  textDecoration: "none",
+                  "&:hover": { textDecoration: "underline" },
+                }}
+              >
                 Back to Login
               </MuiLink>
             </Link>

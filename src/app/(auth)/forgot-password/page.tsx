@@ -46,7 +46,14 @@ export default function ForgotPasswordPage() {
           <Typography variant="body2" sx={{ color: "text.secondary" }}>
             Remember your password?{" "}
             <Link href="/login" passHref>
-              <MuiLink component="span" color="primary">
+              <MuiLink
+                component="span"
+                sx={{
+                  color: "primary.main",
+                  textDecoration: "none",
+                  "&:hover": { textDecoration: "underline" },
+                }}
+              >
                 Back to Login
               </MuiLink>
             </Link>
