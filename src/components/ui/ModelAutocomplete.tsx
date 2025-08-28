@@ -65,9 +65,7 @@ export function ModelAutocomplete({
       ) {
         response = await (
           clientMethod as {
-            index: (params: {
-              filters: Record<string, unknown>
-            }) => Promise<{
+            index: (params: { filters: Record<string, unknown> }) => Promise<{
               data?: Array<{
                 id: number | string
                 name?: string
@@ -84,9 +82,7 @@ export function ModelAutocomplete({
         response = await (
           client as Record<
             string,
-            (params: {
-              filters: Record<string, unknown>
-            }) => Promise<{
+            (params: { filters: Record<string, unknown> }) => Promise<{
               data?: Array<{
                 id: number | string
                 name?: string
