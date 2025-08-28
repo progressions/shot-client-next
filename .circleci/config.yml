@@ -10,7 +10,7 @@ executors:
     working_directory: ~/repo
 
 jobs:
-  test:
+  format:
     executor: node-executor
     steps:
       - checkout
@@ -36,6 +36,28 @@ jobs:
       - run:
           name: Check formatting
           command: npm run format:check
+
+  test:
+    executor: node-executor
+    steps:
+      - checkout
+      
+      # Cache dependencies
+      - restore_cache:
+          keys:
+            - v2-dependencies-{{ checksum "package-lock.json" }}
+            - v2-dependencies-
+      
+      # Install dependencies
+      - run:
+          name: Install dependencies
+          command: npm ci
+      
+      # Save cache
+      - save_cache:
+          paths:
+            - node_modules
+          key: v2-dependencies-{{ checksum "package-lock.json" }}
       
       # Run linting
       - run:
@@ -129,10 +151,13 @@ workflows:
   version: 2
   test_build_deploy:
     jobs:
+      - format
+      
       - test
       
       - build:
           requires:
+            - format
             - test
       
       - deploy:
