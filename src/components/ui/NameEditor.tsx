@@ -61,7 +61,11 @@ export function NameEditor({
   }
 
   return (
-    <FormControl fullWidth error={!!nameError || !!serverError} sx={{ mb: 2 }}>
+    <FormControl
+      fullWidth
+      error={!!nameError || !!serverError}
+      sx={{ mt: 2, mb: 2 }}
+    >
       <TextField
         fullWidth
         label="Name"

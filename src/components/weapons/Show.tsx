@@ -61,7 +61,7 @@ export default function Show({ weapon: initialWeapon }: ShowProperties) {
     entity: initialWeapon,
   })
   const { status, errors = {} } = formState
-  const weapon = formState.data.entity
+  const weapon = formState?.data?.entity || initialWeapon
   const { deleteEntity, updateEntity, handleChangeAndSave } = useEntity<Weapon>(
     weapon,
     dispatchForm

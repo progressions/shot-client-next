@@ -133,7 +133,15 @@ export function formReducer<T extends Record<string, unknown>>(
       }
     }
     case FormActions.RESET: {
-      return action.payload
+      // Ensure the payload is properly structured
+      if (action.payload && action.payload.data) {
+        return action.payload
+      }
+      // If payload is just the data, wrap it properly
+      if (action.value) {
+        return initializeFormState<T>(action.value as T)
+      }
+      return initializeFormState<T>({} as T)
     }
     default: {
       return state
@@ -146,13 +154,15 @@ export function useForm<T extends Record<string, unknown>>(initialData: T) {
   const [formState, dispatchForm] = useReducer(formReducer<T>, initialFormState)
 
   // Memoize formState to ensure stability, but make sure data changes trigger updates
-  const memoizedFormState = useMemo(
-    () => ({
+  const memoizedFormState = useMemo(() => {
+    if (!formState) {
+      return initialFormState
+    }
+    return {
       ...formState,
       data: formState.data,
-    }),
-    [formState]
-  )
+    }
+  }, [formState, initialFormState])
 
   return { formState: memoizedFormState, dispatchForm, initialFormState }
 }

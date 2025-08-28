@@ -38,8 +38,9 @@ export default function Stats({
   // Sync local state with weapon prop changes from WebSocket
   useEffect(() => {
     dispatchForm({
-      type: FormActions.RESET,
-      value: { entity: initialWeapon },
+      type: FormActions.UPDATE,
+      name: "entity",
+      value: initialWeapon,
     })
   }, [initialWeapon, dispatchForm])
 
@@ -61,7 +62,7 @@ export default function Stats({
     }
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "weapon",
+      name: "entity",
       value: updatedWeapon,
     })
     await updateWeapon(updatedWeapon)
@@ -71,7 +72,7 @@ export default function Stats({
     const updatedWeapon = { ...weapon, [event.target.name]: event.target.value }
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "weapon",
+      name: "entity",
       value: updatedWeapon,
     })
     await updateWeapon(updatedWeapon)
