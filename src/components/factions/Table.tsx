@@ -1,5 +1,6 @@
 "use client"
 import { GridColDef } from "@mui/x-data-grid"
+import { Box } from "@mui/material"
 import { FormStateType, FormStateAction } from "@/reducers"
 import { BaseDataGrid, FactionLink, MembersGroup } from "@/components/ui"
 import { EntityAvatar } from "@/components/avatars"
@@ -17,7 +18,11 @@ const columns: GridColDef<Faction>[] = [
     width: 70,
     editable: false,
     sortable: false,
-    renderCell: params => <EntityAvatar entity={params.row} />,
+    renderCell: params => (
+      <Box sx={{ display: "flex", alignItems: "center", height: "100%" }}>
+        <EntityAvatar entity={params.row} />
+      </Box>
+    ),
   },
   {
     field: "name",
@@ -34,7 +39,9 @@ const columns: GridColDef<Faction>[] = [
     editable: false,
     sortable: true,
     renderCell: params => (
-      <MembersGroup items={params.row.characters || []} max={3} />
+      <Box sx={{ display: "flex", alignItems: "center", height: "100%" }}>
+        <MembersGroup items={params.row.characters || []} max={3} />
+      </Box>
     ),
   },
   {

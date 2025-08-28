@@ -95,7 +95,11 @@ export default function View({ formState, dispatchForm }: ViewProps) {
       width: 70,
       editable: false,
       sortable: false,
-      renderCell: params => <EntityAvatar entity={params.row} />,
+      renderCell: params => (
+        <Box sx={{ display: "flex", alignItems: "center", height: "100%" }}>
+          <EntityAvatar entity={params.row} />
+        </Box>
+      ),
       align: "center",
       headerAlign: "center",
     },
