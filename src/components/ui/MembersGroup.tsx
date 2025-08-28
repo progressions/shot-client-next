@@ -8,9 +8,10 @@ interface MembersGroupProps<T> {
   items: T[]
   max?: number
   sx?: SystemStyleObject<Theme>
+  disableImageViewer?: boolean
 }
 
-export function MembersGroup<T>({ items, max = 5, sx }: MembersGroupProps<T>) {
+export function MembersGroup<T>({ items, max = 5, sx, disableImageViewer = true }: MembersGroupProps<T>) {
   return (
     <AvatarGroup
       sx={sx}
@@ -45,6 +46,7 @@ export function MembersGroup<T>({ items, max = 5, sx }: MembersGroupProps<T>) {
           }
           key={item.id} // Assumes each item has an 'id' property; adjust if needed
           sx={{ width: 30, height: 30, fontSize: "0.75rem" }}
+          disableImageViewer={disableImageViewer}
         />
       ))}
     </AvatarGroup>
