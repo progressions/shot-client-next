@@ -23,7 +23,6 @@ const ScreenshotCard = styled(Paper)(({ theme }) => ({
   overflow: "hidden",
   borderRadius: theme.spacing(2),
   transition: "all 0.3s ease",
-  cursor: "pointer",
   height: "100%",
   display: "flex",
   flexDirection: "column",
