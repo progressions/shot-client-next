@@ -19,6 +19,7 @@ export const MARKETING_IMAGES = {
   },
   assets: {
     logo: "/images/marketing/assets/chi-war-logo.svg",
+    campaign: "/images/marketing/assets/Campaign.png",
   },
 } as const
 

@@ -3,28 +3,16 @@
 import { Box, Button, Container, Typography, Stack } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import Link from "next/link"
+import Image from "next/image"
+import { MARKETING_IMAGES } from "@/lib/marketingImages"
 
 const HeroContainer = styled(Box)(({ theme }) => ({
-  background: `linear-gradient(135deg, 
-    ${theme.palette.primary.dark} 0%, 
-    ${theme.palette.primary.main} 50%, 
-    ${theme.palette.secondary.main} 100%)`,
   color: "white",
   minHeight: "100vh",
   display: "flex",
   alignItems: "center",
   position: "relative",
   overflow: "hidden",
-  "&::before": {
-    content: '""',
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: "rgba(0, 0, 0, 0.3)",
-    zIndex: 1,
-  },
 }))
 
 const HeroContent = styled(Container)(({ theme }) => ({
@@ -90,6 +78,28 @@ const SecondaryCTA = styled(CTAButton)(({ theme }) => ({
 export function HeroSection() {
   return (
     <HeroContainer>
+      {/* Background Image */}
+      <Image
+        src={MARKETING_IMAGES.assets.campaign}
+        alt="Epic campaign background"
+        fill
+        style={{ objectFit: "cover" }}
+        priority
+        quality={90}
+      />
+      
+      {/* Dark Overlay */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: "linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7))",
+          zIndex: 1,
+        }}
+      />
       <HeroContent maxWidth="lg">
         <Stack spacing={4} alignItems={{ xs: "center", md: "flex-start" }}>
           <HeroTitle variant="h1" component="h1">
