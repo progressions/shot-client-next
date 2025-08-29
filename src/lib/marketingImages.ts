@@ -27,6 +27,7 @@ export const MARKETING_IMAGES = {
   assets: {
     logo: "/images/marketing/assets/chi-war-logo.svg",
     campaign: `${IMAGEKIT_BASE}/marketing/Campaign.png?updatedAt=1756431194135`,
+    eatersOfTheLotus: `${IMAGEKIT_BASE}/marketing/screenshots/Eaters%20of%20the%20Lotus.png?updatedAt=1756432982466`,
   },
 } as const
 
