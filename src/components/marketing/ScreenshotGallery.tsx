@@ -86,12 +86,22 @@ export function ScreenshotGallery() {
             {screenshots.map((screenshot, index) => (
               <Grid item xs={12} md={6} key={index}>
                 <ScreenshotCard elevation={3}>
-                  <Box position="relative" sx={{ aspectRatio: "16/9" }}>
+                  <Box 
+                    position="relative" 
+                    sx={{ 
+                      aspectRatio: "16/9",
+                      backgroundColor: "background.paper",
+                      overflow: "hidden"
+                    }}
+                  >
                     <Image
                       src={screenshot.imageUrl}
                       alt={screenshot.title}
                       fill
-                      style={{ objectFit: "cover" }}
+                      style={{ 
+                        objectFit: "cover",
+                        objectPosition: "center"
+                      }}
                       sizes="(max-width: 768px) 100vw, 50vw"
                       unoptimized // Using external CDN
                     />
