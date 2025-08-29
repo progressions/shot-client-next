@@ -9,7 +9,9 @@ jest.mock("@/lib/deletionHandler", () => ({
 }))
 
 import { handleEntityDeletion } from "@/lib/deletionHandler"
-const mockHandleEntityDeletion = handleEntityDeletion as jest.MockedFunction<typeof handleEntityDeletion>
+const mockHandleEntityDeletion = handleEntityDeletion as jest.MockedFunction<
+  typeof handleEntityDeletion
+>
 
 // Mock the contexts
 const mockClient = {
@@ -216,9 +218,11 @@ describe("useEntity", () => {
   describe("deleteEntity", () => {
     it("successfully deletes entity", async () => {
       // Mock handleEntityDeletion to call the onSuccess callback
-      mockHandleEntityDeletion.mockImplementation(async (entity, deleteFunc, options) => {
-        options.onSuccess()
-      })
+      mockHandleEntityDeletion.mockImplementation(
+        async (entity, deleteFunc, options) => {
+          options.onSuccess()
+        }
+      )
 
       const { result } = renderHook(() =>
         useEntity(mockEntity, mockDispatchForm)
@@ -246,9 +250,11 @@ describe("useEntity", () => {
     it("handles delete error", async () => {
       const errorMessage = "Failed to delete character"
       // Mock handleEntityDeletion to call the onError callback
-      mockHandleEntityDeletion.mockImplementation(async (entity, deleteFunc, options) => {
-        options.onError(errorMessage)
-      })
+      mockHandleEntityDeletion.mockImplementation(
+        async (entity, deleteFunc, options) => {
+          options.onError(errorMessage)
+        }
+      )
 
       const { result } = renderHook(() =>
         useEntity(mockEntity, mockDispatchForm)
@@ -264,11 +270,13 @@ describe("useEntity", () => {
 
     it("navigates to entity list page after successful delete", async () => {
       const vehicleEntity = { ...mockEntity, entity_class: "Vehicle" as const }
-      
+
       // Mock handleEntityDeletion to call the onSuccess callback
-      mockHandleEntityDeletion.mockImplementation(async (entity, deleteFunc, options) => {
-        options.onSuccess()
-      })
+      mockHandleEntityDeletion.mockImplementation(
+        async (entity, deleteFunc, options) => {
+          options.onSuccess()
+        }
+      )
 
       const { result } = renderHook(() =>
         useEntity(vehicleEntity, mockDispatchForm)
