@@ -44,7 +44,7 @@ const junctures = [
     title: "Mystical Powers Awaken",
     description:
       "Master ancient chi arts during the Tang Dynasty under Wu Zetian. Dragons soar, sorcerers weave spells, and legends are born in temples hidden from mortal eyes.",
-    filename: "Ancient Juncture.png",
+    imageUrl: MARKETING_IMAGES.junctures.ancient,
     features: [
       "Supernatural chi powers",
       "Mystical creatures",
@@ -60,7 +60,7 @@ const junctures = [
     title: "Way of the Shaolin",
     description:
       "Enter a world dominated by austere Shaolin monks and legendary martial artists. Ancient traditions clash with encroaching modernity as kung fu masters defend sacred temples and timeless wisdom.",
-    filename: "Past Juncture.png",
+    imageUrl: MARKETING_IMAGES.junctures.past,
     features: [
       "Shaolin temples",
       "Martial arts schools",
@@ -75,7 +75,7 @@ const junctures = [
     title: "Modern Action Heroes",
     description:
       "Experience high-octane modern adventures with cutting-edge technology. From corporate espionage to street racing, bring action movie excitement to the present day.",
-    filename: "Modern Juncture.png",
+    imageUrl: MARKETING_IMAGES.junctures.modern,
     features: [
       "Modern weapons",
       "Urban environments",
@@ -90,7 +90,7 @@ const junctures = [
     title: "Simian Revolution",
     description:
       "Join The Jammers and the New Simian Army in their rebellion. Genetically-enhanced cyber-apes and human rebels battle for dominance in a world where technology and primal fury collide.",
-    filename: "Future Juncture.png",
+    imageUrl: MARKETING_IMAGES.junctures.future,
     features: [
       "Cyber-apes",
       "Genetic enhancement",
@@ -132,11 +132,12 @@ export function JunctureShowcase() {
                 <JunctureCard>
                   <Box position="relative" sx={{ aspectRatio: "16/9" }}>
                     <Image
-                      src={`/images/marketing/junctures/${juncture.filename}`}
+                      src={juncture.imageUrl}
                       alt={juncture.title}
                       fill
                       style={{ objectFit: "cover" }}
                       sizes="(max-width: 768px) 100vw, 50vw"
+                      unoptimized // Since we're using external CDN
                     />
                     <Box
                       sx={{

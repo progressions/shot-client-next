@@ -1,5 +1,8 @@
 import { StaticImageData } from "next/image"
 
+// ImageKit CDN base URL
+const IMAGEKIT_BASE = "https://ik.imagekit.io/nvqgwnjgv"
+
 // Marketing image paths
 export const MARKETING_IMAGES = {
   heroes: {
@@ -12,14 +15,17 @@ export const MARKETING_IMAGES = {
     aiGeneration: "/images/marketing/screenshots/character-creation.png",
   },
   junctures: {
-    ancient: "/images/marketing/junctures/Ancient Juncture.png",
-    past: "/images/marketing/junctures/Past Juncture.png",
-    modern: "/images/marketing/junctures/Modern Juncture.png",
-    future: "/images/marketing/junctures/Future Juncture.png",
+    ancient: `${IMAGEKIT_BASE}/marketing/Ancient%20Juncture.png`,
+    past: `${IMAGEKIT_BASE}/marketing/Past%20Juncture.png`,
+    modern: `${IMAGEKIT_BASE}/marketing/Modern%20Juncture.png`,
+    future: `${IMAGEKIT_BASE}/marketing/Future%20Juncture.png`,
+    futureWasteland: `${IMAGEKIT_BASE}/marketing/Future%20Wasteland.png?updatedAt=1756431151496`,
+    cyberpunk: `${IMAGEKIT_BASE}/marketing/Cyberpunk%20Future.png`,
+    netherworld: `${IMAGEKIT_BASE}/marketing/Netherworld.png`,
   },
   assets: {
     logo: "/images/marketing/assets/chi-war-logo.svg",
-    campaign: "/images/marketing/assets/Campaign.png",
+    campaign: `${IMAGEKIT_BASE}/marketing/Campaign.png?updatedAt=1756431194135`,
   },
 } as const
 

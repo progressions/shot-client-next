@@ -86,6 +86,7 @@ export function HeroSection() {
         style={{ objectFit: "cover" }}
         priority
         quality={90}
+        unoptimized // Using external CDN
       />
       
       {/* Dark Overlay */}
