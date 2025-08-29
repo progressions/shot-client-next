@@ -87,7 +87,7 @@ export function ScreenshotGallery() {
 
           <Grid container spacing={3}>
             {screenshots.map((screenshot, index) => (
-              <Grid item xs={12} sm={12} md={6} lg={6} xl={6} key={index}>
+              <Grid item xs={12} sm={6} md={6} lg={6} xl={6} key={index}>
                 <ScreenshotCard elevation={3}>
                   <Box 
                     position="relative" 
