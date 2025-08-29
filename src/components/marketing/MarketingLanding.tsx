@@ -6,7 +6,6 @@ import {
   FeatureShowcase,
   ScreenshotGallery,
   JunctureShowcase,
-  TestimonialsSection,
   CallToAction,
 } from "."
 import { Footer } from "@/components/ui"
@@ -18,7 +17,6 @@ export function MarketingLanding() {
       <FeatureShowcase />
       <ScreenshotGallery />
       <JunctureShowcase />
-      <TestimonialsSection />
       <CallToAction />
       <Footer />
     </Box>

@@ -19,7 +19,9 @@ import {
 
 const GallerySection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(8, 0),
-  backgroundColor: theme.palette.grey[50],
+  backgroundColor: theme.palette.mode === 'dark' 
+    ? theme.palette.background.default 
+    : theme.palette.grey[50],
 }))
 
 const ScreenshotPlaceholder = styled(Paper)(({ theme }) => ({
@@ -28,14 +30,20 @@ const ScreenshotPlaceholder = styled(Paper)(({ theme }) => ({
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  backgroundColor: theme.palette.grey[200],
-  border: `2px dashed ${theme.palette.grey[400]}`,
+  backgroundColor: theme.palette.mode === 'dark'
+    ? theme.palette.grey[900]
+    : theme.palette.grey[200],
+  border: `2px dashed ${theme.palette.mode === 'dark' 
+    ? theme.palette.grey[700] 
+    : theme.palette.grey[400]}`,
   borderRadius: theme.spacing(2),
   padding: theme.spacing(4),
   transition: "all 0.3s ease",
   cursor: "pointer",
   "&:hover": {
-    backgroundColor: theme.palette.grey[300],
+    backgroundColor: theme.palette.mode === 'dark'
+      ? theme.palette.grey[800]
+      : theme.palette.grey[300],
     borderColor: theme.palette.primary.main,
     transform: "scale(1.02)",
   },
@@ -43,14 +51,18 @@ const ScreenshotPlaceholder = styled(Paper)(({ theme }) => ({
 
 const ScreenshotIcon = styled(Box)(({ theme }) => ({
   fontSize: 48,
-  color: theme.palette.grey[600],
+  color: theme.palette.mode === 'dark'
+    ? theme.palette.grey[400]
+    : theme.palette.grey[600],
   marginBottom: theme.spacing(2),
 }))
 
 const ScreenshotTitle = styled(Typography)(({ theme }) => ({
   fontWeight: "bold",
   marginBottom: theme.spacing(1),
-  color: theme.palette.grey[800],
+  color: theme.palette.mode === 'dark'
+    ? theme.palette.grey[100]
+    : theme.palette.grey[800],
 }))
 
 const screenshots = [

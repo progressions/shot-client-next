@@ -11,7 +11,7 @@ import {
 } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import Link from "next/link"
-import { RocketLaunch, Login, MenuBook, Support } from "@mui/icons-material"
+import { RocketLaunch, Login, MenuBook } from "@mui/icons-material"
 
 const CTASection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(10, 0),
@@ -94,11 +94,6 @@ const quickFeatures = [
     icon: <MenuBook sx={{ fontSize: 40 }} />,
     title: "Learn Fast",
     description: "Comprehensive documentation and tutorials",
-  },
-  {
-    icon: <Support sx={{ fontSize: 40 }} />,
-    title: "Expert Support",
-    description: "Active community and responsive help",
   },
 ]
 

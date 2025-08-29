@@ -11,6 +11,8 @@ import {
   Chip,
 } from "@mui/material"
 import { styled } from "@mui/material/styles"
+import Image from "next/image"
+import { MARKETING_IMAGES } from "@/lib/marketingImages"
 
 const JunctureSection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(8, 0),
@@ -31,38 +33,6 @@ const JunctureCard = styled(Card)(({ theme }) => ({
   },
 }))
 
-const JunctureImagePlaceholder = styled(Box)<{ juncture: string }>(({
-  juncture,
-}) => {
-  const backgrounds = {
-    ancient: `linear-gradient(135deg, #d4af37 0%, #8b4513 100%)`,
-    colonial: `linear-gradient(135deg, #4a5d23 0%, #8b4513 100%)`,
-    contemporary: `linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)`,
-    future: `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`,
-  }
-
-  return {
-    aspectRatio: "16/9",
-    background:
-      backgrounds[juncture as keyof typeof backgrounds] ||
-      backgrounds.contemporary,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "white",
-    position: "relative",
-    "&::before": {
-      content: '""',
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: "rgba(0, 0, 0, 0.3)",
-    },
-  }
-})
-
 const JunctureContent = styled(CardContent)(({ theme }) => ({
   padding: theme.spacing(3),
 }))
@@ -70,11 +40,11 @@ const JunctureContent = styled(CardContent)(({ theme }) => ({
 const junctures = [
   {
     id: "ancient",
-    era: "Ancient China (69 AD)",
+    era: "Ancient China (690 AD)",
     title: "Mystical Powers Awaken",
     description:
-      "Master ancient chi arts in the birthplace of supernatural martial arts. Dragons soar, sorcerers weave spells, and legends are born in temples hidden from mortal eyes.",
-    filename: "ancient-martial-arts.jpg",
+      "Master ancient chi arts during the Tang Dynasty under Wu Zetian. Dragons soar, sorcerers weave spells, and legends are born in temples hidden from mortal eyes.",
+    filename: "Ancient Juncture.png",
     features: [
       "Supernatural chi powers",
       "Mystical creatures",
@@ -85,27 +55,27 @@ const junctures = [
       "Golden temples, swirling mists, and the whisper of ancient secrets",
   },
   {
-    id: "colonial",
-    era: "Colonial Hong Kong (1850s)",
-    title: "East Meets West",
+    id: "past",
+    era: "Past (1850s)",
+    title: "Way of the Shaolin",
     description:
-      "Navigate the clash of cultures in Victorian Hong Kong. Secret societies, opium wars, and colonial intrigue create the perfect backdrop for pulp adventure stories.",
-    filename: "colonial-hongkong.jpg",
+      "Enter a world dominated by austere Shaolin monks and legendary martial artists. Ancient traditions clash with encroaching modernity as kung fu masters defend sacred temples and timeless wisdom.",
+    filename: "Past Juncture.png",
     features: [
-      "Cultural conflict",
-      "Secret societies",
-      "Steam technology",
-      "Political intrigue",
+      "Shaolin temples",
+      "Martial arts schools",
+      "Traditional kung fu",
+      "Monastic discipline",
     ],
-    atmosphere: "Gaslit streets, oriental mysteries, and the romance of empire",
+    atmosphere: "Mountain monasteries, training courtyards, and the pursuit of perfection",
   },
   {
-    id: "contemporary",
-    era: "Contemporary (Present Day)",
+    id: "modern",
+    era: "Modern (Present Day)",
     title: "Modern Action Heroes",
     description:
       "Experience high-octane modern adventures with cutting-edge technology. From corporate espionage to street racing, bring action movie excitement to the present day.",
-    filename: "contemporary-action.jpg",
+    filename: "Modern Juncture.png",
     features: [
       "Modern weapons",
       "Urban environments",
@@ -117,18 +87,18 @@ const junctures = [
   {
     id: "future",
     era: "Future (2056 AD)",
-    title: "Cyberpunk Dystopia",
+    title: "Simian Revolution",
     description:
-      "Fight against the oppressive Buro in a world of cyber-enhanced warriors and corporate tyranny. Technology and magic collide in a neon-soaked dystopian future.",
-    filename: "cyberpunk-future.jpg",
+      "Join The Jammers and the New Simian Army in their rebellion. Genetically-enhanced cyber-apes and human rebels battle for dominance in a world where technology and primal fury collide.",
+    filename: "Future Juncture.png",
     features: [
-      "Cybernetic enhancement",
-      "Corporate warfare",
-      "Technological magic",
-      "Resistance fighters",
+      "Cyber-apes",
+      "Genetic enhancement",
+      "Rebel warfare",
+      "Primal technology",
     ],
     atmosphere:
-      "Cyber-enhanced reality, corporate megastructures, and digital rebellion",
+      "Post-apocalyptic cityscapes, cyber-simian armies, and revolutionary chaos",
   },
 ]
 
@@ -160,28 +130,38 @@ export function JunctureShowcase() {
             {junctures.map((juncture, index) => (
               <Grid item xs={12} md={6} key={index}>
                 <JunctureCard>
-                  <JunctureImagePlaceholder juncture={juncture.id}>
+                  <Box position="relative" sx={{ aspectRatio: "16/9" }}>
+                    <Image
+                      src={`/images/marketing/junctures/${juncture.filename}`}
+                      alt={juncture.title}
+                      fill
+                      style={{ objectFit: "cover" }}
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
                     <Box
                       sx={{
-                        position: "relative",
-                        zIndex: 2,
-                        textAlign: "center",
-                        p: 2,
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: "linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6))",
+                        display: "flex",
+                        alignItems: "flex-end",
+                        p: 3,
                       }}
                     >
                       <Typography
                         variant="h4"
                         component="h3"
                         fontWeight="bold"
-                        gutterBottom
+                        color="white"
+                        sx={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}
                       >
                         {juncture.era}
                       </Typography>
-                      <Typography variant="caption" sx={{ opacity: 0.9 }}>
-                        Image placeholder: {juncture.filename}
-                      </Typography>
                     </Box>
-                  </JunctureImagePlaceholder>
+                  </Box>
 
                   <JunctureContent>
                     <Stack spacing={2}>
