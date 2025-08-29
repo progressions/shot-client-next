@@ -144,19 +144,33 @@ export default function JunctureForm({
       anchor={isMobile ? "bottom" : "right"}
       open={open}
       onClose={handleClose}
+      PaperProps={{
+        sx: {
+          width: isMobile ? "100%" : "30rem",
+          maxWidth: isMobile ? "100%" : "30rem",
+        }
+      }}
     >
-      <HeroImage
-        entity={formState.data}
-        setEntity={handleEntityUpdate}
-        creationMode={true}
-        pageContext="edit"
-        height={400}
-      />
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: "100%",
+          overflow: "hidden",
+        }}
+      >
+        <HeroImage
+          entity={formState.data}
+          setEntity={handleEntityUpdate}
+          creationMode={true}
+          pageContext="edit"
+          height={400}
+        />
+      </Box>
       <Box
         component="form"
         onSubmit={handleSubmit}
         sx={{
-          width: isMobile ? "100%" : "30rem",
+          width: "100%",
           height: isMobile ? "auto" : "100%",
           p: isMobile ? "1rem" : "2rem",
         }}
