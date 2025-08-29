@@ -155,24 +155,19 @@ export default function SchtickForm({
       PaperProps={{
         sx: {
           width: isMobile ? "100%" : "30rem",
+          minWidth: isMobile ? "100%" : "30rem",
           maxWidth: isMobile ? "100%" : "30rem",
+          flexShrink: 0,
         }
       }}
     >
-      <Box
-        sx={{
-          width: "100%",
-          maxWidth: "100%",
-        }}
-      >
-        <HeroImage
-          entity={formState.data}
-          setEntity={handleEntityUpdate}
-          creationMode={true}
-          pageContext="edit"
-          height={400}
-        />
-      </Box>
+      <HeroImage
+        entity={formState.data}
+        setEntity={handleEntityUpdate}
+        creationMode={true}
+        pageContext="edit"
+        height={400}
+      />
       <Box
         component="form"
         onSubmit={handleSubmit}

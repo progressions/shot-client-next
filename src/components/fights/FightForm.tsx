@@ -119,18 +119,13 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
       PaperProps={{
         sx: {
           width: isMobile ? "100%" : "30rem",
+          minWidth: isMobile ? "100%" : "30rem",
           maxWidth: isMobile ? "100%" : "30rem",
+          flexShrink: 0,
         }
       }}
     >
-      <Box
-        sx={{
-          width: "100%",
-          maxWidth: "100%",
-        }}
-      >
-        <HeroImage entity={{ image_url: data.image_url }} positionable={false} />
-      </Box>
+      <HeroImage entity={{ image_url: data.image_url }} positionable={false} />
       <Box
         component="form"
         onSubmit={handleSubmit}
