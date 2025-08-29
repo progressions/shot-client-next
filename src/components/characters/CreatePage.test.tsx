@@ -176,7 +176,6 @@ describe("CreatePage", () => {
       ).not.toBeInTheDocument()
     })
 
-
     it("updates result count when filtering", () => {
       render(<CreatePage templates={mockTemplates} />)
 
