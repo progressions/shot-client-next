@@ -10,12 +10,8 @@ import {
   Chip,
 } from "@mui/material"
 import { styled } from "@mui/material/styles"
-import {
-  Dashboard,
-  Person,
-  SportsKabaddi,
-  AutoAwesome,
-} from "@mui/icons-material"
+import Image from "next/image"
+import { MARKETING_IMAGES } from "@/lib/marketingImages"
 
 const GallerySection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(8, 0),
@@ -24,78 +20,40 @@ const GallerySection = styled(Box)(({ theme }) => ({
     : theme.palette.grey[50],
 }))
 
-const ScreenshotPlaceholder = styled(Paper)(({ theme }) => ({
-  aspectRatio: "16/9",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  backgroundColor: theme.palette.mode === 'dark'
-    ? theme.palette.grey[900]
-    : theme.palette.grey[200],
-  border: `2px dashed ${theme.palette.mode === 'dark' 
-    ? theme.palette.grey[700] 
-    : theme.palette.grey[400]}`,
+const ScreenshotCard = styled(Paper)(({ theme }) => ({
+  overflow: "hidden",
   borderRadius: theme.spacing(2),
-  padding: theme.spacing(4),
   transition: "all 0.3s ease",
   cursor: "pointer",
   "&:hover": {
-    backgroundColor: theme.palette.mode === 'dark'
-      ? theme.palette.grey[800]
-      : theme.palette.grey[300],
-    borderColor: theme.palette.primary.main,
     transform: "scale(1.02)",
+    boxShadow: theme.shadows[8],
   },
-}))
-
-const ScreenshotIcon = styled(Box)(({ theme }) => ({
-  fontSize: 48,
-  color: theme.palette.mode === 'dark'
-    ? theme.palette.grey[400]
-    : theme.palette.grey[600],
-  marginBottom: theme.spacing(2),
-}))
-
-const ScreenshotTitle = styled(Typography)(({ theme }) => ({
-  fontWeight: "bold",
-  marginBottom: theme.spacing(1),
-  color: theme.palette.mode === 'dark'
-    ? theme.palette.grey[100]
-    : theme.palette.grey[800],
 }))
 
 const screenshots = [
   {
-    icon: <Dashboard sx={{ fontSize: 48 }} />,
+    imageUrl: MARKETING_IMAGES.screenshots.dashboard,
     title: "Campaign Dashboard",
     description: "Central command for managing your entire campaign",
-    filename: "hero-dashboard.png",
-    dimensions: "1920x1080",
     features: ["Real-time updates", "Quick navigation", "Campaign overview"],
   },
   {
-    icon: <Person sx={{ fontSize: 48 }} />,
+    imageUrl: MARKETING_IMAGES.screenshots.characterSheet,
     title: "Character Sheet Interface",
     description: "Comprehensive character management with cinematic flair",
-    filename: "character-sheet-demo.png",
-    dimensions: "1920x1080",
     features: ["Attribute tracking", "Schtick management", "Gear inventory"],
   },
   {
-    icon: <SportsKabaddi sx={{ fontSize: 48 }} />,
+    imageUrl: MARKETING_IMAGES.screenshots.combat,
     title: "Live Combat Session",
     description: "Dynamic encounter management in real-time",
-    filename: "combat-encounter.png",
-    dimensions: "1920x1080",
     features: ["Initiative tracking", "Action resolution", "Multi-participant"],
   },
   {
-    icon: <AutoAwesome sx={{ fontSize: 48 }} />,
+    imageUrl: MARKETING_IMAGES.screenshots.aiGeneration,
     title: "AI Character Generation",
     description: "Intelligent character creation with backstory generation",
-    filename: "character-creation.png",
-    dimensions: "1920x1080",
     features: ["AI assistance", "Visual generation", "Instant backstories"],
   },
 ]
@@ -127,33 +85,41 @@ export function ScreenshotGallery() {
           <Grid container spacing={4}>
             {screenshots.map((screenshot, index) => (
               <Grid item xs={12} md={6} key={index}>
-                <ScreenshotPlaceholder elevation={0}>
-                  <ScreenshotIcon>{screenshot.icon}</ScreenshotIcon>
+                <ScreenshotCard elevation={3}>
+                  <Box position="relative" sx={{ aspectRatio: "16/9" }}>
+                    <Image
+                      src={screenshot.imageUrl}
+                      alt={screenshot.title}
+                      fill
+                      style={{ objectFit: "cover" }}
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      unoptimized // Using external CDN
+                    />
+                  </Box>
+                  
+                  <Box sx={{ p: 3 }}>
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      fontWeight="bold"
+                      color="primary"
+                    >
+                      {screenshot.title}
+                    </Typography>
 
-                  <ScreenshotTitle variant="h6">
-                    Screenshot: {screenshot.title}
-                  </ScreenshotTitle>
-
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    textAlign="center"
-                    sx={{ mb: 2 }}
-                  >
-                    {screenshot.description}
-                  </Typography>
-
-                  <Stack spacing={1} alignItems="center">
-                    <Typography variant="caption" color="text.secondary">
-                      {screenshot.filename} • {screenshot.dimensions}{" "}
-                      recommended
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 2 }}
+                    >
+                      {screenshot.description}
                     </Typography>
 
                     <Stack
                       direction="row"
                       spacing={1}
                       flexWrap="wrap"
-                      justifyContent="center"
+                      useFlexGap
                     >
                       {screenshot.features.map((feature, featureIndex) => (
                         <Chip
@@ -161,23 +127,21 @@ export function ScreenshotGallery() {
                           label={feature}
                           size="small"
                           variant="outlined"
-                          sx={{ fontSize: "0.7rem" }}
+                          color="primary"
                         />
                       ))}
                     </Stack>
-                  </Stack>
-                </ScreenshotPlaceholder>
+                  </Box>
+                </ScreenshotCard>
               </Grid>
             ))}
           </Grid>
 
           <Box textAlign="center">
             <Typography variant="body1" color="text.secondary">
-              Real screenshots will showcase the full power and elegance of the
-              Chi War interface.
+              Experience the full power and elegance of the Chi War interface.
               <br />
-              Experience intuitive design meets Hong Kong action cinema
-              aesthetics.
+              Where intuitive design meets Hong Kong action cinema aesthetics.
             </Typography>
           </Box>
         </Stack>

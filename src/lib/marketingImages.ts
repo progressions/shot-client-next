@@ -9,10 +9,11 @@ export const MARKETING_IMAGES = {
     background: "/images/marketing/heroes/hero-background.jpg",
   },
   screenshots: {
-    dashboard: "/images/marketing/screenshots/hero-dashboard.png",
-    characterSheet: "/images/marketing/screenshots/character-sheet-demo.png",
-    combat: "/images/marketing/screenshots/combat-encounter.png",
-    aiGeneration: "/images/marketing/screenshots/character-creation.png",
+    dashboard: `${IMAGEKIT_BASE}/marketing/screenshots/chi-war-dashboard.png`,
+    characterSheet: `${IMAGEKIT_BASE}/marketing/screenshots/chi-war-character-detail.png`,
+    combat: `${IMAGEKIT_BASE}/marketing/screenshots/chi-war-fight-detail.png`,
+    aiGeneration: `${IMAGEKIT_BASE}/marketing/screenshots/chi-war-ai-character-complete.png`,
+    fightsList: `${IMAGEKIT_BASE}/marketing/screenshots/chi-war-fights-list.png`,
   },
   junctures: {
     ancient: `${IMAGEKIT_BASE}/marketing/Ancient%20Juncture.png`,
