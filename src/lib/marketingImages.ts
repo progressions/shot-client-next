@@ -1,3 +1,6 @@
+// Import React hooks at the top of the file
+import { useState } from "react"
+
 // ImageKit CDN base URL
 const IMAGEKIT_BASE = "https://ik.imagekit.io/nvqgwnjgv"
 
@@ -95,6 +98,3 @@ export function useImageLoadingState() {
     isImageFailed,
   }
 }
-
-// Import React hooks at the top of the file
-import { useState } from "react"
