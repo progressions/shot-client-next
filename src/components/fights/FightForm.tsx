@@ -122,7 +122,7 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
           minWidth: isMobile ? "100%" : "30rem",
           maxWidth: isMobile ? "100%" : "30rem",
           flexShrink: 0,
-        }
+        },
       }}
     >
       <HeroImage entity={{ image_url: data.image_url }} positionable={false} />

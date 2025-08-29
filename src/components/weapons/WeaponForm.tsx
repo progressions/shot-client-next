@@ -150,7 +150,7 @@ export default function WeaponForm({
           minWidth: isMobile ? "100%" : "30rem",
           maxWidth: isMobile ? "100%" : "30rem",
           flexShrink: 0,
-        }
+        },
       }}
     >
       <HeroImage

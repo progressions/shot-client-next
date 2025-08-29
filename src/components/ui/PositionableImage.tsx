@@ -209,7 +209,7 @@ export function PositionableImage({
 
       setIsRepositioning(false)
       toastSuccess("Image position saved successfully")
-      
+
       // Force a small delay to ensure state updates properly
       setTimeout(() => {
         setCurrentX(response.data.x_position)

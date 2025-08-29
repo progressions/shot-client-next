@@ -123,7 +123,7 @@ export default function UserForm({ open, onClose, title }: UserFormProperties) {
           minWidth: isMobile ? "100%" : "30rem",
           maxWidth: isMobile ? "100%" : "30rem",
           flexShrink: 0,
-        }
+        },
       }}
     >
       <HeroImage
