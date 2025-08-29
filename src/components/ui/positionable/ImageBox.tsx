@@ -28,6 +28,17 @@ export function ImageBox({
 }: ImageBoxProps) {
   if (!entity.image_url) return
 
+  // Determine cursor style based on state
+  const getCursor = () => {
+    if (isRepositioning) {
+      return isDragging ? "move" : "grab"
+    }
+    if (onClick && !isRepositioning) {
+      return "pointer"
+    }
+    return "default"
+  }
+
   const handleClick = (event: React.MouseEvent) => {
     // Only trigger click for viewing if not repositioning and not dragging
     if (!isRepositioning && !isDragging && onClick) {
@@ -68,7 +79,7 @@ export function ImageBox({
         objectFit: "cover",
         display: "block",
         transform: `translate(${currentX}px, ${currentY}px)`,
-        cursor: isRepositioning ? (isDragging ? "move" : "grab") : onClick && !isRepositioning ? "pointer" : "default",
+        cursor: getCursor(),
         userSelect: "none",
         touchAction: isRepositioning ? "none" : "auto",
       }}
