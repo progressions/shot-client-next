@@ -8,7 +8,6 @@ import {
   JunctureShowcase,
   CallToAction,
 } from "."
-import { Footer } from "@/components/ui"
 
 export function MarketingLanding() {
   return (
@@ -18,7 +17,6 @@ export function MarketingLanding() {
       <ScreenshotGallery />
       <JunctureShowcase />
       <CallToAction />
-      <Footer />
     </Box>
   )
 }
