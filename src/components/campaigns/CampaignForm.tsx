@@ -2,14 +2,7 @@
 
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import {
-  Drawer,
-  Box,
-  Typography,
-  Alert,
-  IconButton,
-  FormHelperText,
-} from "@mui/material"
+import { Drawer, Box, Typography, Alert, FormHelperText } from "@mui/material"
 import {
   InfoLink,
   HeroImage,
@@ -21,7 +14,6 @@ import type { EditorChangeEvent, Campaign } from "@/types"
 import { defaultCampaign } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
 import { useEntity } from "@/hooks"
 import { useApp } from "@/contexts"
@@ -29,6 +21,7 @@ import { useApp } from "@/contexts"
 type FormStateData = Campaign & {
   [key: string]: unknown
   image?: File | null
+  _tempImageFile?: File
 }
 
 interface CampaignFormProperties {
@@ -49,7 +42,6 @@ export default function CampaignForm({
   })
   const { disabled, error, errors, data } = formState
   const { name, description, image } = data
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [nameValid, setNameValid] = useState(true)
   const { createEntity, handleFormErrors } = useEntity<Campaign>(
     defaultCampaign,
@@ -61,40 +53,46 @@ export default function CampaignForm({
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
   useEffect(() => {
-    if (image) {
-      const previewUrl = URL.createObjectURL(image)
-      setImagePreview(previewUrl)
-      return () => URL.revokeObjectURL(previewUrl)
-    } else {
-      setImagePreview(null)
-    }
-  }, [image])
-
-  useEffect(() => {
     dispatchForm({
       type: FormActions.DISABLE,
       payload: !nameValid || !!errors.name,
     })
   }, [nameValid, errors.name, dispatchForm])
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      if (!/^image\/(webp|jpeg|png|gif)$/.test(file.type)) {
-        dispatchForm({
-          type: FormActions.ERROR,
-          payload: "Image must be WEBP, JPEG, PNG, or GIF",
-        })
-        return
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        dispatchForm({
-          type: FormActions.ERROR,
-          payload: "Image must be less than 5MB",
-        })
-        return
-      }
-      dispatchForm({ type: FormActions.UPDATE, name: "image", value: file })
+  const handleEntityUpdate = (updatedCampaign: Campaign) => {
+    // Update specific fields that might change from PositionableImage component
+    if (updatedCampaign.image_url !== data.image_url) {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "image_url",
+        value: updatedCampaign.image_url,
+      })
+    }
+
+    // Handle temporary image file for creation mode
+    if (updatedCampaign._tempImageFile !== data._tempImageFile) {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "_tempImageFile",
+        value: updatedCampaign._tempImageFile,
+      })
+    }
+
+    // Handle position changes
+    if (updatedCampaign.x_position !== data.x_position) {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "x_position",
+        value: updatedCampaign.x_position,
+      })
+    }
+
+    if (updatedCampaign.y_position !== data.y_position) {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "y_position",
+        value: updatedCampaign.y_position,
+      })
     }
   }
 
@@ -136,7 +134,9 @@ export default function CampaignForm({
     }
     dispatchForm({ type: FormActions.SUBMIT })
     try {
-      await createEntity(data, image)
+      // Check if we have a temporary image file from PositionableImage upload
+      const imageFile = image || data._tempImageFile
+      await createEntity(data, imageFile)
       // Refresh user data to update onboarding progress
       await refreshUser()
 
@@ -160,7 +160,6 @@ export default function CampaignForm({
 
   const handleClose = () => {
     dispatchForm({ type: FormActions.RESET, payload: initialFormState })
-    setImagePreview(null)
     onClose()
   }
 
@@ -170,7 +169,12 @@ export default function CampaignForm({
       open={open}
       onClose={handleClose}
     >
-      <HeroImage entity={formState.data} />
+      <HeroImage
+        entity={formState.data}
+        setEntity={handleEntityUpdate}
+        creationMode={true}
+        pageContext="edit"
+      />
       <Box
         component="form"
         onSubmit={handleSubmit}
@@ -217,21 +221,6 @@ export default function CampaignForm({
             })
           }}
         />
-        <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: "1rem" }}>
-          <IconButton component="label">
-            <AddPhotoAlternateIcon sx={{ color: "#ffffff" }} />
-            <input
-              type="file"
-              hidden
-              accept="image/webp,image/jpeg,image/png,image/gif"
-              onChange={handleImageChange}
-            />
-          </IconButton>
-          <Typography variant="body2" sx={{ color: "#ffffff" }}>
-            Update Image
-          </Typography>
-        </Box>
-        {imagePreview && <HeroImage entity={{ image_url: imagePreview }} />}
         <Box sx={{ display: "flex", gap: "1rem", mt: 3 }}>
           <SaveButton type="submit" disabled={disabled}>
             Save
