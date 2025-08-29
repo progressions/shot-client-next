@@ -83,7 +83,7 @@ export default function CharacterSpeedDial({
       ) {
         const { constraints, suggestions } = error_.response.data
         const constraintsList = Object.entries(constraints)
-          .map(([key, data]: [string, any]) => `• ${data.count} ${data.label}`)
+          .map(([key, data]: [string, { count: number; label: string }]) => `• ${data.count} ${data.label}`)
           .join("\n")
 
         const message = `Cannot delete ${character.name || "this character"} because it has:\n\n${constraintsList}\n\nThese associations must be removed first, or you can force delete which will remove all associations.\n\nForce delete and remove all associations?`
