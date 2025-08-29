@@ -116,13 +116,10 @@ export function PositionableImage({
       const deltaY = clientY - startY
       const newX = startTranslateX + deltaX
       const newY = startTranslateY + deltaY
-      const maxX = Math.max(0, (scaledWidth - boxWidth) / 2)
-      const maxY = Math.max(0, (scaledHeight - boxHeight) / 2)
-      const finalX = Math.max(-maxX, Math.min(maxX, newX))
-      const finalY = Math.max(-maxY, Math.min(maxY, newY))
-
-      setCurrentX(finalX)
-      setCurrentY(finalY)
+      const maxX = (scaledWidth - boxWidth) / 2
+      const maxY = (scaledHeight - boxHeight) / 2
+      setCurrentX(Math.max(-maxX, Math.min(maxX, newX)))
+      setCurrentY(Math.max(-maxY, Math.min(maxY, newY)))
     }
     const handleEnd = () => {
       setIsDragging(false)

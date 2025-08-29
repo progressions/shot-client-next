@@ -64,21 +64,13 @@ export function ImageBox({
       draggable={false} // Disable HTML5 drag
       sx={{
         width: "100%",
-        height: "100%",
+        height: "auto",
         objectFit: "cover",
         display: "block",
-        transform: `translate(${currentX || 0}px, ${currentY || 0}px)`,
-        cursor: isRepositioning
-          ? isDragging
-            ? "move"
-            : "grab"
-          : onClick && !isRepositioning
-            ? "pointer"
-            : "default",
+        transform: `translate(${currentX}px, ${currentY}px)`,
+        cursor: isRepositioning ? (isDragging ? "move" : "grab") : onClick && !isRepositioning ? "pointer" : "default",
         userSelect: "none",
         touchAction: isRepositioning ? "none" : "auto",
-        WebkitUserDrag: "none", // Prevent drag on Safari/Chrome
-        userDrag: "none", // Additional drag prevention
       }}
     />
   )
