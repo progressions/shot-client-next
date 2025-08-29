@@ -126,9 +126,9 @@ export function CallToAction() {
                 mb: 4,
               }}
             >
-              Join thousands of storytellers creating unforgettable cinematic
-              campaigns. Experience the power of professional-grade RPG
-              management tools.
+              The ultimate Feng Shui 2 campaign management platform.
+              Real-time combat, AI character generation, and cross-juncture
+              storytelling await.
             </Typography>
           </Box>
 
