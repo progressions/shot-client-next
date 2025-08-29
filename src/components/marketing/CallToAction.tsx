@@ -11,27 +11,18 @@ import {
 } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import Link from "next/link"
-import { RocketLaunch, Login, MenuBook, Support } from "@mui/icons-material"
+import Image from "next/image"
+import { RocketLaunch, Login, MenuBook } from "@mui/icons-material"
+import { MARKETING_IMAGES } from "@/lib/marketingImages"
 
 const CTASection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(10, 0),
-  background: `linear-gradient(135deg, 
-    ${theme.palette.primary.main} 0%, 
-    ${theme.palette.primary.dark} 50%, 
-    ${theme.palette.secondary.main} 100%)`,
   color: "white",
   position: "relative",
   overflow: "hidden",
-  "&::before": {
-    content: '""',
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: "rgba(0, 0, 0, 0.2)",
-    zIndex: 1,
-  },
+  minHeight: "600px",
+  display: "flex",
+  alignItems: "center",
 }))
 
 const CTAContent = styled(Container)(({ theme }) => ({
@@ -95,16 +86,35 @@ const quickFeatures = [
     title: "Learn Fast",
     description: "Comprehensive documentation and tutorials",
   },
-  {
-    icon: <Support sx={{ fontSize: 40 }} />,
-    title: "Expert Support",
-    description: "Active community and responsive help",
-  },
 ]
 
 export function CallToAction() {
   return (
     <CTASection>
+      {/* Background Image */}
+      <Image
+        src={MARKETING_IMAGES.assets.eatersOfTheLotus}
+        alt="Eaters of the Lotus background"
+        fill
+        style={{ objectFit: "cover" }}
+        quality={90}
+        unoptimized // Using external CDN
+      />
+
+      {/* Dark Overlay */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background:
+            "linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7))",
+          zIndex: 1,
+        }}
+      />
+
       <CTAContent maxWidth="lg">
         <Stack spacing={6}>
           <Box>
@@ -131,16 +141,16 @@ export function CallToAction() {
                 mb: 4,
               }}
             >
-              Join thousands of storytellers creating unforgettable cinematic
-              campaigns. Experience the power of professional-grade RPG
-              management tools.
+              The ultimate Feng Shui 2 campaign management platform. Real-time
+              combat, AI character generation, and cross-juncture storytelling
+              await.
             </Typography>
           </Box>
 
           {/* Quick Features */}
-          <Grid container spacing={3}>
+          <Grid container spacing={3} justifyContent="center">
             {quickFeatures.map((feature, index) => (
-              <Grid item xs={12} md={4} key={index}>
+              <Grid item xs={12} sm={6} md={4} key={index}>
                 <FeatureHighlight elevation={0}>
                   <Stack spacing={2} alignItems="center">
                     <Box sx={{ color: "white" }}>{feature.icon}</Box>

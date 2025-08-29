@@ -125,7 +125,7 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
                 />
               </Grid>
 
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid item xs={12} sm={6} md={6}>
                 <FormControl fullWidth>
                   <InputLabel>Archetype</InputLabel>
                   <Select
@@ -169,11 +169,11 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
                     width: {
                       xs: "100%",
                       sm: "calc(50% - 12px)",
-                      md: "calc(33.333% - 16px)",
-                      lg: "calc(25% - 18px)",
+                      md: "calc(50% - 16px)",
+                      lg: "calc(50% - 18px)",
                     },
                     minWidth: { xs: "100%", sm: 300 },
-                    maxWidth: { xs: "100%", sm: 400 },
+                    maxWidth: { xs: "100%", sm: 500, md: 600 },
                   }}
                 >
                   <PCTemplatePreviewCard
