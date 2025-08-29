@@ -151,7 +151,6 @@ export default function SiteForm({ open, onClose, title }: SiteFormProperties) {
         sx={{
           width: "100%",
           maxWidth: "100%",
-          overflow: "hidden",
         }}
       >
         <HeroImage

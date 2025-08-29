@@ -127,7 +127,6 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
         sx={{
           width: "100%",
           maxWidth: "100%",
-          overflow: "hidden",
         }}
       >
         <HeroImage entity={{ image_url: data.image_url }} positionable={false} />

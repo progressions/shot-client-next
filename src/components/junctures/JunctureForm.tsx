@@ -155,7 +155,6 @@ export default function JunctureForm({
         sx={{
           width: "100%",
           maxWidth: "100%",
-          overflow: "hidden",
         }}
       >
         <HeroImage
