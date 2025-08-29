@@ -4,7 +4,6 @@ import {
   Box,
   Container,
   Typography,
-  Grid,
   Paper,
   Stack,
   Chip,
@@ -85,10 +84,15 @@ export function ScreenshotGallery() {
             </Typography>
           </Box>
 
-          <Grid container spacing={3}>
+          <Box 
+            sx={{ 
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+              gap: 3,
+            }}
+          >
             {screenshots.map((screenshot, index) => (
-              <Grid item xs={12} sm={6} md={6} lg={6} xl={6} key={index}>
-                <ScreenshotCard elevation={3}>
+              <ScreenshotCard key={index} elevation={3}>
                   <Box 
                     position="relative" 
                     sx={{ 
@@ -146,9 +150,8 @@ export function ScreenshotGallery() {
                     </Stack>
                   </Box>
                 </ScreenshotCard>
-              </Grid>
             ))}
-          </Grid>
+          </Box>
 
           <Box textAlign="center">
             <Typography variant="body1" color="text.secondary">
