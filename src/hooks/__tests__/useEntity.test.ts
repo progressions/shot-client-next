@@ -3,6 +3,16 @@ import { useEntity } from "../useEntity"
 import { FormActions } from "@/reducers"
 import type { Entity } from "@/types"
 
+// Mock handleEntityDeletion
+jest.mock("@/lib/deletionHandler", () => ({
+  handleEntityDeletion: jest.fn(),
+}))
+
+import { handleEntityDeletion } from "@/lib/deletionHandler"
+const mockHandleEntityDeletion = handleEntityDeletion as jest.MockedFunction<
+  typeof handleEntityDeletion
+>
+
 // Mock the contexts
 const mockClient = {
   getCharacter: jest.fn(),
@@ -207,7 +217,12 @@ describe("useEntity", () => {
 
   describe("deleteEntity", () => {
     it("successfully deletes entity", async () => {
-      mockClient.deleteCharacter.mockResolvedValue({ data: { success: true } })
+      // Mock handleEntityDeletion to call the onSuccess callback
+      mockHandleEntityDeletion.mockImplementation(
+        async (entity, deleteFunc, options) => {
+          options.onSuccess()
+        }
+      )
 
       const { result } = renderHook(() =>
         useEntity(mockEntity, mockDispatchForm)
@@ -217,7 +232,15 @@ describe("useEntity", () => {
         await result.current.deleteEntity()
       })
 
-      expect(mockClient.deleteCharacter).toHaveBeenCalledWith(mockEntity, {})
+      expect(mockHandleEntityDeletion).toHaveBeenCalledWith(
+        mockEntity,
+        expect.any(Function),
+        expect.objectContaining({
+          entityName: "character",
+          onSuccess: expect.any(Function),
+          onError: expect.any(Function),
+        })
+      )
       expect(mockToast.toastSuccess).toHaveBeenCalledWith(
         "Character deleted successfully"
       )
@@ -225,28 +248,35 @@ describe("useEntity", () => {
     })
 
     it("handles delete error", async () => {
-      const error = new Error("Delete failed")
-      mockClient.deleteCharacter.mockRejectedValue(error)
+      const errorMessage = "Failed to delete character"
+      // Mock handleEntityDeletion to call the onError callback
+      mockHandleEntityDeletion.mockImplementation(
+        async (entity, deleteFunc, options) => {
+          options.onError(errorMessage)
+        }
+      )
 
       const { result } = renderHook(() =>
         useEntity(mockEntity, mockDispatchForm)
       )
 
       await act(async () => {
-        await expect(result.current.deleteEntity()).rejects.toThrow(
-          "Delete failed"
-        )
+        await result.current.deleteEntity()
       })
 
-      expect(mockToast.toastError).toHaveBeenCalledWith(
-        "Failed to delete entity. yeah"
-      )
+      expect(mockToast.toastError).toHaveBeenCalledWith(errorMessage)
       expect(mockRouter.push).not.toHaveBeenCalled()
     })
 
     it("navigates to entity list page after successful delete", async () => {
       const vehicleEntity = { ...mockEntity, entity_class: "Vehicle" as const }
-      mockClient.deleteVehicle.mockResolvedValue({ data: { success: true } })
+
+      // Mock handleEntityDeletion to call the onSuccess callback
+      mockHandleEntityDeletion.mockImplementation(
+        async (entity, deleteFunc, options) => {
+          options.onSuccess()
+        }
+      )
 
       const { result } = renderHook(() =>
         useEntity(vehicleEntity, mockDispatchForm)

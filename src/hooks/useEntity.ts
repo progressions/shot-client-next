@@ -5,6 +5,8 @@ import type { Entity } from "@/types"
 import pluralize from "pluralize"
 import { FormActions } from "@/reducers"
 import { useRouter } from "next/navigation"
+import { handleEntityDeletion } from "@/lib/deletionHandler"
+import { AxiosError } from "axios"
 
 /*********
  * expects a formState with the following structure:
@@ -85,19 +87,23 @@ export function useEntity(
     }
   }
 
-  const deleteEntity = async (params = {}) => {
+  const deleteEntity = async () => {
     if (!entity?.id) return
-    if (!confirm(`Are you sure you want to delete the entity: ${entity.name}?`))
-      return
 
-    try {
-      await client[deleteFunction](entity, params)
-      router.push(`/${pluralName}`)
-      toastSuccess(`${entityClass} deleted successfully`)
-    } catch (error) {
-      toastError("Failed to delete entity. yeah")
-      throw error
-    }
+    await handleEntityDeletion(
+      entity,
+      (entity, params) => client[deleteFunction](entity, params),
+      {
+        entityName: name,
+        onSuccess: () => {
+          router.push(`/${pluralName}`)
+          toastSuccess(`${entityClass} deleted successfully`)
+        },
+        onError: message => {
+          toastError(message)
+        },
+      }
+    )
   }
 
   const createEntity = async (newEntity: Entity, image: File | null) => {
@@ -149,13 +155,13 @@ export function useEntity(
   }
 
   const handleFormErrors = (error: unknown) => {
-    const axiosError = error as AxiosError<ServerErrorResponse>
+    const axiosError = error as AxiosError<{ errors: Record<string, string[]> }>
     if (axiosError.response?.status === 422) {
       const serverErrors = axiosError.response.data.errors
-      const formattedErrors: FormStateData["errors"] = {}
+      const formattedErrors: Record<string, string> = {}
       Object.entries(serverErrors).forEach(([field, messages]) => {
         if (messages && messages.length > 0) {
-          formattedErrors[field as keyof FormStateData] = messages[0]
+          formattedErrors[field] = messages[0]
         }
       })
       dispatchForm({

@@ -67,8 +67,11 @@ export function createFightClient(deps: ClientDependencies) {
     return patch(`${apiV2.fights(fight)}/touch`)
   }
 
-  async function deleteFight(fight: Fight): Promise<AxiosResponse<void>> {
-    return delete_(apiV2.fights(fight))
+  async function deleteFight(
+    fight: Fight,
+    params = {}
+  ): Promise<AxiosResponse<void>> {
+    return delete_(apiV2.fights(fight), params)
   }
 
   async function getFightEvents(

@@ -17,6 +17,7 @@ import { useToast, useCampaign, useClient } from "@/contexts"
 import { RichTextRenderer } from "@/components/editor"
 import DetailButtons from "@/components/DetailButtons"
 import { PositionableImage } from "@/components/ui"
+import { handleEntityDeletion } from "@/lib/deletionHandler"
 
 interface WeaponDetailProperties {
   weapon: Weapon
@@ -43,38 +44,19 @@ export default function WeaponDetail({
 
   const handleDelete = async () => {
     if (!weapon?.id) return
-    if (!confirm(`Are you sure you want to delete the weapon: ${weapon.name}?`))
-      return
 
-    try {
-      await client.deleteWeapon(weapon)
-      onDelete(weapon.id)
-      setError(null)
-      toastSuccess("Weapon deleted successfully.")
-    } catch (error: AxiosError) {
-      if (error.response?.data?.errors?.carries) {
-        if (
-          confirm(
-            "This weapon is carried by one or more characters. Do you want to delete it anyway?"
-          )
-        ) {
-          try {
-            await client.deleteWeapon(weapon, { force: true })
-            onDelete(weapon.id)
-            setError(null)
-            toastSuccess("Weapon deleted successfully.")
-          } catch (forceError: unknown) {
-            console.error(forceError)
-            setError("Failed to delete weapon.")
-            toastError("Failed to delete weapon.")
-          }
-        }
-      }
-
-      console.error("Delete weapon error:", error)
-    }
-    setError("Failed to delete weapon.")
-    toastError("Failed to delete weapon.")
+    await handleEntityDeletion(weapon, client.deleteWeapon, {
+      entityName: "weapon",
+      onSuccess: () => {
+        onDelete(weapon.id)
+        setError(null)
+        toastSuccess("Weapon deleted successfully")
+      },
+      onError: message => {
+        setError(message)
+        toastError(message)
+      },
+    })
   }
 
   return (
