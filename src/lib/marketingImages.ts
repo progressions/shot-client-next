@@ -10,7 +10,7 @@ export const MARKETING_IMAGES = {
   },
   screenshots: {
     dashboard: `${IMAGEKIT_BASE}/marketing/screenshots/chi-war-dashboard.png?tr=ar-16-9,c-at_max,fo-auto`,
-    characterSheet: `${IMAGEKIT_BASE}/marketing/screenshots/chi-war-character-detail.png?tr=ar-16-9,c-at_max,fo-top`,
+    characterSheet: `${IMAGEKIT_BASE}/marketing/screenshots/chi-war-character-detail.png?tr=ar-16-9,c-at_max,fo-auto&v=2`,
     combat: `${IMAGEKIT_BASE}/marketing/screenshots/chi-war-fight-detail.png?tr=ar-16-9,c-at_max,fo-auto`,
     aiGeneration: `${IMAGEKIT_BASE}/marketing/screenshots/chi-war-ai-character-complete.png?tr=ar-16-9,c-at_max,fo-center`,
     fightsList: `${IMAGEKIT_BASE}/marketing/screenshots/chi-war-fights-list.png?tr=ar-16-9,c-at_max,fo-auto`,
