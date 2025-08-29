@@ -50,16 +50,6 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
   useEffect(() => {
-    if (image) {
-      const previewUrl = URL.createObjectURL(image)
-      setImagePreview(previewUrl)
-      return () => URL.revokeObjectURL(previewUrl)
-    } else {
-      // imagePreview removed
-    }
-  }, [image])
-
-  useEffect(() => {
     dispatchForm({
       type: FormActions.DISABLE,
       payload: !nameValid || !!errors.name,
@@ -118,11 +108,8 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
 
   const handleClose = () => {
     dispatchForm({ type: FormActions.RESET, payload: initialFormState })
-    // imagePreview removed
     onClose()
   }
-
-  const previewImage = imagePreview || data.image_url || null
 
   return (
     <Drawer
@@ -130,7 +117,7 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
       open={open}
       onClose={handleClose}
     >
-      <HeroImage entity={{ image_url: previewImage }} positionable={false} />
+      <HeroImage entity={{ image_url: data.image_url }} positionable={false} />
       <Box
         component="form"
         onSubmit={handleSubmit}

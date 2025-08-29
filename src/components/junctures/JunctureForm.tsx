@@ -48,16 +48,6 @@ export default function JunctureForm({
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
   useEffect(() => {
-    if (image) {
-      const previewUrl = URL.createObjectURL(image)
-      setImagePreview(previewUrl)
-      return () => URL.revokeObjectURL(previewUrl)
-    } else {
-      // imagePreview removed
-    }
-  }, [image])
-
-  useEffect(() => {
     dispatchForm({
       type: FormActions.DISABLE,
       payload: !nameValid || !!errors.name,
@@ -146,7 +136,6 @@ export default function JunctureForm({
 
   const handleClose = () => {
     dispatchForm({ type: FormActions.RESET, payload: initialFormState })
-    // imagePreview removed
     onClose()
   }
 

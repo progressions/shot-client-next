@@ -21,7 +21,6 @@ import {
 import type { User } from "@/types"
 import { defaultUser } from "@/types"
 import { FormActions, useForm } from "@/reducers"
-import { useEffect } from "react"
 import { useEntity } from "@/hooks"
 
 type FormStateData = User & {
@@ -49,16 +48,6 @@ export default function UserForm({ open, onClose, title }: UserFormProperties) {
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
-
-  useEffect(() => {
-    if (image) {
-      const previewUrl = URL.createObjectURL(image)
-      setImagePreview(previewUrl)
-      return () => URL.revokeObjectURL(previewUrl)
-    } else {
-      // imagePreview removed
-    }
-  }, [image])
 
   const handleEntityUpdate = (updatedUser: User) => {
     // Update specific fields that might change from PositionableImage component
@@ -120,7 +109,6 @@ export default function UserForm({ open, onClose, title }: UserFormProperties) {
 
   const handleClose = () => {
     dispatchForm({ type: FormActions.RESET, payload: initialFormState })
-    // imagePreview removed
     onClose()
   }
 
