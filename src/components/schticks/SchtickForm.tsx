@@ -2,14 +2,7 @@
 
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import {
-  Drawer,
-  Box,
-  Typography,
-  Alert,
-  IconButton,
-  FormHelperText,
-} from "@mui/material"
+import { Drawer, Box, Typography, Alert, FormHelperText } from "@mui/material"
 import {
   HeroImage,
   SaveButton,
@@ -20,7 +13,6 @@ import type { EditorChangeEvent, Schtick } from "@/types"
 import { defaultSchtick } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
 import { useEntity } from "@/hooks"
 import { EditCategoryPath } from "@/components/schticks"
@@ -28,6 +20,7 @@ import { EditCategoryPath } from "@/components/schticks"
 type FormStateData = Schtick & {
   [key: string]: unknown
   image?: File | null
+  _tempImageFile?: File
 }
 
 interface SchtickFormProperties {
@@ -46,7 +39,6 @@ export default function SchtickForm({
   })
   const { disabled, error, errors, data } = formState
   const { name, description, image } = data
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [nameValid, setNameValid] = useState(true)
   const { createEntity, handleFormErrors } = useEntity<Schtick>(
     defaultSchtick,
@@ -55,16 +47,6 @@ export default function SchtickForm({
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
-
-  useEffect(() => {
-    if (image) {
-      const previewUrl = URL.createObjectURL(image)
-      setImagePreview(previewUrl)
-      return () => URL.revokeObjectURL(previewUrl)
-    } else {
-      setImagePreview(null)
-    }
-  }, [image])
 
   useEffect(() => {
     dispatchForm({
@@ -80,24 +62,40 @@ export default function SchtickForm({
     })
   }
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      if (!/^image\/(webp|jpeg|png|gif)$/.test(file.type)) {
-        dispatchForm({
-          type: FormActions.ERROR,
-          payload: "Image must be WEBP, JPEG, PNG, or GIF",
-        })
-        return
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        dispatchForm({
-          type: FormActions.ERROR,
-          payload: "Image must be less than 5MB",
-        })
-        return
-      }
-      dispatchForm({ type: FormActions.UPDATE, name: "image", value: file })
+  const handleEntityUpdate = (updatedSchtick: Schtick) => {
+    // Update specific fields that might change from PositionableImage component
+    if (updatedSchtick.image_url !== data.image_url) {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "image_url",
+        value: updatedSchtick.image_url,
+      })
+    }
+
+    // Handle temporary image file for creation mode
+    if (updatedSchtick._tempImageFile !== data._tempImageFile) {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "_tempImageFile",
+        value: updatedSchtick._tempImageFile,
+      })
+    }
+
+    // Handle position changes
+    if (updatedSchtick.x_position !== data.x_position) {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "x_position",
+        value: updatedSchtick.x_position,
+      })
+    }
+
+    if (updatedSchtick.y_position !== data.y_position) {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "y_position",
+        value: updatedSchtick.y_position,
+      })
     }
   }
 
@@ -135,7 +133,9 @@ export default function SchtickForm({
     }
     dispatchForm({ type: FormActions.SUBMIT })
     try {
-      await createEntity(data, image)
+      // Check if we have a temporary image file from PositionableImage upload
+      const imageFile = image || data._tempImageFile
+      await createEntity(data, imageFile)
       handleClose()
     } catch (error) {
       handleFormErrors(error)
@@ -144,7 +144,6 @@ export default function SchtickForm({
 
   const handleClose = () => {
     dispatchForm({ type: FormActions.RESET, payload: initialFormState })
-    setImagePreview(null)
     onClose()
   }
 
@@ -154,7 +153,13 @@ export default function SchtickForm({
       open={open}
       onClose={handleClose}
     >
-      <HeroImage entity={formState.data} />
+      <HeroImage
+        entity={formState.data}
+        setEntity={handleEntityUpdate}
+        creationMode={true}
+        pageContext="edit"
+        height={400}
+      />
       <Box
         component="form"
         onSubmit={handleSubmit}
@@ -199,21 +204,6 @@ export default function SchtickForm({
             })
           }}
         />
-        <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: "1rem" }}>
-          <IconButton component="label">
-            <AddPhotoAlternateIcon sx={{ color: "#ffffff" }} />
-            <input
-              type="file"
-              hidden
-              accept="image/webp,image/jpeg,image/png,image/gif"
-              onChange={handleImageChange}
-            />
-          </IconButton>
-          <Typography variant="body2" sx={{ color: "#ffffff" }}>
-            Update Image
-          </Typography>
-        </Box>
-        {imagePreview && <HeroImage entity={{ image_url: imagePreview }} />}
         <Box sx={{ display: "flex", gap: "1rem", mt: 3 }}>
           <SaveButton type="submit" disabled={disabled}>
             Save

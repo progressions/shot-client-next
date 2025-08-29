@@ -108,7 +108,12 @@ export function useEntity(
 
   const createEntity = async (newEntity: Entity, image: File | null) => {
     const formData = new FormData()
-    const entityData = { ...entity, ...newEntity, image: undefined }
+    const {
+      _tempImageFile,
+      image: entityImage,
+      ...cleanedEntity
+    } = { ...entity, ...newEntity }
+    const entityData = cleanedEntity
 
     formData.set(name, JSON.stringify(entityData))
     if (image) {

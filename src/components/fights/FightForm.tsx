@@ -9,7 +9,6 @@ import {
   Box,
   Typography,
   Alert,
-  IconButton,
   Stack,
 } from "@mui/material"
 import {
@@ -22,7 +21,6 @@ import {
 import type { EditorChangeEvent, Fight } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { Editor } from "@/components/editor"
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import { useState, useEffect } from "react"
 import { useEntity } from "@/hooks"
 import { defaultFight } from "@/types"
@@ -43,7 +41,6 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
   })
   const { disabled, error, errors, data } = formState
   const { name, description, image } = data
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [nameValid, setNameValid] = useState(true)
   const { createEntity, handleFormErrors } = useEntity<Fight>(
     defaultFight,
@@ -53,42 +50,11 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
   useEffect(() => {
-    if (image) {
-      const previewUrl = URL.createObjectURL(image)
-      setImagePreview(previewUrl)
-      return () => URL.revokeObjectURL(previewUrl)
-    } else {
-      setImagePreview(null)
-    }
-  }, [image])
-
-  useEffect(() => {
     dispatchForm({
       type: FormActions.DISABLE,
       payload: !nameValid || !!errors.name,
     })
   }, [nameValid, errors.name, dispatchForm])
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      if (!/^image\/(webp|jpeg|png|gif)$/.test(file.type)) {
-        dispatchForm({
-          type: FormActions.ERROR,
-          payload: "Image must be WEBP, JPEG, PNG, or GIF",
-        })
-        return
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        dispatchForm({
-          type: FormActions.ERROR,
-          payload: "Image must be less than 5MB",
-        })
-        return
-      }
-      dispatchForm({ type: FormActions.UPDATE, name: "image", value: file })
-    }
-  }
 
   const handleNameEntityUpdate = (updatedFight: Fight) => {
     // Update the name field
@@ -142,11 +108,8 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
 
   const handleClose = () => {
     dispatchForm({ type: FormActions.RESET, payload: initialFormState })
-    setImagePreview(null)
     onClose()
   }
-
-  const previewImage = imagePreview || data.image_url || null
 
   return (
     <Drawer
@@ -154,7 +117,7 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
       open={open}
       onClose={handleClose}
     >
-      <HeroImage entity={{ image_url: previewImage }} positionable={false} />
+      <HeroImage entity={{ image_url: data.image_url }} positionable={false} />
       <Box
         component="form"
         onSubmit={handleSubmit}
@@ -236,20 +199,6 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
             )}
           </FormControl>
         </Stack>
-        <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: "1rem" }}>
-          <IconButton component="label">
-            <AddPhotoAlternateIcon sx={{ color: "#ffffff" }} />
-            <input
-              type="file"
-              hidden
-              accept="image/webp,image/jpeg,image/png,image/gif"
-              onChange={handleImageChange}
-            />
-          </IconButton>
-          <Typography variant="body2" sx={{ color: "#ffffff" }}>
-            Update Image
-          </Typography>
-        </Box>
         <Box sx={{ display: "flex", gap: "1rem", mt: 3 }}>
           <SaveButton type="submit" disabled={disabled}>
             Save
