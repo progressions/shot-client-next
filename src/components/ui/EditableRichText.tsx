@@ -14,7 +14,7 @@ type EditableRichTextProps = {
 export function EditableRichText({
   name,
   html,
-  editable = true,
+  editable: _editable = true,
   onChange,
   fallback,
 }: EditableRichTextProps) {

@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: FightPageProperties) {
       title: `${fight.name || "Fight"} - Chi War`,
       description: `Fight details${fight.name ? ` for ${fight.name}` : ""}`,
     }
-  } catch (_error) {
+  } catch {
     return {
       title: "Fight Not Found - Chi War",
       description: "The requested fight could not be found",

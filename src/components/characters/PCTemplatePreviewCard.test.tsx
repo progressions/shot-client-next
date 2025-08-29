@@ -6,12 +6,12 @@ import { Character } from "@/types"
 // Mock the CS service
 jest.mock("@/services", () => ({
   CS: {
-    mainAttack: jest.fn(char => "Martial Arts"),
-    mainAttackValue: jest.fn(char => 15),
-    fortune: jest.fn(char => 6),
-    fortuneType: jest.fn(char => "Fortune"),
-    archetype: jest.fn(char => "Archer"),
-    background: jest.fn(char => "<p>A skilled archer from ancient times.</p>"),
+    mainAttack: jest.fn(_char => "Martial Arts"),
+    mainAttackValue: jest.fn(_char => 15),
+    fortune: jest.fn(_char => 6),
+    fortuneType: jest.fn(_char => "Fortune"),
+    archetype: jest.fn(_char => "Archer"),
+    background: jest.fn(_char => "<p>A skilled archer from ancient times.</p>"),
   },
 }))
 
@@ -28,7 +28,7 @@ jest.mock("@mui/material/CardMedia", () => {
     __esModule: true,
     default: ({
       children,
-      component,
+      component: _component,
       ...props
     }: {
       children?: React.ReactNode
