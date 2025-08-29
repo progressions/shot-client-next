@@ -161,6 +161,7 @@ export default function WeaponForm({
         setEntity={handleEntityUpdate}
         creationMode={true}
         pageContext="edit"
+        height={400}
       />
       <Box
         component="form"

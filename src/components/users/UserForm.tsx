@@ -135,6 +135,7 @@ export default function UserForm({ open, onClose, title }: UserFormProperties) {
         setEntity={handleEntityUpdate}
         creationMode={true}
         pageContext="edit"
+        height={400}
       />
       <Box
         component="form"

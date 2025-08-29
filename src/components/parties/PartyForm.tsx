@@ -55,12 +55,40 @@ export default function PartyForm({
   }, [nameValid, errors.name, dispatchForm])
 
   const handleEntityUpdate = (updatedParty: Party) => {
-    // Update the entire entity state from PositionableImage component
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "data",
-      value: updatedParty,
-    })
+    // Update specific fields that might change from PositionableImage component
+    if (updatedParty.image_url !== data.image_url) {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "image_url",
+        value: updatedParty.image_url,
+      })
+    }
+
+    // Handle temporary image file for creation mode
+    if (updatedParty._tempImageFile !== data._tempImageFile) {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "_tempImageFile",
+        value: updatedParty._tempImageFile,
+      })
+    }
+
+    // Handle position changes
+    if (updatedParty.x_position !== data.x_position) {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "x_position",
+        value: updatedParty.x_position,
+      })
+    }
+
+    if (updatedParty.y_position !== data.y_position) {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "y_position",
+        value: updatedParty.y_position,
+      })
+    }
   }
 
   const handleNameEntityUpdate = (updatedParty: Party) => {
@@ -122,6 +150,7 @@ export default function PartyForm({
         setEntity={handleEntityUpdate}
         creationMode={true}
         pageContext="edit"
+        height={400}
       />
       <Box
         component="form"

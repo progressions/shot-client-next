@@ -167,6 +167,7 @@ export default function VehicleForm({
         setEntity={handleEntityUpdate}
         creationMode={true}
         pageContext="edit"
+        height={400}
       />
       <Box
         component="form"

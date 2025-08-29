@@ -51,12 +51,40 @@ export default function SiteForm({ open, onClose, title }: SiteFormProperties) {
   }, [nameValid, errors.name, dispatchForm])
 
   const handleEntityUpdate = (updatedSite: Site) => {
-    // Update the entire entity state from PositionableImage component
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "data",
-      value: updatedSite,
-    })
+    // Update specific fields that might change from PositionableImage component
+    if (updatedSite.image_url !== data.image_url) {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "image_url",
+        value: updatedSite.image_url,
+      })
+    }
+
+    // Handle temporary image file for creation mode
+    if (updatedSite._tempImageFile !== data._tempImageFile) {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "_tempImageFile",
+        value: updatedSite._tempImageFile,
+      })
+    }
+
+    // Handle position changes
+    if (updatedSite.x_position !== data.x_position) {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "x_position",
+        value: updatedSite.x_position,
+      })
+    }
+
+    if (updatedSite.y_position !== data.y_position) {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "y_position",
+        value: updatedSite.y_position,
+      })
+    }
   }
 
   const handleNameEntityUpdate = (updatedSite: Site) => {
@@ -118,6 +146,7 @@ export default function SiteForm({ open, onClose, title }: SiteFormProperties) {
         setEntity={handleEntityUpdate}
         creationMode={true}
         pageContext="edit"
+        height={400}
       />
       <Box
         component="form"
