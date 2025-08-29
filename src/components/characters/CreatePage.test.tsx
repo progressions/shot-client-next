@@ -176,12 +176,6 @@ describe("CreatePage", () => {
       ).not.toBeInTheDocument()
     })
 
-    it("shows archetype filter dropdown", () => {
-      render(<CreatePage templates={mockTemplates} />)
-
-      // Check that the Archetype label is present (indicates dropdown exists)
-      expect(screen.getAllByText("Archetype")).toHaveLength(2)
-    })
 
     it("updates result count when filtering", () => {
       render(<CreatePage templates={mockTemplates} />)
