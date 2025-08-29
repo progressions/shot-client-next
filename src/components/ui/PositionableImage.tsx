@@ -116,8 +116,8 @@ export function PositionableImage({
       const deltaY = clientY - startY
       const newX = startTranslateX + deltaX
       const newY = startTranslateY + deltaY
-      const maxX = (scaledWidth - boxWidth) / 2
-      const maxY = (scaledHeight - boxHeight) / 2
+      const maxX = Math.max(0, (scaledWidth - boxWidth) / 2)
+      const maxY = Math.max(0, (scaledHeight - boxHeight) / 2)
       const finalX = Math.max(-maxX, Math.min(maxX, newX))
       const finalY = Math.max(-maxY, Math.min(maxY, newY))
 
@@ -212,6 +212,12 @@ export function PositionableImage({
 
       setIsRepositioning(false)
       toastSuccess("Image position saved successfully")
+      
+      // Force a small delay to ensure state updates properly
+      setTimeout(() => {
+        setCurrentX(response.data.x_position)
+        setCurrentY(response.data.y_position)
+      }, 100)
     } catch (err: unknown) {
       console.error("Failed to save image position:", err)
       toastError("Failed to save image position")

@@ -67,7 +67,7 @@ export function ImageBox({
         height: "100%",
         objectFit: "cover",
         display: "block",
-        transform: `translate(${currentX}px, ${currentY}px)`,
+        transform: `translate(${currentX || 0}px, ${currentY || 0}px)`,
         cursor: isRepositioning
           ? isDragging
             ? "move"

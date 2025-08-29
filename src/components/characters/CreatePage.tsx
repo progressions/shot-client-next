@@ -7,10 +7,6 @@ import {
   Typography,
   TextField,
   InputAdornment,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Grid,
   CircularProgress,
 } from "@mui/material"
@@ -30,20 +26,13 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
   const { refreshUser } = useApp()
   const { toastSuccess, toastError } = useToast()
 
-  // Search and filter state
+  // Search state
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedArchetype, setSelectedArchetype] = useState("")
 
   // Loading state
   const [creatingFrom, setCreatingFrom] = useState<string | null>(null)
 
-  // Get unique archetypes from templates
-  const archetypes = useMemo(() => {
-    const unique = [...new Set(templates.map(t => t.archetype).filter(Boolean))]
-    return unique.sort()
-  }, [templates])
-
-  // Filter templates based on search and filters
+  // Filter templates based on search
   const filteredTemplates = useMemo(() => {
     return templates.filter(template => {
       // Search filter
@@ -54,14 +43,9 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
         return false
       }
 
-      // Archetype filter
-      if (selectedArchetype && template.archetype !== selectedArchetype) {
-        return false
-      }
-
       return true
     })
-  }, [templates, searchTerm, selectedArchetype])
+  }, [templates, searchTerm])
 
   const handleSelectTemplate = async (template: Character) => {
     if (creatingFrom) return // Prevent double-clicking
@@ -105,7 +89,7 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
         </Box>
       ) : (
         <>
-          {/* Search and Filter Bar */}
+          {/* Search Bar */}
           <Box sx={{ mb: 3 }}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={6} md={4}>
@@ -123,24 +107,6 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
                     ),
                   }}
                 />
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Archetype</InputLabel>
-                  <Select
-                    value={selectedArchetype}
-                    onChange={e => setSelectedArchetype(e.target.value)}
-                    label="Archetype"
-                  >
-                    <MenuItem value="">All Archetypes</MenuItem>
-                    {archetypes.map(arch => (
-                      <MenuItem key={arch} value={arch}>
-                        {arch}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
               </Grid>
             </Grid>
           </Box>
