@@ -54,19 +54,43 @@ export default function CharacterSpeedDial({
     }
   }, [speedDialOpen])
 
-  const handleDelete = async () => {
+  const handleDeleteClick = async () => {
+    await handleDelete(false)
+  }
+
+  const handleDelete = async (force = false) => {
     if (!character?.id) return
-    if (
-      !confirm(
-        `Are you sure you want to delete the character: ${character.name || "Unnamed"}?`
+    
+    if (!force) {
+      if (
+        !confirm(
+          `Are you sure you want to delete the character: ${character.name || "Unnamed"}?`
+        )
       )
-    )
-      return
+        return
+    }
+
     try {
-      await client.deleteCharacter(character)
+      await client.deleteCharacter(character, { force })
       router.push("/characters")
     } catch (error_) {
       console.error("Failed to delete character:", error_)
+      
+      // Handle 422 response with association details
+      if (error_.response?.status === 422 && error_.response?.data?.error_type === 'associations_exist') {
+        const { constraints, suggestions } = error_.response.data
+        const constraintsList = Object.entries(constraints)
+          .map(([key, data]: [string, any]) => `• ${data.count} ${data.label}`)
+          .join('\n')
+        
+        const message = `Cannot delete ${character.name || "this character"} because it has:\n\n${constraintsList}\n\nThese associations must be removed first, or you can force delete which will remove all associations.\n\nForce delete and remove all associations?`
+        
+        if (confirm(message)) {
+          await handleDelete(true)
+        }
+      } else {
+        alert(`Failed to delete character: ${error_.message || 'Unknown error'}`)
+      }
     }
   }
 
@@ -159,7 +183,7 @@ Action Values: ${JSON.stringify(character.actionValues, null, 2)}
     },
     { icon: <PeopleAltIcon />, name: "Copy", onClick: handleDuplicate },
     { icon: <AccessibilityNewIcon />, name: "Extend", onClick: handleExtend },
-    { icon: <DeleteIcon />, name: "Delete", onClick: handleDelete },
+    { icon: <DeleteIcon />, name: "Delete", onClick: handleDeleteClick },
   ]
 
   const handleActionClick =

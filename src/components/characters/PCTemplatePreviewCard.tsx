@@ -64,9 +64,8 @@ export default function PCTemplatePreviewCard({
       >
         {/* Character Image using CardMedia - always render to maintain consistent card layout */}
         <CardMedia
-          component={template.image_url ? "img" : "div"}
-          image={template.image_url}
-          alt={template.image_url ? template.name : undefined}
+          component="div"
+          image={template.image_url ? `${template.image_url}?tr=w-400,h-240,c-maintain_ar,fo-face,q-80` : undefined}
           sx={{
             height: 240,
             bgcolor: template.image_url ? undefined : "background.default",
