@@ -4,6 +4,7 @@ import { Box, Button, Container, Typography, Stack } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import Link from "next/link"
 import Image from "next/image"
+import { RocketLaunch, Login } from "@mui/icons-material"
 import { MARKETING_IMAGES } from "@/lib/marketingImages"
 
 const HeroContainer = styled(Box)(({ theme }) => ({
@@ -44,16 +45,16 @@ const HeroSubtitle = styled(Typography)(({ theme }) => ({
 
 const CTAButton = styled(Button)(({ theme }) => ({
   margin: theme.spacing(1),
-  padding: theme.spacing(1.5, 4),
-  fontSize: "1.1rem",
+  padding: theme.spacing(2, 4),
+  fontSize: "1.2rem",
   fontWeight: "bold",
   textTransform: "none",
   borderRadius: theme.spacing(1),
-  boxShadow: "0 4px 15px rgba(0, 0, 0, 0.3)",
+  boxShadow: "0 6px 20px rgba(0, 0, 0, 0.3)",
   transition: "all 0.3s ease",
   "&:hover": {
-    transform: "translateY(-2px)",
-    boxShadow: "0 6px 20px rgba(0, 0, 0, 0.4)",
+    transform: "translateY(-3px)",
+    boxShadow: "0 8px 25px rgba(0, 0, 0, 0.4)",
   },
 }))
 
@@ -123,6 +124,7 @@ export function HeroSection() {
               <PrimaryCTA
                 variant="contained"
                 size="large"
+                startIcon={<RocketLaunch />}
                 fullWidth={{ xs: true, sm: false }}
               >
                 Start Your Legendary Campaign
@@ -133,6 +135,7 @@ export function HeroSection() {
               <SecondaryCTA
                 variant="outlined"
                 size="large"
+                startIcon={<Login />}
                 fullWidth={{ xs: true, sm: false }}
               >
                 Already a Hero? Login
