@@ -25,6 +25,7 @@ interface UploadImageDialogProps {
   title: string
   entity: Entity
   setEntity?: (entity: Entity) => void
+  creationMode?: boolean
 }
 
 type FormStateData = {
@@ -42,6 +43,7 @@ export function UploadImageDialog({
   title,
   entity,
   setEntity,
+  creationMode = false,
 }: UploadImageDialogProps) {
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
@@ -124,35 +126,69 @@ export function UploadImageDialog({
         name: "uploadStatus",
         value: "uploading",
       })
+
       try {
-        const formData = new FormData()
-        formData.set(entity.entity_class.toLowerCase(), JSON.stringify(entity))
-        if (file) {
-          formData.append("image", file)
+        if (creationMode) {
+          // In creation mode, just create a preview URL and update the entity locally
+          const imageUrl = URL.createObjectURL(file)
+          const updatedEntity = {
+            ...entity,
+            image_url: imageUrl,
+            _tempImageFile: file, // Store the file for form submission later
+          }
+          setEntity?.(updatedEntity)
+
+          dispatchForm({
+            type: FormActions.UPDATE,
+            name: "image_urls",
+            value: [imageUrl, ...image_urls],
+          })
+          dispatchForm({
+            type: FormActions.UPDATE,
+            name: "hasUploaded",
+            value: true,
+          })
+          dispatchForm({
+            type: FormActions.UPDATE,
+            name: "uploadStatus",
+            value: "success",
+          })
+          toastSuccess("Image selected for upload")
+          handleConfirmClose()
+        } else {
+          // Normal mode: upload to backend immediately
+          const formData = new FormData()
+          formData.set(
+            entity.entity_class.toLowerCase(),
+            JSON.stringify(entity)
+          )
+          if (file) {
+            formData.append("image", file)
+          }
+          const response = await client[`update${entity.entity_class}`](
+            entity.id,
+            formData
+          )
+          setEntity?.(response.data)
+          const imageUrl = response.data.image_url
+          dispatchForm({
+            type: FormActions.UPDATE,
+            name: "image_urls",
+            value: [imageUrl, ...image_urls],
+          })
+          dispatchForm({
+            type: FormActions.UPDATE,
+            name: "hasUploaded",
+            value: true,
+          })
+          dispatchForm({
+            type: FormActions.UPDATE,
+            name: "uploadStatus",
+            value: "success",
+          })
+          toastSuccess("Image uploaded successfully")
+          handleConfirmClose()
         }
-        const response = await client[`update${entity.entity_class}`](
-          entity.id,
-          formData
-        )
-        setEntity?.(response.data)
-        const imageUrl = response.data.image_url
-        dispatchForm({
-          type: FormActions.UPDATE,
-          name: "image_urls",
-          value: [imageUrl, ...image_urls],
-        })
-        dispatchForm({
-          type: FormActions.UPDATE,
-          name: "hasUploaded",
-          value: true,
-        })
-        dispatchForm({
-          type: FormActions.UPDATE,
-          name: "uploadStatus",
-          value: "success",
-        })
-        toastSuccess("Image uploaded successfully")
-        handleConfirmClose()
       } catch (error) {
         console.error("Error uploading image:", error)
         const errorMsg =
@@ -167,7 +203,9 @@ export function UploadImageDialog({
           name: "uploadErrorMsg",
           value: errorMsg,
         })
-        toastError("Failed to upload image")
+        toastError(
+          creationMode ? "Failed to select image" : "Failed to upload image"
+        )
       }
     } else {
       dispatchForm({

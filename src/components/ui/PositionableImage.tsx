@@ -20,6 +20,12 @@ type PositionableImageProps = {
   pageContext: "index" | "entity" | "edit"
   height?: number
   isMobile?: boolean
+  creationMode?: boolean
+  onPositionChange?: (position: {
+    x_position: number
+    y_position: number
+    context: string
+  }) => void
 }
 
 export function PositionableImage({
@@ -28,6 +34,8 @@ export function PositionableImage({
   pageContext = "entity",
   height,
   isMobile = false,
+  creationMode = false,
+  onPositionChange,
 }: PositionableImageProps) {
   const { client } = useClient()
   const imgRef = useRef<HTMLImageElement>(null)
@@ -83,7 +91,7 @@ export function PositionableImage({
     }
   }, [entity.image_url])
 
-  const boxHeight = entity.image_url ? height : 100
+  const boxHeight = height || 300
 
   const handleDragStart = (
     e: React.MouseEvent<HTMLImageElement> | React.TouchEvent<HTMLImageElement>
@@ -132,9 +140,47 @@ export function PositionableImage({
   }
 
   const handleSave = async () => {
-    if (!entity.id) return
     setIsSaving(true)
     try {
+      // In creation mode, just store position temporarily without API call
+      if (creationMode || !entity.id) {
+        const position = {
+          x_position: currentX,
+          y_position: currentY,
+          context,
+        }
+
+        // Notify parent component about position change
+        if (onPositionChange) {
+          onPositionChange(position)
+        }
+
+        // Update local entity state if setEntity is provided
+        if (setEntity) {
+          const updatedPositions = entity.image_positions || []
+          const existingIndex = updatedPositions.findIndex(
+            pos => pos.context === context
+          )
+
+          if (existingIndex >= 0) {
+            updatedPositions[existingIndex] = position
+          } else {
+            updatedPositions.push(position)
+          }
+
+          setEntity({
+            ...entity,
+            image_positions: updatedPositions,
+          })
+        }
+
+        setIsRepositioning(false)
+        toastSuccess("Image position updated")
+        setIsSaving(false)
+        return
+      }
+
+      // Normal mode: save to backend
       const response = await client.updateImagePosition(entity, {
         x_position: currentX,
         y_position: currentY,
@@ -256,7 +302,9 @@ export function PositionableImage({
         >
           <UploadButton onClick={handleUploadImage} />
           <GenerateButton onClick={handleGenerateImage} />
-          <RepositionButton onClick={() => setIsRepositioning(true)} />
+          {!creationMode && (
+            <RepositionButton onClick={() => setIsRepositioning(true)} />
+          )}
         </Box>
       )}
       {!isRepositioning && !entity.image_url && (
@@ -288,6 +336,7 @@ export function PositionableImage({
         title="Upload Image"
         entity={entity}
         setEntity={setEntity}
+        creationMode={creationMode}
       />
       {entity.image_url && (
         <ImageViewerModal

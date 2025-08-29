@@ -69,7 +69,6 @@ export interface Party extends BaseEntity {
   vehicles: Vehicle[]
   character_ids: string[]
   vehicle_ids: string[]
-  secret: boolean
   image_url: string
   created_at: string
   updated_at: string
@@ -155,7 +154,6 @@ export interface Site extends BaseEntity {
   faction?: Faction | null
   faction_id: string | null
   characters: Character[]
-  secret: boolean
   image_url: string
   created_at: string
   updated_at: string
