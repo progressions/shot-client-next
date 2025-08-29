@@ -100,7 +100,7 @@ export function CallToAction() {
         quality={90}
         unoptimized // Using external CDN
       />
-      
+
       {/* Dark Overlay */}
       <Box
         sx={{
@@ -109,11 +109,12 @@ export function CallToAction() {
           left: 0,
           right: 0,
           bottom: 0,
-          background: "linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7))",
+          background:
+            "linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7))",
           zIndex: 1,
         }}
       />
-      
+
       <CTAContent maxWidth="lg">
         <Stack spacing={6}>
           <Box>
@@ -140,9 +141,9 @@ export function CallToAction() {
                 mb: 4,
               }}
             >
-              The ultimate Feng Shui 2 campaign management platform.
-              Real-time combat, AI character generation, and cross-juncture
-              storytelling await.
+              The ultimate Feng Shui 2 campaign management platform. Real-time
+              combat, AI character generation, and cross-juncture storytelling
+              await.
             </Typography>
           </Box>
 

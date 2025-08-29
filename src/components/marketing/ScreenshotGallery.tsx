@@ -1,22 +1,16 @@
 "use client"
 
-import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  Stack,
-  Chip,
-} from "@mui/material"
+import { Box, Container, Typography, Paper, Stack, Chip } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import Image from "next/image"
 import { MARKETING_IMAGES } from "@/lib/marketingImages"
 
 const GallerySection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(8, 0),
-  backgroundColor: theme.palette.mode === 'dark' 
-    ? theme.palette.background.default 
-    : theme.palette.grey[50],
+  backgroundColor:
+    theme.palette.mode === "dark"
+      ? theme.palette.background.default
+      : theme.palette.grey[50],
 }))
 
 const ScreenshotCard = styled(Paper)(({ theme }) => ({
@@ -83,8 +77,8 @@ export function ScreenshotGallery() {
             </Typography>
           </Box>
 
-          <Box 
-            sx={{ 
+          <Box
+            sx={{
               display: "grid",
               gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
               gap: 3,
@@ -92,63 +86,58 @@ export function ScreenshotGallery() {
           >
             {screenshots.map((screenshot, index) => (
               <ScreenshotCard key={index} elevation={3}>
-                  <Box 
-                    position="relative" 
-                    sx={{ 
-                      aspectRatio: "16/9",
-                      backgroundColor: "background.paper",
-                      overflow: "hidden"
+                <Box
+                  position="relative"
+                  sx={{
+                    aspectRatio: "16/9",
+                    backgroundColor: "background.paper",
+                    overflow: "hidden",
+                  }}
+                >
+                  <Image
+                    src={screenshot.imageUrl}
+                    alt={screenshot.title}
+                    fill
+                    style={{
+                      objectFit: "cover",
+                      objectPosition: "center",
                     }}
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    unoptimized // Using external CDN
+                  />
+                </Box>
+
+                <Box sx={{ p: 3 }}>
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    fontWeight="bold"
+                    color="primary"
                   >
-                    <Image
-                      src={screenshot.imageUrl}
-                      alt={screenshot.title}
-                      fill
-                      style={{ 
-                        objectFit: "cover",
-                        objectPosition: "center"
-                      }}
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      unoptimized // Using external CDN
-                    />
-                  </Box>
-                  
-                  <Box sx={{ p: 3 }}>
-                    <Typography
-                      variant="h6"
-                      gutterBottom
-                      fontWeight="bold"
-                      color="primary"
-                    >
-                      {screenshot.title}
-                    </Typography>
+                    {screenshot.title}
+                  </Typography>
 
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mb: 2 }}
-                    >
-                      {screenshot.description}
-                    </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 2 }}
+                  >
+                    {screenshot.description}
+                  </Typography>
 
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      flexWrap="wrap"
-                      useFlexGap
-                    >
-                      {screenshot.features.map((feature, featureIndex) => (
-                        <Chip
-                          key={featureIndex}
-                          label={feature}
-                          size="small"
-                          variant="outlined"
-                          color="primary"
-                        />
-                      ))}
-                    </Stack>
-                  </Box>
-                </ScreenshotCard>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                    {screenshot.features.map((feature, featureIndex) => (
+                      <Chip
+                        key={featureIndex}
+                        label={feature}
+                        size="small"
+                        variant="outlined"
+                        color="primary"
+                      />
+                    ))}
+                  </Stack>
+                </Box>
+              </ScreenshotCard>
             ))}
           </Box>
 

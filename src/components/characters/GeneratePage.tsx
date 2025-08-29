@@ -60,7 +60,7 @@ export default function GeneratePage() {
     dispatchForm({ type: FormActions.SUBMIT })
     setPending(true)
     try {
-      const response = await client.generateAiCharacter({ description })
+      await client.generateAiCharacter({ description })
 
       const sub = consumer.subscriptions.create(
         { channel: "CampaignChannel", id: campaign?.id },

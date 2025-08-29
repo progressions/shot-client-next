@@ -75,7 +75,7 @@ export default function SkillsManager({
       name: "characterSkills",
       value: currentSkills,
     })
-  }, [character.skills, dispatchForm])
+  }, [character, dispatchForm])
 
   // Split skills into two even columns
   const midPoint = Math.ceil(characterSkills.length / 2)

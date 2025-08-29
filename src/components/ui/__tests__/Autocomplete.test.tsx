@@ -221,7 +221,7 @@ describe("Autocomplete", () => {
   })
 
   it("clears input when clear button is clicked", async () => {
-    const user = userEvent.setup()
+    const _user = userEvent.setup()
     render(<Autocomplete {...defaultProps} value="1" />)
 
     // Just test the component renders - Material-UI may not show clear button immediately

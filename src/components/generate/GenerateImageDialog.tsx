@@ -64,7 +64,7 @@ export function GenerateImageDialog({
 
   const handleSelect = async (imageUrl: string) => {
     try {
-      const response = await client.attachImage({
+      await client.attachImage({
         entity,
         imageUrl,
       })

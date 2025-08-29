@@ -19,7 +19,7 @@ export default function Extend({ character, open, onClose }: ExtendProps) {
   const extendCharacter = async () => {
     setLoading(true)
     try {
-      const response = await client.extendCharacter(character)
+      await client.extendCharacter(character)
       onClose()
     } catch (error) {
       console.error("Failed to extend character:", error)

@@ -60,7 +60,7 @@ export default function CharacterSpeedDial({
 
   const handleDelete = async (force = false) => {
     if (!character?.id) return
-    
+
     if (!force) {
       if (
         !confirm(
@@ -75,21 +75,29 @@ export default function CharacterSpeedDial({
       router.push("/characters")
     } catch (error_) {
       console.error("Failed to delete character:", error_)
-      
+
       // Handle 422 response with association details
-      if (error_.response?.status === 422 && error_.response?.data?.error_type === 'associations_exist') {
-        const { constraints, suggestions } = error_.response.data
+      if (
+        error_.response?.status === 422 &&
+        error_.response?.data?.error_type === "associations_exist"
+      ) {
+        const { constraints } = error_.response.data
         const constraintsList = Object.entries(constraints)
-          .map(([key, data]: [string, any]) => `• ${data.count} ${data.label}`)
-          .join('\n')
-        
+          .map(
+            ([_key, data]: [string, { count: number; label: string }]) =>
+              `• ${data.count} ${data.label}`
+          )
+          .join("\n")
+
         const message = `Cannot delete ${character.name || "this character"} because it has:\n\n${constraintsList}\n\nThese associations must be removed first, or you can force delete which will remove all associations.\n\nForce delete and remove all associations?`
-        
+
         if (confirm(message)) {
           await handleDelete(true)
         }
       } else {
-        alert(`Failed to delete character: ${error_.message || 'Unknown error'}`)
+        alert(
+          `Failed to delete character: ${error_.message || "Unknown error"}`
+        )
       }
     }
   }

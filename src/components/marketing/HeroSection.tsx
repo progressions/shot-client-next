@@ -89,7 +89,7 @@ export function HeroSection() {
         quality={90}
         unoptimized // Using external CDN
       />
-      
+
       {/* Dark Overlay */}
       <Box
         sx={{
@@ -98,7 +98,8 @@ export function HeroSection() {
           left: 0,
           right: 0,
           bottom: 0,
-          background: "linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7))",
+          background:
+            "linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7))",
           zIndex: 1,
         }}
       />
