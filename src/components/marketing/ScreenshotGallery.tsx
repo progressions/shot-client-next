@@ -25,6 +25,9 @@ const ScreenshotCard = styled(Paper)(({ theme }) => ({
   borderRadius: theme.spacing(2),
   transition: "all 0.3s ease",
   cursor: "pointer",
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
   "&:hover": {
     transform: "scale(1.02)",
     boxShadow: theme.shadows[8],
@@ -61,7 +64,7 @@ const screenshots = [
 export function ScreenshotGallery() {
   return (
     <GallerySection>
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <Stack spacing={6}>
           <Box textAlign="center">
             <Typography
@@ -82,9 +85,9 @@ export function ScreenshotGallery() {
             </Typography>
           </Box>
 
-          <Grid container spacing={4}>
+          <Grid container spacing={3}>
             {screenshots.map((screenshot, index) => (
-              <Grid item xs={12} md={6} key={index}>
+              <Grid item xs={12} sm={12} md={6} lg={6} xl={6} key={index}>
                 <ScreenshotCard elevation={3}>
                   <Box 
                     position="relative" 
