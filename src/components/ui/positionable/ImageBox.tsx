@@ -64,7 +64,7 @@ export function ImageBox({
       draggable={false} // Disable HTML5 drag
       sx={{
         width: "100%",
-        height: isRepositioning ? "auto" : "100%",
+        height: "auto",
         objectFit: "cover",
         display: "block",
         transform: `translate(${currentX}px, ${currentY}px)`,
