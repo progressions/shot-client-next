@@ -1,5 +1,3 @@
-import { StaticImageData } from "next/image"
-
 // ImageKit CDN base URL
 const IMAGEKIT_BASE = "https://ik.imagekit.io/nvqgwnjgv"
 
@@ -33,7 +31,8 @@ export const MARKETING_IMAGES = {
 
 // Placeholder image data URIs for blur effect
 export const PLACEHOLDER_BLUR = {
-  default: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAKABADASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAQFB//EACQQAAIBAwQBBQEAAAAAAAAAAAECAwAEEQUSITFBBhMiUWGR/8QAFQEBAQAAAAAAAAAAAAAAAAAABAX/xAAZEQEAAwEBAAAAAAAAAAAAAAABAAIRIRL/2gAMAwEAAhEDEQA/AMttbKTU7sRWqO5aQqCoOM55PHHNa",
+  default:
+    "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAKABADASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAQFB//EACQQAAIBAwQBBQEAAAAAAAAAAAECAwAEEQUSITFBBhMiUWGR/8QAFQEBAQAAAAAAAAAAAAAAAAAABAX/xAAZEQEAAwEBAAAAAAAAAAAAAAABAAIRIRL/2gAMAwEAAhEDEQA/AMttbKTU7sRWqO5aQqCoOM55PHHNa",
   hero: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAKABADASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAUGB//EACYQAAICAQMDBAMBAAAAAAAAAAECAxEABBIhBTFBEyJRYQZxgZH/xAAVAQEBAAAAAAAAAAAAAAAAAAAAAf/EABcRAQEBAQAAAAAAAAAAAAAAAAEAESH/2gAMAwEAAhEDEQA/AKbRdO",
 }
 
@@ -78,11 +77,11 @@ export function useImageLoadingState() {
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set())
 
   const handleImageLoad = (src: string) => {
-    setLoadedImages((prev) => new Set(prev).add(src))
+    setLoadedImages(prev => new Set(prev).add(src))
   }
 
   const handleImageError = (src: string) => {
-    setFailedImages((prev) => new Set(prev).add(src))
+    setFailedImages(prev => new Set(prev).add(src))
     console.warn(`Failed to load marketing image: ${src}`)
   }
 

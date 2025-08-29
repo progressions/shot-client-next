@@ -67,7 +67,8 @@ const junctures = [
       "Traditional kung fu",
       "Monastic discipline",
     ],
-    atmosphere: "Mountain monasteries, training courtyards, and the pursuit of perfection",
+    atmosphere:
+      "Mountain monasteries, training courtyards, and the pursuit of perfection",
   },
   {
     id: "modern",
@@ -146,7 +147,8 @@ export function JunctureShowcase() {
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        background: "linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6))",
+                        background:
+                          "linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6))",
                         display: "flex",
                         alignItems: "flex-end",
                         p: 3,

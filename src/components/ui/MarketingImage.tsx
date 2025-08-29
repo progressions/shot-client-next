@@ -19,14 +19,15 @@ interface MarketingImageProps {
   overlayOpacity?: number
 }
 
-const ImageContainer = styled(Box)<{ 
+const ImageContainer = styled(Box)<{
   aspectRatio?: string | number
-  fallbackGradient?: string 
+  fallbackGradient?: string
 }>(({ aspectRatio, fallbackGradient }) => ({
   position: "relative",
   width: "100%",
   aspectRatio: aspectRatio || "16/9",
-  background: fallbackGradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+  background:
+    fallbackGradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
   overflow: "hidden",
 }))
 
@@ -69,8 +70,8 @@ export function MarketingImage({
   }
 
   return (
-    <ImageContainer 
-      aspectRatio={aspectRatio} 
+    <ImageContainer
+      aspectRatio={aspectRatio}
       fallbackGradient={fallbackGradient}
       className={className}
     >
@@ -83,13 +84,13 @@ export function MarketingImage({
           sx={{ position: "absolute", top: 0, left: 0 }}
         />
       )}
-      
+
       {!imageError && (
         <Image
           src={src}
           alt={alt}
           fill
-          style={{ 
+          style={{
             objectFit,
             opacity: imageLoaded ? 1 : 0,
             transition: "opacity 0.3s ease-in-out",
@@ -100,7 +101,7 @@ export function MarketingImage({
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       )}
-      
+
       {overlay && imageLoaded && !imageError && (
         <ImageOverlay opacity={overlayOpacity} />
       )}
@@ -146,7 +147,7 @@ export function JunctureImage({
           {/* Fallback gradient view */}
         </Box>
       )}
-      
+
       {/* Content overlay (text, etc.) */}
       {children && (
         <Box
