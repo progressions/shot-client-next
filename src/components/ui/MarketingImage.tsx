@@ -19,25 +19,15 @@ interface MarketingImageProps {
   overlayOpacity?: number
 }
 
-<<<<<<< HEAD
-const ImageContainer = styled(Box)<{ 
-  aspectRatio?: string | number
-  fallbackGradient?: string 
-=======
 const ImageContainer = styled(Box)<{
   aspectRatio?: string | number
   fallbackGradient?: string
->>>>>>> main
 }>(({ aspectRatio, fallbackGradient }) => ({
   position: "relative",
   width: "100%",
   aspectRatio: aspectRatio || "16/9",
-<<<<<<< HEAD
-  background: fallbackGradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-=======
   background:
     fallbackGradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
->>>>>>> main
   overflow: "hidden",
 }))
 
@@ -80,13 +70,8 @@ export function MarketingImage({
   }
 
   return (
-<<<<<<< HEAD
-    <ImageContainer 
-      aspectRatio={aspectRatio} 
-=======
     <ImageContainer
       aspectRatio={aspectRatio}
->>>>>>> main
       fallbackGradient={fallbackGradient}
       className={className}
     >
@@ -99,21 +84,13 @@ export function MarketingImage({
           sx={{ position: "absolute", top: 0, left: 0 }}
         />
       )}
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> main
       {!imageError && (
         <Image
           src={src}
           alt={alt}
           fill
-<<<<<<< HEAD
-          style={{ 
-=======
           style={{
->>>>>>> main
             objectFit,
             opacity: imageLoaded ? 1 : 0,
             transition: "opacity 0.3s ease-in-out",
@@ -124,11 +101,7 @@ export function MarketingImage({
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       )}
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> main
       {overlay && imageLoaded && !imageError && (
         <ImageOverlay opacity={overlayOpacity} />
       )}
@@ -174,11 +147,7 @@ export function JunctureImage({
           {/* Fallback gradient view */}
         </Box>
       )}
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> main
       {/* Content overlay (text, etc.) */}
       {children && (
         <Box
@@ -202,8 +171,4 @@ export function JunctureImage({
       )}
     </Box>
   )
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> main
