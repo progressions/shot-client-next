@@ -13,44 +13,55 @@ const mockHandleEntityDeletion = handleEntityDeletion as jest.MockedFunction<
   typeof handleEntityDeletion
 >
 
-// Mock the contexts
-const mockClient = {
-  getCharacter: jest.fn(),
-  updateCharacter: jest.fn(),
-  deleteCharacter: jest.fn(),
-  createCharacter: jest.fn(),
-  getVehicle: jest.fn(),
-  updateVehicle: jest.fn(),
-  deleteVehicle: jest.fn(),
-  createVehicle: jest.fn(),
-  getCampaign: jest.fn(),
-  updateCampaign: jest.fn(),
-  deleteCampaign: jest.fn(),
-  createCampaign: jest.fn(),
-}
+// Create mocks inside module factories to avoid hoisting issues
+jest.mock("@/contexts", () => {
+  const mockClient = {
+    getCharacter: jest.fn(),
+    updateCharacter: jest.fn(),
+    deleteCharacter: jest.fn(),
+    createCharacter: jest.fn(),
+    getVehicle: jest.fn(),
+    updateVehicle: jest.fn(),
+    deleteVehicle: jest.fn(),
+    createVehicle: jest.fn(),
+    getCampaign: jest.fn(),
+    updateCampaign: jest.fn(),
+    deleteCampaign: jest.fn(),
+    createCampaign: jest.fn(),
+  }
+  
+  const mockToast = {
+    toastSuccess: jest.fn(),
+    toastError: jest.fn(),
+  }
+  
+  return {
+    useClient: () => ({ client: mockClient }),
+    useToast: () => mockToast,
+    useApp: () => ({ refreshUser: jest.fn() }),
+  }
+})
 
-const mockToast = {
-  toastSuccess: jest.fn(),
-  toastError: jest.fn(),
-}
+jest.mock("next/navigation", () => {
+  const mockRouter = {
+    push: jest.fn(),
+    replace: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn(),
+    refresh: jest.fn(),
+  }
+  
+  return {
+    useRouter: () => mockRouter,
+  }
+})
 
-const mockRouter = {
-  push: jest.fn(),
-  replace: jest.fn(),
-  back: jest.fn(),
-  forward: jest.fn(),
-  refresh: jest.fn(),
-}
-
-jest.mock("@/contexts", () => ({
-  useClient: () => ({ client: mockClient }),
-  useToast: () => mockToast,
-  useApp: () => ({ refreshUser: jest.fn() }),
-}))
-
-jest.mock("next/navigation", () => ({
-  useRouter: () => mockRouter,
-}))
+// Get references to the mocks after they're created
+const { useClient, useToast } = require("@/contexts")
+const { useRouter } = require("next/navigation")
+const mockClient = useClient().client
+const mockToast = useToast()
+const mockRouter = useRouter()
 
 describe("useEntity", () => {
   const mockEntity: Entity = {
