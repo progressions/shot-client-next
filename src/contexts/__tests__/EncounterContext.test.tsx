@@ -690,12 +690,12 @@ describe("EncounterProvider", () => {
       // Override the default mock responses for this test
       mockClient.getWeaponsBatch.mockClear()
       mockClient.getSchticksBatch.mockClear()
-      
+
       mockClient.getWeaponsBatch.mockResolvedValue({
-        data: { 
+        data: {
           weapons: [
-            { 
-              id: "weapon-1", 
+            {
+              id: "weapon-1",
               entity_class: "Weapon",
               name: "Weapon 1",
               damage: "5",
@@ -707,8 +707,8 @@ describe("EncounterProvider", () => {
               created_at: "2023-01-01T00:00:00.000Z",
               updated_at: "2023-01-01T00:00:00.000Z",
             },
-            { 
-              id: "weapon-2", 
+            {
+              id: "weapon-2",
               entity_class: "Weapon",
               name: "Weapon 2",
               damage: "5",
@@ -720,8 +720,8 @@ describe("EncounterProvider", () => {
               created_at: "2023-01-01T00:00:00.000Z",
               updated_at: "2023-01-01T00:00:00.000Z",
             },
-            { 
-              id: "weapon-3", 
+            {
+              id: "weapon-3",
               entity_class: "Weapon",
               name: "Weapon 3",
               damage: "5",
@@ -733,15 +733,15 @@ describe("EncounterProvider", () => {
               created_at: "2023-01-01T00:00:00.000Z",
               updated_at: "2023-01-01T00:00:00.000Z",
             },
-          ] 
+          ],
         },
       })
-      
+
       mockClient.getSchticksBatch.mockResolvedValue({
-        data: { 
+        data: {
           schticks: [
-            { 
-              id: "schtick-1", 
+            {
+              id: "schtick-1",
               entity_class: "Schtick",
               name: "Schtick 1",
               description: "Test schtick 1",
@@ -750,8 +750,8 @@ describe("EncounterProvider", () => {
               created_at: "2023-01-01T00:00:00.000Z",
               updated_at: "2023-01-01T00:00:00.000Z",
             },
-            { 
-              id: "schtick-2", 
+            {
+              id: "schtick-2",
               entity_class: "Schtick",
               name: "Schtick 2",
               description: "Test schtick 2",
@@ -760,8 +760,8 @@ describe("EncounterProvider", () => {
               created_at: "2023-01-01T00:00:00.000Z",
               updated_at: "2023-01-01T00:00:00.000Z",
             },
-            { 
-              id: "schtick-3", 
+            {
+              id: "schtick-3",
               entity_class: "Schtick",
               name: "Schtick 3",
               description: "Test schtick 3",
@@ -770,7 +770,7 @@ describe("EncounterProvider", () => {
               created_at: "2023-01-01T00:00:00.000Z",
               updated_at: "2023-01-01T00:00:00.000Z",
             },
-          ] 
+          ],
         },
       })
 
