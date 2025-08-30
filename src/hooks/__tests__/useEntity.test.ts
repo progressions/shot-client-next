@@ -29,12 +29,12 @@ jest.mock("@/contexts", () => {
     deleteCampaign: jest.fn(),
     createCampaign: jest.fn(),
   }
-  
+
   const mockToast = {
     toastSuccess: jest.fn(),
     toastError: jest.fn(),
   }
-  
+
   return {
     useClient: () => ({ client: mockClient }),
     useToast: () => mockToast,
@@ -50,7 +50,7 @@ jest.mock("next/navigation", () => {
     forward: jest.fn(),
     refresh: jest.fn(),
   }
-  
+
   return {
     useRouter: () => mockRouter,
   }

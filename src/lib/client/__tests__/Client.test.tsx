@@ -400,7 +400,7 @@ describe("createClient", () => {
       expect(client.api).toBe(mockApi)
       expect(client.apiV2).toBe(mockApiV2)
       expect(client.consumer).toEqual(expect.any(Function))
-      
+
       // Verify it has methods from various clients (but don't check exact structure)
       expect(typeof client.getCharacters).toBe("function")
       expect(typeof client.getCampaigns).toBe("function")
