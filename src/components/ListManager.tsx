@@ -33,10 +33,7 @@ export function ListManager({
   manage = true,
 }: ListManagerProps) {
   const childIdsKey = `${childEntityName.toLowerCase()}_ids`
-  const childIds = useMemo(
-    () => parentEntity[childIdsKey] || [],
-    [parentEntity, childIdsKey]
-  )
+  const childIds = parentEntity[childIdsKey]
   const stableExcludeIds = excludeIds
   const collection = collectionNames[childEntityName]
   const pluralChildEntityName = pluralize(childEntityName)
@@ -62,25 +59,27 @@ export function ListManager({
       [key: string]: unknown
     }
   }>({
-    data: {
-      characters: [],
-      factions: [],
-      archetypes: [],
-      types: [],
-      filters: {
-        per_page: 200,
-        sort: "name",
-        order: "asc",
-      },
+    characters: [],
+    factions: [],
+    archetypes: [],
+    types: [],
+    filters: {
+      per_page: 200,
+      sort: "name",
+      order: "asc",
     },
   })
   const { filters } = formState.data
+  console.log("parentEntity", parentEntity)
+  console.log("childIds", childIds)
 
   useEffect(() => {
     const fetchChildEntities = async () => {
       try {
         const funcName = `get${pluralChildEntityName}`
         const getFunc = client[funcName as keyof typeof client]
+
+        console.log("About to call", funcName)
 
         if (typeof getFunc !== "function") {
           console.error(`Function ${funcName} does not exist on client`)
@@ -98,6 +97,8 @@ export function ListManager({
           ids: childIds,
           per_page: 200,
         })
+
+        console.log("Just called", getFunc, response)
         setChildEntities(response.data[collection] || [])
       } catch (error) {
         console.error(`Fetch ${childEntityName} error:`, error)

@@ -2,9 +2,12 @@
 import EntityLink from "./EntityLink"
 import dynamic from "next/dynamic"
 
-const CharacterPopup = dynamic(() => import("@/components/popups/CharacterPopup"), {
-  ssr: false,
-})
+const CharacterPopup = dynamic(
+  () => import("@/components/popups/CharacterPopup"),
+  {
+    ssr: false,
+  }
+)
 
 type CharacterLinkProperties = {
   character: Character

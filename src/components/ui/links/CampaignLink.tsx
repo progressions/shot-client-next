@@ -2,9 +2,12 @@
 import EntityLink from "./EntityLink"
 import dynamic from "next/dynamic"
 
-const CampaignPopup = dynamic(() => import("@/components/popups/CampaignPopup"), {
-  ssr: false,
-})
+const CampaignPopup = dynamic(
+  () => import("@/components/popups/CampaignPopup"),
+  {
+    ssr: false,
+  }
+)
 
 type CampaignLinkProperties = {
   campaign: Campaign

@@ -20,6 +20,9 @@ type ManagerProperties = {
     | "Fight"
     | "Party"
     | "Juncture"
+    | "Campaign"
+    | "User"
+    | "Site"
   onListUpdate: (entity: Entity) => Promise<void>
   excludeIds?: string[]
   manage?: boolean

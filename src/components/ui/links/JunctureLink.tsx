@@ -2,9 +2,12 @@
 import EntityLink from "./EntityLink"
 import dynamic from "next/dynamic"
 
-const JuncturePopup = dynamic(() => import("@/components/popups/JuncturePopup"), {
-  ssr: false,
-})
+const JuncturePopup = dynamic(
+  () => import("@/components/popups/JuncturePopup"),
+  {
+    ssr: false,
+  }
+)
 
 type JunctureLinkProperties = {
   juncture: Juncture
