@@ -1,5 +1,4 @@
 import type { AxiosResponse } from "axios"
-import { collectionNames } from "@/lib/maps"
 
 // Type for a record from the API
 interface ApiRecord {

@@ -4,7 +4,6 @@ import { useClient } from "@/contexts"
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { debounce } from "lodash"
 import { getApiMethodForModel } from "@/lib/modelApiMapping"
-import { collectionNames } from "@/lib/maps"
 
 interface AutocompleteOption {
   id: number | string
