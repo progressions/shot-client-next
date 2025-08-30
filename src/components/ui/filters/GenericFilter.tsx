@@ -1,11 +1,9 @@
 "use client"
 import { Stack } from "@mui/material"
-import {
-  AddButton,
-  ModelAutocomplete,
-  StringAutocomplete,
-  SearchInput,
-} from "@/components/ui"
+import { AddButton } from "../AddButton"
+import { ModelAutocomplete } from "../ModelAutocomplete"
+import { StringAutocomplete } from "../StringAutocomplete"
+import { SearchInput } from "../SearchInput"
 import { useCallback } from "react"
 import { filterConfigs } from "@/lib/filterConfigs"
 

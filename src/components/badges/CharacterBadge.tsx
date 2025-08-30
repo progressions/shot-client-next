@@ -1,14 +1,12 @@
 "use client"
 
 import type { Faction, Character } from "@/types"
-import {
-  ArchetypeLink,
-  TypeLink,
-  FactionLink,
-  CharacterLink,
-} from "@/components/ui"
+import ArchetypeLink from "../ui/links/ArchetypeLink"
+import TypeLink from "../ui/links/TypeLink"
+import FactionLink from "../ui/links/FactionLink"
+import CharacterLink from "../ui/links/CharacterLink"
 import { CS } from "@/services"
-import { Badge } from "@/components/badges"
+import Badge from "./Badge"
 import { SystemStyleObject, Theme } from "@mui/system"
 
 type CharacterBadgeProperties = {

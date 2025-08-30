@@ -1,5 +1,10 @@
 "use client"
-import { EntityLink } from "@/components/ui"
+import EntityLink from "./EntityLink"
+import dynamic from "next/dynamic"
+
+const JuncturePopup = dynamic(() => import("@/components/popups/JuncturePopup"), {
+  ssr: false,
+})
 
 type JunctureLinkProperties = {
   juncture: Juncture
@@ -21,9 +26,10 @@ export default function JunctureLink({
       entity={juncture}
       data={data}
       disablePopup={disablePopup}
+      popupOverride={JuncturePopup}
       sx={sx}
     >
-      {children}
+      {children || juncture.name}
     </EntityLink>
   )
 }

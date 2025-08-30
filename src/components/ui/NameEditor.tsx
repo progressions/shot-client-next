@@ -3,7 +3,7 @@
 import type { Entity } from "@/types"
 import { useState, useEffect } from "react"
 import { FormControl, FormHelperText } from "@mui/material"
-import { TextField } from "@/components/ui"
+import { TextField } from "./TextField"
 
 type NameEditorProps = {
   entity: Entity

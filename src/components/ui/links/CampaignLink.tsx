@@ -1,5 +1,10 @@
 "use client"
-import { EntityLink } from "@/components/ui"
+import EntityLink from "./EntityLink"
+import dynamic from "next/dynamic"
+
+const CampaignPopup = dynamic(() => import("@/components/popups/CampaignPopup"), {
+  ssr: false,
+})
 
 type CampaignLinkProperties = {
   campaign: Campaign
@@ -21,9 +26,10 @@ export default function CampaignLink({
       entity={campaign}
       data={data}
       disablePopup={disablePopup}
+      popupOverride={CampaignPopup}
       sx={sx}
     >
-      {children}
+      {children || campaign.name}
     </EntityLink>
   )
 }

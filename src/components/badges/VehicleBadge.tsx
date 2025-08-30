@@ -1,8 +1,8 @@
 "use client"
 
 import type { Vehicle } from "@/types"
-import { VehicleLink } from "@/components/ui"
-import { Badge } from "@/components/badges"
+import VehicleLink from "../ui/links/VehicleLink"
+import Badge from "./Badge"
 import { SystemStyleObject, Theme } from "@mui/system"
 
 type VehicleBadgeProperties = {

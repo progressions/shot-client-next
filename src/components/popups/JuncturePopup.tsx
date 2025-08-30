@@ -4,13 +4,11 @@ import type { PopupProps, Juncture } from "@/types"
 import { defaultJuncture } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
-import { useClient } from "@/contexts"
-import {
-  MembersGroup,
-  InfoLink,
-  FactionLink,
-  JunctureLink,
-} from "@/components/ui"
+import { useClient } from "@/contexts/AppContext"
+import { MembersGroup } from "../ui/MembersGroup"
+import InfoLink from "../ui/links/InfoLink"
+import FactionLink from "../ui/links/FactionLink"
+import JunctureLink from "../ui/links/JunctureLink"
 
 export default function JuncturePopup({ id }: PopupProps) {
   const { user, client } = useClient()

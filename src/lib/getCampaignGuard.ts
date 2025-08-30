@@ -1,7 +1,7 @@
 "use server"
 
 import { redirect } from "next/navigation"
-import { getServerClient } from "@/lib"
+import { getServerClient } from "@/lib/getServerClient"
 
 export async function requireCampaign(): Promise<void> {
   const client = await getServerClient()

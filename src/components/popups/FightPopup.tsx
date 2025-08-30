@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
 import { EntityAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
-import { FightLink } from "@/components/ui"
+import FightLink from "../ui/links/FightLink"
 
 export default function FightPopup({ id }: PopupProps) {
   const { user, client } = useClient()

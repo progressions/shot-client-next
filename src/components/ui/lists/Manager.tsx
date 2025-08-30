@@ -3,7 +3,8 @@
 import { useState } from "react"
 import type { Entity } from "@/types"
 import { ListManager } from "@/components/ListManager"
-import { ManageButton, SectionHeader } from "@/components/ui"
+import { ManageButton } from "../ManageButton"
+import { SectionHeader } from "../SectionHeader"
 import { Box } from "@mui/material"
 
 type ManagerProperties = {

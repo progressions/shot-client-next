@@ -4,7 +4,7 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material"
-import { ConfirmDialog } from "@/components/ui"
+import { ConfirmDialog } from "./ConfirmDialog"
 import { FormActions, useForm } from "@/reducers"
 
 interface DialogBoxProps {

@@ -1,5 +1,10 @@
 "use client"
-import { EntityLink } from "@/components/ui"
+import EntityLink from "./EntityLink"
+import dynamic from "next/dynamic"
+
+const PartyPopup = dynamic(() => import("@/components/popups/PartyPopup"), {
+  ssr: false,
+})
 
 type PartyLinkProperties = {
   party: Party
@@ -17,8 +22,14 @@ export default function PartyLink({
   sx,
 }: PartyLinkProperties) {
   return (
-    <EntityLink entity={party} data={data} disablePopup={disablePopup} sx={sx}>
-      {children}
+    <EntityLink
+      entity={party}
+      data={data}
+      disablePopup={disablePopup}
+      popupOverride={PartyPopup}
+      sx={sx}
+    >
+      {children || party.name}
     </EntityLink>
   )
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { MiniButton } from "@/components/ui"
+import { MiniButton } from "../MiniButton"
 import { SystemStyleObject, Theme } from "@mui/system"
 
 type UploadButtonProps = {

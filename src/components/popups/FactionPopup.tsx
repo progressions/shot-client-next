@@ -5,7 +5,8 @@ import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
 import { EntityAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
-import { MembersGroup, FactionLink } from "@/components/ui"
+import { MembersGroup } from "../ui/MembersGroup"
+import FactionLink from "../ui/links/FactionLink"
 
 export default function FactionPopup({ id }: PopupProps) {
   const { user, client } = useClient()

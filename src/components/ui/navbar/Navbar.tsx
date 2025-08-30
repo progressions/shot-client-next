@@ -1,7 +1,8 @@
 import { Box, AppBar, Toolbar, Typography } from "@mui/material"
 import Link from "next/link"
-import { Button } from "@/components/ui"
-import { ConditionalMenu, UserMenu } from "@/components/ui/navbar"
+import { Button } from "../Button"
+import { ConditionalMenu } from "./ConditionalMenu"
+import { UserMenu } from "./UserMenu"
 
 export async function Navbar({ user }) {
   return (

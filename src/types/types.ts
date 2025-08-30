@@ -119,6 +119,16 @@ export interface VehicleDescription {
   notes: string
 }
 
+// Game roll structure
+export interface Swerve {
+  result: number
+  positiveRolls: number[]
+  negativeRolls: number[]
+  positive: number
+  negative: number
+  boxcars: boolean
+}
+
 export interface FormStateData {
   drawerOpen: boolean
   edit?: boolean

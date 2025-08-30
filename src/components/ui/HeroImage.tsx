@@ -2,7 +2,7 @@
 
 import { Box } from "@mui/material"
 import type { Entity } from "@/types"
-import { PositionableImage } from "@/components/ui"
+import { PositionableImage } from "./PositionableImage"
 
 type HeroImageProps = {
   entity: Entity

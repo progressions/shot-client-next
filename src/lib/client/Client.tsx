@@ -1,5 +1,7 @@
 import Cookies from "js-cookie"
-import { Api, ApiV2, queryParams } from "@/lib"
+import Api from "@/lib/Api"
+import ApiV2 from "@/lib/ApiV2"
+import { queryParams } from "@/lib/queryParams"
 import { createConsumer } from "@rails/actioncable"
 import * as auth from "@/lib/client/authClient"
 import * as character from "@/lib/client/characterClient"

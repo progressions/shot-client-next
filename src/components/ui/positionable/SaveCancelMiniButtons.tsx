@@ -1,7 +1,8 @@
 "use client"
 
 import { Box } from "@mui/material"
-import { SaveButton, CancelButton } from "@/components/ui"
+import { SaveButton } from "../SaveButton"
+import { CancelButton } from "../CancelButton"
 
 type SaveCancelMiniButtonsProps = {
   onSave: () => void

@@ -3,7 +3,7 @@ import type { PopupProps, Weapon } from "@/types"
 import { defaultWeapon } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
-import { WeaponLink } from "@/components/ui"
+import WeaponLink from "../ui/links/WeaponLink"
 import { EntityAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
 

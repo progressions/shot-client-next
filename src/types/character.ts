@@ -1,4 +1,5 @@
-import { Vehicle, Archetype, Person } from "@/types"
+import type { Vehicle, Person } from "./resources"
+import type { Archetype } from "./ui"
 
 export type CharacterType =
   | "PC"

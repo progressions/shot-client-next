@@ -1,20 +1,5 @@
-import type {
-  Character,
-  User,
-  Campaign,
-  Vehicle,
-  Party,
-  Faction,
-  Site,
-  Schtick,
-  Weapon,
-  Juncture,
-  SchtickPath,
-  SchtickCategory,
-  WeaponCategory,
-  Fight,
-  Archetype,
-} from "@/types"
+import type { Character, User, Campaign, Vehicle, Party, Faction, Site, Schtick, Weapon, Juncture, Fight } from "./resources"
+import type { SchtickPath, SchtickCategory, WeaponCategory, Archetype } from "./ui"
 
 export interface SuggestionsResponse {
   Character: Character[]

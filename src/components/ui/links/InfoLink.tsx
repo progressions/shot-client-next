@@ -1,6 +1,7 @@
 "use client"
 import { Entity } from "@/types"
-import { EntityLink, Icon } from "@/components/ui"
+import EntityLink from "./EntityLink"
+import { Icon } from "../Icon"
 import dynamic from "next/dynamic"
 
 // Dynamically import InfoPopup to break circular dependency

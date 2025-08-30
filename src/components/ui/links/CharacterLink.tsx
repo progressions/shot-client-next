@@ -1,5 +1,10 @@
 "use client"
-import { EntityLink } from "@/components/ui"
+import EntityLink from "./EntityLink"
+import dynamic from "next/dynamic"
+
+const CharacterPopup = dynamic(() => import("@/components/popups/CharacterPopup"), {
+  ssr: false,
+})
 
 type CharacterLinkProperties = {
   character: Character
@@ -21,9 +26,10 @@ export default function CharacterLink({
       entity={character}
       data={data}
       disablePopup={disablePopup}
+      popupOverride={CharacterPopup}
       sx={sx}
     >
-      {children}
+      {children || character.name}
     </EntityLink>
   )
 }

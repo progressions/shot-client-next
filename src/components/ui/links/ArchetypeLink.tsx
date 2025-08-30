@@ -1,6 +1,6 @@
 "use client"
 import type { Entity } from "@/types"
-import { EntityLink } from "@/components/ui"
+import EntityLink from "./EntityLink"
 import dynamic from "next/dynamic"
 
 const ArchetypePopup = dynamic(

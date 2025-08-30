@@ -2,8 +2,8 @@
 
 import { Stack, Box } from "@mui/material"
 import type { Weapon } from "@/types"
-import { WeaponLink } from "@/components/ui"
-import { Badge } from "@/components/badges"
+import WeaponLink from "../ui/links/WeaponLink"
+import Badge from "./Badge"
 
 type WeaponBadgeProperties = {
   weapon: Weapon

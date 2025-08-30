@@ -5,7 +5,9 @@ import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
 import { EntityAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
-import { MembersGroup, FactionLink, PartyLink } from "@/components/ui"
+import { MembersGroup } from "../ui/MembersGroup"
+import FactionLink from "../ui/links/FactionLink"
+import PartyLink from "../ui/links/PartyLink"
 
 export default function PartyPopup({ id }: PopupProps) {
   const { user, client } = useClient()

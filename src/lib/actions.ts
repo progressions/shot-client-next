@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
-import { Client } from "@/lib"
+import Client from "@/lib/client/Client"
 
 export async function logoutAction(): Promise<void> {
   const cookieStore = await cookies()

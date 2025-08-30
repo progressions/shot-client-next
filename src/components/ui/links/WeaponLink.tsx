@@ -1,5 +1,10 @@
 "use client"
-import { EntityLink } from "@/components/ui"
+import EntityLink from "./EntityLink"
+import dynamic from "next/dynamic"
+
+const WeaponPopup = dynamic(() => import("@/components/popups/WeaponPopup"), {
+  ssr: false,
+})
 
 type WeaponLinkProperties = {
   weapon: Weapon
@@ -17,8 +22,14 @@ export default function WeaponLink({
   sx,
 }: WeaponLinkProperties) {
   return (
-    <EntityLink entity={weapon} data={data} disablePopup={disablePopup} sx={sx}>
-      {children}
+    <EntityLink
+      entity={weapon}
+      data={data}
+      disablePopup={disablePopup}
+      popupOverride={WeaponPopup}
+      sx={sx}
+    >
+      {children || weapon.name}
     </EntityLink>
   )
 }

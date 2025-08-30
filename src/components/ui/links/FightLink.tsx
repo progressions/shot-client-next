@@ -1,5 +1,10 @@
 "use client"
-import { EntityLink } from "@/components/ui"
+import EntityLink from "./EntityLink"
+import dynamic from "next/dynamic"
+
+const FightPopup = dynamic(() => import("@/components/popups/FightPopup"), {
+  ssr: false,
+})
 
 type FightLinkProperties = {
   fight: Fight
@@ -17,8 +22,14 @@ export default function FightLink({
   sx,
 }: FightLinkProperties) {
   return (
-    <EntityLink entity={fight} data={data} disablePopup={disablePopup} sx={sx}>
-      {children}
+    <EntityLink
+      entity={fight}
+      data={data}
+      disablePopup={disablePopup}
+      popupOverride={FightPopup}
+      sx={sx}
+    >
+      {children || fight.name}
     </EntityLink>
   )
 }
