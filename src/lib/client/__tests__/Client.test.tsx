@@ -116,10 +116,10 @@ describe("createClient", () => {
 
     // Mock API constructors
     ;(Api as jest.MockedClass<typeof Api>).mockImplementation(
-      () => mockApi as unknown
+      () => mockApi as unknown as Api
     )
     ;(ApiV2 as jest.MockedClass<typeof ApiV2>).mockImplementation(
-      () => mockApiV2 as unknown
+      () => mockApiV2 as unknown as ApiV2
     )
 
     // Mock queryParams
