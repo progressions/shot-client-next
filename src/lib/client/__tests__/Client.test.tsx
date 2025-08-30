@@ -1,12 +1,18 @@
 import Cookies from "js-cookie"
 import createClient from "../Client"
-import { Api, ApiV2, queryParams } from "@/lib"
 import { createConsumer } from "@rails/actioncable"
 
 // Mock dependencies
 jest.mock("js-cookie")
-jest.mock("@/lib")
+jest.mock("@/lib/Api")
+jest.mock("@/lib/ApiV2")
+jest.mock("@/lib/queryParams")
 jest.mock("@rails/actioncable")
+
+// Import mocked functions after mocking
+import Api from "@/lib/Api"
+import ApiV2 from "@/lib/ApiV2"
+import { queryParams } from "@/lib/queryParams"
 
 // Mock all client modules
 jest.mock("@/lib/client/authClient")
@@ -287,7 +293,7 @@ describe("createClient", () => {
       jwt,
       api: mockApi,
       apiV2: mockApiV2,
-      queryParams,
+      queryParams: queryParams as jest.MockedFunction<typeof queryParams>,
     }
 
     it("creates all client modules with correct dependencies", () => {
