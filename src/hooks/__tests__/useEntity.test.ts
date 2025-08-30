@@ -70,12 +70,12 @@ describe("useEntity", () => {
   }
 
   const mockDispatchForm = jest.fn()
-  
+
   // Get mock instances within describe block
   let mockClient: any
   let mockToast: any
   let mockRouter: any
-  
+
   beforeEach(() => {
     jest.clearAllMocks()
     // Access the mocks from the modules
@@ -437,9 +437,7 @@ describe("useEntity", () => {
       )
 
       await act(async () => {
-        await expect(
-          result.current.updateEntity(mockEntity)
-        ).rejects.toThrow()
+        await expect(result.current.updateEntity(mockEntity)).rejects.toThrow()
       })
 
       expect(mockToast.toastError).toHaveBeenCalledWith(
