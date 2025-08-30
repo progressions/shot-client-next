@@ -9,12 +9,14 @@ import type {
   Schtick,
   Weapon,
   Juncture,
+  Fight,
+} from "./resources"
+import type {
   SchtickPath,
   SchtickCategory,
   WeaponCategory,
-  Fight,
   Archetype,
-} from "@/types"
+} from "./ui"
 
 export interface SuggestionsResponse {
   Character: Character[]

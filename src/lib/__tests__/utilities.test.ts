@@ -120,7 +120,7 @@ describe("queryParams", () => {
 
   describe("value handling", () => {
     it("handles string values", () => {
-      expect(queryParams({ name: "John Doe" })).toBe("name=John Doe")
+      expect(queryParams({ name: "John Doe" })).toBe("name=John%20Doe")
     })
 
     it("handles number values", () => {
@@ -151,18 +151,20 @@ describe("queryParams", () => {
   })
 
   describe("special characters", () => {
-    it("does not URL encode special characters", () => {
-      expect(queryParams({ search: "hello world" })).toBe("search=hello world")
-      expect(queryParams({ query: "a&b=c" })).toBe("query=a&b=c")
+    it("URL encodes special characters", () => {
+      expect(queryParams({ search: "hello world" })).toBe(
+        "search=hello%20world"
+      )
+      expect(queryParams({ query: "a&b=c" })).toBe("query=a%26b%3Dc")
     })
 
     it("handles equals signs in values", () => {
-      expect(queryParams({ equation: "x=y+z" })).toBe("equation=x=y+z")
+      expect(queryParams({ equation: "x=y+z" })).toBe("equation=x%3Dy%2Bz")
     })
 
     it("handles ampersands in values", () => {
       expect(queryParams({ company: "Johnson & Johnson" })).toBe(
-        "company=Johnson & Johnson"
+        "company=Johnson%20%26%20Johnson"
       )
     })
   })
@@ -170,12 +172,14 @@ describe("queryParams", () => {
   describe("object values", () => {
     it("converts objects to string representation", () => {
       expect(queryParams({ data: { nested: true } })).toBe(
-        "data=[object Object]"
+        "data=%5Bobject%20Object%5D"
       )
     })
 
-    it("converts arrays to string representation", () => {
-      expect(queryParams({ items: [1, 2, 3] })).toBe("items=1,2,3")
+    it("handles arrays with bracket notation", () => {
+      expect(queryParams({ items: [1, 2, 3] })).toBe(
+        "items[]=1&items[]=2&items[]=3"
+      )
     })
   })
 

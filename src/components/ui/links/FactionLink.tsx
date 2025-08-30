@@ -1,5 +1,10 @@
 "use client"
-import { EntityLink } from "@/components/ui"
+import EntityLink from "./EntityLink"
+import dynamic from "next/dynamic"
+
+const FactionPopup = dynamic(() => import("@/components/popups/FactionPopup"), {
+  ssr: false,
+})
 
 type FactionLinkProperties = {
   faction: Faction
@@ -21,9 +26,10 @@ export default function FactionLink({
       entity={faction}
       data={data}
       disablePopup={disablePopup}
+      popupOverride={FactionPopup}
       sx={sx}
     >
-      {children}
+      {children || faction.name}
     </EntityLink>
   )
 }

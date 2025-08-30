@@ -3,16 +3,15 @@
 import type { Entity } from "@/types"
 import { Box } from "@mui/material"
 import { useState, useEffect, useRef } from "react"
-import {
-  UploadButton,
-  ImageBox,
-  GenerateButton,
-  RepositionButton,
-  SaveCancelMiniButtons,
-  ImageViewerModal,
-} from "@/components/ui"
+import { UploadButton } from "./positionable/UploadButton"
+import { ImageBox } from "./positionable/ImageBox"
+import { GenerateButton } from "./positionable/GenerateButton"
+import { RepositionButton } from "./positionable/RepositionButton"
+import { SaveCancelMiniButtons } from "./positionable/SaveCancelMiniButtons"
+import { ImageViewerModal } from "./ImageViewerModal"
 import { GenerateImageDialog, UploadImageDialog } from "@/components/generate"
-import { useToast, useClient } from "@/contexts"
+import { useToast } from "@/contexts/ToastContext"
+import { useClient } from "@/contexts/AppContext"
 
 type PositionableImageProps = {
   entity: Entity

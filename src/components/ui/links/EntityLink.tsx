@@ -2,10 +2,7 @@
 import { Box, Popover, Link } from "@mui/material"
 import { useRef, useState, useEffect } from "react"
 import type { Entity } from "@/types"
-import { CharacterPopup } from "@/components/popups"
-import { CharacterName } from "@/components/names"
 import pluralize from "pluralize"
-import { namePropNames, nameComponents, popupComponents } from "@/lib/maps"
 
 // Map entity_class to keyword generation function
 const keywordMap: Record<string, (id: string) => string | undefined> = {
@@ -120,13 +117,7 @@ export default function EntityLink({
 
   if (!entity || !entity.id || !entity.entity_class) return null
 
-  // Get the appropriate Popup and Name components and prop name
-  const PopupComponent =
-    popupOverride || popupComponents[entity.entity_class] || CharacterPopup
-  const NameComponent = nameComponents[entity.entity_class] || CharacterName
-  const namePropName = namePropNames[entity.entity_class] || "character"
-
-  // Set keyword using hash map
+  const PopupComponent = popupOverride
   const keyword = keywordMap[entity.entity_class]?.(entity.id)
 
   return (
@@ -150,41 +141,43 @@ export default function EntityLink({
         onMouseEnter={handleMouseEnterLink}
         onMouseLeave={handleMouseLeave}
       >
-        {children || <NameComponent {...{ [namePropName]: entity }} />}
+        {children || entity.name}
       </Link>
-      <Popover
-        open={isOpen}
-        anchorEl={anchorEl}
-        onClose={handleMouseLeave}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "center",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-        disableRestoreFocus
-        disableScrollLock
-        sx={{ pointerEvents: "none" }}
-        PaperProps={{
-          sx: { maxWidth: "90vw", maxHeight: "50vh", overflow: "auto" },
-        }}
-      >
-        <Box
-          sx={{ px: 2, maxWidth: 400, pointerEvents: "auto" }}
-          onMouseEnter={handleMouseEnterPopover}
-          onMouseLeave={handleMouseLeave}
+      {PopupComponent && (
+        <Popover
+          open={isOpen}
+          anchorEl={anchorEl}
+          onClose={handleMouseLeave}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "center",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+          disableRestoreFocus
+          disableScrollLock
+          sx={{ pointerEvents: "none" }}
+          PaperProps={{
+            sx: { maxWidth: "90vw", maxHeight: "50vh", overflow: "auto" },
+          }}
         >
-          <PopupComponent
-            id={entity.id}
-            keyword={keyword}
-            handleClose={handleClose}
-            anchorEl={anchorEl}
-            open={isOpen}
-          />
-        </Box>
-      </Popover>
+          <Box
+            sx={{ px: 2, maxWidth: 400, pointerEvents: "auto" }}
+            onMouseEnter={handleMouseEnterPopover}
+            onMouseLeave={handleMouseLeave}
+          >
+            <PopupComponent
+              id={entity.id}
+              keyword={keyword}
+              handleClose={handleClose}
+              anchorEl={anchorEl}
+              open={isOpen}
+            />
+          </Box>
+        </Popover>
+      )}
     </>
   )
 }

@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { v4 as uuidv4 } from "uuid"
 import type { Entity, Encounter, Weapon, Schtick } from "@/types"
 import { FormStateType, FormActions, useForm } from "@/reducers"
-import { useCampaign, useClient } from "@/contexts"
+import { useCampaign, useClient } from "@/contexts/AppContext"
 import { useEntity } from "@/hooks"
 
 export const encounterTransition = {

@@ -1,8 +1,9 @@
 "use client"
 
 import type { FactionBadgeProps } from "@/types"
-import { CharacterLink, FactionLink } from "@/components/ui"
-import { Badge } from "@/components/badges"
+import CharacterLink from "../ui/links/CharacterLink"
+import FactionLink from "../ui/links/FactionLink"
+import Badge from "./Badge"
 
 export default function FactionBadge({
   faction,

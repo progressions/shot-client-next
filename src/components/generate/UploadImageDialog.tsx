@@ -14,7 +14,7 @@ import {
 import CloudUploadIcon from "@mui/icons-material/CloudUpload"
 import CheckIcon from "@mui/icons-material/Check"
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline"
-import { ConfirmDialog } from "@/components/ui"
+import { ConfirmDialog } from "../ui/ConfirmDialog"
 import type { Entity } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useToast, useClient } from "@/contexts"

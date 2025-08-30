@@ -1,5 +1,10 @@
 "use client"
-import { EntityLink } from "@/components/ui"
+import EntityLink from "./EntityLink"
+import dynamic from "next/dynamic"
+
+const SchtickPopup = dynamic(() => import("@/components/popups/SchtickPopup"), {
+  ssr: false,
+})
 
 type SchtickLinkProperties = {
   schtick: Schtick
@@ -21,9 +26,10 @@ export default function SchtickLink({
       entity={schtick}
       data={data}
       disablePopup={disablePopup}
+      popupOverride={SchtickPopup}
       sx={sx}
     >
-      {children}
+      {children || schtick.name}
     </EntityLink>
   )
 }

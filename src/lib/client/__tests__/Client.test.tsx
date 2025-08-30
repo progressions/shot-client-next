@@ -1,12 +1,18 @@
 import Cookies from "js-cookie"
 import createClient from "../Client"
-import { Api, ApiV2, queryParams } from "@/lib"
 import { createConsumer } from "@rails/actioncable"
 
 // Mock dependencies
 jest.mock("js-cookie")
-jest.mock("@/lib")
+jest.mock("@/lib/Api")
+jest.mock("@/lib/ApiV2")
+jest.mock("@/lib/queryParams")
 jest.mock("@rails/actioncable")
+
+// Import mocked functions after mocking
+import Api from "@/lib/Api"
+import ApiV2 from "@/lib/ApiV2"
+import { queryParams } from "@/lib/queryParams"
 
 // Mock all client modules
 jest.mock("@/lib/client/authClient")
@@ -116,10 +122,10 @@ describe("createClient", () => {
 
     // Mock API constructors
     ;(Api as jest.MockedClass<typeof Api>).mockImplementation(
-      () => mockApi as unknown
+      () => mockApi as unknown as Api
     )
     ;(ApiV2 as jest.MockedClass<typeof ApiV2>).mockImplementation(
-      () => mockApiV2 as unknown
+      () => mockApiV2 as unknown as ApiV2
     )
 
     // Mock queryParams
@@ -287,7 +293,7 @@ describe("createClient", () => {
       jwt,
       api: mockApi,
       apiV2: mockApiV2,
-      queryParams,
+      queryParams: queryParams as jest.MockedFunction<typeof queryParams>,
     }
 
     it("creates all client modules with correct dependencies", () => {
@@ -395,14 +401,15 @@ describe("createClient", () => {
       const jwt = "test-jwt"
       const client = createClient({ jwt })
 
-      expect(client).toEqual(
-        expect.objectContaining({
-          jwt: jwt,
-          api: mockApi,
-          apiV2: mockApiV2,
-          consumer: expect.any(Function),
-        })
-      )
+      // Client now includes all methods from individual clients spread onto it
+      expect(client.jwt).toBe(jwt)
+      expect(client.api).toBe(mockApi)
+      expect(client.apiV2).toBe(mockApiV2)
+      expect(client.consumer).toEqual(expect.any(Function))
+
+      // Verify it has methods from various clients (but don't check exact structure)
+      expect(typeof client.getCharacters).toBe("function")
+      expect(typeof client.getCampaigns).toBe("function")
     })
 
     it("includes methods from all client modules", () => {

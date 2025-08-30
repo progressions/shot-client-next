@@ -1,6 +1,6 @@
 "use client"
 
-import { SpeedDialMenu } from "@/components/ui"
+import { SpeedDialMenu } from "./SpeedDialMenu"
 import { useState } from "react"
 
 export const actions = []

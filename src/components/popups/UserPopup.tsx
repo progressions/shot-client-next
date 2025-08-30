@@ -4,7 +4,7 @@ import { defaultUser } from "@/types"
 import { useState, useEffect } from "react"
 import { EntityAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
-import { UserLink } from "@/components/ui"
+import UserLink from "../ui/links/UserLink"
 
 export default function UserPopup({ id }: PopupProps) {
   const { currentUser, client } = useClient()

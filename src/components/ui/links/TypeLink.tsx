@@ -1,6 +1,6 @@
 "use client"
 import { Entity } from "@/types"
-import { EntityLink } from "@/components/ui"
+import EntityLink from "./EntityLink"
 import { TypePopup } from "@/components/popups"
 
 type TypeLinkProperties = {

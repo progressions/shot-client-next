@@ -9,7 +9,7 @@ import {
   Typography,
   Box,
 } from "@mui/material"
-import { ConfirmDialog } from "@/components/ui"
+import { ConfirmDialog } from "../ui/ConfirmDialog"
 import { ImagePreview } from "@/components/generate"
 import type { Entity } from "@/types"
 import { useForm } from "@/reducers"

@@ -1,6 +1,6 @@
 "use client"
 import type { Fight } from "@/types"
-import { Button } from "@/components/ui"
+import { Button } from "./Button"
 import { Box, Typography } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import { useState, useEffect } from "react"

@@ -4,7 +4,7 @@ import { Avatar as MuiAvatar } from "@mui/material"
 import { useState, useCallback } from "react"
 import type { Entity } from "@/types"
 import { SystemStyleObject, Theme } from "@mui/system"
-import { CharacterLink } from "@/components/ui"
+import CharacterLink from "../ui/links/CharacterLink"
 import { ImageViewerModal } from "@/components/ui/ImageViewerModal"
 
 interface AvatarProperties {

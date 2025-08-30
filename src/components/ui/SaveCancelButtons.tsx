@@ -1,5 +1,6 @@
 import { Stack } from "@mui/material"
-import { SaveButton, CancelButton } from "@/components/ui"
+import { SaveButton } from "./SaveButton"
+import { CancelButton } from "./CancelButton"
 
 export function SaveCancelButtons(props: React.PropsWithChildren<AnyProps>) {
   return (

@@ -6,13 +6,11 @@ import { EntityAvatar } from "@/components/avatars"
 import CS from "@/services/CharacterService"
 import GamemasterOnly from "@/components/GamemasterOnly"
 import { RichTextRenderer } from "@/components/editor"
-import { useClient } from "@/contexts"
-import {
-  CharacterLink,
-  ArchetypeLink,
-  TypeLink,
-  FactionLink,
-} from "@/components/ui"
+import { useClient } from "@/contexts/AppContext"
+import CharacterLink from "../ui/links/CharacterLink"
+import ArchetypeLink from "../ui/links/ArchetypeLink"
+import TypeLink from "../ui/links/TypeLink"
+import FactionLink from "../ui/links/FactionLink"
 
 export default function CharacterPopup({ id }: PopupProps) {
   const { user, client } = useClient()

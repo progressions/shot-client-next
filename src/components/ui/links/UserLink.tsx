@@ -1,5 +1,10 @@
 "use client"
-import { EntityLink } from "@/components/ui"
+import EntityLink from "./EntityLink"
+import dynamic from "next/dynamic"
+
+const UserPopup = dynamic(() => import("@/components/popups/UserPopup"), {
+  ssr: false,
+})
 
 type UserLinkProperties = {
   user: User
@@ -17,8 +22,14 @@ export default function UserLink({
   sx,
 }: UserLinkProperties) {
   return (
-    <EntityLink entity={user} data={data} disablePopup={disablePopup} sx={sx}>
-      {children}
+    <EntityLink
+      entity={user}
+      data={data}
+      disablePopup={disablePopup}
+      popupOverride={UserPopup}
+      sx={sx}
+    >
+      {children || user.name}
     </EntityLink>
   )
 }

@@ -1,5 +1,10 @@
 "use client"
-import { EntityLink } from "@/components/ui"
+import EntityLink from "./EntityLink"
+import dynamic from "next/dynamic"
+
+const VehiclePopup = dynamic(() => import("@/components/popups/VehiclePopup"), {
+  ssr: false,
+})
 
 type VehicleLinkProperties = {
   vehicle: Vehicle
@@ -21,9 +26,10 @@ export default function VehicleLink({
       entity={vehicle}
       data={data}
       disablePopup={disablePopup}
+      popupOverride={VehiclePopup}
       sx={sx}
     >
-      {children}
+      {children || vehicle.name}
     </EntityLink>
   )
 }

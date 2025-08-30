@@ -1,20 +1,20 @@
-import {
+import type {
   BaseEntity,
-  Advancement,
-  FightEvent,
-  Character,
   Invitation,
+  FightEvent,
+  Severity,
+  SchtickCategory,
+  SchtickPath,
+} from "./ui"
+import type {
+  Character,
   CharacterCategory,
   ActionValues,
   DescriptionValues,
   SkillValues,
-  VehicleActionValues,
-  WeaponCategory,
-  Severity,
-  SchtickCategory,
-  SchtickPath,
-} from "@/types"
-import { OnboardingProgress } from "@/lib/onboarding"
+} from "./character"
+import type { VehicleActionValues } from "./types"
+import type { OnboardingProgress } from "@/lib/onboarding"
 
 export enum VehicleDescriptionKeys {
   Size = "Size",

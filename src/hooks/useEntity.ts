@@ -1,6 +1,7 @@
 "use client"
 
-import { useToast, useClient, useApp } from "@/contexts"
+import { useToast } from "@/contexts/ToastContext"
+import { useClient, useApp } from "@/contexts/AppContext"
 import type { Entity } from "@/types"
 import pluralize from "pluralize"
 import { FormActions } from "@/reducers"

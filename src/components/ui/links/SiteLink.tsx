@@ -1,5 +1,10 @@
 "use client"
-import { EntityLink } from "@/components/ui"
+import EntityLink from "./EntityLink"
+import dynamic from "next/dynamic"
+
+const SitePopup = dynamic(() => import("@/components/popups/SitePopup"), {
+  ssr: false,
+})
 
 type SiteLinkProperties = {
   site: Site
@@ -17,8 +22,14 @@ export default function SiteLink({
   sx,
 }: SiteLinkProperties) {
   return (
-    <EntityLink entity={site} data={data} disablePopup={disablePopup} sx={sx}>
-      {children}
+    <EntityLink
+      entity={site}
+      data={data}
+      disablePopup={disablePopup}
+      popupOverride={SitePopup}
+      sx={sx}
+    >
+      {children || site.name}
     </EntityLink>
   )
 }

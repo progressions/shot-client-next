@@ -3,7 +3,7 @@ import { Autocomplete, TextField, CircularProgress } from "@mui/material"
 import { useClient } from "@/contexts"
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { debounce } from "lodash"
-import pluralize from "pluralize"
+import { getApiMethodForModel } from "@/lib/modelApiMapping"
 
 interface AutocompleteOption {
   id: number | string
@@ -44,73 +44,61 @@ export function ModelAutocomplete({
   const noneOption: AutocompleteOption = { id: NONE_VALUE, name: "None" }
 
   const fetchRecords = useCallback(async () => {
-    if (disabled || (!model && !records?.length)) {
+    if (disabled || !model) {
+      return
+    }
+
+    // If records are provided and filters are empty, just use the provided records
+    // This handles the common case where GenericFilter pre-fetches data
+    if (records?.length && (!filters || Object.keys(filters).length === 0)) {
+      setOptions(
+        allowNone
+          ? [noneOption, ...(records as AutocompleteOption[])]
+          : (records as AutocompleteOption[])
+      )
+      return
+    }
+
+    // Try to fetch data using the API
+    const apiMethod = getApiMethodForModel(model)
+    if (!apiMethod) {
+      // No API method found, fall back to provided records
+      console.warn(`No API method found for model: ${model}`)
+      setOptions(
+        allowNone
+          ? [noneOption, ...(records as AutocompleteOption[])]
+          : (records as AutocompleteOption[])
+      )
       return
     }
 
     setLoading(true)
     try {
-      const pluralModel = pluralize(model.toLowerCase())
-      let response:
-        | {
-            data?: Array<{ id: number | string; name?: string; title?: string }>
-          }
-        | undefined
+      console.log("about to call apiMethod", apiMethod)
+      // Call the appropriate API method
+      const response = await apiMethod(client, filters)
 
-      const clientMethod = (client as Record<string, unknown>)[pluralModel]
-      if (
-        typeof clientMethod === "object" &&
-        clientMethod !== null &&
-        "index" in clientMethod
-      ) {
-        response = await (
-          clientMethod as {
-            index: (params: { filters: Record<string, unknown> }) => Promise<{
-              data?: Array<{
-                id: number | string
-                name?: string
-                title?: string
-              }>
-            }>
-          }
-        ).index({
-          filters: filters || {},
-        })
-      } else if (
-        typeof client[pluralModel as keyof typeof client] === "function"
-      ) {
-        response = await (
-          client as Record<
-            string,
-            (params: { filters: Record<string, unknown> }) => Promise<{
-              data?: Array<{
-                id: number | string
-                name?: string
-                title?: string
-              }>
-            }>
-          >
-        )[pluralModel]({
-          filters: filters || {},
-        })
-      } else {
-        console.warn(`No client method found for ${pluralModel}`)
-        setOptions(
-          allowNone
-            ? [noneOption, ...(records as AutocompleteOption[])]
-            : (records as AutocompleteOption[])
+      console.log("Just fetched", model, filters, response.data)
+
+      // Model comes in as capitalized plural (e.g., "Weapons", "Parties")
+      // Data is always at response.data.[lowercase plural]
+      const collectionName = model.toLowerCase()
+      const data = response.data[collectionName]
+
+      console.log("Model:", model, "Collection:", collectionName, "Data:", data)
+
+      if (data && Array.isArray(data)) {
+        // Map the response data to options
+        const newOptions = data.map(
+          (record: { id: number | string; name?: string; title?: string }) => ({
+            id: record.id,
+            name: record.name || record.title || String(record.id),
+          })
         )
-        setLoading(false)
-        return
-      }
-
-      if (response?.data) {
-        const newOptions = response.data.map(record => ({
-          id: record.id,
-          name: record.name || record.title || String(record.id),
-        }))
+        console.log("Setting options", newOptions)
         setOptions(allowNone ? [noneOption, ...newOptions] : newOptions)
       } else {
+        // No data returned
         setOptions(
           allowNone
             ? [noneOption, ...(records as AutocompleteOption[])]
@@ -119,6 +107,7 @@ export function ModelAutocomplete({
       }
     } catch (error) {
       console.error(`Error fetching ${model} records:`, error)
+      // On error, fall back to provided records
       setOptions(
         allowNone
           ? [noneOption, ...(records as AutocompleteOption[])]

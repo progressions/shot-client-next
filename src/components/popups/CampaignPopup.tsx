@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
 import { EntityAvatar } from "@/components/avatars"
 import { useClient } from "@/contexts"
-import { CampaignLink } from "@/components/ui"
+import CampaignLink from "../ui/links/CampaignLink"
 
 export default function CampaignPopup({ id }: PopupProps) {
   const { user, client } = useClient()

@@ -32,9 +32,10 @@ const config = [
   }),
   {
     plugins: {
-          "unused-imports": unusedImports,
-          "eslint-plugin-import": eslintPluginImport,
-        },
+      import: eslintPluginImport,
+      "unused-imports": unusedImports,
+      "eslint-plugin-import": eslintPluginImport,
+    },
   },
   {
     rules: {
@@ -79,6 +80,7 @@ const config = [
     // Less strict rules for test files
     files: ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "**/test-utils*.tsx", "**/__tests__/**/*.{ts,tsx}"],
     rules: {
+      "no-restricted-imports": "off",
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-require-imports": "off",
       "@typescript-eslint/no-unsafe-assignment": "off",
@@ -87,6 +89,77 @@ const config = [
       "@typescript-eslint/no-unsafe-argument": "off",
       "@typescript-eslint/no-unsafe-return": "off",
       "@typescript-eslint/strict-boolean-expressions": "off",
+    },
+  },
+  {
+    // Disallow self-barrel imports that create cycles
+    files: ["src/components/ui/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        { paths: ["@/components/ui"] },
+      ],
+      "import/no-cycle": ["warn", { ignoreExternal: true }],
+    },
+  },
+  {
+    files: ["src/contexts/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        { paths: ["@/contexts"] },
+      ],
+      "import/no-cycle": ["warn", { ignoreExternal: true }],
+    },
+  },
+  {
+    files: ["src/hooks/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        { paths: ["@/hooks"] },
+      ],
+      "import/no-cycle": ["warn", { ignoreExternal: true }],
+    },
+  },
+  {
+    files: ["src/lib/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        { paths: ["@/lib"] },
+      ],
+      "import/no-cycle": ["warn", { ignoreExternal: true }],
+    },
+  },
+  {
+    files: ["src/types/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        { paths: ["@/types"] },
+      ],
+      "import/no-cycle": ["warn", { ignoreExternal: true }],
+    },
+  },
+  {
+    // Allow barrels to aggregate within their own folder
+    files: [
+      "src/components/ui/**/index.{ts,tsx}",
+      "src/contexts/index.{ts,tsx}",
+      "src/hooks/index.{ts,tsx}",
+      "src/lib/index.{ts,tsx}",
+      "src/types/index.{ts,tsx}",
+    ],
+    rules: {
+      "no-restricted-imports": "off",
+    },
+  },
+  {
+    // Relax restrictions in tests to allow flexible imports
+    files: ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "**/__tests__/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": "off",
     },
   },
 ]

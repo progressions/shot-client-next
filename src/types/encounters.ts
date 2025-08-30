@@ -1,4 +1,6 @@
-import { Character, BaseEntity } from "@/types"
+import type { BaseEntity } from "./ui"
+import type { Character } from "./character"
+import type { Vehicle } from "./resources"
 
 export type EncounterVehicle = Vehicle & {
   shot_id: string

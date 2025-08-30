@@ -1,13 +1,11 @@
+import type { ActionValues } from "./character"
 import type {
-  VehicleActionValues,
-  ActionValues,
   Faction,
   Person,
   Vehicle,
   Fight,
   User,
   Effect,
-  Toast,
   Campaign,
   CharacterEffect,
   Schtick,
@@ -16,10 +14,11 @@ import type {
   Site,
   Party,
   Weapon,
-  PaginationMeta,
-  Location,
-  Swerve,
-} from "@/types"
+} from "./resources"
+import type { VehicleActionValues } from "./types"
+import type { PaginationMeta } from "./responses"
+import type { Toast, Location } from "./ui"
+import type { Swerve } from "./types"
 
 export const defaultFaction: Faction = {
   entity_class: "Faction",

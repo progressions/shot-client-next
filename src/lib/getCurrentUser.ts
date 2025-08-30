@@ -1,6 +1,6 @@
 "use server"
 
-import { getServerClient } from "@/lib"
+import { getServerClient } from "@/lib/getServerClient"
 
 export async function getCurrentUser() {
   "use server"

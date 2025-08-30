@@ -1,8 +1,8 @@
 "use client"
 
 import type { Campaign } from "@/types"
-import { CampaignLink } from "@/components/ui"
-import { Badge } from "@/components/badges"
+import CampaignLink from "../ui/links/CampaignLink"
+import Badge from "./Badge"
 import { Chip, Box } from "@mui/material"
 import { useApp } from "@/contexts"
 import type { SystemStyleObject, Theme } from "@mui/system"
