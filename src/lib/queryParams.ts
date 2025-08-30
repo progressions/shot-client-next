@@ -9,7 +9,9 @@ export const queryParams = (parameters: Parameters_ = {}) => {
         if (value.length === 0) {
           return `${key}[]=`
         }
-        return value.map(item => `${key}[]=${encodeURIComponent(String(item))}`).join("&")
+        return value
+          .map(item => `${key}[]=${encodeURIComponent(String(item))}`)
+          .join("&")
       }
       return `${key}=${encodeURIComponent(String(value ?? ""))}`
     })

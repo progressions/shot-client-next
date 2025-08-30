@@ -3,9 +3,7 @@ import { Autocomplete, TextField, CircularProgress } from "@mui/material"
 import { useClient } from "@/contexts"
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { debounce } from "lodash"
-import {
-  getApiMethodForModel,
-} from "@/lib/modelApiMapping"
+import { getApiMethodForModel } from "@/lib/modelApiMapping"
 import { collectionNames } from "@/lib/maps"
 
 interface AutocompleteOption {
@@ -87,15 +85,17 @@ export function ModelAutocomplete({
       // Data is always at response.data.[lowercase plural]
       const collectionName = model.toLowerCase()
       const data = response.data[collectionName]
-      
+
       console.log("Model:", model, "Collection:", collectionName, "Data:", data)
 
       if (data && Array.isArray(data)) {
         // Map the response data to options
-        const newOptions = data.map((record: { id: number | string; name?: string; title?: string }) => ({
-          id: record.id,
-          name: record.name || record.title || String(record.id),
-        }))
+        const newOptions = data.map(
+          (record: { id: number | string; name?: string; title?: string }) => ({
+            id: record.id,
+            name: record.name || record.title || String(record.id),
+          })
+        )
         console.log("Setting options", newOptions)
         setOptions(allowNone ? [noneOption, ...newOptions] : newOptions)
       } else {

@@ -12,17 +12,39 @@ interface ApiRecord {
 // Type for the client instance from useClient
 // Using a minimal interface to avoid circular dependencies
 interface ClientInstance {
-  getCharacters: (filters: Record<string, unknown>) => Promise<AxiosResponse<ApiResponse>>
-  getVehicles: (filters: Record<string, unknown>) => Promise<AxiosResponse<ApiResponse>>
-  getFights: (filters: Record<string, unknown>) => Promise<AxiosResponse<ApiResponse>>
-  getWeapons: (filters: Record<string, unknown>) => Promise<AxiosResponse<ApiResponse>>
-  getSchticks: (filters: Record<string, unknown>) => Promise<AxiosResponse<ApiResponse>>
-  getSites: (filters: Record<string, unknown>) => Promise<AxiosResponse<ApiResponse>>
-  getParties: (filters: Record<string, unknown>) => Promise<AxiosResponse<ApiResponse>>
-  getFactions: (filters: Record<string, unknown>) => Promise<AxiosResponse<ApiResponse>>
-  getJunctures: (filters: Record<string, unknown>) => Promise<AxiosResponse<ApiResponse>>
-  getUsers: (filters: Record<string, unknown>) => Promise<AxiosResponse<ApiResponse>>
-  getCampaigns: (filters: Record<string, unknown>) => Promise<AxiosResponse<ApiResponse>>
+  getCharacters: (
+    filters: Record<string, unknown>
+  ) => Promise<AxiosResponse<ApiResponse>>
+  getVehicles: (
+    filters: Record<string, unknown>
+  ) => Promise<AxiosResponse<ApiResponse>>
+  getFights: (
+    filters: Record<string, unknown>
+  ) => Promise<AxiosResponse<ApiResponse>>
+  getWeapons: (
+    filters: Record<string, unknown>
+  ) => Promise<AxiosResponse<ApiResponse>>
+  getSchticks: (
+    filters: Record<string, unknown>
+  ) => Promise<AxiosResponse<ApiResponse>>
+  getSites: (
+    filters: Record<string, unknown>
+  ) => Promise<AxiosResponse<ApiResponse>>
+  getParties: (
+    filters: Record<string, unknown>
+  ) => Promise<AxiosResponse<ApiResponse>>
+  getFactions: (
+    filters: Record<string, unknown>
+  ) => Promise<AxiosResponse<ApiResponse>>
+  getJunctures: (
+    filters: Record<string, unknown>
+  ) => Promise<AxiosResponse<ApiResponse>>
+  getUsers: (
+    filters: Record<string, unknown>
+  ) => Promise<AxiosResponse<ApiResponse>>
+  getCampaigns: (
+    filters: Record<string, unknown>
+  ) => Promise<AxiosResponse<ApiResponse>>
   [key: string]: unknown
 }
 

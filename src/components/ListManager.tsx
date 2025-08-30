@@ -71,7 +71,7 @@ export function ListManager({
   })
   const { filters } = formState.data
   console.log("parentEntity", parentEntity)
-  console.log("childIds", childIds)
+  console.log("childIds", childEntityName, childIds)
 
   useEffect(() => {
     const fetchChildEntities = async () => {
@@ -79,7 +79,7 @@ export function ListManager({
         const funcName = `get${pluralChildEntityName}`
         const getFunc = client[funcName as keyof typeof client]
 
-        console.log("About to call", funcName)
+        console.log("About to call", funcName, "with childIds", childIds)
 
         if (typeof getFunc !== "function") {
           console.error(`Function ${funcName} does not exist on client`)
@@ -98,7 +98,7 @@ export function ListManager({
           per_page: 200,
         })
 
-        console.log("Just called", getFunc, response)
+        console.log("Just fetched", childIds, response)
         setChildEntities(response.data[collection] || [])
       } catch (error) {
         console.error(`Fetch ${childEntityName} error:`, error)
