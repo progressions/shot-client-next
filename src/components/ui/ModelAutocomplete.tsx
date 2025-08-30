@@ -6,6 +6,7 @@ import { debounce } from "lodash"
 import {
   getApiMethodForModel,
 } from "@/lib/modelApiMapping"
+import { collectionNames } from "@/lib/maps"
 
 interface AutocompleteOption {
   id: number | string
@@ -82,9 +83,16 @@ export function ModelAutocomplete({
 
       console.log("Just fetched", model, filters, response.data)
 
-      if (response?.data) {
+      // Model comes in as capitalized plural (e.g., "Weapons", "Parties")
+      // Data is always at response.data.[lowercase plural]
+      const collectionName = model.toLowerCase()
+      const data = response.data[collectionName]
+      
+      console.log("Model:", model, "Collection:", collectionName, "Data:", data)
+
+      if (data && Array.isArray(data)) {
         // Map the response data to options
-        const newOptions = response.data.map((record: { id: number | string; name?: string; title?: string }) => ({
+        const newOptions = data.map((record: { id: number | string; name?: string; title?: string }) => ({
           id: record.id,
           name: record.name || record.title || String(record.id),
         }))
