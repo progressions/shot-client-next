@@ -152,7 +152,9 @@ describe("queryParams", () => {
 
   describe("special characters", () => {
     it("URL encodes special characters", () => {
-      expect(queryParams({ search: "hello world" })).toBe("search=hello%20world")
+      expect(queryParams({ search: "hello world" })).toBe(
+        "search=hello%20world"
+      )
       expect(queryParams({ query: "a&b=c" })).toBe("query=a%26b%3Dc")
     })
 
@@ -175,7 +177,9 @@ describe("queryParams", () => {
     })
 
     it("handles arrays with bracket notation", () => {
-      expect(queryParams({ items: [1, 2, 3] })).toBe("items[]=1&items[]=2&items[]=3")
+      expect(queryParams({ items: [1, 2, 3] })).toBe(
+        "items[]=1&items[]=2&items[]=3"
+      )
     })
   })
 
