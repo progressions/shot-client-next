@@ -37,7 +37,7 @@ jobs:
           name: Check formatting
           command: npm run format:check
 
-  test:
+  lint:
     executor: node-executor
     steps:
       - checkout
@@ -63,6 +63,28 @@ jobs:
       - run:
           name: Lint
           command: npm run lint
+
+  test:
+    executor: node-executor
+    steps:
+      - checkout
+      
+      # Cache dependencies
+      - restore_cache:
+          keys:
+            - v2-dependencies-{{ checksum "package-lock.json" }}
+            - v2-dependencies-
+      
+      # Install dependencies
+      - run:
+          name: Install dependencies
+          command: npm ci
+      
+      # Save cache
+      - save_cache:
+          paths:
+            - node_modules
+          key: v2-dependencies-{{ checksum "package-lock.json" }}
       
       # Run TypeScript check (skip .next types that don't exist yet)
       - run:
@@ -153,11 +175,14 @@ workflows:
     jobs:
       - format
       
+      - lint
+      
       - test
       
       - build:
           requires:
             - format
+            - lint
             - test
       
       - deploy:
