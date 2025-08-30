@@ -59,9 +59,6 @@ jest.mock("next/navigation", () => {
 // Get references to the mocks after they're created
 const { useClient, useToast } = require("@/contexts")
 const { useRouter } = require("next/navigation")
-const mockClient = useClient().client
-const mockToast = useToast()
-const mockRouter = useRouter()
 
 describe("useEntity", () => {
   const mockEntity: Entity = {
@@ -73,9 +70,18 @@ describe("useEntity", () => {
   }
 
   const mockDispatchForm = jest.fn()
-
+  
+  // Get mock instances within describe block
+  let mockClient: any
+  let mockToast: any
+  let mockRouter: any
+  
   beforeEach(() => {
     jest.clearAllMocks()
+    // Access the mocks from the modules
+    mockClient = require("@/contexts").useClient().client
+    mockToast = require("@/contexts").useToast()
+    mockRouter = require("next/navigation").useRouter()
   })
 
   describe("initialization", () => {
@@ -432,7 +438,7 @@ describe("useEntity", () => {
 
       await act(async () => {
         await expect(
-          result.current.updateEntity(new FormData())
+          result.current.updateEntity(mockEntity)
         ).rejects.toThrow()
       })
 
