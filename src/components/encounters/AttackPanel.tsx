@@ -1176,6 +1176,38 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               multiSelect={true}
               characterTypes={(() => {
                 if (!attacker) return undefined
+                
+                // Check if any selected targets are mooks or non-mooks
+                const hasSelectedMooks = selectedTargetIds.some(id => {
+                  const shot = allShots.find(s => s.character?.shot_id === id)
+                  return shot?.character && CS.isMook(shot.character)
+                })
+                const hasSelectedNonMooks = selectedTargetIds.some(id => {
+                  const shot = allShots.find(s => s.character?.shot_id === id)
+                  return shot?.character && !CS.isMook(shot.character)
+                })
+                
+                // If a mook is selected, only show other mooks
+                if (hasSelectedMooks) {
+                  return ["Mook"]
+                }
+                
+                // If a non-mook is selected, exclude mooks
+                if (hasSelectedNonMooks) {
+                  if (CS.isPC(attacker) || CS.isAlly(attacker)) {
+                    return ["Featured Foe", "Boss", "Uber-Boss"]
+                  }
+                  if (
+                    CS.isMook(attacker) ||
+                    CS.isFeaturedFoe(attacker) ||
+                    CS.isBoss(attacker) ||
+                    CS.isUberBoss(attacker)
+                  ) {
+                    return ["PC", "Ally"]
+                  }
+                }
+                
+                // No targets selected yet, show based on attacker type
                 if (CS.isPC(attacker) || CS.isAlly(attacker)) {
                   return ["Mook", "Featured Foe", "Boss", "Uber-Boss"]
                 }
