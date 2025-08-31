@@ -367,6 +367,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                     <Box
                       key={entity.shot_id}
                       onClick={e => {
+                        // Only prevent default and set selection if clicking on the box itself, not the popup
+                        if ((e.target as HTMLElement).closest('.MuiPopover-root')) {
+                          return // Allow clicks in popup to work normally
+                        }
                         e.preventDefault()
                         setAttackerShotId(entity.shot_id || "")
                       }}
@@ -627,6 +631,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                       <Box
                         key={entity.shot_id}
                         onClick={e => {
+                          // Only prevent default and set selection if clicking on the box itself, not the popup
+                          if ((e.target as HTMLElement).closest('.MuiPopover-root')) {
+                            return // Allow clicks in popup to work normally
+                          }
                           e.preventDefault()
                           setTargetShotId(entity.shot_id || "")
                         }}
