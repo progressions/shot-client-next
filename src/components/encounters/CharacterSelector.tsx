@@ -20,7 +20,7 @@ export default function CharacterSelector({
   disabled = false,
 }: CharacterSelectorProps) {
   return (
-    <Box sx={{ mb: 3, opacity: disabled ? 0.5 : 1 }}>
+    <Box sx={{ opacity: disabled ? 0.5 : 1 }}>
       <Stack
         direction="row"
         spacing={1}

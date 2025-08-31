@@ -324,22 +324,32 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               borderBottomColor: "divider",
             }}
           >
+            <Typography
+              variant="h6"
+              sx={{ mb: 2, color: "primary.main" }}
+            >
+              ⚔️ Attacker
+            </Typography>
+
+            {/* Avatar Selection and Shot Cost on same line */}
             <Stack 
               direction="row" 
-              justifyContent="space-between" 
+              spacing={2}
               alignItems="flex-start"
-              sx={{ mb: 2 }}
+              sx={{ mb: 3 }}
             >
-              <Typography
-                variant="h6"
-                sx={{ color: "primary.main" }}
-              >
-                ⚔️ Attacker
-              </Typography>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <CharacterSelector
+                  shots={allShots}
+                  selectedShotId={attackerShotId}
+                  onSelect={setAttackerShotId}
+                  borderColor="primary.main"
+                />
+              </Box>
               
               {/* Shot Cost */}
               {attacker && (
-                <Box>
+                <Box sx={{ flexShrink: 0 }}>
                   <Typography variant="caption" sx={{ display: 'block', mb: 0.5 }}>
                     Shot Cost
                   </Typography>
@@ -355,14 +365,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                 </Box>
               )}
             </Stack>
-
-            {/* Avatar Selection */}
-            <CharacterSelector
-              shots={allShots}
-              selectedShotId={attackerShotId}
-              onSelect={setAttackerShotId}
-              borderColor="primary.main"
-            />
 
             {/* Attack Skill and Weapon Selection */}
             {attacker && "action_values" in attacker && (
