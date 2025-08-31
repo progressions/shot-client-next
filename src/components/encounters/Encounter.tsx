@@ -11,7 +11,7 @@ import {
 import { FightChips } from "@/components/fights"
 import { FormActions } from "@/reducers"
 import { Encounter } from "@/types"
-import { ShotCounter } from "@/components/encounters"
+import { ShotCounter, AttackPanel } from "@/components/encounters"
 import { useEncounter } from "@/contexts"
 
 export default function Encounter() {
@@ -73,7 +73,8 @@ export default function Encounter() {
           <FormHelperText>{errors.description}</FormHelperText>
         )}
       </FormControl>
-      <ShotCounter encounter={encounter} />
+      <AttackPanel />
+      <ShotCounter />
     </Box>
   )
 }
