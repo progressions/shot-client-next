@@ -323,10 +323,11 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     }
   }, [swerve, attackValue, defenseValue, weaponDamage, attacker, selectedTargetIds, allShots])
 
-  // Reset dodge applied when targets change
+  // Reset defense choices when targets change
   useEffect(() => {
-    setDodgeApplied(false)
-    setDodge(false)
+    setDefenseChoicePerTarget({})
+    setFortuneDiePerTarget({})
+    setDefenseAppliedPerTarget({})
   }, [selectedTargetIds])
 
   // Helper function to update defense and toughness based on selected targets
