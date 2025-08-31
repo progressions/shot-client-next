@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Stack } from "@mui/material"
+import { Box, Stack, Tooltip } from "@mui/material"
 import { Avatar } from "@/components/avatars"
 import type { Shot } from "@/types"
 
@@ -52,17 +52,26 @@ export default function CharacterSelector({
           const isSelected = entity.shot_id === selectedShotId
 
           return (
-            <Box
+            <Tooltip
               key={entity.shot_id}
-              onClick={e => {
-                // Only prevent default and set selection if clicking on the box itself, not the popup
-                if ((e.target as HTMLElement).closest(".MuiPopover-root")) {
-                  return // Allow clicks in popup to work normally
-                }
-                e.preventDefault()
-                onSelect(entity.shot_id || "")
-              }}
-              sx={{
+              title={isSelected ? "Click to deselect" : entity.name}
+              arrow
+            >
+              <Box
+                onClick={e => {
+                  // Only prevent default and set selection if clicking on the box itself, not the popup
+                  if ((e.target as HTMLElement).closest(".MuiPopover-root")) {
+                    return // Allow clicks in popup to work normally
+                  }
+                  e.preventDefault()
+                  // If clicking the already selected avatar, deselect it
+                  if (isSelected) {
+                    onSelect("")
+                  } else {
+                    onSelect(entity.shot_id || "")
+                  }
+                }}
+                sx={{
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
@@ -101,6 +110,7 @@ export default function CharacterSelector({
                 />
               </Box>
             </Box>
+          </Tooltip>
           )
         })}
       </Stack>
