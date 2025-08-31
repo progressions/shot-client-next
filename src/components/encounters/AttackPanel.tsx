@@ -340,96 +340,99 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               borderColor="primary.main"
             />
 
-            {/* Attack Skill Selection with Attack Value */}
+            {/* Attack Skill and Weapon Selection */}
             {attacker && "action_values" in attacker && (
-              <Box sx={{ mb: 3 }}>
-                <Typography
-                  variant="body2"
-                  sx={{ mb: 2, fontWeight: "medium" }}
-                >
-                  Attack Skill
-                </Typography>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <NumberField
-                    name="attackValue"
-                    value={parseInt(attackValue) || 0}
-                    size="small"
-                    width="80px"
-                    error={false}
-                    onChange={e => setAttackValue(e.target.value)}
-                    onBlur={e => setAttackValue(e.target.value)}
-                  />
-                  {(() => {
-                    const char = attacker as Character
-                    const mainAttack = CS.mainAttack(char)
-                    const mainValue = CS.actionValue(char, mainAttack)
-                    const secondaryAttack = CS.secondaryAttack(char)
-                    const secondaryValue = secondaryAttack
-                      ? CS.actionValue(char, secondaryAttack)
-                      : 0
+              <Stack 
+                direction={{ xs: "column", sm: "row" }} 
+                spacing={{ xs: 2, sm: 2 }}
+                sx={{ mb: 3 }}
+              >
+                {/* Attack Skill Block */}
+                <Box sx={{ flex: 1 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 2, fontWeight: "medium" }}
+                  >
+                    Attack Skill
+                  </Typography>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <NumberField
+                      name="attackValue"
+                      value={parseInt(attackValue) || 0}
+                      size="small"
+                      width="80px"
+                      error={false}
+                      onChange={e => setAttackValue(e.target.value)}
+                      onBlur={e => setAttackValue(e.target.value)}
+                    />
+                    {(() => {
+                      const char = attacker as Character
+                      const mainAttack = CS.mainAttack(char)
+                      const mainValue = CS.actionValue(char, mainAttack)
+                      const secondaryAttack = CS.secondaryAttack(char)
+                      const secondaryValue = secondaryAttack
+                        ? CS.actionValue(char, secondaryAttack)
+                        : 0
 
-                    const attackOptions = [
-                      { skill: mainAttack, value: mainValue },
-                      ...(secondaryAttack
-                        ? [{ skill: secondaryAttack, value: secondaryValue }]
-                        : []),
-                    ]
+                      const attackOptions = [
+                        { skill: mainAttack, value: mainValue },
+                        ...(secondaryAttack
+                          ? [{ skill: secondaryAttack, value: secondaryValue }]
+                          : []),
+                      ]
 
-                    return (
-                      <FormControl
-                        sx={{
-                          flex: 1,
-                          "& .MuiInputBase-root": { height: 56 },
-                        }}
-                      >
-                        <InputLabel>Attack Skill</InputLabel>
-                        <Select
-                          value={attackSkill}
-                          onChange={e => {
-                            const selected = e.target.value
-                            setAttackSkill(selected)
-                            const option = attackOptions.find(
-                              o => o.skill === selected
-                            )
-                            if (option) {
-                              setAttackValue(option.value.toString())
-                            }
+                      return (
+                        <FormControl
+                          sx={{
+                            flex: 1,
+                            "& .MuiInputBase-root": { height: 56 },
                           }}
-                          label="Attack Skill"
                         >
-                          {attackOptions.map(option => (
-                            <MenuItem key={option.skill} value={option.skill}>
-                              {option.skill} ({option.value})
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    )
-                  })()}
-                </Stack>
-              </Box>
-            )}
+                          <InputLabel>Attack Skill</InputLabel>
+                          <Select
+                            value={attackSkill}
+                            onChange={e => {
+                              const selected = e.target.value
+                              setAttackSkill(selected)
+                              const option = attackOptions.find(
+                                o => o.skill === selected
+                              )
+                              if (option) {
+                                setAttackValue(option.value.toString())
+                              }
+                            }}
+                            label="Attack Skill"
+                          >
+                            {attackOptions.map(option => (
+                              <MenuItem key={option.skill} value={option.skill}>
+                                {option.skill} ({option.value})
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      )
+                    })()}
+                  </Stack>
+                </Box>
 
-            <Stack spacing={2}>
-              {/* Damage and Weapon Row */}
-              <Box sx={{ mb: 3 }}>
-                <Typography
-                  variant="body2"
-                  sx={{ mb: 2, fontWeight: "medium" }}
-                >
-                  Damage
-                </Typography>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <NumberField
-                    name="weaponDamage"
-                    value={parseInt(weaponDamage) || 0}
-                    size="small"
-                    width="80px"
-                    error={false}
-                    onChange={e => setWeaponDamage(e.target.value)}
-                    onBlur={e => setWeaponDamage(e.target.value)}
-                  />
-                  {attacker && (
+                {/* Damage and Weapon Block */}
+                <Box sx={{ flex: 1 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 2, fontWeight: "medium" }}
+                  >
+                    Damage
+                  </Typography>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <NumberField
+                      name="weaponDamage"
+                      value={parseInt(weaponDamage) || 0}
+                      size="small"
+                      width="80px"
+                      error={false}
+                      onChange={e => setWeaponDamage(e.target.value)}
+                      onBlur={e => setWeaponDamage(e.target.value)}
+                    />
                     <FormControl
                       sx={{ flex: 1, "& .MuiInputBase-root": { height: 56 } }}
                     >
@@ -465,10 +468,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                         ))}
                       </Select>
                     </FormControl>
-                  )}
-                </Stack>
-              </Box>
-            </Stack>
+                  </Stack>
+                </Box>
+              </Stack>
+            )}
           </Box>
 
           {/* Target Section */}
