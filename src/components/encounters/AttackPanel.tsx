@@ -29,7 +29,7 @@ import { CS, VS } from "@/services"
 import type { Character, Vehicle, Shot, Weapon } from "@/types"
 import { useClient } from "@/contexts/AppContext"
 import { NumberField } from "@/components/ui"
-import { Avatar } from "@/components/avatars"
+import CharacterSelector from "./CharacterSelector"
 
 interface AttackPanelProps {
   onClose?: () => void
@@ -333,96 +333,12 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             </Typography>
 
             {/* Avatar Selection */}
-            <Box sx={{ mb: 3 }}>
-              <Stack
-                direction="row"
-                spacing={1}
-                sx={{
-                  overflowX: "auto",
-                  overflowY: "hidden",
-                  pb: 1,
-                  // Enable smooth scrolling
-                  scrollBehavior: "smooth",
-                  // Enable momentum scrolling on iOS
-                  WebkitOverflowScrolling: "touch",
-                  // Make sure horizontal scrolling works with trackpad
-                  "&::-webkit-scrollbar": {
-                    height: 6,
-                  },
-                  "&::-webkit-scrollbar-track": {
-                    backgroundColor: "action.hover",
-                  },
-                  "&::-webkit-scrollbar-thumb": {
-                    backgroundColor: "action.disabled",
-                    borderRadius: 3,
-                  },
-                }}
-              >
-                {allShots.map(shot => {
-                  const entity = shot.character || shot.vehicle
-                  if (!entity) return null
-                  const isSelected = entity.shot_id === attackerShotId
-
-                  return (
-                    <Box
-                      key={entity.shot_id}
-                      onClick={e => {
-                        // Only prevent default and set selection if clicking on the box itself, not the popup
-                        if ((e.target as HTMLElement).closest('.MuiPopover-root')) {
-                          return // Allow clicks in popup to work normally
-                        }
-                        e.preventDefault()
-                        setAttackerShotId(entity.shot_id || "")
-                      }}
-                      sx={{
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: 80,
-                        height: 72,
-                        borderRadius: 2,
-                        border: isSelected
-                          ? "3px solid"
-                          : "3px solid transparent",
-                        borderColor: isSelected
-                          ? "primary.main"
-                          : "transparent",
-                        backgroundColor: isSelected
-                          ? "action.selected"
-                          : "transparent",
-                        "&:hover": {
-                          backgroundColor: "action.hover",
-                        },
-                        pl: 1,
-                        transition: "all 0.2s",
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: "100%",
-                          height: "100%",
-                        }}
-                      >
-                        <Avatar
-                          entity={entity}
-                          href={`/characters/${entity.id}`}
-                          disableImageViewer={true}
-                          sx={{
-                            width: 64,
-                            height: 64,
-                            ml: 0.5,
-                          }}
-                        />
-                      </Box>
-                    </Box>
-                  )
-                })}
-              </Stack>
-            </Box>
+            <CharacterSelector
+              shots={allShots}
+              selectedShotId={attackerShotId}
+              onSelect={setAttackerShotId}
+              borderColor="primary.main"
+            />
 
             {/* Attack Skill Selection with Attack Value */}
             {attacker && "action_values" in attacker && (
@@ -572,121 +488,34 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             </Typography>
 
             {/* Target Avatar Selection */}
-            <Box sx={{ mb: 3 }}>
-              <Stack
-                direction="row"
-                spacing={1}
-                sx={{
-                  overflowX: "auto",
-                  overflowY: "hidden",
-                  pb: 1,
-                  opacity: !attackerShotId ? 0.5 : 1,
-                  pointerEvents: !attackerShotId ? "none" : "auto",
-                  // Enable smooth scrolling
-                  scrollBehavior: "smooth",
-                  // Enable momentum scrolling on iOS
-                  WebkitOverflowScrolling: "touch",
-                  // Make sure horizontal scrolling works with trackpad
-                  "&::-webkit-scrollbar": {
-                    height: 6,
-                  },
-                  "&::-webkit-scrollbar-track": {
-                    backgroundColor: "action.hover",
-                  },
-                  "&::-webkit-scrollbar-thumb": {
-                    backgroundColor: "action.disabled",
-                    borderRadius: 3,
-                  },
-                }}
-              >
-                {allShots
-                  .filter(s => {
-                    const entity = s.character
-                    // Exclude self
-                    if (entity?.shot_id === attackerShotId) return false
+            <CharacterSelector
+              shots={allShots.filter(s => {
+                const entity = s.character
+                // Exclude self
+                if (entity?.shot_id === attackerShotId) return false
 
-                    // If attacker is PC or Ally, only show enemies
-                    if (attacker && "action_values" in attacker) {
-                      const attackerChar = attacker as Character
-                      if (CS.isPC(attackerChar) || CS.isAlly(attackerChar)) {
-                        // Only show enemy types for PC/Ally attackers
-                        const targetChar = entity as Character
-                        return (
-                          CS.isMook(targetChar) ||
-                          CS.isFeaturedFoe(targetChar) ||
-                          CS.isBoss(targetChar) ||
-                          CS.isUberBoss(targetChar)
-                        )
-                      }
-                    }
-
-                    return true // Show all for other attacker types
-                  })
-                  .map(shot => {
-                    const entity = shot.character
-                    if (!entity) return null
-                    const isSelected = entity.shot_id === targetShotId
-
+                // If attacker is PC or Ally, only show enemies
+                if (attacker && "action_values" in attacker) {
+                  const attackerChar = attacker as Character
+                  if (CS.isPC(attackerChar) || CS.isAlly(attackerChar)) {
+                    // Only show enemy types for PC/Ally attackers
+                    const targetChar = entity as Character
                     return (
-                      <Box
-                        key={entity.shot_id}
-                        onClick={e => {
-                          // Only prevent default and set selection if clicking on the box itself, not the popup
-                          if ((e.target as HTMLElement).closest('.MuiPopover-root')) {
-                            return // Allow clicks in popup to work normally
-                          }
-                          e.preventDefault()
-                          setTargetShotId(entity.shot_id || "")
-                        }}
-                        sx={{
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: 80,
-                          height: 72,
-                          borderRadius: 2,
-                          border: isSelected
-                            ? "3px solid"
-                            : "3px solid transparent",
-                          borderColor: isSelected
-                            ? "error.main"
-                            : "transparent",
-                          backgroundColor: isSelected
-                            ? "action.selected"
-                            : "transparent",
-                          "&:hover": {
-                            backgroundColor: "action.hover",
-                          },
-                          pl: 1,
-                          transition: "all 0.2s",
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            width: "100%",
-                            height: "100%",
-                          }}
-                        >
-                          <Avatar
-                            entity={entity}
-                            href="#"
-                            disableImageViewer={true}
-                            sx={{
-                              width: 64,
-                              height: 64,
-                              ml: 0.5,
-                            }}
-                          />
-                        </Box>
-                      </Box>
+                      CS.isMook(targetChar) ||
+                      CS.isFeaturedFoe(targetChar) ||
+                      CS.isBoss(targetChar) ||
+                      CS.isUberBoss(targetChar)
                     )
-                  })}
-              </Stack>
-            </Box>
+                  }
+                }
+
+                return true // Show all for other attacker types
+              })}
+              selectedShotId={targetShotId}
+              onSelect={setTargetShotId}
+              borderColor="error.main"
+              disabled={!attackerShotId}
+            />
 
             {/* Defense and Toughness Values */}
             <Box sx={{ mb: 3 }}>
