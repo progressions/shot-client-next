@@ -299,7 +299,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, minHeight: 400 }}>
           {/* Attacker Side */}
           <Box sx={{ 
-            flex: '0 0 55%',
+            flex: '0 0 58%',
             p: 3,
             borderRight: { md: '2px solid' }, 
             borderRightColor: { md: 'divider' },
@@ -348,11 +348,13 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                     value={attackValue}
                     onChange={(e) => setAttackValue(e.target.value)}
                     sx={{ 
-                      minWidth: 100, 
-                      maxWidth: 100,
+                      minWidth: 80, 
+                      maxWidth: 80,
+                      '& .MuiInputBase-root': {
+                        height: 56
+                      },
                       '& .MuiInputBase-input': {
-                        fontSize: '1.2rem',
-                        py: 1.5
+                        fontSize: '1.2rem'
                       }
                     }}
                     disabled={!attacker}
@@ -372,8 +374,11 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                             setAttackSkill(mainAttack)
                             setAttackValue(mainValue.toString())
                           }}
-                          size="small"
-                          sx={{ minWidth: 120 }}
+                          sx={{ 
+                            minWidth: 120,
+                            height: 56,
+                            fontSize: '0.875rem'
+                          }}
                         >
                           {mainAttack} {mainValue}
                         </Button>
@@ -384,8 +389,11 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                               setAttackSkill(secondaryAttack)
                               setAttackValue(secondaryValue.toString())
                             }}
-                            size="small"
-                            sx={{ minWidth: 120 }}
+                            sx={{ 
+                              minWidth: 120,
+                              height: 56,
+                              fontSize: '0.875rem'
+                            }}
                           >
                             {secondaryAttack} {secondaryValue}
                           </Button>
@@ -406,17 +414,19 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   value={weaponDamage}
                   onChange={(e) => setWeaponDamage(e.target.value)}
                   sx={{ 
-                    minWidth: 100, 
-                    maxWidth: 100,
+                    minWidth: 80, 
+                    maxWidth: 80,
+                    '& .MuiInputBase-root': {
+                      height: 56
+                    },
                     '& .MuiInputBase-input': {
-                      fontSize: '1.2rem',
-                      py: 1.5
+                      fontSize: '1.2rem'
                     }
                   }}
                   disabled={!attacker}
                 />
                 {attacker && (
-                  <FormControl fullWidth size="small">
+                  <FormControl fullWidth sx={{ '& .MuiInputBase-root': { height: 56 } }}>
                     <InputLabel>Weapon</InputLabel>
                     <Select
                       value={selectedWeaponId}
@@ -452,7 +462,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           
           {/* Target Side */}
           <Box sx={{ 
-            flex: '0 0 45%',
+            flex: '0 0 42%',
             p: 3,
             backgroundColor: 'action.hover'
           }}>
@@ -514,7 +524,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             <Box sx={{ mb: 3 }}>
               <Typography variant="body2" sx={{ mb: 2, fontWeight: 'medium' }}>Defense</Typography>
               <TextField
-                label="Defense Value"
+                label="DV"
                 type="number"
                 value={defenseValue}
                 onChange={(e) => setDefenseValue(e.target.value)}
@@ -525,11 +535,13 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   return total > 0 ? `+${total}` : ""
                 })()}
                 sx={{ 
-                  minWidth: 100, 
-                  maxWidth: 100,
+                  minWidth: 80, 
+                  maxWidth: 80,
+                  '& .MuiInputBase-root': {
+                    height: 56
+                  },
                   '& .MuiInputBase-input': {
-                    fontSize: '1.2rem',
-                    py: 1.5
+                    fontSize: '1.2rem'
                   }
                 }}
                 disabled={!target}
@@ -590,8 +602,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               value={shotCost}
               onChange={(e) => setShotCost(e.target.value)}
               sx={{ 
-                minWidth: 100, 
-                maxWidth: 100
+                minWidth: 80, 
+                maxWidth: 80
               }}
               disabled={!attacker}
             />
