@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import {
   Box,
   Button,
@@ -39,10 +39,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   const {
     encounter,
     weapons: encounterWeapons,
-    refreshEncounter,
+    ec,
   } = useEncounter()
   const { toastSuccess, toastError } = useToast()
-  const client = useClient()
+  const { client } = useClient()
 
   // State for attack form
   const [attackerShotId, setAttackerShotId] = useState<string>("")
@@ -59,6 +59,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   const [finalDamage, setFinalDamage] = useState<string>("")
   const [shotCost, setShotCost] = useState<string>("3")
   const [isProcessing, setIsProcessing] = useState(false)
+  const [dodgeApplied, setDodgeApplied] = useState(false)
 
   // Get all characters in the fight (excluding hidden ones and vehicles)
   const allShots = useMemo(() => {
@@ -196,17 +197,29 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     }
   }, [swerve, attackValue, defenseValue, weaponDamage])
 
+  // Reset dodge applied when target changes
+  useEffect(() => {
+    setDodgeApplied(false)
+    setDodge(false)
+  }, [targetShotId])
+
   const handleDodge = async () => {
-    if (!targetShot) return
+    if (!targetShot || !target) {
+      toastError("Please select a target first")
+      return
+    }
 
     setIsProcessing(true)
     try {
-      // Spend 1 shot for dodge
-      await client.fight.spendShots(encounter, target!, 1)
-      setDodge(true)
-      toastSuccess("Dodge action taken! +3 Defense")
-      await refreshEncounter()
+      // Spend 1 shot for dodge using the encounter client
+      await ec.spendShots(target, 1)
+      setDodgeApplied(true) // Mark that dodge has been applied
+      // Keep dodge checked - it represents that dodge was used for this attack
+      // Don't reset it here since we need the +3 defense to remain
+      toastSuccess("Dodge applied! Target moved down 1 shot (+3 Defense)")
+      // The encounter will update automatically via WebSocket
     } catch (error) {
+      console.error("Dodge error:", error)
       toastError("Failed to apply dodge")
     } finally {
       setIsProcessing(false)
@@ -225,7 +238,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       const isPC = CS.isPC(targetChar)
 
       // Spend shots for the attacker
-      await client.fight.spendShots(encounter, attacker, shots)
+      await ec.spendShots(attacker, shots)
 
       // Calculate new wounds and impairments
       let newWounds = 0
@@ -252,7 +265,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       }
 
       // Send update to backend
-      await client.fight.updateCombatState(
+      await client.updateCombatState(
         encounter,
         targetShot.character?.shot_id || targetShot.vehicle?.shot_id || "",
         isPC ? newWounds : undefined,
@@ -626,15 +639,16 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   label="Dodge (+3 DV, costs 1 shot)"
                 />
                 {dodge && (
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={handleDodge}
-                    disabled={isProcessing}
-                    fullWidth
-                  >
-                    Apply Dodge (-1 Shot)
-                  </Button>
+                  <Box sx={{ mt: 1 }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={handleDodge}
+                      disabled={isProcessing || dodgeApplied}
+                    >
+                      {dodgeApplied ? "Dodge Applied" : "Apply Dodge (-1 Shot)"}
+                    </Button>
+                  </Box>
                 )}
               </Stack>
             </Box>
