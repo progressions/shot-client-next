@@ -472,6 +472,24 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                 </Box>
               </Stack>
             )}
+
+            {/* Shot Cost */}
+            {attacker && (
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="body2" sx={{ mb: 2, fontWeight: "medium" }}>
+                  Shot Cost
+                </Typography>
+                <NumberField
+                  name="shotCost"
+                  value={parseInt(shotCost) || 0}
+                  size="small"
+                  width="100px"
+                  error={false}
+                  onChange={e => setShotCost(e.target.value)}
+                  onBlur={e => setShotCost(e.target.value)}
+                />
+              </Box>
+            )}
           </Box>
 
           {/* Target Section */}
@@ -632,32 +650,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             justifyContent="center"
             sx={{ flexWrap: { xs: "wrap", sm: "nowrap" } }}
           >
-            {/* Shot Cost */}
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                minWidth: { xs: "70px", sm: "auto" },
-              }}
-            >
-              <Typography
-                variant="caption"
-                sx={{ mb: 0.5, fontSize: { xs: "0.7rem", sm: "0.75rem" } }}
-              >
-                Shot Cost
-              </Typography>
-              <NumberField
-                name="shotCost"
-                value={parseInt(shotCost) || 0}
-                size="small"
-                width="80px"
-                error={false}
-                onChange={e => setShotCost(e.target.value)}
-                onBlur={e => setShotCost(e.target.value)}
-              />
-            </Box>
-
             {/* Dice Roll */}
             <Box
               sx={{
