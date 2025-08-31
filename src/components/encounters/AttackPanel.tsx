@@ -324,8 +324,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               }}
               getOptionLabel={(option) => {
                 const entity = option.character || option.vehicle
-                return entity ? `${entity.name} (Shot ${option.shot})` : ""
-              }}
+                const location = option.location ? ` - ${option.location}` : ""
+                return entity ? `${entity.name} (Shot ${option.shot})${location}` : ""
               renderInput={(params) => (
                 <TextField {...params} label="Select Attacker" />
               )}
@@ -346,13 +346,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                     type="number"
                     value={attackValue}
                     onChange={(e) => setAttackValue(e.target.value)}
+                    size="small"
                     sx={{ 
                       minWidth: 100, 
-                      maxWidth: 100,
-                      '& .MuiInputBase-input': {
-                        fontSize: '1.2rem',
-                        py: 2
-                      }
+                      maxWidth: 100
                     }}
                     disabled={!attacker}
                   />
@@ -404,13 +401,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   type="number"
                   value={weaponDamage}
                   onChange={(e) => setWeaponDamage(e.target.value)}
+                  size="small"
                   sx={{ 
                     minWidth: 100, 
-                    maxWidth: 100,
-                    '& .MuiInputBase-input': {
-                      fontSize: '1.2rem',
-                      py: 2
-                    }
+                    maxWidth: 100
                   }}
                   disabled={!attacker}
                 />
@@ -495,8 +489,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               }}
               getOptionLabel={(option) => {
                 const entity = option.character || option.vehicle
-                return entity ? `${entity.name} (Shot ${option.shot})` : ""
-              }}
+                const location = option.location ? ` - ${option.location}` : ""
+                return entity ? `${entity.name} (Shot ${option.shot})${location}` : ""
               renderInput={(params) => (
                 <TextField {...params} label="Select Target" />
               )}
@@ -516,6 +510,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                 type="number"
                 value={defenseValue}
                 onChange={(e) => setDefenseValue(e.target.value)}
+                size="small"
                 helperText={(() => {
                   let total = 0
                   if (stunt) total += 2
@@ -524,11 +519,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                 })()}
                 sx={{ 
                   minWidth: 100, 
-                  maxWidth: 100,
-                  '& .MuiInputBase-input': {
-                    fontSize: '1.2rem',
-                    py: 2
-                  }
+                  maxWidth: 100
                 }}
                 disabled={!target}
               />
