@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Box, Stack, Tooltip, FormControlLabel, Checkbox } from "@mui/material"
+import { Box, Stack, FormControlLabel, Checkbox } from "@mui/material"
 import { Avatar } from "@/components/avatars"
 import type { Shot, Character } from "@/types"
 import { CS } from "@/services"
@@ -83,67 +83,62 @@ export default function CharacterSelector({
           const isSelected = entity.shot_id === selectedShotId
 
           return (
-            <Tooltip
+            <Box
               key={entity.shot_id}
-              title={isSelected ? "Click to deselect" : entity.name}
-              arrow
-            >
-              <Box
-                onClick={e => {
-                  // Only prevent default and set selection if clicking on the box itself, not the popup
-                  if ((e.target as HTMLElement).closest(".MuiPopover-root")) {
-                    return // Allow clicks in popup to work normally
-                  }
-                  e.preventDefault()
-                  // If clicking the already selected avatar, deselect it
-                  if (isSelected) {
-                    onSelect("")
-                  } else {
-                    onSelect(entity.shot_id || "")
-                  }
-                }}
-                sx={{
-                cursor: "pointer",
+              onClick={e => {
+                // Only prevent default and set selection if clicking on the box itself, not the popup
+                if ((e.target as HTMLElement).closest(".MuiPopover-root")) {
+                  return // Allow clicks in popup to work normally
+                }
+                e.preventDefault()
+                // If clicking the already selected avatar, deselect it
+                if (isSelected) {
+                  onSelect("")
+                } else {
+                  onSelect(entity.shot_id || "")
+                }
+              }}
+              sx={{
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minWidth: 80,  // Use minWidth instead of width
+              width: 80,
+              height: 72,
+              flexShrink: 0,  // Prevent shrinking
+              borderRadius: 2,
+              border: isSelected ? "3px solid" : "3px solid transparent",
+              borderColor: isSelected ? borderColor : "transparent",
+              backgroundColor: isSelected ? "action.selected" : "transparent",
+              "&:hover": {
+                backgroundColor: "action.hover",
+              },
+              pl: 1,
+              transition: "all 0.2s",
+            }}
+          >
+            <Box
+              sx={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                minWidth: 80,  // Use minWidth instead of width
-                width: 80,
-                height: 72,
-                flexShrink: 0,  // Prevent shrinking
-                borderRadius: 2,
-                border: isSelected ? "3px solid" : "3px solid transparent",
-                borderColor: isSelected ? borderColor : "transparent",
-                backgroundColor: isSelected ? "action.selected" : "transparent",
-                "&:hover": {
-                  backgroundColor: "action.hover",
-                },
-                pl: 1,
-                transition: "all 0.2s",
+                width: "100%",
+                height: "100%",
               }}
             >
-              <Box
+              <Avatar
+                entity={entity}
+                href={`/characters/${entity.id}`}
+                disableImageViewer={true}
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "100%",
-                  height: "100%",
+                  width: 64,
+                  height: 64,
+                  ml: 0.5,
                 }}
-              >
-                <Avatar
-                  entity={entity}
-                  href={`/characters/${entity.id}`}
-                  disableImageViewer={true}
-                  sx={{
-                    width: 64,
-                    height: 64,
-                    ml: 0.5,
-                  }}
-                />
-              </Box>
+              />
             </Box>
-          </Tooltip>
+          </Box>
           )
         })}
       </Box>
