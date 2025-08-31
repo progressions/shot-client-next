@@ -1,8 +1,12 @@
 "use client"
 
-import { Box, Stack, Tooltip } from "@mui/material"
+import { useState, useMemo } from "react"
+import { Box, Stack, Tooltip, FormControlLabel, Checkbox } from "@mui/material"
 import { Avatar } from "@/components/avatars"
-import type { Shot } from "@/types"
+import type { Shot, Character } from "@/types"
+import { CS } from "@/services"
+
+type CharacterTypeFilter = "PC" | "Ally" | "Mook" | "Featured Foe" | "Boss" | "Uber-Boss"
 
 interface CharacterSelectorProps {
   shots: Shot[]
@@ -10,6 +14,9 @@ interface CharacterSelectorProps {
   onSelect: (shotId: string) => void
   borderColor?: string
   disabled?: boolean
+  characterTypes?: CharacterTypeFilter[]
+  showAllCheckbox?: boolean
+  excludeShotId?: string
 }
 
 export default function CharacterSelector({
@@ -18,13 +25,37 @@ export default function CharacterSelector({
   onSelect,
   borderColor = "primary.main",
   disabled = false,
+  characterTypes,
+  showAllCheckbox = false,
+  excludeShotId,
 }: CharacterSelectorProps) {
+  const [showAll, setShowAll] = useState(false)
+
+  const filteredShots = useMemo(() => {
+    return shots.filter(shot => {
+      const entity = shot.character
+      if (!entity) return false
+      
+      // Exclude specific shot if provided
+      if (excludeShotId && entity.shot_id === excludeShotId) return false
+      
+      // If showing all or no filter specified, include all
+      if (showAll || !characterTypes || characterTypes.length === 0) return true
+      
+      // Filter by character types - use CS.type to get the properly formatted type
+      const char = entity as Character
+      const charType = CS.type(char)
+      return characterTypes.includes(charType as CharacterTypeFilter)
+    })
+  }, [shots, showAll, characterTypes, excludeShotId])
+
   return (
     <Box sx={{ opacity: disabled ? 0.5 : 1 }}>
-      <Stack
-        direction="row"
-        spacing={1}
+      <Box
         sx={{
+          display: "flex",
+          flexDirection: "row",
+          gap: 0.1,  // Minimal gap between items
           overflowX: "auto",
           overflowY: "hidden",
           pb: 1,
@@ -46,7 +77,7 @@ export default function CharacterSelector({
           },
         }}
       >
-        {shots.map(shot => {
+        {filteredShots.map(shot => {
           const entity = shot.character || shot.vehicle
           if (!entity) return null
           const isSelected = entity.shot_id === selectedShotId
@@ -76,8 +107,10 @@ export default function CharacterSelector({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                minWidth: 80,  // Use minWidth instead of width
                 width: 80,
                 height: 72,
+                flexShrink: 0,  // Prevent shrinking
                 borderRadius: 2,
                 border: isSelected ? "3px solid" : "3px solid transparent",
                 borderColor: isSelected ? borderColor : "transparent",
@@ -113,7 +146,26 @@ export default function CharacterSelector({
           </Tooltip>
           )
         })}
-      </Stack>
+      </Box>
+      {showAllCheckbox && characterTypes && characterTypes.length > 0 && (
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={showAll}
+              onChange={e => setShowAll(e.target.checked)}
+              size="small"
+              disabled={disabled}
+            />
+          }
+          label="Show all characters"
+          sx={{ 
+            mt: 0.5,
+            '& .MuiFormControlLabel-label': {
+              fontSize: '0.75rem'
+            }
+          }}
+        />
+      )}
     </Box>
   )
 }

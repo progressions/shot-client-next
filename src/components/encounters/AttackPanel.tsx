@@ -85,6 +85,44 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     return shots
   }, [encounter.shots])
 
+  // Sort attacker shots by: shot position (higher first), character type priority, then speed
+  const sortedAttackerShots = useMemo(() => {
+    const typeOrder: { [key: string]: number } = {
+      'Uber-Boss': 1,
+      'Boss': 2,
+      'PC': 3,
+      'Ally': 4,
+      'Featured Foe': 5,
+      'Mook': 6,
+    }
+
+    return [...allShots].sort((a, b) => {
+      // First sort by shot position (higher shots first - shot 20 before shot 15)
+      if (a.shot !== b.shot) {
+        return (b.shot || 0) - (a.shot || 0)
+      }
+
+      const charA = a.character
+      const charB = b.character
+      
+      if (!charA || !charB) return 0
+
+      // Then sort by character type priority
+      const typeA = typeOrder[CS.type(charA)] || 999
+      const typeB = typeOrder[CS.type(charB)] || 999
+      
+      if (typeA !== typeB) {
+        return typeA - typeB
+      }
+
+      // Finally sort by Speed (higher speed first)
+      const speedA = CS.speed(charA) || 0
+      const speedB = CS.speed(charB) || 0
+      
+      return speedB - speedA
+    })
+  }, [allShots])
+
   // Get selected attacker and target
   const attackerShot = allShots.find(
     s =>
@@ -105,8 +143,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     if (!attacker) return allShots
 
     const attackerChar = attacker as Character
-    const isNPCAttacker = attackerChar.character_type && 
-      ['mook', 'featured_foe', 'boss', 'uber_boss'].includes(attackerChar.character_type)
+    const attackerType = CS.type(attackerChar)
+    const isNPCAttacker = ['Mook', 'Featured Foe', 'Boss', 'Uber-Boss'].includes(attackerType)
 
     if (!isNPCAttacker) {
       // If attacker is not an NPC, return normal order
@@ -120,10 +158,13 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       
       if (!charA || !charB) return 0
       
-      const isPC_A = charA.character_type === 'pc'
-      const isPC_B = charB.character_type === 'pc'
-      const isAlly_A = charA.character_type === 'ally'
-      const isAlly_B = charB.character_type === 'ally'
+      const typeA = CS.type(charA)
+      const typeB = CS.type(charB)
+      
+      const isPC_A = typeA === 'PC'
+      const isPC_B = typeB === 'PC'
+      const isAlly_A = typeA === 'Ally'
+      const isAlly_B = typeB === 'Ally'
       
       // PCs come first
       if (isPC_A && !isPC_B) return -1
@@ -391,10 +432,11 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             >
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <CharacterSelector
-                  shots={allShots}
+                  shots={sortedAttackerShots}
                   selectedShotId={attackerShotId}
                   onSelect={setAttackerShotId}
                   borderColor="primary.main"
+                  // No filtering for attacker selector - shows all characters
                 />
               </Box>
               
@@ -567,32 +609,31 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
             {/* Target Avatar Selection */}
             <CharacterSelector
-              shots={sortedTargetShots.filter(s => {
-                const entity = s.character
-                // Exclude self
-                if (entity?.shot_id === attackerShotId) return false
-
-                // If attacker is PC or Ally, only show enemies
-                if (attacker && "action_values" in attacker) {
-                  const attackerChar = attacker as Character
-                  if (CS.isPC(attackerChar) || CS.isAlly(attackerChar)) {
-                    // Only show enemy types for PC/Ally attackers
-                    const targetChar = entity as Character
-                    return (
-                      CS.isMook(targetChar) ||
-                      CS.isFeaturedFoe(targetChar) ||
-                      CS.isBoss(targetChar) ||
-                      CS.isUberBoss(targetChar)
-                    )
-                  }
-                }
-
-                return true // Show all for other attacker types
-              })}
+              shots={sortedTargetShots}
               selectedShotId={targetShotId}
               onSelect={setTargetShotId}
               borderColor="error.main"
               disabled={!attackerShotId}
+              showAllCheckbox={true}
+              excludeShotId={attackerShotId}
+              characterTypes={(() => {
+                if (!attacker) return undefined
+                const attackerChar = attacker as Character
+                
+                // If attacker is PC or Ally, show enemies
+                if (CS.isPC(attackerChar) || CS.isAlly(attackerChar)) {
+                  return ["Mook", "Featured Foe", "Boss", "Uber-Boss"]
+                }
+                
+                // If attacker is NPC (Mook, Featured Foe, Boss, Uber Boss), show PCs and Allies
+                if (CS.isMook(attackerChar) || CS.isFeaturedFoe(attackerChar) || 
+                    CS.isBoss(attackerChar) || CS.isUberBoss(attackerChar)) {
+                  return ["PC", "Ally"]
+                }
+                
+                // For other types, show all
+                return undefined
+              })()}
             />
 
             {/* Defense and Toughness Values */}
