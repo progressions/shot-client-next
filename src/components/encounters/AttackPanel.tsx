@@ -777,8 +777,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                       ? 0
                       : parseInt(swerve)
                 }
-                size="small"
-                width="100px"
+                size="large"
+                width="120px"
                 error={false}
                 onChange={e => {
                   const val = e.target.value
@@ -815,8 +815,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               <NumberField
                 name="finalDamage"
                 value={parseInt(finalDamage) || 0}
-                size="small"
-                width="100px"
+                size="large"
+                width="120px"
                 error={false}
                 onChange={e => setFinalDamage(e.target.value)}
                 onBlur={e => setFinalDamage(e.target.value)}
