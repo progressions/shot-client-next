@@ -372,7 +372,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       )
 
       toastSuccess(`Applied ${damage} damage to ${target.name}`)
-      await refreshEncounter()
 
       // Reset form
       setTargetShotId("")
