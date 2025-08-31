@@ -16,9 +16,6 @@ import {
   Stack,
   Divider,
   Alert,
-  IconButton,
-  RadioGroup,
-  Radio,
 } from "@mui/material"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { useEncounter, useToast } from "@/contexts"
@@ -48,11 +45,9 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   const [weaponDamage, setWeaponDamage] = useState<string>("")
   const [swerve, setSwerve] = useState<string>("")
   const [stunt, setStunt] = useState(false)
-  const [dodge, setDodge] = useState(false)
   const [finalDamage, setFinalDamage] = useState<string>("")
   const [shotCost, setShotCost] = useState<string>("3")
   const [isProcessing, setIsProcessing] = useState(false)
-  const [dodgeApplied, setDodgeApplied] = useState(false)
   const [mookRolls, setMookRolls] = useState<
     Array<{
       targetId: string
@@ -285,8 +280,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
         const outcome = av - dv + sw
 
-        // Handle multiple targets
-        if (selectedTargetIds.length > 1) {
+        // Handle all targets the same way (single or multiple)
+        if (selectedTargetIds.length > 0) {
           const results = selectedTargetIds.map(targetId => {
             const targetShot = allShots.find(s => s.character?.shot_id === targetId)
             const targetChar = targetShot?.character
@@ -319,16 +314,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           const totalWounds = results.reduce((sum, r) => sum + r.wounds, 0)
           setFinalDamage(totalWounds.toString())
         } else {
-          // Single target
+          // No targets selected
           setMultiTargetResults([])
           setShowMultiTargetResults(false)
-          
-          if (outcome >= 0) {
-            const totalDamage = outcome + weaponDmg
-            setFinalDamage(totalDamage.toString())
-          } else {
-            setFinalDamage("0")
-          }
+          setFinalDamage("0")
         }
       }
     }
@@ -605,28 +594,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     setFinalDamage(grandTotalWounds.toString())
   }
 
-  const handleDodge = async () => {
-    if (!targetShot || !target) {
-      toastError("Please select a target first")
-      return
-    }
-
-    setIsProcessing(true)
-    try {
-      // Spend 1 shot for dodge using the encounter client
-      await ec.spendShots(target, 1)
-      setDodgeApplied(true) // Mark that dodge has been applied
-      // Keep dodge checked - it represents that dodge was used for this attack
-      // Don't reset it here since we need the +3 defense to remain
-      toastSuccess("Dodge applied! Target moved down 1 shot (+3 Defense)")
-      // The encounter will update automatically via WebSocket
-    } catch (error) {
-      console.error("Dodge error:", error)
-      toastError("Failed to apply dodge")
-    } finally {
-      setIsProcessing(false)
-    }
-  }
 
   const handleApplyDamage = async () => {
     // Handle multiple targets for non-mook attackers
@@ -1299,7 +1266,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             )}
 
             {/* Target Defense Display for Non-Mook Attackers */}
-            {!CS.isMook(attacker) && selectedTargetIds.length > 1 && (
+            {!CS.isMook(attacker) && selectedTargetIds.length > 0 && (
               <Box sx={{ mt: 2, mb: 2 }}>
                 <Stack spacing={1}>
                   {selectedTargetIds.map(id => {
@@ -1317,8 +1284,9 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                         key={id} 
                         sx={{ 
                           display: "flex", 
-                          alignItems: "center", 
-                          gap: 2,
+                          flexDirection: { xs: "column", sm: "row" },
+                          alignItems: { xs: "stretch", sm: "center" }, 
+                          gap: { xs: 1, sm: 2 },
                           backgroundColor: "background.paper",
                           p: 1,
                           borderRadius: 1,
@@ -1326,78 +1294,98 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                           borderColor: "divider"
                         }}
                       >
-                        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "80px" }}>
-                          <NumberField
-                            name={`defense-${id}`}
-                            value={manualDefensePerTarget[id] || currentDefense}
-                            size="small"
-                            width="80px"
-                            error={false}
-                            disabled={false}
-                            onChange={(e) => {
-                              setManualDefensePerTarget(prev => ({
-                                ...prev,
-                                [id]: e.target.value
-                              }))
-                              // Recalculate combined defense for multiple targets
-                              if (selectedTargetIds.length > 1) {
-                                const updatedDefenses = selectedTargetIds.map(targetId => {
-                                  if (targetId === id) {
-                                    return parseInt(e.target.value) || 0
-                                  }
-                                  const targetShot = allShots.find(s => s.character?.shot_id === targetId)
-                                  const targetChar = targetShot?.character
-                                  if (!targetChar) return 0
-                                  return manualDefensePerTarget[targetId] 
-                                    ? parseInt(manualDefensePerTarget[targetId]) 
-                                    : calculateTargetDefense(targetChar, targetId)
-                                })
-                                const highestDefense = Math.max(...updatedDefenses)
-                                const combinedDefense = highestDefense + selectedTargetIds.length
-                                setDefenseValue(combinedDefense.toString())
-                              }
-                            }}
-                            onBlur={(e) => {
-                              setManualDefensePerTarget(prev => ({
-                                ...prev,
-                                [id]: e.target.value
-                              }))
-                            }}
-                          />
-                          <Typography variant="caption" sx={{ mt: 0.5 }}>
-                            Defense
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "80px" }}>
-                          <NumberField
-                            name={`toughness-${id}`}
-                            value={manualToughnessPerTarget[id] || currentToughness}
-                            size="small"
-                            width="80px"
-                            error={false}
-                            disabled={false}
-                            onChange={(e) => {
-                              setManualToughnessPerTarget(prev => ({
-                                ...prev,
-                                [id]: e.target.value
-                              }))
-                            }}
-                            onBlur={(e) => {
-                              setManualToughnessPerTarget(prev => ({
-                                ...prev,
-                                [id]: e.target.value
-                              }))
-                            }}
-                          />
-                          <Typography variant="caption" sx={{ mt: 0.5 }}>
-                            Toughness
-                          </Typography>
-                        </Box>
+                        {/* Name at the top for mobile */}
                         <Typography 
                           variant="body2" 
                           sx={{ 
                             fontWeight: "medium",
-                            flex: 1
+                            display: { xs: "block", sm: "none" },
+                            mb: 1
+                          }}
+                        >
+                          {char.name}
+                        </Typography>
+                        
+                        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+                          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "80px" }}>
+                            <NumberField
+                              name={`defense-${id}`}
+                              value={manualDefensePerTarget[id] || currentDefense}
+                              size="small"
+                              width="80px"
+                              error={false}
+                              disabled={false}
+                              onChange={(e) => {
+                                setManualDefensePerTarget(prev => ({
+                                  ...prev,
+                                  [id]: e.target.value
+                                }))
+                                // Recalculate combined defense for multiple targets
+                                if (selectedTargetIds.length > 1) {
+                                  const updatedDefenses = selectedTargetIds.map(targetId => {
+                                    if (targetId === id) {
+                                      return parseInt(e.target.value) || 0
+                                    }
+                                    const targetShot = allShots.find(s => s.character?.shot_id === targetId)
+                                    const targetChar = targetShot?.character
+                                    if (!targetChar) return 0
+                                    return manualDefensePerTarget[targetId] 
+                                      ? parseInt(manualDefensePerTarget[targetId]) 
+                                      : calculateTargetDefense(targetChar, targetId)
+                                  })
+                                  const highestDefense = Math.max(...updatedDefenses)
+                                  const combinedDefense = highestDefense + selectedTargetIds.length
+                                  setDefenseValue(combinedDefense.toString())
+                                } else {
+                                  // For single target, just update the defense value directly
+                                  setDefenseValue(e.target.value)
+                                }
+                              }}
+                              onBlur={(e) => {
+                                setManualDefensePerTarget(prev => ({
+                                  ...prev,
+                                  [id]: e.target.value
+                                }))
+                              }}
+                            />
+                            <Typography variant="caption" sx={{ mt: 0.5 }}>
+                              Defense
+                            </Typography>
+                          </Box>
+                          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "80px" }}>
+                            <NumberField
+                              name={`toughness-${id}`}
+                              value={manualToughnessPerTarget[id] || currentToughness}
+                              size="small"
+                              width="80px"
+                              error={false}
+                              disabled={false}
+                              onChange={(e) => {
+                                setManualToughnessPerTarget(prev => ({
+                                  ...prev,
+                                  [id]: e.target.value
+                                }))
+                              }}
+                              onBlur={(e) => {
+                                setManualToughnessPerTarget(prev => ({
+                                  ...prev,
+                                  [id]: e.target.value
+                                }))
+                              }}
+                            />
+                            <Typography variant="caption" sx={{ mt: 0.5 }}>
+                              Toughness
+                            </Typography>
+                          </Box>
+                        </Box>
+                        
+                        {/* Name on the side for desktop */}
+                        <Typography 
+                          variant="body2" 
+                          sx={{ 
+                            fontWeight: "medium",
+                            flex: 1,
+                            display: { xs: "none", sm: "block" }
                           }}
                         >
                           {char.name}
@@ -1441,8 +1429,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               </Box>
             )}
 
-            {/* Defense and Toughness Values - show only when targets are selected */}
-            {(selectedTargetIds.length > 0 || targetShotId) && (
+            {/* Defense and Toughness Values - only show when we have no inline target defense display */}
+            {selectedTargetIds.length === 0 && targetShotId && (
               <Box sx={{ mb: 3, mt: 2 }}>
                 <Stack direction="row" spacing={2} alignItems="flex-start">
                   <Box>
@@ -1473,7 +1461,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                     {(() => {
                       let total = 0
                       if (stunt) total += 2
-                      if (dodge) total += 3
                       return total > 0 ? (
                         <Typography
                           variant="caption"
@@ -1542,35 +1529,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   }
                   label="Stunt (+2 DV)"
                 />
-                {selectedTargetIds.length <= 1 && (
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={dodge}
-                        onChange={e => {
-                          const newDodge = e.target.checked
-                          setDodge(newDodge)
-                          // Note: Dodge doesn't affect the displayed defense value directly
-                          // It's handled when applying damage by moving the target down a shot
-                        }}
-                        disabled={!target && selectedTargetIds.length === 0}
-                      />
-                    }
-                    label="Dodge (+3 DV, costs 1 shot)"
-                  />
-                )}
-                {dodge && (
-                  <Box sx={{ mt: 1 }}>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={handleDodge}
-                      disabled={isProcessing || dodgeApplied}
-                    >
-                      {dodgeApplied ? "Dodge Applied" : "Apply Dodge (-1 Shot)"}
-                    </Button>
-                  </Box>
-                )}
               </Stack>
             </Box>
           </Box>
@@ -1813,8 +1771,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   />
                 </Box>
 
-                {/* Final Damage Override - Hide for multiple targets */}
-                {selectedTargetIds.length <= 1 && (
+                {/* Final Damage Override - Hide when using multi-target display */}
+                {selectedTargetIds.length === 0 && (
                   <Box
                     sx={{
                       display: "flex",
@@ -1891,21 +1849,30 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             </>
           )}
 
-          {/* Multi-Target Attack Results for Non-Mook Attackers */}
+          {/* Attack Results for Non-Mook Attackers (single or multiple targets) */}
           {!CS.isMook(attacker) && showMultiTargetResults && multiTargetResults.length > 0 && (
             <Box sx={{ width: "100%", mt: 3 }}>
               {/* Overall attack calculation */}
-              <Alert severity="info" sx={{ mb: 2 }}>
-                <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
-                  Attack Value {attackValue} + Swerve {swerve} = Action Result {parseInt(attackValue || "0") + parseInt(swerve || "0")}
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
-                  Action Result {parseInt(attackValue || "0") + parseInt(swerve || "0")} - Combined Defense {defenseValue} = Outcome {parseInt(attackValue || "0") + parseInt(swerve || "0") - parseInt(defenseValue || "0")}
-                </Typography>
-                <Typography variant="caption" sx={{ display: "block" }}>
-                  Outcome {parseInt(attackValue || "0") + parseInt(swerve || "0") - parseInt(defenseValue || "0")} + Weapon Damage {weaponDamage} = Smackdown {parseInt(attackValue || "0") + parseInt(swerve || "0") - parseInt(defenseValue || "0") + parseInt(weaponDamage || "0")}
-                </Typography>
-              </Alert>
+              {(() => {
+                const outcome = parseInt(attackValue || "0") + parseInt(swerve || "0") - parseInt(defenseValue || "0")
+                const isHit = outcome >= 0
+                const defenseLabel = selectedTargetIds.length === 1 ? "Defense" : "Combined Defense"
+                return (
+                  <Alert severity={isHit ? "success" : "error"} sx={{ mb: 2 }}>
+                    <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
+                      {isHit ? "Hit!" : "Miss!"} Attack Value {attackValue} + Swerve {swerve} = Action Result {parseInt(attackValue || "0") + parseInt(swerve || "0")}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
+                      Action Result {parseInt(attackValue || "0") + parseInt(swerve || "0")} - {defenseLabel} {defenseValue} = Outcome {outcome}
+                    </Typography>
+                    {isHit && (
+                      <Typography variant="caption" sx={{ display: "block" }}>
+                        Outcome {outcome} + Weapon Damage {weaponDamage} = Smackdown {outcome + parseInt(weaponDamage || "0")}
+                      </Typography>
+                    )}
+                  </Alert>
+                )
+              })()}
 
               {/* Individual target results */}
               <Stack spacing={2}>
@@ -1915,10 +1882,23 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   if (!targetChar) return null
                   
                   const currentDefense = calculateTargetDefense(targetChar, result.targetId)
-                  const smackdown = parseInt(attackValue || "0") + parseInt(swerve || "0") - parseInt(defenseValue || "0") + parseInt(weaponDamage || "0")
-                  const effectiveWounds = defenseAppliedPerTarget[result.targetId] 
-                    ? Math.max(0, smackdown - CS.toughness(targetChar))
-                    : result.wounds
+                  const hasDefenseModifier = defenseChoicePerTarget[result.targetId] && defenseChoicePerTarget[result.targetId] !== 'none'
+                  
+                  // If this target has dodge/fortune applied, recalculate their individual wounds
+                  let effectiveWounds = result.wounds
+                  if (hasDefenseModifier && selectedTargetIds.length > 1) {
+                    // For multiple targets with dodge, recalculate outcome for this specific target
+                    const individualOutcome = parseInt(attackValue || "0") + parseInt(swerve || "0") - currentDefense
+                    if (individualOutcome >= 0) {
+                      const individualSmackdown = individualOutcome + parseInt(weaponDamage || "0")
+                      effectiveWounds = Math.max(0, individualSmackdown - CS.toughness(targetChar))
+                    } else {
+                      effectiveWounds = 0
+                    }
+                  } else if (selectedTargetIds.length === 1) {
+                    // For single target, wounds are already calculated correctly
+                    effectiveWounds = result.wounds
+                  }
                   
                   return (
                     <Alert key={result.targetId} severity="info" sx={{ pb: 1 }}>
@@ -1926,7 +1906,9 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                         Target: {result.targetName}
                       </Typography>
                       <Typography variant="body2">
-                        Defense: {currentDefense} (base {result.defense}{defenseAppliedPerTarget[result.targetId] && ', +3 dodged'})
+                        Defense: {currentDefense} (base {result.defense}
+                        {defenseChoicePerTarget[result.targetId] === 'dodge' && ', +3 dodged'}
+                        {defenseChoicePerTarget[result.targetId] === 'fortune' && `, +3 +${fortuneDiePerTarget[result.targetId] || 0} fortune`})
                       </Typography>
                       <Typography variant="body2">
                         Toughness: {result.toughness}
@@ -1950,89 +1932,29 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                     const targetChar = targetShot?.character
                     if (!targetChar) return null
                     
-                    const smackdown = parseInt(attackValue || "0") + parseInt(swerve || "0") - parseInt(defenseValue || "0") + parseInt(weaponDamage || "0")
-                    const effectiveWounds = defenseAppliedPerTarget[result.targetId] 
-                      ? Math.max(0, smackdown - CS.toughness(targetChar))
-                      : result.wounds
+                    const currentDefense = calculateTargetDefense(targetChar, result.targetId)
+                    const hasDefenseModifier = defenseChoicePerTarget[result.targetId] && defenseChoicePerTarget[result.targetId] !== 'none'
+                    
+                    // Use same logic as in individual results
+                    let effectiveWounds = result.wounds
+                    if (hasDefenseModifier && selectedTargetIds.length > 1) {
+                      const individualOutcome = parseInt(attackValue || "0") + parseInt(swerve || "0") - currentDefense
+                      if (individualOutcome >= 0) {
+                        const individualSmackdown = individualOutcome + parseInt(weaponDamage || "0")
+                        effectiveWounds = Math.max(0, individualSmackdown - CS.toughness(targetChar))
+                      } else {
+                        effectiveWounds = 0
+                      }
+                    }
                     
                     return (
                       <Typography key={result.targetId} variant="body2">
                         <strong>{result.targetName}:</strong> {effectiveWounds} wounds
-                        {defenseAppliedPerTarget[result.targetId] && ` (dodged)`}
+                        {defenseChoicePerTarget[result.targetId] === 'dodge' && ` (dodged)`}
+                        {defenseChoicePerTarget[result.targetId] === 'fortune' && ` (fortune dodge)`}
                       </Typography>
                     )
                   })}
-                </Stack>
-              </Alert>
-            </Box>
-          )}
-
-          {/* Damage Calculation (only for non-mook attackers with single target) */}
-          {swerve && attacker && !CS.isMook(attacker) && !showMultiTargetResults && (
-            <Box sx={{ mt: 3 }}>
-              <Alert severity="info">
-                <Stack spacing={1}>
-                  <Typography variant="body2">
-                    <strong>
-                      Attack Value {attackValue} + Swerve {swerve} = Action
-                      Result {parseInt(attackValue) + parseInt(swerve)}
-                    </strong>
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>
-                      Action Result {parseInt(attackValue) + parseInt(swerve)} -
-                      Defense {defenseValue} = Outcome{" "}
-                      {parseInt(attackValue) +
-                        parseInt(swerve) -
-                        parseInt(defenseValue)}
-                      .
-                    </strong>
-                    {parseInt(attackValue) +
-                      parseInt(swerve) -
-                      parseInt(defenseValue) >=
-                    0 ? (
-                      <span style={{ color: "#4caf50", fontWeight: "bold" }}>
-                        {" "}
-                        Hit!
-                      </span>
-                    ) : (
-                      <span style={{ color: "#f44336", fontWeight: "bold" }}>
-                        {" "}
-                        Miss!
-                      </span>
-                    )}
-                  </Typography>
-                  {parseInt(attackValue) +
-                    parseInt(swerve) -
-                    parseInt(defenseValue) >=
-                  0 ? (
-                    <>
-                      <Typography variant="body2">
-                        <strong>
-                          Outcome{" "}
-                          {parseInt(attackValue) +
-                            parseInt(swerve) -
-                            parseInt(defenseValue)}{" "}
-                          + Damage {weaponDamage} = Smackdown{" "}
-                          {parseInt(finalDamage)}
-                        </strong>
-                      </Typography>
-                      {toughnessValue && target && (
-                        <Typography variant="body2">
-                          <strong>
-                            Smackdown {parseInt(finalDamage)} - Toughness{" "}
-                            {parseInt(toughnessValue) || 0} ={" "}
-                            {CS.calculateWounds(
-                              target,
-                              parseInt(finalDamage),
-                              parseInt(toughnessValue) || 0
-                            )}{" "}
-                            Wounds
-                          </strong>
-                        </Typography>
-                      )}
-                    </>
-                  ) : null}
                 </Stack>
               </Alert>
             </Box>
