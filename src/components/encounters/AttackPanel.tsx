@@ -355,16 +355,24 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       // Multiple targets
       if (attacker && CS.isMook(attacker)) {
         // Mooks attacking multiple targets - no defense modifier, just show highest for reference
-        let highestDefense = Math.max(...targets.map(t => CS.defense(t)))
-        if (includeStunt) highestDefense += 2  // Add stunt modifier
+        const defenses = targets.map(t => {
+          let defense = CS.defense(t)
+          if (includeStunt) defense += 2  // Add stunt modifier to each target
+          return defense
+        })
+        const highestDefense = Math.max(...defenses)
         setDefenseValue(highestDefense.toString())
         // No toughness display for multiple targets
         setToughnessValue("0")
       } else {
         // Non-mook attacking multiple targets - highest defense + number of targets
-        const highestDefense = Math.max(...targets.map(t => CS.defense(t)))
-        let combinedDefense = highestDefense + targetIds.length
-        if (includeStunt) combinedDefense += 2  // Add stunt modifier
+        const defenses = targets.map(t => {
+          let defense = CS.defense(t)
+          if (includeStunt) defense += 2  // Add stunt modifier to each target
+          return defense
+        })
+        const highestDefense = Math.max(...defenses)
+        const combinedDefense = highestDefense + targetIds.length
         setDefenseValue(combinedDefense.toString())
         // No toughness for multiple targets
         setToughnessValue("0")
@@ -1528,6 +1536,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                       onChange={e => {
                         const newStunt = e.target.checked
                         setStunt(newStunt)
+                        // Clear manual defense overrides when stunt changes so calculateTargetDefense takes over
+                        setManualDefensePerTarget({})
                         // Recalculate defense with stunt modifier
                         if (selectedTargetIds.length > 0) {
                           updateDefenseAndToughness(selectedTargetIds, newStunt)
