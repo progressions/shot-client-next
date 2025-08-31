@@ -1430,8 +1430,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               </Box>
             )}
 
-            {/* Defense and Toughness Values - show for multiple targets or legacy single target */}
-            {(selectedTargetIds.length > 1 || (selectedTargetIds.length === 0 && targetShotId)) && (
+            {/* Defense Value - show for multiple targets */}
+            {selectedTargetIds.length > 1 && (
               <Box sx={{ mb: 3, mt: 2 }}>
                 <Stack direction="row" spacing={2} alignItems="flex-start">
                   <Box>
@@ -1447,8 +1447,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                       size="small"
                       width="80px"
                       error={false}
-                      disabled={(selectedTargetIds.length === 0 && !targetShotId) || 
-                                (attacker && CS.isMook(attacker) && selectedTargetIds.length > 1)}
+                      disabled={attacker && CS.isMook(attacker)}
                       onChange={e => setDefenseValue(e.target.value)}
                       onBlur={e => setDefenseValue(e.target.value)}
                     />
@@ -1480,29 +1479,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                     })()}
                   </Box>
 
-                  {/* Only show Toughness for legacy single target mode */}
-                  {selectedTargetIds.length === 0 && targetShotId && (
-                    <Box>
-                      <Typography
-                        variant="body2"
-                        sx={{ mb: 1, fontWeight: "medium" }}
-                      >
-                        Toughness
-                      </Typography>
-                      <NumberField
-                        name="toughnessValue"
-                        value={parseInt(toughnessValue || "0") || 0}
-                        size="small"
-                        width="80px"
-                        error={false}
-                        disabled={!targetShotId}
-                        onChange={e => setToughnessValue(e.target.value)}
-                        onBlur={e => setToughnessValue(e.target.value)}
-                      />
-                      {/* TODO: Future toughness modifiers (armor, schticks, etc.) will display here */}
-                      <Box sx={{ minHeight: "20px", mt: 0.5 }} />
-                    </Box>
-                  )}
                 </Stack>
               </Box>
             )}
