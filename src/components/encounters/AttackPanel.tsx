@@ -348,22 +348,20 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               </Box>
               
               {/* Shot Cost */}
-              {attacker && (
-                <Box sx={{ flexShrink: 0 }}>
-                  <Typography variant="caption" sx={{ display: 'block', mb: 0.5 }}>
-                    Shot Cost
-                  </Typography>
-                  <NumberField
-                    name="shotCost"
-                    value={parseInt(shotCost) || 0}
-                    size="small"
-                    width="80px"
-                    error={false}
-                    onChange={e => setShotCost(e.target.value)}
-                    onBlur={e => setShotCost(e.target.value)}
-                  />
-                </Box>
-              )}
+              <Box sx={{ flexShrink: 0 }}>
+                <Typography variant="caption" sx={{ display: 'block', mb: 0.5 }}>
+                  Shot Cost
+                </Typography>
+                <NumberField
+                  name="shotCost"
+                  value={parseInt(shotCost) || 0}
+                  size="small"
+                  width="80px"
+                  error={false}
+                  onChange={e => setShotCost(e.target.value)}
+                  onBlur={e => setShotCost(e.target.value)}
+                />
+              </Box>
             </Stack>
 
             {/* Attack Skill and Weapon Selection */}
@@ -548,7 +546,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
             {/* Defense and Toughness Values */}
             <Box sx={{ mb: 3 }}>
-              <Stack direction="row" spacing={2} alignItems="flex-end">
+              <Stack direction="row" spacing={2} alignItems="flex-start">
                 <Box>
                   <Typography
                     variant="body2"
@@ -556,25 +554,27 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   >
                     Defense
                   </Typography>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <NumberField
-                      name="defenseValue"
-                      value={parseInt(defenseValue) || 0}
-                      size="small"
-                      width="80px"
-                      error={false}
-                      onChange={e => setDefenseValue(e.target.value)}
-                      onBlur={e => setDefenseValue(e.target.value)}
-                    />
-                    {(() => {
-                      let total = 0
-                      if (stunt) total += 2
-                      if (dodge) total += 3
-                      return total > 0 ? (
-                        <Typography variant="caption">+{total}</Typography>
-                      ) : null
-                    })()}
-                  </Stack>
+                  <NumberField
+                    name="defenseValue"
+                    value={parseInt(defenseValue) || 0}
+                    size="small"
+                    width="80px"
+                    error={false}
+                    onChange={e => setDefenseValue(e.target.value)}
+                    onBlur={e => setDefenseValue(e.target.value)}
+                  />
+                  {(() => {
+                    let total = 0
+                    if (stunt) total += 2
+                    if (dodge) total += 3
+                    return total > 0 ? (
+                      <Typography variant="caption" sx={{ display: 'block', mt: 0.5, minHeight: '20px', textAlign: 'center' }}>
+                        +{total}
+                      </Typography>
+                    ) : (
+                      <Box sx={{ minHeight: '20px', mt: 0.5 }} />
+                    )
+                  })()}
                 </Box>
 
                 <Box>
@@ -593,6 +593,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                     onChange={e => setToughnessValue(e.target.value)}
                     onBlur={e => setToughnessValue(e.target.value)}
                   />
+                  {/* TODO: Future toughness modifiers (armor, schticks, etc.) will display here */}
+                  <Box sx={{ minHeight: '20px', mt: 0.5 }} />
                 </Box>
               </Stack>
             </Box>
