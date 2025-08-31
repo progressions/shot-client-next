@@ -323,16 +323,18 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       // Calculate new wounds and impairments
       let newWounds = 0
       let newImpairments = 0
+      let actualWoundsDealt = 0
 
       if (CS.isMook(targetChar)) {
         // Mooks are eliminated on any hit
         newWounds = 0 // Or reduce count
+        actualWoundsDealt = damage // For mooks, show the full damage
       } else {
         // Apply damage using CharacterService
         const currentWounds = CS.wounds(targetChar)
         const toughness = parseInt(toughnessValue) || 0
-        const actualDamage = CS.calculateWounds(targetChar, damage, toughness)
-        newWounds = currentWounds + actualDamage
+        actualWoundsDealt = CS.calculateWounds(targetChar, damage, toughness)
+        newWounds = currentWounds + actualWoundsDealt
 
         // Calculate impairments
         const originalImpairments = targetChar.impairments || 0
@@ -353,7 +355,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         newImpairments,
         {
           type: "attack",
-          description: `${attacker.name} attacked ${target.name} for ${damage} damage`,
+          description: `${attacker.name} attacked ${target.name} for ${actualWoundsDealt} wounds`,
           details: {
             attacker_id: attackerShot.character?.id || attackerShot.vehicle?.id,
             target_id: target.id,
@@ -371,7 +373,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         }
       )
 
-      toastSuccess(`Applied ${damage} damage to ${target.name}`)
+      toastSuccess(`Applied ${actualWoundsDealt} wound${actualWoundsDealt !== 1 ? 's' : ''} to ${target.name}`)
 
       // Reset form
       setTargetShotId("")
