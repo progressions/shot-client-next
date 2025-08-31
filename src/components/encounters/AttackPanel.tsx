@@ -25,6 +25,7 @@ import { useEncounter, useToast } from "@/contexts"
 import { CS, VS } from "@/services"
 import type { Character, Vehicle, Shot, Weapon } from "@/types"
 import { useClient } from "@/contexts/AppContext"
+import { NumberField } from "@/components/ui"
 
 interface AttackPanelProps {
   onClose?: () => void
@@ -41,6 +42,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   const [attackSkill, setAttackSkill] = useState<string>("")
   const [attackValue, setAttackValue] = useState<string>("")
   const [defenseValue, setDefenseValue] = useState<string>("")
+  const [toughnessValue, setToughnessValue] = useState<string>("")
   const [selectedWeaponId, setSelectedWeaponId] = useState<string>("")
   const [weaponDamage, setWeaponDamage] = useState<string>("")
   const [swerve, setSwerve] = useState<string>("")
@@ -148,10 +150,14 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     if (target) {
       // Set suggested defense value
       let defense = 0
+      let toughness = 0
       if ("action_values" in target) {
         defense = CS.defense(target as Character)
+        toughness = CS.toughness(target as Character)
       } else if ("action_values" in target) {
         defense = VS.defense(target as Vehicle)
+        // Vehicles don't have toughness in the same way
+        toughness = 0
       }
       
       // Apply dodge bonus if checked
@@ -165,6 +171,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       }
       
       setDefenseValue(defense.toString())
+      setToughnessValue(toughness.toString())
     }
   }, [target, dodge, stunt])
 
@@ -227,8 +234,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       } else {
         // Apply damage using CharacterService
         const currentWounds = CS.wounds(targetChar)
-        const toughness = CS.toughness(targetChar)
-        const actualDamage = Math.max(0, damage - toughness)
+        const toughness = parseInt(toughnessValue) || 0
+        const actualDamage = CS.calculateWounds(targetChar, damage, toughness)
         newWounds = currentWounds + actualDamage
         
         // Calculate impairments
@@ -296,11 +303,11 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         </Typography>
         
         {/* Top Section - Attacker vs Target */}
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, minHeight: 400 }}>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, minHeight: { xs: 'auto', md: 400 } }}>
           {/* Attacker Side */}
           <Box sx={{ 
-            flex: '0 0 58%',
-            p: 3,
+            flex: { xs: '1 1 auto', md: '0 0 58%' },
+            p: { xs: 2, sm: 3 },
             borderRight: { md: '2px solid' }, 
             borderRightColor: { md: 'divider' },
             borderBottom: { xs: '2px solid', md: 'none' },
@@ -342,22 +349,14 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               <Box sx={{ mb: 3 }}>
                 <Typography variant="body2" sx={{ mb: 2, fontWeight: 'medium' }}>Attack Skill</Typography>
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <TextField
-                    label="AV"
-                    type="number"
-                    value={attackValue}
+                  <NumberField
+                    name="attackValue"
+                    value={parseInt(attackValue) || 0}
+                    size="small"
+                    width="80px"
+                    error={false}
                     onChange={(e) => setAttackValue(e.target.value)}
-                    sx={{ 
-                      minWidth: 80, 
-                      maxWidth: 80,
-                      '& .MuiInputBase-root': {
-                        height: 56
-                      },
-                      '& .MuiInputBase-input': {
-                        fontSize: '1.2rem'
-                      }
-                    }}
-                    disabled={!attacker}
+                    onBlur={(e) => setAttackValue(e.target.value)}
                   />
                   {(() => {
                     const char = attacker as Character
@@ -366,39 +365,36 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                     const secondaryAttack = CS.secondaryAttack(char)
                     const secondaryValue = secondaryAttack ? CS.actionValue(char, secondaryAttack) : 0
                     
+                    const attackOptions = [
+                      { skill: mainAttack, value: mainValue },
+                      ...(secondaryAttack ? [{ skill: secondaryAttack, value: secondaryValue }] : [])
+                    ]
+                    
                     return (
-                      <>
-                        <Button
-                          variant={attackSkill === mainAttack ? "contained" : "outlined"}
-                          onClick={() => {
-                            setAttackSkill(mainAttack)
-                            setAttackValue(mainValue.toString())
+                      <FormControl sx={{ 
+                        flex: 1,
+                        '& .MuiInputBase-root': { height: 56 }
+                      }}>
+                        <InputLabel>Attack Skill</InputLabel>
+                        <Select
+                          value={attackSkill}
+                          onChange={(e) => {
+                            const selected = e.target.value
+                            setAttackSkill(selected)
+                            const option = attackOptions.find(o => o.skill === selected)
+                            if (option) {
+                              setAttackValue(option.value.toString())
+                            }
                           }}
-                          sx={{ 
-                            minWidth: 120,
-                            height: 56,
-                            fontSize: '0.875rem'
-                          }}
+                          label="Attack Skill"
                         >
-                          {mainAttack} {mainValue}
-                        </Button>
-                        {secondaryAttack && (
-                          <Button
-                            variant={attackSkill === secondaryAttack ? "contained" : "outlined"}
-                            onClick={() => {
-                              setAttackSkill(secondaryAttack)
-                              setAttackValue(secondaryValue.toString())
-                            }}
-                            sx={{ 
-                              minWidth: 120,
-                              height: 56,
-                              fontSize: '0.875rem'
-                            }}
-                          >
-                            {secondaryAttack} {secondaryValue}
-                          </Button>
-                        )}
-                      </>
+                          {attackOptions.map((option) => (
+                            <MenuItem key={option.skill} value={option.skill}>
+                              {option.skill} ({option.value})
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
                     )
                   })()}
                 </Stack>
@@ -407,63 +403,57 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             
             <Stack spacing={2}>
               {/* Damage and Weapon Row */}
-              <Stack direction="row" spacing={1}>
-                <TextField
-                  label="Damage"
-                  type="number"
-                  value={weaponDamage}
-                  onChange={(e) => setWeaponDamage(e.target.value)}
-                  sx={{ 
-                    minWidth: 80, 
-                    maxWidth: 80,
-                    '& .MuiInputBase-root': {
-                      height: 56
-                    },
-                    '& .MuiInputBase-input': {
-                      fontSize: '1.2rem'
-                    }
-                  }}
-                  disabled={!attacker}
-                />
-                {attacker && (
-                  <FormControl fullWidth sx={{ '& .MuiInputBase-root': { height: 56 } }}>
-                    <InputLabel>Weapon</InputLabel>
-                    <Select
-                      value={selectedWeaponId}
-                      onChange={(e) => {
-                        setSelectedWeaponId(e.target.value)
-                        if (e.target.value === "unarmed") {
-                          const damage = CS.damage(attacker as Character) || 7
-                          setWeaponDamage(damage.toString())
-                        } else {
-                          const weapon = attackerWeapons.find(w => w.id?.toString() === e.target.value)
-                          if (weapon) {
-                            setWeaponDamage(weapon.damage.toString())
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="body2" sx={{ mb: 2, fontWeight: 'medium' }}>Damage</Typography>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <NumberField
+                    name="weaponDamage"
+                    value={parseInt(weaponDamage) || 0}
+                    size="small"
+                    width="80px"
+                    error={false}
+                    onChange={(e) => setWeaponDamage(e.target.value)}
+                    onBlur={(e) => setWeaponDamage(e.target.value)}
+                  />
+                  {attacker && (
+                    <FormControl sx={{ flex: 1, '& .MuiInputBase-root': { height: 56 } }}>
+                      <InputLabel>Weapon</InputLabel>
+                      <Select
+                        value={selectedWeaponId}
+                        onChange={(e) => {
+                          setSelectedWeaponId(e.target.value)
+                          if (e.target.value === "unarmed") {
+                            const damage = CS.damage(attacker as Character) || 7
+                            setWeaponDamage(damage.toString())
+                          } else {
+                            const weapon = attackerWeapons.find(w => w.id?.toString() === e.target.value)
+                            if (weapon) {
+                              setWeaponDamage(weapon.damage.toString())
+                            }
                           }
-                        }
-                      }}
-                      label="Weapon"
-                    >
-                      <MenuItem value="unarmed">
-                        Damage ({CS.damage(attacker as Character) || 7})
-                      </MenuItem>
-                      {attackerWeapons.map((weapon) => (
-                        <MenuItem key={weapon.id} value={weapon.id?.toString() || ""}>
-                          {weapon.name} (Damage: {weapon.damage})
+                        }}
+                        label="Weapon"
+                      >
+                        <MenuItem value="unarmed">
+                          Damage ({CS.damage(attacker as Character) || 7})
                         </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                )}
-              </Stack>
-              
+                        {attackerWeapons.map((weapon) => (
+                          <MenuItem key={weapon.id} value={weapon.id?.toString() || ""}>
+                            {weapon.name} (Damage: {weapon.damage})
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )}
+                </Stack>
+              </Box>
             </Stack>
           </Box>
           
           {/* Target Side */}
           <Box sx={{ 
-            flex: '0 0 42%',
-            p: 3,
+            flex: { xs: '1 1 auto', md: '0 0 42%' },
+            p: { xs: 2, sm: 3 },
             backgroundColor: 'action.hover'
           }}>
             <Typography variant="h6" gutterBottom sx={{ mb: 3, color: 'error.main' }}>
@@ -520,32 +510,47 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               disabled={!attackerShotId}
             />
             
-            {/* Defense Value - aligned with Attack Skill section */}
+            {/* Defense and Toughness Values */}
             <Box sx={{ mb: 3 }}>
-              <Typography variant="body2" sx={{ mb: 2, fontWeight: 'medium' }}>Defense</Typography>
-              <TextField
-                label="DV"
-                type="number"
-                value={defenseValue}
-                onChange={(e) => setDefenseValue(e.target.value)}
-                helperText={(() => {
-                  let total = 0
-                  if (stunt) total += 2
-                  if (dodge) total += 3
-                  return total > 0 ? `+${total}` : ""
-                })()}
-                sx={{ 
-                  minWidth: 80, 
-                  maxWidth: 80,
-                  '& .MuiInputBase-root': {
-                    height: 56
-                  },
-                  '& .MuiInputBase-input': {
-                    fontSize: '1.2rem'
-                  }
-                }}
-                disabled={!target}
-              />
+              <Stack direction="row" spacing={2} alignItems="flex-end">
+                <Box>
+                  <Typography variant="body2" sx={{ mb: 2, fontWeight: 'medium' }}>Defense</Typography>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <NumberField
+                      name="defenseValue"
+                      value={parseInt(defenseValue) || 0}
+                      size="small"
+                      width="80px"
+                      error={false}
+                      onChange={(e) => setDefenseValue(e.target.value)}
+                      onBlur={(e) => setDefenseValue(e.target.value)}
+                    />
+                    {(() => {
+                      let total = 0
+                      if (stunt) total += 2
+                      if (dodge) total += 3
+                      return total > 0 ? (
+                        <Typography variant="caption">
+                          +{total}
+                        </Typography>
+                      ) : null
+                    })()}
+                  </Stack>
+                </Box>
+                
+                <Box>
+                  <Typography variant="body2" sx={{ mb: 2, fontWeight: 'medium' }}>Toughness</Typography>
+                  <NumberField
+                    name="toughnessValue"
+                    value={parseInt(toughnessValue) || 0}
+                    size="small"
+                    width="80px"
+                    error={false}
+                    onChange={(e) => setToughnessValue(e.target.value)}
+                    onBlur={(e) => setToughnessValue(e.target.value)}
+                  />
+                </Box>
+              </Stack>
             </Box>
             
             {/* Modifiers */}
@@ -589,80 +594,128 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         </Box>
         
         {/* Bottom Section - Combat Resolution */}
-        <Box sx={{ p: 3, backgroundColor: 'background.default', borderTop: '2px solid', borderColor: 'divider' }}>
-          <Typography variant="h6" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
+        <Box sx={{ p: { xs: 2, sm: 3 }, backgroundColor: 'background.default', borderTop: '2px solid', borderColor: 'divider' }}>
+          <Typography variant="h6" gutterBottom sx={{ textAlign: 'center', mb: { xs: 2, sm: 3 } }}>
             🎲 Combat Resolution
           </Typography>
           
-          <Stack direction="row" spacing={2} alignItems="flex-start" justifyContent="center">
+          <Stack direction="row" spacing={{ xs: 1, sm: 2 }} alignItems="center" justifyContent="center" sx={{ flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
             {/* Shot Cost */}
-            <TextField
-              label="Shot Cost"
-              type="number"
-              value={shotCost}
-              onChange={(e) => setShotCost(e.target.value)}
-              sx={{ 
-                minWidth: 80, 
-                maxWidth: 80
-              }}
-              disabled={!attacker}
-            />
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: { xs: '70px', sm: 'auto' } }}>
+              <Typography variant="caption" sx={{ mb: 0.5, fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
+                Shot Cost
+              </Typography>
+              <NumberField
+                name="shotCost"
+                value={parseInt(shotCost) || 0}
+                size="small"
+                width="80px"
+                error={false}
+                onChange={(e) => setShotCost(e.target.value)}
+                onBlur={(e) => setShotCost(e.target.value)}
+              />
+            </Box>
             
             {/* Dice Roll */}
-            <TextField
-              label="Swerve"
-              type="number"
-              value={swerve}
-              onChange={(e) => setSwerve(e.target.value)}
-              sx={{ 
-                minWidth: 120,
-                maxWidth: 120
-              }}
-              disabled={!attackValue || !defenseValue}
-            />
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: { xs: '80px', sm: 'auto' } }}>
+              <Typography variant="caption" sx={{ mb: 0.5, fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
+                Swerve
+              </Typography>
+              <NumberField
+                name="swerve"
+                value={swerve === "" ? 0 : (isNaN(parseInt(swerve)) ? 0 : parseInt(swerve))}
+                size="small"
+                width="100px"
+                error={false}
+                onChange={(e) => {
+                  const val = e.target.value
+                  if (val === "" || val === "-" || !isNaN(parseInt(val))) {
+                    setSwerve(val)
+                  }
+                }}
+                onBlur={(e) => {
+                  const val = e.target.value
+                  if (val === "" || val === "-") {
+                    setSwerve("0")
+                  } else {
+                    setSwerve(val)
+                  }
+                }}
+              />
+            </Box>
             
             {/* Final Damage Override */}
-            <TextField
-              label="Final Damage"
-              type="number"
-              value={finalDamage}
-              onChange={(e) => setFinalDamage(e.target.value)}
-              sx={{ 
-                minWidth: 120,
-                maxWidth: 120
-              }}
-            />
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: { xs: '80px', sm: 'auto' } }}>
+              <Typography variant="caption" sx={{ mb: 0.5, fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
+                Final Damage
+              </Typography>
+              <NumberField
+                name="finalDamage"
+                value={parseInt(finalDamage) || 0}
+                size="small"
+                width="100px"
+                error={false}
+                onChange={(e) => setFinalDamage(e.target.value)}
+                onBlur={(e) => setFinalDamage(e.target.value)}
+              />
+            </Box>
             
             {/* Apply Damage Button */}
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleApplyDamage}
-              disabled={!target || !finalDamage || isProcessing}
-              size="large"
-              sx={{ 
-                minHeight: 56,
-                px: 3
-              }}
-            >
-              Apply Damage
-            </Button>
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              justifyContent: 'flex-end', 
+              height: '100%', 
+              pt: { xs: '8px', sm: '20px' },
+              width: { xs: '100%', sm: 'auto' },
+              mt: { xs: 2, sm: 0 }
+            }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleApplyDamage}
+                disabled={!target || !finalDamage || isProcessing}
+                size="large"
+                sx={{ 
+                  height: 56,
+                  px: { xs: 2, sm: 3 },
+                  width: { xs: '100%', sm: 'auto' }
+                }}
+              >
+                Apply Damage
+              </Button>
+            </Box>
           </Stack>
           
           {/* Damage Calculation */}
           {swerve && (
             <Box sx={{ mt: 3 }}>
               <Alert severity="info">
-                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                  Attack: {attackValue} - {defenseValue} + {swerve} = {
-                    parseInt(attackValue) - parseInt(defenseValue) + parseInt(swerve)
-                  }
-                </Typography>
-                {parseInt(attackValue) - parseInt(defenseValue) + parseInt(swerve) >= 0 && (
-                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                    Damage: {parseInt(attackValue) - parseInt(defenseValue) + parseInt(swerve)} + {weaponDamage} = {finalDamage}
+                <Stack spacing={1}>
+                  <Typography variant="body2">
+                    <strong>Attack Value {attackValue} + Swerve {swerve} = Action Result {parseInt(attackValue) + parseInt(swerve)}</strong>
                   </Typography>
-                )}
+                  <Typography variant="body2">
+                    <strong>Action Result {parseInt(attackValue) + parseInt(swerve)} - Defense {defenseValue} = Outcome {parseInt(attackValue) + parseInt(swerve) - parseInt(defenseValue)}.</strong>
+                    {parseInt(attackValue) + parseInt(swerve) - parseInt(defenseValue) >= 0 ? (
+                      <span style={{ color: '#4caf50', fontWeight: 'bold' }}> Hit!</span>
+                    ) : (
+                      <span style={{ color: '#f44336', fontWeight: 'bold' }}> Miss!</span>
+                    )}
+                  </Typography>
+                  {parseInt(attackValue) + parseInt(swerve) - parseInt(defenseValue) >= 0 ? (
+                    <>
+                      <Typography variant="body2">
+                        <strong>Outcome {parseInt(attackValue) + parseInt(swerve) - parseInt(defenseValue)} + Damage {weaponDamage} = Smackdown {parseInt(attackValue) + parseInt(swerve) - parseInt(defenseValue) + parseInt(weaponDamage)}</strong>
+                      </Typography>
+                      {toughnessValue && target && (
+                        <Typography variant="body2">
+                          <strong>Smackdown {parseInt(attackValue) + parseInt(swerve) - parseInt(defenseValue) + parseInt(weaponDamage)} - Toughness {parseInt(toughnessValue) || 0} = {CS.calculateWounds(target as Character, parseInt(attackValue) + parseInt(swerve) - parseInt(defenseValue) + parseInt(weaponDamage), parseInt(toughnessValue) || 0)} Wounds</strong>
+                        </Typography>
+                      )}
+                    </>
+                  ) : null}
+                </Stack>
               </Alert>
             </Box>
           )}
