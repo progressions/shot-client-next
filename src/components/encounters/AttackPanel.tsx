@@ -324,13 +324,37 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               borderBottomColor: "divider",
             }}
           >
-            <Typography
-              variant="h6"
-              gutterBottom
-              sx={{ mb: 2, color: "primary.main" }}
+            <Stack 
+              direction="row" 
+              justifyContent="space-between" 
+              alignItems="flex-start"
+              sx={{ mb: 2 }}
             >
-              ⚔️ Attacker
-            </Typography>
+              <Typography
+                variant="h6"
+                sx={{ color: "primary.main" }}
+              >
+                ⚔️ Attacker
+              </Typography>
+              
+              {/* Shot Cost */}
+              {attacker && (
+                <Box>
+                  <Typography variant="caption" sx={{ display: 'block', mb: 0.5 }}>
+                    Shot Cost
+                  </Typography>
+                  <NumberField
+                    name="shotCost"
+                    value={parseInt(shotCost) || 0}
+                    size="small"
+                    width="80px"
+                    error={false}
+                    onChange={e => setShotCost(e.target.value)}
+                    onBlur={e => setShotCost(e.target.value)}
+                  />
+                </Box>
+              )}
+            </Stack>
 
             {/* Avatar Selection */}
             <CharacterSelector
@@ -471,24 +495,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   </Stack>
                 </Box>
               </Stack>
-            )}
-
-            {/* Shot Cost */}
-            {attacker && (
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="body2" sx={{ mb: 2, fontWeight: "medium" }}>
-                  Shot Cost
-                </Typography>
-                <NumberField
-                  name="shotCost"
-                  value={parseInt(shotCost) || 0}
-                  size="small"
-                  width="100px"
-                  error={false}
-                  onChange={e => setShotCost(e.target.value)}
-                  onBlur={e => setShotCost(e.target.value)}
-                />
-              </Box>
             )}
           </Box>
 
