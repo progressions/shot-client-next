@@ -405,7 +405,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                       >
                         <Avatar
                           entity={entity}
-                          href="#"
+                          href={`/characters/${entity.id}`}
                           disableImageViewer={true}
                           sx={{
                             width: 64,
