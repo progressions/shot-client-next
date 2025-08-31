@@ -1,7 +1,7 @@
 "use client"
 import { useTheme } from "@mui/material"
 import { useState, useRef, useEffect } from "react"
-import { AppBar, Toolbar, Typography, IconButton, Box, Drawer } from "@mui/material"
+import { AppBar, Toolbar, Typography, IconButton, Box } from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
 import { Icon } from "@/components/ui"
 import { AddCharacter, AddVehicle, AttackPanel } from "@/components/encounters"
@@ -9,11 +9,10 @@ import { FaGun } from "react-icons/fa6"
 
 export default function MenuBar() {
   const theme = useTheme()
-  const [open, setOpen] = useState<"character" | "vehicle" | null>(null)
-  const [attackDrawerOpen, setAttackDrawerOpen] = useState(false)
+  const [open, setOpen] = useState<"character" | "vehicle" | "attack" | null>(null)
   const panelRef = useRef<HTMLDivElement>(null)
 
-  const toggleBox = (type: "character" | "vehicle") => {
+  const toggleBox = (type: "character" | "vehicle" | "attack") => {
     setOpen(current => (current === type ? null : type))
   }
 
@@ -39,7 +38,7 @@ export default function MenuBar() {
             Menu
           </Typography>
           <IconButton 
-            onClick={() => setAttackDrawerOpen(true)}
+            onClick={() => toggleBox("attack")}
             sx={{ color: "white" }}
             title="Attack Resolution"
           >
@@ -81,25 +80,13 @@ export default function MenuBar() {
                   onClose={() => setOpen(null)}
                 />
               )}
+              {open === "attack" && (
+                <AttackPanel />
+              )}
             </Box>
           </motion.div>
         )}
       </AnimatePresence>
-      <Drawer
-        anchor="right"
-        open={attackDrawerOpen}
-        onClose={() => setAttackDrawerOpen(false)}
-        PaperProps={{
-          sx: {
-            width: { xs: "100%", sm: "600px", md: "800px" },
-            maxWidth: "100%",
-          }
-        }}
-      >
-        <Box sx={{ p: 2, pt: 3 }}>
-          <AttackPanel />
-        </Box>
-      </Drawer>
     </>
   )
 }
