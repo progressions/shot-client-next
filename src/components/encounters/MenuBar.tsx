@@ -1,14 +1,16 @@
 "use client"
 import { useTheme } from "@mui/material"
 import { useState, useRef, useEffect } from "react"
-import { AppBar, Toolbar, Typography, IconButton, Box } from "@mui/material"
+import { AppBar, Toolbar, Typography, IconButton, Box, Drawer } from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
 import { Icon } from "@/components/ui"
-import { AddCharacter, AddVehicle } from "@/components/encounters"
+import { AddCharacter, AddVehicle, AttackPanel } from "@/components/encounters"
+import SportsMmaIcon from "@mui/icons-material/SportsMma"
 
 export default function MenuBar() {
   const theme = useTheme()
   const [open, setOpen] = useState<"character" | "vehicle" | null>(null)
+  const [attackDrawerOpen, setAttackDrawerOpen] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
   const toggleBox = (type: "character" | "vehicle") => {
@@ -36,6 +38,13 @@ export default function MenuBar() {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Menu
           </Typography>
+          <IconButton 
+            onClick={() => setAttackDrawerOpen(true)}
+            sx={{ color: "white" }}
+            title="Attack Resolution"
+          >
+            <SportsMmaIcon />
+          </IconButton>
           <IconButton onClick={() => toggleBox("vehicle")}>
             <Icon keyword="Add Vehicle" color="white" />
           </IconButton>
@@ -76,6 +85,21 @@ export default function MenuBar() {
           </motion.div>
         )}
       </AnimatePresence>
+      <Drawer
+        anchor="right"
+        open={attackDrawerOpen}
+        onClose={() => setAttackDrawerOpen(false)}
+        PaperProps={{
+          sx: {
+            width: { xs: "100%", sm: "600px", md: "800px" },
+            maxWidth: "100%",
+          }
+        }}
+      >
+        <Box sx={{ p: 2, pt: 3 }}>
+          <AttackPanel />
+        </Box>
+      </Drawer>
     </>
   )
 }
