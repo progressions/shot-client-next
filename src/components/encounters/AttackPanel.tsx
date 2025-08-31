@@ -24,6 +24,7 @@ import {
   Chip,
   Tooltip,
 } from "@mui/material"
+import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { useEncounter, useToast } from "@/contexts"
 import { CS, VS } from "@/services"
 import type { Character, Vehicle, Shot, Weapon } from "@/types"
@@ -770,22 +771,11 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               </Typography>
               <NumberField
                 name="swerve"
-                value={
-                  swerve === ""
-                    ? 0
-                    : isNaN(parseInt(swerve))
-                      ? 0
-                      : parseInt(swerve)
-                }
+                value={swerve}
                 size="large"
                 width="120px"
                 error={false}
-                onChange={e => {
-                  const val = e.target.value
-                  if (val === "" || val === "-" || !isNaN(parseInt(val))) {
-                    setSwerve(val)
-                  }
-                }}
+                onChange={e => setSwerve(e.target.value)}
                 onBlur={e => {
                   const val = e.target.value
                   if (val === "" || val === "-") {
@@ -810,7 +800,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                 variant="caption"
                 sx={{ mb: 0.5, fontSize: { xs: "0.7rem", sm: "0.75rem" } }}
               >
-                Final Damage
+                Smackdown
               </Typography>
               <NumberField
                 name="finalDamage"
@@ -829,6 +819,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "flex-end",
+                alignItems: "flex-start",
                 height: "100%",
                 pt: { xs: "8px", sm: "20px" },
                 width: { xs: "100%", sm: "auto" },
@@ -841,14 +832,31 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                 onClick={handleApplyDamage}
                 disabled={!target || !finalDamage || isProcessing}
                 size="large"
+                startIcon={<CheckCircleIcon />}
                 sx={{
                   height: 56,
                   px: { xs: 2, sm: 3 },
                   width: { xs: "100%", sm: "auto" },
                 }}
               >
-                Apply Damage
+                Resolve
               </Button>
+              {attacker && target && finalDamage && shotCost && (
+                <Typography
+                  variant="caption"
+                  sx={{ 
+                    mt: 0.5,
+                    fontSize: { xs: "0.65rem", sm: "0.7rem" },
+                    textAlign: "left",
+                    color: "text.secondary"
+                  }}
+                >
+                  {parseInt(finalDamage) > 0 
+                    ? `Apply ${finalDamage} wounds, spend ${shotCost} shots`
+                    : `Spend ${shotCost} shots`
+                  }
+                </Typography>
+              )}
             </Box>
           </Stack>
 
@@ -899,27 +907,18 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                             parseInt(swerve) -
                             parseInt(defenseValue)}{" "}
                           + Damage {weaponDamage} = Smackdown{" "}
-                          {parseInt(attackValue) +
-                            parseInt(swerve) -
-                            parseInt(defenseValue) +
-                            parseInt(weaponDamage)}
+                          {parseInt(finalDamage)}
                         </strong>
                       </Typography>
                       {toughnessValue && target && (
                         <Typography variant="body2">
                           <strong>
                             Smackdown{" "}
-                            {parseInt(attackValue) +
-                              parseInt(swerve) -
-                              parseInt(defenseValue) +
-                              parseInt(weaponDamage)}{" "}
+                            {parseInt(finalDamage)}{" "}
                             - Toughness {parseInt(toughnessValue) || 0} ={" "}
                             {CS.calculateWounds(
                               target as Character,
-                              parseInt(attackValue) +
-                                parseInt(swerve) -
-                                parseInt(defenseValue) +
-                                parseInt(weaponDamage),
+                              parseInt(finalDamage),
                               parseInt(toughnessValue) || 0
                             )}{" "}
                             Wounds

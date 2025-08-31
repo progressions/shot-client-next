@@ -9,7 +9,7 @@ import { useTheme } from "@mui/material/styles"
 
 type NumberFieldProps = {
   name: string
-  value: number | null
+  value: number | null | string
   size: "small" | "large"
   width: string
   error: boolean
