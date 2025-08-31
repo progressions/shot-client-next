@@ -16,24 +16,28 @@ type CharacterTypeFilter =
 
 interface CharacterSelectorProps {
   shots: Shot[]
-  selectedShotId: string
+  selectedShotId?: string
+  selectedShotIds?: string[]
   onSelect: (shotId: string) => void
   borderColor?: string
   disabled?: boolean
   characterTypes?: CharacterTypeFilter[]
   showAllCheckbox?: boolean
   excludeShotId?: string
+  multiSelect?: boolean
 }
 
 export default function CharacterSelector({
   shots,
   selectedShotId,
+  selectedShotIds = [],
   onSelect,
   borderColor = "primary.main",
   disabled = false,
   characterTypes,
   showAllCheckbox = false,
   excludeShotId,
+  multiSelect = false,
 }: CharacterSelectorProps) {
   const [showAll, setShowAll] = useState(false)
 
@@ -86,7 +90,9 @@ export default function CharacterSelector({
         {filteredShots.map(shot => {
           const entity = shot.character || shot.vehicle
           if (!entity) return null
-          const isSelected = entity.shot_id === selectedShotId
+          const isSelected = multiSelect 
+            ? selectedShotIds.includes(entity.shot_id || "")
+            : entity.shot_id === selectedShotId
 
           return (
             <Box
@@ -97,12 +103,7 @@ export default function CharacterSelector({
                   return // Allow clicks in popup to work normally
                 }
                 e.preventDefault()
-                // If clicking the already selected avatar, deselect it
-                if (isSelected) {
-                  onSelect("")
-                } else {
-                  onSelect(entity.shot_id || "")
-                }
+                onSelect(entity.shot_id || "")
               }}
               sx={{
                 cursor: "pointer",
