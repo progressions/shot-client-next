@@ -100,6 +100,44 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   const attacker = attackerShot?.character || attackerShot?.vehicle
   const target = targetShot?.character || targetShot?.vehicle
 
+  // Sort targets based on attacker type
+  const sortedTargetShots = useMemo(() => {
+    if (!attacker) return allShots
+
+    const attackerChar = attacker as Character
+    const isNPCAttacker = attackerChar.character_type && 
+      ['mook', 'featured_foe', 'boss', 'uber_boss'].includes(attackerChar.character_type)
+
+    if (!isNPCAttacker) {
+      // If attacker is not an NPC, return normal order
+      return allShots
+    }
+
+    // Sort: PCs first, then Allies, then others
+    return [...allShots].sort((a, b) => {
+      const charA = a.character
+      const charB = b.character
+      
+      if (!charA || !charB) return 0
+      
+      const isPC_A = charA.character_type === 'pc'
+      const isPC_B = charB.character_type === 'pc'
+      const isAlly_A = charA.character_type === 'ally'
+      const isAlly_B = charB.character_type === 'ally'
+      
+      // PCs come first
+      if (isPC_A && !isPC_B) return -1
+      if (!isPC_A && isPC_B) return 1
+      
+      // Then Allies
+      if (isAlly_A && !isAlly_B && !isPC_B) return -1
+      if (!isAlly_A && isAlly_B && !isPC_A) return 1
+      
+      // Others remain in original order
+      return 0
+    })
+  }, [allShots, attacker])
+
   // Get weapons for selected attacker from preloaded encounter weapons
   const attackerWeapons = useMemo(() => {
     if (attacker && "action_values" in attacker) {
@@ -529,7 +567,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
             {/* Target Avatar Selection */}
             <CharacterSelector
-              shots={allShots.filter(s => {
+              shots={sortedTargetShots.filter(s => {
                 const entity = s.character
                 // Exclude self
                 if (entity?.shot_id === attackerShotId) return false
