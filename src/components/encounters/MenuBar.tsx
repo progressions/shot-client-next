@@ -5,7 +5,7 @@ import { AppBar, Toolbar, Typography, IconButton, Box, Drawer } from "@mui/mater
 import { motion, AnimatePresence } from "framer-motion"
 import { Icon } from "@/components/ui"
 import { AddCharacter, AddVehicle, AttackPanel } from "@/components/encounters"
-import SportsMmaIcon from "@mui/icons-material/SportsMma"
+import { FaGun } from "react-icons/fa6"
 
 export default function MenuBar() {
   const theme = useTheme()
@@ -43,7 +43,7 @@ export default function MenuBar() {
             sx={{ color: "white" }}
             title="Attack Resolution"
           >
-            <SportsMmaIcon />
+            <FaGun size={24} />
           </IconButton>
           <IconButton onClick={() => toggleBox("vehicle")}>
             <Icon keyword="Add Vehicle" color="white" />
