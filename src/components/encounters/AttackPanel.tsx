@@ -1430,8 +1430,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               </Box>
             )}
 
-            {/* Defense and Toughness Values - only show when we have no inline target defense display */}
-            {selectedTargetIds.length === 0 && targetShotId && (
+            {/* Defense and Toughness Values - show for multiple targets or legacy single target */}
+            {(selectedTargetIds.length > 1 || (selectedTargetIds.length === 0 && targetShotId)) && (
               <Box sx={{ mb: 3, mt: 2 }}>
                 <Stack direction="row" spacing={2} alignItems="flex-start">
                   <Box>
@@ -1480,8 +1480,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                     })()}
                   </Box>
 
-                  {/* Only show Toughness for single target or when using backward compatibility mode */}
-                  {(selectedTargetIds.length === 1 || (selectedTargetIds.length === 0 && targetShotId)) && (
+                  {/* Only show Toughness for legacy single target mode */}
+                  {selectedTargetIds.length === 0 && targetShotId && (
                     <Box>
                       <Typography
                         variant="body2"
