@@ -9,7 +9,9 @@ import { FaGun } from "react-icons/fa6"
 
 export default function MenuBar() {
   const theme = useTheme()
-  const [open, setOpen] = useState<"character" | "vehicle" | "attack" | null>(null)
+  const [open, setOpen] = useState<"character" | "vehicle" | "attack" | null>(
+    null
+  )
   const panelRef = useRef<HTMLDivElement>(null)
 
   const toggleBox = (type: "character" | "vehicle" | "attack") => {
@@ -37,7 +39,7 @@ export default function MenuBar() {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Menu
           </Typography>
-          <IconButton 
+          <IconButton
             onClick={() => toggleBox("attack")}
             sx={{ color: "white" }}
             title="Attack Resolution"
@@ -80,9 +82,7 @@ export default function MenuBar() {
                   onClose={() => setOpen(null)}
                 />
               )}
-              {open === "attack" && (
-                <AttackPanel />
-              )}
+              {open === "attack" && <AttackPanel />}
             </Box>
           </motion.div>
         )}

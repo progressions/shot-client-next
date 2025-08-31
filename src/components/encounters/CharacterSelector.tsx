@@ -1,12 +1,18 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Box, Stack, FormControlLabel, Checkbox } from "@mui/material"
+import { Box, FormControlLabel, Checkbox } from "@mui/material"
 import { Avatar } from "@/components/avatars"
 import type { Shot, Character } from "@/types"
 import { CS } from "@/services"
 
-type CharacterTypeFilter = "PC" | "Ally" | "Mook" | "Featured Foe" | "Boss" | "Uber-Boss"
+type CharacterTypeFilter =
+  | "PC"
+  | "Ally"
+  | "Mook"
+  | "Featured Foe"
+  | "Boss"
+  | "Uber-Boss"
 
 interface CharacterSelectorProps {
   shots: Shot[]
@@ -35,13 +41,13 @@ export default function CharacterSelector({
     return shots.filter(shot => {
       const entity = shot.character
       if (!entity) return false
-      
+
       // Exclude specific shot if provided
       if (excludeShotId && entity.shot_id === excludeShotId) return false
-      
+
       // If showing all or no filter specified, include all
       if (showAll || !characterTypes || characterTypes.length === 0) return true
-      
+
       // Filter by character types - use CS.type to get the properly formatted type
       const char = entity as Character
       const charType = CS.type(char)
@@ -55,7 +61,7 @@ export default function CharacterSelector({
         sx={{
           display: "flex",
           flexDirection: "row",
-          gap: 0.1,  // Minimal gap between items
+          gap: 0.1, // Minimal gap between items
           overflowX: "auto",
           overflowY: "hidden",
           pb: 1,
@@ -99,46 +105,46 @@ export default function CharacterSelector({
                 }
               }}
               sx={{
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              minWidth: 80,  // Use minWidth instead of width
-              width: 80,
-              height: 72,
-              flexShrink: 0,  // Prevent shrinking
-              borderRadius: 2,
-              border: isSelected ? "3px solid" : "3px solid transparent",
-              borderColor: isSelected ? borderColor : "transparent",
-              backgroundColor: isSelected ? "action.selected" : "transparent",
-              "&:hover": {
-                backgroundColor: "action.hover",
-              },
-              pl: 1,
-              transition: "all 0.2s",
-            }}
-          >
-            <Box
-              sx={{
+                cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: "100%",
-                height: "100%",
+                minWidth: 80, // Use minWidth instead of width
+                width: 80,
+                height: 72,
+                flexShrink: 0, // Prevent shrinking
+                borderRadius: 2,
+                border: isSelected ? "3px solid" : "3px solid transparent",
+                borderColor: isSelected ? borderColor : "transparent",
+                backgroundColor: isSelected ? "action.selected" : "transparent",
+                "&:hover": {
+                  backgroundColor: "action.hover",
+                },
+                pl: 1,
+                transition: "all 0.2s",
               }}
             >
-              <Avatar
-                entity={entity}
-                href={`/characters/${entity.id}`}
-                disableImageViewer={true}
+              <Box
                 sx={{
-                  width: 64,
-                  height: 64,
-                  ml: 0.5,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "100%",
+                  height: "100%",
                 }}
-              />
+              >
+                <Avatar
+                  entity={entity}
+                  href={`/characters/${entity.id}`}
+                  disableImageViewer={true}
+                  sx={{
+                    width: 64,
+                    height: 64,
+                    ml: 0.5,
+                  }}
+                />
+              </Box>
             </Box>
-          </Box>
           )
         })}
       </Box>
@@ -153,11 +159,11 @@ export default function CharacterSelector({
             />
           }
           label="Show all characters"
-          sx={{ 
+          sx={{
             mt: 0.5,
-            '& .MuiFormControlLabel-label': {
-              fontSize: '0.75rem'
-            }
+            "& .MuiFormControlLabel-label": {
+              fontSize: "0.75rem",
+            },
           }}
         />
       )}

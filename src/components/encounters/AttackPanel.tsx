@@ -9,25 +9,18 @@ import {
   Checkbox,
   FormControl,
   FormControlLabel,
-  FormLabel,
-  Grid,
   InputLabel,
   MenuItem,
   Select,
-  TextField,
   Typography,
   Stack,
   Divider,
   Alert,
-  Autocomplete,
-  Avatar as MuiAvatar,
-  Chip,
-  Tooltip,
 } from "@mui/material"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { useEncounter, useToast } from "@/contexts"
-import { CS, VS } from "@/services"
-import type { Character, Vehicle, Shot, Weapon } from "@/types"
+import { CS, DS } from "@/services"
+import type { Character, Shot, Weapon } from "@/types"
 import { useClient } from "@/contexts/AppContext"
 import { NumberField } from "@/components/ui"
 import CharacterSelector from "./CharacterSelector"
@@ -37,11 +30,7 @@ interface AttackPanelProps {
 }
 
 export default function AttackPanel({ onClose }: AttackPanelProps) {
-  const {
-    encounter,
-    weapons: encounterWeapons,
-    ec,
-  } = useEncounter()
+  const { encounter, weapons: encounterWeapons, ec } = useEncounter()
   const { toastSuccess, toastError } = useToast()
   const { client } = useClient()
 
@@ -61,8 +50,20 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   const [shotCost, setShotCost] = useState<string>("3")
   const [isProcessing, setIsProcessing] = useState(false)
   const [dodgeApplied, setDodgeApplied] = useState(false)
+  const [mookRolls, setMookRolls] = useState<
+    Array<{
+      mookNumber: number
+      swerve: number
+      actionResult: number
+      outcome: number
+      hit: boolean
+      wounds: number
+    }>
+  >([])
+  const [showMookRolls, setShowMookRolls] = useState(false)
+  const [attackingMookCount, setAttackingMookCount] = useState<string>("")
 
-  // Get all characters in the fight (excluding hidden ones and vehicles)
+  // Get all characters in the fight (excluding hidden ones)
   const allShots = useMemo(() => {
     const shots: Shot[] = []
     let index = 0
@@ -80,7 +81,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             })
           })
         }
-        // Skip vehicles - this panel is for character combat only
       }
     })
     return shots
@@ -89,12 +89,12 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   // Sort attacker shots by: shot position (higher first), character type priority, then speed
   const sortedAttackerShots = useMemo(() => {
     const typeOrder: { [key: string]: number } = {
-      'Uber-Boss': 1,
-      'Boss': 2,
-      'PC': 3,
-      'Ally': 4,
-      'Featured Foe': 5,
-      'Mook': 6,
+      "Uber-Boss": 1,
+      Boss: 2,
+      PC: 3,
+      Ally: 4,
+      "Featured Foe": 5,
+      Mook: 6,
     }
 
     return [...allShots].sort((a, b) => {
@@ -105,13 +105,13 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
       const charA = a.character
       const charB = b.character
-      
+
       if (!charA || !charB) return 0
 
       // Then sort by character type priority
       const typeA = typeOrder[CS.type(charA)] || 999
       const typeB = typeOrder[CS.type(charB)] || 999
-      
+
       if (typeA !== typeB) {
         return typeA - typeB
       }
@@ -119,33 +119,31 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       // Finally sort by Speed (higher speed first)
       const speedA = CS.speed(charA) || 0
       const speedB = CS.speed(charB) || 0
-      
+
       return speedB - speedA
     })
   }, [allShots])
 
   // Get selected attacker and target
   const attackerShot = allShots.find(
-    s =>
-      s.character?.shot_id === attackerShotId ||
-      s.vehicle?.shot_id === attackerShotId
+    s => s.character?.shot_id === attackerShotId
   )
-  const targetShot = allShots.find(
-    s =>
-      s.character?.shot_id === targetShotId ||
-      s.vehicle?.shot_id === targetShotId
-  )
+  const targetShot = allShots.find(s => s.character?.shot_id === targetShotId)
 
-  const attacker = attackerShot?.character || attackerShot?.vehicle
-  const target = targetShot?.character || targetShot?.vehicle
+  const attacker = attackerShot?.character
+  const target = targetShot?.character
 
   // Sort targets based on attacker type
   const sortedTargetShots = useMemo(() => {
     if (!attacker) return allShots
 
-    const attackerChar = attacker as Character
-    const attackerType = CS.type(attackerChar)
-    const isNPCAttacker = ['Mook', 'Featured Foe', 'Boss', 'Uber-Boss'].includes(attackerType)
+    const attackerType = CS.type(attacker)
+    const isNPCAttacker = [
+      "Mook",
+      "Featured Foe",
+      "Boss",
+      "Uber-Boss",
+    ].includes(attackerType)
 
     if (!isNPCAttacker) {
       // If attacker is not an NPC, return normal order
@@ -156,25 +154,25 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     return [...allShots].sort((a, b) => {
       const charA = a.character
       const charB = b.character
-      
+
       if (!charA || !charB) return 0
-      
+
       const typeA = CS.type(charA)
       const typeB = CS.type(charB)
-      
-      const isPC_A = typeA === 'PC'
-      const isPC_B = typeB === 'PC'
-      const isAlly_A = typeA === 'Ally'
-      const isAlly_B = typeB === 'Ally'
-      
+
+      const isPC_A = typeA === "PC"
+      const isPC_B = typeB === "PC"
+      const isAlly_A = typeA === "Ally"
+      const isAlly_B = typeB === "Ally"
+
       // PCs come first
       if (isPC_A && !isPC_B) return -1
       if (!isPC_A && isPC_B) return 1
-      
+
       // Then Allies
       if (isAlly_A && !isAlly_B && !isPC_B) return -1
       if (!isAlly_A && isAlly_B && !isPC_A) return 1
-      
+
       // Others remain in original order
       return 0
     })
@@ -195,18 +193,16 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   // Calculate suggested values when selections change
   useMemo(() => {
     if (attacker && "action_values" in attacker) {
-      const char = attacker as Character
-
       // Get attack skills
-      const mainAttack = CS.mainAttack(char)
+      const mainAttack = CS.mainAttack(attacker)
       setAttackSkill(mainAttack)
 
       // Set suggested attack value
-      const av = CS.actionValue(char, mainAttack)
+      const av = CS.actionValue(attacker, mainAttack)
       setAttackValue(av.toString())
 
       // Set default weapon and damage
-      const weaponIds = char.weapon_ids || []
+      const weaponIds = attacker.weapon_ids || []
       const charWeapons = weaponIds
         .map(id => encounterWeapons[id])
         .filter((weapon): weapon is Weapon => weapon !== undefined)
@@ -216,15 +212,22 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         setWeaponDamage(charWeapons[0].damage.toString())
       } else {
         setSelectedWeaponId("unarmed")
-        const damage = CS.damage(char) || 7
+        const damage = CS.damage(attacker) || 7
         setWeaponDamage(damage.toString())
       }
 
       // Set shot cost based on character type
-      if (CS.isBoss(char) || CS.isUberBoss(char)) {
+      if (CS.isBoss(attacker) || CS.isUberBoss(attacker)) {
         setShotCost("2")
       } else {
         setShotCost("3")
+      }
+
+      // Set mook count if attacker is a mook
+      if (CS.isMook(attacker)) {
+        setAttackingMookCount(attacker.count?.toString() || "1")
+      } else {
+        setAttackingMookCount("")
       }
     }
   }, [attacker, encounterWeapons])
@@ -232,16 +235,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   useMemo(() => {
     if (target) {
       // Set suggested defense value
-      let defense = 0
-      let toughness = 0
-      if ("action_values" in target) {
-        defense = CS.defense(target as Character)
-        toughness = CS.toughness(target as Character)
-      } else if ("action_values" in target) {
-        defense = VS.defense(target as Vehicle)
-        // Vehicles don't have toughness in the same way
-        toughness = 0
-      }
+      let defense = CS.defense(target)
+      const toughness = CS.toughness(target)
 
       // Apply dodge bonus if checked
       if (dodge) {
@@ -258,30 +253,81 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     }
   }, [target, dodge, stunt])
 
-  // Calculate damage when swerve is entered
+  // Calculate damage when swerve is entered (only for non-mook attackers)
   useMemo(() => {
-    if (swerve && attackValue && defenseValue) {
-      const av = parseInt(attackValue) || 0
-      const dv = parseInt(defenseValue) || 0
-      const sw = parseInt(swerve) || 0
+    if (attacker && !CS.isMook(attacker)) {
+      if (swerve && attackValue && defenseValue) {
+        const av = parseInt(attackValue) || 0
+        const dv = parseInt(defenseValue) || 0
+        const sw = parseInt(swerve) || 0
 
-      const outcome = av - dv + sw
+        const outcome = av - dv + sw
 
-      if (outcome >= 0) {
-        const weaponDmg = parseInt(weaponDamage) || 0
-        const totalDamage = outcome + weaponDmg
-        setFinalDamage(totalDamage.toString())
-      } else {
-        setFinalDamage("0")
+        if (outcome >= 0) {
+          const weaponDmg = parseInt(weaponDamage) || 0
+          const totalDamage = outcome + weaponDmg
+          setFinalDamage(totalDamage.toString())
+        } else {
+          setFinalDamage("0")
+        }
       }
     }
-  }, [swerve, attackValue, defenseValue, weaponDamage])
+  }, [swerve, attackValue, defenseValue, weaponDamage, attacker])
 
   // Reset dodge applied when target changes
   useEffect(() => {
     setDodgeApplied(false)
     setDodge(false)
   }, [targetShotId])
+
+  // Reset mook rolls when attacker changes
+  useEffect(() => {
+    setMookRolls([])
+    setShowMookRolls(false)
+  }, [attackerShotId])
+
+  const handleRollMookAttacks = () => {
+    if (!attacker || !CS.isMook(attacker)) return
+
+    const char = attacker
+    const mookCount = parseInt(attackingMookCount) || char.count || 0
+    const av = parseInt(attackValue) || 0
+    const dv = parseInt(defenseValue) || 0
+    const toughness = parseInt(toughnessValue) || 0
+    const weaponDmg = parseInt(weaponDamage) || 0
+
+    const rolls = []
+    let totalWounds = 0
+
+    for (let i = 1; i <= mookCount; i++) {
+      // Roll swerve for each mook
+      const swerveRoll = DS.rollSwerve()
+      const actionResult = av + swerveRoll.result
+      const outcome = actionResult - dv
+      const hit = outcome >= 0
+
+      let wounds = 0
+      if (hit) {
+        // Calculate smackdown and wounds for this hit
+        const smackdown = outcome + weaponDmg
+        wounds = Math.max(0, smackdown - toughness)
+        totalWounds += wounds
+      }
+
+      rolls.push({
+        mookNumber: i,
+        swerve: swerveRoll.result,
+        actionResult,
+        outcome,
+        hit,
+        wounds,
+      })
+    }
+
+    setMookRolls(rolls)
+    setShowMookRolls(true)
+    setFinalDamage(totalWounds.toString())
+  }
 
   const handleDodge = async () => {
     if (!targetShot || !target) {
@@ -314,7 +360,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     try {
       const damage = parseInt(finalDamage) || 0
       const shots = parseInt(shotCost) || 3
-      const targetChar = target as Character
+      const targetChar = target
       const isPC = CS.isPC(targetChar)
 
       // Spend shots for the attacker
@@ -329,8 +375,23 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         // Mooks are eliminated on any hit
         newWounds = 0 // Or reduce count
         actualWoundsDealt = damage // For mooks, show the full damage
+      } else if (CS.isMook(attacker)) {
+        // When attacker is a mook, wounds have already been calculated with toughness
+        // so we apply them directly without reducing by toughness again
+        const currentWounds = CS.wounds(targetChar)
+        actualWoundsDealt = damage // This is already the final wound count from mook rolls
+        newWounds = currentWounds + actualWoundsDealt
+
+        // Calculate impairments
+        const originalImpairments = targetChar.impairments || 0
+        const impairmentChange = CS.calculateImpairments(
+          targetChar,
+          currentWounds,
+          newWounds
+        )
+        newImpairments = originalImpairments + impairmentChange
       } else {
-        // Apply damage using CharacterService
+        // Regular attack - apply damage using CharacterService
         const currentWounds = CS.wounds(targetChar)
         const toughness = parseInt(toughnessValue) || 0
         actualWoundsDealt = CS.calculateWounds(targetChar, damage, toughness)
@@ -349,31 +410,44 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       // Send update to backend
       await client.updateCombatState(
         encounter,
-        targetShot.character?.shot_id || targetShot.vehicle?.shot_id || "",
+        targetShot.character?.shot_id || "",
         isPC ? newWounds : undefined,
         !isPC ? newWounds : undefined,
         newImpairments,
         {
           type: "attack",
-          description: `${attacker.name} attacked ${target.name} for ${actualWoundsDealt} wounds`,
+          description: CS.isMook(attacker)
+            ? `${parseInt(attackingMookCount) || attacker.count || 0} ${attacker.name} attacked ${target.name} for ${actualWoundsDealt} wounds`
+            : `${attacker.name} attacked ${target.name} for ${actualWoundsDealt} wounds`,
           details: {
-            attacker_id: attackerShot.character?.id || attackerShot.vehicle?.id,
+            attacker_id: attackerShot.character?.id,
             target_id: target.id,
             damage: damage,
             attack_value: parseInt(attackValue),
             defense_value: parseInt(defenseValue),
-            swerve: parseInt(swerve),
-            outcome:
-              parseInt(attackValue) - parseInt(defenseValue) + parseInt(swerve),
+            swerve: CS.isMook(attacker) ? undefined : parseInt(swerve),
+            outcome: CS.isMook(attacker)
+              ? undefined
+              : parseInt(attackValue) -
+                parseInt(defenseValue) +
+                parseInt(swerve),
             weapon_damage: parseInt(weaponDamage),
             shot_cost: shots,
             stunt: stunt,
             dodge: dodge,
+            is_mook_attack: CS.isMook(attacker),
+            mook_count: CS.isMook(attacker) ? attacker.count : undefined,
+            mook_hits:
+              mookRolls.length > 0
+                ? mookRolls.filter(r => r.hit).length
+                : undefined,
           },
         }
       )
 
-      toastSuccess(`Applied ${actualWoundsDealt} wound${actualWoundsDealt !== 1 ? 's' : ''} to ${target.name}`)
+      toastSuccess(
+        `Applied ${actualWoundsDealt} wound${actualWoundsDealt !== 1 ? "s" : ""} to ${target.name}`
+      )
 
       // Reset form
       setTargetShotId("")
@@ -381,6 +455,12 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       setFinalDamage("")
       setDodge(false)
       setStunt(false)
+      setMookRolls([])
+      setShowMookRolls(false)
+      // Reset attacking mook count to default for the attacker
+      if (attacker && CS.isMook(attacker)) {
+        setAttackingMookCount(attacker.count?.toString() || "1")
+      }
 
       if (onClose) {
         onClose()
@@ -418,16 +498,13 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               borderBottomColor: "divider",
             }}
           >
-            <Typography
-              variant="h6"
-              sx={{ mb: 2, color: "primary.main" }}
-            >
+            <Typography variant="h6" sx={{ mb: 2, color: "primary.main" }}>
               ⚔️ Attacker
             </Typography>
 
             {/* Avatar Selection and Shot Cost on same line */}
-            <Stack 
-              direction="row" 
+            <Stack
+              direction="row"
               spacing={2}
               alignItems="flex-start"
               sx={{ mb: 3 }}
@@ -441,10 +518,13 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   // No filtering for attacker selector - shows all characters
                 />
               </Box>
-              
+
               {/* Shot Cost */}
               <Box sx={{ flexShrink: 0 }}>
-                <Typography variant="caption" sx={{ display: 'block', mb: 0.5 }}>
+                <Typography
+                  variant="caption"
+                  sx={{ display: "block", mb: 0.5 }}
+                >
                   Shot Cost
                 </Typography>
                 <NumberField
@@ -461,135 +541,173 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
             {/* Attack Skill and Weapon Selection */}
             {attacker && "action_values" in attacker && (
-              <Stack 
-                direction={{ xs: "column", sm: "row" }} 
-                spacing={{ xs: 2, sm: 2 }}
-                sx={{ mb: 3 }}
-              >
-                {/* Attack Skill Block */}
-                <Box sx={{ flex: 1 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{ mb: 2, fontWeight: "medium" }}
-                  >
-                    Attack Skill
-                  </Typography>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <NumberField
-                      name="attackValue"
-                      value={parseInt(attackValue) || 0}
-                      size="small"
-                      width="80px"
-                      error={false}
-                      onChange={e => setAttackValue(e.target.value)}
-                      onBlur={e => setAttackValue(e.target.value)}
-                    />
-                    {(() => {
-                      const char = attacker as Character
-                      const mainAttack = CS.mainAttack(char)
-                      const mainValue = CS.actionValue(char, mainAttack)
-                      const secondaryAttack = CS.secondaryAttack(char)
-                      const secondaryValue = secondaryAttack
-                        ? CS.actionValue(char, secondaryAttack)
-                        : 0
-
-                      const attackOptions = [
-                        { skill: mainAttack, value: mainValue },
-                        ...(secondaryAttack
-                          ? [{ skill: secondaryAttack, value: secondaryValue }]
-                          : []),
-                      ]
-
-                      return (
-                        <FormControl
-                          sx={{
-                            flex: 1,
-                            "& .MuiInputBase-root": { height: 56 },
-                          }}
-                        >
-                          <InputLabel>Attack Skill</InputLabel>
-                          <Select
-                            value={attackSkill}
-                            onChange={e => {
-                              const selected = e.target.value
-                              setAttackSkill(selected)
-                              const option = attackOptions.find(
-                                o => o.skill === selected
-                              )
-                              if (option) {
-                                setAttackValue(option.value.toString())
-                              }
-                            }}
-                            label="Attack Skill"
-                          >
-                            {attackOptions.map(option => (
-                              <MenuItem key={option.skill} value={option.skill}>
-                                {option.skill} ({option.value})
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      )
-                    })()}
-                  </Stack>
-                </Box>
-
-                {/* Damage and Weapon Block */}
-                <Box sx={{ flex: 1 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{ mb: 2, fontWeight: "medium" }}
-                  >
-                    Damage
-                  </Typography>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <NumberField
-                      name="weaponDamage"
-                      value={parseInt(weaponDamage) || 0}
-                      size="small"
-                      width="80px"
-                      error={false}
-                      onChange={e => setWeaponDamage(e.target.value)}
-                      onBlur={e => setWeaponDamage(e.target.value)}
-                    />
-                    <FormControl
-                      sx={{ flex: 1, "& .MuiInputBase-root": { height: 56 } }}
+              <>
+                <Stack
+                  direction={{ xs: "column", sm: "row" }}
+                  spacing={{ xs: 2, sm: 2 }}
+                  sx={{ mb: 3 }}
+                >
+                  {/* Attack Skill Block */}
+                  <Box sx={{ flex: 1 }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ mb: 2, fontWeight: "medium" }}
                     >
-                      <InputLabel>Weapon</InputLabel>
-                      <Select
-                        value={selectedWeaponId}
-                        onChange={e => {
-                          setSelectedWeaponId(e.target.value)
-                          if (e.target.value === "unarmed") {
-                            const damage = CS.damage(attacker as Character) || 7
-                            setWeaponDamage(damage.toString())
-                          } else {
-                            const weapon = attackerWeapons.find(
-                              w => w.id?.toString() === e.target.value
-                            )
-                            if (weapon) {
-                              setWeaponDamage(weapon.damage.toString())
-                            }
-                          }
-                        }}
-                        label="Weapon"
-                      >
-                        <MenuItem value="unarmed">
-                          Damage ({CS.damage(attacker as Character) || 7})
-                        </MenuItem>
-                        {attackerWeapons.map(weapon => (
-                          <MenuItem
-                            key={weapon.id}
-                            value={weapon.id?.toString() || ""}
+                      Attack Skill
+                    </Typography>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <NumberField
+                        name="attackValue"
+                        value={parseInt(attackValue) || 0}
+                        size="small"
+                        width="80px"
+                        error={false}
+                        onChange={e => setAttackValue(e.target.value)}
+                        onBlur={e => setAttackValue(e.target.value)}
+                      />
+                      {(() => {
+                        const mainAttack = CS.mainAttack(attacker)
+                        const mainValue = CS.actionValue(attacker, mainAttack)
+                        const secondaryAttack = CS.secondaryAttack(attacker)
+                        const secondaryValue = secondaryAttack
+                          ? CS.actionValue(attacker, secondaryAttack)
+                          : 0
+
+                        const attackOptions = [
+                          { skill: mainAttack, value: mainValue },
+                          ...(secondaryAttack
+                            ? [
+                                {
+                                  skill: secondaryAttack,
+                                  value: secondaryValue,
+                                },
+                              ]
+                            : []),
+                        ]
+
+                        return (
+                          <FormControl
+                            sx={{
+                              flex: 1,
+                              "& .MuiInputBase-root": { height: 56 },
+                            }}
                           >
-                            {weapon.name} (Damage: {weapon.damage})
+                            <InputLabel>Attack Skill</InputLabel>
+                            <Select
+                              value={attackSkill}
+                              onChange={e => {
+                                const selected = e.target.value
+                                setAttackSkill(selected)
+                                const option = attackOptions.find(
+                                  o => o.skill === selected
+                                )
+                                if (option) {
+                                  setAttackValue(option.value.toString())
+                                }
+                              }}
+                              label="Attack Skill"
+                            >
+                              {attackOptions.map(option => (
+                                <MenuItem
+                                  key={option.skill}
+                                  value={option.skill}
+                                >
+                                  {option.skill} ({option.value})
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        )
+                      })()}
+                    </Stack>
+                  </Box>
+
+                  {/* Damage and Weapon Block */}
+                  <Box sx={{ flex: 1 }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ mb: 2, fontWeight: "medium" }}
+                    >
+                      Damage
+                    </Typography>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <NumberField
+                        name="weaponDamage"
+                        value={parseInt(weaponDamage) || 0}
+                        size="small"
+                        width="80px"
+                        error={false}
+                        onChange={e => setWeaponDamage(e.target.value)}
+                        onBlur={e => setWeaponDamage(e.target.value)}
+                      />
+                      <FormControl
+                        sx={{ flex: 1, "& .MuiInputBase-root": { height: 56 } }}
+                      >
+                        <InputLabel>Weapon</InputLabel>
+                        <Select
+                          value={selectedWeaponId}
+                          onChange={e => {
+                            setSelectedWeaponId(e.target.value)
+                            if (e.target.value === "unarmed") {
+                              const damage = CS.damage(attacker) || 7
+                              setWeaponDamage(damage.toString())
+                            } else {
+                              const weapon = attackerWeapons.find(
+                                w => w.id?.toString() === e.target.value
+                              )
+                              if (weapon) {
+                                setWeaponDamage(weapon.damage.toString())
+                              }
+                            }
+                          }}
+                          label="Weapon"
+                        >
+                          <MenuItem value="unarmed">
+                            Damage ({CS.damage(attacker) || 7})
                           </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Stack>
-                </Box>
-              </Stack>
+                          {attackerWeapons.map(weapon => (
+                            <MenuItem
+                              key={weapon.id}
+                              value={weapon.id?.toString() || ""}
+                            >
+                              {weapon.name} (Damage: {weapon.damage})
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Stack>
+                  </Box>
+                </Stack>
+
+                {/* Mook Count Selection */}
+                {CS.isMook(attacker) && (
+                  <Box sx={{ mt: 3 }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ mb: 2, fontWeight: "medium" }}
+                    >
+                      Attacking Mooks
+                    </Typography>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <NumberField
+                        name="attackingMookCount"
+                        value={parseInt(attackingMookCount) || 0}
+                        size="small"
+                        width="80px"
+                        error={false}
+                        onChange={e => setAttackingMookCount(e.target.value)}
+                        onBlur={e => setAttackingMookCount(e.target.value)}
+                      />
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "text.secondary" }}
+                      >
+                        of {attacker.count} total mooks
+                      </Typography>
+                    </Stack>
+                  </Box>
+                )}
+              </>
             )}
           </Box>
 
@@ -620,19 +738,21 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               excludeShotId={attackerShotId}
               characterTypes={(() => {
                 if (!attacker) return undefined
-                const attackerChar = attacker as Character
-                
                 // If attacker is PC or Ally, show enemies
-                if (CS.isPC(attackerChar) || CS.isAlly(attackerChar)) {
+                if (CS.isPC(attacker) || CS.isAlly(attacker)) {
                   return ["Mook", "Featured Foe", "Boss", "Uber-Boss"]
                 }
-                
+
                 // If attacker is NPC (Mook, Featured Foe, Boss, Uber Boss), show PCs and Allies
-                if (CS.isMook(attackerChar) || CS.isFeaturedFoe(attackerChar) || 
-                    CS.isBoss(attackerChar) || CS.isUberBoss(attackerChar)) {
+                if (
+                  CS.isMook(attacker) ||
+                  CS.isFeaturedFoe(attacker) ||
+                  CS.isBoss(attacker) ||
+                  CS.isUberBoss(attacker)
+                ) {
                   return ["PC", "Ally"]
                 }
-                
+
                 // For other types, show all
                 return undefined
               })()}
@@ -662,11 +782,19 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                     if (stunt) total += 2
                     if (dodge) total += 3
                     return total > 0 ? (
-                      <Typography variant="caption" sx={{ display: 'block', mt: 0.5, minHeight: '20px', textAlign: 'center' }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: "block",
+                          mt: 0.5,
+                          minHeight: "20px",
+                          textAlign: "center",
+                        }}
+                      >
                         +{total}
                       </Typography>
                     ) : (
-                      <Box sx={{ minHeight: '20px', mt: 0.5 }} />
+                      <Box sx={{ minHeight: "20px", mt: 0.5 }} />
                     )
                   })()}
                 </Box>
@@ -688,7 +816,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                     onBlur={e => setToughnessValue(e.target.value)}
                   />
                   {/* TODO: Future toughness modifiers (armor, schticks, etc.) will display here */}
-                  <Box sx={{ minHeight: '20px', mt: 0.5 }} />
+                  <Box sx={{ minHeight: "20px", mt: 0.5 }} />
                 </Box>
               </Stack>
             </Box>
@@ -748,121 +876,248 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             🎲 Combat Resolution
           </Typography>
 
-          <Stack
-            direction="row"
-            spacing={{ xs: 1, sm: 2 }}
-            alignItems="center"
-            justifyContent="center"
-            sx={{ flexWrap: { xs: "wrap", sm: "nowrap" } }}
-          >
-            {/* Dice Roll */}
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                minWidth: { xs: "80px", sm: "auto" },
-              }}
-            >
-              <Typography
-                variant="caption"
-                sx={{ mb: 0.5, fontSize: { xs: "0.7rem", sm: "0.75rem" } }}
-              >
-                Swerve
-              </Typography>
-              <NumberField
-                name="swerve"
-                value={swerve}
-                size="large"
-                width="120px"
-                error={false}
-                onChange={e => setSwerve(e.target.value)}
-                onBlur={e => {
-                  const val = e.target.value
-                  if (val === "" || val === "-") {
-                    setSwerve("0")
-                  } else {
-                    setSwerve(val)
-                  }
-                }}
-              />
-            </Box>
+          {/* Show different UI for mook attackers */}
+          {attacker && CS.isMook(attacker) ? (
+            <>
+              {/* Mook Attack Resolution */}
+              <Stack spacing={2} alignItems="center">
+                <Typography variant="body2" sx={{ textAlign: "center" }}>
+                  {parseInt(attackingMookCount) || attacker.count || 0} mooks
+                  attacking
+                </Typography>
 
-            {/* Final Damage Override */}
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                minWidth: { xs: "80px", sm: "auto" },
-              }}
-            >
-              <Typography
-                variant="caption"
-                sx={{ mb: 0.5, fontSize: { xs: "0.7rem", sm: "0.75rem" } }}
-              >
-                Smackdown
-              </Typography>
-              <NumberField
-                name="finalDamage"
-                value={parseInt(finalDamage) || 0}
-                size="large"
-                width="120px"
-                error={false}
-                onChange={e => setFinalDamage(e.target.value)}
-                onBlur={e => setFinalDamage(e.target.value)}
-              />
-            </Box>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={handleRollMookAttacks}
+                  disabled={!target || !attackValue || !defenseValue}
+                  sx={{ mb: 2 }}
+                >
+                  Roll Mook Attacks
+                </Button>
 
-            {/* Apply Damage Button */}
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "flex-end",
-                alignItems: "flex-start",
-                height: "100%",
-                pt: { xs: "8px", sm: "20px" },
-                width: { xs: "100%", sm: "auto" },
-                mt: { xs: 2, sm: 0 },
-              }}
-            >
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleApplyDamage}
-                disabled={!target || !finalDamage || isProcessing}
-                size="large"
-                startIcon={<CheckCircleIcon />}
-                sx={{
-                  height: 56,
-                  px: { xs: 2, sm: 3 },
-                  width: { xs: "100%", sm: "auto" },
-                }}
+                {showMookRolls && mookRolls.length > 0 && (
+                  <Box
+                    sx={{
+                      width: "100%",
+                      maxHeight: 300,
+                      overflowY: "auto",
+                      mb: 2,
+                    }}
+                  >
+                    <Alert severity="info">
+                      <Typography variant="body2" sx={{ mb: 1 }}>
+                        <strong>Mook Attack Results:</strong>
+                      </Typography>
+                      <Stack spacing={0.5}>
+                        {mookRolls.map((roll, index) => (
+                          <Typography
+                            key={index}
+                            variant="caption"
+                            sx={{ display: "block" }}
+                          >
+                            Mook {roll.mookNumber}: AV {attackValue} + Swerve{" "}
+                            {roll.swerve} = {roll.actionResult} vs DV{" "}
+                            {defenseValue} ={" "}
+                            {roll.hit ? (
+                              <span style={{ color: "#4caf50" }}>
+                                Hit! ({roll.wounds} wounds)
+                              </span>
+                            ) : (
+                              <span style={{ color: "#f44336" }}>Miss</span>
+                            )}
+                          </Typography>
+                        ))}
+                        <Divider sx={{ my: 1 }} />
+                        <Typography variant="body2">
+                          <strong>
+                            Hits: {mookRolls.filter(r => r.hit).length}/
+                            {mookRolls.length} | Total Wounds:{" "}
+                            {mookRolls.reduce((sum, r) => sum + r.wounds, 0)}
+                          </strong>
+                        </Typography>
+                      </Stack>
+                    </Alert>
+                  </Box>
+                )}
+
+                {/* Final Damage and Apply Button */}
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography variant="caption" sx={{ mb: 0.5 }}>
+                      Total Wounds
+                    </Typography>
+                    <NumberField
+                      name="finalDamage"
+                      value={parseInt(finalDamage) || 0}
+                      size="large"
+                      width="120px"
+                      error={false}
+                      onChange={e => setFinalDamage(e.target.value)}
+                      onBlur={e => setFinalDamage(e.target.value)}
+                    />
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleApplyDamage}
+                      disabled={!target || !finalDamage || isProcessing}
+                      size="large"
+                      startIcon={<CheckCircleIcon />}
+                      sx={{ height: 56, px: 3 }}
+                    >
+                      Apply Wounds
+                    </Button>
+                    {finalDamage && shotCost && (
+                      <Typography
+                        variant="caption"
+                        sx={{ mt: 0.5, textAlign: "center" }}
+                      >
+                        Apply {finalDamage} wounds, spend {shotCost} shots
+                      </Typography>
+                    )}
+                  </Box>
+                </Stack>
+              </Stack>
+            </>
+          ) : (
+            <>
+              {/* Regular (non-mook) Attack Resolution */}
+              <Stack
+                direction="row"
+                spacing={{ xs: 1, sm: 2 }}
+                alignItems="center"
+                justifyContent="center"
+                sx={{ flexWrap: { xs: "wrap", sm: "nowrap" } }}
               >
-                Resolve
-              </Button>
-              {attacker && target && finalDamage && shotCost && (
-                <Typography
-                  variant="caption"
-                  sx={{ 
-                    mt: 0.5,
-                    fontSize: { xs: "0.65rem", sm: "0.7rem" },
-                    textAlign: "left",
-                    color: "text.secondary"
+                {/* Dice Roll */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    minWidth: { xs: "80px", sm: "auto" },
                   }}
                 >
-                  {parseInt(finalDamage) > 0 
-                    ? `Apply ${finalDamage} wounds, spend ${shotCost} shots`
-                    : `Spend ${shotCost} shots`
-                  }
-                </Typography>
-              )}
-            </Box>
-          </Stack>
+                  <Typography
+                    variant="caption"
+                    sx={{ mb: 0.5, fontSize: { xs: "0.7rem", sm: "0.75rem" } }}
+                  >
+                    Swerve
+                  </Typography>
+                  <NumberField
+                    name="swerve"
+                    value={swerve}
+                    size="large"
+                    width="120px"
+                    error={false}
+                    onChange={e => setSwerve(e.target.value)}
+                    onBlur={e => {
+                      const val = e.target.value
+                      if (val === "" || val === "-") {
+                        setSwerve("0")
+                      } else {
+                        setSwerve(val)
+                      }
+                    }}
+                  />
+                </Box>
 
-          {/* Damage Calculation */}
-          {swerve && (
+                {/* Final Damage Override */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    minWidth: { xs: "80px", sm: "auto" },
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ mb: 0.5, fontSize: { xs: "0.7rem", sm: "0.75rem" } }}
+                  >
+                    Smackdown
+                  </Typography>
+                  <NumberField
+                    name="finalDamage"
+                    value={parseInt(finalDamage) || 0}
+                    size="large"
+                    width="120px"
+                    error={false}
+                    onChange={e => setFinalDamage(e.target.value)}
+                    onBlur={e => setFinalDamage(e.target.value)}
+                  />
+                </Box>
+
+                {/* Apply Damage Button */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "flex-end",
+                    alignItems: "flex-start",
+                    height: "100%",
+                    pt: { xs: "8px", sm: "20px" },
+                    width: { xs: "100%", sm: "auto" },
+                    mt: { xs: 2, sm: 0 },
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleApplyDamage}
+                    disabled={!target || !finalDamage || isProcessing}
+                    size="large"
+                    startIcon={<CheckCircleIcon />}
+                    sx={{
+                      height: 56,
+                      px: { xs: 2, sm: 3 },
+                      width: { xs: "100%", sm: "auto" },
+                    }}
+                  >
+                    Resolve
+                  </Button>
+                  {attacker && target && finalDamage && shotCost && (
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        mt: 0.5,
+                        fontSize: { xs: "0.65rem", sm: "0.7rem" },
+                        textAlign: "left",
+                        color: "text.secondary",
+                      }}
+                    >
+                      {parseInt(finalDamage) > 0
+                        ? `Apply ${finalDamage} wounds, spend ${shotCost} shots`
+                        : `Spend ${shotCost} shots`}
+                    </Typography>
+                  )}
+                </Box>
+              </Stack>
+            </>
+          )}
+
+          {/* Damage Calculation (only for non-mook attackers) */}
+          {swerve && attacker && !CS.isMook(attacker) && (
             <Box sx={{ mt: 3 }}>
               <Alert severity="info">
                 <Stack spacing={1}>
@@ -914,11 +1169,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                       {toughnessValue && target && (
                         <Typography variant="body2">
                           <strong>
-                            Smackdown{" "}
-                            {parseInt(finalDamage)}{" "}
-                            - Toughness {parseInt(toughnessValue) || 0} ={" "}
+                            Smackdown {parseInt(finalDamage)} - Toughness{" "}
+                            {parseInt(toughnessValue) || 0} ={" "}
                             {CS.calculateWounds(
-                              target as Character,
+                              target,
                               parseInt(finalDamage),
                               parseInt(toughnessValue) || 0
                             )}{" "}
