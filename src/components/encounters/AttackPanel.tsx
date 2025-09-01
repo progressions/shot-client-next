@@ -460,6 +460,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       updateFields({
         defenseValue: "0",
         toughnessValue: "0",
+        manualDefensePerTarget: {},  // Clear manual overrides
       })
       return
     }
@@ -471,6 +472,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     if (targetIds.length === 1) {
       // Single target - show actual defense and toughness
       const target = targets[0]
+      const targetId = targetIds[0]
       if (target) {
         let defense = CS.defense(target)
         
@@ -480,9 +482,15 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         }
         
         if (includeStunt) defense += 2  // Add stunt modifier
+        
+        // Update both the main defense value and clear any manual override for this target
         updateFields({
           defenseValue: defense.toString(),
           toughnessValue: CS.toughness(target).toString(),
+          manualDefensePerTarget: {
+            ...manualDefensePerTarget,
+            [targetId]: defense.toString(),  // Set the calculated value as the manual override
+          },
         })
       }
     } else {
@@ -592,8 +600,39 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       manualDefensePerTarget: {},
       manualToughnessPerTarget: {},
       totalAttackingMooks: totalMooks,
+      multiTargetResults: {},  // Clear multi-target results
+      showMultiTargetResults: false,  // Hide multi-target results display
     })
   }, [attackerShotId, allShots])
+  
+  // Clear attack results when targets change
+  useEffect(() => {
+    // Clear all attack-related results when targets change
+    updateFields({
+      swerve: "",
+      finalDamage: "",
+      mookRolls: [],
+      showMookRolls: false,
+      multiTargetResults: {},
+      showMultiTargetResults: false,
+    })
+    
+    // Update defense and toughness for new targets
+    if (selectedTargetIds.length > 0) {
+      updateDefenseAndToughness(selectedTargetIds, formState.data.stunt)
+      
+      // If attacker is a mook, distribute mooks among the new targets
+      if (attacker && CS.isMook(attacker)) {
+        distributeMooks(selectedTargetIds)
+      }
+    } else {
+      // Clear mook distribution when no targets selected
+      updateFields({
+        mookDistribution: {},
+        totalAttackingMooks: 0,
+      })
+    }
+  }, [selectedTargetIds, targetShotId])
 
   const handleRollMookAttacks = () => {
     if (!attacker || !CS.isMook(attacker)) return
@@ -1240,28 +1279,88 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                             width="80px"
                             error={false}
                             onChange={e => {
-                              const newValue = parseInt(e.target.value) || 0
-                              const newDistribution = {
-                                ...mookDistribution,
-                                [id]: newValue
+                              const newValue = Math.max(0, parseInt(e.target.value) || 0)
+                              const totalMooksAvailable = attacker?.count || 0
+                              
+                              // If there are exactly 2 targets, auto-adjust the other one
+                              if (selectedTargetIds.length === 2) {
+                                const otherId = selectedTargetIds.find(tid => tid !== id)
+                                if (!otherId) return
+                                
+                                // Ensure we don't exceed total mooks
+                                const finalValue = Math.min(newValue, totalMooksAvailable)
+                                const remainingMooks = Math.max(0, totalMooksAvailable - finalValue)
+                                
+                                updateField("mookDistribution", {
+                                  [id]: finalValue,
+                                  [otherId]: remainingMooks
+                                })
+                                updateField("totalAttackingMooks", totalMooksAvailable)
+                              } else {
+                                // For more than 2 targets, just update this one
+                                const otherTargetIds = selectedTargetIds.filter(tid => tid !== id)
+                                const otherMooks = otherTargetIds.reduce((sum, tid) => 
+                                  sum + (mookDistribution[tid] || 0), 0
+                                )
+                                
+                                // Ensure we don't exceed total mooks
+                                const maxForThisTarget = totalMooksAvailable - otherMooks
+                                const finalValue = Math.min(newValue, maxForThisTarget)
+                                
+                                const newDistribution = {
+                                  ...mookDistribution,
+                                  [id]: finalValue
+                                }
+                                const newTotal = Object.values(newDistribution).reduce((sum, val) => sum + val, 0)
+                                
+                                updateField("mookDistribution", newDistribution)
+                                updateField("totalAttackingMooks", newTotal)
                               }
-                              const newTotal = Object.values(newDistribution).reduce((sum, val) => sum + val, 0)
-                              updateFields({
-                                mookDistribution: newDistribution,
-                                totalAttackingMooks: newTotal,
-                              })
                             }}
                             onBlur={e => {
-                              const newValue = parseInt(e.target.value) || 0
-                              const newDistribution = {
-                                ...mookDistribution,
-                                [id]: newValue
+                              // onBlur is already handled by onChange for NumberField buttons
+                              // Only process if this is a real blur event (not from buttons)
+                              if (e.relatedTarget?.closest('.MuiIconButton-root')) {
+                                return // Skip if blur was caused by clicking increment/decrement buttons
                               }
-                              const newTotal = Object.values(newDistribution).reduce((sum, val) => sum + val, 0)
-                              updateFields({
-                                mookDistribution: newDistribution,
-                                totalAttackingMooks: newTotal,
-                              })
+                              
+                              const newValue = Math.max(0, parseInt(e.target.value) || 0)
+                              const totalMooksAvailable = attacker?.count || 0
+                              
+                              // If there are exactly 2 targets, auto-adjust the other one
+                              if (selectedTargetIds.length === 2) {
+                                const otherId = selectedTargetIds.find(tid => tid !== id)
+                                if (!otherId) return
+                                
+                                // Ensure we don't exceed total mooks
+                                const finalValue = Math.min(newValue, totalMooksAvailable)
+                                const remainingMooks = Math.max(0, totalMooksAvailable - finalValue)
+                                
+                                updateField("mookDistribution", {
+                                  [id]: finalValue,
+                                  [otherId]: remainingMooks
+                                })
+                                updateField("totalAttackingMooks", totalMooksAvailable)
+                              } else {
+                                // For more than 2 targets, just update this one
+                                const otherTargetIds = selectedTargetIds.filter(tid => tid !== id)
+                                const otherMooks = otherTargetIds.reduce((sum, tid) => 
+                                  sum + (mookDistribution[tid] || 0), 0
+                                )
+                                
+                                // Ensure we don't exceed total mooks
+                                const maxForThisTarget = totalMooksAvailable - otherMooks
+                                const finalValue = Math.min(newValue, maxForThisTarget)
+                                
+                                const newDistribution = {
+                                  ...mookDistribution,
+                                  [id]: finalValue
+                                }
+                                const newTotal = Object.values(newDistribution).reduce((sum, val) => sum + val, 0)
+                                
+                                updateField("mookDistribution", newDistribution)
+                                updateField("totalAttackingMooks", newTotal)
+                              }
                             }}
                           />
                           <Typography variant="caption" sx={{ mt: 0.5 }}>
@@ -1327,12 +1426,12 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
                           {/* Count field for mooks when non-mook is attacking */}
                           {CS.isMook(char) && !CS.isMook(attacker) && (
-                            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "60px" }}>
+                            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "80px" }}>
                               <NumberField
                                 name={`count-${id}`}
                                 value={targetMookCount}
                                 size="small"
-                                width="60px"
+                                width="80px"
                                 error={false}
                                 disabled={false}
                                 onChange={(e) => {
@@ -1596,13 +1695,31 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                         checked={stunt}
                         onChange={e => {
                           const newStunt = e.target.checked
+                          // Clear all manual defense overrides and defense choices when stunt changes
                           updateFields({
                             stunt: newStunt,
                             manualDefensePerTarget: {},
+                            defenseChoicePerTarget: {},
+                            fortuneDiePerTarget: {},
+                            defenseAppliedPerTarget: {},
                           })
                           // Recalculate defense with stunt modifier
                           if (selectedTargetIds.length > 0) {
                             updateDefenseAndToughness(selectedTargetIds, newStunt)
+                          } else if (targetShotId) {
+                            // For backward compatibility with single target
+                            const target = allShots.find(s => s.character?.shot_id === targetShotId)?.character
+                            if (target) {
+                              let defense = CS.defense(target)
+                              if (CS.isMook(target) && !CS.isMook(attacker) && targetMookCount > 1) {
+                                defense += targetMookCount
+                              }
+                              if (newStunt) defense += 2
+                              updateFields({
+                                defenseValue: defense.toString(),
+                                toughnessValue: CS.toughness(target).toString(),
+                              })
+                            }
                           }
                         }}
                         disabled={!target && selectedTargetIds.length === 0}
