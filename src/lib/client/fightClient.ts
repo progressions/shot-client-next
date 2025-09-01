@@ -101,27 +101,29 @@ export function createFightClient(deps: ClientDependencies) {
     })
   }
 
-  async function updateCombatState(
+  async function applyCombatAction(
     fight: Fight | string,
-    shotId: string,
-    wounds?: number,
-    count?: number,
-    impairments?: number,
-    event?: {
-      type: string
-      description: string
-      details?: Record<string, unknown>
-    },
-    fortune?: number
+    characterUpdates: Array<{
+      shot_id?: string
+      character_id?: string
+      vehicle_id?: string
+      shot?: number
+      wounds?: number
+      count?: number
+      impairments?: number
+      defense?: number
+      action_values?: Record<string, number>
+      attributes?: Record<string, any>
+      event?: {
+        type: string
+        description: string
+        details?: Record<string, unknown>
+      }
+    }>
   ): Promise<AxiosResponse<Encounter>> {
     const fightId = typeof fight === "string" ? fight : fight.id
-    return post(`${apiV2.encounters()}/${fightId}/update_combat_state`, {
-      shot_id: shotId,
-      wounds,
-      count,
-      impairments,
-      event,
-      fortune,
+    return post(`${apiV2.encounters()}/${fightId}/apply_combat_action`, {
+      character_updates: characterUpdates,
     })
   }
 
@@ -136,6 +138,6 @@ export function createFightClient(deps: ClientDependencies) {
     getFightEvents,
     createFightEvent,
     spendShots,
-    updateCombatState,
+    applyCombatAction,
   }
 }

@@ -44,16 +44,16 @@ export const sortAttackerShots = (shots: Shot[]): Shot[] => {
 /**
  * Sort shots for target selection based on attacker type
  */
-export const sortTargetShots = (shots: Shot[], attacker: Character | undefined): Shot[] => {
+export const sortTargetShots = (
+  shots: Shot[],
+  attacker: Character | undefined
+): Shot[] => {
   if (!attacker) return shots
 
   const attackerType = CS.type(attacker)
-  const isNPCAttacker = [
-    "Mook",
-    "Featured Foe",
-    "Boss",
-    "Uber-Boss",
-  ].includes(attackerType)
+  const isNPCAttacker = ["Mook", "Featured Foe", "Boss", "Uber-Boss"].includes(
+    attackerType
+  )
 
   if (!isNPCAttacker) {
     // If attacker is not an NPC, return normal order
@@ -94,7 +94,7 @@ export const sortTargetShots = (shots: Shot[], attacker: Character | undefined):
 export const getAllVisibleShots = (encounterShots: unknown[]): Shot[] => {
   const shots: Shot[] = []
   let index = 0
-  
+
   encounterShots.forEach(shotGroupUnknown => {
     const shotGroup = shotGroupUnknown as Record<string, unknown>
     // Only include if shot value is not null (not hidden)
@@ -112,6 +112,6 @@ export const getAllVisibleShots = (encounterShots: unknown[]): Shot[] => {
       }
     }
   })
-  
+
   return shots
 }

@@ -1,6 +1,8 @@
 "use client"
 import EntityLink from "./EntityLink"
 import dynamic from "next/dynamic"
+import { decodeHtmlEntities } from "@/lib/textUtils"
+import type { Weapon } from "@/types"
 
 const WeaponPopup = dynamic(() => import("@/components/popups/WeaponPopup"), {
   ssr: false,
@@ -29,7 +31,7 @@ export default function WeaponLink({
       popupOverride={WeaponPopup}
       sx={sx}
     >
-      {children || weapon.name}
+      {children || decodeHtmlEntities(weapon.name)}
     </EntityLink>
   )
 }

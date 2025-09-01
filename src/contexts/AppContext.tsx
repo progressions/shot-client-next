@@ -415,13 +415,13 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         })
       }
     })
-    
+
     // Clear processed data after a short delay to prevent memory buildup
     // but long enough to ensure all components have processed it
     const timer = setTimeout(() => {
       setCampaignData(null)
     }, 1000)
-    
+
     return () => clearTimeout(timer)
   }, [campaignData])
 

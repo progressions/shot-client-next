@@ -4,7 +4,7 @@ import type { FormStateType, FormStateAction } from "@/reducers"
 /**
  * Defense choice options for targets
  */
-export type DefenseChoice = 'none' | 'dodge' | 'fortune'
+export type DefenseChoice = "none" | "dodge" | "fortune"
 
 /**
  * Form data for attack resolution
@@ -108,7 +108,10 @@ export interface TargetSectionProps {
   attackerShotId: string
   updateField: (name: keyof AttackFormData, value: unknown) => void
   updateFields: (updates: Partial<AttackFormData>) => void
-  updateDefenseAndToughness: (targetIds: string[], includeStunt: boolean) => void
+  updateDefenseAndToughness: (
+    targetIds: string[],
+    includeStunt: boolean
+  ) => void
   distributeMooks: (targetIds: string[]) => void
   calculateTargetDefense: (target: Character, targetId: string) => number
 }
@@ -131,7 +134,10 @@ export interface TargetDefenseDisplayProps {
   calculateTargetDefense: (target: Character, targetId: string) => number
   updateField: (name: string, value: unknown) => void
   updateFields: (updates: Partial<AttackFormData>) => void
-  updateDefenseAndToughness: (targetIds: string[], includeStunt: boolean) => void
+  updateDefenseAndToughness: (
+    targetIds: string[],
+    includeStunt: boolean
+  ) => void
 }
 
 /**
@@ -184,7 +190,11 @@ export interface AttackResultsProps {
   defenseValue: string
   weaponDamage: string
   defenseChoicePerTarget: { [targetId: string]: DefenseChoice }
-  calculateEffectiveAttackValue: (attacker: Character | undefined, weapons: Weapon[], allShots: Shot[]) => number
+  calculateEffectiveAttackValue: (
+    attacker: Character | undefined,
+    weapons: Weapon[],
+    allShots: Shot[]
+  ) => number
   calculateTargetDefense: (target: Character, targetId: string) => number
 }
 

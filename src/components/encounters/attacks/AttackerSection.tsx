@@ -11,10 +11,7 @@ import {
   Stack,
 } from "@mui/material"
 import { CS } from "@/services"
-import type {
-  AttackFormData,
-  AttackerSectionProps
-} from "@/types"
+import type { AttackFormData, AttackerSectionProps } from "@/types"
 import { FormActions } from "@/reducers"
 import { NumberField } from "@/components/ui"
 import CharacterSelector from "../CharacterSelector"
@@ -46,20 +43,23 @@ export default function AttackerSection({
       value,
     })
   }
-  
+
   // Check if any selected targets are mooks
   const targetingMooks = selectedTargetIds.some(id => {
     const shot = allShots.find(s => s.character?.shot_id === id)
     return shot?.character && CS.isMook(shot.character)
   })
-  
+
   // Get the selected weapon's mook bonus (only show if targeting mooks)
-  const selectedWeapon = attackerWeapons.find(w => w.id?.toString() === selectedWeaponId)
-  const weaponMookBonus = targetingMooks && selectedWeapon?.mook_bonus ? selectedWeapon.mook_bonus : 0
-  
+  const selectedWeapon = attackerWeapons.find(
+    w => w.id?.toString() === selectedWeaponId
+  )
+  const weaponMookBonus =
+    targetingMooks && selectedWeapon?.mook_bonus ? selectedWeapon.mook_bonus : 0
+
   // Track previous targeting state to detect changes
   const prevTargetingMooks = useRef(targetingMooks)
-  
+
   // Update attack value when targeting mooks changes
   useEffect(() => {
     if (prevTargetingMooks.current !== targetingMooks && selectedWeapon) {
@@ -77,11 +77,11 @@ export default function AttackerSection({
     }
     prevTargetingMooks.current = targetingMooks
   }, [targetingMooks, selectedWeapon, attackValue])
-  
+
   // Get attack skills for the selected attacker
   const attackOptions = useMemo(() => {
     if (!attacker || !("action_values" in attacker)) return []
-    
+
     const mainAttack = CS.mainAttack(attacker)
     const mainValue = CS.actionValue(attacker, mainAttack)
     const secondaryAttack = CS.secondaryAttack(attacker)
@@ -110,27 +110,19 @@ export default function AttackerSection({
       </Typography>
 
       {/* Avatar Selection and Shot Cost on same line */}
-      <Stack
-        direction="row"
-        spacing={2}
-        alignItems="flex-start"
-        sx={{ mb: 3 }}
-      >
+      <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ mb: 3 }}>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <CharacterSelector
             shots={sortedAttackerShots}
             selectedShotId={attackerShotId}
-            onSelect={(shotId) => updateField("attackerShotId", shotId)}
+            onSelect={shotId => updateField("attackerShotId", shotId)}
             borderColor="primary.main"
           />
         </Box>
 
         {/* Shot Cost */}
         <Box sx={{ flexShrink: 0 }}>
-          <Typography
-            variant="caption"
-            sx={{ display: "block", mb: 0.5 }}
-          >
+          <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
             Shot Cost
           </Typography>
           <NumberField
@@ -155,10 +147,7 @@ export default function AttackerSection({
           >
             {/* Attack Skill Block */}
             <Box sx={{ width: "50%" }}>
-              <Typography
-                variant="body2"
-                sx={{ mb: 2, fontWeight: "medium" }}
-              >
+              <Typography variant="body2" sx={{ mb: 2, fontWeight: "medium" }}>
                 Attack Skill
               </Typography>
               <Stack direction="row" spacing={1} alignItems="flex-start">
@@ -196,10 +185,7 @@ export default function AttackerSection({
                     label="Attack Skill"
                   >
                     {attackOptions.map(option => (
-                      <MenuItem
-                        key={option.skill}
-                        value={option.skill}
-                      >
+                      <MenuItem key={option.skill} value={option.skill}>
                         {option.skill} ({option.value})
                       </MenuItem>
                     ))}
@@ -207,26 +193,26 @@ export default function AttackerSection({
                   {/* Display attack modifiers */}
                   <Box sx={{ ml: 1.75 }}>
                     {weaponMookBonus > 0 && (
-                      <Typography 
-                        variant="caption" 
-                        sx={{ 
-                          display: "block", 
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: "block",
                           mt: 0.5,
                           color: "text.secondary",
-                          fontStyle: "italic"
+                          fontStyle: "italic",
                         }}
                       >
                         +{weaponMookBonus} vs mooks
                       </Typography>
                     )}
                     {attacker && attacker.impairments > 0 && (
-                      <Typography 
-                        variant="caption" 
-                        sx={{ 
-                          display: "block", 
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: "block",
                           mt: 0.5,
                           color: "text.secondary",
-                          fontStyle: "italic"
+                          fontStyle: "italic",
                         }}
                       >
                         -{attacker.impairments} impairment
@@ -239,10 +225,7 @@ export default function AttackerSection({
 
             {/* Damage and Weapon Block */}
             <Box sx={{ width: "50%" }}>
-              <Typography
-                variant="body2"
-                sx={{ mb: 2, fontWeight: "medium" }}
-              >
+              <Typography variant="body2" sx={{ mb: 2, fontWeight: "medium" }}>
                 Damage
               </Typography>
               <Stack direction="row" spacing={1} alignItems="flex-start">
@@ -268,9 +251,12 @@ export default function AttackerSection({
                         updateField("weaponDamage", damage.toString())
                         // Remove mook bonus when switching to unarmed (if targeting mooks)
                         if (targetingMooks) {
-                          const oldWeapon = attackerWeapons.find(w => w.id?.toString() === selectedWeaponId)
+                          const oldWeapon = attackerWeapons.find(
+                            w => w.id?.toString() === selectedWeaponId
+                          )
                           const oldBonus = oldWeapon?.mook_bonus || 0
-                          const baseAttackValue = parseInt(attackValue) - oldBonus
+                          const baseAttackValue =
+                            parseInt(attackValue) - oldBonus
                           updateField("attackValue", baseAttackValue.toString())
                         }
                       } else {
@@ -281,12 +267,18 @@ export default function AttackerSection({
                           updateField("weaponDamage", weapon.damage.toString())
                           // Update attack value with new weapon's mook bonus (only if targeting mooks)
                           if (targetingMooks) {
-                            const oldWeapon = attackerWeapons.find(w => w.id?.toString() === selectedWeaponId)
+                            const oldWeapon = attackerWeapons.find(
+                              w => w.id?.toString() === selectedWeaponId
+                            )
                             const oldBonus = oldWeapon?.mook_bonus || 0
                             const newBonus = weapon.mook_bonus || 0
-                            const baseAttackValue = parseInt(attackValue) - oldBonus
+                            const baseAttackValue =
+                              parseInt(attackValue) - oldBonus
                             const newAttackValue = baseAttackValue + newBonus
-                            updateField("attackValue", newAttackValue.toString())
+                            updateField(
+                              "attackValue",
+                              newAttackValue.toString()
+                            )
                           }
                         }
                       }
@@ -301,35 +293,46 @@ export default function AttackerSection({
                         key={weapon.id}
                         value={weapon.id?.toString() || ""}
                       >
-                        {weapon.name} ({weapon.damage}/{weapon.concealment}/{weapon.reload_value || "-"})
-                        {weapon.mook_bonus > 0 && ` [+${weapon.mook_bonus} vs mooks]`}
+                        {weapon.name} ({weapon.damage}/{weapon.concealment}/
+                        {weapon.reload_value || "-"})
+                        {weapon.mook_bonus > 0 &&
+                          ` [+${weapon.mook_bonus} vs mooks]`}
                       </MenuItem>
                     ))}
                   </Select>
                   {/* Display selected weapon stats */}
-                  {selectedWeaponId && selectedWeaponId !== "unarmed" && (() => {
-                    const weapon = attackerWeapons.find(w => w.id?.toString() === selectedWeaponId)
-                    if (weapon) {
-                      const attrs = `(${weapon.damage}/${weapon.concealment}/${weapon.reload_value || "-"})`
-                      const mookBonus = weapon.mook_bonus && weapon.mook_bonus > 0 ? `, +${weapon.mook_bonus} vs mooks` : ""
-                      const kachunk = weapon.kachunk ? ", kachunk!" : ""
-                      return (
-                        <Typography 
-                          variant="caption" 
-                          sx={{ 
-                            display: "block", 
-                            mt: 0.5, 
-                            ml: 1.75,
-                            color: "text.secondary",
-                            fontStyle: "italic"
-                          }}
-                        >
-                          {attrs}{mookBonus}{kachunk}
-                        </Typography>
+                  {selectedWeaponId &&
+                    selectedWeaponId !== "unarmed" &&
+                    (() => {
+                      const weapon = attackerWeapons.find(
+                        w => w.id?.toString() === selectedWeaponId
                       )
-                    }
-                    return null
-                  })()}
+                      if (weapon) {
+                        const attrs = `(${weapon.damage}/${weapon.concealment}/${weapon.reload_value || "-"})`
+                        const mookBonus =
+                          weapon.mook_bonus && weapon.mook_bonus > 0
+                            ? `, +${weapon.mook_bonus} vs mooks`
+                            : ""
+                        const kachunk = weapon.kachunk ? ", kachunk!" : ""
+                        return (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              display: "block",
+                              mt: 0.5,
+                              ml: 1.75,
+                              color: "text.secondary",
+                              fontStyle: "italic",
+                            }}
+                          >
+                            {attrs}
+                            {mookBonus}
+                            {kachunk}
+                          </Typography>
+                        )
+                      }
+                      return null
+                    })()}
                 </FormControl>
               </Stack>
             </Box>

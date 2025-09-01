@@ -1,16 +1,9 @@
 "use client"
 
-import {
-  Box,
-  Button,
-  Stack,
-  Typography,
-} from "@mui/material"
+import { Box, Button, Stack, Typography } from "@mui/material"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { CS } from "@/services"
-import type {
-  CombatResolutionProps
-} from "@/types"
+import type { CombatResolutionProps } from "@/types"
 import { NumberField } from "@/components/ui"
 
 export default function CombatResolution({
@@ -27,9 +20,11 @@ export default function CombatResolution({
   handleApplyDamage,
 }: CombatResolutionProps) {
   // Get single target if applicable
-  const target = selectedTargetIds.length === 1 
-    ? allShots.find(s => s.character?.shot_id === selectedTargetIds[0])?.character 
-    : undefined
+  const target =
+    selectedTargetIds.length === 1
+      ? allShots.find(s => s.character?.shot_id === selectedTargetIds[0])
+          ?.character
+      : undefined
 
   return (
     <Stack
@@ -73,37 +68,40 @@ export default function CombatResolution({
       </Box>
 
       {/* Final Damage Override - Show for single non-mook target */}
-      {selectedTargetIds.length === 1 && (() => {
-        const targetShot = allShots.find(s => s.character?.shot_id === selectedTargetIds[0])
-        const targetChar = targetShot?.character
-        // Only show Smackdown for non-mooks
-        return targetChar && !CS.isMook(targetChar) ? (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              minWidth: { xs: "80px", sm: "auto" },
-            }}
-          >
-            <Typography
-              variant="caption"
-              sx={{ mb: 0.5, fontSize: { xs: "0.7rem", sm: "0.75rem" } }}
+      {selectedTargetIds.length === 1 &&
+        (() => {
+          const targetShot = allShots.find(
+            s => s.character?.shot_id === selectedTargetIds[0]
+          )
+          const targetChar = targetShot?.character
+          // Only show Smackdown for non-mooks
+          return targetChar && !CS.isMook(targetChar) ? (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                minWidth: { xs: "80px", sm: "auto" },
+              }}
             >
-              Smackdown
-            </Typography>
-            <NumberField
-              name="finalDamage"
-              value={parseInt(finalDamage) || 0}
-              size="large"
-              width="120px"
-              error={false}
-              onChange={e => updateField("finalDamage", e.target.value)}
-              onBlur={e => updateField("finalDamage", e.target.value)}
-            />
-          </Box>
-        ) : null
-      })()}
+              <Typography
+                variant="caption"
+                sx={{ mb: 0.5, fontSize: { xs: "0.7rem", sm: "0.75rem" } }}
+              >
+                Smackdown
+              </Typography>
+              <NumberField
+                name="finalDamage"
+                value={parseInt(finalDamage) || 0}
+                size="large"
+                width="120px"
+                error={false}
+                onChange={e => updateField("finalDamage", e.target.value)}
+                onBlur={e => updateField("finalDamage", e.target.value)}
+              />
+            </Box>
+          ) : null
+        })()}
 
       {/* Apply Damage Button */}
       <Box
@@ -122,7 +120,11 @@ export default function CombatResolution({
           variant="contained"
           color="primary"
           onClick={handleApplyDamage}
-          disabled={(!target && selectedTargetIds.length === 0) || (!finalDamage && !showMultiTargetResults) || isProcessing}
+          disabled={
+            (!target && selectedTargetIds.length === 0) ||
+            (!finalDamage && !showMultiTargetResults) ||
+            isProcessing
+          }
           size="large"
           startIcon={<CheckCircleIcon />}
           sx={{
@@ -144,10 +146,10 @@ export default function CombatResolution({
             }}
           >
             {showMultiTargetResults && multiTargetResults.length > 0
-              ? `Apply wounds to ${multiTargetResults.length} ${multiTargetResults.length === 1 ? 'target' : 'targets'}, spend ${shotCost} ${parseInt(shotCost) === 1 ? 'shot' : 'shots'}`
+              ? `Apply wounds to ${multiTargetResults.length} ${multiTargetResults.length === 1 ? "target" : "targets"}, spend ${shotCost} ${parseInt(shotCost) === 1 ? "shot" : "shots"}`
               : parseInt(finalDamage) > 0
-              ? `Apply ${finalDamage} ${parseInt(finalDamage) === 1 ? 'wound' : 'wounds'}, spend ${shotCost} ${parseInt(shotCost) === 1 ? 'shot' : 'shots'}`
-              : `Spend ${shotCost} ${parseInt(shotCost) === 1 ? 'shot' : 'shots'}`}
+                ? `Apply ${finalDamage} ${parseInt(finalDamage) === 1 ? "wound" : "wounds"}, spend ${shotCost} ${parseInt(shotCost) === 1 ? "shot" : "shots"}`
+                : `Spend ${shotCost} ${parseInt(shotCost) === 1 ? "shot" : "shots"}`}
           </Typography>
         )}
       </Box>

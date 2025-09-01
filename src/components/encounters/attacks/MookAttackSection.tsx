@@ -1,18 +1,9 @@
 "use client"
 
-import {
-  Box,
-  Button,
-  Stack,
-  Typography,
-  Alert,
-  Divider,
-} from "@mui/material"
+import { Box, Button, Stack, Typography, Alert, Divider } from "@mui/material"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { CS } from "@/services"
-import type {
-  MookAttackSectionProps
-} from "@/types"
+import type { MookAttackSectionProps } from "@/types"
 import { NumberField } from "@/components/ui"
 
 export default function MookAttackSection({
@@ -31,17 +22,19 @@ export default function MookAttackSection({
   handleApplyDamage,
 }: MookAttackSectionProps) {
   if (!attacker || !CS.isMook(attacker)) return null
-  
+
   // For backward compatibility with single target
-  const target = selectedTargetIds[0] ? allShots.find(s => s.character?.shot_id === selectedTargetIds[0])?.character : undefined
-  
+  const target = selectedTargetIds[0]
+    ? allShots.find(s => s.character?.shot_id === selectedTargetIds[0])
+        ?.character
+    : undefined
+
   return (
     <>
       {/* Mook Attack Resolution */}
       <Stack spacing={2} alignItems="center">
         <Typography variant="body2" sx={{ textAlign: "center" }}>
-          {totalAttackingMooks || attacker.count || 0} mooks
-          attacking
+          {totalAttackingMooks || attacker.count || 0} mooks attacking
         </Typography>
 
         <Button
@@ -66,18 +59,32 @@ export default function MookAttackSection({
           >
             <Stack spacing={2}>
               {mookRolls.map((targetGroup, groupIndex) => {
-                const targetShot = allShots.find(s => s.character?.shot_id === targetGroup.targetId)
+                const targetShot = allShots.find(
+                  s => s.character?.shot_id === targetGroup.targetId
+                )
                 const targetChar = targetShot?.character
                 const targetDefense = targetChar ? CS.defense(targetChar) : 0
-                const targetToughness = targetChar ? CS.toughness(targetChar) : 0
+                const targetToughness = targetChar
+                  ? CS.toughness(targetChar)
+                  : 0
                 const hits = targetGroup.rolls.filter(r => r.hit).length
-                const totalWounds = targetGroup.rolls.reduce((sum, r) => sum + r.wounds, 0)
-                
+                const totalWounds = targetGroup.rolls.reduce(
+                  (sum, r) => sum + r.wounds,
+                  0
+                )
+
                 return (
                   <Alert key={groupIndex} severity="info" sx={{ pb: 1 }}>
-                    <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
-                      Attacking {targetGroup.targetName} 
-                      ({targetGroup.rolls.length} mooks, DV {targetDefense}{CS.isMook(targetChar) ? "" : `, Toughness ${targetToughness}`})
+                    <Typography
+                      variant="body2"
+                      sx={{ mb: 1, fontWeight: "bold" }}
+                    >
+                      Attacking {targetGroup.targetName}(
+                      {targetGroup.rolls.length} mooks, DV {targetDefense}
+                      {CS.isMook(targetChar)
+                        ? ""
+                        : `, Toughness ${targetToughness}`}
+                      )
                     </Typography>
                     <Stack spacing={0.5} sx={{ mb: 1 }}>
                       {targetGroup.rolls.map((roll, index) => (
@@ -91,7 +98,11 @@ export default function MookAttackSection({
                           {targetDefense} ={" "}
                           {roll.hit ? (
                             <span style={{ color: "#4caf50" }}>
-                              Hit! ({CS.isMook(targetChar) ? `${roll.wounds} mook eliminated` : `${roll.wounds} wounds`})
+                              Hit! (
+                              {CS.isMook(targetChar)
+                                ? `${roll.wounds} mook eliminated`
+                                : `${roll.wounds} wounds`}
+                              )
                             </span>
                           ) : (
                             <span style={{ color: "#f44336" }}>Miss</span>
@@ -102,25 +113,39 @@ export default function MookAttackSection({
                     <Divider sx={{ my: 1 }} />
                     <Typography variant="body2">
                       <strong>
-                        {targetGroup.targetName}: {hits}/{targetGroup.rolls.length} hits, {totalWounds} {CS.isMook(targetChar) ? "mooks eliminated" : "wounds total"}
+                        {targetGroup.targetName}: {hits}/
+                        {targetGroup.rolls.length} hits, {totalWounds}{" "}
+                        {CS.isMook(targetChar)
+                          ? "mooks eliminated"
+                          : "wounds total"}
                       </strong>
                     </Typography>
                   </Alert>
                 )
               })}
-              
+
               {/* Per-Target Wounds Summary */}
               {mookRolls.length > 0 && (
-                <Alert severity="warning" sx={{ position: 'sticky', bottom: 0, zIndex: 1 }}>
-                  <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                <Alert
+                  severity="warning"
+                  sx={{ position: "sticky", bottom: 0, zIndex: 1 }}
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: "bold", mb: 1 }}
+                  >
                     Wounds to Apply:
                   </Typography>
                   <Stack spacing={0.5}>
-                    {mookRolls.map((targetGroup) => {
-                      const totalWounds = targetGroup.rolls.reduce((sum, r) => sum + r.wounds, 0)
+                    {mookRolls.map(targetGroup => {
+                      const totalWounds = targetGroup.rolls.reduce(
+                        (sum, r) => sum + r.wounds,
+                        0
+                      )
                       return (
                         <Typography key={targetGroup.targetId} variant="body2">
-                          <strong>{targetGroup.targetName}:</strong> {totalWounds} wounds
+                          <strong>{targetGroup.targetName}:</strong>{" "}
+                          {totalWounds} wounds
                         </Typography>
                       )
                     })}
@@ -196,7 +221,9 @@ export default function MookAttackSection({
               variant="contained"
               color="primary"
               onClick={handleApplyDamage}
-              disabled={selectedTargetIds.length === 0 || !showMookRolls || isProcessing}
+              disabled={
+                selectedTargetIds.length === 0 || !showMookRolls || isProcessing
+              }
               size="large"
               startIcon={<CheckCircleIcon />}
               sx={{ px: 3 }}

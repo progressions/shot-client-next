@@ -81,9 +81,9 @@ const Avatar = ({
   }
 
   // Check if entity has impairments (Character or Vehicle types)
-  const impairments = 
-    ("impairments" in entity && typeof entity.impairments === "number") 
-      ? entity.impairments 
+  const impairments =
+    "impairments" in entity && typeof entity.impairments === "number"
+      ? entity.impairments
       : 0
 
   const avatarElement = (
@@ -106,9 +106,7 @@ const Avatar = ({
   )
 
   const baseAvatar = (
-    <ImpairmentBadge impairments={impairments}>
-      {avatarElement}
-    </ImpairmentBadge>
+    <ImpairmentBadge impairments={impairments}>{avatarElement}</ImpairmentBadge>
   )
 
   const avatarWithViewer = (

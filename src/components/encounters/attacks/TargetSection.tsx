@@ -8,9 +8,7 @@ import {
   Checkbox,
 } from "@mui/material"
 import { CS } from "@/services"
-import type {
-  TargetSectionProps
-} from "@/types"
+import type { TargetSectionProps } from "@/types"
 import { NumberField } from "@/components/ui"
 import CharacterSelector from "../CharacterSelector"
 import TargetDefenseDisplay from "./TargetDefenseDisplay"
@@ -26,38 +24,42 @@ const updateMookDistribution = (
   updateField: (name: string, value: unknown) => void
 ) => {
   const validValue = Math.max(0, newValue)
-  
+
   // If there are exactly 2 targets, auto-adjust the other one
   if (selectedTargetIds.length === 2) {
     const otherId = selectedTargetIds.find(tid => tid !== targetId)
     if (!otherId) return
-    
+
     // Ensure we don't exceed total mooks
     const finalValue = Math.min(validValue, totalMooksAvailable)
     const remainingMooks = Math.max(0, totalMooksAvailable - finalValue)
-    
+
     updateField("mookDistribution", {
       [targetId]: finalValue,
-      [otherId]: remainingMooks
+      [otherId]: remainingMooks,
     })
     updateField("totalAttackingMooks", totalMooksAvailable)
   } else {
     // For more than 2 targets, just update this one
     const otherTargetIds = selectedTargetIds.filter(tid => tid !== targetId)
-    const otherMooks = otherTargetIds.reduce((sum, tid) => 
-      sum + (mookDistribution[tid] || 0), 0
+    const otherMooks = otherTargetIds.reduce(
+      (sum, tid) => sum + (mookDistribution[tid] || 0),
+      0
     )
-    
+
     // Ensure we don't exceed total mooks
     const maxForThisTarget = totalMooksAvailable - otherMooks
     const finalValue = Math.min(validValue, maxForThisTarget)
-    
+
     const newDistribution = {
       ...mookDistribution,
-      [targetId]: finalValue
+      [targetId]: finalValue,
     }
-    const newTotal = Object.values(newDistribution).reduce((sum, val) => sum + val, 0)
-    
+    const newTotal = Object.values(newDistribution).reduce(
+      (sum, val) => sum + val,
+      0
+    )
+
     updateField("mookDistribution", newDistribution)
     updateField("totalAttackingMooks", newTotal)
   }
@@ -105,33 +107,40 @@ export default function TargetSection({
         borderBottomColor: "divider",
       }}
     >
-      <Typography
-        variant="h6"
-        gutterBottom
-        sx={{ mb: 2, color: "error.main" }}
-      >
-        🎯 Target{selectedTargetIds.length > 1 ? "s" : ""} {selectedTargetIds.length > 0 && `(${selectedTargetIds.length})`}
+      <Typography variant="h6" gutterBottom sx={{ mb: 2, color: "error.main" }}>
+        🎯 Target{selectedTargetIds.length > 1 ? "s" : ""}{" "}
+        {selectedTargetIds.length > 0 && `(${selectedTargetIds.length})`}
       </Typography>
 
       {/* Multi-select Target Selection */}
       <CharacterSelector
         shots={sortedTargetShots}
         selectedShotIds={selectedTargetIds}
-        onSelect={(shotId) => {
+        onSelect={shotId => {
           if (selectedTargetIds.includes(shotId)) {
             // Deselect if already selected
             const newIds = selectedTargetIds.filter(id => id !== shotId)
             updateField("selectedTargetIds", newIds)
-            
+
             // Reset the mook count for the deselected target
-            const deselectedShot = allShots.find(s => s.character?.shot_id === shotId)
-            if (deselectedShot?.character && CS.isMook(deselectedShot.character)) {
+            const deselectedShot = allShots.find(
+              s => s.character?.shot_id === shotId
+            )
+            if (
+              deselectedShot?.character &&
+              CS.isMook(deselectedShot.character)
+            ) {
               // Remove the count for this specific mook
-              const newTargetMookCountPerTarget = { ...targetMookCountPerTarget }
+              const newTargetMookCountPerTarget = {
+                ...targetMookCountPerTarget,
+              }
               delete newTargetMookCountPerTarget[shotId]
-              updateField("targetMookCountPerTarget", newTargetMookCountPerTarget)
+              updateField(
+                "targetMookCountPerTarget",
+                newTargetMookCountPerTarget
+              )
             }
-            
+
             // Update defense/toughness based on remaining targets
             if (newIds.length === 0) {
               updateFields({
@@ -141,7 +150,7 @@ export default function TargetSection({
             } else {
               updateDefenseAndToughness(newIds, stunt)
             }
-            
+
             // Update mook distribution
             if (CS.isMook(attacker)) {
               distributeMooks(newIds)
@@ -150,18 +159,20 @@ export default function TargetSection({
             // Add to selection
             const newIds = [...selectedTargetIds, shotId]
             updateField("selectedTargetIds", newIds)
-            
+
             // Initialize mook count for newly selected mook
-            const selectedShot = allShots.find(s => s.character?.shot_id === shotId)
+            const selectedShot = allShots.find(
+              s => s.character?.shot_id === shotId
+            )
             if (selectedShot?.character && CS.isMook(selectedShot.character)) {
               updateField("targetMookCountPerTarget", {
                 ...targetMookCountPerTarget,
-                [shotId]: 1  // Initialize with count of 1
+                [shotId]: 1, // Initialize with count of 1
               })
             }
-            
+
             updateDefenseAndToughness(newIds, stunt)
-            
+
             // Update mook distribution
             if (CS.isMook(attacker)) {
               distributeMooks(newIds)
@@ -175,7 +186,7 @@ export default function TargetSection({
         multiSelect={true}
         characterTypes={(() => {
           if (!attacker) return undefined
-          
+
           // Check if any selected targets are mooks or non-mooks
           const hasSelectedMooks = selectedTargetIds.some(id => {
             const shot = allShots.find(s => s.character?.shot_id === id)
@@ -185,12 +196,12 @@ export default function TargetSection({
             const shot = allShots.find(s => s.character?.shot_id === id)
             return shot?.character && !CS.isMook(shot.character)
           })
-          
+
           // If a mook is selected, only show other mooks
           if (hasSelectedMooks) {
             return ["Mook"]
           }
-          
+
           // If a non-mook is selected, exclude mooks
           if (hasSelectedNonMooks) {
             if (CS.isPC(attacker) || CS.isAlly(attacker)) {
@@ -205,7 +216,7 @@ export default function TargetSection({
               return ["PC", "Ally"]
             }
           }
-          
+
           // No targets selected yet, show based on attacker type
           if (CS.isPC(attacker) || CS.isAlly(attacker)) {
             return ["Mook", "Featured Foe", "Boss", "Uber-Boss"]
@@ -233,22 +244,28 @@ export default function TargetSection({
               const shot = allShots.find(s => s.character?.shot_id === id)
               const char = shot?.character
               if (!char) return null
-              
+
               return (
-                <Box 
-                  key={id} 
-                  sx={{ 
-                    display: "flex", 
-                    alignItems: "center", 
+                <Box
+                  key={id}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
                     gap: 2,
                     backgroundColor: "background.paper",
                     p: 1,
                     borderRadius: 1,
                     border: "1px solid",
-                    borderColor: "divider"
+                    borderColor: "divider",
                   }}
                 >
-                  <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
                     <NumberField
                       name={`mookDist-${id}`}
                       value={mookDistribution[id] || 0}
@@ -268,10 +285,10 @@ export default function TargetSection({
                       onBlur={e => {
                         // onBlur is already handled by onChange for NumberField buttons
                         // Only process if this is a real blur event (not from buttons)
-                        if (e.relatedTarget?.closest('.MuiIconButton-root')) {
+                        if (e.relatedTarget?.closest(".MuiIconButton-root")) {
                           return // Skip if blur was caused by clicking increment/decrement buttons
                         }
-                        
+
                         updateMookDistribution(
                           id,
                           parseInt(e.target.value) || 0,
@@ -287,10 +304,10 @@ export default function TargetSection({
                     </Typography>
                   </Box>
                   <Box sx={{ flex: 1 }}>
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
-                        fontWeight: "medium"
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: "medium",
                       }}
                     >
                       {char.name}
@@ -304,12 +321,12 @@ export default function TargetSection({
                         fortuneDiePerTarget[id]
                       )
                       return modifiersText ? (
-                        <Typography 
-                          variant="caption" 
-                          sx={{ 
+                        <Typography
+                          variant="caption"
+                          sx={{
                             fontStyle: "italic",
                             color: "text.secondary",
-                            display: "block"
+                            display: "block",
                           }}
                         >
                           {modifiersText}
@@ -354,7 +371,7 @@ export default function TargetSection({
 
       {/* Defense and Modifiers Section */}
       <Box sx={{ mb: 3, mt: 2 }}>
-        <Stack 
+        <Stack
           direction="row"
           spacing={{ xs: 2, sm: 4 }}
           alignItems="flex-start"
@@ -362,10 +379,7 @@ export default function TargetSection({
           {/* Defense Value - show for multiple targets when non-mook attacker (except for single mook group) */}
           {selectedTargetIds.length > 1 && attacker && !CS.isMook(attacker) && (
             <Box>
-              <Typography
-                variant="body2"
-                sx={{ mb: 1, fontWeight: "medium" }}
-              >
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: "medium" }}>
                 Defense
               </Typography>
               <NumberField
@@ -379,13 +393,22 @@ export default function TargetSection({
                 onBlur={e => updateField("defenseValue", e.target.value)}
               />
               <Typography variant="caption" sx={{ display: "block", mt: 0.5 }}>
-                (Highest + {selectedTargetIds.length}{allTargetsAreMooks ? " groups" : ""})
+                (Highest + {selectedTargetIds.length}
+                {allTargetsAreMooks ? " groups" : ""})
               </Typography>
               {(() => {
                 let total = 0
                 if (stunt) total += 2
                 return total > 0 ? (
-                  <Typography variant="caption" sx={{ display: "block", mt: 0.5, fontStyle: "italic", color: "text.secondary" }}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: "block",
+                      mt: 0.5,
+                      fontStyle: "italic",
+                      color: "text.secondary",
+                    }}
+                  >
                     +{total} modifiers
                   </Typography>
                 ) : null
@@ -403,7 +426,10 @@ export default function TargetSection({
                     updateField("stunt", e.target.checked)
                     // When stunt changes, recalculate defense for all targets
                     if (selectedTargetIds.length > 0) {
-                      updateDefenseAndToughness(selectedTargetIds, e.target.checked)
+                      updateDefenseAndToughness(
+                        selectedTargetIds,
+                        e.target.checked
+                      )
                     }
                   }}
                 />

@@ -90,7 +90,7 @@ export default function CharacterSelector({
         {filteredShots.map(shot => {
           const entity = shot.character || shot.vehicle
           if (!entity) return null
-          const isSelected = multiSelect 
+          const isSelected = multiSelect
             ? selectedShotIds.includes(entity.shot_id || "")
             : entity.shot_id === selectedShotId
 

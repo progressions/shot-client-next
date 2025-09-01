@@ -4,7 +4,10 @@ import type { FormStateAction } from "@/reducers"
 /**
  * Helper to create form update action
  */
-export const createUpdateAction = <T>(name: keyof T, value: unknown): FormStateAction<T> => ({
+export const createUpdateAction = <T>(
+  name: keyof T,
+  value: unknown
+): FormStateAction<T> => ({
   type: FormActions.UPDATE,
   name,
   value,
@@ -13,7 +16,9 @@ export const createUpdateAction = <T>(name: keyof T, value: unknown): FormStateA
 /**
  * Helper to update a single form field
  */
-export const createFieldUpdater = <T>(dispatch: (action: FormStateAction<T>) => void) => {
+export const createFieldUpdater = <T>(
+  dispatch: (action: FormStateAction<T>) => void
+) => {
   return (name: keyof T, value: unknown) => {
     dispatch(createUpdateAction(name, value))
   }
@@ -22,7 +27,9 @@ export const createFieldUpdater = <T>(dispatch: (action: FormStateAction<T>) => 
 /**
  * Helper to update multiple form fields at once
  */
-export const createFieldsUpdater = <T>(dispatch: (action: FormStateAction<T>) => void) => {
+export const createFieldsUpdater = <T>(
+  dispatch: (action: FormStateAction<T>) => void
+) => {
   return (updates: Partial<T>) => {
     Object.entries(updates).forEach(([name, value]) => {
       dispatch(createUpdateAction(name as keyof T, value))

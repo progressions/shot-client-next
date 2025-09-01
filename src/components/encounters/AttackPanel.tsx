@@ -1,17 +1,12 @@
 "use client"
 
 import { useMemo, useEffect } from "react"
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-} from "@mui/material"
+import { Box, Card, CardContent, Typography } from "@mui/material"
 import { useEncounter, useToast } from "@/contexts"
 import { CS, DS } from "@/services"
-import type { 
-  Character, 
-  Shot, 
+import type {
+  Character,
+  Shot,
   Weapon,
   AttackFormData,
   AttackPanelProps,
@@ -28,15 +23,12 @@ import {
   calculateTargetDefense as calcTargetDefense,
   distributeMooksAmongTargets,
 } from "./attacks/attackCalculations"
-import { 
+import {
   sortAttackerShots,
   sortTargetShots,
   getAllVisibleShots,
 } from "./attacks/shotSorting"
-import { 
-  createFieldUpdater,
-  createFieldsUpdater,
-} from "./attacks/formHelpers"
+import { createFieldUpdater, createFieldsUpdater } from "./attacks/formHelpers"
 
 export default function AttackPanel({ onClose }: AttackPanelProps) {
   const { encounter, weapons: encounterWeapons, ec } = useEncounter()
@@ -52,7 +44,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     selectedWeaponId: "",
     weaponDamage: "",
     shotCost: "3",
-    
+
     // Target state
     selectedTargetIds: [],
     targetShotId: "", // For backward compatibility
@@ -61,28 +53,28 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     stunt: false,
     targetMookCount: 1,
     targetMookCountPerTarget: {},
-    
+
     // Defense modifiers per target
     defenseChoicePerTarget: {},
     fortuneDiePerTarget: {},
     defenseAppliedPerTarget: {},
     manualDefensePerTarget: {},
     manualToughnessPerTarget: {},
-    
+
     // Attack resolution
     swerve: "",
     finalDamage: "",
-    
+
     // Mook attack state
     mookDistribution: {},
     totalAttackingMooks: 0,
     mookRolls: [],
     showMookRolls: false,
-    
+
     // Multi-target results
     multiTargetResults: [],
     showMultiTargetResults: false,
-    
+
     // Processing state
     isProcessing: false,
   })
@@ -130,41 +122,52 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     allShotsList: Shot[]
   ): number => {
     let baseAttack = parseInt(attackValue) || 0
-    
+
     // Note: We no longer add weapon mook bonus here since it's already
     // included in the attack value when the weapon is selected in the UI
-    
+
     // Apply attacker's impairment (already shown in UI but needs to be applied for calculation)
     if (attackerChar && attackerChar.impairments > 0) {
       baseAttack -= attackerChar.impairments
     }
-    
+
     return baseAttack
   }
 
   // Get all characters in the fight (excluding hidden ones)
-  const allShots = useMemo(() => getAllVisibleShots(encounter.shots), [encounter.shots])
+  const allShots = useMemo(
+    () => getAllVisibleShots(encounter.shots),
+    [encounter.shots]
+  )
 
   // Sort attacker shots by: shot position (higher first), character type priority, then speed
-  const sortedAttackerShots = useMemo(() => sortAttackerShots(allShots), [allShots])
+  const sortedAttackerShots = useMemo(
+    () => sortAttackerShots(allShots),
+    [allShots]
+  )
 
   // Get selected attacker and targets
   const attackerShot = allShots.find(
     s => s.character?.shot_id === attackerShotId
   )
   const attacker = attackerShot?.character
-  
+
   // Get all selected targets
-  const selectedTargets = selectedTargetIds.map(id => 
-    allShots.find(s => s.character?.shot_id === id)?.character
-  ).filter((char): char is Character => char !== undefined)
-  
+  const selectedTargets = selectedTargetIds
+    .map(id => allShots.find(s => s.character?.shot_id === id)?.character)
+    .filter((char): char is Character => char !== undefined)
+
   // For backward compatibility
   const target = selectedTargets[0]
-  const targetShot = selectedTargetIds[0] ? allShots.find(s => s.character?.shot_id === selectedTargetIds[0]) : undefined
+  const targetShot = selectedTargetIds[0]
+    ? allShots.find(s => s.character?.shot_id === selectedTargetIds[0])
+    : undefined
 
   // Sort targets based on attacker type
-  const sortedTargetShots = useMemo(() => sortTargetShots(allShots, attacker), [allShots, attacker])
+  const sortedTargetShots = useMemo(
+    () => sortTargetShots(allShots, attacker),
+    [allShots, attacker]
+  )
 
   // Get weapons for selected attacker from preloaded encounter weapons
   const attackerWeapons = useMemo(() => {
@@ -184,7 +187,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       // Get attack skills
       const mainAttack = CS.mainAttack(attacker)
       const av = CS.actionValue(attacker, mainAttack)
-      
+
       // Get default weapon and damage
       const weaponIds = attacker.weapon_ids || []
       const charWeapons = weaponIds
@@ -204,27 +207,31 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         updates.selectedWeaponId = "unarmed"
         updates.weaponDamage = (CS.damage(attacker) || 7).toString()
       }
-      
+
       updates.attackValue = av.toString()
 
       // Set shot cost based on character type
-      updates.shotCost = (CS.isBoss(attacker) || CS.isUberBoss(attacker)) ? "2" : "3"
+      updates.shotCost =
+        CS.isBoss(attacker) || CS.isUberBoss(attacker) ? "2" : "3"
 
       // Set default mook distribution
       if (CS.isMook(attacker)) {
         updates.mookDistribution = {}
       }
-      
+
       updateFields(updates)
     }
   }, [attacker, encounterWeapons, targetShotId])
-
 
   // Calculate damage when swerve is entered (only for non-mook attackers)
   useMemo(() => {
     if (attacker && !CS.isMook(attacker)) {
       if (swerve && attackValue && defenseValue) {
-        const av = calculateEffectiveAttackValue(attacker, attackerWeapons, allShots)
+        const av = calculateEffectiveAttackValue(
+          attacker,
+          attackerWeapons,
+          allShots
+        )
         const dv = parseInt(defenseValue) || 0
         const sw = parseInt(swerve) || 0
         const weaponDmg = parseInt(weaponDamage) || 0
@@ -233,41 +240,46 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
         // Handle all targets the same way (single or multiple)
         if (selectedTargetIds.length > 0) {
-          const results = selectedTargetIds.map(targetId => {
-            const targetShot = allShots.find(s => s.character?.shot_id === targetId)
-            const targetChar = targetShot?.character
-            if (!targetChar) return null
+          const results = selectedTargetIds
+            .map(targetId => {
+              const targetShot = allShots.find(
+                s => s.character?.shot_id === targetId
+              )
+              const targetChar = targetShot?.character
+              if (!targetChar) return null
 
-            const targetDefense = CS.defense(targetChar)
-            const targetToughness = CS.toughness(targetChar)
-            
-            // For multiple targets, the outcome is already calculated against combined defense
-            // The smackdown is the same for all targets
-            let wounds = 0
-            
-            // Special handling for non-mook attacking mooks
-            if (CS.isMook(targetChar) && !CS.isMook(attacker)) {
-              // For mooks, if the attack succeeds, the attacker takes out the targeted number
-              if (outcome >= 0) {
-                // Use per-target mook count if available, otherwise fall back to single count
-                wounds = targetMookCountPerTarget[targetId] || targetMookCount || 1
-              }
-            } else {
-              // Normal wound calculation for non-mooks
-              if (outcome >= 0) {
-                const smackdown = outcome + weaponDmg
-                wounds = Math.max(0, smackdown - targetToughness)
-              }
-            }
+              const targetDefense = CS.defense(targetChar)
+              const targetToughness = CS.toughness(targetChar)
 
-            return {
-              targetId,
-              targetName: targetChar.name,
-              defense: targetDefense,
-              toughness: targetToughness,
-              wounds
-            }
-          }).filter(r => r !== null) as typeof multiTargetResults
+              // For multiple targets, the outcome is already calculated against combined defense
+              // The smackdown is the same for all targets
+              let wounds = 0
+
+              // Special handling for non-mook attacking mooks
+              if (CS.isMook(targetChar) && !CS.isMook(attacker)) {
+                // For mooks, if the attack succeeds, the attacker takes out the targeted number
+                if (outcome >= 0) {
+                  // Use per-target mook count if available, otherwise fall back to single count
+                  wounds =
+                    targetMookCountPerTarget[targetId] || targetMookCount || 1
+                }
+              } else {
+                // Normal wound calculation for non-mooks
+                if (outcome >= 0) {
+                  const smackdown = outcome + weaponDmg
+                  wounds = Math.max(0, smackdown - targetToughness)
+                }
+              }
+
+              return {
+                targetId,
+                targetName: targetChar.name,
+                defense: targetDefense,
+                toughness: targetToughness,
+                wounds,
+              }
+            })
+            .filter(r => r !== null) as typeof multiTargetResults
 
           // Set finalDamage to smackdown value for the Smackdown field
           let damageValue = ""
@@ -277,16 +289,16 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             damageValue = smackdown.toString()
             console.log("Attack calculation:", {
               attackValue: av,
-              defense: dv, 
+              defense: dv,
               swerve: sw,
               weaponDamage: weaponDmg,
               outcome,
               smackdown,
               toughness: results[0].toughness,
-              wounds: results[0].wounds
+              wounds: results[0].wounds,
             })
           }
-          
+
           updateFields({
             multiTargetResults: results,
             showMultiTargetResults: true,
@@ -302,7 +314,16 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         }
       }
     }
-  }, [swerve, attackValue, defenseValue, weaponDamage, attacker, selectedTargetIds, allShots, targetMookCount])
+  }, [
+    swerve,
+    attackValue,
+    defenseValue,
+    weaponDamage,
+    attacker,
+    selectedTargetIds,
+    allShots,
+    targetMookCount,
+  ])
 
   // Reset defense choices when targets change
   useEffect(() => {
@@ -314,19 +335,22 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   }, [selectedTargetIds])
 
   // Helper function to update defense and toughness based on selected targets
-  const updateDefenseAndToughness = (targetIds: string[], includeStunt: boolean = false) => {
+  const updateDefenseAndToughness = (
+    targetIds: string[],
+    includeStunt: boolean = false
+  ) => {
     if (targetIds.length === 0) {
       updateFields({
         defenseValue: "0",
         toughnessValue: "0",
-        manualDefensePerTarget: {},  // Clear manual overrides
+        manualDefensePerTarget: {}, // Clear manual overrides
       })
       return
     }
 
-    const targets = targetIds.map(id => 
-      allShots.find(s => s.character?.shot_id === id)?.character
-    ).filter((char): char is Character => char !== undefined)
+    const targets = targetIds
+      .map(id => allShots.find(s => s.character?.shot_id === id)?.character)
+      .filter((char): char is Character => char !== undefined)
 
     if (targetIds.length === 1) {
       // Single target - show actual defense and toughness
@@ -334,21 +358,21 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       const targetId = targetIds[0]
       if (target) {
         let defense = CS.defense(target)
-        
+
         // Add mook count to defense if targeting multiple mooks
         if (CS.isMook(target) && !CS.isMook(attacker) && targetMookCount > 1) {
           defense += targetMookCount
         }
-        
-        if (includeStunt) defense += 2  // Add stunt modifier
-        
+
+        if (includeStunt) defense += 2 // Add stunt modifier
+
         // Update both the main defense value and clear any manual override for this target
         updateFields({
           defenseValue: defense.toString(),
           toughnessValue: CS.toughness(target).toString(),
           manualDefensePerTarget: {
             ...manualDefensePerTarget,
-            [targetId]: defense.toString(),  // Set the calculated value as the manual override
+            [targetId]: defense.toString(), // Set the calculated value as the manual override
           },
         })
       }
@@ -358,7 +382,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         // Mooks attacking multiple targets - no defense modifier, just show highest for reference
         const defenses = targets.map(t => {
           let defense = CS.defense(t)
-          if (includeStunt) defense += 2  // Add stunt modifier to each target
+          if (includeStunt) defense += 2 // Add stunt modifier to each target
           return defense
         })
         const highestDefense = Math.max(...defenses)
@@ -368,19 +392,19 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         })
       } else {
         // Non-mook attacking multiple targets
-        
+
         // Check if all targets are mooks
         const allTargetsAreMooks = targets.every(t => CS.isMook(t))
-        
+
         if (allTargetsAreMooks) {
           // Multiple mook groups - calculate each group's defense (base + count), then add number of groups
           const defenses = targetIds.map((id, index) => {
             const target = targets[index]
             if (!target) return 0
-            
+
             let defense = CS.defense(target)
             const mookCount = targetMookCountPerTarget[id] || 1
-            defense += mookCount  // Add the number of mooks in this group
+            defense += mookCount // Add the number of mooks in this group
             if (includeStunt) defense += 2
             return defense
           })
@@ -395,7 +419,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           // Mixed or non-mook targets - highest defense + number of targets
           const defenses = targets.map(t => {
             let defense = CS.defense(t)
-            if (includeStunt) defense += 2  // Add stunt modifier to each target
+            if (includeStunt) defense += 2 // Add stunt modifier to each target
             return defense
           })
           const highestDefense = Math.max(...defenses)
@@ -412,9 +436,9 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   // Helper function to distribute mooks among targets
   const distributeMooks = (targetIds: string[]) => {
     if (!attacker || !CS.isMook(attacker)) return
-    
+
     const totalMooks = attacker.count || 0
-    
+
     if (targetIds.length === 0) {
       updateFields({
         mookDistribution: {},
@@ -422,9 +446,9 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       })
       return
     }
-    
+
     const distribution = distributeMooksAmongTargets(totalMooks, targetIds)
-    
+
     updateFields({
       mookDistribution: distribution,
       totalAttackingMooks: totalMooks,
@@ -432,7 +456,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   }
 
   // Helper function to calculate effective defense for a target based on their defense choice
-  const calculateTargetDefense = (target: Character, targetId: string): number => {
+  const calculateTargetDefense = (
+    target: Character,
+    targetId: string
+  ): number => {
     return calcTargetDefense(
       target,
       targetId,
@@ -448,11 +475,14 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   // Reset when attacker changes
   useEffect(() => {
     // Initialize total attacking mooks for mook attackers
-    const currentAttacker = allShots.find(s => s.character?.shot_id === attackerShotId)?.character
-    const totalMooks = (currentAttacker && CS.isMook(currentAttacker)) 
-      ? (currentAttacker.count || 0) 
-      : 0
-    
+    const currentAttacker = allShots.find(
+      s => s.character?.shot_id === attackerShotId
+    )?.character
+    const totalMooks =
+      currentAttacker && CS.isMook(currentAttacker)
+        ? currentAttacker.count || 0
+        : 0
+
     updateFields({
       mookRolls: [],
       showMookRolls: false,
@@ -460,38 +490,41 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       mookDistribution: {},
       defenseValue: "0",
       toughnessValue: "0",
-      swerve: "",  // Reset to empty, not 0
-      finalDamage: "",  // Reset to empty, not 0
+      swerve: "", // Reset to empty, not 0
+      finalDamage: "", // Reset to empty, not 0
       defenseChoicePerTarget: {},
       fortuneDiePerTarget: {},
       defenseAppliedPerTarget: {},
       manualDefensePerTarget: {},
       manualToughnessPerTarget: {},
       totalAttackingMooks: totalMooks,
-      multiTargetResults: {},  // Clear multi-target results
-      showMultiTargetResults: false,  // Hide multi-target results display
+      multiTargetResults: {}, // Clear multi-target results
+      showMultiTargetResults: false, // Hide multi-target results display
     })
   }, [attackerShotId, allShots])
-  
+
   // Recalculate defense when mook counts change
   useEffect(() => {
     // Only recalculate for multiple mook groups
     if (selectedTargetIds.length > 1 && !CS.isMook(attacker)) {
-      const targets = selectedTargetIds.map(id => 
-        allShots.find(s => s.character?.shot_id === id)?.character
-      ).filter((char): char is Character => char !== undefined)
-      
+      const targets = selectedTargetIds
+        .map(id => allShots.find(s => s.character?.shot_id === id)?.character)
+        .filter((char): char is Character => char !== undefined)
+
       const allTargetsAreMooks = targets.every(t => CS.isMook(t))
-      
-      if (allTargetsAreMooks && Object.keys(targetMookCountPerTarget).length > 0) {
+
+      if (
+        allTargetsAreMooks &&
+        Object.keys(targetMookCountPerTarget).length > 0
+      ) {
         // Recalculate combined defense for multiple mook groups
         const defenses = selectedTargetIds.map((id, index) => {
           const target = targets[index]
           if (!target) return 0
-          
+
           let defense = CS.defense(target)
           const mookCount = targetMookCountPerTarget[id] || 1
-          defense += mookCount  // Add the number of mooks in this group
+          defense += mookCount // Add the number of mooks in this group
           if (formState.data.stunt) defense += 2
           return defense
         })
@@ -513,11 +546,11 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       multiTargetResults: {},
       showMultiTargetResults: false,
     })
-    
+
     // Update defense and toughness for new targets
     if (selectedTargetIds.length > 0) {
       updateDefenseAndToughness(selectedTargetIds, formState.data.stunt)
-      
+
       // If attacker is a mook, distribute mooks among the new targets
       if (attacker && CS.isMook(attacker)) {
         distributeMooks(selectedTargetIds)
@@ -534,9 +567,13 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   const handleRollMookAttacks = () => {
     if (!attacker || !CS.isMook(attacker)) return
 
-    const av = calculateEffectiveAttackValue(attacker, attackerWeapons, allShots)
+    const av = calculateEffectiveAttackValue(
+      attacker,
+      attackerWeapons,
+      allShots
+    )
     const weaponDmg = parseInt(weaponDamage) || 0
-    
+
     const allTargetRolls = []
     let grandTotalWounds = 0
 
@@ -553,7 +590,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         // Get defense and toughness for this specific target
         const targetDefense = CS.defense(targetChar)
         const targetToughness = CS.toughness(targetChar)
-        
+
         const targetRolls = []
         let targetTotalWounds = 0
 
@@ -569,7 +606,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             // Check if target is also a mook
             if (CS.isMook(targetChar)) {
               // Mook vs mook: each hit eliminates 1 mook (no toughness calculation)
-              wounds = 1  // Represents 1 mook eliminated
+              wounds = 1 // Represents 1 mook eliminated
             } else {
               // Mook vs non-mook: calculate smackdown and wounds normally
               const smackdown = outcome + weaponDmg
@@ -597,14 +634,16 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       })
     } else if (targetShotId) {
       // Fallback to single target mode
-      const targetShot = allShots.find(s => s.character?.shot_id === targetShotId)
+      const targetShot = allShots.find(
+        s => s.character?.shot_id === targetShotId
+      )
       const targetChar = targetShot?.character
       if (!targetChar) return
 
       const mookCount = totalAttackingMooks || attacker.count || 0
       const dv = parseInt(defenseValue) || 0
       const toughness = parseInt(toughnessValue) || 0
-      
+
       const targetRolls = []
       let targetTotalWounds = 0
 
@@ -619,7 +658,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           // Check if target is also a mook
           if (CS.isMook(targetChar)) {
             // Mook vs mook: each hit eliminates 1 mook (no toughness calculation)
-            wounds = 1  // Represents 1 mook eliminated
+            wounds = 1 // Represents 1 mook eliminated
           } else {
             // Mook vs non-mook: calculate smackdown and wounds normally
             const smackdown = outcome + weaponDmg
@@ -653,74 +692,175 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     })
   }
 
-
   const handleApplyDamage = async () => {
     // Handle multiple targets for non-mook attackers
-    if (!CS.isMook(attacker) && selectedTargetIds.length > 0 && multiTargetResults.length > 0) {
+    if (
+      !CS.isMook(attacker) &&
+      selectedTargetIds.length > 0 &&
+      multiTargetResults.length > 0
+    ) {
       updateField("isProcessing", true)
       try {
         const shots = parseInt(shotCost) || 3
-        
-        // Spend shots for the attacker
-        await ec.spendShots(attacker, shots)
-        
-        // Apply dodges for targets that have dodge selected
+
+        // Collect all character updates with complete states
+        const characterUpdates: Array<{
+          shot_id?: string
+          character_id?: string
+          shot?: number
+          wounds?: number
+          count?: number
+          impairments?: number
+          defense?: number
+          action_values?: Record<string, number>
+          event?: {
+            type: string
+            description: string
+            details?: Record<string, unknown>
+          }
+        }> = []
+
+        // Add attacker's shot spending to character updates
+        if (attackerShot && attackerShot.character) {
+          const currentShot = attackerShot.shot || 0
+          const newShot = currentShot - shots
+          
+          // Calculate complete state for attacker
+          const attackerUpdate: any = {
+            shot_id: attackerShot.character.shot_id,
+            character_id: attackerShot.character.id,
+            shot: newShot,
+            event: {
+              type: "act",
+              description: `${attacker.name} acts (${shots} shots)`,
+              details: {
+                character_id: attackerShot.character.id,
+                shot_cost: shots,
+                from_shot: currentShot,
+                to_shot: newShot,
+              },
+            },
+          }
+          
+          // If attacker is spending fortune for extra damage
+          if (formState.data.fortuneSpent && CS.isPC(attacker)) {
+            const currentFortune = CS.fortune(attacker)
+            if (currentFortune > 0) {
+              attackerUpdate.action_values = {
+                Fortune: currentFortune - 1
+              }
+            }
+          }
+          
+          characterUpdates.push(attackerUpdate)
+        }
+
+        // Add dodge actions for targets that have dodge selected
         for (const targetId of selectedTargetIds) {
           const choice = defenseChoicePerTarget[targetId]
-          if (choice === 'dodge' || choice === 'fortune') {
-            const targetShot = allShots.find(s => s.character?.shot_id === targetId)
+          if (choice === "dodge" || choice === "fortune") {
+            const targetShot = allShots.find(
+              s => s.character?.shot_id === targetId
+            )
             const targetChar = targetShot?.character
-            if (targetChar) {
-              // Spend 1 shot for dodge
-              await ec.spendShots(targetChar, 1)
-              if (choice === 'fortune') {
-                // TODO: Also deduct fortune point when fortune point tracking is implemented
+            if (targetChar && targetShot) {
+              const currentShot = targetShot.shot || 0
+              const newShot = currentShot - 1
+              
+              // Add dodge shot spending to character updates
+              const dodgeUpdate: any = {
+                shot_id: targetChar.shot_id,
+                character_id: targetChar.id,
+                shot: newShot, // Update shot position on Shot record
+                event: {
+                  type: "dodge",
+                  description: choice === "fortune" 
+                    ? `${targetChar.name} dodges with fortune`
+                    : `${targetChar.name} dodges`,
+                  details: {
+                    character_id: targetChar.id,
+                    dodge_type: choice,
+                    from_shot: currentShot,
+                    to_shot: newShot,
+                  },
+                },
+              }
+              
+              // If using fortune dodge, update fortune points for PCs
+              if (choice === "fortune" && CS.isPC(targetChar)) {
+                const currentFortune = CS.fortune(targetChar)
+                if (currentFortune > 0) {
+                  dodgeUpdate.action_values = {
+                    Fortune: currentFortune - 1
+                  }
+                }
+              }
+              
+              characterUpdates.push(dodgeUpdate)
+              
+              if (choice === "fortune") {
                 const fortuneRoll = fortuneDiePerTarget[targetId] || "0"
-                toastInfo(`${targetChar.name} dodged with fortune (+3 +${fortuneRoll} DV, -1 shot, -1 fortune)`)
+                toastInfo(
+                  `${targetChar.name} dodged with fortune (+3 +${fortuneRoll} DV, -1 shot, -1 fortune)`
+                )
               } else {
                 toastInfo(`${targetChar.name} dodged (+3 DV, -1 shot)`)
               }
             }
           }
         }
-        
-        // Apply wounds to each target
+
+        // Collect wounds updates for each target
         for (const result of multiTargetResults) {
-          const targetShot = allShots.find(s => s.character?.shot_id === result.targetId)
+          const targetShot = allShots.find(
+            s => s.character?.shot_id === result.targetId
+          )
           const targetChar = targetShot?.character
           if (!targetChar) continue
-          
+
           // Calculate effective wounds considering defense choices
-          const currentDefense = calculateTargetDefense(targetChar, result.targetId)
-          const hasDefenseModifier = defenseChoicePerTarget[result.targetId] && defenseChoicePerTarget[result.targetId] !== 'none'
-          
+          const currentDefense = calculateTargetDefense(
+            targetChar,
+            result.targetId
+          )
+          const hasDefenseModifier =
+            defenseChoicePerTarget[result.targetId] &&
+            defenseChoicePerTarget[result.targetId] !== "none"
+
           let effectiveWounds = result.wounds
           if (hasDefenseModifier && selectedTargetIds.length > 1) {
             // For multiple targets with dodge, recalculate outcome for this specific target
-            const individualOutcome = parseInt(attackValue || "0") + parseInt(swerve || "0") - currentDefense
+            const individualOutcome =
+              parseInt(attackValue || "0") +
+              parseInt(swerve || "0") -
+              currentDefense
             if (individualOutcome >= 0) {
               // For mooks, wounds = number taken out; for others, calculate normally
               if (CS.isMook(targetChar)) {
                 effectiveWounds = targetMookCount // Still take out the targeted number if hit
               } else {
-                const individualSmackdown = individualOutcome + parseInt(weaponDamage || "0")
-                effectiveWounds = Math.max(0, individualSmackdown - CS.toughness(targetChar))
+                const individualSmackdown =
+                  individualOutcome + parseInt(weaponDamage || "0")
+                effectiveWounds = Math.max(
+                  0,
+                  individualSmackdown - CS.toughness(targetChar)
+                )
               }
             } else {
               effectiveWounds = 0
             }
           }
-          
+
           if (effectiveWounds === 0) continue // Skip targets with no wounds
-          
+
           const isPC = CS.isPC(targetChar)
           const currentWounds = CS.wounds(targetChar)
-          
+
           // For mooks, reduce the count; for others, add wounds
-          const newWounds = CS.isMook(targetChar) 
-            ? Math.max(0, currentWounds - effectiveWounds)  // Reduce mook count
-            : currentWounds + effectiveWounds  // Add wounds for non-mooks
-          
+          const newWounds = CS.isMook(targetChar)
+            ? Math.max(0, currentWounds - effectiveWounds) // Reduce mook count
+            : currentWounds + effectiveWounds // Add wounds for non-mooks
+
           // Calculate impairments
           const originalImpairments = targetChar.impairments || 0
           const impairmentChange = CS.calculateImpairments(
@@ -729,69 +869,108 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             newWounds
           )
           const newImpairments = originalImpairments + impairmentChange
-          
+
           // Include defense choice in the description
-          const defenseChoice = defenseChoicePerTarget[result.targetId] || 'none'
-          const defenseDesc = defenseChoice === 'fortune' 
-            ? ` (Fortune dodge +3 +${fortuneDiePerTarget[result.targetId] || 0})`
-            : defenseChoice === 'dodge' 
-            ? ' (Dodge +3)'
-            : ''
-          
+          const defenseChoice =
+            defenseChoicePerTarget[result.targetId] || "none"
+          const defenseDesc =
+            defenseChoice === "fortune"
+              ? ` (Fortune dodge +3 +${fortuneDiePerTarget[result.targetId] || 0})`
+              : defenseChoice === "dodge"
+                ? " (Dodge +3)"
+                : ""
+
           // Calculate updated Fortune points if fortune dodge was used
           let updatedFortune: number | undefined
-          if (defenseChoice === 'fortune' && CS.isPC(targetChar)) {
+          if (defenseChoice === "fortune" && CS.isPC(targetChar)) {
             const currentFortune = CS.fortune(targetChar)
             if (currentFortune > 0) {
               updatedFortune = currentFortune - 1
               toastInfo(`${targetChar.name} spent 1 Fortune point for dodge`)
             }
           }
-          
-          // Send update to backend for this target
+
+          // Collect character update for this target with complete state
           const isMook = CS.isMook(targetChar)
           const description = isMook
-            ? `${attacker.name} took out ${effectiveWounds} ${effectiveWounds === 1 ? 'mook' : 'mooks'}${defenseDesc}`
+            ? `${attacker.name} took out ${effectiveWounds} ${effectiveWounds === 1 ? "mook" : "mooks"}${defenseDesc}`
             : `${attacker.name} attacked ${targetChar.name}${defenseDesc} for ${effectiveWounds} wounds`
-            
-          await client.updateCombatState(
-            encounter,
-            targetChar.shot_id || "",
-            isPC ? newWounds : undefined,
-            !isPC ? newWounds : undefined,
-            newImpairments,
-            {
+
+          const targetUpdate: any = {
+            shot_id: targetChar.shot_id,
+            character_id: targetChar.id,
+            impairments: newImpairments,
+            event: {
               type: "attack",
               description,
               details: {
                 attacker_id: attackerShot.character?.id,
                 target_id: targetChar.id,
                 damage: effectiveWounds,
-                attack_value: calculateEffectiveAttackValue(attacker, attackerWeapons, allShots),
+                attack_value: calculateEffectiveAttackValue(
+                  attacker,
+                  attackerWeapons,
+                  allShots
+                ),
                 defense_value: parseInt(defenseValue),
-                effective_defense: calculateTargetDefense(targetChar, result.targetId),
+                effective_defense: calculateTargetDefense(
+                  targetChar,
+                  result.targetId
+                ),
                 swerve: parseInt(swerve),
-                outcome: calculateEffectiveAttackValue(attacker, attackerWeapons, allShots) + parseInt(swerve) - parseInt(defenseValue),
+                outcome:
+                  calculateEffectiveAttackValue(
+                    attacker,
+                    attackerWeapons,
+                    allShots
+                  ) +
+                  parseInt(swerve) -
+                  parseInt(defenseValue),
                 weapon_damage: parseInt(weaponDamage),
                 shot_cost: shots,
                 stunt: stunt,
-                dodge: defenseChoice !== 'none',
+                dodge: defenseChoice !== "none",
                 defense_choice: defenseChoice,
-                fortune_die: defenseChoice === 'fortune' ? parseInt(fortuneDiePerTarget[result.targetId] || "0") : undefined,
+                fortune_die:
+                  defenseChoice === "fortune"
+                    ? parseInt(fortuneDiePerTarget[result.targetId] || "0")
+                    : undefined,
                 is_mook_takedown: isMook,
                 mooks_taken_out: isMook ? effectiveWounds : undefined,
               },
             },
-            updatedFortune
-          )
+          }
           
+          // For PCs, update action values (wounds, fortune)
+          if (isPC) {
+            targetUpdate.action_values = {
+              Wounds: newWounds
+            }
+            
+            // If fortune was spent for dodge, include it
+            if (updatedFortune !== undefined) {
+              targetUpdate.action_values.Fortune = updatedFortune
+            }
+          } else {
+            // For NPCs and mooks, wounds/count go on the shot record
+            targetUpdate.wounds = isMook ? undefined : newWounds
+            targetUpdate.count = isMook ? newWounds : undefined
+          }
+          
+          characterUpdates.push(targetUpdate)
+
           const toastMessage = isMook
-            ? `Took out ${effectiveWounds} ${effectiveWounds === 1 ? 'mook' : 'mooks'}${defenseDesc}`
+            ? `Took out ${effectiveWounds} ${effectiveWounds === 1 ? "mook" : "mooks"}${defenseDesc}`
             : `Applied ${effectiveWounds} wound${effectiveWounds !== 1 ? "s" : ""} to ${targetChar.name}${defenseDesc}`
-          
+
           toastSuccess(toastMessage)
         }
-        
+
+        // Send all character updates in a single batched request
+        if (characterUpdates.length > 0) {
+          await client.applyCombatAction(encounter, characterUpdates)
+        }
+
         // Reset form
         updateFields({
           selectedTargetIds: [],
@@ -807,7 +986,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           manualToughnessPerTarget: {},
           targetMookCount: 1,
         })
-        
+
         if (onClose) {
           onClose()
         }
@@ -818,46 +997,93 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         updateField("isProcessing", false)
       }
     }
-    
+
     // Handle multiple targets for mook attackers
-    if (CS.isMook(attacker) && selectedTargetIds.length > 1 && mookRolls.length > 0) {
+    if (
+      CS.isMook(attacker) &&
+      selectedTargetIds.length > 1 &&
+      mookRolls.length > 0
+    ) {
       updateField("isProcessing", true)
       try {
         const shots = parseInt(shotCost) || 3
-        
-        // Spend shots for the attacker
-        await ec.spendShots(attacker, shots)
-        
-        // Apply wounds to each target
+
+        // Collect all character updates with complete states
+        const characterUpdates: Array<{
+          shot_id?: string
+          character_id?: string
+          shot?: number
+          wounds?: number
+          count?: number
+          impairments?: number
+          defense?: number
+          action_values?: Record<string, number>
+          event?: {
+            type: string
+            description: string
+            details?: Record<string, unknown>
+          }
+        }> = []
+
+        // Add attacker's shot spending to combat actions
+        if (attackerShot) {
+          const currentShot = attackerShot.shot || 0
+          const newShot = currentShot - shots
+          characterUpdates.push({
+            shot_id: attackerShot.character?.shot_id || "",
+            character_id: attackerShot.character?.id,
+            shot: newShot,
+            event: {
+              type: "act",
+              description: `${attacker.name} acts (${shots} shots)`,
+              details: {
+                character_id: attackerShot.character?.id,
+                shot_cost: shots,
+                from_shot: currentShot,
+                to_shot: newShot,
+              },
+            },
+          })
+        }
+
+        // Collect wounds updates for each target
         for (const targetGroup of mookRolls) {
-          const targetShot = allShots.find(s => s.character?.shot_id === targetGroup.targetId)
+          const targetShot = allShots.find(
+            s => s.character?.shot_id === targetGroup.targetId
+          )
           const targetChar = targetShot?.character
           if (!targetChar) continue
-          
-          const totalWounds = targetGroup.rolls.reduce((sum, r) => sum + r.wounds, 0)
+
+          const totalWounds = targetGroup.rolls.reduce(
+            (sum, r) => sum + r.wounds,
+            0
+          )
           if (totalWounds === 0) continue // Skip targets with no wounds
-          
+
           // Check if this is mook vs mook combat
           if (CS.isMook(targetChar)) {
             // Mook vs mook: reduce mook count instead of applying wounds
             const currentCount = targetChar.count || 0
             const newCount = Math.max(0, currentCount - totalWounds)
-            
-            // Send update to backend for mook elimination
-            await client.updateCombatState(
-              encounter,
-              targetChar.shot_id || "",
-              undefined, // No wounds for PCs
-              newCount,  // New mook count
-              0,         // Mooks don't have impairments
-              {
+
+            // Collect combat action for mook elimination
+            characterUpdates.push({
+              shot_id: targetChar.shot_id || "",
+              character_id: targetChar.id,
+              count: newCount, // New mook count
+              impairments: 0, // Mooks don't have impairments
+              event: {
                 type: "attack",
                 description: `${targetGroup.rolls.length} ${attacker.name} attacked ${targetChar.name}, eliminating ${totalWounds} mook${totalWounds !== 1 ? "s" : ""}`,
                 details: {
                   attacker_id: attackerShot.character?.id,
                   target_id: targetChar.id,
                   mooks_eliminated: totalWounds,
-                  attack_value: calculateEffectiveAttackValue(attacker, attackerWeapons, allShots),
+                  attack_value: calculateEffectiveAttackValue(
+                    attacker,
+                    attackerWeapons,
+                    allShots
+                  ),
                   defense_value: CS.defense(targetChar),
                   shot_cost: shots,
                   is_mook_vs_mook: true,
@@ -865,9 +1091,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   successful_hits: targetGroup.rolls.filter(r => r.hit).length,
                 },
               },
-              undefined // No fortune change for mook attacks
-            )
-            
+            })
+
             toastSuccess(
               `Eliminated ${totalWounds} ${targetChar.name}${totalWounds !== 1 ? "s" : ""}`
             )
@@ -876,7 +1101,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             const isPC = CS.isPC(targetChar)
             const currentWounds = CS.wounds(targetChar)
             const newWounds = currentWounds + totalWounds
-            
+
             // Calculate impairments
             const originalImpairments = targetChar.impairments || 0
             const impairmentChange = CS.calculateImpairments(
@@ -885,22 +1110,26 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               newWounds
             )
             const newImpairments = originalImpairments + impairmentChange
-            
-            // Send update to backend for this target
-            await client.updateCombatState(
-              encounter,
-              targetChar.shot_id || "",
-              isPC ? newWounds : undefined,
-              !isPC ? newWounds : undefined,
-              newImpairments,
-              {
+
+            // Collect combat action for this target
+            characterUpdates.push({
+              shot_id: targetChar.shot_id || "",
+              character_id: targetChar.id,
+              wounds: isPC ? newWounds : undefined,
+              count: !isPC ? newWounds : undefined,
+              impairments: newImpairments,
+              event: {
                 type: "attack",
                 description: `${targetGroup.rolls.length} ${attacker.name} attacked ${targetChar.name} for ${totalWounds} wounds`,
                 details: {
                   attacker_id: attackerShot.character?.id,
                   target_id: targetChar.id,
                   damage: totalWounds,
-                  attack_value: calculateEffectiveAttackValue(attacker, attackerWeapons, allShots),
+                  attack_value: calculateEffectiveAttackValue(
+                    attacker,
+                    attackerWeapons,
+                    allShots
+                  ),
                   defense_value: CS.defense(targetChar),
                   weapon_damage: parseInt(weaponDamage),
                   shot_cost: shots,
@@ -909,15 +1138,19 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   mook_hits: targetGroup.rolls.filter(r => r.hit).length,
                 },
               },
-              undefined // No fortune change for mook attacks
-            )
-            
+            })
+
             toastSuccess(
               `Applied ${totalWounds} wound${totalWounds !== 1 ? "s" : ""} to ${targetChar.name}`
             )
           }
         }
-        
+
+        // Send all character updates in a single batched request
+        if (characterUpdates.length > 0) {
+          await client.applyCombatAction(encounter, characterUpdates)
+        }
+
         // Reset form
         updateFields({
           selectedTargetIds: [],
@@ -932,7 +1165,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           fortuneDiePerTarget: {},
           defenseAppliedPerTarget: {},
         })
-        
+
         if (onClose) {
           onClose()
         }
@@ -943,132 +1176,156 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         updateField("isProcessing", false)
       }
     }
-    
-    // Original single-target logic
-    if (!target || !targetShot || !finalDamage || !attacker || !attackerShot)
-      return
 
-    updateField("isProcessing", true)
-    try {
-      const damage = parseInt(finalDamage) || 0
-      const shots = parseInt(shotCost) || 3
-      const targetChar = target
-      const isPC = CS.isPC(targetChar)
+    // Single-target attack handling for non-mook attackers with single target
+    if (!CS.isMook(attacker) && selectedTargetIds.length === 1 && finalDamage) {
+      updateField("isProcessing", true)
+      try {
+        const shots = parseInt(shotCost) || 3
+        const damage = parseInt(finalDamage) || 0
+        const targetChar = target
+        if (!targetChar || !attackerShot) return
 
-      // Spend shots for the attacker
-      await ec.spendShots(attacker, shots)
+        // Collect combat action for single target
+        const characterUpdates: Array<{
+          shot_id?: string
+          character_id?: string
+          shot?: number
+          wounds?: number
+          count?: number
+          impairments?: number
+          action_values?: Record<string, number>
+          event?: {
+            type: string
+            description: string
+            details?: Record<string, unknown>
+          }
+        }> = []
 
-      // Calculate new wounds and impairments
-      let newWounds = 0
-      let newImpairments = 0
-      let actualWoundsDealt = 0
+        // Add attacker's shot spending to combat actions
+        if (attackerShot) {
+          const currentShot = attackerShot.shot || 0
+          const newShot = currentShot - shots
+          characterUpdates.push({
+            shot_id: attackerShot.character?.shot_id || "",
+            character_id: attackerShot.character?.id,
+            shot: newShot,
+            event: {
+              type: "act",
+              description: `${attacker.name} acts (${shots} shots)`,
+              details: {
+                character_id: attackerShot.character?.id,
+                shot_cost: shots,
+                from_shot: currentShot,
+                to_shot: newShot,
+              },
+            },
+          })
+        }
 
-      if (CS.isMook(targetChar)) {
-        // Mooks are eliminated on any hit
-        newWounds = 0 // Or reduce count
-        actualWoundsDealt = damage // For mooks, show the full damage
-      } else if (CS.isMook(attacker)) {
-        // When attacker is a mook, wounds have already been calculated with toughness
-        // so we apply them directly without reducing by toughness again
+        const isPC = CS.isPC(targetChar)
         const currentWounds = CS.wounds(targetChar)
-        actualWoundsDealt = damage // This is already the final wound count from mook rolls
-        newWounds = currentWounds + actualWoundsDealt
 
-        // Calculate impairments
-        const originalImpairments = targetChar.impairments || 0
-        const impairmentChange = CS.calculateImpairments(
-          targetChar,
-          currentWounds,
-          newWounds
-        )
-        newImpairments = originalImpairments + impairmentChange
-      } else {
-        // Regular attack - for single non-mook targets
-        const currentWounds = CS.wounds(targetChar)
-        
-        // The Smackdown field (finalDamage) is always treated as the smackdown value
-        // We need to subtract toughness to get actual wounds
-        const toughness = parseInt(toughnessValue) || CS.toughness(targetChar) || 0
-        actualWoundsDealt = Math.max(0, damage - toughness)
-        
-        newWounds = currentWounds + actualWoundsDealt
+        // Calculate actual wounds
+        let actualWoundsDealt = 0
+        let newWounds = 0
+        let newImpairments = 0
 
-        // Calculate impairments
-        const originalImpairments = targetChar.impairments || 0
-        const impairmentChange = CS.calculateImpairments(
-          targetChar,
-          currentWounds,
-          newWounds
-        )
-        newImpairments = originalImpairments + impairmentChange
-      }
+        if (CS.isMook(targetChar)) {
+          // For mooks, the damage is the number to eliminate
+          actualWoundsDealt = damage
+          newWounds = Math.max(0, currentWounds - actualWoundsDealt)
+        } else {
+          // For non-mooks, subtract toughness from smackdown
+          const toughness =
+            parseInt(toughnessValue) || CS.toughness(targetChar) || 0
+          actualWoundsDealt = Math.max(0, damage - toughness)
+          newWounds = currentWounds + actualWoundsDealt
 
-      // Send update to backend
-      await client.updateCombatState(
-        encounter,
-        targetShot.character?.shot_id || "",
-        isPC ? newWounds : undefined,
-        !isPC ? newWounds : undefined,
-        newImpairments,
-        {
-          type: "attack",
-          description: CS.isMook(attacker)
-            ? `${parseInt(targets[0]?.mookCount || attackingMookCount) || attacker.count || 0} ${attacker.name} attacked ${target.name} for ${actualWoundsDealt} wounds`
-            : `${attacker.name} attacked ${target.name} for ${actualWoundsDealt} wounds`,
-          details: {
-            attacker_id: attackerShot.character?.id,
-            target_id: target.id,
-            damage: damage,
-            attack_value: parseInt(attackValue),
-            defense_value: parseInt(defenseValue),
-            swerve: CS.isMook(attacker) ? undefined : parseInt(swerve),
-            outcome: CS.isMook(attacker)
-              ? undefined
-              : parseInt(attackValue) -
+          // Calculate impairments
+          const originalImpairments = targetChar.impairments || 0
+          const impairmentChange = CS.calculateImpairments(
+            targetChar,
+            currentWounds,
+            newWounds
+          )
+          newImpairments = originalImpairments + impairmentChange
+        }
+
+        // Create combat action
+        const targetUpdate: any = {
+          shot_id: targetChar.shot_id || "",
+          character_id: targetChar.id,
+          impairments: newImpairments,
+          event: {
+            type: "attack",
+            description: `${attacker.name} attacked ${targetChar.name} for ${actualWoundsDealt} wounds`,
+            details: {
+              attacker_id: attackerShot.character?.id,
+              target_id: targetChar.id,
+              damage: actualWoundsDealt,
+              attack_value: parseInt(attackValue),
+              defense_value: parseInt(defenseValue),
+              swerve: parseInt(swerve),
+              outcome:
+                parseInt(attackValue) -
                 parseInt(defenseValue) +
                 parseInt(swerve),
-            weapon_damage: parseInt(weaponDamage),
-            shot_cost: shots,
-            stunt: stunt,
-            is_mook_attack: CS.isMook(attacker),
-            mook_count: CS.isMook(attacker) ? attacker.count : undefined,
-            mook_hits:
-              mookRolls.length > 0
-                ? mookRolls.filter(r => r.hit).length
-                : undefined,
+              weapon_damage: parseInt(weaponDamage),
+              shot_cost: shots,
+              stunt: stunt,
+            },
           },
-        },
-        undefined // No fortune change for single target mode (doesn't support dodge)
-      )
+        }
+        
+        // For PCs, update action values (wounds go there)
+        if (isPC) {
+          targetUpdate.action_values = {
+            Wounds: newWounds
+          }
+        } else {
+          // For NPCs and mooks, wounds/count go on the shot record
+          if (CS.isMook(targetChar)) {
+            targetUpdate.count = newWounds
+          } else {
+            targetUpdate.wounds = newWounds
+          }
+        }
+        
+        characterUpdates.push(targetUpdate)
 
-      toastSuccess(
-        `Applied ${actualWoundsDealt} wound${actualWoundsDealt !== 1 ? "s" : ""} to ${target.name}`
-      )
+        // Send combat action
+        await client.applyCombatAction(encounter, characterUpdates)
 
-      // Reset form
-      updateFields({
-        targetShotId: "",
-        swerve: "",
-        finalDamage: "",
-        stunt: false,
-        mookRolls: [],
-        showMookRolls: false,
-        selectedTargetIds: [],
-        mookDistribution: {},
-        totalAttackingMooks: 0,
-        defenseChoicePerTarget: {},
-        fortuneDiePerTarget: {},
-        defenseAppliedPerTarget: {},
-      })
+        toastSuccess(
+          `Applied ${actualWoundsDealt} wound${actualWoundsDealt !== 1 ? "s" : ""} to ${targetChar.name}`
+        )
 
-      if (onClose) {
-        onClose()
+        // Reset form
+        updateFields({
+          targetShotId: "",
+          selectedTargetIds: [],
+          swerve: "",
+          finalDamage: "",
+          stunt: false,
+          mookRolls: [],
+          showMookRolls: false,
+          mookDistribution: {},
+          totalAttackingMooks: 0,
+          defenseChoicePerTarget: {},
+          fortuneDiePerTarget: {},
+          defenseAppliedPerTarget: {},
+        })
+
+        if (onClose) {
+          onClose()
+        }
+      } catch (error) {
+        toastError("Failed to apply damage")
+        console.error(error)
+      } finally {
+        updateField("isProcessing", false)
       }
-    } catch (error) {
-      toastError("Failed to apply damage")
-      console.error(error)
-    } finally {
-      updateField("isProcessing", false)
     }
   }
 
@@ -1178,7 +1435,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               calculateTargetDefense={calculateTargetDefense}
             />
           )}
-          
+
           {/* Summary of wounds to apply */}
           {showMultiTargetResults && multiTargetResults.length > 0 && (
             <WoundsSummary
