@@ -693,6 +693,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   }
 
   const handleApplyDamage = async () => {
+    console.log("doing something")
     // Handle multiple targets for non-mook attackers
     if (
       !CS.isMook(attacker) &&
@@ -726,7 +727,17 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           const newShot = currentShot - shots
           
           // Calculate complete state for attacker
-          const attackerUpdate: any = {
+          const attackerUpdate: {
+            shot_id?: string
+            character_id?: string
+            shot?: number
+            action_values?: Record<string, number>
+            event?: {
+              type: string
+              description: string
+              details?: Record<string, unknown>
+            }
+          } = {
             shot_id: attackerShot.character.shot_id,
             character_id: attackerShot.character.id,
             shot: newShot,
@@ -768,7 +779,17 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               const newShot = currentShot - 1
               
               // Add dodge shot spending to character updates
-              const dodgeUpdate: any = {
+              const dodgeUpdate: {
+                shot_id?: string
+                character_id?: string
+                shot?: number
+                action_values?: Record<string, number>
+                event?: {
+                  type: string
+                  description: string
+                  details?: Record<string, unknown>
+                }
+              } = {
                 shot_id: targetChar.shot_id,
                 character_id: targetChar.id,
                 shot: newShot, // Update shot position on Shot record
@@ -896,7 +917,19 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             ? `${attacker.name} took out ${effectiveWounds} ${effectiveWounds === 1 ? "mook" : "mooks"}${defenseDesc}`
             : `${attacker.name} attacked ${targetChar.name}${defenseDesc} for ${effectiveWounds} wounds`
 
-          const targetUpdate: any = {
+          const targetUpdate: {
+            shot_id?: string
+            character_id?: string
+            wounds?: number
+            count?: number
+            impairments?: number
+            action_values?: Record<string, number>
+            event?: {
+              type: string
+              description: string
+              details?: Record<string, unknown>
+            }
+          } = {
             shot_id: targetChar.shot_id,
             character_id: targetChar.id,
             impairments: newImpairments,
@@ -998,10 +1031,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       }
     }
 
-    // Handle multiple targets for mook attackers
+    // Handle mook attackers (single or multiple targets)
     if (
       CS.isMook(attacker) &&
-      selectedTargetIds.length > 1 &&
+      selectedTargetIds.length >= 1 &&
       mookRolls.length > 0
     ) {
       updateField("isProcessing", true)
@@ -1112,11 +1145,20 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             const newImpairments = originalImpairments + impairmentChange
 
             // Collect combat action for this target
-            characterUpdates.push({
+            const targetUpdate: {
+              shot_id: string
+              character_id: string
+              impairments: number
+              wounds?: number
+              action_values?: Record<string, number>
+              event: {
+                type: string
+                description: string
+                details: Record<string, unknown>
+              }
+            } = {
               shot_id: targetChar.shot_id || "",
               character_id: targetChar.id,
-              wounds: isPC ? newWounds : undefined,
-              count: !isPC ? newWounds : undefined,
               impairments: newImpairments,
               event: {
                 type: "attack",
@@ -1138,7 +1180,19 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   mook_hits: targetGroup.rolls.filter(r => r.hit).length,
                 },
               },
-            })
+            }
+            
+            // For PCs, update action values (wounds go there)
+            if (isPC) {
+              targetUpdate.action_values = {
+                Wounds: newWounds
+              }
+            } else {
+              // For NPCs and mooks, wounds/count go on the shot record
+              targetUpdate.wounds = newWounds
+            }
+            
+            characterUpdates.push(targetUpdate)
 
             toastSuccess(
               `Applied ${totalWounds} wound${totalWounds !== 1 ? "s" : ""} to ${targetChar.name}`
@@ -1253,7 +1307,19 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         }
 
         // Create combat action
-        const targetUpdate: any = {
+        const targetUpdate: {
+          shot_id: string
+          character_id: string
+          impairments: number
+          wounds?: number
+          count?: number
+          action_values?: Record<string, number>
+          event: {
+            type: string
+            description: string
+            details: Record<string, unknown>
+          }
+        } = {
           shot_id: targetChar.shot_id || "",
           character_id: targetChar.id,
           impairments: newImpairments,
