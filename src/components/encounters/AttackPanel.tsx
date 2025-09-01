@@ -7,11 +7,7 @@ import {
   Card,
   CardContent,
   Checkbox,
-  FormControl,
   FormControlLabel,
-  InputLabel,
-  MenuItem,
-  Select,
   Typography,
   Stack,
   Divider,
@@ -24,6 +20,7 @@ import type { Character, Shot, Weapon } from "@/types"
 import { useClient } from "@/contexts/AppContext"
 import { NumberField } from "@/components/ui"
 import CharacterSelector from "./CharacterSelector"
+import AttackerSection from "./AttackerSection"
 
 interface AttackPanelProps {
   onClose?: () => void
@@ -31,7 +28,7 @@ interface AttackPanelProps {
 
 export default function AttackPanel({ onClose }: AttackPanelProps) {
   const { encounter, weapons: encounterWeapons, ec } = useEncounter()
-  const { toastSuccess, toastError } = useToast()
+  const { toastSuccess, toastError, toastInfo } = useToast()
   const { client } = useClient()
 
   // State for attack form
@@ -321,9 +318,25 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           setMultiTargetResults(results)
           setShowMultiTargetResults(true)
           
-          // Set total for display
-          const totalWounds = results.reduce((sum, r) => sum + r.wounds, 0)
-          setFinalDamage(totalWounds.toString())
+          // Set finalDamage to smackdown value for the Smackdown field
+          if (selectedTargetIds.length === 1 && results.length === 1) {
+            // For single target, the Smackdown field should show smackdown (outcome + weapon damage)
+            const smackdown = outcome + weaponDmg
+            setFinalDamage(smackdown.toString())
+            console.log("Attack calculation:", {
+              attackValue: av,
+              defense: dv, 
+              swerve: sw,
+              weaponDamage: weaponDmg,
+              outcome,
+              smackdown,
+              toughness: results[0].toughness,
+              wounds: results[0].wounds
+            })
+          } else {
+            // For multiple targets, clear the field
+            setFinalDamage("")
+          }
         } else {
           // No targets selected
           setMultiTargetResults([])
@@ -332,7 +345,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         }
       }
     }
-  }, [swerve, attackValue, defenseValue, weaponDamage, attacker, selectedTargetIds, allShots])
+  }, [swerve, attackValue, defenseValue, weaponDamage, attacker, selectedTargetIds, allShots, targetMookCount])
 
   // Reset defense choices when targets change
   useEffect(() => {
@@ -855,10 +868,14 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         )
         newImpairments = originalImpairments + impairmentChange
       } else {
-        // Regular attack - apply damage using CharacterService
+        // Regular attack - for single non-mook targets
         const currentWounds = CS.wounds(targetChar)
-        const toughness = parseInt(toughnessValue) || 0
-        actualWoundsDealt = CS.calculateWounds(targetChar, damage, toughness)
+        
+        // The Smackdown field (finalDamage) is always treated as the smackdown value
+        // We need to subtract toughness to get actual wounds
+        const toughness = parseInt(toughnessValue) || CS.toughness(targetChar) || 0
+        actualWoundsDealt = Math.max(0, damage - toughness)
+        
         newWounds = currentWounds + actualWoundsDealt
 
         // Calculate impairments
@@ -957,197 +974,23 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         {/* Main Content - Attacker then Target */}
         <Box sx={{ backgroundColor: "action.hover" }}>
           {/* Attacker Section */}
-          <Box
-            sx={{
-              p: { xs: 2, sm: 3 },
-              borderBottom: "2px solid",
-              borderBottomColor: "divider",
-            }}
-          >
-            <Typography variant="h6" sx={{ mb: 2, color: "primary.main" }}>
-              ⚔️ Attacker
-            </Typography>
-
-            {/* Avatar Selection and Shot Cost on same line */}
-            <Stack
-              direction="row"
-              spacing={2}
-              alignItems="flex-start"
-              sx={{ mb: 3 }}
-            >
-              <Box sx={{ flex: 1, minWidth: 0 }}>
-                <CharacterSelector
-                  shots={sortedAttackerShots}
-                  selectedShotId={attackerShotId}
-                  onSelect={setAttackerShotId}
-                  borderColor="primary.main"
-                  // No filtering for attacker selector - shows all characters
-                />
-              </Box>
-
-              {/* Shot Cost */}
-              <Box sx={{ flexShrink: 0 }}>
-                <Typography
-                  variant="caption"
-                  sx={{ display: "block", mb: 0.5 }}
-                >
-                  Shot Cost
-                </Typography>
-                <NumberField
-                  name="shotCost"
-                  value={parseInt(shotCost) || 0}
-                  size="small"
-                  width="80px"
-                  error={false}
-                  onChange={e => setShotCost(e.target.value)}
-                  onBlur={e => setShotCost(e.target.value)}
-                />
-              </Box>
-            </Stack>
-
-            {/* Attack Skill and Weapon Selection */}
-            {attacker && "action_values" in attacker && (
-              <>
-                <Stack
-                  direction={{ xs: "column", sm: "row" }}
-                  spacing={{ xs: 2, sm: 2 }}
-                  sx={{ mb: 3 }}
-                >
-                  {/* Attack Skill Block */}
-                  <Box sx={{ flex: 1 }}>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 2, fontWeight: "medium" }}
-                    >
-                      Attack Skill
-                    </Typography>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <NumberField
-                        name="attackValue"
-                        value={parseInt(attackValue) || 0}
-                        size="small"
-                        width="80px"
-                        error={false}
-                        onChange={e => setAttackValue(e.target.value)}
-                        onBlur={e => setAttackValue(e.target.value)}
-                      />
-                      {(() => {
-                        const mainAttack = CS.mainAttack(attacker)
-                        const mainValue = CS.actionValue(attacker, mainAttack)
-                        const secondaryAttack = CS.secondaryAttack(attacker)
-                        const secondaryValue = secondaryAttack
-                          ? CS.actionValue(attacker, secondaryAttack)
-                          : 0
-
-                        const attackOptions = [
-                          { skill: mainAttack, value: mainValue },
-                          ...(secondaryAttack
-                            ? [
-                                {
-                                  skill: secondaryAttack,
-                                  value: secondaryValue,
-                                },
-                              ]
-                            : []),
-                        ]
-
-                        return (
-                          <FormControl
-                            sx={{
-                              flex: 1,
-                              "& .MuiInputBase-root": { height: 56 },
-                            }}
-                          >
-                            <InputLabel>Attack Skill</InputLabel>
-                            <Select
-                              value={attackSkill}
-                              onChange={e => {
-                                const selected = e.target.value
-                                setAttackSkill(selected)
-                                const option = attackOptions.find(
-                                  o => o.skill === selected
-                                )
-                                if (option) {
-                                  setAttackValue(option.value.toString())
-                                }
-                              }}
-                              label="Attack Skill"
-                            >
-                              {attackOptions.map(option => (
-                                <MenuItem
-                                  key={option.skill}
-                                  value={option.skill}
-                                >
-                                  {option.skill} ({option.value})
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          </FormControl>
-                        )
-                      })()}
-                    </Stack>
-                  </Box>
-
-                  {/* Damage and Weapon Block */}
-                  <Box sx={{ flex: 1 }}>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 2, fontWeight: "medium" }}
-                    >
-                      Damage
-                    </Typography>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <NumberField
-                        name="weaponDamage"
-                        value={parseInt(weaponDamage) || 0}
-                        size="small"
-                        width="80px"
-                        error={false}
-                        onChange={e => setWeaponDamage(e.target.value)}
-                        onBlur={e => setWeaponDamage(e.target.value)}
-                      />
-                      <FormControl
-                        sx={{ flex: 1, "& .MuiInputBase-root": { height: 56 } }}
-                      >
-                        <InputLabel>Weapon</InputLabel>
-                        <Select
-                          value={selectedWeaponId}
-                          onChange={e => {
-                            setSelectedWeaponId(e.target.value)
-                            if (e.target.value === "unarmed") {
-                              const damage = CS.damage(attacker) || 7
-                              setWeaponDamage(damage.toString())
-                            } else {
-                              const weapon = attackerWeapons.find(
-                                w => w.id?.toString() === e.target.value
-                              )
-                              if (weapon) {
-                                setWeaponDamage(weapon.damage.toString())
-                              }
-                            }
-                          }}
-                          label="Weapon"
-                        >
-                          <MenuItem value="unarmed">
-                            Damage ({CS.damage(attacker) || 7})
-                          </MenuItem>
-                          {attackerWeapons.map(weapon => (
-                            <MenuItem
-                              key={weapon.id}
-                              value={weapon.id?.toString() || ""}
-                            >
-                              {weapon.name} (Damage: {weapon.damage})
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Stack>
-                  </Box>
-                </Stack>
-
-              </>
-            )}
-          </Box>
+          <AttackerSection
+            sortedAttackerShots={sortedAttackerShots}
+            attackerShotId={attackerShotId}
+            setAttackerShotId={setAttackerShotId}
+            shotCost={shotCost}
+            setShotCost={setShotCost}
+            attackSkill={attackSkill}
+            setAttackSkill={setAttackSkill}
+            attackValue={attackValue}
+            setAttackValue={setAttackValue}
+            weaponDamage={weaponDamage}
+            setWeaponDamage={setWeaponDamage}
+            selectedWeaponId={selectedWeaponId}
+            setSelectedWeaponId={setSelectedWeaponId}
+            attacker={attacker}
+            attackerWeapons={attackerWeapons}
+          />
 
           {/* Target Section */}
           <Box
