@@ -428,48 +428,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     return defense
   }
 
-  // Handle defense application for a specific target
-  const handleApplyDefenseForTarget = async (targetId: string) => {
-    const targetShot = allShots.find(s => s.character?.shot_id === targetId)
-    const target = targetShot?.character
-    if (!target) return
-    
-    const choice = defenseChoicePerTarget[targetId]
-    if (choice === 'none' || defenseAppliedPerTarget[targetId]) return
-    
-    setIsProcessing(true)
-    try {
-      // Spend 1 shot for dodge or fortune
-      await ec.spendShots(target, 1)
-      
-      if (choice === 'fortune') {
-        // TODO: Also deduct fortune point when fortune point tracking is implemented
-        const fortuneRoll = fortuneDiePerTarget[targetId] || "0"
-        toastSuccess(`Fortune dodge applied to ${target.name}! (+3 +${fortuneRoll} DV, -1 shot, -1 fortune)`)
-      } else {
-        toastSuccess(`Dodge applied to ${target.name}! (+3 DV, -1 shot)`)
-      }
-      
-      setDefenseAppliedPerTarget(prev => ({ ...prev, [targetId]: true }))
-      
-      // Recalculate wounds for this target with new defense
-      const newDefense = calculateTargetDefense(target, targetId)
-      const smackdown = parseInt(attackValue || "0") + parseInt(swerve || "0") - parseInt(defenseValue || "0") + parseInt(weaponDamage || "0")
-      const newWounds = Math.max(0, smackdown - CS.toughness(target))
-      
-      // Update the multi-target results
-      setMultiTargetResults(prev => prev.map(result => 
-        result.targetId === targetId 
-          ? { ...result, defense: newDefense, wounds: newWounds }
-          : result
-      ))
-    } catch (error) {
-      console.error("Defense application error:", error)
-      toastError(`Failed to apply defense for ${target.name}`)
-    } finally {
-      setIsProcessing(false)
-    }
-  }
 
   // Reset when attacker changes
   useEffect(() => {
@@ -606,13 +564,33 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
   const handleApplyDamage = async () => {
     // Handle multiple targets for non-mook attackers
-    if (!CS.isMook(attacker) && selectedTargetIds.length > 1 && multiTargetResults.length > 0) {
+    if (!CS.isMook(attacker) && selectedTargetIds.length > 0 && multiTargetResults.length > 0) {
       setIsProcessing(true)
       try {
         const shots = parseInt(shotCost) || 3
         
         // Spend shots for the attacker
         await ec.spendShots(attacker, shots)
+        
+        // Apply dodges for targets that have dodge selected
+        for (const targetId of selectedTargetIds) {
+          const choice = defenseChoicePerTarget[targetId]
+          if (choice === 'dodge' || choice === 'fortune') {
+            const targetShot = allShots.find(s => s.character?.shot_id === targetId)
+            const targetChar = targetShot?.character
+            if (targetChar) {
+              // Spend 1 shot for dodge
+              await ec.spendShots(targetChar, 1)
+              if (choice === 'fortune') {
+                // TODO: Also deduct fortune point when fortune point tracking is implemented
+                const fortuneRoll = fortuneDiePerTarget[targetId] || "0"
+                toastInfo(`${targetChar.name} dodged with fortune (+3 +${fortuneRoll} DV, -1 shot, -1 fortune)`)
+              } else {
+                toastInfo(`${targetChar.name} dodged (+3 DV, -1 shot)`)
+              }
+            }
+          }
+        }
         
         // Apply wounds to each target
         for (const result of multiTargetResults) {
@@ -621,10 +599,20 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           if (!targetChar) continue
           
           // Calculate effective wounds considering defense choices
-          const smackdown = parseInt(attackValue || "0") + parseInt(swerve || "0") - parseInt(defenseValue || "0") + parseInt(weaponDamage || "0")
-          const effectiveWounds = defenseAppliedPerTarget[result.targetId] 
-            ? Math.max(0, smackdown - CS.toughness(targetChar))
-            : result.wounds
+          const currentDefense = calculateTargetDefense(targetChar, result.targetId)
+          const hasDefenseModifier = defenseChoicePerTarget[result.targetId] && defenseChoicePerTarget[result.targetId] !== 'none'
+          
+          let effectiveWounds = result.wounds
+          if (hasDefenseModifier && selectedTargetIds.length > 1) {
+            // For multiple targets with dodge, recalculate outcome for this specific target
+            const individualOutcome = parseInt(attackValue || "0") + parseInt(swerve || "0") - currentDefense
+            if (individualOutcome >= 0) {
+              const individualSmackdown = individualOutcome + parseInt(weaponDamage || "0")
+              effectiveWounds = Math.max(0, individualSmackdown - CS.toughness(targetChar))
+            } else {
+              effectiveWounds = 0
+            }
+          }
           
           if (effectiveWounds === 0) continue // Skip targets with no wounds
           
@@ -689,11 +677,12 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         setShowMultiTargetResults(false)
         setSwerve("")
         setFinalDamage("")
-        setDodge(false)
         setStunt(false)
         setDefenseChoicePerTarget({})
         setFortuneDiePerTarget({})
         setDefenseAppliedPerTarget({})
+        setManualDefensePerTarget({})
+        setManualToughnessPerTarget({})
         
         if (onClose) {
           onClose()
@@ -775,7 +764,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         setShowMookRolls(false)
         setSwerve("")
         setFinalDamage("")
-        setDodge(false)
         setStunt(false)
         setDefenseChoicePerTarget({})
         setFortuneDiePerTarget({})
@@ -874,7 +862,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             weapon_damage: parseInt(weaponDamage),
             shot_cost: shots,
             stunt: stunt,
-            dodge: dodge,
             is_mook_attack: CS.isMook(attacker),
             mook_count: CS.isMook(attacker) ? attacker.count : undefined,
             mook_hits:
@@ -893,7 +880,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       setTargetShotId("")
       setSwerve("")
       setFinalDamage("")
-      setDodge(false)
       setStunt(false)
       setMookRolls([])
       setShowMookRolls(false)
@@ -1433,35 +1419,73 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                         </Typography>
                         
                         {/* Dodge button */}
-                        {!defenseAppliedPerTarget[id] && (
+                        {defenseChoicePerTarget[id] !== 'dodge' ? (
                           <Button
                             variant="outlined"
                             size="small"
                             onClick={() => {
-                              // Open a dialog or toggle inline options for dodge
-                              if (defenseChoicePerTarget[id] === 'dodge') {
-                                // Apply regular dodge
-                                handleApplyDefenseForTarget(id)
+                              // Just set the dodge choice, don't apply it yet
+                              setDefenseChoicePerTarget(prev => ({
+                                ...prev,
+                                [id]: 'dodge' as DefenseChoice
+                              }))
+                              // Clear any manual defense override so calculateTargetDefense takes over
+                              setManualDefensePerTarget(prev => {
+                                const newOverrides = { ...prev }
+                                delete newOverrides[id]
+                                return newOverrides
+                              })
+                              // Recalculate combined defense
+                              if (selectedTargetIds.length > 1) {
+                                const updatedDefenses = selectedTargetIds.map(targetId => {
+                                  const targetShot = allShots.find(s => s.character?.shot_id === targetId)
+                                  const targetChar = targetShot?.character
+                                  if (!targetChar) return 0
+                                  
+                                  // Use calculateTargetDefense which will include dodge for this target
+                                  if (targetId === id) {
+                                    return CS.defense(targetChar) + 3 + (stunt ? 2 : 0) // dodge + stunt
+                                  }
+                                  return calculateTargetDefense(targetChar, targetId)
+                                })
+                                const highestDefense = Math.max(...updatedDefenses)
+                                const combinedDefense = highestDefense + selectedTargetIds.length
+                                setDefenseValue(combinedDefense.toString())
                               } else {
-                                // Set to dodge choice
-                                setDefenseChoicePerTarget(prev => ({
-                                  ...prev,
-                                  [id]: 'dodge' as DefenseChoice
-                                }))
-                                // Auto-apply regular dodge
-                                handleApplyDefenseForTarget(id)
+                                // Single target - just update defense
+                                const targetShot = allShots.find(s => s.character?.shot_id === id)
+                                const targetChar = targetShot?.character
+                                if (targetChar) {
+                                  const newDefense = CS.defense(targetChar) + 3 + (stunt ? 2 : 0)
+                                  setDefenseValue(newDefense.toString())
+                                }
                               }
                             }}
                             sx={{ minWidth: "80px" }}
                           >
                             Dodge
                           </Button>
-                        )}
-                        
-                        {defenseAppliedPerTarget[id] && (
-                          <Typography variant="body2" sx={{ color: 'success.main' }}>
-                            ✓ Dodged
-                          </Typography>
+                        ) : (
+                          <Button
+                            variant="contained"
+                            size="small"
+                            color="success"
+                            onClick={() => {
+                              // Remove dodge choice
+                              setDefenseChoicePerTarget(prev => {
+                                const newChoices = { ...prev }
+                                delete newChoices[id]
+                                return newChoices
+                              })
+                              // Recalculate defense without dodge
+                              if (selectedTargetIds.length > 0) {
+                                updateDefenseAndToughness(selectedTargetIds, stunt)
+                              }
+                            }}
+                            sx={{ minWidth: "80px" }}
+                          >
+                            ✓ Dodging
+                          </Button>
                         )}
                       </Box>
                     )
@@ -1903,19 +1927,25 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   const currentDefense = calculateTargetDefense(targetChar, result.targetId)
                   const hasDefenseModifier = defenseChoicePerTarget[result.targetId] && defenseChoicePerTarget[result.targetId] !== 'none'
                   
-                  // If this target has dodge/fortune applied, recalculate their individual wounds
+                  // Calculate smackdown for this target
+                  let individualOutcome: number
+                  let smackdown: number
                   let effectiveWounds = result.wounds
+                  
                   if (hasDefenseModifier && selectedTargetIds.length > 1) {
                     // For multiple targets with dodge, recalculate outcome for this specific target
-                    const individualOutcome = parseInt(attackValue || "0") + parseInt(swerve || "0") - currentDefense
+                    individualOutcome = parseInt(attackValue || "0") + parseInt(swerve || "0") - currentDefense
                     if (individualOutcome >= 0) {
-                      const individualSmackdown = individualOutcome + parseInt(weaponDamage || "0")
-                      effectiveWounds = Math.max(0, individualSmackdown - CS.toughness(targetChar))
+                      smackdown = individualOutcome + parseInt(weaponDamage || "0")
+                      effectiveWounds = Math.max(0, smackdown - CS.toughness(targetChar))
                     } else {
+                      smackdown = individualOutcome + parseInt(weaponDamage || "0") // Still calculate smackdown even on miss
                       effectiveWounds = 0
                     }
-                  } else if (selectedTargetIds.length === 1) {
-                    // For single target, wounds are already calculated correctly
+                  } else {
+                    // Use the standard calculation
+                    const outcome = parseInt(attackValue || "0") + parseInt(swerve || "0") - parseInt(defenseValue || "0")
+                    smackdown = outcome + parseInt(weaponDamage || "0")
                     effectiveWounds = result.wounds
                   }
                   
