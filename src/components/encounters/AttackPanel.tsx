@@ -3,14 +3,10 @@
 import { useMemo, useEffect } from "react"
 import {
   Box,
-  Button,
   Card,
   CardContent,
   Typography,
-  Stack,
-  Alert,
 } from "@mui/material"
-import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { useEncounter, useToast } from "@/contexts"
 import { CS, DS } from "@/services"
 import type { 
@@ -19,26 +15,18 @@ import type {
   Weapon,
   AttackFormData,
   AttackPanelProps,
-  MultiTargetResult,
-  MookTargetGroup,
-  MookRoll,
-  DefenseChoice,
 } from "@/types"
 import { useClient } from "@/contexts/AppContext"
-import { NumberField } from "@/components/ui"
 import AttackerSection from "./attacks/AttackerSection"
 import TargetSection from "./attacks/TargetSection"
 import WoundsSummary from "./attacks/WoundsSummary"
 import MookAttackSection from "./attacks/MookAttackSection"
 import CombatResolution from "./attacks/CombatResolution"
 import AttackResults from "./attacks/AttackResults"
-import { FormActions, useForm } from "@/reducers"
-import { 
-  calculateEffectiveAttackValue as calcEffectiveAttack,
+import { useForm } from "@/reducers"
+import {
   calculateTargetDefense as calcTargetDefense,
-  calculateCombinedDefense,
   distributeMooksAmongTargets,
-  calculateWounds,
 } from "./attacks/attackCalculations"
 import { 
   sortAttackerShots,
@@ -72,6 +60,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     toughnessValue: "0",
     stunt: false,
     targetMookCount: 1,
+    targetMookCountPerTarget: {},
     
     // Defense modifiers per target
     defenseChoicePerTarget: {},
@@ -120,6 +109,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     multiTargetResults,
     showMultiTargetResults,
     targetMookCount,
+    targetMookCountPerTarget,
     defenseChoicePerTarget,
     fortuneDiePerTarget,
     defenseAppliedPerTarget,
@@ -193,7 +183,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     if (attacker && "action_values" in attacker) {
       // Get attack skills
       const mainAttack = CS.mainAttack(attacker)
-      let av = CS.actionValue(attacker, mainAttack)
+      const av = CS.actionValue(attacker, mainAttack)
       
       // Get default weapon and damage
       const weaponIds = attacker.weapon_ids || []
@@ -259,7 +249,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             if (CS.isMook(targetChar) && !CS.isMook(attacker)) {
               // For mooks, if the attack succeeds, the attacker takes out the targeted number
               if (outcome >= 0) {
-                wounds = targetMookCount // Number of mooks taken out
+                // Use per-target mook count if available, otherwise fall back to single count
+                wounds = targetMookCountPerTarget[targetId] || targetMookCount || 1
               }
             } else {
               // Normal wound calculation for non-mooks
@@ -376,18 +367,44 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           toughnessValue: "0",
         })
       } else {
-        // Non-mook attacking multiple targets - highest defense + number of targets
-        const defenses = targets.map(t => {
-          let defense = CS.defense(t)
-          if (includeStunt) defense += 2  // Add stunt modifier to each target
-          return defense
-        })
-        const highestDefense = Math.max(...defenses)
-        const combinedDefense = highestDefense + targetIds.length
-        updateFields({
-          defenseValue: combinedDefense.toString(),
-          toughnessValue: "0",
-        })
+        // Non-mook attacking multiple targets
+        
+        // Check if all targets are mooks
+        const allTargetsAreMooks = targets.every(t => CS.isMook(t))
+        
+        if (allTargetsAreMooks) {
+          // Multiple mook groups - calculate each group's defense (base + count), then add number of groups
+          const defenses = targetIds.map((id, index) => {
+            const target = targets[index]
+            if (!target) return 0
+            
+            let defense = CS.defense(target)
+            const mookCount = targetMookCountPerTarget[id] || 1
+            defense += mookCount  // Add the number of mooks in this group
+            if (includeStunt) defense += 2
+            return defense
+          })
+          const highestDefense = Math.max(...defenses)
+          // Add the number of groups (not individual mooks)
+          const combinedDefense = highestDefense + targetIds.length
+          updateFields({
+            defenseValue: combinedDefense.toString(),
+            toughnessValue: "0",
+          })
+        } else {
+          // Mixed or non-mook targets - highest defense + number of targets
+          const defenses = targets.map(t => {
+            let defense = CS.defense(t)
+            if (includeStunt) defense += 2  // Add stunt modifier to each target
+            return defense
+          })
+          const highestDefense = Math.max(...defenses)
+          const combinedDefense = highestDefense + targetIds.length
+          updateFields({
+            defenseValue: combinedDefense.toString(),
+            toughnessValue: "0",
+          })
+        }
       }
     }
   }
@@ -456,6 +473,35 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     })
   }, [attackerShotId, allShots])
   
+  // Recalculate defense when mook counts change
+  useEffect(() => {
+    // Only recalculate for multiple mook groups
+    if (selectedTargetIds.length > 1 && !CS.isMook(attacker)) {
+      const targets = selectedTargetIds.map(id => 
+        allShots.find(s => s.character?.shot_id === id)?.character
+      ).filter((char): char is Character => char !== undefined)
+      
+      const allTargetsAreMooks = targets.every(t => CS.isMook(t))
+      
+      if (allTargetsAreMooks && Object.keys(targetMookCountPerTarget).length > 0) {
+        // Recalculate combined defense for multiple mook groups
+        const defenses = selectedTargetIds.map((id, index) => {
+          const target = targets[index]
+          if (!target) return 0
+          
+          let defense = CS.defense(target)
+          const mookCount = targetMookCountPerTarget[id] || 1
+          defense += mookCount  // Add the number of mooks in this group
+          if (formState.data.stunt) defense += 2
+          return defense
+        })
+        const highestDefense = Math.max(...defenses)
+        const combinedDefense = highestDefense + selectedTargetIds.length
+        updateField("defenseValue", combinedDefense.toString())
+      }
+    }
+  }, [targetMookCountPerTarget, selectedTargetIds, formState.data.stunt])
+
   // Clear attack results when targets change
   useEffect(() => {
     // Clear all attack-related results when targets change

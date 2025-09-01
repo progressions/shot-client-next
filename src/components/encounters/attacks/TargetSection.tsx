@@ -8,13 +8,9 @@ import {
   Checkbox,
 } from "@mui/material"
 import { CS } from "@/services"
-import type { 
-  Character, 
-  Shot,
-  AttackFormData,
+import type {
   TargetSectionProps
 } from "@/types"
-import type { FormStateType, FormStateAction } from "@/reducers"
 import { NumberField } from "@/components/ui"
 import CharacterSelector from "../CharacterSelector"
 import TargetDefenseDisplay from "./TargetDefenseDisplay"
@@ -85,6 +81,7 @@ export default function TargetSection({
     selectedTargetIds,
     stunt,
     targetMookCount,
+    targetMookCountPerTarget,
     mookDistribution,
     totalAttackingMooks,
     defenseChoicePerTarget,
@@ -93,6 +90,12 @@ export default function TargetSection({
     manualToughnessPerTarget,
     defenseValue,
   } = formState.data
+
+  // Check if all selected targets are mooks
+  const allTargetsAreMooks = selectedTargetIds.every(id => {
+    const shot = allShots.find(s => s.character?.shot_id === id)
+    return shot?.character && CS.isMook(shot.character)
+  })
 
   return (
     <Box
@@ -120,6 +123,15 @@ export default function TargetSection({
             const newIds = selectedTargetIds.filter(id => id !== shotId)
             updateField("selectedTargetIds", newIds)
             
+            // Reset the mook count for the deselected target
+            const deselectedShot = allShots.find(s => s.character?.shot_id === shotId)
+            if (deselectedShot?.character && CS.isMook(deselectedShot.character)) {
+              // Remove the count for this specific mook
+              const newTargetMookCountPerTarget = { ...targetMookCountPerTarget }
+              delete newTargetMookCountPerTarget[shotId]
+              updateField("targetMookCountPerTarget", newTargetMookCountPerTarget)
+            }
+            
             // Update defense/toughness based on remaining targets
             if (newIds.length === 0) {
               updateFields({
@@ -138,6 +150,16 @@ export default function TargetSection({
             // Add to selection
             const newIds = [...selectedTargetIds, shotId]
             updateField("selectedTargetIds", newIds)
+            
+            // Initialize mook count for newly selected mook
+            const selectedShot = allShots.find(s => s.character?.shot_id === shotId)
+            if (selectedShot?.character && CS.isMook(selectedShot.character)) {
+              updateField("targetMookCountPerTarget", {
+                ...targetMookCountPerTarget,
+                [shotId]: 1  // Initialize with count of 1
+              })
+            }
+            
             updateDefenseAndToughness(newIds, stunt)
             
             // Update mook distribution
@@ -314,6 +336,7 @@ export default function TargetSection({
                 attacker={attacker}
                 stunt={stunt}
                 targetMookCount={targetMookCount}
+                targetMookCountPerTarget={targetMookCountPerTarget}
                 defenseChoicePerTarget={defenseChoicePerTarget}
                 fortuneDiePerTarget={fortuneDiePerTarget}
                 manualDefensePerTarget={manualDefensePerTarget}
@@ -336,7 +359,7 @@ export default function TargetSection({
           spacing={{ xs: 2, sm: 4 }}
           alignItems="flex-start"
         >
-          {/* Defense Value - only show for multiple targets when non-mook attacker */}
+          {/* Defense Value - show for multiple targets when non-mook attacker (except for single mook group) */}
           {selectedTargetIds.length > 1 && attacker && !CS.isMook(attacker) && (
             <Box>
               <Typography
@@ -356,7 +379,7 @@ export default function TargetSection({
                 onBlur={e => updateField("defenseValue", e.target.value)}
               />
               <Typography variant="caption" sx={{ display: "block", mt: 0.5 }}>
-                (Highest + {selectedTargetIds.length})
+                (Highest + {selectedTargetIds.length}{allTargetsAreMooks ? " groups" : ""})
               </Typography>
               {(() => {
                 let total = 0

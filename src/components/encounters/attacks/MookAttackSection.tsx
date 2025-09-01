@@ -10,11 +10,7 @@ import {
 } from "@mui/material"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { CS } from "@/services"
-import type { 
-  Character, 
-  Shot,
-  MookRoll,
-  MookTargetGroup,
+import type {
   MookAttackSectionProps
 } from "@/types"
 import { NumberField } from "@/components/ui"

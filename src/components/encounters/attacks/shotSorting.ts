@@ -91,14 +91,15 @@ export const sortTargetShots = (shots: Shot[], attacker: Character | undefined):
 /**
  * Get all visible shots from encounter
  */
-export const getAllVisibleShots = (encounterShots: any[]): Shot[] => {
+export const getAllVisibleShots = (encounterShots: unknown[]): Shot[] => {
   const shots: Shot[] = []
   let index = 0
   
-  encounterShots.forEach(shotGroup => {
+  encounterShots.forEach(shotGroupUnknown => {
+    const shotGroup = shotGroupUnknown as Record<string, unknown>
     // Only include if shot value is not null (not hidden)
     if (shotGroup.shot !== null && shotGroup.shot !== undefined) {
-      if (shotGroup.characters) {
+      if (shotGroup.characters && Array.isArray(shotGroup.characters)) {
         shotGroup.characters.forEach((char: Character) => {
           shots.push({
             ...shotGroup,
@@ -106,7 +107,7 @@ export const getAllVisibleShots = (encounterShots: any[]): Shot[] => {
             characters: [char],
             // Add a unique index for handling duplicate names
             uniqueIndex: index++,
-          })
+          } as Shot)
         })
       }
     }

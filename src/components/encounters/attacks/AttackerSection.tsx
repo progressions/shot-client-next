@@ -11,14 +11,10 @@ import {
   Stack,
 } from "@mui/material"
 import { CS } from "@/services"
-import type { 
-  Character, 
-  Shot, 
-  Weapon,
+import type {
   AttackFormData,
   AttackerSectionProps
 } from "@/types"
-import type { FormStateType, FormStateAction } from "@/reducers"
 import { FormActions } from "@/reducers"
 import { NumberField } from "@/components/ui"
 import CharacterSelector from "../CharacterSelector"

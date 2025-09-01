@@ -23,6 +23,7 @@ export interface AttackFormData {
   finalDamage: string
   stunt: boolean
   targetMookCount: number
+  targetMookCountPerTarget: { [targetId: string]: number }
   shotCost: string
   isProcessing: boolean
   mookDistribution: { [targetId: string]: number }
@@ -77,7 +78,7 @@ export interface MookTargetGroup {
  * Props for AttackPanel component
  */
 export interface AttackPanelProps {
-  encounter: any // Replace with proper Encounter type when available
+  encounter: Record<string, unknown> // Replace with proper Encounter type when available
   encounterWeapons: { [key: string]: Weapon }
   onExpandChange?: (expanded: boolean) => void
 }
@@ -121,6 +122,7 @@ export interface TargetDefenseDisplayProps {
   attacker: Character | undefined
   stunt: boolean
   targetMookCount: number
+  targetMookCountPerTarget: { [targetId: string]: number }
   defenseChoicePerTarget: { [targetId: string]: DefenseChoice }
   fortuneDiePerTarget: { [targetId: string]: string }
   manualDefensePerTarget: { [targetId: string]: string }

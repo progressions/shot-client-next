@@ -2,12 +2,8 @@
 
 import { Alert, Stack, Typography } from "@mui/material"
 import { CS } from "@/services"
-import type { 
-  Character, 
-  Shot,
-  WoundsSummaryProps,
-  DefenseChoice,
-  MultiTargetResult
+import type {
+  WoundsSummaryProps
 } from "@/types"
 
 export default function WoundsSummary({
@@ -25,7 +21,7 @@ export default function WoundsSummary({
   return (
     <Alert severity="warning" sx={{ mt: 2 }}>
       <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-        Wounds to Apply:
+        Results:
       </Typography>
       <Stack spacing={0.5} sx={{ mt: 0.5 }}>
         {multiTargetResults.map((result) => {

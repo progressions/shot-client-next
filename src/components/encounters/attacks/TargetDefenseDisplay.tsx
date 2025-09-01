@@ -7,8 +7,7 @@ import type {
   Character, 
   Shot,
   DefenseChoice,
-  TargetDefenseDisplayProps,
-  AttackFormData
+  TargetDefenseDisplayProps
 } from "@/types"
 import { getDefenseModifiersText } from "./defenseModifierUtils"
 
@@ -48,6 +47,7 @@ export default function TargetDefenseDisplay({
   attacker,
   stunt,
   targetMookCount,
+  targetMookCountPerTarget,
   defenseChoicePerTarget,
   fortuneDiePerTarget,
   manualDefensePerTarget,
@@ -63,7 +63,12 @@ export default function TargetDefenseDisplay({
   if (!char) return null
   
   const baseDefense = CS.defense(char)
-  const currentDefense = calculateTargetDefense(char, targetId)
+  // For mooks, calculate defense including the count
+  const mookCount = CS.isMook(char) ? (targetMookCountPerTarget[targetId] || 1) : 1
+  const defenseWithMookCount = CS.isMook(char) && mookCount > 1 ? baseDefense + mookCount : baseDefense
+  const currentDefense = manualDefensePerTarget[targetId] 
+    ? parseInt(manualDefensePerTarget[targetId]) 
+    : (defenseWithMookCount + (stunt ? 2 : 0))
   const baseToughness = CS.toughness(char)
   const currentToughness = manualToughnessPerTarget[targetId] ? parseInt(manualToughnessPerTarget[targetId]) : baseToughness
   
@@ -157,42 +162,54 @@ export default function TargetDefenseDisplay({
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "80px" }}>
             <NumberField
               name={`count-${targetId}`}
-              value={targetMookCount}
+              value={targetMookCountPerTarget[targetId] || 1}
               size="small"
               width="80px"
               error={false}
               disabled={false}
               onChange={(e) => {
                 const count = Math.max(1, parseInt(e.target.value) || 1)
-                updateField("targetMookCount", count)
-                // Update defense based on mook count
+                // Update the per-target mook count
+                updateField("targetMookCountPerTarget", {
+                  ...targetMookCountPerTarget,
+                  [targetId]: count
+                })
+                
+                // Update the manual defense for this mook group
                 const baseDefense = CS.defense(char)
                 const newDefense = count > 1 ? baseDefense + count : baseDefense
-                // Apply stunt bonus if active
                 const finalDefense = newDefense + (stunt ? 2 : 0)
                 updateField("manualDefensePerTarget", {
                   ...manualDefensePerTarget,
                   [targetId]: finalDefense.toString()
                 })
-                // Update the main defense value for single target
+                
+                // For backward compatibility, update single targetMookCount if only one target
                 if (selectedTargetIds.length === 1) {
+                  updateField("targetMookCount", count)
                   updateField("defenseValue", finalDefense.toString())
                 }
               }}
               onBlur={(e) => {
                 const count = Math.max(1, parseInt(e.target.value) || 1)
-                updateField("targetMookCount", count)
-                // Update defense based on mook count
+                // Update the per-target mook count
+                updateField("targetMookCountPerTarget", {
+                  ...targetMookCountPerTarget,
+                  [targetId]: count
+                })
+                
+                // Update the manual defense for this mook group
                 const baseDefense = CS.defense(char)
                 const newDefense = count > 1 ? baseDefense + count : baseDefense
-                // Apply stunt bonus if active
                 const finalDefense = newDefense + (stunt ? 2 : 0)
                 updateField("manualDefensePerTarget", {
                   ...manualDefensePerTarget,
                   [targetId]: finalDefense.toString()
                 })
-                // Update the main defense value for single target
+                
+                // For backward compatibility, update single targetMookCount if only one target
                 if (selectedTargetIds.length === 1) {
+                  updateField("targetMookCount", count)
                   updateField("defenseValue", finalDefense.toString())
                 }
               }}

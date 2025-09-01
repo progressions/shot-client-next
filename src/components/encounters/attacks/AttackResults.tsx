@@ -7,13 +7,8 @@ import {
   Alert,
 } from "@mui/material"
 import { CS } from "@/services"
-import type { 
-  Character, 
-  Shot, 
-  Weapon,
-  MultiTargetResult,
-  AttackResultsProps,
-  DefenseChoice
+import type {
+  AttackResultsProps
 } from "@/types"
 
 export default function AttackResults({
@@ -42,6 +37,12 @@ export default function AttackResults({
   const attackDisplay = mookBonus > 0 
     ? `${attackValue} (+${mookBonus} vs mooks)` 
     : attackValue
+  
+  // Check if all targets are mooks
+  const allTargetsAreMooks = selectedTargetIds.every(id => {
+    const shot = allShots.find(s => s.character?.shot_id === id)
+    return shot?.character && CS.isMook(shot.character)
+  })
 
   return (
     <Box sx={{ width: "100%", mt: 3 }}>
@@ -53,15 +54,16 @@ export default function AttackResults({
         <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
           Action Result {effectiveAttack + parseInt(swerve || "0")} - {defenseLabel} {defenseValue} = Outcome {outcome}
         </Typography>
-        {isHit && (
+        {isHit && !allTargetsAreMooks && (
           <Typography variant="caption" sx={{ display: "block" }}>
             Outcome {outcome} + Weapon Damage {weaponDamage} = Smackdown {outcome + parseInt(weaponDamage || "0")}
           </Typography>
         )}
       </Alert>
 
-      {/* Individual target results */}
-      <Stack spacing={2}>
+      {/* Individual target results - only show for non-mook targets */}
+      {!allTargetsAreMooks && (
+        <Stack spacing={2}>
         {multiTargetResults.map((result) => {
           const targetShot = allShots.find(s => s.character?.shot_id === result.targetId)
           const targetChar = targetShot?.character
@@ -141,7 +143,8 @@ export default function AttackResults({
             </Alert>
           )
         })}
-      </Stack>
+        </Stack>
+      )}
     </Box>
   )
 }

@@ -8,10 +8,7 @@ import {
 } from "@mui/material"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { CS } from "@/services"
-import type { 
-  Character, 
-  Shot,
-  MultiTargetResult,
+import type {
   CombatResolutionProps
 } from "@/types"
 import { NumberField } from "@/components/ui"

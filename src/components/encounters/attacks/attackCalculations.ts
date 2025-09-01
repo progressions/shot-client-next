@@ -117,19 +117,30 @@ export const calculateCombinedDefense = (
   targetIds: string[],
   allShots: Shot[],
   attacker: Character | undefined,
-  stunt: boolean
+  stunt: boolean,
+  targetMookCountPerTarget?: { [targetId: string]: number }
 ): number => {
   if (targetIds.length === 0) return 0
   
-  const targets = targetIds.map(id => 
-    allShots.find(s => s.character?.shot_id === id)?.character
-  ).filter((char): char is Character => char !== undefined)
+  const targets = targetIds.map(id => ({
+    id,
+    character: allShots.find(s => s.character?.shot_id === id)?.character
+  })).filter((t): t is { id: string, character: Character } => t.character !== undefined)
   
   if (targetIds.length === 1) {
     // Single target - return actual defense
     const target = targets[0]
-    if (target) {
-      let defense = CS.defense(target)
+    if (target.character) {
+      let defense = CS.defense(target.character)
+      
+      // Add mook count if targeting multiple mooks in a single group
+      if (CS.isMook(target.character) && targetMookCountPerTarget) {
+        const count = targetMookCountPerTarget[target.id] || 1
+        if (count > 1) {
+          defense += count
+        }
+      }
+      
       if (stunt) defense += 2
       return defense
     }
@@ -140,20 +151,39 @@ export const calculateCombinedDefense = (
   if (attacker && CS.isMook(attacker)) {
     // Mooks attacking multiple targets - just show highest for reference
     const defenses = targets.map(t => {
-      let defense = CS.defense(t)
+      let defense = CS.defense(t.character)
       if (stunt) defense += 2
       return defense
     })
     return Math.max(...defenses)
   } else {
-    // Non-mook attacking multiple targets - highest defense + number of targets
-    const defenses = targets.map(t => {
-      let defense = CS.defense(t)
-      if (stunt) defense += 2
-      return defense
-    })
-    const highestDefense = Math.max(...defenses)
-    return highestDefense + targetIds.length
+    // Non-mook attacking multiple targets
+    
+    // Check if all targets are mooks
+    const allTargetsAreMooks = targets.every(t => CS.isMook(t.character))
+    
+    if (allTargetsAreMooks && targetMookCountPerTarget) {
+      // Multiple mook groups - calculate each group's defense (base + count), then add number of groups
+      const defenses = targets.map(t => {
+        let defense = CS.defense(t.character)
+        const mookCount = targetMookCountPerTarget[t.id] || 1
+        defense += mookCount  // Add the number of mooks in this group
+        if (stunt) defense += 2
+        return defense
+      })
+      const highestDefense = Math.max(...defenses)
+      // Add the number of groups (not individual mooks)
+      return highestDefense + targetIds.length
+    } else {
+      // Mixed or non-mook targets - highest defense + number of targets
+      const defenses = targets.map(t => {
+        let defense = CS.defense(t.character)
+        if (stunt) defense += 2
+        return defense
+      })
+      const highestDefense = Math.max(...defenses)
+      return highestDefense + targetIds.length
+    }
   }
 }
 
