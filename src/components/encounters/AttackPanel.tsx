@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useMemo, useEffect } from "react"
 import {
   Box,
   Button,
@@ -21,6 +21,72 @@ import { useClient } from "@/contexts/AppContext"
 import { NumberField } from "@/components/ui"
 import CharacterSelector from "./CharacterSelector"
 import AttackerSection from "./AttackerSection"
+import { FormActions, useForm } from "@/reducers"
+
+// Define the shape of our form data
+type DefenseChoice = 'none' | 'dodge' | 'fortune'
+
+interface AttackFormData {
+  // Attacker state
+  attackerShotId: string
+  attackSkill: string
+  attackValue: string
+  selectedWeaponId: string
+  weaponDamage: string
+  shotCost: string
+  
+  // Target state
+  selectedTargetIds: string[]
+  targetShotId: string // For backward compatibility
+  defenseValue: string
+  toughnessValue: string
+  stunt: boolean
+  targetMookCount: number
+  
+  // Defense modifiers per target
+  defenseChoicePerTarget: { [targetId: string]: DefenseChoice }
+  fortuneDiePerTarget: { [targetId: string]: string }
+  defenseAppliedPerTarget: { [targetId: string]: boolean }
+  manualDefensePerTarget: { [targetId: string]: string }
+  manualToughnessPerTarget: { [targetId: string]: string }
+  
+  // Attack resolution
+  swerve: string
+  finalDamage: string
+  
+  // Mook attack state
+  mookDistribution: { [targetId: string]: number }
+  totalAttackingMooks: number
+  mookRolls: Array<{
+    targetId: string
+    targetName: string
+    rolls: Array<{
+      mookNumber: number
+      swerve: number
+      actionResult: number
+      outcome: number
+      hit: boolean
+      wounds: number
+    }>
+  }>
+  showMookRolls: boolean
+  
+  // Multi-target results
+  multiTargetResults: Array<{
+    targetId: string
+    targetName: string
+    defense: number
+    toughness: number
+    wounds: number
+  }>
+  showMultiTargetResults: boolean
+  
+  // Processing state
+  isProcessing: boolean
+  
+  // Allow string keys for FormActions.UPDATE
+  [key: string]: unknown
+}
 
 interface AttackPanelProps {
   onClose?: () => void
@@ -31,67 +97,98 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   const { toastSuccess, toastError, toastInfo } = useToast()
   const { client } = useClient()
 
-  // State for attack form
-  const [attackerShotId, setAttackerShotId] = useState<string>("")
-  const [selectedTargetIds, setSelectedTargetIds] = useState<string[]>([])
-  const [attackSkill, setAttackSkill] = useState<string>("")
-  const [attackValue, setAttackValue] = useState<string>("")
-  const [defenseValue, setDefenseValue] = useState<string>("0")
-  const [toughnessValue, setToughnessValue] = useState<string>("0")
-  const [selectedWeaponId, setSelectedWeaponId] = useState<string>("")
-  const [weaponDamage, setWeaponDamage] = useState<string>("")
-  const [swerve, setSwerve] = useState<string>("")
-  const [stunt, setStunt] = useState(false)
-  const [finalDamage, setFinalDamage] = useState<string>("")
-  const [shotCost, setShotCost] = useState<string>("3")
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [mookRolls, setMookRolls] = useState<
-    Array<{
-      targetId: string
-      targetName: string
-      rolls: Array<{
-        mookNumber: number
-        swerve: number
-        actionResult: number
-        outcome: number
-        hit: boolean
-        wounds: number
-      }>
-    }>
-  >([])
-  const [showMookRolls, setShowMookRolls] = useState(false)
-  const [mookDistribution, setMookDistribution] = useState<{ [targetId: string]: number }>({})
-  const [totalAttackingMooks, setTotalAttackingMooks] = useState<number>(0)
-  const [multiTargetResults, setMultiTargetResults] = useState<Array<{
-    targetId: string
-    targetName: string
-    defense: number
-    toughness: number
-    wounds: number
-  }>>([])
-  const [showMultiTargetResults, setShowMultiTargetResults] = useState(false)
-  const [targetMookCount, setTargetMookCount] = useState<number>(1) // For non-mook attacking mooks
-  
-  // Per-target defense tracking for multiple target attacks
-  type DefenseChoice = 'none' | 'dodge' | 'fortune'
-  const [defenseChoicePerTarget, setDefenseChoicePerTarget] = useState<{ 
-    [targetId: string]: DefenseChoice 
-  }>({})
-  const [fortuneDiePerTarget, setFortuneDiePerTarget] = useState<{ 
-    [targetId: string]: string 
-  }>({})
-  const [defenseAppliedPerTarget, setDefenseAppliedPerTarget] = useState<{ 
-    [targetId: string]: boolean 
-  }>({})
-  const [manualDefensePerTarget, setManualDefensePerTarget] = useState<{
-    [targetId: string]: string
-  }>({})
-  const [manualToughnessPerTarget, setManualToughnessPerTarget] = useState<{
-    [targetId: string]: string
-  }>({})
-  
-  // For backward compatibility
-  const [targetShotId, setTargetShotId] = useState<string>("")
+  // Initialize form state with useForm
+  const { formState, dispatchForm } = useForm<AttackFormData>({
+    // Attacker state
+    attackerShotId: "",
+    attackSkill: "",
+    attackValue: "",
+    selectedWeaponId: "",
+    weaponDamage: "",
+    shotCost: "3",
+    
+    // Target state
+    selectedTargetIds: [],
+    targetShotId: "", // For backward compatibility
+    defenseValue: "0",
+    toughnessValue: "0",
+    stunt: false,
+    targetMookCount: 1,
+    
+    // Defense modifiers per target
+    defenseChoicePerTarget: {},
+    fortuneDiePerTarget: {},
+    defenseAppliedPerTarget: {},
+    manualDefensePerTarget: {},
+    manualToughnessPerTarget: {},
+    
+    // Attack resolution
+    swerve: "",
+    finalDamage: "",
+    
+    // Mook attack state
+    mookDistribution: {},
+    totalAttackingMooks: 0,
+    mookRolls: [],
+    showMookRolls: false,
+    
+    // Multi-target results
+    multiTargetResults: [],
+    showMultiTargetResults: false,
+    
+    // Processing state
+    isProcessing: false,
+  })
+
+  // Destructure commonly used values from formState.data
+  const {
+    attackerShotId,
+    selectedTargetIds,
+    attackSkill,
+    attackValue,
+    defenseValue,
+    toughnessValue,
+    selectedWeaponId,
+    weaponDamage,
+    swerve,
+    stunt,
+    finalDamage,
+    shotCost,
+    isProcessing,
+    mookRolls,
+    showMookRolls,
+    mookDistribution,
+    totalAttackingMooks,
+    multiTargetResults,
+    showMultiTargetResults,
+    targetMookCount,
+    defenseChoicePerTarget,
+    fortuneDiePerTarget,
+    defenseAppliedPerTarget,
+    manualDefensePerTarget,
+    manualToughnessPerTarget,
+    targetShotId,
+  } = formState.data
+
+  // Helper function to update form field
+  const updateField = (name: keyof AttackFormData, value: unknown) => {
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name,
+      value,
+    })
+  }
+
+  // Helper function to update multiple fields at once
+  const updateFields = (updates: Partial<AttackFormData>) => {
+    Object.entries(updates).forEach(([name, value]) => {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name,
+        value,
+      })
+    })
+  }
 
   // Get all characters in the fight (excluding hidden ones)
   const allShots = useMemo(() => {
@@ -231,38 +328,36 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     if (attacker && "action_values" in attacker) {
       // Get attack skills
       const mainAttack = CS.mainAttack(attacker)
-      setAttackSkill(mainAttack)
-
-      // Set suggested attack value
       const av = CS.actionValue(attacker, mainAttack)
-      setAttackValue(av.toString())
-
-      // Set default weapon and damage
+      
+      // Get default weapon and damage
       const weaponIds = attacker.weapon_ids || []
       const charWeapons = weaponIds
         .map(id => encounterWeapons[id])
         .filter((weapon): weapon is Weapon => weapon !== undefined)
 
+      const updates: Partial<AttackFormData> = {
+        attackSkill: mainAttack,
+        attackValue: av.toString(),
+      }
+
       if (charWeapons.length > 0) {
-        setSelectedWeaponId(charWeapons[0].id?.toString() || "")
-        setWeaponDamage(charWeapons[0].damage.toString())
+        updates.selectedWeaponId = charWeapons[0].id?.toString() || ""
+        updates.weaponDamage = charWeapons[0].damage.toString()
       } else {
-        setSelectedWeaponId("unarmed")
-        const damage = CS.damage(attacker) || 7
-        setWeaponDamage(damage.toString())
+        updates.selectedWeaponId = "unarmed"
+        updates.weaponDamage = (CS.damage(attacker) || 7).toString()
       }
 
       // Set shot cost based on character type
-      if (CS.isBoss(attacker) || CS.isUberBoss(attacker)) {
-        setShotCost("2")
-      } else {
-        setShotCost("3")
-      }
+      updates.shotCost = (CS.isBoss(attacker) || CS.isUberBoss(attacker)) ? "2" : "3"
 
       // Set default mook distribution
       if (CS.isMook(attacker)) {
-        setMookDistribution({})
+        updates.mookDistribution = {}
       }
+      
+      updateFields(updates)
     }
   }, [attacker, encounterWeapons, targetShotId])
 
@@ -315,14 +410,12 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             }
           }).filter(r => r !== null) as typeof multiTargetResults
 
-          setMultiTargetResults(results)
-          setShowMultiTargetResults(true)
-          
           // Set finalDamage to smackdown value for the Smackdown field
+          let damageValue = ""
           if (selectedTargetIds.length === 1 && results.length === 1) {
             // For single target, the Smackdown field should show smackdown (outcome + weapon damage)
             const smackdown = outcome + weaponDmg
-            setFinalDamage(smackdown.toString())
+            damageValue = smackdown.toString()
             console.log("Attack calculation:", {
               attackValue: av,
               defense: dv, 
@@ -333,15 +426,20 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               toughness: results[0].toughness,
               wounds: results[0].wounds
             })
-          } else {
-            // For multiple targets, clear the field
-            setFinalDamage("")
           }
+          
+          updateFields({
+            multiTargetResults: results,
+            showMultiTargetResults: true,
+            finalDamage: damageValue,
+          })
         } else {
           // No targets selected
-          setMultiTargetResults([])
-          setShowMultiTargetResults(false)
-          setFinalDamage("0")
+          updateFields({
+            multiTargetResults: [],
+            showMultiTargetResults: false,
+            finalDamage: "0",
+          })
         }
       }
     }
@@ -349,16 +447,20 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
   // Reset defense choices when targets change
   useEffect(() => {
-    setDefenseChoicePerTarget({})
-    setFortuneDiePerTarget({})
-    setDefenseAppliedPerTarget({})
+    updateFields({
+      defenseChoicePerTarget: {},
+      fortuneDiePerTarget: {},
+      defenseAppliedPerTarget: {},
+    })
   }, [selectedTargetIds])
 
   // Helper function to update defense and toughness based on selected targets
   const updateDefenseAndToughness = (targetIds: string[], includeStunt: boolean = false) => {
     if (targetIds.length === 0) {
-      setDefenseValue("0")
-      setToughnessValue("0")
+      updateFields({
+        defenseValue: "0",
+        toughnessValue: "0",
+      })
       return
     }
 
@@ -378,8 +480,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         }
         
         if (includeStunt) defense += 2  // Add stunt modifier
-        setDefenseValue(defense.toString())
-        setToughnessValue(CS.toughness(target).toString())
+        updateFields({
+          defenseValue: defense.toString(),
+          toughnessValue: CS.toughness(target).toString(),
+        })
       }
     } else {
       // Multiple targets
@@ -391,9 +495,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           return defense
         })
         const highestDefense = Math.max(...defenses)
-        setDefenseValue(highestDefense.toString())
-        // No toughness display for multiple targets
-        setToughnessValue("0")
+        updateFields({
+          defenseValue: highestDefense.toString(),
+          toughnessValue: "0",
+        })
       } else {
         // Non-mook attacking multiple targets - highest defense + number of targets
         const defenses = targets.map(t => {
@@ -403,9 +508,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         })
         const highestDefense = Math.max(...defenses)
         const combinedDefense = highestDefense + targetIds.length
-        setDefenseValue(combinedDefense.toString())
-        // No toughness for multiple targets
-        setToughnessValue("0")
+        updateFields({
+          defenseValue: combinedDefense.toString(),
+          toughnessValue: "0",
+        })
       }
     }
   }
@@ -418,8 +524,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     const targetCount = targetIds.length
     
     if (targetCount === 0) {
-      setMookDistribution({})
-      setTotalAttackingMooks(0)
+      updateFields({
+        mookDistribution: {},
+        totalAttackingMooks: 0,
+      })
       return
     }
     
@@ -431,8 +539,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       distribution[id] = mooksPerTarget + (index < remainder ? 1 : 0)
     })
     
-    setMookDistribution(distribution)
-    setTotalAttackingMooks(totalMooks)
+    updateFields({
+      mookDistribution: distribution,
+      totalAttackingMooks: totalMooks,
+    })
   }
 
   // Helper function to calculate effective defense for a target based on their defense choice
@@ -461,27 +571,28 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
   // Reset when attacker changes
   useEffect(() => {
-    setMookRolls([])
-    setShowMookRolls(false)
-    setSelectedTargetIds([])
-    setMookDistribution({})
-    setDefenseValue("0")
-    setToughnessValue("0")
-    setSwerve("")  // Reset to empty, not 0
-    setFinalDamage("")  // Reset to empty, not 0
-    // Reset per-target defense states
-    setDefenseChoicePerTarget({})
-    setFortuneDiePerTarget({})
-    setDefenseAppliedPerTarget({})
-    setManualDefensePerTarget({})
-    setManualToughnessPerTarget({})
     // Initialize total attacking mooks for mook attackers
     const currentAttacker = allShots.find(s => s.character?.shot_id === attackerShotId)?.character
-    if (currentAttacker && CS.isMook(currentAttacker)) {
-      setTotalAttackingMooks(currentAttacker.count || 0)
-    } else {
-      setTotalAttackingMooks(0)
-    }
+    const totalMooks = (currentAttacker && CS.isMook(currentAttacker)) 
+      ? (currentAttacker.count || 0) 
+      : 0
+    
+    updateFields({
+      mookRolls: [],
+      showMookRolls: false,
+      selectedTargetIds: [],
+      mookDistribution: {},
+      defenseValue: "0",
+      toughnessValue: "0",
+      swerve: "",  // Reset to empty, not 0
+      finalDamage: "",  // Reset to empty, not 0
+      defenseChoicePerTarget: {},
+      fortuneDiePerTarget: {},
+      defenseAppliedPerTarget: {},
+      manualDefensePerTarget: {},
+      manualToughnessPerTarget: {},
+      totalAttackingMooks: totalMooks,
+    })
   }, [attackerShotId, allShots])
 
   const handleRollMookAttacks = () => {
@@ -586,16 +697,18 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       })
     }
 
-    setMookRolls(allTargetRolls)
-    setShowMookRolls(true)
-    setFinalDamage(grandTotalWounds.toString())
+    updateFields({
+      mookRolls: allTargetRolls,
+      showMookRolls: true,
+      finalDamage: grandTotalWounds.toString(),
+    })
   }
 
 
   const handleApplyDamage = async () => {
     // Handle multiple targets for non-mook attackers
     if (!CS.isMook(attacker) && selectedTargetIds.length > 0 && multiTargetResults.length > 0) {
-      setIsProcessing(true)
+      updateField("isProcessing", true)
       try {
         const shots = parseInt(shotCost) || 3
         
@@ -720,18 +833,20 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         }
         
         // Reset form
-        setSelectedTargetIds([])
-        setMultiTargetResults([])
-        setShowMultiTargetResults(false)
-        setSwerve("")
-        setFinalDamage("")
-        setStunt(false)
-        setDefenseChoicePerTarget({})
-        setFortuneDiePerTarget({})
-        setDefenseAppliedPerTarget({})
-        setManualDefensePerTarget({})
-        setManualToughnessPerTarget({})
-        setTargetMookCount(1)
+        updateFields({
+          selectedTargetIds: [],
+          multiTargetResults: [],
+          showMultiTargetResults: false,
+          swerve: "",
+          finalDamage: "",
+          stunt: false,
+          defenseChoicePerTarget: {},
+          fortuneDiePerTarget: {},
+          defenseAppliedPerTarget: {},
+          manualDefensePerTarget: {},
+          manualToughnessPerTarget: {},
+          targetMookCount: 1,
+        })
         
         if (onClose) {
           onClose()
@@ -740,13 +855,13 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       } catch (error) {
         toastError("Failed to apply damage")
       } finally {
-        setIsProcessing(false)
+        updateField("isProcessing", false)
       }
     }
     
     // Handle multiple targets for mook attackers
     if (CS.isMook(attacker) && selectedTargetIds.length > 1 && mookRolls.length > 0) {
-      setIsProcessing(true)
+      updateField("isProcessing", true)
       try {
         const shots = parseInt(shotCost) || 3
         
@@ -806,17 +921,19 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         }
         
         // Reset form
-        setSelectedTargetIds([])
-        setMookDistribution({})
-        setTotalAttackingMooks(0)
-        setMookRolls([])
-        setShowMookRolls(false)
-        setSwerve("")
-        setFinalDamage("")
-        setStunt(false)
-        setDefenseChoicePerTarget({})
-        setFortuneDiePerTarget({})
-        setDefenseAppliedPerTarget({})
+        updateFields({
+          selectedTargetIds: [],
+          mookDistribution: {},
+          totalAttackingMooks: 0,
+          mookRolls: [],
+          showMookRolls: false,
+          swerve: "",
+          finalDamage: "",
+          stunt: false,
+          defenseChoicePerTarget: {},
+          fortuneDiePerTarget: {},
+          defenseAppliedPerTarget: {},
+        })
         
         if (onClose) {
           onClose()
@@ -825,7 +942,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       } catch (error) {
         toastError("Failed to apply damage")
       } finally {
-        setIsProcessing(false)
+        updateField("isProcessing", false)
       }
     }
     
@@ -833,7 +950,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     if (!target || !targetShot || !finalDamage || !attacker || !attackerShot)
       return
 
-    setIsProcessing(true)
+    updateField("isProcessing", true)
     try {
       const damage = parseInt(finalDamage) || 0
       const shots = parseInt(shotCost) || 3
@@ -930,20 +1047,20 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       )
 
       // Reset form
-      setTargetShotId("")
-      setSwerve("")
-      setFinalDamage("")
-      setStunt(false)
-      setMookRolls([])
-      setShowMookRolls(false)
-      // Reset targets
-      setSelectedTargetIds([])
-      setTargetShotId("")
-      setMookDistribution({})
-      setTotalAttackingMooks(0)
-      setDefenseChoicePerTarget({})
-      setFortuneDiePerTarget({})
-      setDefenseAppliedPerTarget({})
+      updateFields({
+        targetShotId: "",
+        swerve: "",
+        finalDamage: "",
+        stunt: false,
+        mookRolls: [],
+        showMookRolls: false,
+        selectedTargetIds: [],
+        mookDistribution: {},
+        totalAttackingMooks: 0,
+        defenseChoicePerTarget: {},
+        fortuneDiePerTarget: {},
+        defenseAppliedPerTarget: {},
+      })
 
       if (onClose) {
         onClose()
@@ -952,7 +1069,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       toastError("Failed to apply damage")
       console.error(error)
     } finally {
-      setIsProcessing(false)
+      updateField("isProcessing", false)
     }
   }
 
@@ -976,18 +1093,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           {/* Attacker Section */}
           <AttackerSection
             sortedAttackerShots={sortedAttackerShots}
-            attackerShotId={attackerShotId}
-            setAttackerShotId={setAttackerShotId}
-            shotCost={shotCost}
-            setShotCost={setShotCost}
-            attackSkill={attackSkill}
-            setAttackSkill={setAttackSkill}
-            attackValue={attackValue}
-            setAttackValue={setAttackValue}
-            weaponDamage={weaponDamage}
-            setWeaponDamage={setWeaponDamage}
-            selectedWeaponId={selectedWeaponId}
-            setSelectedWeaponId={setSelectedWeaponId}
+            formState={formState}
+            dispatchForm={dispatchForm}
             attacker={attacker}
             attackerWeapons={attackerWeapons}
           />
@@ -1016,12 +1123,14 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                 if (selectedTargetIds.includes(shotId)) {
                   // Deselect if already selected
                   const newIds = selectedTargetIds.filter(id => id !== shotId)
-                  setSelectedTargetIds(newIds)
+                  updateField("selectedTargetIds", newIds)
                   
                   // Update defense/toughness based on remaining targets
                   if (newIds.length === 0) {
-                    setDefenseValue("0")
-                    setToughnessValue("0")
+                    updateFields({
+                      defenseValue: "0",
+                      toughnessValue: "0",
+                    })
                   } else {
                     updateDefenseAndToughness(newIds, stunt)
                   }
@@ -1033,7 +1142,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                 } else {
                   // Add to selection
                   const newIds = [...selectedTargetIds, shotId]
-                  setSelectedTargetIds(newIds)
+                  updateField("selectedTargetIds", newIds)
                   updateDefenseAndToughness(newIds, stunt)
                   
                   // Update mook distribution
@@ -1136,10 +1245,11 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                                 ...mookDistribution,
                                 [id]: newValue
                               }
-                              setMookDistribution(newDistribution)
-                              // Update total
                               const newTotal = Object.values(newDistribution).reduce((sum, val) => sum + val, 0)
-                              setTotalAttackingMooks(newTotal)
+                              updateFields({
+                                mookDistribution: newDistribution,
+                                totalAttackingMooks: newTotal,
+                              })
                             }}
                             onBlur={e => {
                               const newValue = parseInt(e.target.value) || 0
@@ -1147,10 +1257,11 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                                 ...mookDistribution,
                                 [id]: newValue
                               }
-                              setMookDistribution(newDistribution)
-                              // Update total
                               const newTotal = Object.values(newDistribution).reduce((sum, val) => sum + val, 0)
-                              setTotalAttackingMooks(newTotal)
+                              updateFields({
+                                mookDistribution: newDistribution,
+                                totalAttackingMooks: newTotal,
+                              })
                             }}
                           />
                           <Typography variant="caption" sx={{ mt: 0.5 }}>
@@ -1226,36 +1337,36 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                                 disabled={false}
                                 onChange={(e) => {
                                   const count = Math.max(1, parseInt(e.target.value) || 1)
-                                  setTargetMookCount(count)
+                                  updateField("targetMookCount", count)
                                   // Update defense based on mook count
                                   const baseDefense = CS.defense(char)
                                   const newDefense = count > 1 ? baseDefense + count : baseDefense
                                   // Apply stunt bonus if active
                                   const finalDefense = newDefense + (stunt ? 2 : 0)
-                                  setManualDefensePerTarget(prev => ({
-                                    ...prev,
+                                  updateField("manualDefensePerTarget", {
+                                    ...manualDefensePerTarget,
                                     [id]: finalDefense.toString()
-                                  }))
+                                  })
                                   // Update the main defense value for single target
                                   if (selectedTargetIds.length === 1) {
-                                    setDefenseValue(finalDefense.toString())
+                                    updateField("defenseValue", finalDefense.toString())
                                   }
                                 }}
                                 onBlur={(e) => {
                                   const count = Math.max(1, parseInt(e.target.value) || 1)
-                                  setTargetMookCount(count)
+                                  updateField("targetMookCount", count)
                                   // Update defense based on mook count
                                   const baseDefense = CS.defense(char)
                                   const newDefense = count > 1 ? baseDefense + count : baseDefense
                                   // Apply stunt bonus if active
                                   const finalDefense = newDefense + (stunt ? 2 : 0)
-                                  setManualDefensePerTarget(prev => ({
-                                    ...prev,
+                                  updateField("manualDefensePerTarget", {
+                                    ...manualDefensePerTarget,
                                     [id]: finalDefense.toString()
-                                  }))
+                                  })
                                   // Update the main defense value for single target
                                   if (selectedTargetIds.length === 1) {
-                                    setDefenseValue(finalDefense.toString())
+                                    updateField("defenseValue", finalDefense.toString())
                                   }
                                 }}
                               />
@@ -1273,10 +1384,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                               error={false}
                               disabled={false}
                               onChange={(e) => {
-                                setManualDefensePerTarget(prev => ({
-                                  ...prev,
+                                updateField("manualDefensePerTarget", {
+                                  ...manualDefensePerTarget,
                                   [id]: e.target.value
-                                }))
+                                })
                                 // Recalculate combined defense for multiple targets
                                 if (selectedTargetIds.length > 1) {
                                   const updatedDefenses = selectedTargetIds.map(targetId => {
@@ -1292,17 +1403,17 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                                   })
                                   const highestDefense = Math.max(...updatedDefenses)
                                   const combinedDefense = highestDefense + selectedTargetIds.length
-                                  setDefenseValue(combinedDefense.toString())
+                                  updateField("defenseValue", combinedDefense.toString())
                                 } else {
                                   // For single target, just update the defense value directly
-                                  setDefenseValue(e.target.value)
+                                  updateField("defenseValue", e.target.value)
                                 }
                               }}
                               onBlur={(e) => {
-                                setManualDefensePerTarget(prev => ({
-                                  ...prev,
+                                updateField("manualDefensePerTarget", {
+                                  ...manualDefensePerTarget,
                                   [id]: e.target.value
-                                }))
+                                })
                               }}
                             />
                             <Typography variant="caption" sx={{ mt: 0.5 }}>
@@ -1320,16 +1431,16 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                                 error={false}
                                 disabled={false}
                                 onChange={(e) => {
-                                  setManualToughnessPerTarget(prev => ({
-                                    ...prev,
+                                  updateField("manualToughnessPerTarget", {
+                                    ...manualToughnessPerTarget,
                                     [id]: e.target.value
-                                  }))
+                                  })
                                 }}
                                 onBlur={(e) => {
-                                  setManualToughnessPerTarget(prev => ({
-                                    ...prev,
+                                  updateField("manualToughnessPerTarget", {
+                                    ...manualToughnessPerTarget,
                                     [id]: e.target.value
-                                  }))
+                                  })
                                 }}
                               />
                               <Typography variant="caption" sx={{ mt: 0.5 }}>
@@ -1358,16 +1469,14 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                             size="small"
                             onClick={() => {
                               // Just set the dodge choice, don't apply it yet
-                              setDefenseChoicePerTarget(prev => ({
-                                ...prev,
+                              updateField("defenseChoicePerTarget", {
+                                ...defenseChoicePerTarget,
                                 [id]: 'dodge' as DefenseChoice
-                              }))
-                              // Clear any manual defense override so calculateTargetDefense takes over
-                              setManualDefensePerTarget(prev => {
-                                const newOverrides = { ...prev }
-                                delete newOverrides[id]
-                                return newOverrides
                               })
+                              // Clear any manual defense override so calculateTargetDefense takes over
+                              const newOverrides = { ...manualDefensePerTarget }
+                              delete newOverrides[id]
+                              updateField("manualDefensePerTarget", newOverrides)
                               // Recalculate combined defense
                               if (selectedTargetIds.length > 1) {
                                 const updatedDefenses = selectedTargetIds.map(targetId => {
@@ -1383,14 +1492,14 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                                 })
                                 const highestDefense = Math.max(...updatedDefenses)
                                 const combinedDefense = highestDefense + selectedTargetIds.length
-                                setDefenseValue(combinedDefense.toString())
+                                updateField("defenseValue", combinedDefense.toString())
                               } else {
                                 // Single target - just update defense
                                 const targetShot = allShots.find(s => s.character?.shot_id === id)
                                 const targetChar = targetShot?.character
                                 if (targetChar) {
                                   const newDefense = CS.defense(targetChar) + 3 + (stunt ? 2 : 0)
-                                  setDefenseValue(newDefense.toString())
+                                  updateField("defenseValue", newDefense.toString())
                                 }
                               }
                             }}
@@ -1405,11 +1514,9 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                             color="success"
                             onClick={() => {
                               // Remove dodge choice
-                              setDefenseChoicePerTarget(prev => {
-                                const newChoices = { ...prev }
-                                delete newChoices[id]
-                                return newChoices
-                              })
+                              const newChoices = { ...defenseChoicePerTarget }
+                              delete newChoices[id]
+                              updateField("defenseChoicePerTarget", newChoices)
                               // Recalculate defense without dodge
                               if (selectedTargetIds.length > 0) {
                                 updateDefenseAndToughness(selectedTargetIds, stunt)
@@ -1450,8 +1557,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                       width="80px"
                       error={false}
                       disabled={false}
-                      onChange={e => setDefenseValue(e.target.value)}
-                      onBlur={e => setDefenseValue(e.target.value)}
+                      onChange={e => updateField("defenseValue", e.target.value)}
+                      onBlur={e => updateField("defenseValue", e.target.value)}
                     />
                     <Typography variant="caption" sx={{ display: "block", mt: 0.5 }}>
                       (Highest + {selectedTargetIds.length})
@@ -1489,9 +1596,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                         checked={stunt}
                         onChange={e => {
                           const newStunt = e.target.checked
-                          setStunt(newStunt)
-                          // Clear manual defense overrides when stunt changes so calculateTargetDefense takes over
-                          setManualDefensePerTarget({})
+                          updateFields({
+                            stunt: newStunt,
+                            manualDefensePerTarget: {},
+                          })
                           // Recalculate defense with stunt modifier
                           if (selectedTargetIds.length > 0) {
                             updateDefenseAndToughness(selectedTargetIds, newStunt)
@@ -1641,8 +1749,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                         size="large"
                         width="120px"
                         error={false}
-                        onChange={e => setFinalDamage(e.target.value)}
-                        onBlur={e => setFinalDamage(e.target.value)}
+                        onChange={e => updateField("finalDamage", e.target.value)}
+                        onBlur={e => updateField("finalDamage", e.target.value)}
                       />
                     </Box>
 
@@ -1731,13 +1839,13 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                     size="large"
                     width="120px"
                     error={false}
-                    onChange={e => setSwerve(e.target.value)}
+                    onChange={e => updateField("swerve", e.target.value)}
                     onBlur={e => {
                       const val = e.target.value
                       if (val === "" || val === "-") {
-                        setSwerve("0")
+                        updateField("swerve", "0")
                       } else {
-                        setSwerve(val)
+                        updateField("swerve", val)
                       }
                     }}
                   />
@@ -1769,8 +1877,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                         size="large"
                         width="120px"
                         error={false}
-                        onChange={e => setFinalDamage(e.target.value)}
-                        onBlur={e => setFinalDamage(e.target.value)}
+                        onChange={e => updateField("finalDamage", e.target.value)}
+                        onBlur={e => updateField("finalDamage", e.target.value)}
                       />
                     </Box>
                   ) : null

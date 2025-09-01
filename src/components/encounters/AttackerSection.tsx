@@ -12,44 +12,55 @@ import {
 } from "@mui/material"
 import { CS } from "@/services"
 import type { Character, Shot, Weapon } from "@/types"
+import type { FormStateType, FormStateAction } from "@/reducers"
+import { FormActions } from "@/reducers"
 import { NumberField } from "@/components/ui"
 import CharacterSelector from "./CharacterSelector"
 
+// Import the AttackFormData type from parent
+interface AttackFormData {
+  attackerShotId: string
+  shotCost: string
+  attackSkill: string
+  attackValue: string
+  weaponDamage: string
+  selectedWeaponId: string
+  [key: string]: unknown
+}
+
 interface AttackerSectionProps {
   sortedAttackerShots: Shot[]
-  attackerShotId: string
-  setAttackerShotId: (shotId: string) => void
-  shotCost: string
-  setShotCost: (cost: string) => void
-  attackSkill: string
-  setAttackSkill: (skill: string) => void
-  attackValue: string
-  setAttackValue: (value: string) => void
-  weaponDamage: string
-  setWeaponDamage: (damage: string) => void
-  selectedWeaponId: string
-  setSelectedWeaponId: (weaponId: string) => void
+  formState: FormStateType<AttackFormData>
+  dispatchForm: (action: FormStateAction<AttackFormData>) => void
   attacker: Character | undefined
   attackerWeapons: Weapon[]
 }
 
 export default function AttackerSection({
   sortedAttackerShots,
-  attackerShotId,
-  setAttackerShotId,
-  shotCost,
-  setShotCost,
-  attackSkill,
-  setAttackSkill,
-  attackValue,
-  setAttackValue,
-  weaponDamage,
-  setWeaponDamage,
-  selectedWeaponId,
-  setSelectedWeaponId,
+  formState,
+  dispatchForm,
   attacker,
   attackerWeapons,
 }: AttackerSectionProps) {
+  // Extract needed values from formState
+  const {
+    attackerShotId,
+    shotCost,
+    attackSkill,
+    attackValue,
+    weaponDamage,
+    selectedWeaponId,
+  } = formState.data
+
+  // Helper to update a field
+  const updateField = (name: keyof AttackFormData, value: unknown) => {
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name,
+      value,
+    })
+  }
   // Get attack skills for the selected attacker
   const attackOptions = useMemo(() => {
     if (!attacker || !("action_values" in attacker)) return []
@@ -92,7 +103,7 @@ export default function AttackerSection({
           <CharacterSelector
             shots={sortedAttackerShots}
             selectedShotId={attackerShotId}
-            onSelect={setAttackerShotId}
+            onSelect={(shotId) => updateField("attackerShotId", shotId)}
             borderColor="primary.main"
           />
         </Box>
@@ -111,8 +122,8 @@ export default function AttackerSection({
             size="small"
             width="80px"
             error={false}
-            onChange={e => setShotCost(e.target.value)}
-            onBlur={e => setShotCost(e.target.value)}
+            onChange={e => updateField("shotCost", e.target.value)}
+            onBlur={e => updateField("shotCost", e.target.value)}
           />
         </Box>
       </Stack>
@@ -140,8 +151,8 @@ export default function AttackerSection({
                   size="small"
                   width="80px"
                   error={false}
-                  onChange={e => setAttackValue(e.target.value)}
-                  onBlur={e => setAttackValue(e.target.value)}
+                  onChange={e => updateField("attackValue", e.target.value)}
+                  onBlur={e => updateField("attackValue", e.target.value)}
                 />
                 <FormControl
                   sx={{
@@ -154,12 +165,12 @@ export default function AttackerSection({
                     value={attackSkill}
                     onChange={e => {
                       const selected = e.target.value
-                      setAttackSkill(selected)
+                      updateField("attackSkill", selected)
                       const option = attackOptions.find(
                         o => o.skill === selected
                       )
                       if (option) {
-                        setAttackValue(option.value.toString())
+                        updateField("attackValue", option.value.toString())
                       }
                     }}
                     label="Attack Skill"
@@ -192,8 +203,8 @@ export default function AttackerSection({
                   size="small"
                   width="80px"
                   error={false}
-                  onChange={e => setWeaponDamage(e.target.value)}
-                  onBlur={e => setWeaponDamage(e.target.value)}
+                  onChange={e => updateField("weaponDamage", e.target.value)}
+                  onBlur={e => updateField("weaponDamage", e.target.value)}
                 />
                 <FormControl
                   sx={{ flex: 1, "& .MuiInputBase-root": { height: 56 } }}
@@ -202,16 +213,16 @@ export default function AttackerSection({
                   <Select
                     value={selectedWeaponId}
                     onChange={e => {
-                      setSelectedWeaponId(e.target.value)
+                      updateField("selectedWeaponId", e.target.value)
                       if (e.target.value === "unarmed") {
                         const damage = CS.damage(attacker) || 7
-                        setWeaponDamage(damage.toString())
+                        updateField("weaponDamage", damage.toString())
                       } else {
                         const weapon = attackerWeapons.find(
                           w => w.id?.toString() === e.target.value
                         )
                         if (weapon) {
-                          setWeaponDamage(weapon.damage.toString())
+                          updateField("weaponDamage", weapon.damage.toString())
                         }
                       }
                     }}
