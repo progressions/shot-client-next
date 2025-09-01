@@ -669,9 +669,15 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
           let wounds = 0
           if (hit) {
-            // Calculate smackdown and wounds for this hit
-            const smackdown = outcome + weaponDmg
-            wounds = Math.max(0, smackdown - targetToughness)
+            // Check if target is also a mook
+            if (CS.isMook(targetChar)) {
+              // Mook vs mook: each hit eliminates 1 mook (no toughness calculation)
+              wounds = 1  // Represents 1 mook eliminated
+            } else {
+              // Mook vs non-mook: calculate smackdown and wounds normally
+              const smackdown = outcome + weaponDmg
+              wounds = Math.max(0, smackdown - targetToughness)
+            }
             targetTotalWounds += wounds
           }
 
@@ -713,8 +719,15 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
         let wounds = 0
         if (hit) {
-          const smackdown = outcome + weaponDmg
-          wounds = Math.max(0, smackdown - toughness)
+          // Check if target is also a mook
+          if (CS.isMook(targetChar)) {
+            // Mook vs mook: each hit eliminates 1 mook (no toughness calculation)
+            wounds = 1  // Represents 1 mook eliminated
+          } else {
+            // Mook vs non-mook: calculate smackdown and wounds normally
+            const smackdown = outcome + weaponDmg
+            wounds = Math.max(0, smackdown - toughness)
+          }
           targetTotalWounds += wounds
         }
 
@@ -916,47 +929,83 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           const totalWounds = targetGroup.rolls.reduce((sum, r) => sum + r.wounds, 0)
           if (totalWounds === 0) continue // Skip targets with no wounds
           
-          const isPC = CS.isPC(targetChar)
-          const currentWounds = CS.wounds(targetChar)
-          const newWounds = currentWounds + totalWounds
-          
-          // Calculate impairments
-          const originalImpairments = targetChar.impairments || 0
-          const impairmentChange = CS.calculateImpairments(
-            targetChar,
-            currentWounds,
-            newWounds
-          )
-          const newImpairments = originalImpairments + impairmentChange
-          
-          // Send update to backend for this target
-          await client.updateCombatState(
-            encounter,
-            targetChar.shot_id || "",
-            isPC ? newWounds : undefined,
-            !isPC ? newWounds : undefined,
-            newImpairments,
-            {
-              type: "attack",
-              description: `${targetGroup.rolls.length} ${attacker.name} attacked ${targetChar.name} for ${totalWounds} wounds`,
-              details: {
-                attacker_id: attackerShot.character?.id,
-                target_id: targetChar.id,
-                damage: totalWounds,
-                attack_value: parseInt(attackValue),
-                defense_value: CS.defense(targetChar),
-                weapon_damage: parseInt(weaponDamage),
-                shot_cost: shots,
-                is_mook_attack: true,
-                mook_count: targetGroup.rolls.length,
-                mook_hits: targetGroup.rolls.filter(r => r.hit).length,
-              },
-            }
-          )
-          
-          toastSuccess(
-            `Applied ${totalWounds} wound${totalWounds !== 1 ? "s" : ""} to ${targetChar.name}`
-          )
+          // Check if this is mook vs mook combat
+          if (CS.isMook(targetChar)) {
+            // Mook vs mook: reduce mook count instead of applying wounds
+            const currentCount = targetChar.count || 0
+            const newCount = Math.max(0, currentCount - totalWounds)
+            
+            // Send update to backend for mook elimination
+            await client.updateCombatState(
+              encounter,
+              targetChar.shot_id || "",
+              undefined, // No wounds for PCs
+              newCount,  // New mook count
+              0,         // Mooks don't have impairments
+              {
+                type: "attack",
+                description: `${targetGroup.rolls.length} ${attacker.name} attacked ${targetChar.name}, eliminating ${totalWounds} mook${totalWounds !== 1 ? "s" : ""}`,
+                details: {
+                  attacker_id: attackerShot.character?.id,
+                  target_id: targetChar.id,
+                  mooks_eliminated: totalWounds,
+                  attack_value: parseInt(attackValue),
+                  defense_value: CS.defense(targetChar),
+                  shot_cost: shots,
+                  is_mook_vs_mook: true,
+                  attacking_mooks: targetGroup.rolls.length,
+                  successful_hits: targetGroup.rolls.filter(r => r.hit).length,
+                },
+              }
+            )
+            
+            toastSuccess(
+              `Eliminated ${totalWounds} ${targetChar.name}${totalWounds !== 1 ? "s" : ""}`
+            )
+          } else {
+            // Mook vs non-mook: apply wounds normally
+            const isPC = CS.isPC(targetChar)
+            const currentWounds = CS.wounds(targetChar)
+            const newWounds = currentWounds + totalWounds
+            
+            // Calculate impairments
+            const originalImpairments = targetChar.impairments || 0
+            const impairmentChange = CS.calculateImpairments(
+              targetChar,
+              currentWounds,
+              newWounds
+            )
+            const newImpairments = originalImpairments + impairmentChange
+            
+            // Send update to backend for this target
+            await client.updateCombatState(
+              encounter,
+              targetChar.shot_id || "",
+              isPC ? newWounds : undefined,
+              !isPC ? newWounds : undefined,
+              newImpairments,
+              {
+                type: "attack",
+                description: `${targetGroup.rolls.length} ${attacker.name} attacked ${targetChar.name} for ${totalWounds} wounds`,
+                details: {
+                  attacker_id: attackerShot.character?.id,
+                  target_id: targetChar.id,
+                  damage: totalWounds,
+                  attack_value: parseInt(attackValue),
+                  defense_value: CS.defense(targetChar),
+                  weapon_damage: parseInt(weaponDamage),
+                  shot_cost: shots,
+                  is_mook_attack: true,
+                  mook_count: targetGroup.rolls.length,
+                  mook_hits: targetGroup.rolls.filter(r => r.hit).length,
+                },
+              }
+            )
+            
+            toastSuccess(
+              `Applied ${totalWounds} wound${totalWounds !== 1 ? "s" : ""} to ${targetChar.name}`
+            )
+          }
         }
         
         // Reset form
@@ -1787,7 +1836,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                           <Alert key={groupIndex} severity="info" sx={{ pb: 1 }}>
                             <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
                               Attacking {targetGroup.targetName} 
-                              ({targetGroup.rolls.length} mooks, DV {targetDefense}, Toughness {targetToughness})
+                              ({targetGroup.rolls.length} mooks, DV {targetDefense}{CS.isMook(targetChar) ? "" : `, Toughness ${targetToughness}`})
                             </Typography>
                             <Stack spacing={0.5} sx={{ mb: 1 }}>
                               {targetGroup.rolls.map((roll, index) => (
@@ -1801,7 +1850,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                                   {targetDefense} ={" "}
                                   {roll.hit ? (
                                     <span style={{ color: "#4caf50" }}>
-                                      Hit! ({roll.wounds} wounds)
+                                      Hit! ({CS.isMook(targetChar) ? `${roll.wounds} mook eliminated` : `${roll.wounds} wounds`})
                                     </span>
                                   ) : (
                                     <span style={{ color: "#f44336" }}>Miss</span>
@@ -1812,7 +1861,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                             <Divider sx={{ my: 1 }} />
                             <Typography variant="body2">
                               <strong>
-                                {targetGroup.targetName}: {hits}/{targetGroup.rolls.length} hits, {totalWounds} wounds total
+                                {targetGroup.targetName}: {hits}/{targetGroup.rolls.length} hits, {totalWounds} {CS.isMook(targetChar) ? "mooks eliminated" : "wounds total"}
                               </strong>
                             </Typography>
                           </Alert>
