@@ -1,6 +1,6 @@
 # Chi War Shot Client Roadmap
 
-> Last Updated: 2025-08-29
+> Last Updated: 2025-09-01
 > Status: Active Development
 
 ## Completed Features
@@ -36,7 +36,27 @@
 - **Status**: Applied to both marketing and deletion feature PRs
 - **Impact**: Improved maintainability and type safety
 
+### September 2025
+
+#### [x] Encounter Manager Backend APIs - COMPLETED 2025-09-01
+- **Description**: Backend attack resolution and damage application system
+- **Technical Implementation**:
+  - Attack resolution API endpoints fully implemented
+  - Damage application system with proper wound calculation
+  - Real-time websocket updates for encounter synchronization
+  - Mook vs mook combat mechanics
+  - Defense modifier system (dodge, stunt modifiers)
+- **Status**: Backend APIs complete and working
+- **Impact**: Full backend support for combat encounter management
+
 ## In Progress Features
+
+### [o] Encounter Manager Frontend (2025-08-31)
+- **Description**: Complete frontend interface for encounter management
+- **Current Status**: Backend complete, frontend 75% complete
+- **Task File**: `.agent-os/specs/2025-08-31-encounter-manager-completion/tasks.md`
+- **Progress**: 7/10 main components complete (70%)
+- **Next Steps**: Complete E2E testing and performance optimization
 
 ### [o] Image Viewer Popup System (2025-08-27)
 - **Description**: Modal popup for viewing character and entity images
@@ -62,6 +82,7 @@
 ## Planned Features
 
 ### Q3 2025 Priorities
+- Complete Encounter Manager frontend implementation
 - Complete Image Viewer system implementation
 - Campaign seeding automation
 - Enhanced character management workflows
@@ -73,18 +94,21 @@
 - **Marketing Page**: Improved load times with ImageKit CDN integration
 - **Character Deletion**: Enhanced data integrity with smart association handling
 - **Code Quality**: Reduced TypeScript warnings from ~10+ to 0
+- **Encounter Manager Backend**: Full API support for combat management
 
 ### Development Velocity
-- **August 2025**: 2 major features completed and merged
+- **August 2025**: 3 major features completed and merged
+- **September 2025**: 1 major backend system completed
 - **Average PR Cycle**: ~2-3 days from creation to merge
 - **Code Quality Trend**: Improving with consistent TypeScript adoption
 
 ## Technical Debt & Maintenance
 
 ### Priority Items
-1. Complete Image Viewer popup system (high user value)
-2. Campaign seeding automation (reduces manual setup)  
-3. Avatar integration improvements (UI/UX enhancement)
+1. Complete Encounter Manager frontend (high user value, backend done)
+2. Complete Image Viewer popup system (high user value)
+3. Campaign seeding automation (reduces manual setup)  
+4. Avatar integration improvements (UI/UX enhancement)
 
 ### Code Quality Goals
 - Maintain 0 ESLint warnings
