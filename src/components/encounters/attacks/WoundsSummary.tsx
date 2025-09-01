@@ -2,26 +2,13 @@
 
 import { Alert, Stack, Typography } from "@mui/material"
 import { CS } from "@/services"
-import type { Character, Shot } from "@/types"
-
-interface WoundsSummaryProps {
-  multiTargetResults: Array<{
-    targetId: string
-    targetName: string
-    defense: number
-    toughness: number
-    wounds: number
-  }>
-  allShots: Shot[]
-  calculateTargetDefense: (target: Character, targetId: string) => number
-  defenseChoicePerTarget: { [targetId: string]: 'none' | 'dodge' | 'fortune' }
-  selectedTargetIds: string[]
-  attackValue: string
-  swerve: string
-  weaponDamage: string
-  targetMookCount: number
-  finalDamage: string
-}
+import type { 
+  Character, 
+  Shot,
+  WoundsSummaryProps,
+  DefenseChoice,
+  MultiTargetResult
+} from "@/types"
 
 export default function WoundsSummary({
   multiTargetResults,

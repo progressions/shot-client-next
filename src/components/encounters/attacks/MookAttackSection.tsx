@@ -10,39 +10,14 @@ import {
 } from "@mui/material"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { CS } from "@/services"
-import type { Character, Shot } from "@/types"
+import type { 
+  Character, 
+  Shot,
+  MookRoll,
+  MookTargetGroup,
+  MookAttackSectionProps
+} from "@/types"
 import { NumberField } from "@/components/ui"
-
-interface MookRoll {
-  mookNumber: number
-  swerve: number
-  actionResult: number
-  outcome: number
-  hit: boolean
-  wounds: number
-}
-
-interface MookTargetGroup {
-  targetId: string
-  targetName: string
-  rolls: MookRoll[]
-}
-
-interface MookAttackSectionProps {
-  attacker: Character | undefined
-  allShots: Shot[]
-  selectedTargetIds: string[]
-  mookRolls: MookTargetGroup[]
-  showMookRolls: boolean
-  totalAttackingMooks: number
-  finalDamage: string
-  shotCost: string
-  attackValue: string
-  isProcessing: boolean
-  updateField: (name: string, value: unknown) => void
-  handleRollMookAttacks: () => void
-  handleApplyDamage: () => void
-}
 
 export default function MookAttackSection({
   attacker,

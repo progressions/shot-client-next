@@ -3,27 +3,14 @@
 import { Box, Typography, Button } from "@mui/material"
 import { NumberField } from "@/components/ui"
 import { CS } from "@/services"
-import type { Character, Shot } from "@/types"
+import type { 
+  Character, 
+  Shot,
+  DefenseChoice,
+  TargetDefenseDisplayProps,
+  AttackFormData
+} from "@/types"
 import { getDefenseModifiersText } from "./defenseModifierUtils"
-
-type DefenseChoice = 'none' | 'dodge' | 'fortune'
-
-interface TargetDefenseDisplayProps {
-  targetId: string
-  allShots: Shot[]
-  attacker: Character | undefined
-  stunt: boolean
-  targetMookCount: number
-  defenseChoicePerTarget: Record<string, DefenseChoice>
-  fortuneDiePerTarget: Record<string, string>
-  manualDefensePerTarget: Record<string, string>
-  manualToughnessPerTarget: Record<string, string>
-  selectedTargetIds: string[]
-  calculateTargetDefense: (target: Character, targetId: string) => number
-  updateField: (name: string, value: unknown) => void
-  updateFields: (updates: Record<string, unknown>) => void
-  updateDefenseAndToughness: (targetIds: string[], includeStunt: boolean) => void
-}
 
 // Helper function to recalculate combined defense for multiple targets
 const recalculateCombinedDefense = (

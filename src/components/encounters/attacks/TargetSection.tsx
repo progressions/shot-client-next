@@ -8,43 +8,17 @@ import {
   Checkbox,
 } from "@mui/material"
 import { CS } from "@/services"
-import type { Character, Shot } from "@/types"
+import type { 
+  Character, 
+  Shot,
+  AttackFormData,
+  TargetSectionProps
+} from "@/types"
 import type { FormStateType, FormStateAction } from "@/reducers"
 import { NumberField } from "@/components/ui"
 import CharacterSelector from "../CharacterSelector"
 import TargetDefenseDisplay from "./TargetDefenseDisplay"
 import { getDefenseModifiersText } from "./defenseModifierUtils"
-
-// Import the AttackFormData type from parent
-interface AttackFormData {
-  attackerShotId: string
-  selectedTargetIds: string[]
-  defenseValue: string
-  toughnessValue: string
-  stunt: boolean
-  targetMookCount: number
-  mookDistribution: { [targetId: string]: number }
-  totalAttackingMooks: number
-  defenseChoicePerTarget: { [targetId: string]: 'none' | 'dodge' | 'fortune' }
-  fortuneDiePerTarget: { [targetId: string]: string }
-  manualDefensePerTarget: { [targetId: string]: string }
-  manualToughnessPerTarget: { [targetId: string]: string }
-  [key: string]: unknown
-}
-
-interface TargetSectionProps {
-  allShots: Shot[]
-  sortedTargetShots: Shot[]
-  formState: FormStateType<AttackFormData>
-  dispatchForm: (action: FormStateAction<AttackFormData>) => void
-  attacker: Character | undefined
-  attackerShotId: string
-  updateField: (name: keyof AttackFormData, value: unknown) => void
-  updateFields: (updates: Partial<AttackFormData>) => void
-  updateDefenseAndToughness: (targetIds: string[], includeStunt: boolean) => void
-  distributeMooks: (targetIds: string[]) => void
-  calculateTargetDefense: (target: Character, targetId: string) => number
-}
 
 // Helper function to handle mook distribution updates
 const updateMookDistribution = (
