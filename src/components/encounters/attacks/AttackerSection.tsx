@@ -15,7 +15,7 @@ import type { Character, Shot, Weapon } from "@/types"
 import type { FormStateType, FormStateAction } from "@/reducers"
 import { FormActions } from "@/reducers"
 import { NumberField } from "@/components/ui"
-import CharacterSelector from "./CharacterSelector"
+import CharacterSelector from "../CharacterSelector"
 
 // Import the AttackFormData type from parent
 interface AttackFormData {

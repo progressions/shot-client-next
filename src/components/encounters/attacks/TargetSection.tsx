@@ -1,0 +1,421 @@
+"use client"
+
+import {
+  Box,
+  Typography,
+  Stack,
+  FormControlLabel,
+  Checkbox,
+} from "@mui/material"
+import { CS } from "@/services"
+import type { Character, Shot } from "@/types"
+import type { FormStateType, FormStateAction } from "@/reducers"
+import { NumberField } from "@/components/ui"
+import CharacterSelector from "../CharacterSelector"
+import TargetDefenseDisplay from "./TargetDefenseDisplay"
+import { getDefenseModifiersText } from "./defenseModifierUtils"
+
+// Import the AttackFormData type from parent
+interface AttackFormData {
+  attackerShotId: string
+  selectedTargetIds: string[]
+  defenseValue: string
+  toughnessValue: string
+  stunt: boolean
+  targetMookCount: number
+  mookDistribution: { [targetId: string]: number }
+  totalAttackingMooks: number
+  defenseChoicePerTarget: { [targetId: string]: 'none' | 'dodge' | 'fortune' }
+  fortuneDiePerTarget: { [targetId: string]: string }
+  manualDefensePerTarget: { [targetId: string]: string }
+  manualToughnessPerTarget: { [targetId: string]: string }
+  [key: string]: unknown
+}
+
+interface TargetSectionProps {
+  allShots: Shot[]
+  sortedTargetShots: Shot[]
+  formState: FormStateType<AttackFormData>
+  dispatchForm: (action: FormStateAction<AttackFormData>) => void
+  attacker: Character | undefined
+  attackerShotId: string
+  updateField: (name: keyof AttackFormData, value: unknown) => void
+  updateFields: (updates: Partial<AttackFormData>) => void
+  updateDefenseAndToughness: (targetIds: string[], includeStunt: boolean) => void
+  distributeMooks: (targetIds: string[]) => void
+  calculateTargetDefense: (target: Character, targetId: string) => number
+}
+
+// Helper function to handle mook distribution updates
+const updateMookDistribution = (
+  targetId: string,
+  newValue: number,
+  selectedTargetIds: string[],
+  mookDistribution: { [targetId: string]: number },
+  totalMooksAvailable: number,
+  updateField: (name: string, value: unknown) => void
+) => {
+  const validValue = Math.max(0, newValue)
+  
+  // If there are exactly 2 targets, auto-adjust the other one
+  if (selectedTargetIds.length === 2) {
+    const otherId = selectedTargetIds.find(tid => tid !== targetId)
+    if (!otherId) return
+    
+    // Ensure we don't exceed total mooks
+    const finalValue = Math.min(validValue, totalMooksAvailable)
+    const remainingMooks = Math.max(0, totalMooksAvailable - finalValue)
+    
+    updateField("mookDistribution", {
+      [targetId]: finalValue,
+      [otherId]: remainingMooks
+    })
+    updateField("totalAttackingMooks", totalMooksAvailable)
+  } else {
+    // For more than 2 targets, just update this one
+    const otherTargetIds = selectedTargetIds.filter(tid => tid !== targetId)
+    const otherMooks = otherTargetIds.reduce((sum, tid) => 
+      sum + (mookDistribution[tid] || 0), 0
+    )
+    
+    // Ensure we don't exceed total mooks
+    const maxForThisTarget = totalMooksAvailable - otherMooks
+    const finalValue = Math.min(validValue, maxForThisTarget)
+    
+    const newDistribution = {
+      ...mookDistribution,
+      [targetId]: finalValue
+    }
+    const newTotal = Object.values(newDistribution).reduce((sum, val) => sum + val, 0)
+    
+    updateField("mookDistribution", newDistribution)
+    updateField("totalAttackingMooks", newTotal)
+  }
+}
+
+export default function TargetSection({
+  allShots,
+  sortedTargetShots,
+  formState,
+  dispatchForm,
+  attacker,
+  attackerShotId,
+  updateField,
+  updateFields,
+  updateDefenseAndToughness,
+  distributeMooks,
+  calculateTargetDefense,
+}: TargetSectionProps) {
+  // Extract needed values from formState
+  const {
+    selectedTargetIds,
+    stunt,
+    targetMookCount,
+    mookDistribution,
+    totalAttackingMooks,
+    defenseChoicePerTarget,
+    fortuneDiePerTarget,
+    manualDefensePerTarget,
+    manualToughnessPerTarget,
+    defenseValue,
+  } = formState.data
+
+  return (
+    <Box
+      sx={{
+        p: { xs: 2, sm: 3 },
+        borderBottom: "2px solid",
+        borderBottomColor: "divider",
+      }}
+    >
+      <Typography
+        variant="h6"
+        gutterBottom
+        sx={{ mb: 2, color: "error.main" }}
+      >
+        🎯 Target{selectedTargetIds.length > 1 ? "s" : ""} {selectedTargetIds.length > 0 && `(${selectedTargetIds.length})`}
+      </Typography>
+
+      {/* Multi-select Target Selection */}
+      <CharacterSelector
+        shots={sortedTargetShots}
+        selectedShotIds={selectedTargetIds}
+        onSelect={(shotId) => {
+          if (selectedTargetIds.includes(shotId)) {
+            // Deselect if already selected
+            const newIds = selectedTargetIds.filter(id => id !== shotId)
+            updateField("selectedTargetIds", newIds)
+            
+            // Update defense/toughness based on remaining targets
+            if (newIds.length === 0) {
+              updateFields({
+                defenseValue: "0",
+                toughnessValue: "0",
+              })
+            } else {
+              updateDefenseAndToughness(newIds, stunt)
+            }
+            
+            // Update mook distribution
+            if (CS.isMook(attacker)) {
+              distributeMooks(newIds)
+            }
+          } else {
+            // Add to selection
+            const newIds = [...selectedTargetIds, shotId]
+            updateField("selectedTargetIds", newIds)
+            updateDefenseAndToughness(newIds, stunt)
+            
+            // Update mook distribution
+            if (CS.isMook(attacker)) {
+              distributeMooks(newIds)
+            }
+          }
+        }}
+        borderColor="error.main"
+        disabled={!attackerShotId}
+        showAllCheckbox={true}
+        excludeShotId={attackerShotId}
+        multiSelect={true}
+        characterTypes={(() => {
+          if (!attacker) return undefined
+          
+          // Check if any selected targets are mooks or non-mooks
+          const hasSelectedMooks = selectedTargetIds.some(id => {
+            const shot = allShots.find(s => s.character?.shot_id === id)
+            return shot?.character && CS.isMook(shot.character)
+          })
+          const hasSelectedNonMooks = selectedTargetIds.some(id => {
+            const shot = allShots.find(s => s.character?.shot_id === id)
+            return shot?.character && !CS.isMook(shot.character)
+          })
+          
+          // If a mook is selected, only show other mooks
+          if (hasSelectedMooks) {
+            return ["Mook"]
+          }
+          
+          // If a non-mook is selected, exclude mooks
+          if (hasSelectedNonMooks) {
+            if (CS.isPC(attacker) || CS.isAlly(attacker)) {
+              return ["Featured Foe", "Boss", "Uber-Boss"]
+            }
+            if (
+              CS.isMook(attacker) ||
+              CS.isFeaturedFoe(attacker) ||
+              CS.isBoss(attacker) ||
+              CS.isUberBoss(attacker)
+            ) {
+              return ["PC", "Ally"]
+            }
+          }
+          
+          // No targets selected yet, show based on attacker type
+          if (CS.isPC(attacker) || CS.isAlly(attacker)) {
+            return ["Mook", "Featured Foe", "Boss", "Uber-Boss"]
+          }
+          if (
+            CS.isMook(attacker) ||
+            CS.isFeaturedFoe(attacker) ||
+            CS.isBoss(attacker) ||
+            CS.isUberBoss(attacker)
+          ) {
+            return ["PC", "Ally"]
+          }
+          return undefined
+        })()}
+      />
+
+      {/* Mook Distribution Display */}
+      {CS.isMook(attacker) && selectedTargetIds.length > 0 && (
+        <Box sx={{ mt: 2, mb: 2 }}>
+          <Typography variant="body2" sx={{ mb: 1.5, fontWeight: "medium" }}>
+            Mook Distribution ({totalAttackingMooks} total)
+          </Typography>
+          <Stack spacing={1}>
+            {selectedTargetIds.map(id => {
+              const shot = allShots.find(s => s.character?.shot_id === id)
+              const char = shot?.character
+              if (!char) return null
+              
+              return (
+                <Box 
+                  key={id} 
+                  sx={{ 
+                    display: "flex", 
+                    alignItems: "center", 
+                    gap: 2,
+                    backgroundColor: "background.paper",
+                    p: 1,
+                    borderRadius: 1,
+                    border: "1px solid",
+                    borderColor: "divider"
+                  }}
+                >
+                  <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <NumberField
+                      name={`mookDist-${id}`}
+                      value={mookDistribution[id] || 0}
+                      size="small"
+                      width="80px"
+                      error={false}
+                      onChange={e => {
+                        updateMookDistribution(
+                          id,
+                          parseInt(e.target.value) || 0,
+                          selectedTargetIds,
+                          mookDistribution,
+                          attacker?.count || 0,
+                          updateField
+                        )
+                      }}
+                      onBlur={e => {
+                        // onBlur is already handled by onChange for NumberField buttons
+                        // Only process if this is a real blur event (not from buttons)
+                        if (e.relatedTarget?.closest('.MuiIconButton-root')) {
+                          return // Skip if blur was caused by clicking increment/decrement buttons
+                        }
+                        
+                        updateMookDistribution(
+                          id,
+                          parseInt(e.target.value) || 0,
+                          selectedTargetIds,
+                          mookDistribution,
+                          attacker?.count || 0,
+                          updateField
+                        )
+                      }}
+                    />
+                    <Typography variant="caption" sx={{ mt: 0.5 }}>
+                      mooks
+                    </Typography>
+                  </Box>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        fontWeight: "medium"
+                      }}
+                    >
+                      {char.name}
+                    </Typography>
+                    {/* Always show defense modifiers if any exist */}
+                    {(() => {
+                      const modifiersText = getDefenseModifiersText(
+                        char,
+                        stunt,
+                        defenseChoicePerTarget[id],
+                        fortuneDiePerTarget[id]
+                      )
+                      return modifiersText ? (
+                        <Typography 
+                          variant="caption" 
+                          sx={{ 
+                            fontStyle: "italic",
+                            color: "text.secondary",
+                            display: "block"
+                          }}
+                        >
+                          {modifiersText}
+                        </Typography>
+                      ) : null
+                    })()}
+                  </Box>
+                </Box>
+              )
+            })}
+          </Stack>
+        </Box>
+      )}
+
+      {/* Target Defense Display - Only show when non-mook attacker (mook attackers have distribution display above) */}
+      {selectedTargetIds.length > 0 && attacker && !CS.isMook(attacker) && (
+        <Box sx={{ mt: 2, mb: 2 }}>
+          <Stack spacing={1}>
+            {selectedTargetIds.map(targetId => (
+              <TargetDefenseDisplay
+                key={targetId}
+                targetId={targetId}
+                allShots={allShots}
+                attacker={attacker}
+                stunt={stunt}
+                targetMookCount={targetMookCount}
+                defenseChoicePerTarget={defenseChoicePerTarget}
+                fortuneDiePerTarget={fortuneDiePerTarget}
+                manualDefensePerTarget={manualDefensePerTarget}
+                manualToughnessPerTarget={manualToughnessPerTarget}
+                selectedTargetIds={selectedTargetIds}
+                calculateTargetDefense={calculateTargetDefense}
+                updateField={updateField}
+                updateFields={updateFields}
+                updateDefenseAndToughness={updateDefenseAndToughness}
+              />
+            ))}
+          </Stack>
+        </Box>
+      )}
+
+      {/* Defense and Modifiers Section */}
+      <Box sx={{ mb: 3, mt: 2 }}>
+        <Stack 
+          direction="row"
+          spacing={{ xs: 2, sm: 4 }}
+          alignItems="flex-start"
+        >
+          {/* Defense Value - only show for multiple targets when non-mook attacker */}
+          {selectedTargetIds.length > 1 && attacker && !CS.isMook(attacker) && (
+            <Box>
+              <Typography
+                variant="body2"
+                sx={{ mb: 1, fontWeight: "medium" }}
+              >
+                Defense
+              </Typography>
+              <NumberField
+                name="defenseValue"
+                value={parseInt(defenseValue || "0") || 0}
+                size="small"
+                width="80px"
+                error={false}
+                disabled={false}
+                onChange={e => updateField("defenseValue", e.target.value)}
+                onBlur={e => updateField("defenseValue", e.target.value)}
+              />
+              <Typography variant="caption" sx={{ display: "block", mt: 0.5 }}>
+                (Highest + {selectedTargetIds.length})
+              </Typography>
+              {(() => {
+                let total = 0
+                if (stunt) total += 2
+                return total > 0 ? (
+                  <Typography variant="caption" sx={{ display: "block", mt: 0.5, fontStyle: "italic", color: "text.secondary" }}>
+                    +{total} modifiers
+                  </Typography>
+                ) : null
+              })()}
+            </Box>
+          )}
+
+          {/* Stunt Checkbox */}
+          <Box>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={stunt}
+                  onChange={e => {
+                    updateField("stunt", e.target.checked)
+                    // When stunt changes, recalculate defense for all targets
+                    if (selectedTargetIds.length > 0) {
+                      updateDefenseAndToughness(selectedTargetIds, e.target.checked)
+                    }
+                  }}
+                />
+              }
+              label="Stunt (+2 Defense)"
+            />
+          </Box>
+        </Stack>
+      </Box>
+    </Box>
+  )
+}

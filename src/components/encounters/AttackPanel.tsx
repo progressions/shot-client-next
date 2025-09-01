@@ -6,11 +6,8 @@ import {
   Button,
   Card,
   CardContent,
-  Checkbox,
-  FormControlLabel,
   Typography,
   Stack,
-  Divider,
   Alert,
 } from "@mui/material"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
@@ -19,8 +16,10 @@ import { CS, DS } from "@/services"
 import type { Character, Shot, Weapon } from "@/types"
 import { useClient } from "@/contexts/AppContext"
 import { NumberField } from "@/components/ui"
-import CharacterSelector from "./CharacterSelector"
-import AttackerSection from "./AttackerSection"
+import AttackerSection from "./attacks/AttackerSection"
+import TargetSection from "./attacks/TargetSection"
+import WoundsSummary from "./attacks/WoundsSummary"
+import MookAttackSection from "./attacks/MookAttackSection"
 import { FormActions, useForm } from "@/reducers"
 
 // Define the shape of our form data
@@ -169,6 +168,38 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     manualToughnessPerTarget,
     targetShotId,
   } = formState.data
+
+  // Helper function to calculate effective attack value with mook bonus
+  const calculateEffectiveAttackValue = (
+    attackerChar: Character | undefined,
+    weapons: Weapon[],
+    allShotsList: Shot[]
+  ): number => {
+    let baseAttack = parseInt(attackValue) || 0
+    
+    // Check if any targets are mooks and apply weapon mook bonus
+    if (selectedWeaponId && selectedWeaponId !== "unarmed" && selectedTargetIds.length > 0) {
+      const weapon = weapons.find(w => w.id?.toString() === selectedWeaponId)
+      if (weapon && weapon.mook_bonus > 0) {
+        // Check if any selected target is a mook
+        const targetingMooks = selectedTargetIds.some(id => {
+          const shot = allShotsList.find(s => s.character?.shot_id === id)
+          return shot?.character && CS.isMook(shot.character)
+        })
+        
+        if (targetingMooks) {
+          baseAttack += weapon.mook_bonus
+        }
+      }
+    }
+    
+    // Apply attacker's impairment
+    if (attackerChar && attackerChar.impairments > 0) {
+      baseAttack -= attackerChar.impairments
+    }
+    
+    return baseAttack
+  }
 
   // Helper function to update form field
   const updateField = (name: keyof AttackFormData, value: unknown) => {
@@ -366,7 +397,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   useMemo(() => {
     if (attacker && !CS.isMook(attacker)) {
       if (swerve && attackValue && defenseValue) {
-        const av = calculateEffectiveAttackValue()
+        const av = calculateEffectiveAttackValue(attacker, attackerWeapons, allShots)
         const dv = parseInt(defenseValue) || 0
         const sw = parseInt(swerve) || 0
         const weaponDmg = parseInt(weaponDamage) || 0
@@ -576,29 +607,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     return defense
   }
 
-  // Helper function to calculate effective attack value with mook bonus
-  const calculateEffectiveAttackValue = (): number => {
-    let baseAttack = parseInt(attackValue) || 0
-    
-    // Check if any targets are mooks and apply weapon mook bonus
-    if (selectedWeaponId && selectedWeaponId !== "unarmed" && selectedTargetIds.length > 0) {
-      const weapon = attackerWeapons.find(w => w.id?.toString() === selectedWeaponId)
-      if (weapon && weapon.mook_bonus > 0) {
-        // Check if any selected target is a mook
-        const targetingMooks = selectedTargetIds.some(id => {
-          const shot = allShots.find(s => s.character?.shot_id === id)
-          return shot?.character && CS.isMook(shot.character)
-        })
-        
-        if (targetingMooks) {
-          baseAttack += weapon.mook_bonus
-        }
-      }
-    }
-    
-    return baseAttack
-  }
-
   // Reset when attacker changes
   useEffect(() => {
     // Initialize total attacking mooks for mook attackers
@@ -659,7 +667,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   const handleRollMookAttacks = () => {
     if (!attacker || !CS.isMook(attacker)) return
 
-    const av = calculateEffectiveAttackValue()
+    const av = calculateEffectiveAttackValue(attacker, attackerWeapons, allShots)
     const weaponDmg = parseInt(weaponDamage) || 0
     
     const allTargetRolls = []
@@ -892,11 +900,11 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                 attacker_id: attackerShot.character?.id,
                 target_id: targetChar.id,
                 damage: effectiveWounds,
-                attack_value: calculateEffectiveAttackValue(),
+                attack_value: calculateEffectiveAttackValue(attacker, attackerWeapons, allShots),
                 defense_value: parseInt(defenseValue),
                 effective_defense: calculateTargetDefense(targetChar, result.targetId),
                 swerve: parseInt(swerve),
-                outcome: calculateEffectiveAttackValue() + parseInt(swerve) - parseInt(defenseValue),
+                outcome: calculateEffectiveAttackValue(attacker, attackerWeapons, allShots) + parseInt(swerve) - parseInt(defenseValue),
                 weapon_damage: parseInt(weaponDamage),
                 shot_cost: shots,
                 stunt: stunt,
@@ -982,7 +990,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   attacker_id: attackerShot.character?.id,
                   target_id: targetChar.id,
                   mooks_eliminated: totalWounds,
-                  attack_value: calculateEffectiveAttackValue(),
+                  attack_value: calculateEffectiveAttackValue(attacker, attackerWeapons, allShots),
                   defense_value: CS.defense(targetChar),
                   shot_cost: shots,
                   is_mook_vs_mook: true,
@@ -1025,7 +1033,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   attacker_id: attackerShot.character?.id,
                   target_id: targetChar.id,
                   damage: totalWounds,
-                  attack_value: calculateEffectiveAttackValue(),
+                  attack_value: calculateEffectiveAttackValue(attacker, attackerWeapons, allShots),
                   defense_value: CS.defense(targetChar),
                   weapon_damage: parseInt(weaponDamage),
                   shot_cost: shots,
@@ -1224,768 +1232,19 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           />
 
           {/* Target Section */}
-          <Box
-            sx={{
-              p: { xs: 2, sm: 3 },
-              borderBottom: "2px solid",
-              borderBottomColor: "divider",
-            }}
-          >
-            <Typography
-              variant="h6"
-              gutterBottom
-              sx={{ mb: 2, color: "error.main" }}
-            >
-              🎯 Target{selectedTargetIds.length > 1 ? "s" : ""} {selectedTargetIds.length > 0 && `(${selectedTargetIds.length})`}
-            </Typography>
-
-            {/* Multi-select Target Selection */}
-            <CharacterSelector
-              shots={sortedTargetShots}
-              selectedShotIds={selectedTargetIds}
-              onSelect={(shotId) => {
-                if (selectedTargetIds.includes(shotId)) {
-                  // Deselect if already selected
-                  const newIds = selectedTargetIds.filter(id => id !== shotId)
-                  updateField("selectedTargetIds", newIds)
-                  
-                  // Update defense/toughness based on remaining targets
-                  if (newIds.length === 0) {
-                    updateFields({
-                      defenseValue: "0",
-                      toughnessValue: "0",
-                    })
-                  } else {
-                    updateDefenseAndToughness(newIds, stunt)
-                  }
-                  
-                  // Update mook distribution
-                  if (CS.isMook(attacker)) {
-                    distributeMooks(newIds)
-                  }
-                } else {
-                  // Add to selection
-                  const newIds = [...selectedTargetIds, shotId]
-                  updateField("selectedTargetIds", newIds)
-                  updateDefenseAndToughness(newIds, stunt)
-                  
-                  // Update mook distribution
-                  if (CS.isMook(attacker)) {
-                    distributeMooks(newIds)
-                  }
-                }
-              }}
-              borderColor="error.main"
-              disabled={!attackerShotId}
-              showAllCheckbox={true}
-              excludeShotId={attackerShotId}
-              multiSelect={true}
-              characterTypes={(() => {
-                if (!attacker) return undefined
-                
-                // Check if any selected targets are mooks or non-mooks
-                const hasSelectedMooks = selectedTargetIds.some(id => {
-                  const shot = allShots.find(s => s.character?.shot_id === id)
-                  return shot?.character && CS.isMook(shot.character)
-                })
-                const hasSelectedNonMooks = selectedTargetIds.some(id => {
-                  const shot = allShots.find(s => s.character?.shot_id === id)
-                  return shot?.character && !CS.isMook(shot.character)
-                })
-                
-                // If a mook is selected, only show other mooks
-                if (hasSelectedMooks) {
-                  return ["Mook"]
-                }
-                
-                // If a non-mook is selected, exclude mooks
-                if (hasSelectedNonMooks) {
-                  if (CS.isPC(attacker) || CS.isAlly(attacker)) {
-                    return ["Featured Foe", "Boss", "Uber-Boss"]
-                  }
-                  if (
-                    CS.isMook(attacker) ||
-                    CS.isFeaturedFoe(attacker) ||
-                    CS.isBoss(attacker) ||
-                    CS.isUberBoss(attacker)
-                  ) {
-                    return ["PC", "Ally"]
-                  }
-                }
-                
-                // No targets selected yet, show based on attacker type
-                if (CS.isPC(attacker) || CS.isAlly(attacker)) {
-                  return ["Mook", "Featured Foe", "Boss", "Uber-Boss"]
-                }
-                if (
-                  CS.isMook(attacker) ||
-                  CS.isFeaturedFoe(attacker) ||
-                  CS.isBoss(attacker) ||
-                  CS.isUberBoss(attacker)
-                ) {
-                  return ["PC", "Ally"]
-                }
-                return undefined
-              })()}
-            />
-
-
-            {/* Mook Distribution Display */}
-            {CS.isMook(attacker) && selectedTargetIds.length > 0 && (
-              <Box sx={{ mt: 2, mb: 2 }}>
-                <Typography variant="body2" sx={{ mb: 1.5, fontWeight: "medium" }}>
-                  Mook Distribution ({totalAttackingMooks} total)
-                </Typography>
-                <Stack spacing={1}>
-                  {selectedTargetIds.map(id => {
-                    const shot = allShots.find(s => s.character?.shot_id === id)
-                    const char = shot?.character
-                    if (!char) return null
-                    
-                    return (
-                      <Box 
-                        key={id} 
-                        sx={{ 
-                          display: "flex", 
-                          alignItems: "center", 
-                          gap: 2,
-                          backgroundColor: "background.paper",
-                          p: 1,
-                          borderRadius: 1,
-                          border: "1px solid",
-                          borderColor: "divider"
-                        }}
-                      >
-                        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                          <NumberField
-                            name={`mookDist-${id}`}
-                            value={mookDistribution[id] || 0}
-                            size="small"
-                            width="80px"
-                            error={false}
-                            onChange={e => {
-                              const newValue = Math.max(0, parseInt(e.target.value) || 0)
-                              const totalMooksAvailable = attacker?.count || 0
-                              
-                              // If there are exactly 2 targets, auto-adjust the other one
-                              if (selectedTargetIds.length === 2) {
-                                const otherId = selectedTargetIds.find(tid => tid !== id)
-                                if (!otherId) return
-                                
-                                // Ensure we don't exceed total mooks
-                                const finalValue = Math.min(newValue, totalMooksAvailable)
-                                const remainingMooks = Math.max(0, totalMooksAvailable - finalValue)
-                                
-                                updateField("mookDistribution", {
-                                  [id]: finalValue,
-                                  [otherId]: remainingMooks
-                                })
-                                updateField("totalAttackingMooks", totalMooksAvailable)
-                              } else {
-                                // For more than 2 targets, just update this one
-                                const otherTargetIds = selectedTargetIds.filter(tid => tid !== id)
-                                const otherMooks = otherTargetIds.reduce((sum, tid) => 
-                                  sum + (mookDistribution[tid] || 0), 0
-                                )
-                                
-                                // Ensure we don't exceed total mooks
-                                const maxForThisTarget = totalMooksAvailable - otherMooks
-                                const finalValue = Math.min(newValue, maxForThisTarget)
-                                
-                                const newDistribution = {
-                                  ...mookDistribution,
-                                  [id]: finalValue
-                                }
-                                const newTotal = Object.values(newDistribution).reduce((sum, val) => sum + val, 0)
-                                
-                                updateField("mookDistribution", newDistribution)
-                                updateField("totalAttackingMooks", newTotal)
-                              }
-                            }}
-                            onBlur={e => {
-                              // onBlur is already handled by onChange for NumberField buttons
-                              // Only process if this is a real blur event (not from buttons)
-                              if (e.relatedTarget?.closest('.MuiIconButton-root')) {
-                                return // Skip if blur was caused by clicking increment/decrement buttons
-                              }
-                              
-                              const newValue = Math.max(0, parseInt(e.target.value) || 0)
-                              const totalMooksAvailable = attacker?.count || 0
-                              
-                              // If there are exactly 2 targets, auto-adjust the other one
-                              if (selectedTargetIds.length === 2) {
-                                const otherId = selectedTargetIds.find(tid => tid !== id)
-                                if (!otherId) return
-                                
-                                // Ensure we don't exceed total mooks
-                                const finalValue = Math.min(newValue, totalMooksAvailable)
-                                const remainingMooks = Math.max(0, totalMooksAvailable - finalValue)
-                                
-                                updateField("mookDistribution", {
-                                  [id]: finalValue,
-                                  [otherId]: remainingMooks
-                                })
-                                updateField("totalAttackingMooks", totalMooksAvailable)
-                              } else {
-                                // For more than 2 targets, just update this one
-                                const otherTargetIds = selectedTargetIds.filter(tid => tid !== id)
-                                const otherMooks = otherTargetIds.reduce((sum, tid) => 
-                                  sum + (mookDistribution[tid] || 0), 0
-                                )
-                                
-                                // Ensure we don't exceed total mooks
-                                const maxForThisTarget = totalMooksAvailable - otherMooks
-                                const finalValue = Math.min(newValue, maxForThisTarget)
-                                
-                                const newDistribution = {
-                                  ...mookDistribution,
-                                  [id]: finalValue
-                                }
-                                const newTotal = Object.values(newDistribution).reduce((sum, val) => sum + val, 0)
-                                
-                                updateField("mookDistribution", newDistribution)
-                                updateField("totalAttackingMooks", newTotal)
-                              }
-                            }}
-                          />
-                          <Typography variant="caption" sx={{ mt: 0.5 }}>
-                            mooks
-                          </Typography>
-                        </Box>
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            fontWeight: "medium"
-                          }}
-                        >
-                          {char.name}
-                        </Typography>
-                      </Box>
-                    )
-                  })}
-                </Stack>
-              </Box>
-            )}
-
-            {/* Target Defense Display for Non-Mook Attackers */}
-            {!CS.isMook(attacker) && selectedTargetIds.length > 0 && (
-              <Box sx={{ mt: 2, mb: 2 }}>
-                <Stack spacing={1}>
-                  {selectedTargetIds.map(id => {
-                    const shot = allShots.find(s => s.character?.shot_id === id)
-                    const char = shot?.character
-                    if (!char) return null
-                    
-                    const baseDefense = CS.defense(char)
-                    const currentDefense = calculateTargetDefense(char, id)
-                    const baseToughness = CS.toughness(char)
-                    const currentToughness = manualToughnessPerTarget[id] ? parseInt(manualToughnessPerTarget[id]) : baseToughness
-                    
-                    return (
-                      <Box 
-                        key={id} 
-                        sx={{ 
-                          display: "flex", 
-                          flexDirection: { xs: "column", sm: "row" },
-                          alignItems: { xs: "stretch", sm: "center" }, 
-                          gap: { xs: 1, sm: 2 },
-                          backgroundColor: "background.paper",
-                          p: 1,
-                          borderRadius: 1,
-                          border: "1px solid",
-                          borderColor: "divider"
-                        }}
-                      >
-                        {/* Name at the top for mobile */}
-                        <Box sx={{ display: { xs: "block", sm: "none" }, mb: 1 }}>
-                          <Typography 
-                            variant="body2" 
-                            sx={{ 
-                              fontWeight: "medium"
-                            }}
-                          >
-                            {char.name}
-                          </Typography>
-                          {/* Defense modifiers text */}
-                          {(stunt || (defenseChoicePerTarget[id] && defenseChoicePerTarget[id] !== 'none') || char.impairments > 0) && (
-                            <Typography 
-                              variant="caption" 
-                              sx={{ 
-                                fontStyle: "italic",
-                                color: "text.secondary",
-                                display: "block"
-                              }}
-                            >
-                              {(() => {
-                                const modifiers = []
-                                if (stunt) modifiers.push("+2 Stunt")
-                                if (defenseChoicePerTarget[id] === 'dodge') {
-                                  modifiers.push("+3 Dodge")
-                                } else if (defenseChoicePerTarget[id] === 'fortune') {
-                                  const fortuneDie = parseInt(fortuneDiePerTarget[id] || "0")
-                                  modifiers.push(`+${3 + fortuneDie} Fortune`)
-                                }
-                                if (char.impairments > 0) {
-                                  modifiers.push(`-${char.impairments} Impairment`)
-                                }
-                                return modifiers.length > 0 ? `Defense ${modifiers.join(", ")}` : ""
-                              })()}
-                            </Typography>
-                          )}
-                        </Box>
-                        
-                        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-                          {/* Count field for mooks when non-mook is attacking */}
-                          {CS.isMook(char) && !CS.isMook(attacker) && (
-                            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "80px" }}>
-                              <NumberField
-                                name={`count-${id}`}
-                                value={targetMookCount}
-                                size="small"
-                                width="80px"
-                                error={false}
-                                disabled={false}
-                                onChange={(e) => {
-                                  const count = Math.max(1, parseInt(e.target.value) || 1)
-                                  updateField("targetMookCount", count)
-                                  // Update defense based on mook count
-                                  const baseDefense = CS.defense(char)
-                                  const newDefense = count > 1 ? baseDefense + count : baseDefense
-                                  // Apply stunt bonus if active
-                                  const finalDefense = newDefense + (stunt ? 2 : 0)
-                                  updateField("manualDefensePerTarget", {
-                                    ...manualDefensePerTarget,
-                                    [id]: finalDefense.toString()
-                                  })
-                                  // Update the main defense value for single target
-                                  if (selectedTargetIds.length === 1) {
-                                    updateField("defenseValue", finalDefense.toString())
-                                  }
-                                }}
-                                onBlur={(e) => {
-                                  const count = Math.max(1, parseInt(e.target.value) || 1)
-                                  updateField("targetMookCount", count)
-                                  // Update defense based on mook count
-                                  const baseDefense = CS.defense(char)
-                                  const newDefense = count > 1 ? baseDefense + count : baseDefense
-                                  // Apply stunt bonus if active
-                                  const finalDefense = newDefense + (stunt ? 2 : 0)
-                                  updateField("manualDefensePerTarget", {
-                                    ...manualDefensePerTarget,
-                                    [id]: finalDefense.toString()
-                                  })
-                                  // Update the main defense value for single target
-                                  if (selectedTargetIds.length === 1) {
-                                    updateField("defenseValue", finalDefense.toString())
-                                  }
-                                }}
-                              />
-                              <Typography variant="caption" sx={{ mt: 0.5 }}>
-                                Count
-                              </Typography>
-                            </Box>
-                          )}
-                          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "80px" }}>
-                            <NumberField
-                              name={`defense-${id}`}
-                              value={manualDefensePerTarget[id] || currentDefense}
-                              size="small"
-                              width="80px"
-                              error={false}
-                              disabled={false}
-                              onChange={(e) => {
-                                updateField("manualDefensePerTarget", {
-                                  ...manualDefensePerTarget,
-                                  [id]: e.target.value
-                                })
-                                // Recalculate combined defense for multiple targets
-                                if (selectedTargetIds.length > 1) {
-                                  const updatedDefenses = selectedTargetIds.map(targetId => {
-                                    if (targetId === id) {
-                                      return parseInt(e.target.value) || 0
-                                    }
-                                    const targetShot = allShots.find(s => s.character?.shot_id === targetId)
-                                    const targetChar = targetShot?.character
-                                    if (!targetChar) return 0
-                                    return manualDefensePerTarget[targetId] 
-                                      ? parseInt(manualDefensePerTarget[targetId]) 
-                                      : calculateTargetDefense(targetChar, targetId)
-                                  })
-                                  const highestDefense = Math.max(...updatedDefenses)
-                                  const combinedDefense = highestDefense + selectedTargetIds.length
-                                  updateField("defenseValue", combinedDefense.toString())
-                                } else {
-                                  // For single target, just update the defense value directly
-                                  updateField("defenseValue", e.target.value)
-                                }
-                              }}
-                              onBlur={(e) => {
-                                updateField("manualDefensePerTarget", {
-                                  ...manualDefensePerTarget,
-                                  [id]: e.target.value
-                                })
-                              }}
-                            />
-                            <Typography variant="caption" sx={{ mt: 0.5 }}>
-                              Defense
-                            </Typography>
-                          </Box>
-                          {/* Only show Toughness for non-mooks */}
-                          {!CS.isMook(char) && (
-                            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "80px" }}>
-                              <NumberField
-                                name={`toughness-${id}`}
-                                value={manualToughnessPerTarget[id] || currentToughness}
-                                size="small"
-                                width="80px"
-                                error={false}
-                                disabled={false}
-                                onChange={(e) => {
-                                  updateField("manualToughnessPerTarget", {
-                                    ...manualToughnessPerTarget,
-                                    [id]: e.target.value
-                                  })
-                                }}
-                                onBlur={(e) => {
-                                  updateField("manualToughnessPerTarget", {
-                                    ...manualToughnessPerTarget,
-                                    [id]: e.target.value
-                                  })
-                                }}
-                              />
-                              <Typography variant="caption" sx={{ mt: 0.5 }}>
-                                Toughness
-                              </Typography>
-                            </Box>
-                          )}
-                        </Box>
-                        
-                        {/* Name on the side for desktop */}
-                        <Box sx={{ flex: 1, display: { xs: "none", sm: "block" } }}>
-                          <Typography 
-                            variant="body2" 
-                            sx={{ 
-                              fontWeight: "medium"
-                            }}
-                          >
-                            {char.name}
-                          </Typography>
-                          {/* Defense modifiers text */}
-                          {(stunt || (defenseChoicePerTarget[id] && defenseChoicePerTarget[id] !== 'none') || char.impairments > 0) && (
-                            <Typography 
-                              variant="caption" 
-                              sx={{ 
-                                fontStyle: "italic",
-                                color: "text.secondary",
-                                display: "block"
-                              }}
-                            >
-                              {(() => {
-                                const modifiers = []
-                                if (stunt) modifiers.push("+2 Stunt")
-                                if (defenseChoicePerTarget[id] === 'dodge') {
-                                  modifiers.push("+3 Dodge")
-                                } else if (defenseChoicePerTarget[id] === 'fortune') {
-                                  const fortuneDie = parseInt(fortuneDiePerTarget[id] || "0")
-                                  modifiers.push(`+${3 + fortuneDie} Fortune`)
-                                }
-                                if (char.impairments > 0) {
-                                  modifiers.push(`-${char.impairments} Impairment`)
-                                }
-                                return modifiers.length > 0 ? `Defense ${modifiers.join(", ")}` : ""
-                              })()}
-                            </Typography>
-                          )}
-                        </Box>
-                        
-                        {/* Dodge buttons */}
-                        {defenseChoicePerTarget[id] !== 'dodge' && defenseChoicePerTarget[id] !== 'fortune' ? (
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            onClick={() => {
-                              // Just set the dodge choice, don't apply it yet
-                              updateField("defenseChoicePerTarget", {
-                                ...defenseChoicePerTarget,
-                                [id]: 'dodge' as DefenseChoice
-                              })
-                              // Clear any manual defense override so calculateTargetDefense takes over
-                              const newOverrides = { ...manualDefensePerTarget }
-                              delete newOverrides[id]
-                              updateField("manualDefensePerTarget", newOverrides)
-                              // Recalculate combined defense
-                              if (selectedTargetIds.length > 1) {
-                                const updatedDefenses = selectedTargetIds.map(targetId => {
-                                  const targetShot = allShots.find(s => s.character?.shot_id === targetId)
-                                  const targetChar = targetShot?.character
-                                  if (!targetChar) return 0
-                                  
-                                  // Use calculateTargetDefense which will include dodge for this target
-                                  if (targetId === id) {
-                                    return CS.defense(targetChar) + 3 + (stunt ? 2 : 0) // dodge + stunt
-                                  }
-                                  return calculateTargetDefense(targetChar, targetId)
-                                })
-                                const highestDefense = Math.max(...updatedDefenses)
-                                const combinedDefense = highestDefense + selectedTargetIds.length
-                                updateField("defenseValue", combinedDefense.toString())
-                              } else {
-                                // Single target - just update defense
-                                const targetShot = allShots.find(s => s.character?.shot_id === id)
-                                const targetChar = targetShot?.character
-                                if (targetChar) {
-                                  const newDefense = CS.defense(targetChar) + 3 + (stunt ? 2 : 0)
-                                  updateField("defenseValue", newDefense.toString())
-                                }
-                              }
-                            }}
-                            sx={{ minWidth: "80px" }}
-                          >
-                            Dodge
-                          </Button>
-                        ) : defenseChoicePerTarget[id] === 'dodge' ? (
-                          <>
-                            <Button
-                              variant="contained"
-                              size="small"
-                              color="success"
-                              onClick={() => {
-                                // Remove dodge choice
-                                const newChoices = { ...defenseChoicePerTarget }
-                                delete newChoices[id]
-                                updateField("defenseChoicePerTarget", newChoices)
-                                // Recalculate defense without dodge
-                                if (selectedTargetIds.length > 0) {
-                                  updateDefenseAndToughness(selectedTargetIds, stunt)
-                                }
-                              }}
-                              sx={{ minWidth: "80px" }}
-                            >
-                              ✓ Dodging
-                            </Button>
-                            
-                            {/* Fortune button for PCs - only shows when regular dodge is active */}
-                            {CS.isPC(char) && (
-                              <Button
-                                variant="outlined"
-                                size="small"
-                                color="secondary"
-                                onClick={() => {
-                                  // Upgrade to fortune defense choice
-                                  updateField("defenseChoicePerTarget", {
-                                    ...defenseChoicePerTarget,
-                                    [id]: 'fortune' as DefenseChoice
-                                  })
-                                  // Initialize fortune die to 0
-                                  updateField("fortuneDiePerTarget", {
-                                    ...fortuneDiePerTarget,
-                                    [id]: "0"
-                                  })
-                                }}
-                                sx={{ minWidth: "40px", px: 1 }}
-                                title="Add Fortune to Dodge"
-                              >
-                                +🎲
-                              </Button>
-                            )}
-                          </>
-                        ) : (
-                          // Fortune dodge is active - show button and number field
-                          <>
-                            <Button
-                              variant="contained"
-                              size="small"
-                              color="secondary"
-                              onClick={() => {
-                                // Go back to regular dodge
-                                updateField("defenseChoicePerTarget", {
-                                  ...defenseChoicePerTarget,
-                                  [id]: 'dodge' as DefenseChoice
-                                })
-                                // Clear fortune die
-                                const newFortuneDice = { ...fortuneDiePerTarget }
-                                delete newFortuneDice[id]
-                                updateField("fortuneDiePerTarget", newFortuneDice)
-                                // Recalculate defense for regular dodge
-                                if (selectedTargetIds.length > 1) {
-                                  const updatedDefenses = selectedTargetIds.map(targetId => {
-                                    const targetShot = allShots.find(s => s.character?.shot_id === targetId)
-                                    const targetChar = targetShot?.character
-                                    if (!targetChar) return 0
-                                    
-                                    if (targetId === id) {
-                                      return CS.defense(targetChar) + 3 + (stunt ? 2 : 0) // back to regular dodge
-                                    }
-                                    return calculateTargetDefense(targetChar, targetId)
-                                  })
-                                  const highestDefense = Math.max(...updatedDefenses)
-                                  const combinedDefense = highestDefense + selectedTargetIds.length
-                                  updateField("defenseValue", combinedDefense.toString())
-                                } else {
-                                  // Single target
-                                  const targetShot = allShots.find(s => s.character?.shot_id === id)
-                                  const targetChar = targetShot?.character
-                                  if (targetChar) {
-                                    const newDefense = CS.defense(targetChar) + 3 + (stunt ? 2 : 0)
-                                    updateField("defenseValue", newDefense.toString())
-                                  }
-                                }
-                              }}
-                              sx={{ minWidth: "120px" }}
-                            >
-                              ✓ Fortune Dodge
-                            </Button>
-                            <NumberField
-                              name={`fortuneDie-${id}`}
-                              value={parseInt(fortuneDiePerTarget[id] || "0") || 0}
-                              size="small"
-                              width="80px"
-                              error={false}
-                              disabled={false}
-                              onChange={e => {
-                                updateField("fortuneDiePerTarget", {
-                                  ...fortuneDiePerTarget,
-                                  [id]: e.target.value
-                                })
-                                // Recalculate defense with new fortune value
-                                if (selectedTargetIds.length > 1) {
-                                  const updatedDefenses = selectedTargetIds.map(targetId => {
-                                    const targetShot = allShots.find(s => s.character?.shot_id === targetId)
-                                    const targetChar = targetShot?.character
-                                    if (!targetChar) return 0
-                                    
-                                    if (targetId === id) {
-                                      return CS.defense(targetChar) + 3 + parseInt(e.target.value || "0") + (stunt ? 2 : 0)
-                                    }
-                                    return calculateTargetDefense(targetChar, targetId)
-                                  })
-                                  const highestDefense = Math.max(...updatedDefenses)
-                                  const combinedDefense = highestDefense + selectedTargetIds.length
-                                  updateField("defenseValue", combinedDefense.toString())
-                                } else {
-                                  // Single target
-                                  const targetShot = allShots.find(s => s.character?.shot_id === id)
-                                  const targetChar = targetShot?.character
-                                  if (targetChar) {
-                                    const newDefense = CS.defense(targetChar) + 3 + parseInt(e.target.value || "0") + (stunt ? 2 : 0)
-                                    updateField("defenseValue", newDefense.toString())
-                                  }
-                                }
-                              }}
-                              onBlur={e => {
-                                updateField("fortuneDiePerTarget", {
-                                  ...fortuneDiePerTarget,
-                                  [id]: e.target.value
-                                })
-                              }}
-                            />
-                          </>
-                        )}
-                      </Box>
-                    )
-                  })}
-                </Stack>
-              </Box>
-            )}
-
-            {/* Defense and Modifiers Section */}
-            <Box sx={{ mb: 3, mt: 2 }}>
-              <Stack 
-                direction="row"
-                spacing={{ xs: 2, sm: 4 }}
-                alignItems="flex-start"
-              >
-                {/* Defense Value - only show for multiple targets when non-mook attacker */}
-                {selectedTargetIds.length > 1 && attacker && !CS.isMook(attacker) && (
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 1, fontWeight: "medium" }}
-                    >
-                      Defense
-                    </Typography>
-                    <NumberField
-                      name="defenseValue"
-                      value={parseInt(defenseValue || "0") || 0}
-                      size="small"
-                      width="80px"
-                      error={false}
-                      disabled={false}
-                      onChange={e => updateField("defenseValue", e.target.value)}
-                      onBlur={e => updateField("defenseValue", e.target.value)}
-                    />
-                    <Typography variant="caption" sx={{ display: "block", mt: 0.5 }}>
-                      (Highest + {selectedTargetIds.length})
-                    </Typography>
-                    {(() => {
-                      let total = 0
-                      if (stunt) total += 2
-                      return total > 0 ? (
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            display: "block",
-                            mt: 0.5,
-                            minHeight: "20px",
-                            textAlign: "center",
-                          }}
-                        >
-                          +{total}
-                        </Typography>
-                      ) : (
-                        <Box sx={{ minHeight: "20px", mt: 0.5 }} />
-                      )
-                    })()}
-                  </Box>
-                )}
-
-                {/* Defense Modifiers - always show */}
-                <Box>
-                  <Typography variant="body2" sx={{ mb: 1, fontWeight: "medium" }}>
-                    Defense Modifiers
-                  </Typography>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={stunt}
-                        onChange={e => {
-                          const newStunt = e.target.checked
-                          // Clear all manual defense overrides and defense choices when stunt changes
-                          updateFields({
-                            stunt: newStunt,
-                            manualDefensePerTarget: {},
-                            defenseChoicePerTarget: {},
-                            fortuneDiePerTarget: {},
-                            defenseAppliedPerTarget: {},
-                          })
-                          // Recalculate defense with stunt modifier
-                          if (selectedTargetIds.length > 0) {
-                            updateDefenseAndToughness(selectedTargetIds, newStunt)
-                          } else if (targetShotId) {
-                            // For backward compatibility with single target
-                            const target = allShots.find(s => s.character?.shot_id === targetShotId)?.character
-                            if (target) {
-                              let defense = CS.defense(target)
-                              if (CS.isMook(target) && !CS.isMook(attacker) && targetMookCount > 1) {
-                                defense += targetMookCount
-                              }
-                              if (newStunt) defense += 2
-                              updateFields({
-                                defenseValue: defense.toString(),
-                                toughnessValue: CS.toughness(target).toString(),
-                              })
-                            }
-                          }
-                        }}
-                        disabled={!target && selectedTargetIds.length === 0}
-                      />
-                    }
-                    label="Stunt (+2 DV)"
-                  />
-                </Box>
-              </Stack>
-            </Box>
-          </Box>
+          <TargetSection
+            allShots={allShots}
+            sortedTargetShots={sortedTargetShots}
+            formState={formState}
+            dispatchForm={dispatchForm}
+            attacker={attacker}
+            attackerShotId={attackerShotId}
+            updateField={updateField}
+            updateFields={updateFields}
+            updateDefenseAndToughness={updateDefenseAndToughness}
+            distributeMooks={distributeMooks}
+            calculateTargetDefense={calculateTargetDefense}
+          />
         </Box>
 
         {/* Bottom Section - Combat Resolution */}
@@ -2002,184 +1261,21 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
           {/* Show different UI for mook attackers */}
           {attacker && CS.isMook(attacker) ? (
-            <>
-              {/* Mook Attack Resolution */}
-              <Stack spacing={2} alignItems="center">
-                <Typography variant="body2" sx={{ textAlign: "center" }}>
-                  {totalAttackingMooks || attacker.count || 0} mooks
-                  attacking
-                </Typography>
-
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={handleRollMookAttacks}
-                  disabled={(!target && selectedTargetIds.length === 0) || !attackValue}
-                  sx={{ mb: 2 }}
-                >
-                  Roll Mook Attacks
-                </Button>
-
-                {showMookRolls && mookRolls.length > 0 && (
-                  <Box
-                    sx={{
-                      width: "100%",
-                      maxHeight: 400,
-                      overflowY: "auto",
-                      mb: 2,
-                    }}
-                  >
-                    <Stack spacing={2}>
-                      {mookRolls.map((targetGroup, groupIndex) => {
-                        const targetShot = allShots.find(s => s.character?.shot_id === targetGroup.targetId)
-                        const targetChar = targetShot?.character
-                        const targetDefense = targetChar ? CS.defense(targetChar) : 0
-                        const targetToughness = targetChar ? CS.toughness(targetChar) : 0
-                        const hits = targetGroup.rolls.filter(r => r.hit).length
-                        const totalWounds = targetGroup.rolls.reduce((sum, r) => sum + r.wounds, 0)
-                        
-                        return (
-                          <Alert key={groupIndex} severity="info" sx={{ pb: 1 }}>
-                            <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
-                              Attacking {targetGroup.targetName} 
-                              ({targetGroup.rolls.length} mooks, DV {targetDefense}{CS.isMook(targetChar) ? "" : `, Toughness ${targetToughness}`})
-                            </Typography>
-                            <Stack spacing={0.5} sx={{ mb: 1 }}>
-                              {targetGroup.rolls.map((roll, index) => (
-                                <Typography
-                                  key={index}
-                                  variant="caption"
-                                  sx={{ display: "block" }}
-                                >
-                                  Mook {roll.mookNumber}: AV {attackValue} + Swerve{" "}
-                                  {roll.swerve} = {roll.actionResult} vs DV{" "}
-                                  {targetDefense} ={" "}
-                                  {roll.hit ? (
-                                    <span style={{ color: "#4caf50" }}>
-                                      Hit! ({CS.isMook(targetChar) ? `${roll.wounds} mook eliminated` : `${roll.wounds} wounds`})
-                                    </span>
-                                  ) : (
-                                    <span style={{ color: "#f44336" }}>Miss</span>
-                                  )}
-                                </Typography>
-                              ))}
-                            </Stack>
-                            <Divider sx={{ my: 1 }} />
-                            <Typography variant="body2">
-                              <strong>
-                                {targetGroup.targetName}: {hits}/{targetGroup.rolls.length} hits, {totalWounds} {CS.isMook(targetChar) ? "mooks eliminated" : "wounds total"}
-                              </strong>
-                            </Typography>
-                          </Alert>
-                        )
-                      })}
-                      
-                      {/* Per-Target Wounds Summary */}
-                      {mookRolls.length > 0 && (
-                        <Alert severity="warning" sx={{ position: 'sticky', bottom: 0, zIndex: 1 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
-                            Wounds to Apply:
-                          </Typography>
-                          <Stack spacing={0.5}>
-                            {mookRolls.map((targetGroup) => {
-                              const totalWounds = targetGroup.rolls.reduce((sum, r) => sum + r.wounds, 0)
-                              return (
-                                <Typography key={targetGroup.targetId} variant="body2">
-                                  <strong>{targetGroup.targetName}:</strong> {totalWounds} wounds
-                                </Typography>
-                              )
-                            })}
-                          </Stack>
-                        </Alert>
-                      )}
-                    </Stack>
-                  </Box>
-                )}
-
-                {/* Final Damage and Apply Button */}
-                {/* Hide Total Wounds field when mooks attack multiple targets */}
-                {selectedTargetIds.length <= 1 ? (
-                  <Stack
-                    direction="row"
-                    spacing={2}
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Typography variant="caption" sx={{ mb: 0.5 }}>
-                        Total Wounds
-                      </Typography>
-                      <NumberField
-                        name="finalDamage"
-                        value={parseInt(finalDamage) || 0}
-                        size="large"
-                        width="120px"
-                        error={false}
-                        onChange={e => updateField("finalDamage", e.target.value)}
-                        onBlur={e => updateField("finalDamage", e.target.value)}
-                      />
-                    </Box>
-
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "flex-end",
-                      }}
-                    >
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleApplyDamage}
-                        disabled={!target || !finalDamage || isProcessing}
-                        size="large"
-                        startIcon={<CheckCircleIcon />}
-                        sx={{ height: 56, px: 3 }}
-                      >
-                        Apply Wounds
-                      </Button>
-                      {finalDamage && shotCost && (
-                        <Typography
-                          variant="caption"
-                          sx={{ mt: 0.5, textAlign: "center" }}
-                        >
-                          Apply {finalDamage} wounds, spend {shotCost} shots
-                        </Typography>
-                      )}
-                    </Box>
-                  </Stack>
-                ) : (
-                  /* For multiple targets, show apply button without total field */
-                  <Box sx={{ textAlign: "center", mt: 2 }}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleApplyDamage}
-                      disabled={selectedTargetIds.length === 0 || !showMookRolls || isProcessing}
-                      size="large"
-                      startIcon={<CheckCircleIcon />}
-                      sx={{ px: 3 }}
-                    >
-                      Apply Wounds
-                    </Button>
-                    {shotCost && (
-                      <Typography
-                        variant="caption"
-                        sx={{ mt: 1, display: "block", textAlign: "center" }}
-                      >
-                        Spend {shotCost} shots
-                      </Typography>
-                    )}
-                  </Box>
-                )}
-              </Stack>
-            </>
+            <MookAttackSection
+              attacker={attacker}
+              allShots={allShots}
+              selectedTargetIds={selectedTargetIds}
+              mookRolls={mookRolls}
+              showMookRolls={showMookRolls}
+              totalAttackingMooks={totalAttackingMooks}
+              finalDamage={finalDamage}
+              shotCost={shotCost}
+              attackValue={attackValue}
+              isProcessing={isProcessing}
+              updateField={updateField}
+              handleRollMookAttacks={handleRollMookAttacks}
+              handleApplyDamage={handleApplyDamage}
+            />
           ) : (
             <>
               {/* Regular (non-mook) Attack Resolution */}
@@ -2311,7 +1407,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             <Box sx={{ width: "100%", mt: 3 }}>
               {/* Overall attack calculation */}
               {(() => {
-                const effectiveAttack = calculateEffectiveAttackValue()
+                const effectiveAttack = calculateEffectiveAttackValue(attacker, attackerWeapons, allShots)
                 const mookBonus = effectiveAttack - parseInt(attackValue || "0")
                 const outcome = effectiveAttack + parseInt(swerve || "0") - parseInt(defenseValue || "0")
                 const isHit = outcome >= 0
@@ -2354,7 +1450,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   
                   if (hasDefenseModifier && selectedTargetIds.length > 1) {
                     // For multiple targets with dodge, recalculate outcome for this specific target
-                    individualOutcome = calculateEffectiveAttackValue() + parseInt(swerve || "0") - currentDefense
+                    individualOutcome = calculateEffectiveAttackValue(attacker, attackerWeapons, allShots) + parseInt(swerve || "0") - currentDefense
                     if (individualOutcome >= 0) {
                       smackdown = individualOutcome + parseInt(weaponDamage || "0")
                       // For mooks, wounds = number taken out; for others, calculate normally
@@ -2367,7 +1463,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                     }
                   } else {
                     // Use the standard calculation or manual override for single target
-                    const outcome = calculateEffectiveAttackValue() + parseInt(swerve || "0") - parseInt(defenseValue || "0")
+                    const outcome = calculateEffectiveAttackValue(attacker, attackerWeapons, allShots) + parseInt(swerve || "0") - parseInt(defenseValue || "0")
                     
                     // For single target, check if there's a manual smackdown override
                     if (selectedTargetIds.length === 1 && finalDamage) {
@@ -2409,53 +1505,18 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               </Stack>
 
               {/* Summary of wounds to apply */}
-              <Alert severity="warning" sx={{ mt: 2 }}>
-                <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                  Wounds to Apply:
-                </Typography>
-                <Stack spacing={0.5} sx={{ mt: 0.5 }}>
-                  {multiTargetResults.map((result) => {
-                    const targetShot = allShots.find(s => s.character?.shot_id === result.targetId)
-                    const targetChar = targetShot?.character
-                    if (!targetChar) return null
-                    
-                    const currentDefense = calculateTargetDefense(targetChar, result.targetId)
-                    const hasDefenseModifier = defenseChoicePerTarget[result.targetId] && defenseChoicePerTarget[result.targetId] !== 'none'
-                    
-                    // Use same logic as in individual results
-                    let effectiveWounds = result.wounds
-                    if (hasDefenseModifier && selectedTargetIds.length > 1) {
-                      const individualOutcome = parseInt(attackValue || "0") + parseInt(swerve || "0") - currentDefense
-                      if (individualOutcome >= 0) {
-                        // For mooks, wounds = number taken out; for others, calculate normally
-                        if (CS.isMook(targetChar)) {
-                          effectiveWounds = targetMookCount
-                        } else {
-                          const individualSmackdown = individualOutcome + parseInt(weaponDamage || "0")
-                          effectiveWounds = Math.max(0, individualSmackdown - CS.toughness(targetChar))
-                        }
-                      } else {
-                        effectiveWounds = 0
-                      }
-                    } else if (selectedTargetIds.length === 1 && finalDamage && !CS.isMook(targetChar)) {
-                      // For single target with manual smackdown override
-                      const smackdown = parseInt(finalDamage || "0")
-                      effectiveWounds = Math.max(0, smackdown - CS.toughness(targetChar))
-                    }
-                    
-                    return (
-                      <Typography key={result.targetId} variant="body2">
-                        <strong>{result.targetName}:</strong> {CS.isMook(targetChar) 
-                          ? `${effectiveWounds} ${effectiveWounds === 1 ? 'mook' : 'mooks'} taken out`
-                          : `${effectiveWounds} ${effectiveWounds === 1 ? 'wound' : 'wounds'}`
-                        }
-                        {defenseChoicePerTarget[result.targetId] === 'dodge' && ` (dodged)`}
-                        {defenseChoicePerTarget[result.targetId] === 'fortune' && ` (fortune dodge)`}
-                      </Typography>
-                    )
-                  })}
-                </Stack>
-              </Alert>
+              <WoundsSummary
+                multiTargetResults={multiTargetResults}
+                allShots={allShots}
+                calculateTargetDefense={calculateTargetDefense}
+                defenseChoicePerTarget={defenseChoicePerTarget}
+                selectedTargetIds={selectedTargetIds}
+                attackValue={attackValue}
+                swerve={swerve}
+                weaponDamage={weaponDamage}
+                targetMookCount={targetMookCount}
+                finalDamage={finalDamage}
+              />
             </Box>
           )}
         </Box>
