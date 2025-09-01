@@ -137,14 +137,14 @@ export default function AttackerSection({
             sx={{ mb: 3 }}
           >
             {/* Attack Skill Block */}
-            <Box sx={{ flex: 1 }}>
+            <Box sx={{ width: "50%" }}>
               <Typography
                 variant="body2"
                 sx={{ mb: 2, fontWeight: "medium" }}
               >
                 Attack Skill
               </Typography>
-              <Stack direction="row" spacing={1} alignItems="center">
+              <Stack direction="row" spacing={1} alignItems="flex-start">
                 <NumberField
                   name="attackValue"
                   value={parseInt(attackValue) || 0}
@@ -184,19 +184,34 @@ export default function AttackerSection({
                       </MenuItem>
                     ))}
                   </Select>
+                  {/* Display attack modifiers */}
+                  {attacker && attacker.impairments > 0 && (
+                    <Typography 
+                      variant="caption" 
+                      sx={{ 
+                        display: "block", 
+                        mt: 0.5, 
+                        ml: 1.75,
+                        color: "text.secondary",
+                        fontStyle: "italic"
+                      }}
+                    >
+                      -{attacker.impairments} impairment
+                    </Typography>
+                  )}
                 </FormControl>
               </Stack>
             </Box>
 
             {/* Damage and Weapon Block */}
-            <Box sx={{ flex: 1 }}>
+            <Box sx={{ width: "50%" }}>
               <Typography
                 variant="body2"
                 sx={{ mb: 2, fontWeight: "medium" }}
               >
                 Damage
               </Typography>
-              <Stack direction="row" spacing={1} alignItems="center">
+              <Stack direction="row" spacing={1} alignItems="flex-start">
                 <NumberField
                   name="weaponDamage"
                   value={parseInt(weaponDamage) || 0}
@@ -236,10 +251,34 @@ export default function AttackerSection({
                         key={weapon.id}
                         value={weapon.id?.toString() || ""}
                       >
-                        {weapon.name} (Damage: {weapon.damage})
+                        {weapon.name} ({weapon.damage}/{weapon.concealment}/{weapon.reload_value || "-"})
                       </MenuItem>
                     ))}
                   </Select>
+                  {/* Display selected weapon stats */}
+                  {selectedWeaponId && selectedWeaponId !== "unarmed" && (() => {
+                    const weapon = attackerWeapons.find(w => w.id?.toString() === selectedWeaponId)
+                    if (weapon) {
+                      const attrs = `(${weapon.damage}/${weapon.concealment}/${weapon.reload_value || "-"})`
+                      const mookBonus = weapon.mook_bonus && weapon.mook_bonus > 0 ? `, +${weapon.mook_bonus} vs mooks` : ""
+                      const kachunk = weapon.kachunk ? ", kachunk!" : ""
+                      return (
+                        <Typography 
+                          variant="caption" 
+                          sx={{ 
+                            display: "block", 
+                            mt: 0.5, 
+                            ml: 1.75,
+                            color: "text.secondary",
+                            fontStyle: "italic"
+                          }}
+                        >
+                          {attrs}{mookBonus}{kachunk}
+                        </Typography>
+                      )
+                    }
+                    return null
+                  })()}
                 </FormControl>
               </Stack>
             </Box>

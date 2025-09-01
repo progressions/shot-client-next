@@ -366,7 +366,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   useMemo(() => {
     if (attacker && !CS.isMook(attacker)) {
       if (swerve && attackValue && defenseValue) {
-        const av = parseInt(attackValue) || 0
+        const av = calculateEffectiveAttackValue()
         const dv = parseInt(defenseValue) || 0
         const sw = parseInt(swerve) || 0
         const weaponDmg = parseInt(weaponDamage) || 0
@@ -576,6 +576,28 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     return defense
   }
 
+  // Helper function to calculate effective attack value with mook bonus
+  const calculateEffectiveAttackValue = (): number => {
+    let baseAttack = parseInt(attackValue) || 0
+    
+    // Check if any targets are mooks and apply weapon mook bonus
+    if (selectedWeaponId && selectedWeaponId !== "unarmed" && selectedTargetIds.length > 0) {
+      const weapon = attackerWeapons.find(w => w.id?.toString() === selectedWeaponId)
+      if (weapon && weapon.mook_bonus > 0) {
+        // Check if any selected target is a mook
+        const targetingMooks = selectedTargetIds.some(id => {
+          const shot = allShots.find(s => s.character?.shot_id === id)
+          return shot?.character && CS.isMook(shot.character)
+        })
+        
+        if (targetingMooks) {
+          baseAttack += weapon.mook_bonus
+        }
+      }
+    }
+    
+    return baseAttack
+  }
 
   // Reset when attacker changes
   useEffect(() => {
@@ -637,7 +659,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   const handleRollMookAttacks = () => {
     if (!attacker || !CS.isMook(attacker)) return
 
-    const av = parseInt(attackValue) || 0
+    const av = calculateEffectiveAttackValue()
     const weaponDmg = parseInt(weaponDamage) || 0
     
     const allTargetRolls = []
@@ -870,11 +892,11 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                 attacker_id: attackerShot.character?.id,
                 target_id: targetChar.id,
                 damage: effectiveWounds,
-                attack_value: parseInt(attackValue),
+                attack_value: calculateEffectiveAttackValue(),
                 defense_value: parseInt(defenseValue),
                 effective_defense: calculateTargetDefense(targetChar, result.targetId),
                 swerve: parseInt(swerve),
-                outcome: parseInt(attackValue) + parseInt(swerve) - parseInt(defenseValue),
+                outcome: calculateEffectiveAttackValue() + parseInt(swerve) - parseInt(defenseValue),
                 weapon_damage: parseInt(weaponDamage),
                 shot_cost: shots,
                 stunt: stunt,
@@ -960,7 +982,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   attacker_id: attackerShot.character?.id,
                   target_id: targetChar.id,
                   mooks_eliminated: totalWounds,
-                  attack_value: parseInt(attackValue),
+                  attack_value: calculateEffectiveAttackValue(),
                   defense_value: CS.defense(targetChar),
                   shot_cost: shots,
                   is_mook_vs_mook: true,
@@ -1003,7 +1025,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   attacker_id: attackerShot.character?.id,
                   target_id: targetChar.id,
                   damage: totalWounds,
-                  attack_value: parseInt(attackValue),
+                  attack_value: calculateEffectiveAttackValue(),
                   defense_value: CS.defense(targetChar),
                   weapon_damage: parseInt(weaponDamage),
                   shot_cost: shots,
@@ -1475,16 +1497,42 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                         }}
                       >
                         {/* Name at the top for mobile */}
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            fontWeight: "medium",
-                            display: { xs: "block", sm: "none" },
-                            mb: 1
-                          }}
-                        >
-                          {char.name}
-                        </Typography>
+                        <Box sx={{ display: { xs: "block", sm: "none" }, mb: 1 }}>
+                          <Typography 
+                            variant="body2" 
+                            sx={{ 
+                              fontWeight: "medium"
+                            }}
+                          >
+                            {char.name}
+                          </Typography>
+                          {/* Defense modifiers text */}
+                          {(stunt || (defenseChoicePerTarget[id] && defenseChoicePerTarget[id] !== 'none') || char.impairments > 0) && (
+                            <Typography 
+                              variant="caption" 
+                              sx={{ 
+                                fontStyle: "italic",
+                                color: "text.secondary",
+                                display: "block"
+                              }}
+                            >
+                              {(() => {
+                                const modifiers = []
+                                if (stunt) modifiers.push("+2 Stunt")
+                                if (defenseChoicePerTarget[id] === 'dodge') {
+                                  modifiers.push("+3 Dodge")
+                                } else if (defenseChoicePerTarget[id] === 'fortune') {
+                                  const fortuneDie = parseInt(fortuneDiePerTarget[id] || "0")
+                                  modifiers.push(`+${3 + fortuneDie} Fortune`)
+                                }
+                                if (char.impairments > 0) {
+                                  modifiers.push(`-${char.impairments} Impairment`)
+                                }
+                                return modifiers.length > 0 ? `Defense ${modifiers.join(", ")}` : ""
+                              })()}
+                            </Typography>
+                          )}
+                        </Box>
                         
                         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
                           {/* Count field for mooks when non-mook is attacking */}
@@ -1613,16 +1661,42 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                         </Box>
                         
                         {/* Name on the side for desktop */}
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            fontWeight: "medium",
-                            flex: 1,
-                            display: { xs: "none", sm: "block" }
-                          }}
-                        >
-                          {char.name}
-                        </Typography>
+                        <Box sx={{ flex: 1, display: { xs: "none", sm: "block" } }}>
+                          <Typography 
+                            variant="body2" 
+                            sx={{ 
+                              fontWeight: "medium"
+                            }}
+                          >
+                            {char.name}
+                          </Typography>
+                          {/* Defense modifiers text */}
+                          {(stunt || (defenseChoicePerTarget[id] && defenseChoicePerTarget[id] !== 'none') || char.impairments > 0) && (
+                            <Typography 
+                              variant="caption" 
+                              sx={{ 
+                                fontStyle: "italic",
+                                color: "text.secondary",
+                                display: "block"
+                              }}
+                            >
+                              {(() => {
+                                const modifiers = []
+                                if (stunt) modifiers.push("+2 Stunt")
+                                if (defenseChoicePerTarget[id] === 'dodge') {
+                                  modifiers.push("+3 Dodge")
+                                } else if (defenseChoicePerTarget[id] === 'fortune') {
+                                  const fortuneDie = parseInt(fortuneDiePerTarget[id] || "0")
+                                  modifiers.push(`+${3 + fortuneDie} Fortune`)
+                                }
+                                if (char.impairments > 0) {
+                                  modifiers.push(`-${char.impairments} Impairment`)
+                                }
+                                return modifiers.length > 0 ? `Defense ${modifiers.join(", ")}` : ""
+                              })()}
+                            </Typography>
+                          )}
+                        </Box>
                         
                         {/* Dodge buttons */}
                         {defenseChoicePerTarget[id] !== 'dodge' && defenseChoicePerTarget[id] !== 'fortune' ? (
@@ -2237,16 +2311,22 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             <Box sx={{ width: "100%", mt: 3 }}>
               {/* Overall attack calculation */}
               {(() => {
-                const outcome = parseInt(attackValue || "0") + parseInt(swerve || "0") - parseInt(defenseValue || "0")
+                const effectiveAttack = calculateEffectiveAttackValue()
+                const mookBonus = effectiveAttack - parseInt(attackValue || "0")
+                const outcome = effectiveAttack + parseInt(swerve || "0") - parseInt(defenseValue || "0")
                 const isHit = outcome >= 0
                 const defenseLabel = selectedTargetIds.length === 1 ? "Defense" : "Combined Defense"
+                const attackDisplay = mookBonus > 0 
+                  ? `${attackValue} (+${mookBonus} vs mooks)` 
+                  : attackValue
+                
                 return (
                   <Alert severity={isHit ? "success" : "error"} sx={{ mb: 2 }}>
                     <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
-                      {isHit ? "Hit!" : "Miss!"} Attack Value {attackValue} + Swerve {swerve} = Action Result {parseInt(attackValue || "0") + parseInt(swerve || "0")}
+                      {isHit ? "Hit!" : "Miss!"} Attack Value {attackDisplay} + Swerve {swerve} = Action Result {effectiveAttack + parseInt(swerve || "0")}
                     </Typography>
                     <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
-                      Action Result {parseInt(attackValue || "0") + parseInt(swerve || "0")} - {defenseLabel} {defenseValue} = Outcome {outcome}
+                      Action Result {effectiveAttack + parseInt(swerve || "0")} - {defenseLabel} {defenseValue} = Outcome {outcome}
                     </Typography>
                     {isHit && (
                       <Typography variant="caption" sx={{ display: "block" }}>
@@ -2274,7 +2354,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   
                   if (hasDefenseModifier && selectedTargetIds.length > 1) {
                     // For multiple targets with dodge, recalculate outcome for this specific target
-                    individualOutcome = parseInt(attackValue || "0") + parseInt(swerve || "0") - currentDefense
+                    individualOutcome = calculateEffectiveAttackValue() + parseInt(swerve || "0") - currentDefense
                     if (individualOutcome >= 0) {
                       smackdown = individualOutcome + parseInt(weaponDamage || "0")
                       // For mooks, wounds = number taken out; for others, calculate normally
@@ -2287,7 +2367,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                     }
                   } else {
                     // Use the standard calculation or manual override for single target
-                    const outcome = parseInt(attackValue || "0") + parseInt(swerve || "0") - parseInt(defenseValue || "0")
+                    const outcome = calculateEffectiveAttackValue() + parseInt(swerve || "0") - parseInt(defenseValue || "0")
                     
                     // For single target, check if there's a manual smackdown override
                     if (selectedTargetIds.length === 1 && finalDamage) {
