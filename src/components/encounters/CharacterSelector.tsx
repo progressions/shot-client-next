@@ -103,7 +103,12 @@ export default function CharacterSelector({
                   return // Allow clicks in popup to work normally
                 }
                 e.preventDefault()
-                onSelect(entity.shot_id || "")
+                // Toggle selection - if already selected, pass empty string to deselect
+                if (isSelected && !multiSelect) {
+                  onSelect("")
+                } else {
+                  onSelect(entity.shot_id || "")
+                }
               }}
               sx={{
                 cursor: "pointer",

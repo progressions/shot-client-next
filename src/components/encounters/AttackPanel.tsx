@@ -841,6 +841,16 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             ? ' (Dodge +3)'
             : ''
           
+          // Calculate updated Fortune points if fortune dodge was used
+          let updatedFortune: number | undefined
+          if (defenseChoice === 'fortune' && CS.isPC(targetChar)) {
+            const currentFortune = CS.fortune(targetChar)
+            if (currentFortune > 0) {
+              updatedFortune = currentFortune - 1
+              toastInfo(`${targetChar.name} spent 1 Fortune point for dodge`)
+            }
+          }
+          
           // Send update to backend for this target
           const isMook = CS.isMook(targetChar)
           const description = isMook
@@ -874,7 +884,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                 is_mook_takedown: isMook,
                 mooks_taken_out: isMook ? effectiveWounds : undefined,
               },
-            }
+            },
+            updatedFortune
           )
           
           const toastMessage = isMook
@@ -956,7 +967,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   attacking_mooks: targetGroup.rolls.length,
                   successful_hits: targetGroup.rolls.filter(r => r.hit).length,
                 },
-              }
+              },
+              undefined // No fortune change for mook attacks
             )
             
             toastSuccess(
@@ -999,7 +1011,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                   mook_count: targetGroup.rolls.length,
                   mook_hits: targetGroup.rolls.filter(r => r.hit).length,
                 },
-              }
+              },
+              undefined // No fortune change for mook attacks
             )
             
             toastSuccess(
@@ -1127,7 +1140,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                 ? mookRolls.filter(r => r.hit).length
                 : undefined,
           },
-        }
+        },
+        undefined // No fortune change for single target mode (doesn't support dodge)
       )
 
       toastSuccess(
@@ -1610,8 +1624,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                           {char.name}
                         </Typography>
                         
-                        {/* Dodge button */}
-                        {defenseChoicePerTarget[id] !== 'dodge' ? (
+                        {/* Dodge buttons */}
+                        {defenseChoicePerTarget[id] !== 'dodge' && defenseChoicePerTarget[id] !== 'fortune' ? (
                           <Button
                             variant="outlined"
                             size="small"
@@ -1655,25 +1669,143 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                           >
                             Dodge
                           </Button>
+                        ) : defenseChoicePerTarget[id] === 'dodge' ? (
+                          <>
+                            <Button
+                              variant="contained"
+                              size="small"
+                              color="success"
+                              onClick={() => {
+                                // Remove dodge choice
+                                const newChoices = { ...defenseChoicePerTarget }
+                                delete newChoices[id]
+                                updateField("defenseChoicePerTarget", newChoices)
+                                // Recalculate defense without dodge
+                                if (selectedTargetIds.length > 0) {
+                                  updateDefenseAndToughness(selectedTargetIds, stunt)
+                                }
+                              }}
+                              sx={{ minWidth: "80px" }}
+                            >
+                              ✓ Dodging
+                            </Button>
+                            
+                            {/* Fortune button for PCs - only shows when regular dodge is active */}
+                            {CS.isPC(char) && (
+                              <Button
+                                variant="outlined"
+                                size="small"
+                                color="secondary"
+                                onClick={() => {
+                                  // Upgrade to fortune defense choice
+                                  updateField("defenseChoicePerTarget", {
+                                    ...defenseChoicePerTarget,
+                                    [id]: 'fortune' as DefenseChoice
+                                  })
+                                  // Initialize fortune die to 0
+                                  updateField("fortuneDiePerTarget", {
+                                    ...fortuneDiePerTarget,
+                                    [id]: "0"
+                                  })
+                                }}
+                                sx={{ minWidth: "40px", px: 1 }}
+                                title="Add Fortune to Dodge"
+                              >
+                                +🎲
+                              </Button>
+                            )}
+                          </>
                         ) : (
-                          <Button
-                            variant="contained"
-                            size="small"
-                            color="success"
-                            onClick={() => {
-                              // Remove dodge choice
-                              const newChoices = { ...defenseChoicePerTarget }
-                              delete newChoices[id]
-                              updateField("defenseChoicePerTarget", newChoices)
-                              // Recalculate defense without dodge
-                              if (selectedTargetIds.length > 0) {
-                                updateDefenseAndToughness(selectedTargetIds, stunt)
-                              }
-                            }}
-                            sx={{ minWidth: "80px" }}
-                          >
-                            ✓ Dodging
-                          </Button>
+                          // Fortune dodge is active - show button and number field
+                          <>
+                            <Button
+                              variant="contained"
+                              size="small"
+                              color="secondary"
+                              onClick={() => {
+                                // Go back to regular dodge
+                                updateField("defenseChoicePerTarget", {
+                                  ...defenseChoicePerTarget,
+                                  [id]: 'dodge' as DefenseChoice
+                                })
+                                // Clear fortune die
+                                const newFortuneDice = { ...fortuneDiePerTarget }
+                                delete newFortuneDice[id]
+                                updateField("fortuneDiePerTarget", newFortuneDice)
+                                // Recalculate defense for regular dodge
+                                if (selectedTargetIds.length > 1) {
+                                  const updatedDefenses = selectedTargetIds.map(targetId => {
+                                    const targetShot = allShots.find(s => s.character?.shot_id === targetId)
+                                    const targetChar = targetShot?.character
+                                    if (!targetChar) return 0
+                                    
+                                    if (targetId === id) {
+                                      return CS.defense(targetChar) + 3 + (stunt ? 2 : 0) // back to regular dodge
+                                    }
+                                    return calculateTargetDefense(targetChar, targetId)
+                                  })
+                                  const highestDefense = Math.max(...updatedDefenses)
+                                  const combinedDefense = highestDefense + selectedTargetIds.length
+                                  updateField("defenseValue", combinedDefense.toString())
+                                } else {
+                                  // Single target
+                                  const targetShot = allShots.find(s => s.character?.shot_id === id)
+                                  const targetChar = targetShot?.character
+                                  if (targetChar) {
+                                    const newDefense = CS.defense(targetChar) + 3 + (stunt ? 2 : 0)
+                                    updateField("defenseValue", newDefense.toString())
+                                  }
+                                }
+                              }}
+                              sx={{ minWidth: "120px" }}
+                            >
+                              ✓ Fortune Dodge
+                            </Button>
+                            <NumberField
+                              name={`fortuneDie-${id}`}
+                              value={parseInt(fortuneDiePerTarget[id] || "0") || 0}
+                              size="small"
+                              width="80px"
+                              error={false}
+                              disabled={false}
+                              onChange={e => {
+                                updateField("fortuneDiePerTarget", {
+                                  ...fortuneDiePerTarget,
+                                  [id]: e.target.value
+                                })
+                                // Recalculate defense with new fortune value
+                                if (selectedTargetIds.length > 1) {
+                                  const updatedDefenses = selectedTargetIds.map(targetId => {
+                                    const targetShot = allShots.find(s => s.character?.shot_id === targetId)
+                                    const targetChar = targetShot?.character
+                                    if (!targetChar) return 0
+                                    
+                                    if (targetId === id) {
+                                      return CS.defense(targetChar) + 3 + parseInt(e.target.value || "0") + (stunt ? 2 : 0)
+                                    }
+                                    return calculateTargetDefense(targetChar, targetId)
+                                  })
+                                  const highestDefense = Math.max(...updatedDefenses)
+                                  const combinedDefense = highestDefense + selectedTargetIds.length
+                                  updateField("defenseValue", combinedDefense.toString())
+                                } else {
+                                  // Single target
+                                  const targetShot = allShots.find(s => s.character?.shot_id === id)
+                                  const targetChar = targetShot?.character
+                                  if (targetChar) {
+                                    const newDefense = CS.defense(targetChar) + 3 + parseInt(e.target.value || "0") + (stunt ? 2 : 0)
+                                    updateField("defenseValue", newDefense.toString())
+                                  }
+                                }
+                              }}
+                              onBlur={e => {
+                                updateField("fortuneDiePerTarget", {
+                                  ...fortuneDiePerTarget,
+                                  [id]: e.target.value
+                                })
+                              }}
+                            />
+                          </>
                         )}
                       </Box>
                     )

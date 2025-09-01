@@ -7,7 +7,7 @@ type AVProps = {
 }
 
 export function AV({ label, value, maxValue }: AVProps) {
-  if (!value && !maxValue) return null
+  if (value === null || value === undefined) return null
 
   return (
     <Box component="span">

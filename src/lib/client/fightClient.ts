@@ -111,7 +111,8 @@ export function createFightClient(deps: ClientDependencies) {
       type: string
       description: string
       details?: Record<string, unknown>
-    }
+    },
+    fortune?: number
   ): Promise<AxiosResponse<Encounter>> {
     const fightId = typeof fight === "string" ? fight : fight.id
     return post(`${apiV2.encounters()}/${fightId}/update_combat_state`, {
@@ -120,6 +121,7 @@ export function createFightClient(deps: ClientDependencies) {
       count,
       impairments,
       event,
+      fortune,
     })
   }
 
