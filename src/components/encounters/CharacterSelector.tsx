@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Box, FormControlLabel, Checkbox } from "@mui/material"
+import { Box, FormControlLabel, Checkbox, useMediaQuery, useTheme } from "@mui/material"
 import { Avatar } from "@/components/avatars"
 import type { Shot, Character } from "@/types"
 import { CS } from "@/services"
@@ -40,6 +40,8 @@ export default function CharacterSelector({
   multiSelect = false,
 }: CharacterSelectorProps) {
   const [showAll, setShowAll] = useState(false)
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
   const filteredShots = useMemo(() => {
     return shots.filter(shot => {
@@ -142,6 +144,7 @@ export default function CharacterSelector({
                 <Avatar
                   entity={entity}
                   href={`/characters/${entity.id}`}
+                  disablePopup={isMobile}
                   disableImageViewer={true}
                   sx={{
                     width: 64,

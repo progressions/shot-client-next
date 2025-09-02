@@ -64,7 +64,6 @@ export default function MenuBar() {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             style={{
-              overflow: "hidden",
               backgroundColor: theme.palette.divider,
               zIndex: 1099,
             }}

@@ -148,7 +148,7 @@ export default function AttackerSection({
             sx={{ mb: 3 }}
           >
             {/* Attack Skill Block */}
-            <Box sx={{ width: "50%" }}>
+            <Box sx={{ width: { xs: "100%", sm: "50%" } }}>
               <Typography variant="body2" sx={{ mb: 2, fontWeight: "medium" }}>
                 Attack Skill
               </Typography>
@@ -183,6 +183,7 @@ export default function AttackerSection({
                 <FormControl
                   sx={{
                     flex: 1,
+                    minWidth: { xs: 120, sm: 150 },
                     "& .MuiInputBase-root": { height: 56 },
                   }}
                 >
@@ -256,7 +257,7 @@ export default function AttackerSection({
             </Box>
 
             {/* Damage and Weapon Block */}
-            <Box sx={{ width: "50%" }}>
+            <Box sx={{ width: { xs: "100%", sm: "50%" } }}>
               <Typography variant="body2" sx={{ mb: 2, fontWeight: "medium" }}>
                 Damage
               </Typography>
@@ -288,7 +289,11 @@ export default function AttackerSection({
                   )}
                 </Box>
                 <FormControl
-                  sx={{ flex: 1, "& .MuiInputBase-root": { height: 56 } }}
+                  sx={{ 
+                    flex: 1, 
+                    minWidth: { xs: 120, sm: 150 },
+                    "& .MuiInputBase-root": { height: 56 } 
+                  }}
                 >
                   <InputLabel>Weapon</InputLabel>
                   <Select
