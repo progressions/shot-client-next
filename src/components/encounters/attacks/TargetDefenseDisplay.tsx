@@ -480,7 +480,7 @@ export default function TargetDefenseDisplay({
               Dodge
             </Button>
           ) : defenseChoicePerTarget[targetId] === "dodge" ? (
-            <>
+            <Box sx={{ display: "flex", gap: 0.5 }}>
               <Button
                 variant="contained"
                 size="small"
@@ -524,10 +524,10 @@ export default function TargetDefenseDisplay({
                   +🎲
                 </Button>
               )}
-            </>
+            </Box>
           ) : (
             // Fortune dodge is active - show button and number field
-            <>
+            <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
               <Button
                 variant="contained"
                 size="small"
@@ -606,7 +606,7 @@ export default function TargetDefenseDisplay({
                   })
                 }}
               />
-            </>
+            </Box>
           ))}
       </Box>
     </Box>
