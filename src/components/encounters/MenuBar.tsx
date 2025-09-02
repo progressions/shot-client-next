@@ -11,6 +11,8 @@ import {
   ButtonGroup,
   Button,
   Divider,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
 import { Icon } from "@/components/ui"
@@ -27,7 +29,12 @@ import { useEncounter } from "@/contexts"
 import FightService from "@/services/FightService"
 import type { Character, Vehicle } from "@/types"
 
-export default function MenuBar() {
+interface MenuBarProps {
+  showHidden: boolean
+  onShowHiddenChange: (show: boolean) => void
+}
+
+export default function MenuBar({ showHidden, onShowHiddenChange }: MenuBarProps) {
   const theme = useTheme()
   const { encounter, updateEncounter } = useEncounter()
   const [open, setOpen] = useState<"character" | "vehicle" | "attack" | null>(
@@ -238,6 +245,36 @@ export default function MenuBar() {
           >
             <FaMapMarkerAlt size={18} />
           </IconButton>
+          <Divider
+            orientation="vertical"
+            sx={{
+              mx: { xs: 0.5, sm: 1 },
+              height: 24,
+              backgroundColor: "rgba(255, 255, 255, 0.3)",
+            }}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={showHidden}
+                onChange={(e) => onShowHiddenChange(e.target.checked)}
+                sx={{
+                  color: "white",
+                  "&.Mui-checked": {
+                    color: "white",
+                  },
+                }}
+              />
+            }
+            label="Show Hidden"
+            sx={{
+              color: "white",
+              ml: 1,
+              "& .MuiFormControlLabel-label": {
+                fontSize: { xs: "0.875rem", sm: "1rem" },
+              },
+            }}
+          />
         </Toolbar>
       </AppBar>
       <AnimatePresence mode="wait">

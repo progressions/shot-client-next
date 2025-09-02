@@ -6,7 +6,6 @@ import { useEncounter, useToast } from "@/contexts"
 import { CS, DS, CES } from "@/services"
 import type {
   Character,
-  Shot,
   Weapon,
   AttackFormData,
   AttackPanelProps,
