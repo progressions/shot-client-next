@@ -33,10 +33,10 @@ type CharacterFilterProps = {
 }
 
 export default function CharacterFilter({
-  value,
+  value: _value,
   setSelectedChild,
   addMember,
-  dispatch,
+  dispatch: _dispatch,
   omit = [],
 }: CharacterFilterProps) {
   const { client } = useClient()

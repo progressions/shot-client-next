@@ -14,9 +14,7 @@ type EditableRichTextProps = {
 export function EditableRichText({
   name,
   html,
-  editable: _editable = true,
   onChange,
-  fallback,
 }: EditableRichTextProps) {
   const handleSave = (event: EditorChangeEvent) => {
     if (onChange) {

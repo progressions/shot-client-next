@@ -42,7 +42,6 @@ interface FilterAccordionProps {
 
   // Common props
   title?: string
-  showSearch?: boolean
 }
 
 export function FilterAccordion({
@@ -54,7 +53,6 @@ export function FilterAccordion({
   omit = [],
   excludeIds = [],
   title = "Filters",
-  showSearch = true,
 }: FilterAccordionProps) {
   const [expanded, setExpanded] = useState(false)
 

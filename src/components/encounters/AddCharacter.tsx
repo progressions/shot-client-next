@@ -7,7 +7,7 @@ import { type Character } from "@/types"
 import { useEncounter, useToast, useClient } from "@/contexts"
 
 export default function AddCharacter({
-  open,
+  open: _open,
   onClose,
 }: {
   open: boolean
@@ -51,7 +51,7 @@ export default function AddCharacter({
   // Debug logging
   console.log("[AddCharacter] Current selectedCharacter:", selectedCharacter)
 
-  const handleDispatch = (action: unknown) => {
+  const handleDispatch = (_action: unknown) => {
     // CharacterFilter expects a dispatch function for managing its internal state
     // We don't need to handle this externally for our use case
   }
