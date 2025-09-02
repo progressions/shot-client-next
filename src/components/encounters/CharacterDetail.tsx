@@ -68,18 +68,20 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
     >
       <ListItem
         sx={{ 
-          alignItems: "center",
+          alignItems: "flex-start",
           position: "relative",
           pr: 0,
           "& .MuiListItemSecondaryAction-root": {
-            right: 0
+            right: 0,
+            top: "50%",
+            transform: "translateY(-50%)"
           }
         }}
         secondaryAction={
           <Actions entity={character} />
         }
       >
-        <ListItemIcon>
+        <ListItemIcon sx={{ mt: 0 }}>
           <Wounds character={character} />
         </ListItemIcon>
         <ListItemText
