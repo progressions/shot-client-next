@@ -155,45 +155,44 @@ export default function CharacterEffectsDisplay({ character, effects = [] }: Cha
         }}
       >
         {openSeverity && groupedEffects[openSeverity] && (
-          <Box sx={{ p: 2, maxWidth: 300 }}>
-            <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: "bold" }}>
-              Active Effects
-            </Typography>
-            <Stack spacing={1}>
-              {groupedEffects[openSeverity].map((effect, index) => (
-                <Box key={effect.id || index}>
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography variant="body2" sx={{ fontWeight: "medium" }}>
-                        {effect.name}
+          <Box sx={{ p: 1.5, minWidth: 200 }}>
+            {groupedEffects[openSeverity].map((effect, index) => (
+              <Stack 
+                key={effect.id || index} 
+                direction="row" 
+                alignItems="center" 
+                spacing={1}
+                sx={{ 
+                  py: 0.5,
+                  borderBottom: index < groupedEffects[openSeverity].length - 1 ? '1px solid' : 'none',
+                  borderColor: 'divider'
+                }}
+              >
+                <InfoOutlinedIcon 
+                  fontSize="small" 
+                  color={severityColors[openSeverity] as any}
+                />
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="body2">
+                    {effect.name}
+                    {effect.action_value && effect.change && (
+                      <Typography component="span" variant="body2" sx={{ ml: 1, fontWeight: 'bold' }}>
+                        ({formatChange(effect)})
                       </Typography>
-                      {effect.description && (
-                        <Typography variant="caption" color="text.secondary">
-                          {effect.description}
-                        </Typography>
-                      )}
-                      {effect.action_value && effect.change && (
-                        <Chip
-                          label={formatChange(effect)}
-                          size="small"
-                          color={severityColors[openSeverity] as any}
-                          sx={{ mt: 0.5 }}
-                        />
-                      )}
-                    </Box>
-                    {isGamemaster && (
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDeleteEffect(effect)}
-                        sx={{ padding: 0.5 }}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
                     )}
-                  </Stack>
+                  </Typography>
                 </Box>
-              ))}
-            </Stack>
+                {isGamemaster && (
+                  <IconButton
+                    size="small"
+                    onClick={() => handleDeleteEffect(effect)}
+                    sx={{ padding: 0.25 }}
+                  >
+                    <DeleteIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+                )}
+              </Stack>
+            ))}
           </Box>
         )}
       </Popover>
