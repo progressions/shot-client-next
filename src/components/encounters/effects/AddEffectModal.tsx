@@ -9,8 +9,10 @@ import {
   TextField,
   MenuItem,
   Stack,
-  Box
+  Box,
+  IconButton
 } from "@mui/material"
+import CircleIcon from "@mui/icons-material/Circle"
 import { useState } from "react"
 import { useEncounter, useToast, useClient } from "@/contexts"
 import type { Character, CharacterEffect } from "@/types"
@@ -38,7 +40,6 @@ export default function AddEffectModal({ open, onClose, character }: AddEffectMo
   const [saving, setSaving] = useState(false)
   const [effect, setEffect] = useState<Partial<CharacterEffect>>({
     name: "",
-    description: "",
     severity: "info" as Severity,
     action_value: "",
     change: "",
@@ -101,7 +102,6 @@ export default function AddEffectModal({ open, onClose, character }: AddEffectMo
   const handleClose = () => {
     setEffect({
       name: "",
-      description: "",
       severity: "info" as Severity,
       action_value: "",
       change: "",
@@ -121,7 +121,7 @@ export default function AddEffectModal({ open, onClose, character }: AddEffectMo
       <DialogTitle>Add Effect to {character.name}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
-          <Stack direction="row" spacing={2}>
+          <Stack direction="row" spacing={2} alignItems="center">
             <TextField
               label="Effect Name"
               value={effect.name}
@@ -131,30 +131,29 @@ export default function AddEffectModal({ open, onClose, character }: AddEffectMo
               autoFocus
               placeholder="e.g., Stunned, Blessed, Wounded"
             />
-            <TextField
-              select
-              label="Severity"
-              value={effect.severity}
-              onChange={handleChange("severity")}
-              sx={{ minWidth: 150 }}
-            >
+            <Stack direction="row" spacing={0.5}>
               {severityOptions.map(option => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
+                <IconButton
+                  key={option.value}
+                  onClick={() => setEffect(prev => ({ ...prev, severity: option.value }))}
+                  sx={{
+                    p: 0.25,
+                    border: effect.severity === option.value ? 2 : 0,
+                    borderColor: effect.severity === option.value ? "primary.main" : "transparent"
+                  }}
+                >
+                  <CircleIcon 
+                    sx={{ 
+                      color: option.value === "error" ? "error.main" : 
+                             option.value === "warning" ? "warning.main" :
+                             option.value === "info" ? "info.main" : "success.main",
+                      fontSize: 24
+                    }} 
+                  />
+                </IconButton>
               ))}
-            </TextField>
+            </Stack>
           </Stack>
-
-          <TextField
-            label="Description (Optional)"
-            value={effect.description}
-            onChange={handleChange("description")}
-            fullWidth
-            multiline
-            rows={2}
-            placeholder="Additional details about the effect"
-          />
 
           <Box>
             <Box sx={{ mb: 1 }}>
