@@ -16,7 +16,10 @@ interface CharacterEffectsDisplayProps {
 
 type Severity = "error" | "warning" | "info" | "success"
 
-const severityColors: Record<Severity, "error" | "warning" | "info" | "success"> = {
+const severityColors: Record<
+  Severity,
+  "error" | "warning" | "info" | "success"
+> = {
   error: "error",
   warning: "warning",
   info: "info",
