@@ -19,8 +19,15 @@ export default function AddCharacter({
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null
   )
+  
+  // Add a wrapper to debug setSelectedCharacter calls
+  const handleSetSelectedCharacter = (character: Character | null) => {
+    console.log("[AddCharacter] Setting selected character to:", character?.name || "null")
+    setSelectedCharacter(character)
+  }
 
   const handleAddMember = async (character: Character) => {
+    console.log("[AddCharacter] handleAddMember called with:", character)
     if (!character || !encounter) {
       console.log("Missing character or encounter", { character, encounter })
       return
@@ -37,6 +44,9 @@ export default function AddCharacter({
       toastError(`Failed to add ${character.name} to the fight`)
     }
   }
+  
+  // Debug logging
+  console.log("[AddCharacter] Current selectedCharacter:", selectedCharacter)
 
   const handleDispatch = (action: unknown) => {
     // CharacterFilter expects a dispatch function for managing its internal state
@@ -52,7 +62,7 @@ export default function AddCharacter({
     >
       <CharacterFilter
         value={selectedCharacter?.id || null}
-        setSelectedChild={setSelectedCharacter}
+        setSelectedChild={handleSetSelectedCharacter}
         addMember={handleAddMember}
         dispatch={handleDispatch}
         omit={[]}

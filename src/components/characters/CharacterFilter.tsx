@@ -46,7 +46,7 @@ export default function CharacterFilter({
     archetype: null,
     characters: [],
     factions: [],
-    selectedChild: value,
+    selectedChild: null,  // Initialize as null, will be set when character is selected
   })
   const {
     character_type,
@@ -62,7 +62,7 @@ export default function CharacterFilter({
 
   const fetchCharacters = useCallback(async () => {
     try {
-      const response = await client.getCharacter({
+      const response = await client.getCharacters({
         autocomplete: true,
         faction_id,
         type: character_type,
@@ -113,6 +113,11 @@ export default function CharacterFilter({
   }, [])
 
   useEffect(() => {
+    console.log("[CharacterFilter] fetchCharacters useEffect triggered, deps:", {
+      character_type,
+      selectedChild: selectedChild?.name,
+      faction_id,
+    })
     fetchCharacters()
       .catch(error => {
         console.error("Error in useEffect fetchCharacters:", error)
@@ -133,13 +138,25 @@ export default function CharacterFilter({
     fetchCharacters,
   ])
 
-  const handleCharacterChange = (character: Character | null) => {
+  const handleCharacterChange = (characterId: string | null) => {
+    console.log("[CharacterFilter] handleCharacterChange called with ID:", characterId)
+    console.log("[CharacterFilter] Available characters in state:", characters.length)
+    console.log("[CharacterFilter] Character IDs available:", characters.map(c => c.id))
+    
+    const character = characterId ? characters.find(c => c.id === characterId) : null
+    console.log("[CharacterFilter] Found character:", character ? `${character.name} (${character.id})` : "NOT FOUND")
+    
+    if (!character && characterId) {
+      console.error("[CharacterFilter] Character ID not found in characters array!", characterId)
+    }
+    
     dispatchForm({
       type: FormActions.UPDATE,
       name: "selectedChild",
       value: character,
     })
     setSelectedChild?.(character)
+    console.log("[CharacterFilter] After setSelectedChild, selectedChild state is:", selectedChild)
   }
 
   const handleFactionChange = (value: string | null) => {
