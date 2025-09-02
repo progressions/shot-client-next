@@ -50,8 +50,9 @@ export default function CharacterEditDialog({
       setName(character.name || "")
       // Get current shot from character's shot_id data
       // For now, using the current_shot field if available
-      const shot = (character as any).current_shot || 0
-      setCurrentShot(typeof shot === "number" ? shot : parseInt(shot) || 0)
+      const characterWithShot = character as Character & { current_shot?: number | string }
+      const shot = characterWithShot.current_shot || 0
+      setCurrentShot(typeof shot === "number" ? shot : parseInt(String(shot)) || 0)
 
       // Get wounds from action_values
       setWounds(character.action_values?.Wounds || 0)
@@ -66,8 +67,9 @@ export default function CharacterEditDialog({
       } else {
         // For non-PCs, impairments would be on the shot association
         // We'll need to get this from the shot data
+        const characterWithShotImpairments = character as Character & { shot_impairments?: number }
         setImpairments(
-          (character as any).shot_impairments || character.impairments || 0
+          characterWithShotImpairments.shot_impairments || character.impairments || 0
         )
       }
     }
@@ -93,7 +95,13 @@ export default function CharacterEditDialog({
     setLoading(true)
     try {
       // Prepare character update payload
-      const characterUpdate: any = {
+      interface CharacterUpdate {
+        name: string
+        action_values: Record<string, unknown>
+        impairments?: number
+      }
+      
+      const characterUpdate: CharacterUpdate = {
         name: name.trim(),
         action_values: {
           ...character.action_values,
@@ -112,7 +120,13 @@ export default function CharacterEditDialog({
 
       // Update shot if we have shot data
       if (character.shot_id) {
-        const shotUpdate: any = {
+        interface ShotUpdate {
+          shot_id: string
+          current_shot: number
+          impairments?: number
+        }
+        
+        const shotUpdate: ShotUpdate = {
           shot_id: character.shot_id,
           current_shot: currentShot,
         }
@@ -166,11 +180,11 @@ export default function CharacterEditDialog({
                 </Typography>
                 <NumberField
                   value={currentShot}
-                  onChange={(e: any) => {
+                  onChange={(e: React.ChangeEvent<HTMLInputElement> | number) => {
                     const val =
-                      typeof e === "object" && e?.target ? e.target.value : e
+                      typeof e === "object" && "target" in e ? e.target.value : e
                     setCurrentShot(
-                      typeof val === "number" ? val : parseInt(val) || 0
+                      typeof val === "number" ? val : parseInt(String(val)) || 0
                     )
                   }}
                   onBlur={() => {}}
@@ -190,11 +204,11 @@ export default function CharacterEditDialog({
                 </Typography>
                 <NumberField
                   value={wounds}
-                  onChange={(e: any) => {
+                  onChange={(e: React.ChangeEvent<HTMLInputElement> | number) => {
                     const val =
-                      typeof e === "object" && e?.target ? e.target.value : e
+                      typeof e === "object" && "target" in e ? e.target.value : e
                     setWounds(
-                      typeof val === "number" ? val : parseInt(val) || 0
+                      typeof val === "number" ? val : parseInt(String(val)) || 0
                     )
                   }}
                   onBlur={() => {}}
@@ -215,11 +229,11 @@ export default function CharacterEditDialog({
                 </Typography>
                 <NumberField
                   value={impairments}
-                  onChange={(e: any) => {
+                  onChange={(e: React.ChangeEvent<HTMLInputElement> | number) => {
                     const val =
-                      typeof e === "object" && e?.target ? e.target.value : e
+                      typeof e === "object" && "target" in e ? e.target.value : e
                     setImpairments(
-                      typeof val === "number" ? val : parseInt(val) || 0
+                      typeof val === "number" ? val : parseInt(String(val)) || 0
                     )
                   }}
                   onBlur={() => {}}
@@ -240,11 +254,11 @@ export default function CharacterEditDialog({
                 </Typography>
                 <NumberField
                   value={marksOfDeath}
-                  onChange={(e: any) => {
+                  onChange={(e: React.ChangeEvent<HTMLInputElement> | number) => {
                     const val =
-                      typeof e === "object" && e?.target ? e.target.value : e
+                      typeof e === "object" && "target" in e ? e.target.value : e
                     setMarksOfDeath(
-                      typeof val === "number" ? val : parseInt(val) || 0
+                      typeof val === "number" ? val : parseInt(String(val)) || 0
                     )
                   }}
                   onBlur={() => {}}
