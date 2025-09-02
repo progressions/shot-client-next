@@ -139,28 +139,28 @@ export default function TargetDefenseDisplay({
       <Box sx={{ display: { xs: "block", sm: "none" }, mb: 1 }}>
         <CharacterLink character={char}>{char.name}</CharacterLink>
         {/* Defense modifiers text */}
-        {(stunt ||
-          (defenseChoicePerTarget[targetId] &&
-            defenseChoicePerTarget[targetId] !== "none") ||
-          char.impairments > 0) && (
-          <Typography
-            variant="caption"
-            sx={{
-              fontStyle: "italic",
-              color: "text.secondary",
-              display: "block",
-            }}
-          >
-            {getDefenseModifiersText(
-              char,
-              stunt,
-              defenseChoicePerTarget[targetId],
-              fortuneDiePerTarget[targetId],
-              encounter,
-              "Defense"
-            )}
-          </Typography>
-        )}
+        {(() => {
+          const modifiersText = getDefenseModifiersText(
+            char,
+            stunt,
+            defenseChoicePerTarget[targetId],
+            fortuneDiePerTarget[targetId],
+            encounter,
+            "Defense"
+          )
+          return modifiersText ? (
+            <Typography
+              variant="caption"
+              sx={{
+                fontStyle: "italic",
+                color: "text.secondary",
+                display: "block",
+              }}
+            >
+              {modifiersText}
+            </Typography>
+          ) : null
+        })()}
       </Box>
 
       <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
@@ -414,28 +414,28 @@ export default function TargetDefenseDisplay({
       >
         <CharacterLink character={char}>{char.name}</CharacterLink>
         {/* Defense modifiers text */}
-        {(stunt ||
-          (defenseChoicePerTarget[targetId] &&
-            defenseChoicePerTarget[targetId] !== "none") ||
-          char.impairments > 0) && (
-          <Typography
-            variant="caption"
-            sx={{
-              fontStyle: "italic",
-              color: "text.secondary",
-              display: "block",
-            }}
-          >
-            {getDefenseModifiersText(
-              char,
-              stunt,
-              defenseChoicePerTarget[targetId],
-              fortuneDiePerTarget[targetId],
-              encounter,
-              "Defense"
-            )}
-          </Typography>
-        )}
+        {(() => {
+          const modifiersText = getDefenseModifiersText(
+            char,
+            stunt,
+            defenseChoicePerTarget[targetId],
+            fortuneDiePerTarget[targetId],
+            encounter,
+            "Defense"
+          )
+          return modifiersText ? (
+            <Typography
+              variant="caption"
+              sx={{
+                fontStyle: "italic",
+                color: "text.secondary",
+                display: "block",
+              }}
+            >
+              {modifiersText}
+            </Typography>
+          ) : null
+        })()}
       </Box>
 
       {/* Dodge buttons - not shown for Mook targets */}
