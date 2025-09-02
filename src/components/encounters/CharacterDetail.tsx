@@ -188,9 +188,6 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
                 character={character}
                 effects={character.effects || []}
               />
-              <Box component="span" sx={{ display: { xs: "flex", sm: "none" }, gap: 0.5, mt: 0.5 }}>
-                <Actions entity={character} />
-              </Box>
             </Box>
           }
         />
@@ -200,9 +197,17 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
             top: { xs: 4, sm: 8 },
             right: { xs: 4, sm: 8 },
             display: "flex",
-            gap: { xs: 0.25, sm: 0.5 },
+            flexDirection: { xs: "column", sm: "row" },
+            gap: { xs: 0.5, sm: 0.5 },
+            alignItems: "flex-end",
           }}
         >
+          <Box
+            sx={{
+              display: "flex",
+              gap: { xs: 0.25, sm: 0.5 },
+            }}
+          >
           <Tooltip title="Edit character details">
             <IconButton
               aria-label="edit"
@@ -274,6 +279,10 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
               <FaTimes size={16} />
             </IconButton>
           </Tooltip>
+          </Box>
+          <Box sx={{ display: { xs: "block", sm: "none" } }}>
+            <Actions entity={character} />
+          </Box>
         </Box>
       </ListItem>
 

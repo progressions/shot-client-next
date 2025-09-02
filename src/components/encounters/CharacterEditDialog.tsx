@@ -31,7 +31,7 @@ export default function CharacterEditDialog({
 }: CharacterEditDialogProps) {
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
-  const { encounter } = useEncounter()
+  const { encounter, updateEncounter } = useEncounter()
 
   // Form state
   const [name, setName] = useState(character.name)
@@ -64,8 +64,8 @@ export default function CharacterEditDialog({
         )
       }
 
-      // Get wounds from action_values
-      setWounds(character.action_values?.Wounds || 0)
+      // Get wounds using CharacterService
+      setWounds(CS.wounds(character) || 0)
 
       // Get marks of death from action_values
       setMarksOfDeath(character.action_values?.["Marks of Death"] || 0)
@@ -111,33 +111,42 @@ export default function CharacterEditDialog({
       // Prepare character update payload
       interface CharacterUpdate {
         name: string
-        action_values: Record<string, unknown>
+        action_values?: Record<string, unknown>
         impairments?: number
       }
 
       const characterUpdate: CharacterUpdate = {
         name: name.trim(),
-        action_values: {
+      }
+
+      // Handle wounds and marks of death based on character type
+      if (isPC()) {
+        // PCs: wounds and impairments are always on the character model
+        characterUpdate.action_values = {
           ...character.action_values,
           Wounds: wounds,
           "Marks of Death": marksOfDeath,
-        },
-      }
-
-      // Add impairments for PCs
-      if (isPC()) {
+        }
         characterUpdate.impairments = impairments
+      } else {
+        // Non-PCs: only marks of death on character
+        // Count and impairments are ONLY relevant in fights (stored on Shot)
+        characterUpdate.action_values = {
+          ...character.action_values,
+          "Marks of Death": marksOfDeath,
+        }
       }
 
       // Update character
       await client.updateCharacterCombatStats(character.id, characterUpdate)
 
       // Update shot if we have shot data
-      if (character.shot_id) {
+      if (character.shot_id && encounter) {
         interface ShotUpdate {
           shot_id: string
           current_shot: number | null
           impairments?: number
+          count?: number
         }
 
         const shotUpdate: ShotUpdate = {
@@ -145,13 +154,21 @@ export default function CharacterEditDialog({
           current_shot: currentShot,
         }
 
-        // Add impairments for non-PCs
+        // For non-PCs, impairments and count go on the shot
+        // For PCs, only current_shot goes on the shot (impairments are on character)
         if (!isPC()) {
           shotUpdate.impairments = impairments
+          shotUpdate.count = wounds
         }
 
-        // Update shot (we'll need to implement this method)
+        // Update shot
         await client.updateCharacterShot(encounter, character, shotUpdate)
+      }
+
+      // Fetch the updated encounter to refresh the display
+      const updatedEncounterResponse = await client.getEncounter(encounter)
+      if (updatedEncounterResponse.data) {
+        updateEncounter(updatedEncounterResponse.data)
       }
 
       toastSuccess(`Updated ${name}`)
@@ -224,7 +241,7 @@ export default function CharacterEditDialog({
                   color="text.secondary"
                   sx={{ display: "block", mb: 0.5 }}
                 >
-                  Wounds
+                  {CS.isMook(character) ? "Count" : "Wounds"}
                 </Typography>
                 <NumberField
                   value={wounds}

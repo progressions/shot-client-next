@@ -294,8 +294,9 @@ export function createCharacterClient(deps: ClientDependencies) {
     character: Character,
     updates: {
       shot_id: string
-      current_shot?: number
+      current_shot?: number | null
       impairments?: number
+      count?: number
     }
   ): Promise<AxiosResponse<void>> {
     // Use V2 API for shot updates
@@ -303,6 +304,7 @@ export function createCharacterClient(deps: ClientDependencies) {
       shot: {
         shot: updates.current_shot,
         impairments: updates.impairments,
+        count: updates.count,
       },
     })
   }

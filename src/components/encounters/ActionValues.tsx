@@ -53,76 +53,52 @@ export default function ActionValues({ character }: ActionValuesProps) {
   return (
     <Stack
       component="span"
-      direction="column"
+      direction="row"
+      flexWrap="wrap"
       sx={{
         fontSize: { xs: "0.7rem", sm: "0.75rem", md: "0.75rem" },
         width: "100%",
-        gap: { xs: 0.5, sm: 0.5 },
+        gap: { xs: 0.75, sm: 0.5 },
+        // On mobile, make it wrap after 4 items if there are more than 6 total
+        "& > span": {
+          flexBasis: { 
+            xs: secondaryAttackData ? "calc(25% - 6px)" : "calc(33.333% - 6px)", // 4 or 3 columns on mobile
+            sm: "auto", 
+            md: "auto" 
+          },
+          minWidth: { xs: "auto", sm: "auto" },
+        }
       }}
     >
-      <Stack
-        component="span"
-        direction="row"
-        flexWrap="wrap"
-        sx={{
-          gap: { xs: 0.75, sm: 1 },
-          "& > span": {
-            flexBasis: { 
-              xs: "calc(33.333% - 6px)", // 3 columns on mobile
-              sm: "auto", 
-              md: "auto" 
-            },
-            minWidth: { xs: "auto", sm: "auto" },
-          }
-        }}
-      >
+      <AV
+        label={CS.mainAttack(character)}
+        value={mainAttackData.value}
+        change={mainAttackData.change}
+      />
+      {secondaryAttackData && (
         <AV
-          label={CS.mainAttack(character)}
-          value={mainAttackData.value}
-          change={mainAttackData.change}
+          label={secondaryAttackName}
+          value={secondaryAttackData.value}
+          change={secondaryAttackData.change}
         />
-        {secondaryAttackData && (
-          <AV
-            label={secondaryAttackName}
-            value={secondaryAttackData.value}
-            change={secondaryAttackData.change}
-          />
-        )}
-        <AV
-          label="Defense"
-          value={defenseData.value}
-          change={defenseData.change}
-        />
-        <AV
-          label={CS.fortuneType(character)}
-          value={CS.fortune(character)}
-          maxValue={CS.maxFortune(character)}
-        />
-      </Stack>
-      <Stack
-        component="span"
-        direction="row"
-        flexWrap="wrap"
-        sx={{
-          gap: { xs: 0.75, sm: 1 },
-          "& > span": {
-            flexBasis: { 
-              xs: "calc(33.333% - 6px)", // 3 columns on mobile
-              sm: "auto", 
-              md: "auto" 
-            },
-            minWidth: { xs: "auto", sm: "auto" },
-          }
-        }}
-      >
-        <AV
-          label="Toughness"
-          value={toughnessData.value}
-          change={toughnessData.change}
-        />
-        <AV label="Speed" value={speedData.value} change={speedData.change} />
-        <AV label="Damage" value={damageData.value} change={damageData.change} />
-      </Stack>
+      )}
+      <AV
+        label="Defense"
+        value={defenseData.value}
+        change={defenseData.change}
+      />
+      <AV
+        label={CS.fortuneType(character)}
+        value={CS.fortune(character)}
+        maxValue={CS.maxFortune(character)}
+      />
+      <AV
+        label="Toughness"
+        value={toughnessData.value}
+        change={toughnessData.change}
+      />
+      <AV label="Speed" value={speedData.value} change={speedData.change} />
+      <AV label="Damage" value={damageData.value} change={damageData.change} />
     </Stack>
   )
 }
