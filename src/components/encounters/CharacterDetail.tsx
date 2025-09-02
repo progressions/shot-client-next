@@ -19,7 +19,7 @@ import {
   Typography,
   TextField,
 } from "@mui/material"
-import { FaTimes, FaMapMarkerAlt, FaEdit } from "react-icons/fa"
+import { FaTimes } from "react-icons/fa"
 import {
   CharacterHeader,
   Wounds,
@@ -115,31 +115,11 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
         <ListItemText
           sx={{ ml: 2 }}
           primary={
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <CharacterHeader character={character} />
-              {character.location && (
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: "text.secondary",
-                    fontStyle: "italic",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 0.5,
-                  }}
-                >
-                  <FaMapMarkerAlt size={12} />
-                  {character.location}
-                </Typography>
-              )}
-              <IconButton
-                size="small"
-                onClick={handleLocationClick}
-                sx={{ ml: 1, p: 0.5 }}
-              >
-                <FaEdit size={12} />
-              </IconButton>
-            </Box>
+            <CharacterHeader 
+              character={character} 
+              location={character.location}
+              onLocationClick={handleLocationClick}
+            />
           }
           secondary={
             <Box

@@ -19,8 +19,10 @@ import {
   AddVehicle,
   AttackPanel,
   InitiativeDialog,
+  LocationsDialog,
 } from "@/components/encounters"
 import { FaGun, FaPlay, FaPlus, FaMinus } from "react-icons/fa6"
+import { FaMapMarkerAlt } from "react-icons/fa"
 import { useEncounter } from "@/contexts"
 import FightService from "@/services/FightService"
 import type { Character, Vehicle } from "@/types"
@@ -32,6 +34,7 @@ export default function MenuBar() {
     null
   )
   const [initiativeDialogOpen, setInitiativeDialogOpen] = useState(false)
+  const [locationsDialogOpen, setLocationsDialogOpen] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
   const toggleBox = (type: "character" | "vehicle" | "attack") => {
@@ -170,6 +173,21 @@ export default function MenuBar() {
           <IconButton onClick={() => toggleBox("character")}>
             <Icon keyword="Add Character" color="white" />
           </IconButton>
+          <Divider
+            orientation="vertical"
+            sx={{
+              mx: 1,
+              height: 24,
+              backgroundColor: "rgba(255, 255, 255, 0.3)",
+            }}
+          />
+          <IconButton 
+            onClick={() => setLocationsDialogOpen(true)}
+            sx={{ color: "white" }}
+            title="View Locations"
+          >
+            <FaMapMarkerAlt size={20} />
+          </IconButton>
         </Toolbar>
       </AppBar>
       <AnimatePresence mode="wait">
@@ -209,6 +227,10 @@ export default function MenuBar() {
         onClose={() => setInitiativeDialogOpen(false)}
         characters={getAllCombatants()}
         onApply={handleApplyInitiatives}
+      />
+      <LocationsDialog
+        open={locationsDialogOpen}
+        onClose={() => setLocationsDialogOpen(false)}
       />
     </>
   )
