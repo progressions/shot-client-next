@@ -57,52 +57,61 @@ export default function ActionValues({ character }: ActionValuesProps) {
   return (
     <Stack
       component="span"
-      direction="row"
-      flexWrap="wrap"
+      direction="column"
       sx={{
         fontSize: { xs: "0.7rem", sm: "0.75rem", md: "0.75rem" },
         width: "100%",
-        gap: { xs: 0.75, sm: 0.5 },
-        // On mobile, make it wrap after 4 items if there are more than 6 total
-        "& > span": {
-          flexBasis: {
-            xs: secondaryAttackData ? "calc(25% - 6px)" : "calc(33.333% - 6px)", // 4 or 3 columns on mobile
-            sm: "auto",
-            md: "auto",
-          },
-          minWidth: { xs: "auto", sm: "auto" },
-        },
+        gap: 0.5,
       }}
     >
-      <AV
-        label={CS.mainAttack(character)}
-        value={mainAttackData.value}
-        change={mainAttackData.change}
-      />
-      {secondaryAttackData && (
+      {/* First row: Attack skills, Defense, and Fortune */}
+      <Stack
+        component="span"
+        direction="row"
+        sx={{
+          gap: { xs: 0.75, sm: 0.5 },
+        }}
+      >
         <AV
-          label={secondaryAttackName}
-          value={secondaryAttackData.value}
-          change={secondaryAttackData.change}
+          label={CS.mainAttack(character)}
+          value={mainAttackData.value}
+          change={mainAttackData.change}
         />
-      )}
-      <AV
-        label="Defense"
-        value={defenseData.value}
-        change={defenseData.change}
-      />
-      <AV
-        label={CS.fortuneType(character)}
-        value={CS.fortune(character)}
-        maxValue={CS.maxFortune(character)}
-      />
-      <AV
-        label="Toughness"
-        value={toughnessData.value}
-        change={toughnessData.change}
-      />
-      <AV label="Speed" value={speedData.value} change={speedData.change} />
-      <AV label="Damage" value={damageData.value} change={damageData.change} />
+        {secondaryAttackData && (
+          <AV
+            label={secondaryAttackName}
+            value={secondaryAttackData.value}
+            change={secondaryAttackData.change}
+          />
+        )}
+        <AV
+          label="Defense"
+          value={defenseData.value}
+          change={defenseData.change}
+        />
+        <AV
+          label={CS.fortuneType(character)}
+          value={CS.fortune(character)}
+          maxValue={CS.maxFortune(character)}
+        />
+      </Stack>
+      
+      {/* Second row: Toughness, Speed, and Damage */}
+      <Stack
+        component="span"
+        direction="row"
+        sx={{
+          gap: { xs: 0.75, sm: 0.5 },
+        }}
+      >
+        <AV
+          label="Toughness"
+          value={toughnessData.value}
+          change={toughnessData.change}
+        />
+        <AV label="Speed" value={speedData.value} change={speedData.change} />
+        <AV label="Damage" value={damageData.value} change={damageData.change} />
+      </Stack>
     </Stack>
   )
 }
