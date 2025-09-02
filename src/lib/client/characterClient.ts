@@ -218,8 +218,8 @@ export function createCharacterClient(deps: ClientDependencies) {
     fight: Fight | Encounter,
     character: Character
   ): Promise<AxiosResponse<void>> {
-    // Use the V1 API endpoint for now - this needs to be migrated to V2
-    return delete_(`${api.fights(fight)}/actors/${character.shot_id}`)
+    // Use V2 API endpoint for removing character from fight
+    return delete_(`${apiV2.fights(fight)}/shots/${character.shot_id}`)
   }
 
   async function showCharacter(
@@ -276,6 +276,37 @@ export function createCharacterClient(deps: ClientDependencies) {
     })
   }
 
+  async function updateCharacterCombatStats(
+    characterId: string,
+    updates: {
+      name?: string
+      impairments?: number
+      action_values?: Record<string, unknown>
+    }
+  ): Promise<AxiosResponse<Character>> {
+    return patch(`${apiV2.characters({ id: characterId })}`, {
+      character: updates,
+    })
+  }
+
+  async function updateCharacterShot(
+    fight: Fight | Encounter,
+    character: Character,
+    updates: {
+      shot_id: string
+      current_shot?: number
+      impairments?: number
+    }
+  ): Promise<AxiosResponse<void>> {
+    // Use V2 API for shot updates
+    return patch(`${apiV2.fights(fight)}/shots/${updates.shot_id}`, {
+      shot: {
+        shot: updates.current_shot,
+        impairments: updates.impairments,
+      },
+    })
+  }
+
   return {
     getEncounter,
     createImagePosition,
@@ -304,5 +335,7 @@ export function createCharacterClient(deps: ClientDependencies) {
     deleteAdvancement,
     getAllCharacters,
     updateShotLocation,
+    updateCharacterCombatStats,
+    updateCharacterShot,
   }
 }
