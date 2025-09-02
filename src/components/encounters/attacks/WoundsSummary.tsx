@@ -29,45 +29,8 @@ export default function WoundsSummary({
           const targetChar = targetShot?.character
           if (!targetChar) return null
 
-          const currentDefense = calculateTargetDefense(
-            targetChar,
-            result.targetId
-          )
-          const hasDefenseModifier =
-            defenseChoicePerTarget[result.targetId] &&
-            defenseChoicePerTarget[result.targetId] !== "none"
-
-          // Use same logic as in individual results
-          let effectiveWounds = result.wounds
-          if (hasDefenseModifier && selectedTargetIds.length > 1) {
-            const individualOutcome =
-              parseInt(attackValue || "0") +
-              parseInt(swerve || "0") -
-              currentDefense
-            if (individualOutcome >= 0) {
-              // For mooks, wounds = number taken out; for others, calculate normally
-              if (CS.isMook(targetChar)) {
-                effectiveWounds = targetMookCount
-              } else {
-                const individualSmackdown =
-                  individualOutcome + parseInt(weaponDamage || "0")
-                effectiveWounds = Math.max(
-                  0,
-                  individualSmackdown - CS.toughness(targetChar)
-                )
-              }
-            } else {
-              effectiveWounds = 0
-            }
-          } else if (
-            selectedTargetIds.length === 1 &&
-            finalDamage &&
-            !CS.isMook(targetChar)
-          ) {
-            // For single target with manual smackdown override
-            const smackdown = parseInt(finalDamage || "0")
-            effectiveWounds = Math.max(0, smackdown - CS.toughness(targetChar))
-          }
+          // Just use the wounds already calculated in multiTargetResults
+          const effectiveWounds = result.wounds
 
           return (
             <Typography key={result.targetId} variant="body2">

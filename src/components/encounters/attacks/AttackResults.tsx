@@ -27,14 +27,11 @@ export default function AttackResults({
     attackerWeapons,
     allShots
   )
-  const mookBonus = effectiveAttack - parseInt(attackValue || "0")
   const outcome =
     effectiveAttack + parseInt(swerve || "0") - parseInt(defenseValue || "0")
   const isHit = outcome >= 0
   const defenseLabel =
     selectedTargetIds.length === 1 ? "Defense" : "Combined Defense"
-  const attackDisplay =
-    mookBonus > 0 ? `${attackValue} (+${mookBonus} vs mooks)` : attackValue
 
   // Check if all targets are mooks
   const allTargetsAreMooks = selectedTargetIds.every(id => {
@@ -47,7 +44,7 @@ export default function AttackResults({
       {/* Overall attack calculation */}
       <Alert severity={isHit ? "success" : "error"} sx={{ mb: 2 }}>
         <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
-          {isHit ? "Hit!" : "Miss!"} Attack Value {attackDisplay} + Swerve{" "}
+          {isHit ? "Hit!" : "Miss!"} Attack Value {attackValue} + Swerve{" "}
           {swerve} = Action Result {effectiveAttack + parseInt(swerve || "0")}
         </Typography>
         <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
@@ -80,40 +77,28 @@ export default function AttackResults({
               defenseChoicePerTarget[result.targetId] &&
               defenseChoicePerTarget[result.targetId] !== "none"
 
-            // Calculate smackdown for this target
-            let individualOutcome: number
-            let smackdown: number
+            // For multiple targets, use the same smackdown for all
+            // (outcome is calculated once against combined defense)
+            const smackdown = outcome + parseInt(weaponDamage || "0")
             let effectiveWounds = result.wounds
 
-            if (selectedTargetIds.length === 1) {
-              // Single target: use the global outcome calculation
-              individualOutcome = outcome
-              smackdown = outcome + parseInt(weaponDamage || "0")
-            } else {
-              // Multiple targets: recalculate for this specific target
-              const targetSpecificOutcome =
-                effectiveAttack + parseInt(swerve || "0") - currentDefense
-              individualOutcome = targetSpecificOutcome
-              smackdown = targetSpecificOutcome + parseInt(weaponDamage || "0")
+            // Recalculate wounds if needed (should match result.wounds)
+            if (outcome >= 0) {
+              const targetToughness = CS.toughness(targetChar)
+              effectiveWounds = Math.max(0, smackdown - targetToughness)
 
-              // Recalculate wounds based on this target's actual defense and toughness
-              if (targetSpecificOutcome >= 0) {
-                const targetToughness = CS.toughness(targetChar)
-                effectiveWounds = Math.max(0, smackdown - targetToughness)
-
-                // For mooks, convert wounds to kills
-                if (CS.isMook(targetChar)) {
-                  effectiveWounds = Math.min(
-                    effectiveWounds,
-                    targetChar.count || 0
-                  )
-                }
-              } else {
-                effectiveWounds = 0
+              // For mooks, convert wounds to kills
+              if (CS.isMook(targetChar)) {
+                effectiveWounds = Math.min(
+                  effectiveWounds,
+                  targetChar.count || 0
+                )
               }
+            } else {
+              effectiveWounds = 0
             }
 
-            const isTargetHit = individualOutcome >= 0
+            const isTargetHit = outcome >= 0
 
             return (
               <Alert
@@ -129,24 +114,9 @@ export default function AttackResults({
                   {hasDefenseModifier && " (defense modified)"}
                 </Typography>
 
-                {/* Show the calculation for this target */}
-                <Typography
-                  variant="caption"
-                  sx={{ display: "block", mb: 0.5 }}
-                >
-                  Action Result {effectiveAttack + parseInt(swerve || "0")} -
-                  Defense {currentDefense} = Outcome {individualOutcome}
-                </Typography>
-
+                {/* For multiple targets, just show smackdown application */}
                 {isTargetHit && (
                   <>
-                    <Typography
-                      variant="caption"
-                      sx={{ display: "block", mb: 0.5 }}
-                    >
-                      Outcome {individualOutcome} + Weapon Damage {weaponDamage}{" "}
-                      = Smackdown {smackdown}
-                    </Typography>
                     {!CS.isMook(targetChar) && (
                       <Typography
                         variant="caption"

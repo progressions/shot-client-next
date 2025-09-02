@@ -124,23 +124,15 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   const updateFields = createFieldsUpdater<AttackFormData>(dispatchForm)
 
   // Helper function to calculate effective attack value
-  // Note: Mook bonus is already included in the attack value from the UI
+  // Note: The attack value already includes effects and impairments from the UI
   const calculateEffectiveAttackValue = (
     attackerChar: Character | undefined,
     weapons: Weapon[],
     allShotsList: Shot[]
   ): number => {
-    let baseAttack = parseInt(attackValue) || 0
-
-    // Note: We no longer add weapon mook bonus here since it's already
-    // included in the attack value when the weapon is selected in the UI
-
-    // Apply attacker's impairment (already shown in UI but needs to be applied for calculation)
-    if (attackerChar && attackerChar.impairments > 0) {
-      baseAttack -= attackerChar.impairments
-    }
-
-    return baseAttack
+    // The attackValue from the form already includes all modifiers
+    // (effects, impairments, mook bonuses) as calculated in the UI
+    return parseInt(attackValue) || 0
   }
 
   // Get all characters in the fight (excluding hidden ones)
