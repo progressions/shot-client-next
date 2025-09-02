@@ -167,9 +167,13 @@ export default function AttackerSection({
                     onBlur={e => updateField("attackValue", e.target.value)}
                   />
                   {(() => {
-                    // Calculate total attack modifier including mook bonus
+                    // Calculate NET modifier from base value
+                    // This includes: -impairments, +effects, +mook bonus
+                    const impairmentPenalty = attacker?.impairments
+                      ? -attacker.impairments
+                      : 0
                     const totalAttackModifier =
-                      attackValueChange + weaponMookBonus
+                      impairmentPenalty + attackValueChange + weaponMookBonus
 
                     if (totalAttackModifier !== 0) {
                       return (

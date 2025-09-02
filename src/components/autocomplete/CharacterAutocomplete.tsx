@@ -63,9 +63,13 @@ export default function CharactersAutocomplete({
       }))
   }
 
-  const handleChange = (selectedOption: Option | null) => {
-    const character = characters.find(s => s.id === selectedOption)
-    onChange(character)
+  const handleChange = (value: string | null) => {
+    // The base Autocomplete passes the value (ID) directly
+    console.log(
+      "[CharacterAutocomplete] handleChange called with value:",
+      value
+    )
+    onChange(value)
   }
 
   return (
