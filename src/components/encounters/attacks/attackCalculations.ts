@@ -1,5 +1,5 @@
-import { CS } from "@/services"
-import type { Character, Shot, Weapon } from "@/types"
+import { CS, CharacterEffectService } from "@/services"
+import type { Character, Shot, Weapon, Encounter } from "@/types"
 
 /**
  * Calculate the effective attack value considering mook bonuses
@@ -39,14 +39,30 @@ export const calculateTargetDefense = (
   fortuneDiePerTarget: { [key: string]: string },
   stunt: boolean,
   attacker?: Character,
-  targetMookCount?: number
+  targetMookCount?: number,
+  encounter?: Encounter | null
 ): number => {
   // If there's a manual override, use that
   if (manualDefensePerTarget[targetId]) {
     return parseInt(manualDefensePerTarget[targetId]) || 0
   }
 
+  // Start with defense that already includes impairments
   let defense = CS.defense(target)
+  
+  // Add effects if encounter exists
+  if (encounter) {
+    const baseValue = CS.rawActionValue(target, "Defense")
+    const [effectChange] = CharacterEffectService.adjustedValue(
+      target,
+      baseValue,
+      "Defense",
+      encounter,
+      true // ignore impairments since CS.defense already includes them
+    )
+    defense += effectChange
+  }
+
   const choice = defenseChoicePerTarget[targetId] || "none"
 
   if (choice === "dodge") {
@@ -71,10 +87,7 @@ export const calculateTargetDefense = (
     defense += targetMookCount
   }
 
-  // Apply impairments
-  if (target.impairments > 0) {
-    defense -= target.impairments
-  }
+  // Don't apply impairments again - CS.defense already includes them
 
   return defense
 }

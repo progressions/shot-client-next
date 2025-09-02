@@ -522,7 +522,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       fortuneDiePerTarget,
       stunt,
       attacker,
-      targetMookCount
+      targetMookCount,
+      encounter
     )
   }
 

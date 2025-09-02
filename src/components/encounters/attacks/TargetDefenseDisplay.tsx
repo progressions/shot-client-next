@@ -2,6 +2,7 @@
 
 import { Box, Typography, Button } from "@mui/material"
 import { NumberField } from "@/components/ui"
+import CharacterLink from "@/components/ui/links/CharacterLink"
 import { CS, CharacterEffectService } from "@/services"
 import type {
   Character,
@@ -71,9 +72,10 @@ export default function TargetDefenseDisplay({
     : 1
   const defenseWithMookCount =
     CS.isMook(char) && mookCount > 1 ? baseDefense + mookCount : baseDefense
+  // Calculate the actual current defense using the same function used everywhere else
   const currentDefense = manualDefensePerTarget[targetId]
     ? parseInt(manualDefensePerTarget[targetId])
-    : defenseWithMookCount + (stunt ? 2 : 0)
+    : calculateTargetDefense(char, targetId)
   const baseToughness = CS.toughness(char)
   const currentToughness = manualToughnessPerTarget[targetId]
     ? parseInt(manualToughnessPerTarget[targetId])
@@ -103,9 +105,7 @@ export default function TargetDefenseDisplay({
           borderColor: "divider",
         }}
       >
-        <Typography variant="body2" sx={{ fontWeight: "medium" }}>
-          {char.name}
-        </Typography>
+        <CharacterLink character={char}>{char.name}</CharacterLink>
         <Typography
           variant="caption"
           sx={{
@@ -137,14 +137,7 @@ export default function TargetDefenseDisplay({
     >
       {/* Name at the top for mobile */}
       <Box sx={{ display: { xs: "block", sm: "none" }, mb: 1 }}>
-        <Typography
-          variant="body2"
-          sx={{
-            fontWeight: "medium",
-          }}
-        >
-          {char.name}
-        </Typography>
+        <CharacterLink character={char}>{char.name}</CharacterLink>
         {/* Defense modifiers text */}
         {(stunt ||
           (defenseChoicePerTarget[targetId] &&
@@ -286,45 +279,49 @@ export default function TargetDefenseDisplay({
           {/* Defense total change - always reserve space */}
           <Box sx={{ height: "20px", mt: 0.25 }}>
             {(() => {
-              // Get the total change from effects and impairments
+              let totalChange = 0
+              
+              // Add stunt bonus
+              if (stunt) {
+                totalChange += 2
+              }
+              
+              // Add dodge/fortune bonus
+              if (defenseChoicePerTarget[targetId] === "dodge") {
+                totalChange += 3
+              } else if (defenseChoicePerTarget[targetId] === "fortune") {
+                const fortuneValue = parseInt(fortuneDiePerTarget[targetId] || "0")
+                totalChange += 3 + fortuneValue
+              }
+              
+              // Add effects and impairments
               if (encounter) {
                 const baseValue = CS.rawActionValue(char, "Defense")
-                const [totalChange] = CharacterEffectService.adjustedValue(
+                const [effectsAndImpairments] = CharacterEffectService.adjustedValue(
                   char,
                   baseValue,
                   "Defense",
                   encounter,
                   false // don't ignore impairments - this will include both effects and impairments
                 )
-                
-                if (totalChange !== 0) {
-                  return (
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        display: "block",
-                        color: totalChange > 0 ? "success.main" : "error.main",
-                        fontWeight: "bold",
-                        textAlign: "center",
-                      }}
-                    >
-                      {totalChange > 0 ? "+" : ""}{totalChange}
-                    </Typography>
-                  )
-                }
+                totalChange += effectsAndImpairments
               } else if (char.impairments > 0) {
-                // No encounter, but show impairments
+                // No encounter, but subtract impairments
+                totalChange -= char.impairments
+              }
+              
+              if (totalChange !== 0) {
                 return (
                   <Typography
                     variant="caption"
                     sx={{
                       display: "block",
-                      color: "error.main",
+                      color: totalChange > 0 ? "success.main" : "error.main",
                       fontWeight: "bold",
                       textAlign: "center",
                     }}
                   >
-                    -{char.impairments}
+                    {totalChange > 0 ? "+" : ""}{totalChange}
                   </Typography>
                 )
               }
@@ -403,14 +400,7 @@ export default function TargetDefenseDisplay({
 
       {/* Name on the side for desktop */}
       <Box sx={{ flex: 1, display: { xs: "none", sm: "block" }, alignSelf: "flex-start" }}>
-        <Typography
-          variant="body2"
-          sx={{
-            fontWeight: "medium",
-          }}
-        >
-          {char.name}
-        </Typography>
+        <CharacterLink character={char}>{char.name}</CharacterLink>
         {/* Defense modifiers text */}
         {(stunt ||
           (defenseChoicePerTarget[targetId] &&
@@ -454,36 +444,22 @@ export default function TargetDefenseDisplay({
               const newOverrides = { ...manualDefensePerTarget }
               delete newOverrides[targetId]
               updateField("manualDefensePerTarget", newOverrides)
-              // Recalculate combined defense
-              if (selectedTargetIds.length > 1) {
-                const updatedDefenses = selectedTargetIds.map(tid => {
-                  const targetShot = allShots.find(
-                    s => s.character?.shot_id === tid
-                  )
-                  const targetChar = targetShot?.character
-                  if (!targetChar) return 0
-
-                  // Use calculateTargetDefense which will include dodge for this target
-                  if (tid === targetId) {
-                    return CS.defense(targetChar) + 3 + (stunt ? 2 : 0) // dodge + stunt
-                  }
-                  return calculateTargetDefense(targetChar, tid)
-                })
-                const highestDefense = Math.max(...updatedDefenses)
-                const combinedDefense =
-                  highestDefense + selectedTargetIds.length
-                updateField("defenseValue", combinedDefense.toString())
-              } else {
-                // Single target - just update defense
+              // Recalculate defense using the standard function
+              const updatedDefenses = selectedTargetIds.map(tid => {
                 const targetShot = allShots.find(
-                  s => s.character?.shot_id === targetId
+                  s => s.character?.shot_id === tid
                 )
                 const targetChar = targetShot?.character
-                if (targetChar) {
-                  const newDefense =
-                    CS.defense(targetChar) + 3 + (stunt ? 2 : 0)
-                  updateField("defenseValue", newDefense.toString())
-                }
+                if (!targetChar) return 0
+                return calculateTargetDefense(targetChar, tid)
+              })
+              
+              if (selectedTargetIds.length > 1) {
+                const highestDefense = Math.max(...updatedDefenses)
+                const combinedDefense = highestDefense + selectedTargetIds.length
+                updateField("defenseValue", combinedDefense.toString())
+              } else if (updatedDefenses.length > 0) {
+                updateField("defenseValue", updatedDefenses[0].toString())
               }
             }}
             sx={{ minWidth: "80px" }}
@@ -553,35 +529,22 @@ export default function TargetDefenseDisplay({
                 const newFortuneDice = { ...fortuneDiePerTarget }
                 delete newFortuneDice[targetId]
                 updateField("fortuneDiePerTarget", newFortuneDice)
-                // Recalculate defense for regular dodge
-                if (selectedTargetIds.length > 1) {
-                  const updatedDefenses = selectedTargetIds.map(tid => {
-                    const targetShot = allShots.find(
-                      s => s.character?.shot_id === tid
-                    )
-                    const targetChar = targetShot?.character
-                    if (!targetChar) return 0
-
-                    if (tid === targetId) {
-                      return CS.defense(targetChar) + 3 + (stunt ? 2 : 0) // back to regular dodge
-                    }
-                    return calculateTargetDefense(targetChar, tid)
-                  })
-                  const highestDefense = Math.max(...updatedDefenses)
-                  const combinedDefense =
-                    highestDefense + selectedTargetIds.length
-                  updateField("defenseValue", combinedDefense.toString())
-                } else {
-                  // Single target
+                // Recalculate defense using the standard function
+                const updatedDefenses = selectedTargetIds.map(tid => {
                   const targetShot = allShots.find(
-                    s => s.character?.shot_id === targetId
+                    s => s.character?.shot_id === tid
                   )
                   const targetChar = targetShot?.character
-                  if (targetChar) {
-                    const newDefense =
-                      CS.defense(targetChar) + 3 + (stunt ? 2 : 0)
-                    updateField("defenseValue", newDefense.toString())
-                  }
+                  if (!targetChar) return 0
+                  return calculateTargetDefense(targetChar, tid)
+                })
+                
+                if (selectedTargetIds.length > 1) {
+                  const highestDefense = Math.max(...updatedDefenses)
+                  const combinedDefense = highestDefense + selectedTargetIds.length
+                  updateField("defenseValue", combinedDefense.toString())
+                } else if (updatedDefenses.length > 0) {
+                  updateField("defenseValue", updatedDefenses[0].toString())
                 }
               }}
               sx={{ minWidth: "120px" }}
@@ -600,44 +563,26 @@ export default function TargetDefenseDisplay({
                   ...fortuneDiePerTarget,
                   [targetId]: e.target.value,
                 })
-                // Recalculate defense with new fortune value
-                if (selectedTargetIds.length > 1) {
+                // Recalculate defense using the standard function
+                // Wait for the state to update by using a small delay
+                setTimeout(() => {
                   const updatedDefenses = selectedTargetIds.map(tid => {
                     const targetShot = allShots.find(
                       s => s.character?.shot_id === tid
                     )
                     const targetChar = targetShot?.character
                     if (!targetChar) return 0
-
-                    if (tid === targetId) {
-                      return (
-                        CS.defense(targetChar) +
-                        3 +
-                        parseInt(e.target.value || "0") +
-                        (stunt ? 2 : 0)
-                      )
-                    }
                     return calculateTargetDefense(targetChar, tid)
                   })
-                  const highestDefense = Math.max(...updatedDefenses)
-                  const combinedDefense =
-                    highestDefense + selectedTargetIds.length
-                  updateField("defenseValue", combinedDefense.toString())
-                } else {
-                  // Single target
-                  const targetShot = allShots.find(
-                    s => s.character?.shot_id === targetId
-                  )
-                  const targetChar = targetShot?.character
-                  if (targetChar) {
-                    const newDefense =
-                      CS.defense(targetChar) +
-                      3 +
-                      parseInt(e.target.value || "0") +
-                      (stunt ? 2 : 0)
-                    updateField("defenseValue", newDefense.toString())
+                  
+                  if (selectedTargetIds.length > 1) {
+                    const highestDefense = Math.max(...updatedDefenses)
+                    const combinedDefense = highestDefense + selectedTargetIds.length
+                    updateField("defenseValue", combinedDefense.toString())
+                  } else if (updatedDefenses.length > 0) {
+                    updateField("defenseValue", updatedDefenses[0].toString())
                   }
-                }
+                }, 0)
               }}
               onBlur={e => {
                 updateField("fortuneDiePerTarget", {
