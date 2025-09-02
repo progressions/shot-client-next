@@ -70,10 +70,6 @@ export default function AttackResults({
             const targetChar = targetShot?.character
             if (!targetChar) return null
 
-            const currentDefense = calculateTargetDefense(
-              targetChar,
-              result.targetId
-            )
             const hasDefenseModifier =
               defenseChoicePerTarget[result.targetId] &&
               defenseChoicePerTarget[result.targetId] !== "none"

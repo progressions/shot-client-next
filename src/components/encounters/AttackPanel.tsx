@@ -37,7 +37,7 @@ import {
 
 export default function AttackPanel({ onClose }: AttackPanelProps) {
   const [isReady, setIsReady] = useState(false)
-  const { encounter, weapons: encounterWeapons, ec } = useEncounter()
+  const { encounter, weapons: encounterWeapons } = useEncounter()
   const { toastSuccess, toastError, toastInfo } = useToast()
   const { client } = useClient()
 
@@ -99,14 +99,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   const {
     attackerShotId,
     selectedTargetIds,
-    attackSkill,
     attackValue,
-    attackValueChange,
     defenseValue,
     toughnessValue,
-    selectedWeaponId,
     weaponDamage,
-    damageChange,
     swerve,
     stunt,
     smackdown,
@@ -123,9 +119,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     targetMookCountPerTarget,
     defenseChoicePerTarget,
     fortuneDiePerTarget,
-    defenseAppliedPerTarget,
     manualDefensePerTarget,
-    manualToughnessPerTarget,
     targetShotId,
   } = formState.data
 
@@ -135,11 +129,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
   // Helper function to calculate effective attack value
   // Note: The attack value already includes effects and impairments from the UI
-  const calculateEffectiveAttackValue = (
-    attackerChar: Character | undefined,
-    weapons: Weapon[],
-    allShotsList: Shot[]
-  ): number => {
+  const calculateEffectiveAttackValue = (): number => {
     // The attackValue from the form already includes all modifiers
     // (effects, impairments, mook bonuses) as calculated in the UI
     return parseInt(attackValue) || 0
@@ -170,9 +160,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
   // For backward compatibility
   const target = selectedTargets[0]
-  const targetShot = selectedTargetIds[0]
-    ? allShots.find(s => s.character?.shot_id === selectedTargetIds[0])
-    : undefined
 
   // Sort targets based on attacker type
   const sortedTargetShots = useMemo(
@@ -200,7 +187,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
       // Get action value with effects applied
       // adjustedActionValue returns [change, adjustedValue]
-      const [changeAV, av] = CES.adjustedActionValue(
+      const [, av] = CES.adjustedActionValue(
         attacker,
         mainAttack,
         encounter,

@@ -48,7 +48,6 @@ export default function TargetDefenseDisplay({
   allShots,
   attacker,
   stunt,
-  targetMookCount,
   targetMookCountPerTarget,
   defenseChoicePerTarget,
   fortuneDiePerTarget,
