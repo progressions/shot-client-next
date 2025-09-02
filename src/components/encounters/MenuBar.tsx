@@ -113,7 +113,15 @@ export default function MenuBar() {
             <Tooltip title="Start Sequence">
               <IconButton
                 onClick={handleStartSequence}
-                sx={{ color: "white", mr: 2 }}
+                sx={{ 
+                  color: "white", 
+                  mr: 2,
+                  backgroundColor: initiativeDialogOpen ? "rgba(255, 255, 255, 0.2)" : "transparent",
+                  borderRadius: 1,
+                  "&:hover": {
+                    backgroundColor: initiativeDialogOpen ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.1)",
+                  },
+                }}
               >
                 <FaPlay size={20} />
               </IconButton>
@@ -160,7 +168,15 @@ export default function MenuBar() {
           </Box>
           <IconButton
             onClick={() => toggleBox("attack")}
-            sx={{ color: "white", px: { xs: 0.5, sm: 1 } }}
+            sx={{ 
+              color: "white", 
+              px: { xs: 0.5, sm: 1 },
+              backgroundColor: open === "attack" ? "rgba(255, 255, 255, 0.2)" : "transparent",
+              borderRadius: 1,
+              "&:hover": {
+                backgroundColor: open === "attack" ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.1)",
+              },
+            }}
             title="Attack Resolution"
           >
             <FaGun size={20} />
@@ -175,13 +191,27 @@ export default function MenuBar() {
           />
           <IconButton
             onClick={() => toggleBox("vehicle")}
-            sx={{ px: { xs: 0.5, sm: 1 } }}
+            sx={{ 
+              px: { xs: 0.5, sm: 1 },
+              backgroundColor: open === "vehicle" ? "rgba(255, 255, 255, 0.2)" : "transparent",
+              borderRadius: 1,
+              "&:hover": {
+                backgroundColor: open === "vehicle" ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.1)",
+              },
+            }}
           >
             <Icon keyword="Add Vehicle" color="white" />
           </IconButton>
           <IconButton
             onClick={() => toggleBox("character")}
-            sx={{ px: { xs: 0.5, sm: 1 } }}
+            sx={{ 
+              px: { xs: 0.5, sm: 1 },
+              backgroundColor: open === "character" ? "rgba(255, 255, 255, 0.2)" : "transparent",
+              borderRadius: 1,
+              "&:hover": {
+                backgroundColor: open === "character" ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.1)",
+              },
+            }}
           >
             <Icon keyword="Add Character" color="white" />
           </IconButton>
@@ -195,7 +225,15 @@ export default function MenuBar() {
           />
           <IconButton
             onClick={() => setLocationsDialogOpen(true)}
-            sx={{ color: "white", px: { xs: 0.5, sm: 1 } }}
+            sx={{ 
+              color: "white", 
+              px: { xs: 0.5, sm: 1 },
+              backgroundColor: locationsDialogOpen ? "rgba(255, 255, 255, 0.2)" : "transparent",
+              borderRadius: 1,
+              "&:hover": {
+                backgroundColor: locationsDialogOpen ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.1)",
+              },
+            }}
             title="View Locations"
           >
             <FaMapMarkerAlt size={18} />
