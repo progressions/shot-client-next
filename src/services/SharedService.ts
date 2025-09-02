@@ -167,13 +167,14 @@ const SharedService = {
     if (this.isMook(character)) return 0
 
     const threshold = woundThresholds[this.type(character)]!
-    
+
     console.log(`[calculateImpairments] ${character.name}:`, {
       type: this.type(character),
       originalWounds,
       newWounds,
       threshold,
-      willGainImpairments: originalWounds < threshold.low && newWounds >= threshold.low
+      willGainImpairments:
+        originalWounds < threshold.low && newWounds >= threshold.low,
     })
 
     // a Boss and an Uber-Boss gain 1 point of Impairment when their Wounds

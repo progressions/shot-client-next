@@ -199,7 +199,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         encounter,
         false // don't ignore impairments for the actual value
       )
-      
+
       // Get just the effects change (without impairments) for display
       const [effectsOnlyChange] = CharacterEffectService.adjustedActionValue(
         attacker,
@@ -323,10 +323,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
           // Calculate smackdown (outcome + weapon damage)
           const calculatedSmackdown = outcome >= 0 ? outcome + weaponDmg : 0
-          
+
           // Calculate total wounds from all targets
           const totalWounds = results.reduce((sum, r) => sum + r.wounds, 0)
-          
+
           console.log("Attack calculation:", {
             attackValue: av,
             defense: dv,
@@ -363,15 +363,12 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     allShots,
     targetMookCount,
   ])
-  
+
   // Function to recalculate wounds based on smackdown
   const recalculateWoundsFromSmackdown = (smackdownValue: string) => {
-    if (
-      selectedTargetIds.length > 0 &&
-      !CS.isMook(attacker)
-    ) {
+    if (selectedTargetIds.length > 0 && !CS.isMook(attacker)) {
       const smackdown = parseInt(smackdownValue) || 0
-      
+
       const results = selectedTargetIds
         .map(targetId => {
           const targetShot = allShots.find(
@@ -384,11 +381,12 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           const targetToughness = CS.toughness(targetChar)
 
           let wounds = 0
-          
+
           // For mooks, if smackdown > 0, take out the targeted number
           if (CS.isMook(targetChar)) {
             if (smackdown > 0) {
-              wounds = targetMookCountPerTarget[targetId] || targetMookCount || 1
+              wounds =
+                targetMookCountPerTarget[targetId] || targetMookCount || 1
             }
           } else {
             // For non-mooks, subtract toughness from smackdown
@@ -407,14 +405,14 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
       // Calculate total wounds from all targets
       const totalWounds = results.reduce((sum, r) => sum + r.wounds, 0)
-      
+
       updateFields({
         multiTargetResults: results,
         finalDamage: totalWounds.toString(),
       })
     }
   }
-  
+
   // Handle smackdown field change
   const handleSmackdownChange = (value: string) => {
     updateField("smackdown", value)
@@ -439,7 +437,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     overrideManualDefense?: { [key: string]: string }
   ) => {
     // Use overrides if provided, otherwise use state values
-    const currentDefenseChoices = overrideDefenseChoices || defenseChoicePerTarget
+    const currentDefenseChoices =
+      overrideDefenseChoices || defenseChoicePerTarget
     const currentFortuneDice = overrideFortuneDice || fortuneDiePerTarget
     const currentManualDefense = overrideManualDefense || manualDefensePerTarget
     if (targetIds.length === 0) {
@@ -469,7 +468,9 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           currentFortuneDice,
           includeStunt,
           attacker,
-          CS.isMook(target) ? (targetMookCountPerTarget[targetId] || targetMookCount || 1) : 1,
+          CS.isMook(target)
+            ? targetMookCountPerTarget[targetId] || targetMookCount || 1
+            : 1,
           encounter
         )
 
@@ -850,7 +851,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       finalDamage,
       swerve,
       attackValue,
-      defenseValue
+      defenseValue,
     })
     updateField("isProcessing", true)
 

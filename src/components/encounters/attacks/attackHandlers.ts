@@ -150,7 +150,7 @@ export async function handleNonMookMultipleTargets(
       newWounds
     )
     const newImpairments = originalImpairments + impairmentChange
-    
+
     // Debug logging for impairment calculation
     if (!CS.isMook(targetChar)) {
       console.log(`[Impairment Debug] ${targetChar.name}:`, {
@@ -160,7 +160,7 @@ export async function handleNonMookMultipleTargets(
         originalImpairments,
         impairmentChange,
         newImpairments,
-        type: CS.type(targetChar)
+        type: CS.type(targetChar),
       })
     }
 
@@ -205,6 +205,7 @@ export async function handleNonMookMultipleTargets(
 
   // Send all character updates in a single batched request
   if (characterUpdates.length > 0) {
+    console.log("[Apply Damage] Sending character updates:", characterUpdates)
     await client.applyCombatAction(encounter, characterUpdates)
   }
 }
@@ -301,6 +302,7 @@ export async function handleMookAttack(
 
   // Send all character updates in a single batched request
   if (characterUpdates.length > 0) {
+    console.log("[Apply Damage] Sending character updates:", characterUpdates)
     await client.applyCombatAction(encounter, characterUpdates)
   }
 }
@@ -355,7 +357,7 @@ export async function handleSingleTargetAttack(
       newWounds
     )
     newImpairments = originalImpairments + impairmentChange
-    
+
     // Debug logging for impairment calculation
     console.log(`[Impairment Debug - Single] ${targetChar.name}:`, {
       currentWounds,
@@ -364,7 +366,7 @@ export async function handleSingleTargetAttack(
       originalImpairments,
       impairmentChange,
       newImpairments,
-      type: CS.type(targetChar)
+      type: CS.type(targetChar),
     })
   }
 

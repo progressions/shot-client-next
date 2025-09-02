@@ -1,7 +1,13 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Box, FormControlLabel, Checkbox, useMediaQuery, useTheme } from "@mui/material"
+import {
+  Box,
+  FormControlLabel,
+  Checkbox,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material"
 import { Avatar } from "@/components/avatars"
 import type { Shot, Character } from "@/types"
 import { CS } from "@/services"

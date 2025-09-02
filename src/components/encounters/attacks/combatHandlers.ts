@@ -152,6 +152,14 @@ export function createWoundUpdate(
       ? `${attacker.name} took out ${wounds} ${wounds === 1 ? "mook" : "mooks"}${defenseDesc}`
       : `${attacker.name} attacked ${targetChar.name}${defenseDesc} for ${wounds} wounds`
 
+  console.log(`[createWoundUpdate] Creating update for ${targetChar.name}:`, {
+    impairments,
+    wounds,
+    newWounds: isMook
+      ? Math.max(0, currentWounds - wounds)
+      : currentWounds + wounds,
+  })
+
   const update: CharacterUpdate = {
     shot_id: targetChar.shot_id,
     character_id: targetChar.id,

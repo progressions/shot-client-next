@@ -33,13 +33,15 @@ export default function ActionValues({ character }: ActionValuesProps) {
     CS.mainAttack(character),
     CS.rawActionValue(character, CS.mainAttack(character))
   )
-  
+
   const secondaryAttackName = CS.secondaryAttack(character)
-  const secondaryAttackData = secondaryAttackName ? getAdjustedValue(
-    secondaryAttackName,
-    CS.rawActionValue(character, secondaryAttackName)
-  ) : null
-  
+  const secondaryAttackData = secondaryAttackName
+    ? getAdjustedValue(
+        secondaryAttackName,
+        CS.rawActionValue(character, secondaryAttackName)
+      )
+    : null
+
   const defenseData = getAdjustedValue(
     "Defense",
     CS.rawActionValue(character, "Defense")

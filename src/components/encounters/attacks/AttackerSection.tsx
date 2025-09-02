@@ -168,8 +168,9 @@ export default function AttackerSection({
                   />
                   {(() => {
                     // Calculate total attack modifier including mook bonus
-                    const totalAttackModifier = attackValueChange + weaponMookBonus
-                    
+                    const totalAttackModifier =
+                      attackValueChange + weaponMookBonus
+
                     if (totalAttackModifier !== 0) {
                       return (
                         <Typography
@@ -177,7 +178,10 @@ export default function AttackerSection({
                           sx={{
                             display: "block",
                             mt: 0.25,
-                            color: totalAttackModifier > 0 ? "success.main" : "error.main",
+                            color:
+                              totalAttackModifier > 0
+                                ? "success.main"
+                                : "error.main",
                             fontWeight: "bold",
                             textAlign: "center",
                           }}
@@ -224,19 +228,23 @@ export default function AttackerSection({
                   {/* Display attack modifiers */}
                   {(() => {
                     const modifiers = []
-                    
+
                     if (attacker && attacker.impairments > 0) {
-                      modifiers.push(`-${attacker.impairments} from impairments`)
+                      modifiers.push(
+                        `-${attacker.impairments} from impairments`
+                      )
                     }
-                    
+
                     if (weaponMookBonus > 0) {
                       modifiers.push(`+${weaponMookBonus} AV vs mooks`)
                     }
-                    
+
                     if (attackValueChange !== 0) {
-                      modifiers.push(`${attackValueChange > 0 ? '+' : ''}${attackValueChange} from effects`)
+                      modifiers.push(
+                        `${attackValueChange > 0 ? "+" : ""}${attackValueChange} from effects`
+                      )
                     }
-                    
+
                     if (modifiers.length > 0) {
                       return (
                         <Typography
@@ -253,7 +261,7 @@ export default function AttackerSection({
                         </Typography>
                       )
                     }
-                    
+
                     return null
                   })()}
                 </FormControl>
@@ -293,10 +301,10 @@ export default function AttackerSection({
                   )}
                 </Box>
                 <FormControl
-                  sx={{ 
-                    flex: 1, 
+                  sx={{
+                    flex: 1,
                     minWidth: { xs: 120, sm: 150 },
-                    "& .MuiInputBase-root": { height: 56 } 
+                    "& .MuiInputBase-root": { height: 56 },
                   }}
                 >
                   <InputLabel>Weapon</InputLabel>
@@ -307,7 +315,10 @@ export default function AttackerSection({
                       // Reset kachunk when switching weapons
                       if (kachunkActive) {
                         updateField("kachunkActive", false)
-                        updateField("shotCost", (parseInt(shotCost) - 1).toString())
+                        updateField(
+                          "shotCost",
+                          (parseInt(shotCost) - 1).toString()
+                        )
                       }
                       if (e.target.value === "unarmed") {
                         const damage = CS.damage(attacker) || 7
@@ -402,7 +413,7 @@ export default function AttackerSection({
                     })()}
                 </FormControl>
               </Stack>
-              
+
               {/* Kachunk Button */}
               {selectedWeaponId &&
                 selectedWeaponId !== "unarmed" &&
@@ -413,10 +424,11 @@ export default function AttackerSection({
                   if (weapon?.kachunk) {
                     return (
                       <Box sx={{ ml: "90px", mt: 1 }}>
-                        <Tooltip 
-                          title={kachunkActive 
-                            ? "Click to deactivate kachunk mode" 
-                            : "Weapon damage is 14 if you spend an extra shot to go 'ka-chunk!'"
+                        <Tooltip
+                          title={
+                            kachunkActive
+                              ? "Click to deactivate kachunk mode"
+                              : "Weapon damage is 14 if you spend an extra shot to go 'ka-chunk!'"
                           }
                           placement="top"
                         >
@@ -428,18 +440,31 @@ export default function AttackerSection({
                               if (kachunkActive) {
                                 // Deactivate kachunk - restore original weapon damage with effects
                                 updateField("kachunkActive", false)
-                                const adjustedDamage = weapon.damage + damageChange
-                                updateField("weaponDamage", adjustedDamage.toString())
-                                updateField("shotCost", (parseInt(shotCost) - 1).toString())
+                                const adjustedDamage =
+                                  weapon.damage + damageChange
+                                updateField(
+                                  "weaponDamage",
+                                  adjustedDamage.toString()
+                                )
+                                updateField(
+                                  "shotCost",
+                                  (parseInt(shotCost) - 1).toString()
+                                )
                               } else {
                                 // Activate kachunk - set to 14 plus damage change from effects
                                 updateField("kachunkActive", true)
                                 const kachunkDamage = 14 + damageChange
-                                updateField("weaponDamage", kachunkDamage.toString())
-                                updateField("shotCost", (parseInt(shotCost) + 1).toString())
+                                updateField(
+                                  "weaponDamage",
+                                  kachunkDamage.toString()
+                                )
+                                updateField(
+                                  "shotCost",
+                                  (parseInt(shotCost) + 1).toString()
+                                )
                               }
                             }}
-                            sx={{ 
+                            sx={{
                               textTransform: "none",
                               fontWeight: "bold",
                               fontSize: "0.875rem",
@@ -447,8 +472,8 @@ export default function AttackerSection({
                                 backgroundColor: "warning.dark",
                                 "&:hover": {
                                   backgroundColor: "warning.main",
-                                }
-                              })
+                                },
+                              }),
                             }}
                           >
                             💥 Kachunk! {kachunkActive && "✓"}
