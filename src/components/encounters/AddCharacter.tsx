@@ -68,7 +68,7 @@ export default function AddCharacter({
         setSelectedChild={handleSetSelectedCharacter}
         addMember={handleAddMember}
         dispatch={handleDispatch}
-        omit={[]}
+        omit={["search"]}
       />
     </Stack>
   )

@@ -1,34 +1,28 @@
 "use client"
 
-import { Stack, Box } from "@mui/material"
+import { Box } from "@mui/material"
 import { FormActions, useForm } from "@/reducers"
 import { useClient } from "@/contexts"
-import {
-  FactionAutocomplete,
-  CharacterAutocomplete,
-} from "@/components/autocomplete"
-import { AddButton, Autocomplete } from "@/components/ui"
+import { GenericFilter } from "@/components/ui/filters/GenericFilter"
 import type { Character, Faction } from "@/types"
 import { useCallback, useEffect } from "react"
 
 type FormStateData = {
-  character_type: string | null
-  archetypes: string[]
-  archetype: string | null
+  filters: Record<string, string | boolean | null>
   characters: Character[]
   factions: Faction[]
-  faction_id: string | null
+  archetypes: string[]
   selectedChild: Character | null
 }
 
-type OmitType = "type" | "archetype" | "faction" | "character" | "add"
+type OmitType = "character_type" | "archetype" | "faction" | "character" | "add" | "search"
 
 type CharacterFilterProps = {
   // value is the ID of the selected character
   value?: string | null
-  setSelectedChild: (character: Character) => void
+  setSelectedChild: (character: Character | null) => void
   addMember?: (character: Character) => void
-  dispatch: React.Dispatch<FormStateData>
+  dispatch?: React.Dispatch<FormStateData>
   omit: OmitType[]
 }
 
@@ -41,32 +35,28 @@ export default function CharacterFilter({
 }: CharacterFilterProps) {
   const { client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
-    character_type: null,
-    archetypes: [],
-    archetype: null,
+    filters: {
+      character_type: null,
+      archetype: null,
+      faction_id: null,
+      character_id: null,
+      search: "",
+    },
     characters: [],
     factions: [],
-    selectedChild: null, // Initialize as null, will be set when character is selected
+    archetypes: [],
+    selectedChild: null,
   })
-  const {
-    character_type,
-    archetypes,
-    archetype,
-    characters,
-    factions,
-    faction_id,
-    selectedChild,
-  } = formState.data
-
-  const character_id = selectedChild?.id
 
   const fetchCharacters = useCallback(async () => {
     try {
+      const { filters } = formState.data
       const response = await client.getCharacters({
         autocomplete: true,
-        faction_id,
-        type: character_type,
-        archetype: archetype,
+        faction_id: filters.faction_id as string,
+        character_type: filters.character_type as string,
+        archetype: filters.archetype as string,
+        search: filters.search as string,
         per_page: 100,
         sort: "name",
         order: "asc",
@@ -90,211 +80,58 @@ export default function CharacterFilter({
       console.error("Error fetching characters:", error)
       return []
     }
-  }, [client, faction_id, character_type, archetype, dispatchForm])
+  }, [client, formState.data.filters, dispatchForm]) // Only depend on filters
 
   useEffect(() => {
-    if (!dispatch) return
-    // update the set of characters outside the component
-    dispatch({
-      type: FormActions.UPDATE,
-      name: "character_type",
-      value: character_type,
-    })
-    dispatch({ type: FormActions.UPDATE, name: "archetype", value: archetype })
-    dispatch({
-      type: FormActions.UPDATE,
-      name: "faction_id",
-      value: faction_id,
-    })
-  }, [character_type, faction_id, archetype, dispatch])
-
-  useEffect(() => {
-    fetchCharacterTypes()
-  }, [])
-
-  useEffect(() => {
-    console.log(
-      "[CharacterFilter] fetchCharacters useEffect triggered, deps:",
-      {
-        character_type,
-        selectedChild: selectedChild?.name,
-        faction_id,
-      }
-    )
     fetchCharacters()
       .catch(error => {
         console.error("Error in useEffect fetchCharacters:", error)
       })
-      .then(() => {
-        dispatchForm({
-          type: FormActions.EDIT,
-          name: "loading",
-          value: false,
-        })
+  }, [fetchCharacters])
+
+  const handleCharacterChange = (character: Character | null) => {
+    console.log("[CharacterFilter] handleCharacterChange called with:", character)
+    
+    if (character && addMember) {
+      addMember(character)
+      // Clear the selection after adding
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "filters",
+        value: {
+          ...formState.data.filters,
+          character_id: null,
+          character: null,
+        },
       })
-  }, [
-    client,
-    dispatchForm,
-    character_type,
-    selectedChild,
-    faction_id,
-    fetchCharacters,
-  ])
-
-  const handleCharacterChange = (characterId: string | null) => {
-    console.log(
-      "[CharacterFilter] handleCharacterChange called with ID:",
-      characterId
-    )
-    console.log(
-      "[CharacterFilter] Available characters in state:",
-      characters.length
-    )
-    console.log(
-      "[CharacterFilter] Character IDs available:",
-      characters.map(c => c.id)
-    )
-
-    const character = characterId
-      ? characters.find(c => c.id === characterId)
-      : null
-    console.log(
-      "[CharacterFilter] Found character:",
-      character ? `${character.name} (${character.id})` : "NOT FOUND"
-    )
-
-    if (!character && characterId) {
-      console.error(
-        "[CharacterFilter] Character ID not found in characters array!",
-        characterId
-      )
     }
-
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "selectedChild",
-      value: character,
-    })
     setSelectedChild?.(character)
-    console.log(
-      "[CharacterFilter] After setSelectedChild, selectedChild state is:",
-      selectedChild
-    )
   }
 
-  const handleFactionChange = (value: string | null) => {
+  const handleFiltersUpdate = (filters: Record<string, string | boolean | null>) => {
     dispatchForm({
       type: FormActions.UPDATE,
-      name: "faction_id",
-      value: value?.id,
+      name: "filters",
+      value: filters,
     })
-  }
-
-  const handleArchetypeChange = (value: string | null) => {
-    dispatchForm({ type: FormActions.UPDATE, name: "archetype", value: value })
-  }
-
-  const handleTypeChange = (value: string | null) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "character_type",
-      value: value,
-    })
-  }
-
-  const fetchArchetypes = async () => {
-    const opts = archetypes.map(archetype => ({
-      label: archetype,
-      value: archetype,
-    }))
-    return Promise.resolve(opts)
-  }
-
-  const fetchCharacterTypes = async () => {
-    const characterTypes = [
-      "Ally",
-      "PC",
-      "Mook",
-      "Featured Foe",
-      "Boss",
-      "Uber-Boss",
-    ].map(type => ({
-      label: type,
-      value: type,
-    }))
-    return Promise.resolve(characterTypes)
-  }
-
-  const handleAddMember = () => {
-    addMember?.(selectedChild)
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name: "selectedChild",
-      value: null,
-    })
-    setSelectedChild(null)
   }
 
   return (
     <Box
       sx={{
-        mb: 2,
         width: "100%",
         display: "flex",
         flexDirection: "column",
         gap: 2,
       }}
     >
-      <Stack
-        direction={{ xs: "column", sm: "row" }}
-        spacing={1}
-        alignItems="center"
-        sx={{ width: "100%" }}
-      >
-        {!omit.includes("type") && (
-          <Autocomplete
-            label="Type"
-            value={character_type || ""}
-            fetchOptions={fetchCharacterTypes}
-            onChange={handleTypeChange}
-            allowNone={false}
-          />
-        )}
-        {!omit.includes("archetype") && (
-          <Autocomplete
-            label="Archetype"
-            value={archetype || ""}
-            fetchOptions={fetchArchetypes}
-            onChange={handleArchetypeChange}
-            allowNone={false}
-          />
-        )}
-        {!omit.includes("faction") && (
-          <FactionAutocomplete
-            options={factions.map(faction => ({
-              label: faction.name || "",
-              value: faction.id || "",
-            }))}
-            value={faction_id || ""}
-            onChange={handleFactionChange}
-            allowNone={false}
-          />
-        )}
-        {!omit.includes("character") && (
-          <CharacterAutocomplete
-            options={characters.map(character => ({
-              label: character.name || "",
-              value: character.id || "",
-            }))}
-            value={character_id || ""}
-            onChange={handleCharacterChange}
-            allowNone={false}
-          />
-        )}
-        {!omit.includes("add") && (
-          <AddButton onClick={handleAddMember} disabled={!selectedChild} />
-        )}
-      </Stack>
+      <GenericFilter
+        entity="Character"
+        formState={formState}
+        onChange={handleCharacterChange}
+        onFiltersUpdate={handleFiltersUpdate}
+        omit={omit}
+      />
     </Box>
   )
 }
