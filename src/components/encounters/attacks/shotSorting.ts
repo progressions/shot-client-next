@@ -6,14 +6,17 @@ import type { Character, Shot, Encounter } from "@/types"
  * Order: Shot number (desc) -> Character Type -> Speed (desc) -> Name (asc)
  * Type order: Uber-Boss, Boss, PC, Ally, Featured Foe, Mook
  */
-export const sortAttackerShots = (shots: Shot[], encounter?: Encounter): Shot[] => {
+export const sortAttackerShots = (
+  shots: Shot[],
+  encounter?: Encounter
+): Shot[] => {
   const typeOrder: Record<string, number> = {
     "Uber-Boss": 1,
-    "Boss": 2,
-    "PC": 3,
-    "Ally": 4,
+    Boss: 2,
+    PC: 3,
+    Ally: 4,
     "Featured Foe": 5,
-    "Mook": 6,
+    Mook: 6,
   }
 
   return [...shots].sort((a, b) => {
@@ -41,11 +44,23 @@ export const sortAttackerShots = (shots: Shot[], encounter?: Encounter): Shot[] 
     // Get adjusted speed values if encounter is provided
     let speedA = CS.speed(charA) || 0
     let speedB = CS.speed(charB) || 0
-    
+
     if (encounter) {
       // Get adjusted speed accounting for effects but not impairments
-      const [, adjustedSpeedA] = CES.adjustedValue(charA, speedA, "Speed", encounter, true)
-      const [, adjustedSpeedB] = CES.adjustedValue(charB, speedB, "Speed", encounter, true)
+      const [, adjustedSpeedA] = CES.adjustedValue(
+        charA,
+        speedA,
+        "Speed",
+        encounter,
+        true
+      )
+      const [, adjustedSpeedB] = CES.adjustedValue(
+        charB,
+        speedB,
+        "Speed",
+        encounter,
+        true
+      )
       speedA = adjustedSpeedA
       speedB = adjustedSpeedB
     }

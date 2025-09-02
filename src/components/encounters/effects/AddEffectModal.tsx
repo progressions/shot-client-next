@@ -93,7 +93,9 @@ export default function AddEffectModal({
         encounter,
         effectToSend as CharacterEffect
       )
-      toastSuccess(effect.name ? `Added effect: ${effect.name}` : "Added effect")
+      toastSuccess(
+        effect.name ? `Added effect: ${effect.name}` : "Added effect"
+      )
       handleClose()
     } catch (error) {
       toastError("Failed to add effect")
@@ -125,7 +127,7 @@ export default function AddEffectModal({
               label="Effect Name (Optional)"
               value={effect.name}
               onChange={handleChange("name")}
-              onKeyDown={(e) => {
+              onKeyDown={e => {
                 if (e.key === "Enter" && !saving) {
                   e.preventDefault()
                   handleSubmit()
@@ -179,7 +181,7 @@ export default function AddEffectModal({
                 label="Attribute"
                 value={effect.action_value}
                 onChange={handleChange("action_value")}
-                onKeyDown={(e) => {
+                onKeyDown={e => {
                   if (e.key === "Enter" && !saving) {
                     e.preventDefault()
                     handleSubmit()
@@ -198,7 +200,7 @@ export default function AddEffectModal({
                 label="Change"
                 value={effect.change}
                 onChange={handleChange("change")}
-                onKeyDown={(e) => {
+                onKeyDown={e => {
                   if (e.key === "Enter" && !saving) {
                     e.preventDefault()
                     handleSubmit()
@@ -216,11 +218,7 @@ export default function AddEffectModal({
         <Button onClick={handleClose} disabled={saving}>
           Cancel
         </Button>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
-          disabled={saving}
-        >
+        <Button onClick={handleSubmit} variant="contained" disabled={saving}>
           {saving ? "Adding..." : "Add Effect"}
         </Button>
       </DialogActions>

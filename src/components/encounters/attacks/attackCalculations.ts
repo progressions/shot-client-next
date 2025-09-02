@@ -51,13 +51,12 @@ export const calculateTargetDefense = (
   let defense: number
   if (encounter) {
     // Use adjustedActionValue to get defense with all effects and impairments
-    const [_defenseChange, adjustedDefense] =
-      CES.adjustedActionValue(
-        target,
-        "Defense",
-        encounter,
-        false // don't ignore impairments
-      )
+    const [_defenseChange, adjustedDefense] = CES.adjustedActionValue(
+      target,
+      "Defense",
+      encounter,
+      false // don't ignore impairments
+    )
     defense = adjustedDefense
   } else {
     // No encounter, just use base defense

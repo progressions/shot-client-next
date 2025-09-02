@@ -13,18 +13,18 @@ type ShotDetailProps = {
 
 export default function ShotDetail({ shot }: ShotDetailProps) {
   const { encounter } = useEncounter()
-  
+
   // Sort characters by type, then adjusted speed, then name
   const sortedCharacters = useMemo(() => {
     const typeOrder: Record<string, number> = {
       "Uber-Boss": 1,
-      "Boss": 2,
-      "PC": 3,
-      "Ally": 4,
+      Boss: 2,
+      PC: 3,
+      Ally: 4,
       "Featured Foe": 5,
-      "Mook": 6,
+      Mook: 6,
     }
-    
+
     return [...shot.characters].sort((a, b) => {
       // First sort by character type priority
       const typeA = CS.type(a)
@@ -40,11 +40,23 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
       // Get adjusted speed values if encounter is provided
       let speedA = CS.speed(a) || 0
       let speedB = CS.speed(b) || 0
-      
+
       if (encounter) {
         // Get adjusted speed accounting for effects but not impairments
-        const [, adjustedSpeedA] = CES.adjustedValue(a, speedA, "Speed", encounter, true)
-        const [, adjustedSpeedB] = CES.adjustedValue(b, speedB, "Speed", encounter, true)
+        const [, adjustedSpeedA] = CES.adjustedValue(
+          a,
+          speedA,
+          "Speed",
+          encounter,
+          true
+        )
+        const [, adjustedSpeedB] = CES.adjustedValue(
+          b,
+          speedB,
+          "Speed",
+          encounter,
+          true
+        )
         speedA = adjustedSpeedA
         speedB = adjustedSpeedB
       }
@@ -60,7 +72,7 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
       return nameA.localeCompare(nameB)
     })
   }, [shot.characters, encounter])
-  
+
   return (
     <Box>
       <ListSubheader

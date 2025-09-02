@@ -299,14 +299,13 @@ export default function TargetDefenseDisplay({
               // Add effects and impairments
               if (encounter) {
                 const baseValue = CS.rawActionValue(char, "Defense")
-                const [effectsAndImpairments] =
-                  CES.adjustedValue(
-                    char,
-                    baseValue,
-                    "Defense",
-                    encounter,
-                    false // don't ignore impairments - this will include both effects and impairments
-                  )
+                const [effectsAndImpairments] = CES.adjustedValue(
+                  char,
+                  baseValue,
+                  "Defense",
+                  encounter,
+                  false // don't ignore impairments - this will include both effects and impairments
+                )
                 totalChange += effectsAndImpairments
               } else if (char.impairments > 0) {
                 // No encounter, but subtract impairments

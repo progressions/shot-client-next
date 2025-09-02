@@ -161,11 +161,13 @@ export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
           </Box>
         }
       >
-        <ListItemIcon sx={{ 
-          mt: 0, 
-          minWidth: { xs: 40, sm: 56 },
-          mr: { xs: 1, sm: 0 }
-        }}>
+        <ListItemIcon
+          sx={{
+            mt: 0,
+            minWidth: { xs: 40, sm: 56 },
+            mr: { xs: 1, sm: 0 },
+          }}
+        >
           <ChaseConditionPoints vehicle={vehicle} />
         </ListItemIcon>
         <ListItemText
@@ -318,10 +320,10 @@ export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
                 }
               }}
               inputProps={{
-                onFocus: (e) => {
+                onFocus: e => {
                   // Small delay to ensure the field is ready
                   setTimeout(() => e.target.select(), 0)
-                }
+                },
               }}
               placeholder="e.g., On the highway, In pursuit, At the dock"
             />

@@ -231,26 +231,24 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         updates.selectedWeaponId = firstWeapon.id?.toString() || ""
 
         // Apply effects to weapon damage if applicable
-        const [damageChange, _modifiedDamage] =
-          CES.adjustedActionValue(
-            attacker,
-            "Damage",
-            encounter,
-            true // ignore impairments for damage
-          )
+        const [damageChange, _modifiedDamage] = CES.adjustedActionValue(
+          attacker,
+          "Damage",
+          encounter,
+          true // ignore impairments for damage
+        )
         updates.weaponDamage = (firstWeapon.damage + damageChange).toString()
         updates.damageChange = damageChange // Store the change from effects
         // Don't add mook bonus here - it will be added when mook targets are selected
       } else {
         updates.selectedWeaponId = "unarmed"
         const baseDamage = CS.damage(attacker) || 7
-        const [damageChange, _modifiedDamage] =
-          CES.adjustedActionValue(
-            attacker,
-            "Damage",
-            encounter,
-            true // ignore impairments for damage
-          )
+        const [damageChange, _modifiedDamage] = CES.adjustedActionValue(
+          attacker,
+          "Damage",
+          encounter,
+          true // ignore impairments for damage
+        )
         updates.weaponDamage = (baseDamage + damageChange).toString()
         updates.damageChange = damageChange // Store the change from effects
       }
@@ -482,13 +480,12 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         )
 
         // Get toughness with effects applied
-        const [_toughnessChange, toughness] =
-          CES.adjustedActionValue(
-            target,
-            "Toughness",
-            encounter,
-            true // ignore impairments for toughness
-          )
+        const [_toughnessChange, toughness] = CES.adjustedActionValue(
+          target,
+          "Toughness",
+          encounter,
+          true // ignore impairments for toughness
+        )
 
         // Update the defense value - don't set manual override anymore since calculateTargetDefense handles it
         updateFields({
@@ -1054,90 +1051,90 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               calculateTargetDefense={calculateTargetDefense}
               encounter={encounter}
             />
-        </Box>
+          </Box>
 
-        {/* Bottom Section - Combat Resolution */}
-        <Box
-          sx={{ p: { xs: 2, sm: 3 }, backgroundColor: "background.default" }}
-        >
-          <Typography
-            variant="h6"
-            gutterBottom
-            sx={{ textAlign: "center", mb: { xs: 2, sm: 3 } }}
+          {/* Bottom Section - Combat Resolution */}
+          <Box
+            sx={{ p: { xs: 2, sm: 3 }, backgroundColor: "background.default" }}
           >
-            🎲 Combat Resolution
-          </Typography>
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ textAlign: "center", mb: { xs: 2, sm: 3 } }}
+            >
+              🎲 Combat Resolution
+            </Typography>
 
-          {/* Show different UI for mook attackers */}
-          {attacker && CS.isMook(attacker) ? (
-            <MookAttackSection
-              attacker={attacker}
-              allShots={allShots}
-              selectedTargetIds={selectedTargetIds}
-              mookRolls={mookRolls}
-              showMookRolls={showMookRolls}
-              totalAttackingMooks={totalAttackingMooks}
-              finalDamage={finalDamage}
-              shotCost={shotCost}
-              attackValue={attackValue}
-              isProcessing={isProcessing}
-              updateField={updateField}
-              handleRollMookAttacks={handleRollMookAttacks}
-              handleApplyDamage={handleApplyDamage}
-            />
-          ) : (
-            <CombatResolution
-              attacker={attacker}
-              allShots={allShots}
-              selectedTargetIds={selectedTargetIds}
-              swerve={swerve}
-              smackdown={smackdown}
-              finalDamage={finalDamage}
-              shotCost={shotCost}
-              showMultiTargetResults={showMultiTargetResults}
-              multiTargetResults={multiTargetResults}
-              isProcessing={isProcessing}
-              updateField={updateField}
-              handleApplyDamage={handleApplyDamage}
-              handleSmackdownChange={handleSmackdownChange}
-            />
-          )}
+            {/* Show different UI for mook attackers */}
+            {attacker && CS.isMook(attacker) ? (
+              <MookAttackSection
+                attacker={attacker}
+                allShots={allShots}
+                selectedTargetIds={selectedTargetIds}
+                mookRolls={mookRolls}
+                showMookRolls={showMookRolls}
+                totalAttackingMooks={totalAttackingMooks}
+                finalDamage={finalDamage}
+                shotCost={shotCost}
+                attackValue={attackValue}
+                isProcessing={isProcessing}
+                updateField={updateField}
+                handleRollMookAttacks={handleRollMookAttacks}
+                handleApplyDamage={handleApplyDamage}
+              />
+            ) : (
+              <CombatResolution
+                attacker={attacker}
+                allShots={allShots}
+                selectedTargetIds={selectedTargetIds}
+                swerve={swerve}
+                smackdown={smackdown}
+                finalDamage={finalDamage}
+                shotCost={shotCost}
+                showMultiTargetResults={showMultiTargetResults}
+                multiTargetResults={multiTargetResults}
+                isProcessing={isProcessing}
+                updateField={updateField}
+                handleApplyDamage={handleApplyDamage}
+                handleSmackdownChange={handleSmackdownChange}
+              />
+            )}
 
-          {/* Attack Results for Non-Mook Attackers (single or multiple targets) */}
-          {showMultiTargetResults && (
-            <AttackResults
-              attacker={attacker}
-              attackerWeapons={attackerWeapons}
-              allShots={allShots}
-              selectedTargetIds={selectedTargetIds}
-              multiTargetResults={multiTargetResults}
-              attackValue={attackValue}
-              swerve={swerve}
-              defenseValue={defenseValue}
-              weaponDamage={weaponDamage}
-              smackdown={smackdown}
-              defenseChoicePerTarget={defenseChoicePerTarget}
-              calculateEffectiveAttackValue={calculateEffectiveAttackValue}
-              calculateTargetDefense={calculateTargetDefense}
-            />
-          )}
+            {/* Attack Results for Non-Mook Attackers (single or multiple targets) */}
+            {showMultiTargetResults && (
+              <AttackResults
+                attacker={attacker}
+                attackerWeapons={attackerWeapons}
+                allShots={allShots}
+                selectedTargetIds={selectedTargetIds}
+                multiTargetResults={multiTargetResults}
+                attackValue={attackValue}
+                swerve={swerve}
+                defenseValue={defenseValue}
+                weaponDamage={weaponDamage}
+                smackdown={smackdown}
+                defenseChoicePerTarget={defenseChoicePerTarget}
+                calculateEffectiveAttackValue={calculateEffectiveAttackValue}
+                calculateTargetDefense={calculateTargetDefense}
+              />
+            )}
 
-          {/* Summary of wounds to apply */}
-          {showMultiTargetResults && multiTargetResults.length > 0 && (
-            <WoundsSummary
-              multiTargetResults={multiTargetResults}
-              allShots={allShots}
-              calculateTargetDefense={calculateTargetDefense}
-              defenseChoicePerTarget={defenseChoicePerTarget}
-              selectedTargetIds={selectedTargetIds}
-              attackValue={attackValue}
-              swerve={swerve}
-              weaponDamage={weaponDamage}
-              targetMookCount={targetMookCount}
-              finalDamage={finalDamage}
-            />
-          )}
-        </Box>
+            {/* Summary of wounds to apply */}
+            {showMultiTargetResults && multiTargetResults.length > 0 && (
+              <WoundsSummary
+                multiTargetResults={multiTargetResults}
+                allShots={allShots}
+                calculateTargetDefense={calculateTargetDefense}
+                defenseChoicePerTarget={defenseChoicePerTarget}
+                selectedTargetIds={selectedTargetIds}
+                attackValue={attackValue}
+                swerve={swerve}
+                weaponDamage={weaponDamage}
+                targetMookCount={targetMookCount}
+                finalDamage={finalDamage}
+              />
+            )}
+          </Box>
         </>
       ) : null}
     </Box>

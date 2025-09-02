@@ -13,22 +13,22 @@ type AVProps = {
 // Mobile abbreviations for common action values
 const mobileLabels: Record<string, string> = {
   "Martial Arts": "MA",
-  "Guns": "Guns",
-  "Sorcery": "Sorc",
-  "Creature": "Creat",
-  "Defense": "Def",
-  "Toughness": "Tough",
-  "Speed": "Spd",
-  "Damage": "Dmg",
-  "Fortune": "Fort",
-  "Magic": "Mag",
-  "Chi": "Chi",
+  Guns: "Guns",
+  Sorcery: "Sorc",
+  Creature: "Creat",
+  Defense: "Def",
+  Toughness: "Tough",
+  Speed: "Spd",
+  Damage: "Dmg",
+  Fortune: "Fort",
+  Magic: "Mag",
+  Chi: "Chi",
 }
 
 export function AV({ label, value, maxValue, change }: AVProps) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
-  
+
   if (value === null || value === undefined) return null
 
   const getChangeColor = () => {
@@ -36,34 +36,34 @@ export function AV({ label, value, maxValue, change }: AVProps) {
     return change > 0 ? "success.main" : "error.main"
   }
 
-  const displayLabel = isMobile ? (mobileLabels[label] || label) : label
+  const displayLabel = isMobile ? mobileLabels[label] || label : label
   const changeColor = getChangeColor()
 
   return (
-    <Box 
+    <Box
       component="span"
       sx={{
         display: "inline-flex",
         alignItems: "baseline",
         gap: 0.5,
-        minWidth: { xs: "auto", sm: "auto" }
+        minWidth: { xs: "auto", sm: "auto" },
       }}
     >
-      <Box 
-        component="strong" 
-        sx={{ 
+      <Box
+        component="strong"
+        sx={{
           fontSize: { xs: "0.7rem", sm: "0.75rem" },
-          color: changeColor
+          color: changeColor,
         }}
       >
         {displayLabel}
       </Box>
-      <Box 
-        component="span" 
-        sx={{ 
+      <Box
+        component="span"
+        sx={{
           color: changeColor,
           fontSize: { xs: "0.7rem", sm: "0.75rem" },
-          fontWeight: 500
+          fontWeight: 500,
         }}
       >
         {maxValue ? `${value}/${maxValue}` : value}

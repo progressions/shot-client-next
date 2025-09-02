@@ -27,13 +27,13 @@ export default function VehicleActionValues({
         sx={{
           gap: { xs: 0.75, sm: 1 },
           "& > span": {
-            flexBasis: { 
+            flexBasis: {
               xs: "calc(33.333% - 6px)", // 3 columns on mobile
-              sm: "auto", 
-              md: "auto" 
+              sm: "auto",
+              md: "auto",
             },
             minWidth: { xs: "auto", sm: "auto" },
-          }
+          },
         }}
       >
         <AV label="Acceleration" value={VS.acceleration(vehicle)} />
@@ -47,13 +47,13 @@ export default function VehicleActionValues({
         sx={{
           gap: { xs: 0.75, sm: 1 },
           "& > span": {
-            flexBasis: { 
+            flexBasis: {
               xs: "calc(50% - 6px)", // 2 columns on mobile for second row
-              sm: "auto", 
-              md: "auto" 
+              sm: "auto",
+              md: "auto",
             },
             minWidth: { xs: "auto", sm: "auto" },
-          }
+          },
         }}
       >
         <AV label="Frame" value={VS.frame(vehicle)} />

@@ -17,8 +17,8 @@ export default function ChaseConditionPoints({
   const conditionPoints = VS.conditionPoints(vehicle)
 
   return (
-    <Stack 
-      direction={{ xs: "row", sm: "column" }} 
+    <Stack
+      direction={{ xs: "row", sm: "column" }}
       spacing={{ xs: 0.5, sm: 1 }}
       sx={{ alignItems: "center" }}
     >
@@ -37,19 +37,21 @@ export default function ChaseConditionPoints({
         }}
       >
         <Box
-          sx={{ 
-            fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" }, 
+          sx={{
+            fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
             fontWeight: 800,
-            lineHeight: 1
+            lineHeight: 1,
           }}
         >
           {chasePoints}
         </Box>
-        <Box sx={{ 
-          fontSize: { xs: "0.4rem", sm: "0.5rem", md: "0.65rem" },
-          lineHeight: 1,
-          mt: { xs: 0, md: 0.25 }
-        }}>
+        <Box
+          sx={{
+            fontSize: { xs: "0.4rem", sm: "0.5rem", md: "0.65rem" },
+            lineHeight: 1,
+            mt: { xs: 0, md: 0.25 },
+          }}
+        >
           Chase
         </Box>
       </Box>
@@ -68,19 +70,21 @@ export default function ChaseConditionPoints({
         }}
       >
         <Box
-          sx={{ 
-            fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" }, 
+          sx={{
+            fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
             fontWeight: 800,
-            lineHeight: 1
+            lineHeight: 1,
           }}
         >
           {conditionPoints}
         </Box>
-        <Box sx={{ 
-          fontSize: { xs: "0.4rem", sm: "0.5rem", md: "0.65rem" },
-          lineHeight: 1,
-          mt: { xs: 0, md: 0.25 }
-        }}>
+        <Box
+          sx={{
+            fontSize: { xs: "0.4rem", sm: "0.5rem", md: "0.65rem" },
+            lineHeight: 1,
+            mt: { xs: 0, md: 0.25 },
+          }}
+        >
           Cond
         </Box>
       </Box>

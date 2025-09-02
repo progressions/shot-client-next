@@ -46,7 +46,11 @@ export default function ActionValues({ character }: ActionValuesProps) {
     "Defense",
     CS.rawActionValue(character, "Defense")
   )
-  const toughnessData = getAdjustedValue("Toughness", CS.toughness(character), true)
+  const toughnessData = getAdjustedValue(
+    "Toughness",
+    CS.toughness(character),
+    true
+  )
   const speedData = getAdjustedValue("Speed", CS.speed(character), true)
   const damageData = getAdjustedValue("Damage", CS.damage(character), true)
 
@@ -61,13 +65,13 @@ export default function ActionValues({ character }: ActionValuesProps) {
         gap: { xs: 0.75, sm: 0.5 },
         // On mobile, make it wrap after 4 items if there are more than 6 total
         "& > span": {
-          flexBasis: { 
+          flexBasis: {
             xs: secondaryAttackData ? "calc(25% - 6px)" : "calc(33.333% - 6px)", // 4 or 3 columns on mobile
-            sm: "auto", 
-            md: "auto" 
+            sm: "auto",
+            md: "auto",
           },
           minWidth: { xs: "auto", sm: "auto" },
-        }
+        },
       }}
     >
       <AV

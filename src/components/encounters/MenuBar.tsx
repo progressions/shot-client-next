@@ -121,7 +121,10 @@ export default function MenuBar() {
           )}
           <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
             <Typography variant="h6" sx={{ mr: { xs: 1, sm: 2 } }}>
-              <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
                 Sequence{" "}
               </Box>
               {encounter.sequence || 1}
@@ -170,13 +173,13 @@ export default function MenuBar() {
               backgroundColor: "rgba(255, 255, 255, 0.3)",
             }}
           />
-          <IconButton 
+          <IconButton
             onClick={() => toggleBox("vehicle")}
             sx={{ px: { xs: 0.5, sm: 1 } }}
           >
             <Icon keyword="Add Vehicle" color="white" />
           </IconButton>
-          <IconButton 
+          <IconButton
             onClick={() => toggleBox("character")}
             sx={{ px: { xs: 0.5, sm: 1 } }}
           >

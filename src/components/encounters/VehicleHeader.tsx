@@ -18,19 +18,31 @@ export default function VehicleHeader({
 }: VehicleHeaderProps) {
   const archetype = VS.archetype(vehicle)
   const faction = VS.faction(vehicle)?.name
-  
+
   return (
-    <Stack 
-      direction={{ xs: "column", sm: "row" }} 
-      spacing={{ xs: 0.5, sm: 1 }} 
+    <Stack
+      direction={{ xs: "column", sm: "row" }}
+      spacing={{ xs: 0.5, sm: 1 }}
       component="span"
       sx={{ width: "100%" }}
     >
       <Box sx={{ display: { xs: "none", sm: "block" } }}>
         <EntityAvatar entity={vehicle} />
       </Box>
-      <Stack direction="column" spacing={0.25} component="span" sx={{ flex: 1 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, flexWrap: "wrap" }}>
+      <Stack
+        direction="column"
+        spacing={0.25}
+        component="span"
+        sx={{ flex: 1 }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 0.5,
+            flexWrap: "wrap",
+          }}
+        >
           <VehicleLink vehicle={vehicle} />
           {onLocationClick && location && (
             <Chip
@@ -38,14 +50,14 @@ export default function VehicleHeader({
               icon={<FaMapMarkerAlt size={10} />}
               label={location}
               onClick={onLocationClick}
-              sx={{ 
+              sx={{
                 height: "20px",
                 fontSize: "0.7rem",
                 ml: 1,
                 "& .MuiChip-icon": {
                   fontSize: "0.7rem",
-                  ml: 0.5
-                }
+                  ml: 0.5,
+                },
               }}
             />
           )}
@@ -62,11 +74,11 @@ export default function VehicleHeader({
         </Box>
         <Typography
           variant="caption"
-          sx={{ 
+          sx={{
             textTransform: "uppercase",
             fontSize: { xs: "0.65rem", sm: "0.7rem" },
             color: "text.secondary",
-            letterSpacing: 0.5
+            letterSpacing: 0.5,
           }}
         >
           {archetype && faction ? (
