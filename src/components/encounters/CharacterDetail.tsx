@@ -220,6 +220,12 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
               label="Location"
               value={newLocation}
               onChange={e => setNewLocation(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  handleLocationSave()
+                }
+              }}
               placeholder="e.g., Behind cover, On the roof, In the car"
             />
           </Box>
