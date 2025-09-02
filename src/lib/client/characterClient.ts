@@ -266,6 +266,16 @@ export function createCharacterClient(deps: ClientDependencies) {
     return get(api.allCharacters(), {}, cacheOptions)
   }
 
+  async function updateShotLocation(
+    fight: Fight | Encounter,
+    shotId: string,
+    location: string
+  ): Promise<AxiosResponse<void>> {
+    return patch(`${apiV2.fights(fight)}/shots/${shotId}`, {
+      shot: { location },
+    })
+  }
+
   return {
     getEncounter,
     createImagePosition,
@@ -293,5 +303,6 @@ export function createCharacterClient(deps: ClientDependencies) {
     createAdvancement,
     deleteAdvancement,
     getAllCharacters,
+    updateShotLocation,
   }
 }

@@ -16,9 +16,16 @@ import {
   DialogActions,
   Button,
   Box,
+  Typography,
+  TextField,
 } from "@mui/material"
-import { FaTimes } from "react-icons/fa"
-import { CharacterHeader, Wounds, Actions, ActionValues } from "@/components/encounters"
+import { FaTimes, FaMapMarkerAlt, FaEdit } from "react-icons/fa"
+import {
+  CharacterHeader,
+  Wounds,
+  Actions,
+  ActionValues,
+} from "@/components/encounters"
 import CharacterEffectsDisplay from "./effects/CharacterEffectsDisplay"
 import { encounterTransition } from "@/contexts/EncounterContext"
 import { useEncounter, useClient, useToast } from "@/contexts"
@@ -32,6 +39,8 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [locationDialogOpen, setLocationDialogOpen] = useState(false)
+  const [newLocation, setNewLocation] = useState(character.location || "")
 
   const handleRemoveClick = () => {
     setConfirmOpen(true)
@@ -59,6 +68,27 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
     setConfirmOpen(false)
   }
 
+  const handleLocationClick = () => {
+    setNewLocation(character.location || "")
+    setLocationDialogOpen(true)
+  }
+
+  const handleLocationClose = () => {
+    setLocationDialogOpen(false)
+  }
+
+  const handleLocationSave = async () => {
+    try {
+      // Update the shot location
+      await client.updateShotLocation(encounter, character.shot_id, newLocation)
+      toastSuccess(`Updated location for ${character.name}`)
+      setLocationDialogOpen(false)
+    } catch (error) {
+      console.error("Error updating location:", error)
+      toastError(`Failed to update location for ${character.name}`)
+    }
+  }
+
   return (
     <motion.div
       key={`${character.id}-${character.shot_id}`}
@@ -67,28 +97,55 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
       transition={encounterTransition}
     >
       <ListItem
-        sx={{ 
+        sx={{
           alignItems: "flex-start",
           position: "relative",
           pr: 0,
           "& .MuiListItemSecondaryAction-root": {
             right: 0,
             top: "50%",
-            transform: "translateY(-50%)"
-          }
+            transform: "translateY(-50%)",
+          },
         }}
-        secondaryAction={
-          <Actions entity={character} />
-        }
+        secondaryAction={<Actions entity={character} />}
       >
         <ListItemIcon sx={{ mt: 0 }}>
           <Wounds character={character} />
         </ListItemIcon>
         <ListItemText
           sx={{ ml: 2 }}
-          primary={<CharacterHeader character={character} />}
+          primary={
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <CharacterHeader character={character} />
+              {character.location && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "text.secondary",
+                    fontStyle: "italic",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.5,
+                  }}
+                >
+                  <FaMapMarkerAlt size={12} />
+                  {character.location}
+                </Typography>
+              )}
+              <IconButton
+                size="small"
+                onClick={handleLocationClick}
+                sx={{ ml: 1, p: 0.5 }}
+              >
+                <FaEdit size={12} />
+              </IconButton>
+            </Box>
+          }
           secondary={
-            <Box component="span" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <Box
+              component="span"
+              sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+            >
               <ActionValues character={character} />
               <CharacterEffectsDisplay
                 character={character}
@@ -140,6 +197,37 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
           </Button>
           <Button onClick={handleConfirmRemove} color="error" autoFocus>
             Remove
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Location Edit Dialog */}
+      <Dialog
+        open={locationDialogOpen}
+        onClose={handleLocationClose}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>Edit Location</DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 2 }}>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              Where is {character.name}?
+            </Typography>
+            <TextField
+              autoFocus
+              fullWidth
+              label="Location"
+              value={newLocation}
+              onChange={e => setNewLocation(e.target.value)}
+              placeholder="e.g., Behind cover, On the roof, In the car"
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleLocationClose}>Cancel</Button>
+          <Button onClick={handleLocationSave} variant="contained">
+            Save
           </Button>
         </DialogActions>
       </Dialog>

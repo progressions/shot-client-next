@@ -1,16 +1,16 @@
 "use client"
 import { useState } from "react"
 import type { Entity, Character } from "@/types"
-import { 
-  IconButton, 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  Button, 
+import {
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
   TextField,
   Box,
-  Typography
+  Typography,
 } from "@mui/material"
 import { useEncounter, useToast } from "@/contexts"
 import { Icon } from "@/components/ui"
@@ -47,7 +47,9 @@ export default function Actions({ entity }: ActionsProps) {
   const handleSpendShots = async () => {
     try {
       await ec.spendShots(entity, shotCost)
-      toastSuccess(`${entity.name} spent ${shotCost} ${shotCost === 1 ? 'shot' : 'shots'}`)
+      toastSuccess(
+        `${entity.name} spent ${shotCost} ${shotCost === 1 ? "shot" : "shots"}`
+      )
       handleClose()
     } catch (error) {
       console.error("Error spending shots:", error)
@@ -65,7 +67,7 @@ export default function Actions({ entity }: ActionsProps) {
       <IconButton onClick={handleOpen} sx={{ p: 1 }}>
         <Icon keyword="Actions" size={24} />
       </IconButton>
-      
+
       <Dialog open={dialogOpen} onClose={handleClose} maxWidth="xs" fullWidth>
         <DialogTitle>Spend Shots</DialogTitle>
         <DialogContent>
@@ -80,22 +82,22 @@ export default function Actions({ entity }: ActionsProps) {
               value={shotCost}
               onChange={handleShotChange}
               sx={{ width: 120 }}
-              inputProps={{ 
-                min: 0, 
+              inputProps={{
+                min: 0,
                 max: 20,
-                step: 1
+                step: 1,
               }}
             />
           </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button 
-            onClick={handleSpendShots} 
-            variant="contained" 
+          <Button
+            onClick={handleSpendShots}
+            variant="contained"
             disabled={shotCost < 0 || shotCost > 20}
           >
-            Spend {shotCost} {shotCost === 1 ? 'Shot' : 'Shots'}
+            Spend {shotCost} {shotCost === 1 ? "Shot" : "Shots"}
           </Button>
         </DialogActions>
       </Dialog>

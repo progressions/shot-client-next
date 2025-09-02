@@ -108,7 +108,10 @@ export default function MenuBar() {
         <Toolbar>
           {showStartSequence && (
             <Tooltip title="Start Sequence">
-              <IconButton onClick={handleStartSequence} sx={{ color: "white", mr: 2 }}>
+              <IconButton
+                onClick={handleStartSequence}
+                sx={{ color: "white", mr: 2 }}
+              >
                 <FaPlay size={20} />
               </IconButton>
             </Tooltip>
@@ -118,28 +121,28 @@ export default function MenuBar() {
               Sequence {encounter.sequence || 1}
             </Typography>
             <ButtonGroup size="small" variant="contained">
-              <Button 
+              <Button
                 onClick={() => handleSequenceChange(-1)}
-                sx={{ 
+                sx={{
                   minWidth: 24,
                   width: 24,
                   height: 24,
                   p: 0,
                   backgroundColor: "primary.dark",
-                  "&:hover": { backgroundColor: "primary.main" }
+                  "&:hover": { backgroundColor: "primary.main" },
                 }}
               >
                 <FaMinus size={10} />
               </Button>
-              <Button 
+              <Button
                 onClick={() => handleSequenceChange(1)}
-                sx={{ 
+                sx={{
                   minWidth: 24,
-                  width: 24, 
+                  width: 24,
                   height: 24,
                   p: 0,
                   backgroundColor: "primary.dark",
-                  "&:hover": { backgroundColor: "primary.main" }
+                  "&:hover": { backgroundColor: "primary.main" },
                 }}
               >
                 <FaPlus size={10} />
@@ -153,7 +156,14 @@ export default function MenuBar() {
           >
             <FaGun size={24} />
           </IconButton>
-          <Divider orientation="vertical" sx={{ mx: 1, height: 24, backgroundColor: "rgba(255, 255, 255, 0.3)" }} />
+          <Divider
+            orientation="vertical"
+            sx={{
+              mx: 1,
+              height: 24,
+              backgroundColor: "rgba(255, 255, 255, 0.3)",
+            }}
+          />
           <IconButton onClick={() => toggleBox("vehicle")}>
             <Icon keyword="Add Vehicle" color="white" />
           </IconButton>
