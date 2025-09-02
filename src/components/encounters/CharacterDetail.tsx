@@ -20,11 +20,13 @@ import {
   TextField,
 } from "@mui/material"
 import { FaTimes } from "react-icons/fa"
+import { MdEdit } from "react-icons/md"
 import {
   CharacterHeader,
   Wounds,
   Actions,
   ActionValues,
+  CharacterEditDialog,
 } from "@/components/encounters"
 import CharacterEffectsDisplay from "./effects/CharacterEffectsDisplay"
 import { encounterTransition } from "@/contexts/EncounterContext"
@@ -41,6 +43,15 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [locationDialogOpen, setLocationDialogOpen] = useState(false)
   const [newLocation, setNewLocation] = useState(character.location || "")
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+
+  const handleEditClick = () => {
+    setEditDialogOpen(true)
+  }
+
+  const handleEditClose = () => {
+    setEditDialogOpen(false)
+  }
 
   const handleRemoveClick = () => {
     setConfirmOpen(true)
@@ -134,6 +145,25 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
             </Box>
           }
         />
+        <Tooltip title="Edit character details">
+          <IconButton
+            aria-label="edit"
+            onClick={handleEditClick}
+            size="small"
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: 40,
+              color: "text.secondary",
+              "&:hover": {
+                color: "primary.main",
+                backgroundColor: "action.hover",
+              },
+            }}
+          >
+            <MdEdit />
+          </IconButton>
+        </Tooltip>
         <Tooltip title="Remove from encounter">
           <IconButton
             aria-label="remove"
@@ -217,6 +247,13 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Character Edit Dialog */}
+      <CharacterEditDialog
+        open={editDialogOpen}
+        onClose={handleEditClose}
+        character={character}
+      />
     </motion.div>
   )
 }

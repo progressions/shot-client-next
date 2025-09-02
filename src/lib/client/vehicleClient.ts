@@ -153,6 +153,14 @@ export function createVehicleClient(deps: ClientDependencies) {
     return get(api.allVehicles(), {}, cacheOptions)
   }
 
+  async function removeVehicleFromFight(
+    fight: Fight,
+    vehicle: Vehicle
+  ): Promise<AxiosResponse<void>> {
+    // Use V2 API endpoint for removing vehicle from fight
+    return delete_(`${apiV2.fights(fight)}/shots/${vehicle.shot_id}`)
+  }
+
   return {
     getLocationForVehicle,
     setVehicleLocation,
@@ -169,5 +177,6 @@ export function createVehicleClient(deps: ClientDependencies) {
     hideVehicle,
     showVehicle,
     getAllVehicles,
+    removeVehicleFromFight,
   }
 }
