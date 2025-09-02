@@ -527,7 +527,7 @@ export default function TargetDefenseDisplay({
             </Box>
           ) : (
             // Fortune dodge is active - show button and number field
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, alignItems: "flex-end" }}>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1, alignItems: "flex-end" }}>
               <Button
                 variant="contained"
                 size="small"
