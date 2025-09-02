@@ -38,7 +38,7 @@ export default function AddCharacter({
     }
   }
 
-  const handleDispatch = (action: any) => {
+  const handleDispatch = (action: unknown) => {
     // CharacterFilter expects a dispatch function for managing its internal state
     // We don't need to handle this externally for our use case
   }

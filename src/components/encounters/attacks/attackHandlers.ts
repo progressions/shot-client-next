@@ -1,5 +1,12 @@
-import type { Character, Encounter, Shot, Weapon } from "@/types"
+import type {
+  Character,
+  Encounter,
+  Shot,
+  Weapon,
+  AttackFormData,
+} from "@/types"
 import { CS } from "@/services"
+import type createClient from "@/lib/client/Client"
 import {
   CharacterUpdate,
   createAttackerUpdate,
@@ -8,6 +15,11 @@ import {
   createMookVsMookUpdate,
   createMookVsNonMookUpdate,
 } from "./combatHandlers"
+
+type Client = ReturnType<typeof createClient>
+type AttackFormState = {
+  data: AttackFormData
+}
 
 interface MultiTargetResult {
   targetId: string
@@ -32,7 +44,7 @@ interface MookRoll {
 
 // Handle non-mook attacker with multiple targets
 export async function handleNonMookMultipleTargets(
-  client: any,
+  client: Client,
   encounter: Encounter,
   attackerShot: Shot,
   attacker: Character,
@@ -58,7 +70,7 @@ export async function handleNonMookMultipleTargets(
   toastSuccess: (msg: string) => void,
   toastInfo: (msg: string) => void,
   toastError: (msg: string) => void,
-  formState: any
+  formState: AttackFormState
 ): Promise<void> {
   const shots = parseInt(shotCost) || 3
   const characterUpdates: CharacterUpdate[] = []
@@ -212,7 +224,7 @@ export async function handleNonMookMultipleTargets(
 
 // Handle mook attackers
 export async function handleMookAttack(
-  client: any,
+  client: Client,
   encounter: Encounter,
   attackerShot: Shot,
   attacker: Character,
@@ -309,7 +321,7 @@ export async function handleMookAttack(
 
 // Handle single target attack
 export async function handleSingleTargetAttack(
-  client: any,
+  client: Client,
   encounter: Encounter,
   attackerShot: Shot,
   attacker: Character,

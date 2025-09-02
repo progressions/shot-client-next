@@ -87,7 +87,7 @@ export default function AddEffectModal({
     setSaving(true)
     try {
       // Only send action_value and change if they have values
-      const effectToSend: any = {
+      const effectToSend: Partial<CharacterEffect> = {
         ...effect,
         action_value: effect.action_value || undefined,
         change: effect.change || undefined,
