@@ -4,14 +4,17 @@ import { useState, useRef, useEffect } from "react"
 import { AppBar, Toolbar, Typography, IconButton, Box } from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
 import { Icon } from "@/components/ui"
-import { AddCharacter, AddVehicle } from "@/components/encounters"
+import { AddCharacter, AddVehicle, AttackPanel } from "@/components/encounters"
+import { FaGun } from "react-icons/fa6"
 
 export default function MenuBar() {
   const theme = useTheme()
-  const [open, setOpen] = useState<"character" | "vehicle" | null>(null)
+  const [open, setOpen] = useState<"character" | "vehicle" | "attack" | null>(
+    null
+  )
   const panelRef = useRef<HTMLDivElement>(null)
 
-  const toggleBox = (type: "character" | "vehicle") => {
+  const toggleBox = (type: "character" | "vehicle" | "attack") => {
     setOpen(current => (current === type ? null : type))
   }
 
@@ -36,6 +39,13 @@ export default function MenuBar() {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Menu
           </Typography>
+          <IconButton
+            onClick={() => toggleBox("attack")}
+            sx={{ color: "white" }}
+            title="Attack Resolution"
+          >
+            <FaGun size={24} />
+          </IconButton>
           <IconButton onClick={() => toggleBox("vehicle")}>
             <Icon keyword="Add Vehicle" color="white" />
           </IconButton>
@@ -54,7 +64,6 @@ export default function MenuBar() {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             style={{
-              overflow: "hidden",
               backgroundColor: theme.palette.divider,
               zIndex: 1099,
             }}
@@ -72,6 +81,7 @@ export default function MenuBar() {
                   onClose={() => setOpen(null)}
                 />
               )}
+              {open === "attack" && <AttackPanel />}
             </Box>
           </motion.div>
         )}

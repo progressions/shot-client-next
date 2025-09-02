@@ -6,6 +6,7 @@ import type { Entity } from "@/types"
 import { SystemStyleObject, Theme } from "@mui/system"
 import CharacterLink from "../ui/links/CharacterLink"
 import { ImageViewerModal } from "@/components/ui/ImageViewerModal"
+import ImpairmentBadge from "@/components/ui/ImpairmentBadge"
 
 interface AvatarProperties {
   entity: Entity
@@ -79,7 +80,13 @@ const Avatar = ({
     }),
   }
 
-  const baseAvatar = (
+  // Check if entity has impairments (Character or Vehicle types)
+  const impairments =
+    "impairments" in entity && typeof entity.impairments === "number"
+      ? entity.impairments
+      : 0
+
+  const avatarElement = (
     <MuiAvatar
       alt={entity.name}
       src={entity.image_url || ""}
@@ -96,6 +103,10 @@ const Avatar = ({
     >
       {initials}
     </MuiAvatar>
+  )
+
+  const baseAvatar = (
+    <ImpairmentBadge impairments={impairments}>{avatarElement}</ImpairmentBadge>
   )
 
   const avatarWithViewer = (

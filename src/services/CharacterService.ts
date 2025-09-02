@@ -327,7 +327,7 @@ const CharacterService = {
   },
 
   fortune: function (character: Character): number {
-    return this.rawActionValue(character, this.fortuneType(character))
+    return this.rawActionValue(character, "Fortune")
   },
 
   fortuneType: function (character: Character): string {

@@ -15,6 +15,7 @@ import * as weapon from "@/lib/client/weaponClient"
 import * as schtick from "@/lib/client/schtickClient"
 import * as ai from "@/lib/client/aiClient"
 import * as editor from "@/lib/client/editorClient"
+import * as characterEffect from "@/lib/client/characterEffectClient"
 
 interface ClientParameters {
   jwt?: string
@@ -51,5 +52,11 @@ export default function createClient(parameters: ClientParameters = {}) {
     ...schtick.createSchtickClient({ jwt, api, apiV2, queryParams }),
     ...ai.createAiClient({ jwt, api, apiV2 }),
     ...editor.createEditorClient({ jwt, api, apiV2, queryParams }),
+    ...characterEffect.createCharacterEffectClient({
+      jwt,
+      api,
+      apiV2,
+      queryParams,
+    }),
   }
 }

@@ -9,7 +9,7 @@ import { useTheme } from "@mui/material/styles"
 
 type NumberFieldProps = {
   name: string
-  value: number | null
+  value: number | null | string
   size: "small" | "large"
   width: string
   error: boolean
@@ -32,7 +32,7 @@ export function NumberField({
   const [isFocused, setIsFocused] = useState<boolean>(false)
   const [isHovered, setIsHovered] = useState<boolean>(false)
   const fontSizeMap = {
-    small: { xs: "1rem", sm: "1.5rem" },
+    small: { xs: "1.25rem", sm: "1.5rem" },
     large: { xs: "2rem", sm: "3rem" },
   }
   const paddingMap = {

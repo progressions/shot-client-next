@@ -73,7 +73,7 @@ export default function Encounter() {
           <FormHelperText>{errors.description}</FormHelperText>
         )}
       </FormControl>
-      <ShotCounter encounter={encounter} />
+      <ShotCounter />
     </Box>
   )
 }

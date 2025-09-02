@@ -356,7 +356,8 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         disconnected: () => {}, // Disconnected from CampaignChannel
         received: (data: CampaignCableData) => {
           if (data) {
-            setCampaignData(data)
+            // Merge new data with existing to prevent overwrites
+            setCampaignData(prev => ({ ...prev, ...data }))
           }
         },
       }
@@ -378,7 +379,8 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         disconnected: () => {}, // Disconnected from UserChannel
         received: (data: CampaignCableData) => {
           if (data) {
-            setCampaignData(data)
+            // Merge new data with existing to prevent overwrites
+            setCampaignData(prev => ({ ...prev, ...data }))
           }
         },
       }
@@ -413,6 +415,14 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         })
       }
     })
+
+    // Clear processed data after a short delay to prevent memory buildup
+    // but long enough to ensure all components have processed it
+    const timer = setTimeout(() => {
+      setCampaignData(null)
+    }, 1000)
+
+    return () => clearTimeout(timer)
   }, [campaignData])
 
   const refreshUser = useCallback(async () => {

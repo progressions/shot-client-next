@@ -12,6 +12,7 @@ interface WoundsProps {
 export default function Wounds({ character }: WoundsProps) {
   const theme = useTheme()
   const wounds = CS.wounds(character)
+  const isMook = CS.isMook(character)
 
   return (
     <Stack
@@ -28,7 +29,9 @@ export default function Wounds({ character }: WoundsProps) {
       <Box sx={{ fontSize: { xs: "1.5rem", md: "1.75rem" }, fontWeight: 800 }}>
         {wounds}
       </Box>
-      <Box sx={{ fontSize: { xs: "0.75rem", md: "0.75rem" } }}>Wounds</Box>
+      <Box sx={{ fontSize: { xs: "0.75rem", md: "0.75rem" } }}>
+        {isMook ? "Mooks" : "Wounds"}
+      </Box>
     </Stack>
   )
 }

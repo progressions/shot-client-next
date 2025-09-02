@@ -1,6 +1,7 @@
-import { Stack } from "@mui/material"
+import { Box } from "@mui/material"
 import type { Character } from "@/types"
 import { Actions, ActionValues } from "@/components/encounters"
+import CharacterEffectsDisplay from "./effects/CharacterEffectsDisplay"
 
 interface CharacterProps {
   character: Character
@@ -8,16 +9,18 @@ interface CharacterProps {
 
 export default function Character({ character }: CharacterProps) {
   return (
-    <Stack component="span" direction="row" spacing={1}>
-      <Stack
+    <Box component="span" sx={{ display: "flex", gap: 1 }}>
+      <Box
         component="span"
-        direction="column"
-        spacing={1}
-        sx={{ flexGrow: 1 }}
+        sx={{ display: "flex", flexDirection: "column", gap: 1, flexGrow: 1 }}
       >
         <ActionValues character={character} />
-      </Stack>
+        <CharacterEffectsDisplay
+          character={character}
+          effects={character.effects || []}
+        />
+      </Box>
       <Actions entity={character} />
-    </Stack>
+    </Box>
   )
 }
