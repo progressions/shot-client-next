@@ -1,4 +1,4 @@
-import { Stack, Box } from "@mui/material"
+import { Box } from "@mui/material"
 import type { Vehicle } from "@/types"
 import { Actions, VehicleActionValues } from "@/components/encounters"
 
