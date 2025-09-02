@@ -230,11 +230,7 @@ export default function InitiativeDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button
-          onClick={handleApply}
-          variant="contained"
-          disabled={!canApply}
-        >
+        <Button onClick={handleApply} variant="contained" disabled={!canApply}>
           Apply & Start Sequence
         </Button>
       </DialogActions>

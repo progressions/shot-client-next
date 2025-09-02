@@ -1,11 +1,26 @@
 "use client"
 import { useTheme } from "@mui/material"
 import { useState, useRef, useEffect } from "react"
-import { AppBar, Toolbar, Typography, IconButton, Box, Tooltip } from "@mui/material"
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Box,
+  Tooltip,
+  ButtonGroup,
+  Button,
+  Divider,
+} from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
 import { Icon } from "@/components/ui"
-import { AddCharacter, AddVehicle, AttackPanel, InitiativeDialog } from "@/components/encounters"
-import { FaGun, FaPlay } from "react-icons/fa6"
+import {
+  AddCharacter,
+  AddVehicle,
+  AttackPanel,
+  InitiativeDialog,
+} from "@/components/encounters"
+import { FaGun, FaPlay, FaPlus, FaMinus } from "react-icons/fa6"
 import { useEncounter } from "@/contexts"
 import FightService from "@/services/FightService"
 import type { Character, Vehicle } from "@/types"
@@ -41,7 +56,18 @@ export default function MenuBar() {
     setInitiativeDialogOpen(true)
   }
 
-  const handleApplyInitiatives = async (updatedCharacters: (Character | Vehicle)[]) => {
+  const handleSequenceChange = async (delta: number) => {
+    const newSequence = Math.max(1, (encounter.sequence || 1) + delta)
+    const updatedEncounter = {
+      ...encounter,
+      sequence: newSequence,
+    }
+    await updateEncounter(updatedEncounter)
+  }
+
+  const handleApplyInitiatives = async (
+    updatedCharacters: (Character | Vehicle)[]
+  ) => {
     // Update the encounter with the new character initiatives
     const updatedShots = encounter.shots.map(shot => ({
       ...shot,
@@ -80,19 +106,46 @@ export default function MenuBar() {
     <>
       <AppBar position="sticky" sx={{ top: 0, zIndex: 1100 }}>
         <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Menu
-          </Typography>
           {showStartSequence && (
             <Tooltip title="Start Sequence">
-              <IconButton
-                onClick={handleStartSequence}
-                sx={{ color: "white" }}
-              >
+              <IconButton onClick={handleStartSequence} sx={{ color: "white", mr: 2 }}>
                 <FaPlay size={20} />
               </IconButton>
             </Tooltip>
           )}
+          <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+            <Typography variant="h6" sx={{ mr: 2 }}>
+              Sequence {encounter.sequence || 1}
+            </Typography>
+            <ButtonGroup size="small" variant="contained">
+              <Button 
+                onClick={() => handleSequenceChange(-1)}
+                sx={{ 
+                  minWidth: 24,
+                  width: 24,
+                  height: 24,
+                  p: 0,
+                  backgroundColor: "primary.dark",
+                  "&:hover": { backgroundColor: "primary.main" }
+                }}
+              >
+                <FaMinus size={10} />
+              </Button>
+              <Button 
+                onClick={() => handleSequenceChange(1)}
+                sx={{ 
+                  minWidth: 24,
+                  width: 24, 
+                  height: 24,
+                  p: 0,
+                  backgroundColor: "primary.dark",
+                  "&:hover": { backgroundColor: "primary.main" }
+                }}
+              >
+                <FaPlus size={10} />
+              </Button>
+            </ButtonGroup>
+          </Box>
           <IconButton
             onClick={() => toggleBox("attack")}
             sx={{ color: "white" }}
@@ -100,6 +153,7 @@ export default function MenuBar() {
           >
             <FaGun size={24} />
           </IconButton>
+          <Divider orientation="vertical" sx={{ mx: 1, height: 24, backgroundColor: "rgba(255, 255, 255, 0.3)" }} />
           <IconButton onClick={() => toggleBox("vehicle")}>
             <Icon keyword="Add Vehicle" color="white" />
           </IconButton>

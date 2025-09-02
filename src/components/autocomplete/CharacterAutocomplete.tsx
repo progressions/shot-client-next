@@ -65,7 +65,10 @@ export default function CharactersAutocomplete({
 
   const handleChange = (value: string | null) => {
     // The base Autocomplete passes the value (ID) directly
-    console.log("[CharacterAutocomplete] handleChange called with value:", value)
+    console.log(
+      "[CharacterAutocomplete] handleChange called with value:",
+      value
+    )
     onChange(value)
   }
 

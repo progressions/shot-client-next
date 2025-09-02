@@ -16,10 +16,8 @@ export default function Actions({ entity }: ActionsProps) {
   }
 
   return (
-    <Box component="span" sx={{ display: "flex", alignItems: "center" }}>
-      <IconButton onClick={spendShots}>
-        <Icon keyword="Actions" size={24} />
-      </IconButton>
-    </Box>
+    <IconButton onClick={spendShots} sx={{ p: 1 }}>
+      <Icon keyword="Actions" size={24} />
+    </IconButton>
   )
 }

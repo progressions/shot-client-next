@@ -19,10 +19,13 @@ export default function AddCharacter({
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null
   )
-  
+
   // Add a wrapper to debug setSelectedCharacter calls
   const handleSetSelectedCharacter = (character: Character | null) => {
-    console.log("[AddCharacter] Setting selected character to:", character?.name || "null")
+    console.log(
+      "[AddCharacter] Setting selected character to:",
+      character?.name || "null"
+    )
     setSelectedCharacter(character)
   }
 
@@ -44,7 +47,7 @@ export default function AddCharacter({
       toastError(`Failed to add ${character.name} to the fight`)
     }
   }
-  
+
   // Debug logging
   console.log("[AddCharacter] Current selectedCharacter:", selectedCharacter)
 

@@ -169,7 +169,9 @@ export default function AttackerSection({
                   {(() => {
                     // Calculate NET modifier from base value
                     // This includes: -impairments, +effects, +mook bonus
-                    const impairmentPenalty = attacker?.impairments ? -attacker.impairments : 0
+                    const impairmentPenalty = attacker?.impairments
+                      ? -attacker.impairments
+                      : 0
                     const totalAttackModifier =
                       impairmentPenalty + attackValueChange + weaponMookBonus
 
