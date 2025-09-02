@@ -49,7 +49,7 @@ export const calculateTargetDefense = (
 
   // Start with defense that already includes impairments
   let defense = CS.defense(target)
-  
+
   // Add effects if encounter exists
   if (encounter) {
     const baseValue = CS.rawActionValue(target, "Defense")

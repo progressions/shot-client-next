@@ -37,7 +37,10 @@ export default function ActionValues({ character }: ActionValuesProps) {
     CS.secondaryAttack(character),
     CS.rawActionValue(character, CS.secondaryAttack(character))
   )
-  const defenseData = getAdjustedValue("Defense", CS.rawActionValue(character, "Defense"))
+  const defenseData = getAdjustedValue(
+    "Defense",
+    CS.rawActionValue(character, "Defense")
+  )
   const toughnessData = getAdjustedValue("Toughness", CS.toughness(character))
   const speedData = getAdjustedValue("Speed", CS.speed(character))
   const damageData = getAdjustedValue("Damage", CS.damage(character), true)

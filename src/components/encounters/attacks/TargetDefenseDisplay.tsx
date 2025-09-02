@@ -280,36 +280,39 @@ export default function TargetDefenseDisplay({
           <Box sx={{ height: "20px", mt: 0.25 }}>
             {(() => {
               let totalChange = 0
-              
+
               // Add stunt bonus
               if (stunt) {
                 totalChange += 2
               }
-              
+
               // Add dodge/fortune bonus
               if (defenseChoicePerTarget[targetId] === "dodge") {
                 totalChange += 3
               } else if (defenseChoicePerTarget[targetId] === "fortune") {
-                const fortuneValue = parseInt(fortuneDiePerTarget[targetId] || "0")
+                const fortuneValue = parseInt(
+                  fortuneDiePerTarget[targetId] || "0"
+                )
                 totalChange += 3 + fortuneValue
               }
-              
+
               // Add effects and impairments
               if (encounter) {
                 const baseValue = CS.rawActionValue(char, "Defense")
-                const [effectsAndImpairments] = CharacterEffectService.adjustedValue(
-                  char,
-                  baseValue,
-                  "Defense",
-                  encounter,
-                  false // don't ignore impairments - this will include both effects and impairments
-                )
+                const [effectsAndImpairments] =
+                  CharacterEffectService.adjustedValue(
+                    char,
+                    baseValue,
+                    "Defense",
+                    encounter,
+                    false // don't ignore impairments - this will include both effects and impairments
+                  )
                 totalChange += effectsAndImpairments
               } else if (char.impairments > 0) {
                 // No encounter, but subtract impairments
                 totalChange -= char.impairments
               }
-              
+
               if (totalChange !== 0) {
                 return (
                   <Typography
@@ -321,7 +324,8 @@ export default function TargetDefenseDisplay({
                       textAlign: "center",
                     }}
                   >
-                    {totalChange > 0 ? "+" : ""}{totalChange}
+                    {totalChange > 0 ? "+" : ""}
+                    {totalChange}
                   </Typography>
                 )
               }
@@ -374,19 +378,21 @@ export default function TargetDefenseDisplay({
                     encounter,
                     true // ignore impairments for Toughness
                   )
-                  
+
                   if (effectChange !== 0) {
                     return (
                       <Typography
                         variant="caption"
                         sx={{
                           display: "block",
-                          color: effectChange > 0 ? "success.main" : "error.main",
+                          color:
+                            effectChange > 0 ? "success.main" : "error.main",
                           fontWeight: "bold",
                           textAlign: "center",
                         }}
                       >
-                        {effectChange > 0 ? "+" : ""}{effectChange}
+                        {effectChange > 0 ? "+" : ""}
+                        {effectChange}
                       </Typography>
                     )
                   }
@@ -399,7 +405,13 @@ export default function TargetDefenseDisplay({
       </Box>
 
       {/* Name on the side for desktop */}
-      <Box sx={{ flex: 1, display: { xs: "none", sm: "block" }, alignSelf: "flex-start" }}>
+      <Box
+        sx={{
+          flex: 1,
+          display: { xs: "none", sm: "block" },
+          alignSelf: "flex-start",
+        }}
+      >
         <CharacterLink character={char}>{char.name}</CharacterLink>
         {/* Defense modifiers text */}
         {(stunt ||
@@ -429,106 +441,21 @@ export default function TargetDefenseDisplay({
       {/* Dodge buttons - not shown for Mook targets */}
       <Box sx={{ alignSelf: "flex-start" }}>
         {!CS.isMook(char) &&
-        (defenseChoicePerTarget[targetId] !== "dodge" &&
-        defenseChoicePerTarget[targetId] !== "fortune" ? (
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => {
-              // Just set the dodge choice, don't apply it yet
-              updateField("defenseChoicePerTarget", {
-                ...defenseChoicePerTarget,
-                [targetId]: "dodge" as DefenseChoice,
-              })
-              // Clear any manual defense override so calculateTargetDefense takes over
-              const newOverrides = { ...manualDefensePerTarget }
-              delete newOverrides[targetId]
-              updateField("manualDefensePerTarget", newOverrides)
-              // Recalculate defense using the standard function
-              const updatedDefenses = selectedTargetIds.map(tid => {
-                const targetShot = allShots.find(
-                  s => s.character?.shot_id === tid
-                )
-                const targetChar = targetShot?.character
-                if (!targetChar) return 0
-                return calculateTargetDefense(targetChar, tid)
-              })
-              
-              if (selectedTargetIds.length > 1) {
-                const highestDefense = Math.max(...updatedDefenses)
-                const combinedDefense = highestDefense + selectedTargetIds.length
-                updateField("defenseValue", combinedDefense.toString())
-              } else if (updatedDefenses.length > 0) {
-                updateField("defenseValue", updatedDefenses[0].toString())
-              }
-            }}
-            sx={{ minWidth: "80px" }}
-          >
-            Dodge
-          </Button>
-        ) : defenseChoicePerTarget[targetId] === "dodge" ? (
-          <>
+          (defenseChoicePerTarget[targetId] !== "dodge" &&
+          defenseChoicePerTarget[targetId] !== "fortune" ? (
             <Button
-              variant="contained"
+              variant="outlined"
               size="small"
-              color="success"
               onClick={() => {
-                // Remove dodge choice
-                const newChoices = { ...defenseChoicePerTarget }
-                delete newChoices[targetId]
-                updateField("defenseChoicePerTarget", newChoices)
-                // Recalculate defense without dodge
-                if (selectedTargetIds.length > 0) {
-                  updateDefenseAndToughness(selectedTargetIds, stunt)
-                }
-              }}
-              sx={{ minWidth: "80px" }}
-            >
-              ✓ Dodging
-            </Button>
-
-            {/* Fortune button for PCs - only shows when regular dodge is active */}
-            {CS.isPC(char) && (
-              <Button
-                variant="outlined"
-                size="small"
-                color="secondary"
-                onClick={() => {
-                  // Upgrade to fortune defense choice
-                  updateField("defenseChoicePerTarget", {
-                    ...defenseChoicePerTarget,
-                    [targetId]: "fortune" as DefenseChoice,
-                  })
-                  // Initialize fortune die to 0
-                  updateField("fortuneDiePerTarget", {
-                    ...fortuneDiePerTarget,
-                    [targetId]: "0",
-                  })
-                }}
-                sx={{ minWidth: "40px", px: 1 }}
-                title="Add Fortune to Dodge"
-              >
-                +🎲
-              </Button>
-            )}
-          </>
-        ) : (
-          // Fortune dodge is active - show button and number field
-          <>
-            <Button
-              variant="contained"
-              size="small"
-              color="secondary"
-              onClick={() => {
-                // Go back to regular dodge
+                // Just set the dodge choice, don't apply it yet
                 updateField("defenseChoicePerTarget", {
                   ...defenseChoicePerTarget,
                   [targetId]: "dodge" as DefenseChoice,
                 })
-                // Clear fortune die
-                const newFortuneDice = { ...fortuneDiePerTarget }
-                delete newFortuneDice[targetId]
-                updateField("fortuneDiePerTarget", newFortuneDice)
+                // Clear any manual defense override so calculateTargetDefense takes over
+                const newOverrides = { ...manualDefensePerTarget }
+                delete newOverrides[targetId]
+                updateField("manualDefensePerTarget", newOverrides)
                 // Recalculate defense using the standard function
                 const updatedDefenses = selectedTargetIds.map(tid => {
                   const targetShot = allShots.find(
@@ -538,34 +465,84 @@ export default function TargetDefenseDisplay({
                   if (!targetChar) return 0
                   return calculateTargetDefense(targetChar, tid)
                 })
-                
+
                 if (selectedTargetIds.length > 1) {
                   const highestDefense = Math.max(...updatedDefenses)
-                  const combinedDefense = highestDefense + selectedTargetIds.length
+                  const combinedDefense =
+                    highestDefense + selectedTargetIds.length
                   updateField("defenseValue", combinedDefense.toString())
                 } else if (updatedDefenses.length > 0) {
                   updateField("defenseValue", updatedDefenses[0].toString())
                 }
               }}
-              sx={{ minWidth: "120px" }}
+              sx={{ minWidth: "80px" }}
             >
-              ✓ Fortune Dodge
+              Dodge
             </Button>
-            <NumberField
-              name={`fortuneDie-${targetId}`}
-              value={parseInt(fortuneDiePerTarget[targetId] || "0") || 0}
-              size="small"
-              width="80px"
-              error={false}
-              disabled={false}
-              onChange={e => {
-                updateField("fortuneDiePerTarget", {
-                  ...fortuneDiePerTarget,
-                  [targetId]: e.target.value,
-                })
-                // Recalculate defense using the standard function
-                // Wait for the state to update by using a small delay
-                setTimeout(() => {
+          ) : defenseChoicePerTarget[targetId] === "dodge" ? (
+            <>
+              <Button
+                variant="contained"
+                size="small"
+                color="success"
+                onClick={() => {
+                  // Remove dodge choice
+                  const newChoices = { ...defenseChoicePerTarget }
+                  delete newChoices[targetId]
+                  updateField("defenseChoicePerTarget", newChoices)
+                  // Recalculate defense without dodge
+                  if (selectedTargetIds.length > 0) {
+                    updateDefenseAndToughness(selectedTargetIds, stunt)
+                  }
+                }}
+                sx={{ minWidth: "80px" }}
+              >
+                ✓ Dodging
+              </Button>
+
+              {/* Fortune button for PCs - only shows when regular dodge is active */}
+              {CS.isPC(char) && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  color="secondary"
+                  onClick={() => {
+                    // Upgrade to fortune defense choice
+                    updateField("defenseChoicePerTarget", {
+                      ...defenseChoicePerTarget,
+                      [targetId]: "fortune" as DefenseChoice,
+                    })
+                    // Initialize fortune die to 0
+                    updateField("fortuneDiePerTarget", {
+                      ...fortuneDiePerTarget,
+                      [targetId]: "0",
+                    })
+                  }}
+                  sx={{ minWidth: "40px", px: 1 }}
+                  title="Add Fortune to Dodge"
+                >
+                  +🎲
+                </Button>
+              )}
+            </>
+          ) : (
+            // Fortune dodge is active - show button and number field
+            <>
+              <Button
+                variant="contained"
+                size="small"
+                color="secondary"
+                onClick={() => {
+                  // Go back to regular dodge
+                  updateField("defenseChoicePerTarget", {
+                    ...defenseChoicePerTarget,
+                    [targetId]: "dodge" as DefenseChoice,
+                  })
+                  // Clear fortune die
+                  const newFortuneDice = { ...fortuneDiePerTarget }
+                  delete newFortuneDice[targetId]
+                  updateField("fortuneDiePerTarget", newFortuneDice)
+                  // Recalculate defense using the standard function
                   const updatedDefenses = selectedTargetIds.map(tid => {
                     const targetShot = allShots.find(
                       s => s.character?.shot_id === tid
@@ -574,25 +551,63 @@ export default function TargetDefenseDisplay({
                     if (!targetChar) return 0
                     return calculateTargetDefense(targetChar, tid)
                   })
-                  
+
                   if (selectedTargetIds.length > 1) {
                     const highestDefense = Math.max(...updatedDefenses)
-                    const combinedDefense = highestDefense + selectedTargetIds.length
+                    const combinedDefense =
+                      highestDefense + selectedTargetIds.length
                     updateField("defenseValue", combinedDefense.toString())
                   } else if (updatedDefenses.length > 0) {
                     updateField("defenseValue", updatedDefenses[0].toString())
                   }
-                }, 0)
-              }}
-              onBlur={e => {
-                updateField("fortuneDiePerTarget", {
-                  ...fortuneDiePerTarget,
-                  [targetId]: e.target.value,
-                })
-              }}
-            />
-          </>
-        ))}
+                }}
+                sx={{ minWidth: "120px" }}
+              >
+                ✓ Fortune Dodge
+              </Button>
+              <NumberField
+                name={`fortuneDie-${targetId}`}
+                value={parseInt(fortuneDiePerTarget[targetId] || "0") || 0}
+                size="small"
+                width="80px"
+                error={false}
+                disabled={false}
+                onChange={e => {
+                  updateField("fortuneDiePerTarget", {
+                    ...fortuneDiePerTarget,
+                    [targetId]: e.target.value,
+                  })
+                  // Recalculate defense using the standard function
+                  // Wait for the state to update by using a small delay
+                  setTimeout(() => {
+                    const updatedDefenses = selectedTargetIds.map(tid => {
+                      const targetShot = allShots.find(
+                        s => s.character?.shot_id === tid
+                      )
+                      const targetChar = targetShot?.character
+                      if (!targetChar) return 0
+                      return calculateTargetDefense(targetChar, tid)
+                    })
+
+                    if (selectedTargetIds.length > 1) {
+                      const highestDefense = Math.max(...updatedDefenses)
+                      const combinedDefense =
+                        highestDefense + selectedTargetIds.length
+                      updateField("defenseValue", combinedDefense.toString())
+                    } else if (updatedDefenses.length > 0) {
+                      updateField("defenseValue", updatedDefenses[0].toString())
+                    }
+                  }, 0)
+                }}
+                onBlur={e => {
+                  updateField("fortuneDiePerTarget", {
+                    ...fortuneDiePerTarget,
+                    [targetId]: e.target.value,
+                  })
+                }}
+              />
+            </>
+          ))}
       </Box>
     </Box>
   )

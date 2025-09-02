@@ -38,10 +38,11 @@ export const getDefenseModifiersText = (
 
   // Effects modifier
   if (encounter && effectType) {
-    const baseValue = effectType === "Defense" 
-      ? CS.rawActionValue(char, "Defense")
-      : CS.toughness(char)
-    
+    const baseValue =
+      effectType === "Defense"
+        ? CS.rawActionValue(char, "Defense")
+        : CS.toughness(char)
+
     // For Defense, we need to get just the effects without impairments
     // So we calculate with ignoreImpairments=true to get just the effect change
     const [effectOnlyChange] = CES.adjustedValue(
@@ -51,9 +52,11 @@ export const getDefenseModifiersText = (
       encounter,
       true // always ignore impairments to get just the effect change
     )
-    
+
     if (effectOnlyChange !== 0) {
-      modifiers.push(`${effectOnlyChange > 0 ? "+" : ""}${effectOnlyChange} from effects`)
+      modifiers.push(
+        `${effectOnlyChange > 0 ? "+" : ""}${effectOnlyChange} from effects`
+      )
     }
   }
 

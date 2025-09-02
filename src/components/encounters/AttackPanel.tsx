@@ -3,7 +3,7 @@
 import { useMemo, useEffect } from "react"
 import { Box, Card, CardContent, Typography } from "@mui/material"
 import { useEncounter, useToast } from "@/contexts"
-import { CS, DS, CharacterEffectService, FS } from "@/services"
+import { CS, DS, CharacterEffectService } from "@/services"
 import type {
   Character,
   Shot,

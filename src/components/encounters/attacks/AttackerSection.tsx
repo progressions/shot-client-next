@@ -170,9 +170,7 @@ export default function AttackerSection({
                         display: "block",
                         mt: 0.25,
                         color:
-                          attackValueChange > 0
-                            ? "success.main"
-                            : "error.main",
+                          attackValueChange > 0 ? "success.main" : "error.main",
                         fontWeight: "bold",
                         textAlign: "center",
                       }}
@@ -227,7 +225,8 @@ export default function AttackerSection({
                         +{weaponMookBonus} vs mooks
                       </Typography>
                     )}
-                    {(attacker && attacker.impairments > 0) || attackValueChange !== 0 ? (
+                    {(attacker && attacker.impairments > 0) ||
+                    attackValueChange !== 0 ? (
                       <Typography
                         variant="caption"
                         sx={{
@@ -240,12 +239,13 @@ export default function AttackerSection({
                         {attacker && attacker.impairments > 0 && (
                           <span>-{attacker.impairments} impairment</span>
                         )}
-                        {attacker && attacker.impairments > 0 && attackValueChange !== 0 && (
-                          <span>, </span>
-                        )}
+                        {attacker &&
+                          attacker.impairments > 0 &&
+                          attackValueChange !== 0 && <span>, </span>}
                         {attackValueChange !== 0 && (
                           <span>
-                            {attackValueChange > 0 ? "+" : ""}{attackValueChange} from effects
+                            {attackValueChange > 0 ? "+" : ""}
+                            {attackValueChange} from effects
                           </span>
                         )}
                       </Typography>
@@ -277,10 +277,7 @@ export default function AttackerSection({
                       sx={{
                         display: "block",
                         mt: 0.25,
-                        color:
-                          damageChange > 0
-                            ? "success.main"
-                            : "error.main",
+                        color: damageChange > 0 ? "success.main" : "error.main",
                         fontWeight: "bold",
                         textAlign: "center",
                       }}
