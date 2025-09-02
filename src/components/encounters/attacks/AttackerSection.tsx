@@ -31,7 +31,9 @@ export default function AttackerSection({
     shotCost,
     attackSkill,
     attackValue,
+    attackValueChange,
     weaponDamage,
+    damageChange,
     selectedWeaponId,
   } = formState.data
 
@@ -151,15 +153,35 @@ export default function AttackerSection({
                 Attack Skill
               </Typography>
               <Stack direction="row" spacing={1} alignItems="flex-start">
-                <NumberField
-                  name="attackValue"
-                  value={parseInt(attackValue) || 0}
-                  size="small"
-                  width="80px"
-                  error={false}
-                  onChange={e => updateField("attackValue", e.target.value)}
-                  onBlur={e => updateField("attackValue", e.target.value)}
-                />
+                <Box>
+                  <NumberField
+                    name="attackValue"
+                    value={parseInt(attackValue) || 0}
+                    size="small"
+                    width="80px"
+                    error={false}
+                    onChange={e => updateField("attackValue", e.target.value)}
+                    onBlur={e => updateField("attackValue", e.target.value)}
+                  />
+                  {attackValueChange !== 0 && (
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: "block",
+                        mt: 0.25,
+                        color:
+                          attackValueChange > 0
+                            ? "success.main"
+                            : "error.main",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                      }}
+                    >
+                      {attackValueChange > 0 ? "+" : ""}
+                      {attackValueChange}
+                    </Typography>
+                  )}
+                </Box>
                 <FormControl
                   sx={{
                     flex: 1,
@@ -205,7 +227,7 @@ export default function AttackerSection({
                         +{weaponMookBonus} vs mooks
                       </Typography>
                     )}
-                    {attacker && attacker.impairments > 0 && (
+                    {(attacker && attacker.impairments > 0) || attackValueChange !== 0 ? (
                       <Typography
                         variant="caption"
                         sx={{
@@ -215,9 +237,19 @@ export default function AttackerSection({
                           fontStyle: "italic",
                         }}
                       >
-                        -{attacker.impairments} impairment
+                        {attacker && attacker.impairments > 0 && (
+                          <span>-{attacker.impairments} impairment</span>
+                        )}
+                        {attacker && attacker.impairments > 0 && attackValueChange !== 0 && (
+                          <span>, </span>
+                        )}
+                        {attackValueChange !== 0 && (
+                          <span>
+                            {attackValueChange > 0 ? "+" : ""}{attackValueChange} from effects
+                          </span>
+                        )}
                       </Typography>
-                    )}
+                    ) : null}
                   </Box>
                 </FormControl>
               </Stack>
@@ -229,15 +261,35 @@ export default function AttackerSection({
                 Damage
               </Typography>
               <Stack direction="row" spacing={1} alignItems="flex-start">
-                <NumberField
-                  name="weaponDamage"
-                  value={parseInt(weaponDamage) || 0}
-                  size="small"
-                  width="80px"
-                  error={false}
-                  onChange={e => updateField("weaponDamage", e.target.value)}
-                  onBlur={e => updateField("weaponDamage", e.target.value)}
-                />
+                <Box>
+                  <NumberField
+                    name="weaponDamage"
+                    value={parseInt(weaponDamage) || 0}
+                    size="small"
+                    width="80px"
+                    error={false}
+                    onChange={e => updateField("weaponDamage", e.target.value)}
+                    onBlur={e => updateField("weaponDamage", e.target.value)}
+                  />
+                  {damageChange !== 0 && (
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: "block",
+                        mt: 0.25,
+                        color:
+                          damageChange > 0
+                            ? "success.main"
+                            : "error.main",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                      }}
+                    >
+                      {damageChange > 0 ? "+" : ""}
+                      {damageChange}
+                    </Typography>
+                  )}
+                </Box>
                 <FormControl
                   sx={{ flex: 1, "& .MuiInputBase-root": { height: 56 } }}
                 >

@@ -14,8 +14,10 @@ export interface AttackFormData {
   selectedTargetIds: string[]
   attackSkill: string
   attackValue: string
+  attackValueChange: number
   selectedWeaponId: string
   weaponDamage: string
+  damageChange: number
   swerve: string
   defenseValue: string
   toughnessValue: string

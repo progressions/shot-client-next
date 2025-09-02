@@ -8,7 +8,7 @@ import {
   Checkbox,
 } from "@mui/material"
 import { CS } from "@/services"
-import type { TargetSectionProps } from "@/types"
+import type { TargetSectionProps, Encounter } from "@/types"
 import { NumberField } from "@/components/ui"
 import CharacterSelector from "../CharacterSelector"
 import TargetDefenseDisplay from "./TargetDefenseDisplay"
@@ -77,7 +77,8 @@ export default function TargetSection({
   updateDefenseAndToughness,
   distributeMooks,
   calculateTargetDefense,
-}: TargetSectionProps) {
+  encounter,
+}: TargetSectionProps & { encounter: Encounter }) {
   // Extract needed values from formState
   const {
     selectedTargetIds,
@@ -318,7 +319,9 @@ export default function TargetSection({
                         char,
                         stunt,
                         defenseChoicePerTarget[id],
-                        fortuneDiePerTarget[id]
+                        fortuneDiePerTarget[id],
+                        encounter,
+                        "Defense"
                       )
                       return modifiersText ? (
                         <Typography
@@ -363,6 +366,7 @@ export default function TargetSection({
                 updateField={updateField}
                 updateFields={updateFields}
                 updateDefenseAndToughness={updateDefenseAndToughness}
+                encounter={encounter}
               />
             ))}
           </Stack>

@@ -3,7 +3,7 @@
 import { useMemo, useEffect } from "react"
 import { Box, Card, CardContent, Typography } from "@mui/material"
 import { useEncounter, useToast } from "@/contexts"
-import { CS, DS } from "@/services"
+import { CS, DS, CharacterEffectService, FS } from "@/services"
 import type {
   Character,
   Shot,
@@ -46,8 +46,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     attackerShotId: "",
     attackSkill: "",
     attackValue: "",
+    attackValueChange: 0, // Track effect changes
     selectedWeaponId: "",
     weaponDamage: "",
+    damageChange: 0, // Track effect changes
     shotCost: "3",
 
     // Target state
@@ -90,10 +92,12 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     selectedTargetIds,
     attackSkill,
     attackValue,
+    attackValueChange,
     defenseValue,
     toughnessValue,
     selectedWeaponId,
     weaponDamage,
+    damageChange,
     swerve,
     stunt,
     finalDamage,
@@ -191,7 +195,15 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     if (attacker && "action_values" in attacker) {
       // Get attack skills
       const mainAttack = CS.mainAttack(attacker)
-      const av = CS.actionValue(attacker, mainAttack)
+
+      // Get action value with effects applied
+      // adjustedActionValue returns [change, adjustedValue]
+      const [changeAV, av] = CharacterEffectService.adjustedActionValue(
+        attacker,
+        mainAttack,
+        encounter,
+        false // don't ignore impairments
+      )
 
       // Get default weapon and damage
       const weaponIds = attacker.weapon_ids || []
@@ -201,16 +213,36 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
       const updates: Partial<AttackFormData> = {
         attackSkill: mainAttack,
+        attackValueChange: changeAV, // Store the change from effects
       }
 
       if (charWeapons.length > 0) {
         const firstWeapon = charWeapons[0]
         updates.selectedWeaponId = firstWeapon.id?.toString() || ""
-        updates.weaponDamage = firstWeapon.damage.toString()
+
+        // Apply effects to weapon damage if applicable
+        const [damageChange, _modifiedDamage] =
+          CharacterEffectService.adjustedActionValue(
+            attacker,
+            "Damage",
+            encounter,
+            true // ignore impairments for damage
+          )
+        updates.weaponDamage = (firstWeapon.damage + damageChange).toString()
+        updates.damageChange = damageChange // Store the change from effects
         // Don't add mook bonus here - it will be added when mook targets are selected
       } else {
         updates.selectedWeaponId = "unarmed"
-        updates.weaponDamage = (CS.damage(attacker) || 7).toString()
+        const baseDamage = CS.damage(attacker) || 7
+        const [damageChange, _modifiedDamage] =
+          CharacterEffectService.adjustedActionValue(
+            attacker,
+            "Damage",
+            encounter,
+            true // ignore impairments for damage
+          )
+        updates.weaponDamage = (baseDamage + damageChange).toString()
+        updates.damageChange = damageChange // Store the change from effects
       }
 
       updates.attackValue = av.toString()
@@ -362,22 +394,39 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       const target = targets[0]
       const targetId = targetIds[0]
       if (target) {
-        let defense = CS.defense(target)
+        // Get defense with effects applied
+        const [_defenseChange, defense] =
+          CharacterEffectService.adjustedActionValue(
+            target,
+            "Defense",
+            encounter,
+            false // don't ignore impairments
+          )
 
         // Add mook count to defense if targeting multiple mooks
+        let finalDefense = defense
         if (CS.isMook(target) && !CS.isMook(attacker) && targetMookCount > 1) {
-          defense += targetMookCount
+          finalDefense += targetMookCount
         }
 
-        if (includeStunt) defense += 2 // Add stunt modifier
+        if (includeStunt) finalDefense += 2 // Add stunt modifier
+
+        // Get toughness with effects applied
+        const [_toughnessChange, toughness] =
+          CharacterEffectService.adjustedActionValue(
+            target,
+            "Toughness",
+            encounter,
+            true // ignore impairments for toughness
+          )
 
         // Update both the main defense value and clear any manual override for this target
         updateFields({
-          defenseValue: defense.toString(),
-          toughnessValue: CS.toughness(target).toString(),
+          defenseValue: finalDefense.toString(),
+          toughnessValue: toughness.toString(),
           manualDefensePerTarget: {
             ...manualDefensePerTarget,
-            [targetId]: defense.toString(), // Set the calculated value as the manual override
+            [targetId]: finalDefense.toString(), // Set the calculated value as the manual override
           },
         })
       }
@@ -886,6 +935,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             updateDefenseAndToughness={updateDefenseAndToughness}
             distributeMooks={distributeMooks}
             calculateTargetDefense={calculateTargetDefense}
+            encounter={encounter}
           />
         </Box>
 

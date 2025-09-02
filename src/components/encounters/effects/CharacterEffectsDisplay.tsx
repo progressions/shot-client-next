@@ -1,12 +1,6 @@
 "use client"
 
-import {
-  Stack,
-  IconButton,
-  Popover,
-  Box,
-  Typography,
-} from "@mui/material"
+import { Stack, IconButton, Popover, Box, Typography } from "@mui/material"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
 import DeleteIcon from "@mui/icons-material/Delete"
@@ -68,7 +62,7 @@ export default function CharacterEffectsDisplay({
   ) => {
     // Capture the element immediately before it becomes null
     const element = event.currentTarget
-    
+
     // Clear any existing close timeout
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current)
@@ -280,4 +274,3 @@ export default function CharacterEffectsDisplay({
     </>
   )
 }
-

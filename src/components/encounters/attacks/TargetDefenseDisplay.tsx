@@ -2,12 +2,13 @@
 
 import { Box, Typography, Button } from "@mui/material"
 import { NumberField } from "@/components/ui"
-import { CS } from "@/services"
+import { CS, CharacterEffectService } from "@/services"
 import type {
   Character,
   Shot,
   DefenseChoice,
   TargetDefenseDisplayProps,
+  Encounter,
 } from "@/types"
 import { getDefenseModifiersText } from "./defenseModifierUtils"
 
@@ -57,7 +58,8 @@ export default function TargetDefenseDisplay({
   updateField,
   updateFields,
   updateDefenseAndToughness,
-}: TargetDefenseDisplayProps) {
+  encounter,
+}: TargetDefenseDisplayProps & { encounter: Encounter }) {
   const shot = allShots.find(s => s.character?.shot_id === targetId)
   const char = shot?.character
   if (!char) return null
@@ -83,7 +85,9 @@ export default function TargetDefenseDisplay({
       char,
       stunt,
       defenseChoicePerTarget[targetId],
-      fortuneDiePerTarget[targetId]
+      fortuneDiePerTarget[targetId],
+      encounter,
+      "Defense"
     )
 
     // Don't show anything if there are no modifiers
@@ -158,7 +162,9 @@ export default function TargetDefenseDisplay({
               char,
               stunt,
               defenseChoicePerTarget[targetId],
-              fortuneDiePerTarget[targetId]
+              fortuneDiePerTarget[targetId],
+              encounter,
+              "Defense"
             )}
           </Typography>
         )}
@@ -275,6 +281,54 @@ export default function TargetDefenseDisplay({
           <Typography variant="caption" sx={{ mt: 0.5 }}>
             Defense
           </Typography>
+          {/* Defense total change */}
+          {(() => {
+            // Get the total change from effects and impairments
+            if (encounter) {
+              const baseValue = CS.rawActionValue(char, "Defense")
+              const [totalChange] = CharacterEffectService.adjustedValue(
+                char,
+                baseValue,
+                "Defense",
+                encounter,
+                false // don't ignore impairments - this will include both effects and impairments
+              )
+              
+              if (totalChange !== 0) {
+                return (
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: "block",
+                      mt: 0.25,
+                      color: totalChange > 0 ? "success.main" : "error.main",
+                      fontWeight: "bold",
+                      textAlign: "center",
+                    }}
+                  >
+                    {totalChange > 0 ? "+" : ""}{totalChange}
+                  </Typography>
+                )
+              }
+            } else if (char.impairments > 0) {
+              // No encounter, but show impairments
+              return (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: "block",
+                    mt: 0.25,
+                    color: "error.main",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  -{char.impairments}
+                </Typography>
+              )
+            }
+            return null
+          })()}
         </Box>
         {/* Only show Toughness for non-mooks */}
         {!CS.isMook(char) && (
@@ -309,6 +363,37 @@ export default function TargetDefenseDisplay({
             <Typography variant="caption" sx={{ mt: 0.5 }}>
               Toughness
             </Typography>
+            {/* Toughness total change (only effects, no impairments) */}
+            {(() => {
+              if (encounter) {
+                const baseValue = CS.toughness(char)
+                const [effectChange] = CharacterEffectService.adjustedValue(
+                  char,
+                  baseValue,
+                  "Toughness",
+                  encounter,
+                  true // ignore impairments for Toughness
+                )
+                
+                if (effectChange !== 0) {
+                  return (
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: "block",
+                        mt: 0.25,
+                        color: effectChange > 0 ? "success.main" : "error.main",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                      }}
+                    >
+                      {effectChange > 0 ? "+" : ""}{effectChange}
+                    </Typography>
+                  )
+                }
+              }
+              return null
+            })()}
           </Box>
         )}
       </Box>
@@ -340,7 +425,9 @@ export default function TargetDefenseDisplay({
               char,
               stunt,
               defenseChoicePerTarget[targetId],
-              fortuneDiePerTarget[targetId]
+              fortuneDiePerTarget[targetId],
+              encounter,
+              "Defense"
             )}
           </Typography>
         )}
