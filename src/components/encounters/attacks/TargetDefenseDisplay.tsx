@@ -170,7 +170,7 @@ export default function TargetDefenseDisplay({
         )}
       </Box>
 
-      <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+      <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
         {/* Count field for mooks when non-mook is attacking */}
         {CS.isMook(char) && !CS.isMook(attacker) && (
           <Box
@@ -238,6 +238,8 @@ export default function TargetDefenseDisplay({
             <Typography variant="caption" sx={{ mt: 0.5 }}>
               Count
             </Typography>
+            {/* Reserve space for consistency */}
+            <Box sx={{ height: "20px", mt: 0.25 }} />
           </Box>
         )}
         <Box
@@ -281,54 +283,54 @@ export default function TargetDefenseDisplay({
           <Typography variant="caption" sx={{ mt: 0.5 }}>
             Defense
           </Typography>
-          {/* Defense total change */}
-          {(() => {
-            // Get the total change from effects and impairments
-            if (encounter) {
-              const baseValue = CS.rawActionValue(char, "Defense")
-              const [totalChange] = CharacterEffectService.adjustedValue(
-                char,
-                baseValue,
-                "Defense",
-                encounter,
-                false // don't ignore impairments - this will include both effects and impairments
-              )
-              
-              if (totalChange !== 0) {
+          {/* Defense total change - always reserve space */}
+          <Box sx={{ height: "20px", mt: 0.25 }}>
+            {(() => {
+              // Get the total change from effects and impairments
+              if (encounter) {
+                const baseValue = CS.rawActionValue(char, "Defense")
+                const [totalChange] = CharacterEffectService.adjustedValue(
+                  char,
+                  baseValue,
+                  "Defense",
+                  encounter,
+                  false // don't ignore impairments - this will include both effects and impairments
+                )
+                
+                if (totalChange !== 0) {
+                  return (
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: "block",
+                        color: totalChange > 0 ? "success.main" : "error.main",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                      }}
+                    >
+                      {totalChange > 0 ? "+" : ""}{totalChange}
+                    </Typography>
+                  )
+                }
+              } else if (char.impairments > 0) {
+                // No encounter, but show impairments
                 return (
                   <Typography
                     variant="caption"
                     sx={{
                       display: "block",
-                      mt: 0.25,
-                      color: totalChange > 0 ? "success.main" : "error.main",
+                      color: "error.main",
                       fontWeight: "bold",
                       textAlign: "center",
                     }}
                   >
-                    {totalChange > 0 ? "+" : ""}{totalChange}
+                    -{char.impairments}
                   </Typography>
                 )
               }
-            } else if (char.impairments > 0) {
-              // No encounter, but show impairments
-              return (
-                <Typography
-                  variant="caption"
-                  sx={{
-                    display: "block",
-                    mt: 0.25,
-                    color: "error.main",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  -{char.impairments}
-                </Typography>
-              )
-            }
-            return null
-          })()}
+              return null
+            })()}
+          </Box>
         </Box>
         {/* Only show Toughness for non-mooks */}
         {!CS.isMook(char) && (
@@ -363,43 +365,44 @@ export default function TargetDefenseDisplay({
             <Typography variant="caption" sx={{ mt: 0.5 }}>
               Toughness
             </Typography>
-            {/* Toughness total change (only effects, no impairments) */}
-            {(() => {
-              if (encounter) {
-                const baseValue = CS.toughness(char)
-                const [effectChange] = CharacterEffectService.adjustedValue(
-                  char,
-                  baseValue,
-                  "Toughness",
-                  encounter,
-                  true // ignore impairments for Toughness
-                )
-                
-                if (effectChange !== 0) {
-                  return (
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        display: "block",
-                        mt: 0.25,
-                        color: effectChange > 0 ? "success.main" : "error.main",
-                        fontWeight: "bold",
-                        textAlign: "center",
-                      }}
-                    >
-                      {effectChange > 0 ? "+" : ""}{effectChange}
-                    </Typography>
+            {/* Toughness total change - always reserve space */}
+            <Box sx={{ height: "20px", mt: 0.25 }}>
+              {(() => {
+                if (encounter) {
+                  const baseValue = CS.toughness(char)
+                  const [effectChange] = CharacterEffectService.adjustedValue(
+                    char,
+                    baseValue,
+                    "Toughness",
+                    encounter,
+                    true // ignore impairments for Toughness
                   )
+                  
+                  if (effectChange !== 0) {
+                    return (
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: "block",
+                          color: effectChange > 0 ? "success.main" : "error.main",
+                          fontWeight: "bold",
+                          textAlign: "center",
+                        }}
+                      >
+                        {effectChange > 0 ? "+" : ""}{effectChange}
+                      </Typography>
+                    )
+                  }
                 }
-              }
-              return null
-            })()}
+                return null
+              })()}
+            </Box>
           </Box>
         )}
       </Box>
 
       {/* Name on the side for desktop */}
-      <Box sx={{ flex: 1, display: { xs: "none", sm: "block" } }}>
+      <Box sx={{ flex: 1, display: { xs: "none", sm: "block" }, alignSelf: "flex-start" }}>
         <Typography
           variant="body2"
           sx={{
@@ -434,7 +437,8 @@ export default function TargetDefenseDisplay({
       </Box>
 
       {/* Dodge buttons - not shown for Mook targets */}
-      {!CS.isMook(char) &&
+      <Box sx={{ alignSelf: "flex-start" }}>
+        {!CS.isMook(char) &&
         (defenseChoicePerTarget[targetId] !== "dodge" &&
         defenseChoicePerTarget[targetId] !== "fortune" ? (
           <Button
@@ -644,6 +648,7 @@ export default function TargetDefenseDisplay({
             />
           </>
         ))}
+      </Box>
     </Box>
   )
 }
