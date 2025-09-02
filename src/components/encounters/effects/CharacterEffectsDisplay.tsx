@@ -16,7 +16,7 @@ interface CharacterEffectsDisplayProps {
 
 type Severity = "error" | "warning" | "info" | "success"
 
-const severityColors: Record<Severity, string> = {
+const severityColors: Record<Severity, "error" | "warning" | "info" | "success"> = {
   error: "error",
   warning: "warning",
   info: "info",
@@ -170,7 +170,7 @@ export default function CharacterEffectsDisplay({
             <IconButton
               key={severity}
               size="small"
-              color={severityColors[severity] as any}
+              color={severityColors[severity]}
               onMouseEnter={e => handlePopoverOpen(e, severity)}
               onMouseLeave={handlePopoverClose}
               sx={{ padding: 0.5 }}
@@ -233,7 +233,7 @@ export default function CharacterEffectsDisplay({
               >
                 <InfoOutlinedIcon
                   fontSize="small"
-                  color={severityColors[openSeverity] as any}
+                  color={severityColors[openSeverity]}
                 />
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="body2">
