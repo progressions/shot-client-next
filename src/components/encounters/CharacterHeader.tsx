@@ -11,7 +11,11 @@ type CharacterHeaderProps = {
   onLocationClick?: () => void
 }
 
-export default function CharacterHeader({ character, location, onLocationClick }: CharacterHeaderProps) {
+export default function CharacterHeader({
+  character,
+  location,
+  onLocationClick,
+}: CharacterHeaderProps) {
   const divider = CS.archetype(character) && CS.faction(character) ? " - " : ""
   return (
     <Stack direction="row" spacing={1} component="span">

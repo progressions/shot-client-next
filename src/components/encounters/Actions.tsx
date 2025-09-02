@@ -81,7 +81,7 @@ export default function Actions({ entity }: ActionsProps) {
               label="Shot Cost"
               value={shotCost}
               onChange={handleShotChange}
-              onKeyDown={(e) => {
+              onKeyDown={e => {
                 if (e.key === "Enter") {
                   e.preventDefault()
                   handleSpendShots()

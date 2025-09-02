@@ -181,7 +181,7 @@ export default function MenuBar() {
               backgroundColor: "rgba(255, 255, 255, 0.3)",
             }}
           />
-          <IconButton 
+          <IconButton
             onClick={() => setLocationsDialogOpen(true)}
             sx={{ color: "white" }}
             title="View Locations"

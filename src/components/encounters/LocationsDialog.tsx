@@ -22,17 +22,20 @@ type LocationsDialogProps = {
   onClose: () => void
 }
 
-export default function LocationsDialog({ open, onClose }: LocationsDialogProps) {
+export default function LocationsDialog({
+  open,
+  onClose,
+}: LocationsDialogProps) {
   const { encounter } = useEncounter()
 
   const locationGroups = useMemo(() => {
     // Get all characters and vehicles from the fight
     const characters = FightService.charactersInFight(encounter)
     const vehicles = FightService.vehiclesInFight(encounter)
-    
+
     // Group entities by location
     const groups = new Map<string, (Character | Vehicle)[]>()
-    
+
     // Process characters
     characters.forEach(character => {
       const location = character.location || "No Location"
@@ -41,7 +44,7 @@ export default function LocationsDialog({ open, onClose }: LocationsDialogProps)
       }
       groups.get(location)!.push(character)
     })
-    
+
     // Process vehicles
     vehicles.forEach(vehicle => {
       const location = vehicle.location || "No Location"
@@ -50,7 +53,7 @@ export default function LocationsDialog({ open, onClose }: LocationsDialogProps)
       }
       groups.get(location)!.push(vehicle)
     })
-    
+
     // Convert to sorted array - sort locations alphabetically
     const sortedGroups = Array.from(groups.entries()).sort((a, b) => {
       // Put "No Location" at the end
@@ -58,12 +61,12 @@ export default function LocationsDialog({ open, onClose }: LocationsDialogProps)
       if (b[0] === "No Location") return -1
       return a[0].localeCompare(b[0])
     })
-    
+
     // Sort entities within each location by name
     sortedGroups.forEach(([location, entities]) => {
       entities.sort((a, b) => a.name.localeCompare(b.name))
     })
-    
+
     return sortedGroups
   }, [encounter])
 
@@ -83,7 +86,10 @@ export default function LocationsDialog({ open, onClose }: LocationsDialogProps)
                   variant="subtitle2"
                   sx={{
                     fontWeight: "bold",
-                    color: location === "No Location" ? "text.secondary" : "text.primary",
+                    color:
+                      location === "No Location"
+                        ? "text.secondary"
+                        : "text.primary",
                     mb: 0.5,
                   }}
                 >
@@ -91,14 +97,19 @@ export default function LocationsDialog({ open, onClose }: LocationsDialogProps)
                 </Typography>
                 <List dense sx={{ pl: 1.5, py: 0 }}>
                   {entities.map(entity => (
-                    <ListItem key={`${entity.id}-${entity.shot_id}`} sx={{ py: 0, px: 1 }}>
+                    <ListItem
+                      key={`${entity.id}-${entity.shot_id}`}
+                      sx={{ py: 0, px: 1 }}
+                    >
                       <ListItemText
                         sx={{ my: 0 }}
                         primary={
                           "archetype" in entity ? (
                             <CharacterLink character={entity as Character} />
                           ) : (
-                            <Typography variant="body2">{entity.name}</Typography>
+                            <Typography variant="body2">
+                              {entity.name}
+                            </Typography>
                           )
                         }
                       />

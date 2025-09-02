@@ -15,7 +15,13 @@ type FormStateData = {
   selectedChild: Character | null
 }
 
-type OmitType = "character_type" | "archetype" | "faction" | "character" | "add" | "search"
+type OmitType =
+  | "character_type"
+  | "archetype"
+  | "faction"
+  | "character"
+  | "add"
+  | "search"
 
 type CharacterFilterProps = {
   // value is the ID of the selected character
@@ -83,15 +89,17 @@ export default function CharacterFilter({
   }, [client, formState.data.filters, dispatchForm]) // Only depend on filters
 
   useEffect(() => {
-    fetchCharacters()
-      .catch(error => {
-        console.error("Error in useEffect fetchCharacters:", error)
-      })
+    fetchCharacters().catch(error => {
+      console.error("Error in useEffect fetchCharacters:", error)
+    })
   }, [fetchCharacters])
 
   const handleCharacterChange = (character: Character | null) => {
-    console.log("[CharacterFilter] handleCharacterChange called with:", character)
-    
+    console.log(
+      "[CharacterFilter] handleCharacterChange called with:",
+      character
+    )
+
     if (character && addMember) {
       addMember(character)
       // Clear the selection after adding
@@ -108,7 +116,9 @@ export default function CharacterFilter({
     setSelectedChild?.(character)
   }
 
-  const handleFiltersUpdate = (filters: Record<string, string | boolean | null>) => {
+  const handleFiltersUpdate = (
+    filters: Record<string, string | boolean | null>
+  ) => {
     dispatchForm({
       type: FormActions.UPDATE,
       name: "filters",

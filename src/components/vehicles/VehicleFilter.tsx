@@ -58,7 +58,7 @@ export default function VehicleFilter({
         faction_id: filters.faction_id as string,
         search: filters.search as string,
       })
-      
+
       dispatchForm({
         type: FormActions.UPDATE,
         name: "vehicles",
@@ -80,15 +80,14 @@ export default function VehicleFilter({
   }, [client, dispatchForm, formState.data.filters]) // Only depend on filters
 
   useEffect(() => {
-    fetchVehicles()
-      .catch(error => {
-        console.error("Error in useEffect fetchVehicles:", error)
-      })
+    fetchVehicles().catch(error => {
+      console.error("Error in useEffect fetchVehicles:", error)
+    })
   }, [fetchVehicles])
 
   const handleVehicleChange = (vehicle: Vehicle | null) => {
     console.log("[VehicleFilter] handleVehicleChange called with:", vehicle)
-    
+
     if (vehicle && addMember) {
       addMember(vehicle)
       // Clear the selection after adding
@@ -105,7 +104,9 @@ export default function VehicleFilter({
     setSelectedVehicle?.(vehicle)
   }
 
-  const handleFiltersUpdate = (filters: Record<string, string | boolean | null>) => {
+  const handleFiltersUpdate = (
+    filters: Record<string, string | boolean | null>
+  ) => {
     dispatchForm({
       type: FormActions.UPDATE,
       name: "filters",

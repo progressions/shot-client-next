@@ -115,8 +115,8 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
         <ListItemText
           sx={{ ml: 2 }}
           primary={
-            <CharacterHeader 
-              character={character} 
+            <CharacterHeader
+              character={character}
               location={character.location}
               onLocationClick={handleLocationClick}
             />
@@ -200,7 +200,7 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
               label="Location"
               value={newLocation}
               onChange={e => setNewLocation(e.target.value)}
-              onKeyDown={(e) => {
+              onKeyDown={e => {
                 if (e.key === "Enter") {
                   e.preventDefault()
                   handleLocationSave()
