@@ -15,7 +15,10 @@ export default function Character({ character }: CharacterProps) {
         sx={{ display: "flex", flexDirection: "column", gap: 1, flexGrow: 1 }}
       >
         <ActionValues character={character} />
-        <CharacterEffectsDisplay character={character} effects={character.effects || []} />
+        <CharacterEffectsDisplay
+          character={character}
+          effects={character.effects || []}
+        />
       </Box>
       <Actions entity={character} />
     </Box>

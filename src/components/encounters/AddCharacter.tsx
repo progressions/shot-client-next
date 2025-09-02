@@ -5,20 +5,27 @@ import { Stack } from "@mui/material"
 import { CharacterFilter } from "@/components/characters"
 import { type Character } from "@/types"
 import { useEncounter, useToast, useClient } from "@/contexts"
-import { FormActions } from "@/reducers"
 
-export default function AddCharacter({ open, onClose }: { open: boolean; onClose: () => void }) {
+export default function AddCharacter({
+  open,
+  onClose,
+}: {
+  open: boolean
+  onClose: () => void
+}) {
   const { encounter } = useEncounter()
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
-  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null)
+  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
+    null
+  )
 
   const handleAddMember = async (character: Character) => {
     if (!character || !encounter) {
       console.log("Missing character or encounter", { character, encounter })
       return
     }
-    
+
     try {
       console.log("Adding character to fight:", character.name)
       await client.addCharacter(encounter, character)

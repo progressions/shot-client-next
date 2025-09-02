@@ -41,7 +41,7 @@ export function createAttackerUpdate(
 ): CharacterUpdate {
   const currentShot = attackerShot.shot || 0
   const newShot = currentShot - shotCost
-  
+
   const update: CharacterUpdate = {
     shot_id: attackerShot.character?.shot_id,
     character_id: attackerShot.character?.id,
@@ -57,17 +57,17 @@ export function createAttackerUpdate(
       },
     },
   }
-  
+
   // If attacker is spending fortune for extra damage
   if (fortuneSpent && CS.isPC(attacker)) {
     const currentFortune = CS.fortune(attacker)
     if (currentFortune > 0) {
       update.action_values = {
-        Fortune: currentFortune - 1
+        Fortune: currentFortune - 1,
       }
     }
   }
-  
+
   return update
 }
 
@@ -80,16 +80,17 @@ export function createDodgeUpdate(
 ): CharacterUpdate {
   const currentShot = targetShot.shot || 0
   const newShot = currentShot - 1
-  
+
   const update: CharacterUpdate = {
     shot_id: targetChar.shot_id,
     character_id: targetChar.id,
     shot: newShot,
     event: {
       type: "dodge",
-      description: defenseChoice === "fortune" 
-        ? `${targetChar.name} dodges with fortune`
-        : `${targetChar.name} dodges`,
+      description:
+        defenseChoice === "fortune"
+          ? `${targetChar.name} dodges with fortune`
+          : `${targetChar.name} dodges`,
       details: {
         character_id: targetChar.id,
         dodge_type: defenseChoice,
@@ -98,17 +99,17 @@ export function createDodgeUpdate(
       },
     },
   }
-  
+
   // If using fortune dodge, update fortune points for PCs
   if (defenseChoice === "fortune" && CS.isPC(targetChar)) {
     const currentFortune = CS.fortune(targetChar)
     if (currentFortune > 0) {
       update.action_values = {
-        Fortune: currentFortune - 1
+        Fortune: currentFortune - 1,
       }
     }
   }
-  
+
   return update
 }
 
@@ -135,20 +136,22 @@ export function createWoundUpdate(
   const isPC = CS.isPC(targetChar)
   const isMook = CS.isMook(targetChar)
   const currentWounds = CS.wounds(targetChar)
-  const newWounds = isMook 
+  const newWounds = isMook
     ? Math.max(0, currentWounds - wounds) // Reduce mook count
     : currentWounds + wounds // Add wounds for non-mooks
-  
-  const defenseDesc = context.defenseChoice === "fortune"
-    ? ` (Fortune dodge +3 +${context.fortuneDie || 0})`
-    : context.defenseChoice === "dodge"
-      ? " (Dodge +3)"
-      : ""
-  
-  const description = isMook && context.isMookTakedown
-    ? `${attacker.name} took out ${wounds} ${wounds === 1 ? "mook" : "mooks"}${defenseDesc}`
-    : `${attacker.name} attacked ${targetChar.name}${defenseDesc} for ${wounds} wounds`
-  
+
+  const defenseDesc =
+    context.defenseChoice === "fortune"
+      ? ` (Fortune dodge +3 +${context.fortuneDie || 0})`
+      : context.defenseChoice === "dodge"
+        ? " (Dodge +3)"
+        : ""
+
+  const description =
+    isMook && context.isMookTakedown
+      ? `${attacker.name} took out ${wounds} ${wounds === 1 ? "mook" : "mooks"}${defenseDesc}`
+      : `${attacker.name} attacked ${targetChar.name}${defenseDesc} for ${wounds} wounds`
+
   const update: CharacterUpdate = {
     shot_id: targetChar.shot_id,
     character_id: targetChar.id,
@@ -175,11 +178,11 @@ export function createWoundUpdate(
       },
     },
   }
-  
+
   // For PCs, update action values (wounds go there)
   if (isPC) {
     update.action_values = {
-      Wounds: newWounds
+      Wounds: newWounds,
     }
   } else {
     // For NPCs and mooks, wounds/count go on the shot record
@@ -189,7 +192,7 @@ export function createWoundUpdate(
       update.wounds = newWounds
     }
   }
-  
+
   return update
 }
 
@@ -209,7 +212,7 @@ export function createMookVsMookUpdate(
 ): CharacterUpdate {
   const currentCount = targetChar.count || 0
   const newCount = Math.max(0, currentCount - mooksEliminated)
-  
+
   return {
     shot_id: targetChar.shot_id || "",
     character_id: targetChar.id,
@@ -251,7 +254,7 @@ export function createMookVsNonMookUpdate(
   const isPC = CS.isPC(targetChar)
   const currentWounds = CS.wounds(targetChar)
   const newWounds = currentWounds + totalWounds
-  
+
   // Calculate impairments
   const originalImpairments = targetChar.impairments || 0
   const impairmentChange = CS.calculateImpairments(
@@ -260,7 +263,7 @@ export function createMookVsNonMookUpdate(
     newWounds
   )
   const newImpairments = originalImpairments + impairmentChange
-  
+
   const update: CharacterUpdate = {
     shot_id: targetChar.shot_id || "",
     character_id: targetChar.id,
@@ -282,16 +285,16 @@ export function createMookVsNonMookUpdate(
       },
     },
   }
-  
+
   // For PCs, update action values (wounds go there)
   if (isPC) {
     update.action_values = {
-      Wounds: newWounds
+      Wounds: newWounds,
     }
   } else {
     // For NPCs, wounds go on the shot record
     update.wounds = newWounds
   }
-  
+
   return update
 }

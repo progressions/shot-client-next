@@ -149,7 +149,12 @@ export default function Show({ weapon: initialWeapon }: ShowProperties) {
         </FormControl>
       </Box>
       <WeaponChips weapon={weapon} />
-      <Stats weapon={weapon} updateWeapon={updateEntity} handleChangeAndSave={handleChangeAndSave} state={formState} />
+      <Stats
+        weapon={weapon}
+        updateWeapon={updateEntity}
+        handleChangeAndSave={handleChangeAndSave}
+        state={formState}
+      />
       <SectionHeader title="Description" icon={<VscGithubAction size="24" />} />
       <EditableRichText
         name="description"

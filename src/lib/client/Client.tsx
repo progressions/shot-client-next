@@ -52,6 +52,11 @@ export default function createClient(parameters: ClientParameters = {}) {
     ...schtick.createSchtickClient({ jwt, api, apiV2, queryParams }),
     ...ai.createAiClient({ jwt, api, apiV2 }),
     ...editor.createEditorClient({ jwt, api, apiV2, queryParams }),
-    ...characterEffect.createCharacterEffectClient({ jwt, api, apiV2, queryParams }),
+    ...characterEffect.createCharacterEffectClient({
+      jwt,
+      api,
+      apiV2,
+      queryParams,
+    }),
   }
 }

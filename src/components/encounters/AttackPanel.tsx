@@ -29,10 +29,10 @@ import {
   getAllVisibleShots,
 } from "./attacks/shotSorting"
 import { createFieldUpdater, createFieldsUpdater } from "./attacks/formHelpers"
-import { 
-  handleNonMookMultipleTargets, 
-  handleMookAttack, 
-  handleSingleTargetAttack 
+import {
+  handleNonMookMultipleTargets,
+  handleMookAttack,
+  handleSingleTargetAttack,
 } from "./attacks/attackHandlers"
 
 export default function AttackPanel({ onClose }: AttackPanelProps) {
@@ -699,10 +699,14 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
   const handleApplyDamage = async () => {
     updateField("isProcessing", true)
-    
+
     try {
       // Handle non-mook attacker with multiple targets
-      if (!CS.isMook(attacker) && selectedTargetIds.length > 0 && multiTargetResults.length > 0) {
+      if (
+        !CS.isMook(attacker) &&
+        selectedTargetIds.length > 0 &&
+        multiTargetResults.length > 0
+      ) {
         await handleNonMookMultipleTargets(
           client,
           encounter,
@@ -728,7 +732,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           toastError,
           formState
         )
-        
+
         // Reset form
         updateFields({
           selectedTargetIds: [],
@@ -744,13 +748,17 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           manualToughnessPerTarget: {},
           targetMookCount: 1,
         })
-        
+
         if (onClose) onClose()
         return
       }
 
       // Handle mook attackers (single or multiple targets)
-      if (CS.isMook(attacker) && selectedTargetIds.length >= 1 && mookRolls.length > 0) {
+      if (
+        CS.isMook(attacker) &&
+        selectedTargetIds.length >= 1 &&
+        mookRolls.length > 0
+      ) {
         await handleMookAttack(
           client,
           encounter,
@@ -765,7 +773,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           toastSuccess,
           toastError
         )
-        
+
         // Reset form
         updateFields({
           selectedTargetIds: [],
@@ -780,13 +788,18 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           fortuneDiePerTarget: {},
           defenseAppliedPerTarget: {},
         })
-        
+
         if (onClose) onClose()
         return
       }
 
       // Handle single-target attack for non-mook attackers
-      if (!CS.isMook(attacker) && selectedTargetIds.length === 1 && finalDamage && target) {
+      if (
+        !CS.isMook(attacker) &&
+        selectedTargetIds.length === 1 &&
+        finalDamage &&
+        target
+      ) {
         await handleSingleTargetAttack(
           client,
           encounter,
@@ -804,7 +817,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           toastSuccess,
           toastError
         )
-        
+
         // Reset form
         updateFields({
           targetShotId: "",
@@ -820,7 +833,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           fortuneDiePerTarget: {},
           defenseAppliedPerTarget: {},
         })
-        
+
         if (onClose) onClose()
         return
       }

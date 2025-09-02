@@ -10,17 +10,33 @@ type ActionValuesProps = {
 
 export default function ActionValues({ character }: ActionValuesProps) {
   const { encounter } = useEncounter()
-  
+
   // Get adjusted values with effect indicators
-  const getAdjustedValue = (name: string, baseValue: number, ignoreImpairments: boolean = false) => {
+  const getAdjustedValue = (
+    name: string,
+    baseValue: number,
+    ignoreImpairments: boolean = false
+  ) => {
     if (!encounter) return { value: baseValue, change: 0 }
-    
-    const [change, adjustedValue] = CES.adjustedValue(character, baseValue, name, encounter, ignoreImpairments)
+
+    const [change, adjustedValue] = CES.adjustedValue(
+      character,
+      baseValue,
+      name,
+      encounter,
+      ignoreImpairments
+    )
     return { value: adjustedValue, change }
   }
 
-  const mainAttackData = getAdjustedValue(CS.mainAttack(character), CS.mainAttackValue(character))
-  const secondaryAttackData = getAdjustedValue(CS.secondaryAttack(character), CS.secondaryAttackValue(character))
+  const mainAttackData = getAdjustedValue(
+    CS.mainAttack(character),
+    CS.mainAttackValue(character)
+  )
+  const secondaryAttackData = getAdjustedValue(
+    CS.secondaryAttack(character),
+    CS.secondaryAttackValue(character)
+  )
   const defenseData = getAdjustedValue("Defense", CS.defense(character))
   const toughnessData = getAdjustedValue("Toughness", CS.toughness(character))
   const speedData = getAdjustedValue("Speed", CS.speed(character))
@@ -48,8 +64,8 @@ export default function ActionValues({ character }: ActionValuesProps) {
         value={secondaryAttackData.value}
         change={secondaryAttackData.change}
       />
-      <AV 
-        label="Defense" 
+      <AV
+        label="Defense"
         value={defenseData.value}
         change={defenseData.change}
       />
@@ -58,21 +74,13 @@ export default function ActionValues({ character }: ActionValuesProps) {
         value={CS.fortune(character)}
         maxValue={CS.maxFortune(character)}
       />
-      <AV 
-        label="Toughness" 
+      <AV
+        label="Toughness"
         value={toughnessData.value}
         change={toughnessData.change}
       />
-      <AV 
-        label="Speed" 
-        value={speedData.value}
-        change={speedData.change}
-      />
-      <AV 
-        label="Damage" 
-        value={damageData.value}
-        change={damageData.change}
-      />
+      <AV label="Speed" value={speedData.value} change={speedData.change} />
+      <AV label="Damage" value={damageData.value} change={damageData.change} />
     </Stack>
   )
 }

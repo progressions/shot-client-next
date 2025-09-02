@@ -1,12 +1,12 @@
 import type { Character, Encounter, Shot, Weapon } from "@/types"
 import { CS } from "@/services"
-import { 
-  CharacterUpdate, 
-  createAttackerUpdate, 
-  createDodgeUpdate, 
+import {
+  CharacterUpdate,
+  createAttackerUpdate,
+  createDodgeUpdate,
   createWoundUpdate,
   createMookVsMookUpdate,
-  createMookVsNonMookUpdate
+  createMookVsNonMookUpdate,
 } from "./combatHandlers"
 
 interface MultiTargetResult {
@@ -49,7 +49,11 @@ export async function handleNonMookMultipleTargets(
   fortuneDiePerTarget: Record<string, string>,
   targetMookCount: number,
   calculateTargetDefense: (target: Character, targetId: string) => number,
-  calculateEffectiveAttackValue: (attacker: Character, weapons: Weapon[], shots: Shot[]) => number,
+  calculateEffectiveAttackValue: (
+    attacker: Character,
+    weapons: Weapon[],
+    shots: Shot[]
+  ) => number,
   attackerWeapons: Weapon[],
   toastSuccess: (msg: string) => void,
   toastInfo: (msg: string) => void,
@@ -61,8 +65,8 @@ export async function handleNonMookMultipleTargets(
 
   // Add attacker's shot spending
   const attackerUpdate = createAttackerUpdate(
-    attackerShot, 
-    attacker, 
+    attackerShot,
+    attacker,
     shots,
     formState.data.fortuneSpent
   )
@@ -82,7 +86,7 @@ export async function handleNonMookMultipleTargets(
           fortuneDiePerTarget[targetId]
         )
         characterUpdates.push(dodgeUpdate)
-        
+
         if (choice === "fortune") {
           const fortuneRoll = fortuneDiePerTarget[targetId] || "0"
           toastInfo(
@@ -97,30 +101,34 @@ export async function handleNonMookMultipleTargets(
 
   // Collect wounds updates for each target
   for (const result of multiTargetResults) {
-    const targetShot = allShots.find(s => s.character?.shot_id === result.targetId)
+    const targetShot = allShots.find(
+      s => s.character?.shot_id === result.targetId
+    )
     const targetChar = targetShot?.character
     if (!targetChar) continue
 
     // Calculate effective wounds considering defense choices
     const currentDefense = calculateTargetDefense(targetChar, result.targetId)
-    const hasDefenseModifier = 
-      defenseChoicePerTarget[result.targetId] && 
+    const hasDefenseModifier =
+      defenseChoicePerTarget[result.targetId] &&
       defenseChoicePerTarget[result.targetId] !== "none"
 
     let effectiveWounds = result.wounds
     if (hasDefenseModifier && selectedTargetIds.length > 1) {
       // For multiple targets with dodge, recalculate outcome for this specific target
       const individualOutcome =
-        parseInt(attackValue || "0") +
-        parseInt(swerve || "0") -
-        currentDefense
+        parseInt(attackValue || "0") + parseInt(swerve || "0") - currentDefense
       if (individualOutcome >= 0) {
         // For mooks, wounds = number taken out; for others, calculate normally
         if (CS.isMook(targetChar)) {
           effectiveWounds = targetMookCount // Still take out the targeted number if hit
         } else {
-          const individualSmackdown = individualOutcome + parseInt(weaponDamage || "0")
-          effectiveWounds = Math.max(0, individualSmackdown - CS.toughness(targetChar))
+          const individualSmackdown =
+            individualOutcome + parseInt(weaponDamage || "0")
+          effectiveWounds = Math.max(
+            0,
+            individualSmackdown - CS.toughness(targetChar)
+          )
         }
       } else {
         effectiveWounds = 0
@@ -144,9 +152,10 @@ export async function handleNonMookMultipleTargets(
     const newImpairments = originalImpairments + impairmentChange
 
     const defenseChoice = defenseChoicePerTarget[result.targetId] || "none"
-    const fortuneDie = defenseChoice === "fortune" 
-      ? parseInt(fortuneDiePerTarget[result.targetId] || "0")
-      : undefined
+    const fortuneDie =
+      defenseChoice === "fortune"
+        ? parseInt(fortuneDiePerTarget[result.targetId] || "0")
+        : undefined
 
     const woundUpdate = createWoundUpdate(
       targetChar,
@@ -156,7 +165,11 @@ export async function handleNonMookMultipleTargets(
       attacker,
       attackerShot,
       {
-        attackValue: calculateEffectiveAttackValue(attacker, attackerWeapons, allShots),
+        attackValue: calculateEffectiveAttackValue(
+          attacker,
+          attackerWeapons,
+          allShots
+        ),
         defenseValue: parseInt(defenseValue),
         swerve: parseInt(swerve),
         weaponDamage: parseInt(weaponDamage),
@@ -164,10 +177,10 @@ export async function handleNonMookMultipleTargets(
         stunt,
         defenseChoice,
         fortuneDie,
-        isMookTakedown: CS.isMook(targetChar)
+        isMookTakedown: CS.isMook(targetChar),
       }
     )
-    
+
     characterUpdates.push(woundUpdate)
 
     const isMook = CS.isMook(targetChar)
@@ -193,7 +206,11 @@ export async function handleMookAttack(
   mookRolls: MookRoll[],
   shotCost: number,
   weaponDamage: string,
-  calculateEffectiveAttackValue: (attacker: Character, weapons: Weapon[], shots: Shot[]) => number,
+  calculateEffectiveAttackValue: (
+    attacker: Character,
+    weapons: Weapon[],
+    shots: Shot[]
+  ) => number,
   attackerWeapons: Weapon[],
   toastSuccess: (msg: string) => void,
   toastError: (msg: string) => void
@@ -209,7 +226,9 @@ export async function handleMookAttack(
 
   // Collect wounds updates for each target
   for (const targetGroup of mookRolls) {
-    const targetShot = allShots.find(s => s.character?.shot_id === targetGroup.targetId)
+    const targetShot = allShots.find(
+      s => s.character?.shot_id === targetGroup.targetId
+    )
     const targetChar = targetShot?.character
     if (!targetChar) continue
 
@@ -227,13 +246,19 @@ export async function handleMookAttack(
         targetGroup.rolls.length,
         targetGroup.rolls.filter(r => r.hit).length,
         {
-          attackValue: calculateEffectiveAttackValue(attacker, attackerWeapons, allShots),
+          attackValue: calculateEffectiveAttackValue(
+            attacker,
+            attackerWeapons,
+            allShots
+          ),
           defenseValue: CS.defense(targetChar),
-          shotCost: shots
+          shotCost: shots,
         }
       )
       characterUpdates.push(update)
-      toastSuccess(`Eliminated ${totalWounds} ${targetChar.name}${totalWounds !== 1 ? "s" : ""}`)
+      toastSuccess(
+        `Eliminated ${totalWounds} ${targetChar.name}${totalWounds !== 1 ? "s" : ""}`
+      )
     } else {
       // Mook vs non-mook: apply wounds normally
       const update = createMookVsNonMookUpdate(
@@ -244,14 +269,20 @@ export async function handleMookAttack(
         targetGroup.rolls.length,
         targetGroup.rolls.filter(r => r.hit).length,
         {
-          attackValue: calculateEffectiveAttackValue(attacker, attackerWeapons, allShots),
+          attackValue: calculateEffectiveAttackValue(
+            attacker,
+            attackerWeapons,
+            allShots
+          ),
           defenseValue: CS.defense(targetChar),
           weaponDamage: parseInt(weaponDamage),
-          shotCost: shots
+          shotCost: shots,
         }
       )
       characterUpdates.push(update)
-      toastSuccess(`Applied ${totalWounds} wound${totalWounds !== 1 ? "s" : ""} to ${targetChar.name}`)
+      toastSuccess(
+        `Applied ${totalWounds} wound${totalWounds !== 1 ? "s" : ""} to ${targetChar.name}`
+      )
     }
   }
 
@@ -281,7 +312,7 @@ export async function handleSingleTargetAttack(
 ): Promise<void> {
   const shots = parseInt(shotCost) || 3
   const damage = parseInt(finalDamage) || 0
-  
+
   const characterUpdates: CharacterUpdate[] = []
 
   // Add attacker's shot spending
@@ -299,10 +330,10 @@ export async function handleSingleTargetAttack(
     // For non-mooks, subtract toughness from smackdown
     const toughness = parseInt(toughnessValue) || CS.toughness(targetChar) || 0
     actualWoundsDealt = Math.max(0, damage - toughness)
-    
+
     const currentWounds = CS.wounds(targetChar)
     const newWounds = currentWounds + actualWoundsDealt
-    
+
     // Calculate impairments
     const originalImpairments = targetChar.impairments || 0
     const impairmentChange = CS.calculateImpairments(
@@ -328,10 +359,10 @@ export async function handleSingleTargetAttack(
       weaponDamage: parseInt(weaponDamage),
       shotCost: shots,
       stunt,
-      isMookTakedown: CS.isMook(targetChar)
+      isMookTakedown: CS.isMook(targetChar),
     }
   )
-  
+
   characterUpdates.push(woundUpdate)
 
   // Send combat action

@@ -113,7 +113,7 @@ export function createFightClient(deps: ClientDependencies) {
       impairments?: number
       defense?: number
       action_values?: Record<string, number>
-      attributes?: Record<string, any>
+      attributes?: Record<string, unknown>
       event?: {
         type: string
         description: string

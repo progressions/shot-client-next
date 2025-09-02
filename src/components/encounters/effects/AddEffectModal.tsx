@@ -10,7 +10,7 @@ import {
   MenuItem,
   Stack,
   Box,
-  IconButton
+  IconButton,
 } from "@mui/material"
 import CircleIcon from "@mui/icons-material/Circle"
 import { useState } from "react"
@@ -29,14 +29,18 @@ const severityOptions: { value: Severity; label: string }[] = [
   { value: "error", label: "Danger (Red)" },
   { value: "warning", label: "Warning (Yellow)" },
   { value: "info", label: "Info (Blue)" },
-  { value: "success", label: "Success (Green)" }
+  { value: "success", label: "Success (Green)" },
 ]
 
-export default function AddEffectModal({ open, onClose, character }: AddEffectModalProps) {
+export default function AddEffectModal({
+  open,
+  onClose,
+  character,
+}: AddEffectModalProps) {
   const { encounter } = useEncounter()
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
-  
+
   const [saving, setSaving] = useState(false)
   const [effect, setEffect] = useState<Partial<CharacterEffect>>({
     name: "",
@@ -44,34 +48,35 @@ export default function AddEffectModal({ open, onClose, character }: AddEffectMo
     action_value: "",
     change: "",
     character_id: character.id,
-    shot_id: character.shot_id
+    shot_id: character.shot_id,
   })
 
   // Define available action values based on character type
-  const actionValues = character.entity_class === "Vehicle"
-    ? [
-        { label: "Acceleration", value: "Acceleration" },
-        { label: "Handling", value: "Handling" },
-        { label: "Frame", value: "Frame" },
-        { label: "Crunch", value: "Crunch" }
-      ]
-    : [
-        { label: "Attack", value: "MainAttack" },
-        { label: "Defense", value: "Defense" },
-        { label: "Toughness", value: "Toughness" },
-        { label: "Speed", value: "Speed" },
-        { label: "Damage", value: "Damage" },
-        { label: "Fortune", value: "Fortune" }
-      ]
+  const actionValues =
+    character.entity_class === "Vehicle"
+      ? [
+          { label: "Acceleration", value: "Acceleration" },
+          { label: "Handling", value: "Handling" },
+          { label: "Frame", value: "Frame" },
+          { label: "Crunch", value: "Crunch" },
+        ]
+      : [
+          { label: "Attack", value: "MainAttack" },
+          { label: "Defense", value: "Defense" },
+          { label: "Toughness", value: "Toughness" },
+          { label: "Speed", value: "Speed" },
+          { label: "Damage", value: "Damage" },
+          { label: "Fortune", value: "Fortune" },
+        ]
 
-  const handleChange = (field: keyof CharacterEffect) => (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setEffect(prev => ({
-      ...prev,
-      [field]: event.target.value
-    }))
-  }
+  const handleChange =
+    (field: keyof CharacterEffect) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setEffect(prev => ({
+        ...prev,
+        [field]: event.target.value,
+      }))
+    }
 
   const handleSubmit = async () => {
     if (!effect.name) {
@@ -85,10 +90,13 @@ export default function AddEffectModal({ open, onClose, character }: AddEffectMo
       const effectToSend: any = {
         ...effect,
         action_value: effect.action_value || undefined,
-        change: effect.change || undefined
+        change: effect.change || undefined,
       }
-      
-      await client.createCharacterEffect(encounter, effectToSend as CharacterEffect)
+
+      await client.createCharacterEffect(
+        encounter,
+        effectToSend as CharacterEffect
+      )
       toastSuccess(`Added effect: ${effect.name}`)
       handleClose()
     } catch (error) {
@@ -106,18 +114,13 @@ export default function AddEffectModal({ open, onClose, character }: AddEffectMo
       action_value: "",
       change: "",
       character_id: character.id,
-      shot_id: character.shot_id
+      shot_id: character.shot_id,
     })
     onClose()
   }
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={handleClose}
-      maxWidth="sm"
-      fullWidth
-    >
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>Add Effect to {character.name}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
@@ -135,20 +138,30 @@ export default function AddEffectModal({ open, onClose, character }: AddEffectMo
               {severityOptions.map(option => (
                 <IconButton
                   key={option.value}
-                  onClick={() => setEffect(prev => ({ ...prev, severity: option.value }))}
+                  onClick={() =>
+                    setEffect(prev => ({ ...prev, severity: option.value }))
+                  }
                   sx={{
                     p: 0.25,
                     border: effect.severity === option.value ? 2 : 0,
-                    borderColor: effect.severity === option.value ? "primary.main" : "transparent"
+                    borderColor:
+                      effect.severity === option.value
+                        ? "primary.main"
+                        : "transparent",
                   }}
                 >
-                  <CircleIcon 
-                    sx={{ 
-                      color: option.value === "error" ? "error.main" : 
-                             option.value === "warning" ? "warning.main" :
-                             option.value === "info" ? "info.main" : "success.main",
-                      fontSize: 24
-                    }} 
+                  <CircleIcon
+                    sx={{
+                      color:
+                        option.value === "error"
+                          ? "error.main"
+                          : option.value === "warning"
+                            ? "warning.main"
+                            : option.value === "info"
+                              ? "info.main"
+                              : "success.main",
+                      fontSize: 24,
+                    }}
                   />
                 </IconButton>
               ))}
@@ -190,9 +203,9 @@ export default function AddEffectModal({ open, onClose, character }: AddEffectMo
         <Button onClick={handleClose} disabled={saving}>
           Cancel
         </Button>
-        <Button 
-          onClick={handleSubmit} 
-          variant="contained" 
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
           disabled={saving || !effect.name}
         >
           {saving ? "Adding..." : "Add Effect"}
@@ -201,3 +214,4 @@ export default function AddEffectModal({ open, onClose, character }: AddEffectMo
     </Dialog>
   )
 }
+

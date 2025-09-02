@@ -18,7 +18,7 @@ export function createCharacterEffectClient(deps: ClientDependencies) {
     effect: Partial<CharacterEffect>
   ): Promise<AxiosResponse<CharacterEffect>> {
     return post(`${api.fights(encounter)}/character_effects`, {
-      character_effect: effect
+      character_effect: effect,
     })
   }
 
@@ -27,7 +27,7 @@ export function createCharacterEffectClient(deps: ClientDependencies) {
     effect: CharacterEffect
   ): Promise<AxiosResponse<CharacterEffect>> {
     return patch(`${api.fights(encounter)}/character_effects/${effect.id}`, {
-      character_effect: effect
+      character_effect: effect,
     })
   }
 
@@ -48,6 +48,6 @@ export function createCharacterEffectClient(deps: ClientDependencies) {
     createCharacterEffect,
     updateCharacterEffect,
     deleteCharacterEffect,
-    getCharacterEffects
+    getCharacterEffects,
   }
 }

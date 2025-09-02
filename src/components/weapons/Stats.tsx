@@ -22,7 +22,11 @@ type FormStateData = {
 type StatsProps = {
   weapon: Weapon
   updateWeapon: (weapon: Weapon) => Promise<void>
-  handleChangeAndSave: (event: React.ChangeEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>) => Promise<void>
+  handleChangeAndSave: (
+    event:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.FocusEvent<HTMLInputElement>
+  ) => Promise<void>
   state?: FormStateType<FormStateData>
 }
 
@@ -69,7 +73,6 @@ export default function Stats({
     })
     await updateWeapon(updatedWeapon)
   }
-
 
   return (
     <Box>

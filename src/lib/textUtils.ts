@@ -5,7 +5,7 @@
  */
 export function decodeHtmlEntities(text: string): string {
   if (!text) return text
-  
+
   // Decode common HTML entities
   return text
     .replace(/&amp;/g, "&")
