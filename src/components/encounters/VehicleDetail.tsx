@@ -20,11 +20,12 @@ import {
   TextField,
 } from "@mui/material"
 import { FaTimes } from "react-icons/fa"
+import { MdEdit } from "react-icons/md"
 import {
   VehicleHeader,
   ChaseConditionPoints,
   Vehicle,
-  Actions,
+  VehicleEditDialog,
 } from "@/components/encounters"
 import { encounterTransition } from "@/contexts/EncounterContext"
 import { useEncounter, useClient, useToast } from "@/contexts"
@@ -38,8 +39,17 @@ export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [locationDialogOpen, setLocationDialogOpen] = useState(false)
   const [newLocation, setNewLocation] = useState(vehicle.location || "")
+
+  const handleEditClick = () => {
+    setEditDialogOpen(true)
+  }
+
+  const handleEditClose = () => {
+    setEditDialogOpen(false)
+  }
 
   const handleRemoveClick = () => {
     setConfirmOpen(true)
@@ -100,13 +110,7 @@ export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
           alignItems: "flex-start",
           position: "relative",
           pr: 0,
-          "& .MuiListItemSecondaryAction-root": {
-            right: 0,
-            top: "50%",
-            transform: "translateY(-50%)",
-          },
         }}
-        secondaryAction={<Actions entity={vehicle} />}
       >
         <ListItemIcon sx={{ mt: 0 }}>
           <ChaseConditionPoints vehicle={vehicle} />
@@ -122,6 +126,24 @@ export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
           }
           secondary={<Vehicle vehicle={vehicle} />}
         />
+        <Tooltip title="Edit vehicle details">
+          <IconButton
+            onClick={handleEditClick}
+            size="small"
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: 40,
+              color: "text.secondary",
+              "&:hover": {
+                color: "primary.main",
+                backgroundColor: "action.hover",
+              },
+            }}
+          >
+            <MdEdit />
+          </IconButton>
+        </Tooltip>
         <Tooltip title="Remove from encounter">
           <IconButton
             aria-label="remove"
@@ -205,6 +227,13 @@ export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Vehicle Edit Dialog */}
+      <VehicleEditDialog
+        open={editDialogOpen}
+        onClose={handleEditClose}
+        vehicle={vehicle}
+      />
     </motion.div>
   )
 }

@@ -161,6 +161,48 @@ export function createVehicleClient(deps: ClientDependencies) {
     return delete_(`${apiV2.fights(fight)}/shots/${vehicle.shot_id}`)
   }
 
+  async function updateVehicleCombatStats(
+    vehicleId: string,
+    updates: {
+      name?: string
+      action_values?: Record<string, unknown>
+    }
+  ): Promise<AxiosResponse<Vehicle>> {
+    return patch(`${apiV2.vehicles({ id: vehicleId })}`, {
+      vehicle: updates,
+    })
+  }
+
+  async function updateVehicleShot(
+    fight: Fight | import("@/types").Encounter,
+    vehicle: Vehicle,
+    updates: {
+      shot_id: string
+      current_shot?: number
+      impairments?: number
+    }
+  ): Promise<AxiosResponse<void>> {
+    // Use V2 API for shot updates
+    return patch(`${apiV2.fights(fight)}/shots/${updates.shot_id}`, {
+      shot: {
+        shot: updates.current_shot,
+        impairments: updates.impairments,
+      },
+    })
+  }
+
+  async function updateShotLocation(
+    fight: Fight | import("@/types").Encounter,
+    shotId: string,
+    location: string
+  ): Promise<AxiosResponse<void>> {
+    return patch(`${apiV2.fights(fight)}/shots/${shotId}`, {
+      shot: {
+        location: location,
+      },
+    })
+  }
+
   return {
     getLocationForVehicle,
     setVehicleLocation,
@@ -178,5 +220,8 @@ export function createVehicleClient(deps: ClientDependencies) {
     showVehicle,
     getAllVehicles,
     removeVehicleFromFight,
+    updateVehicleCombatStats,
+    updateVehicleShot,
+    updateShotLocation,
   }
 }

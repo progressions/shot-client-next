@@ -15,45 +15,41 @@ import {
 } from "@mui/material"
 import { NumberField } from "@/components/ui"
 import { useClient, useToast, useEncounter } from "@/contexts"
-import { CS } from "@/services"
-import type { Character } from "@/types"
+import type { Vehicle } from "@/types"
 
-interface CharacterEditDialogProps {
+interface VehicleEditDialogProps {
   open: boolean
   onClose: () => void
-  character: Character
+  vehicle: Vehicle
 }
 
-export default function CharacterEditDialog({
+export default function VehicleEditDialog({
   open,
   onClose,
-  character,
-}: CharacterEditDialogProps) {
+  vehicle,
+}: VehicleEditDialogProps) {
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
   const { encounter } = useEncounter()
 
   // Form state
-  const [name, setName] = useState(character.name)
+  const [name, setName] = useState(vehicle.name)
   const [currentShot, setCurrentShot] = useState<number | null>(0)
-  const [wounds, setWounds] = useState<number>(0)
+  const [chasePoints, setChasePoints] = useState<number>(0)
+  const [conditionPoints, setConditionPoints] = useState<number>(0)
   const [impairments, setImpairments] = useState<number>(0)
-  const [marksOfDeath, setMarksOfDeath] = useState<number>(0)
   const [loading, setLoading] = useState(false)
-
-  // Helper to check if character is PC
-  const isPC = () => CS.isPC(character)
 
   // Initialize form values when dialog opens
   useEffect(() => {
     if (open) {
-      setName(character.name || "")
-      // Get current shot from character's shot_id data
-      // For now, using the current_shot field if available
-      const characterWithShot = character as Character & {
+      setName(vehicle.name || "")
+
+      // Get current shot from vehicle's shot data
+      const vehicleWithShot = vehicle as Vehicle & {
         current_shot?: number | string | null
       }
-      const shot = characterWithShot.current_shot
+      const shot = vehicleWithShot.current_shot
 
       // Handle null (hidden), 0 (shot 0), or other numbers
       if (shot === null || shot === undefined || shot === "") {
@@ -64,38 +60,29 @@ export default function CharacterEditDialog({
         )
       }
 
-      // Get wounds from action_values
-      setWounds(character.action_values?.Wounds || 0)
+      // Get chase points from action_values
+      setChasePoints(vehicle.action_values?.["Chase Points"] || 0)
 
-      // Get marks of death from action_values
-      setMarksOfDeath(character.action_values?.["Marks of Death"] || 0)
+      // Get condition points from action_values
+      setConditionPoints(vehicle.action_values?.["Condition Points"] || 0)
 
-      // Get impairments based on character type
-      if (isPC()) {
-        // For PCs, impairments are on the character model
-        setImpairments(character.impairments || 0)
-      } else {
-        // For non-PCs, impairments would be on the shot association
-        // We'll need to get this from the shot data
-        const characterWithShotImpairments = character as Character & {
-          shot_impairments?: number
-        }
-        setImpairments(
-          characterWithShotImpairments.shot_impairments ||
-            character.impairments ||
-            0
-        )
+      // Get impairments from shot data
+      const vehicleWithShotImpairments = vehicle as Vehicle & {
+        shot_impairments?: number
       }
+      setImpairments(
+        vehicleWithShotImpairments.shot_impairments || vehicle.impairments || 0
+      )
     }
-  }, [open, character])
+  }, [open, vehicle])
 
   // Validation
   const isValid = () => {
     return (
       name.trim().length > 0 &&
-      wounds >= 0 &&
-      impairments >= 0 &&
-      marksOfDeath >= 0
+      chasePoints >= 0 &&
+      conditionPoints >= 0 &&
+      impairments >= 0
     )
   }
 
@@ -108,32 +95,26 @@ export default function CharacterEditDialog({
 
     setLoading(true)
     try {
-      // Prepare character update payload
-      interface CharacterUpdate {
+      // Prepare vehicle update payload
+      interface VehicleUpdate {
         name: string
         action_values: Record<string, unknown>
-        impairments?: number
       }
 
-      const characterUpdate: CharacterUpdate = {
+      const vehicleUpdate: VehicleUpdate = {
         name: name.trim(),
         action_values: {
-          ...character.action_values,
-          Wounds: wounds,
-          "Marks of Death": marksOfDeath,
+          ...vehicle.action_values,
+          "Chase Points": chasePoints,
+          "Condition Points": conditionPoints,
         },
       }
 
-      // Add impairments for PCs
-      if (isPC()) {
-        characterUpdate.impairments = impairments
-      }
-
-      // Update character
-      await client.updateCharacterCombatStats(character.id, characterUpdate)
+      // Update vehicle
+      await client.updateVehicleCombatStats(vehicle.id, vehicleUpdate)
 
       // Update shot if we have shot data
-      if (character.shot_id) {
+      if (vehicle.shot_id) {
         interface ShotUpdate {
           shot_id: string
           current_shot: number | null
@@ -141,24 +122,22 @@ export default function CharacterEditDialog({
         }
 
         const shotUpdate: ShotUpdate = {
-          shot_id: character.shot_id,
+          shot_id: vehicle.shot_id,
           current_shot: currentShot,
         }
 
-        // Add impairments for non-PCs
-        if (!isPC()) {
-          shotUpdate.impairments = impairments
-        }
+        // Add impairments for vehicles (stored on shot)
+        shotUpdate.impairments = impairments
 
-        // Update shot (we'll need to implement this method)
-        await client.updateCharacterShot(encounter, character, shotUpdate)
+        // Update shot
+        await client.updateVehicleShot(encounter, vehicle, shotUpdate)
       }
 
       toastSuccess(`Updated ${name}`)
       onClose()
     } catch (error) {
-      console.error("Error updating character:", error)
-      toastError(`Failed to update ${character.name}`)
+      console.error("Error updating vehicle:", error)
+      toastError(`Failed to update ${vehicle.name}`)
     } finally {
       setLoading(false)
     }
@@ -166,13 +145,13 @@ export default function CharacterEditDialog({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Edit {character.name}</DialogTitle>
+      <DialogTitle>Edit {vehicle.name}</DialogTitle>
       <DialogContent>
         <Stack spacing={2.5} sx={{ pt: 2 }}>
           {/* Name field */}
           <TextField
             fullWidth
-            label="Character Name"
+            label="Vehicle Name"
             value={name}
             onChange={e => setName(e.target.value)}
             disabled={loading}
@@ -194,21 +173,15 @@ export default function CharacterEditDialog({
                 </Typography>
                 <NumberField
                   value={currentShot}
-                  onChange={(
-                    e: React.ChangeEvent<HTMLInputElement> | number
-                  ) => {
-                    const val =
-                      typeof e === "object" && "target" in e
-                        ? e.target.value
-                        : e
-                    if (val === "" || val === null) {
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const val = e.target.value
+                    if (val === "") {
                       setCurrentShot(null)
                     } else {
-                      setCurrentShot(
-                        typeof val === "number"
-                          ? val
-                          : parseInt(String(val)) || 0
-                      )
+                      const num = parseInt(val)
+                      if (!isNaN(num)) {
+                        setCurrentShot(num)
+                      }
                     }
                   }}
                   onBlur={() => {}}
@@ -224,10 +197,10 @@ export default function CharacterEditDialog({
                   color="text.secondary"
                   sx={{ display: "block", mb: 0.5 }}
                 >
-                  Wounds
+                  Chase Points
                 </Typography>
                 <NumberField
-                  value={wounds}
+                  value={chasePoints}
                   onChange={(
                     e: React.ChangeEvent<HTMLInputElement> | number
                   ) => {
@@ -235,7 +208,36 @@ export default function CharacterEditDialog({
                       typeof e === "object" && "target" in e
                         ? e.target.value
                         : e
-                    setWounds(
+                    setChasePoints(
+                      typeof val === "number" ? val : parseInt(String(val)) || 0
+                    )
+                  }}
+                  onBlur={() => {}}
+                  min={0}
+                  disabled={loading}
+                  size="small"
+                  fullWidth
+                />
+              </Grid>
+
+              <Grid item xs={3}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "block", mb: 0.5 }}
+                >
+                  Condition Points
+                </Typography>
+                <NumberField
+                  value={conditionPoints}
+                  onChange={(
+                    e: React.ChangeEvent<HTMLInputElement> | number
+                  ) => {
+                    const val =
+                      typeof e === "object" && "target" in e
+                        ? e.target.value
+                        : e
+                    setConditionPoints(
                       typeof val === "number" ? val : parseInt(String(val)) || 0
                     )
                   }}
@@ -265,35 +267,6 @@ export default function CharacterEditDialog({
                         ? e.target.value
                         : e
                     setImpairments(
-                      typeof val === "number" ? val : parseInt(String(val)) || 0
-                    )
-                  }}
-                  onBlur={() => {}}
-                  min={0}
-                  disabled={loading}
-                  size="small"
-                  fullWidth
-                />
-              </Grid>
-
-              <Grid item xs={3}>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block", mb: 0.5 }}
-                >
-                  Marks of Death
-                </Typography>
-                <NumberField
-                  value={marksOfDeath}
-                  onChange={(
-                    e: React.ChangeEvent<HTMLInputElement> | number
-                  ) => {
-                    const val =
-                      typeof e === "object" && "target" in e
-                        ? e.target.value
-                        : e
-                    setMarksOfDeath(
                       typeof val === "number" ? val : parseInt(String(val)) || 0
                     )
                   }}
