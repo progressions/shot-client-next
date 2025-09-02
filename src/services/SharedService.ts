@@ -167,6 +167,14 @@ const SharedService = {
     if (this.isMook(character)) return 0
 
     const threshold = woundThresholds[this.type(character)]!
+    
+    console.log(`[calculateImpairments] ${character.name}:`, {
+      type: this.type(character),
+      originalWounds,
+      newWounds,
+      threshold,
+      willGainImpairments: originalWounds < threshold.low && newWounds >= threshold.low
+    })
 
     // a Boss and an Uber-Boss gain 1 point of Impairment when their Wounds
     // goes from < 40 to between 40 and 44
@@ -186,14 +194,14 @@ const SharedService = {
     if (
       originalWounds >= threshold.low &&
       originalWounds < threshold.high &&
-      newWounds >= 30
+      newWounds >= threshold.high
     ) {
       return 1
     }
     // Boss and Uber-Boss gain 2 points of Impairment when their Wounds go from
     // < 40 to >= 45
     // PC, Ally, Featured Foe gain 2 points of Impairment when their Wounds go from
-    // < 25 to >= 35
+    // < 25 to >= 30
     if (originalWounds < threshold.low && newWounds >= threshold.high) {
       return 2
     }

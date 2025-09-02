@@ -150,6 +150,19 @@ export async function handleNonMookMultipleTargets(
       newWounds
     )
     const newImpairments = originalImpairments + impairmentChange
+    
+    // Debug logging for impairment calculation
+    if (!CS.isMook(targetChar)) {
+      console.log(`[Impairment Debug] ${targetChar.name}:`, {
+        currentWounds,
+        newWounds,
+        effectiveWounds,
+        originalImpairments,
+        impairmentChange,
+        newImpairments,
+        type: CS.type(targetChar)
+      })
+    }
 
     const defenseChoice = defenseChoicePerTarget[result.targetId] || "none"
     const fortuneDie =
@@ -342,6 +355,17 @@ export async function handleSingleTargetAttack(
       newWounds
     )
     newImpairments = originalImpairments + impairmentChange
+    
+    // Debug logging for impairment calculation
+    console.log(`[Impairment Debug - Single] ${targetChar.name}:`, {
+      currentWounds,
+      newWounds,
+      actualWoundsDealt,
+      originalImpairments,
+      impairmentChange,
+      newImpairments,
+      type: CS.type(targetChar)
+    })
   }
 
   // Create wound update

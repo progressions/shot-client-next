@@ -14,6 +14,7 @@ export default function AttackResults({
   swerve,
   defenseValue,
   weaponDamage,
+  smackdown,
   defenseChoicePerTarget,
   calculateEffectiveAttackValue,
   calculateTargetDefense,
@@ -54,7 +55,7 @@ export default function AttackResults({
         {isHit && !allTargetsAreMooks && (
           <Typography variant="caption" sx={{ display: "block" }}>
             Outcome {outcome} + Weapon Damage {weaponDamage} = Smackdown{" "}
-            {outcome + parseInt(weaponDamage || "0")}
+            {smackdown}
           </Typography>
         )}
       </Alert>
@@ -77,15 +78,14 @@ export default function AttackResults({
               defenseChoicePerTarget[result.targetId] &&
               defenseChoicePerTarget[result.targetId] !== "none"
 
-            // For multiple targets, use the same smackdown for all
-            // (outcome is calculated once against combined defense)
-            const smackdown = outcome + parseInt(weaponDamage || "0")
+            // Use the smackdown from props (which can be manually edited)
+            const smackdownValue = parseInt(smackdown || "0")
             let effectiveWounds = result.wounds
 
-            // Recalculate wounds if needed (should match result.wounds)
-            if (outcome >= 0) {
+            // Recalculate wounds based on the current smackdown value
+            if (smackdownValue > 0) {
               const targetToughness = CS.toughness(targetChar)
-              effectiveWounds = Math.max(0, smackdown - targetToughness)
+              effectiveWounds = Math.max(0, smackdownValue - targetToughness)
 
               // For mooks, convert wounds to kills
               if (CS.isMook(targetChar)) {
@@ -122,7 +122,7 @@ export default function AttackResults({
                         variant="caption"
                         sx={{ display: "block", mb: 0.5 }}
                       >
-                        Smackdown {smackdown} - Toughness{" "}
+                        Smackdown {smackdownValue} - Toughness{" "}
                         {CS.toughness(targetChar)} = {effectiveWounds} wounds
                       </Typography>
                     )}

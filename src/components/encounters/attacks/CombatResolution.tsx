@@ -11,6 +11,7 @@ export default function CombatResolution({
   allShots,
   selectedTargetIds,
   swerve,
+  smackdown,
   finalDamage,
   shotCost,
   showMultiTargetResults,
@@ -18,6 +19,7 @@ export default function CombatResolution({
   isProcessing,
   updateField,
   handleApplyDamage,
+  handleSmackdownChange,
 }: CombatResolutionProps) {
   // Get single target if applicable
   const target =
@@ -91,13 +93,27 @@ export default function CombatResolution({
                 Smackdown
               </Typography>
               <NumberField
-                name="finalDamage"
-                value={parseInt(finalDamage) || 0}
+                name="smackdown"
+                value={parseInt(smackdown) || 0}
                 size="large"
                 width="120px"
                 error={false}
-                onChange={e => updateField("finalDamage", e.target.value)}
-                onBlur={e => updateField("finalDamage", e.target.value)}
+                onChange={e => {
+                  const value = e.target.value
+                  if (handleSmackdownChange) {
+                    handleSmackdownChange(value)
+                  } else {
+                    updateField("smackdown", value)
+                  }
+                }}
+                onBlur={e => {
+                  const value = e.target.value
+                  if (handleSmackdownChange) {
+                    handleSmackdownChange(value)
+                  } else {
+                    updateField("smackdown", value)
+                  }
+                }}
               />
             </Box>
           ) : null

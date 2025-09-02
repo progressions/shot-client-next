@@ -22,8 +22,10 @@ export interface AttackFormData {
   defenseValue: string
   toughnessValue: string
   outcome: string
+  smackdown: string
   finalDamage: string
   stunt: boolean
+  kachunkActive: boolean
   targetMookCount: number
   targetMookCountPerTarget: { [targetId: string]: number }
   shotCost: string
@@ -169,6 +171,7 @@ export interface CombatResolutionProps {
   allShots: Shot[]
   selectedTargetIds: string[]
   swerve: string
+  smackdown: string
   finalDamage: string
   shotCost: string
   showMultiTargetResults: boolean
@@ -176,6 +179,7 @@ export interface CombatResolutionProps {
   isProcessing: boolean
   updateField: (name: string, value: unknown) => void
   handleApplyDamage: () => void
+  handleSmackdownChange?: (value: string) => void
 }
 
 /**
@@ -191,6 +195,7 @@ export interface AttackResultsProps {
   swerve: string
   defenseValue: string
   weaponDamage: string
+  smackdown: string
   defenseChoicePerTarget: { [targetId: string]: DefenseChoice }
   calculateEffectiveAttackValue: (
     attacker: Character | undefined,
