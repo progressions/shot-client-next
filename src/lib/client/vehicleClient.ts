@@ -180,6 +180,7 @@ export function createVehicleClient(deps: ClientDependencies) {
       shot_id: string
       current_shot?: number
       impairments?: number
+      driver_id?: string
     }
   ): Promise<AxiosResponse<void>> {
     // Use V2 API for shot updates
@@ -187,6 +188,7 @@ export function createVehicleClient(deps: ClientDependencies) {
       shot: {
         shot: updates.current_shot,
         impairments: updates.impairments,
+        driver_id: updates.driver_id,
       },
     })
   }

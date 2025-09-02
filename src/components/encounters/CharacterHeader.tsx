@@ -16,6 +16,7 @@ export default function CharacterHeader({
   location,
   onLocationClick,
 }: CharacterHeaderProps) {
+  const type = CS.type(character)
   const archetype = CS.archetype(character)
   const faction = CS.faction(character)?.name
 
@@ -81,14 +82,24 @@ export default function CharacterHeader({
             letterSpacing: 0.5,
           }}
         >
+          {type && (
+            <>
+              <Box component="span">{type}</Box>
+              {(archetype || faction) && " • "}
+            </>
+          )}
           {archetype && faction ? (
             <>
-              <Box component="span">{archetype}</Box>
-              {" • "}
               <Box component="span">{faction}</Box>
+              {" • "}
+              <Box component="span">{archetype}</Box>
             </>
+          ) : archetype ? (
+            <Box component="span">{archetype}</Box>
+          ) : faction ? (
+            <Box component="span">{faction}</Box>
           ) : (
-            archetype || faction || "Character"
+            !type && "Character"
           )}
         </Typography>
       </Stack>

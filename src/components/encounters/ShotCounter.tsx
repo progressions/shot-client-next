@@ -1,13 +1,29 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { List } from "@mui/material"
 import { MenuBar, ShotDetail } from "@/components/encounters"
 import { useEncounter } from "@/contexts"
+import { useLocalStorage } from "@/contexts/LocalStorageContext"
 
 export default function ShotCounter() {
   const { encounter } = useEncounter()
+  const { getLocally, saveLocally } = useLocalStorage()
   const [showHidden, setShowHidden] = useState(false)
+
+  // Load the persisted setting on mount
+  useEffect(() => {
+    const savedShowHidden = getLocally(`fight_${encounter.id}_showHidden`)
+    if (savedShowHidden !== null) {
+      setShowHidden(savedShowHidden as boolean)
+    }
+  }, [encounter.id, getLocally])
+
+  // Handle changes to the showHidden setting
+  const handleShowHiddenChange = (value: boolean) => {
+    setShowHidden(value)
+    saveLocally(`fight_${encounter.id}_showHidden`, value)
+  }
 
   // Filter shots based on showHidden state
   const visibleShots = useMemo(() => {
@@ -22,7 +38,7 @@ export default function ShotCounter() {
 
   return (
     <>
-      <MenuBar showHidden={showHidden} onShowHiddenChange={setShowHidden} />
+      <MenuBar showHidden={showHidden} onShowHiddenChange={handleShowHiddenChange} />
       <List>
         {visibleShots.map((shot, index) => (
           <ShotDetail key={`${shot.shot}-${index}`} shot={shot} />

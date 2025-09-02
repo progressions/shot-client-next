@@ -95,7 +95,7 @@ export default function ActionValues({ character }: ActionValuesProps) {
           maxValue={CS.maxFortune(character)}
         />
       </Stack>
-      
+
       {/* Second row: Toughness, Speed, and Damage */}
       <Stack
         component="span"
@@ -110,7 +110,11 @@ export default function ActionValues({ character }: ActionValuesProps) {
           change={toughnessData.change}
         />
         <AV label="Speed" value={speedData.value} change={speedData.change} />
-        <AV label="Damage" value={damageData.value} change={damageData.change} />
+        <AV
+          label="Damage"
+          value={damageData.value}
+          change={damageData.change}
+        />
       </Stack>
     </Stack>
   )

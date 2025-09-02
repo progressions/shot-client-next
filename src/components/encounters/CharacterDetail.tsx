@@ -29,6 +29,7 @@ import {
   CharacterEditDialog,
 } from "@/components/encounters"
 import CharacterEffectsDisplay from "./effects/CharacterEffectsDisplay"
+import { VehicleLink } from "@/components/ui/links"
 import { encounterTransition } from "@/contexts/EncounterContext"
 import { useEncounter, useClient, useToast } from "@/contexts"
 
@@ -191,6 +192,17 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
               }}
             >
               <ActionValues character={character} />
+              {character.driving && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "info.main",
+                    fontStyle: "italic",
+                  }}
+                >
+                  Driving <VehicleLink vehicle={character.driving} />
+                </Typography>
+              )}
               <CharacterEffectsDisplay
                 character={character}
                 effects={character.effects || []}

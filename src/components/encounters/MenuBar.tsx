@@ -37,12 +37,15 @@ interface MenuBarProps {
   onShowHiddenChange: (show: boolean) => void
 }
 
-export default function MenuBar({ showHidden, onShowHiddenChange }: MenuBarProps) {
+export default function MenuBar({
+  showHidden,
+  onShowHiddenChange,
+}: MenuBarProps) {
   const theme = useTheme()
   const { encounter, updateEncounter } = useEncounter()
-  const [open, setOpen] = useState<"character" | "vehicle" | "attack" | "admin" | null>(
-    null
-  )
+  const [open, setOpen] = useState<
+    "character" | "vehicle" | "attack" | "admin" | null
+  >(null)
   const [initiativeDialogOpen, setInitiativeDialogOpen] = useState(false)
   const [locationsDialogOpen, setLocationsDialogOpen] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -121,46 +124,64 @@ export default function MenuBar({ showHidden, onShowHiddenChange }: MenuBarProps
         <Toolbar>
           {/* Admin Panel Toggle and Sequence Display */}
           <Box sx={{ display: "flex", alignItems: "center", mr: 2 }}>
-            <Tooltip title={open === "admin" ? "Close Admin Panel" : "Open Admin Panel"}>
+            <Tooltip
+              title={
+                open === "admin" ? "Close Admin Panel" : "Open Admin Panel"
+              }
+            >
               <IconButton
                 onClick={() => toggleBox("admin")}
-                sx={{ 
+                sx={{
                   color: "white",
                   p: 0.5,
                   mr: 1,
-                  backgroundColor: open === "admin" ? "rgba(255, 255, 255, 0.2)" : "transparent",
+                  backgroundColor:
+                    open === "admin"
+                      ? "rgba(255, 255, 255, 0.2)"
+                      : "transparent",
                   borderRadius: 1,
                   "&:hover": {
-                    backgroundColor: open === "admin" ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.1)",
+                    backgroundColor:
+                      open === "admin"
+                        ? "rgba(255, 255, 255, 0.3)"
+                        : "rgba(255, 255, 255, 0.1)",
                   },
                 }}
               >
-                {open === "admin" ? <FaCaretDown size={20} /> : <FaCaretRight size={20} />}
+                {open === "admin" ? (
+                  <FaCaretDown size={20} />
+                ) : (
+                  <FaCaretRight size={20} />
+                )}
               </IconButton>
             </Tooltip>
-            <Typography 
-              variant="h6" 
-              sx={{ 
+            <Typography
+              variant="h6"
+              sx={{
                 minWidth: 80,
-                fontWeight: "bold"
+                fontWeight: "bold",
               }}
             >
               Sequence {encounter.sequence || 1}
             </Typography>
           </Box>
-          
+
           <Box sx={{ flexGrow: 1 }} />
-          
+
           {/* Action Buttons */}
           <IconButton
             onClick={() => toggleBox("attack")}
-            sx={{ 
-              color: "white", 
+            sx={{
+              color: "white",
               px: { xs: 0.5, sm: 1 },
-              backgroundColor: open === "attack" ? "rgba(255, 255, 255, 0.2)" : "transparent",
+              backgroundColor:
+                open === "attack" ? "rgba(255, 255, 255, 0.2)" : "transparent",
               borderRadius: 1,
               "&:hover": {
-                backgroundColor: open === "attack" ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.1)",
+                backgroundColor:
+                  open === "attack"
+                    ? "rgba(255, 255, 255, 0.3)"
+                    : "rgba(255, 255, 255, 0.1)",
               },
             }}
             title="Attack Resolution"
@@ -177,12 +198,16 @@ export default function MenuBar({ showHidden, onShowHiddenChange }: MenuBarProps
           />
           <IconButton
             onClick={() => toggleBox("vehicle")}
-            sx={{ 
+            sx={{
               px: { xs: 0.5, sm: 1 },
-              backgroundColor: open === "vehicle" ? "rgba(255, 255, 255, 0.2)" : "transparent",
+              backgroundColor:
+                open === "vehicle" ? "rgba(255, 255, 255, 0.2)" : "transparent",
               borderRadius: 1,
               "&:hover": {
-                backgroundColor: open === "vehicle" ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.1)",
+                backgroundColor:
+                  open === "vehicle"
+                    ? "rgba(255, 255, 255, 0.3)"
+                    : "rgba(255, 255, 255, 0.1)",
               },
             }}
           >
@@ -190,12 +215,18 @@ export default function MenuBar({ showHidden, onShowHiddenChange }: MenuBarProps
           </IconButton>
           <IconButton
             onClick={() => toggleBox("character")}
-            sx={{ 
+            sx={{
               px: { xs: 0.5, sm: 1 },
-              backgroundColor: open === "character" ? "rgba(255, 255, 255, 0.2)" : "transparent",
+              backgroundColor:
+                open === "character"
+                  ? "rgba(255, 255, 255, 0.2)"
+                  : "transparent",
               borderRadius: 1,
               "&:hover": {
-                backgroundColor: open === "character" ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.1)",
+                backgroundColor:
+                  open === "character"
+                    ? "rgba(255, 255, 255, 0.3)"
+                    : "rgba(255, 255, 255, 0.1)",
               },
             }}
           >
@@ -211,13 +242,17 @@ export default function MenuBar({ showHidden, onShowHiddenChange }: MenuBarProps
           />
           <IconButton
             onClick={() => setLocationsDialogOpen(true)}
-            sx={{ 
-              color: "white", 
+            sx={{
+              color: "white",
               px: { xs: 0.5, sm: 1 },
-              backgroundColor: locationsDialogOpen ? "rgba(255, 255, 255, 0.2)" : "transparent",
+              backgroundColor: locationsDialogOpen
+                ? "rgba(255, 255, 255, 0.2)"
+                : "transparent",
               borderRadius: 1,
               "&:hover": {
-                backgroundColor: locationsDialogOpen ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.1)",
+                backgroundColor: locationsDialogOpen
+                  ? "rgba(255, 255, 255, 0.3)"
+                  : "rgba(255, 255, 255, 0.1)",
               },
             }}
             title="View Locations"
@@ -226,7 +261,6 @@ export default function MenuBar({ showHidden, onShowHiddenChange }: MenuBarProps
           </IconButton>
         </Toolbar>
       </AppBar>
-
 
       {/* Collapsible Panels */}
       <AnimatePresence mode="wait">
@@ -246,18 +280,31 @@ export default function MenuBar({ showHidden, onShowHiddenChange }: MenuBarProps
             <Box sx={{ p: 2, border: "1px solid", borderColor: "grey.300" }}>
               {open === "admin" && (
                 <Box sx={{ maxWidth: 1200, mx: "auto" }}>
-                  <Typography variant="h6" sx={{ mb: 3, display: "flex", alignItems: "center", gap: 1 }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      mb: 3,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
                     <MdAdminPanelSettings size={24} />
                     Fight Admin
                   </Typography>
-                  
+
                   <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
                     {/* Sequence Controls */}
                     <Paper elevation={1} sx={{ p: 2, flex: 1 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ mb: 1, fontWeight: "bold" }}
+                      >
                         Sequence Control
                       </Typography>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
                         <Typography sx={{ mr: 1 }}>
                           Current: {encounter.sequence || 1}
                         </Typography>
@@ -287,7 +334,10 @@ export default function MenuBar({ showHidden, onShowHiddenChange }: MenuBarProps
                     {/* Initiative Button */}
                     {showStartSequence && (
                       <Paper elevation={1} sx={{ p: 2, flex: 1 }}>
-                        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ mb: 1, fontWeight: "bold" }}
+                        >
                           Initiative
                         </Typography>
                         <Button
@@ -296,7 +346,9 @@ export default function MenuBar({ showHidden, onShowHiddenChange }: MenuBarProps
                           onClick={handleStartSequence}
                           fullWidth
                           sx={{
-                            backgroundColor: initiativeDialogOpen ? "primary.dark" : "primary.main",
+                            backgroundColor: initiativeDialogOpen
+                              ? "primary.dark"
+                              : "primary.main",
                           }}
                         >
                           Roll Initiative
@@ -306,22 +358,25 @@ export default function MenuBar({ showHidden, onShowHiddenChange }: MenuBarProps
 
                     {/* View Options */}
                     <Paper elevation={1} sx={{ p: 2, flex: 1 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ mb: 1, fontWeight: "bold" }}
+                      >
                         View Options
                       </Typography>
                       <FormControlLabel
                         control={
                           <Checkbox
                             checked={showHidden}
-                            onChange={(e) => onShowHiddenChange(e.target.checked)}
+                            onChange={e => onShowHiddenChange(e.target.checked)}
                             size="small"
                           />
                         }
                         label="Show Hidden Characters"
-                        sx={{ 
-                          "& .MuiFormControlLabel-label": { 
-                            fontSize: "0.875rem" 
-                          } 
+                        sx={{
+                          "& .MuiFormControlLabel-label": {
+                            fontSize: "0.875rem",
+                          },
                         }}
                       />
                     </Paper>

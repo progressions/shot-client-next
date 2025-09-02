@@ -28,6 +28,7 @@ import {
   VehicleEditDialog,
   Actions,
 } from "@/components/encounters"
+import { CharacterLink } from "@/components/ui/links"
 import { encounterTransition } from "@/contexts/EncounterContext"
 import { useEncounter, useClient, useToast } from "@/contexts"
 
@@ -182,6 +183,18 @@ export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
           secondary={
             <Box component="span" sx={{ display: "block", mt: 0.5 }}>
               <Vehicle vehicle={vehicle} />
+              {vehicle.driver && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    mt: 0.5,
+                    color: "info.main",
+                    fontStyle: "italic",
+                  }}
+                >
+                  Driven by <CharacterLink character={vehicle.driver} />
+                </Typography>
+              )}
             </Box>
           }
         />
