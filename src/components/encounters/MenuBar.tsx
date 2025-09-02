@@ -13,7 +13,6 @@ import {
   Divider,
   FormControlLabel,
   Checkbox,
-  Drawer,
   Stack,
   Paper,
 } from "@mui/material"
@@ -27,7 +26,7 @@ import {
   LocationsDialog,
 } from "@/components/encounters"
 import { FaGun, FaPlay, FaPlus, FaMinus } from "react-icons/fa6"
-import { FaMapMarkerAlt, FaChevronRight, FaChevronLeft } from "react-icons/fa"
+import { FaMapMarkerAlt, FaCaretRight, FaCaretDown } from "react-icons/fa"
 import { MdAdminPanelSettings } from "react-icons/md"
 import { useEncounter } from "@/contexts"
 import FightService from "@/services/FightService"
@@ -41,15 +40,14 @@ interface MenuBarProps {
 export default function MenuBar({ showHidden, onShowHiddenChange }: MenuBarProps) {
   const theme = useTheme()
   const { encounter, updateEncounter } = useEncounter()
-  const [open, setOpen] = useState<"character" | "vehicle" | "attack" | null>(
+  const [open, setOpen] = useState<"character" | "vehicle" | "attack" | "admin" | null>(
     null
   )
-  const [adminPanelOpen, setAdminPanelOpen] = useState(false)
   const [initiativeDialogOpen, setInitiativeDialogOpen] = useState(false)
   const [locationsDialogOpen, setLocationsDialogOpen] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
-  const toggleBox = (type: "character" | "vehicle" | "attack") => {
+  const toggleBox = (type: "character" | "vehicle" | "attack" | "admin") => {
     setOpen(current => (current === type ? null : type))
   }
 
@@ -123,31 +121,32 @@ export default function MenuBar({ showHidden, onShowHiddenChange }: MenuBarProps
         <Toolbar>
           {/* Admin Panel Toggle and Sequence Display */}
           <Box sx={{ display: "flex", alignItems: "center", mr: 2 }}>
+            <Tooltip title={open === "admin" ? "Close Admin Panel" : "Open Admin Panel"}>
+              <IconButton
+                onClick={() => toggleBox("admin")}
+                sx={{ 
+                  color: "white",
+                  p: 0.5,
+                  mr: 1,
+                  backgroundColor: open === "admin" ? "rgba(255, 255, 255, 0.2)" : "transparent",
+                  borderRadius: 1,
+                  "&:hover": {
+                    backgroundColor: open === "admin" ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.1)",
+                  },
+                }}
+              >
+                {open === "admin" ? <FaCaretDown size={20} /> : <FaCaretRight size={20} />}
+              </IconButton>
+            </Tooltip>
             <Typography 
               variant="h6" 
               sx={{ 
-                mr: 1,
                 minWidth: 80,
                 fontWeight: "bold"
               }}
             >
               Sequence {encounter.sequence || 1}
             </Typography>
-            <Tooltip title={adminPanelOpen ? "Close Admin Panel" : "Open Admin Panel"}>
-              <IconButton
-                onClick={() => setAdminPanelOpen(!adminPanelOpen)}
-                sx={{ 
-                  color: "white",
-                  backgroundColor: adminPanelOpen ? "rgba(255, 255, 255, 0.2)" : "transparent",
-                  borderRadius: 1,
-                  "&:hover": {
-                    backgroundColor: adminPanelOpen ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.1)",
-                  },
-                }}
-              >
-                {adminPanelOpen ? <FaChevronLeft size={16} /> : <FaChevronRight size={16} />}
-              </IconButton>
-            </Tooltip>
           </Box>
           
           <Box sx={{ flexGrow: 1 }} />
@@ -228,103 +227,6 @@ export default function MenuBar({ showHidden, onShowHiddenChange }: MenuBarProps
         </Toolbar>
       </AppBar>
 
-      {/* Admin Panel Drawer */}
-      <Drawer
-        anchor="left"
-        open={adminPanelOpen}
-        onClose={() => setAdminPanelOpen(false)}
-        sx={{
-          "& .MuiDrawer-paper": {
-            width: 280,
-            top: 64, // Below the AppBar
-            height: "calc(100% - 64px)",
-            backgroundColor: theme.palette.background.paper,
-          },
-        }}
-      >
-        <Box sx={{ p: 2 }}>
-          <Typography variant="h6" sx={{ mb: 3, display: "flex", alignItems: "center", gap: 1 }}>
-            <MdAdminPanelSettings size={24} />
-            Fight Admin
-          </Typography>
-          
-          <Stack spacing={3}>
-            {/* Sequence Controls */}
-            <Paper elevation={1} sx={{ p: 2 }}>
-              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
-                Sequence Control
-              </Typography>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Typography sx={{ mr: 1 }}>
-                  Current: {encounter.sequence || 1}
-                </Typography>
-                <ButtonGroup size="small" variant="contained">
-                  <Button
-                    onClick={() => handleSequenceChange(-1)}
-                    sx={{
-                      minWidth: 32,
-                      p: 0.5,
-                    }}
-                  >
-                    <FaMinus size={12} />
-                  </Button>
-                  <Button
-                    onClick={() => handleSequenceChange(1)}
-                    sx={{
-                      minWidth: 32,
-                      p: 0.5,
-                    }}
-                  >
-                    <FaPlus size={12} />
-                  </Button>
-                </ButtonGroup>
-              </Box>
-            </Paper>
-
-            {/* Initiative Button */}
-            {showStartSequence && (
-              <Paper elevation={1} sx={{ p: 2 }}>
-                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
-                  Initiative
-                </Typography>
-                <Button
-                  variant="contained"
-                  startIcon={<FaPlay />}
-                  onClick={handleStartSequence}
-                  fullWidth
-                  sx={{
-                    backgroundColor: initiativeDialogOpen ? "primary.dark" : "primary.main",
-                  }}
-                >
-                  Roll Initiative
-                </Button>
-              </Paper>
-            )}
-
-            {/* View Options */}
-            <Paper elevation={1} sx={{ p: 2 }}>
-              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
-                View Options
-              </Typography>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={showHidden}
-                    onChange={(e) => onShowHiddenChange(e.target.checked)}
-                    size="small"
-                  />
-                }
-                label="Show Hidden Characters"
-                sx={{ 
-                  "& .MuiFormControlLabel-label": { 
-                    fontSize: "0.875rem" 
-                  } 
-                }}
-              />
-            </Paper>
-          </Stack>
-        </Box>
-      </Drawer>
 
       {/* Collapsible Panels */}
       <AnimatePresence mode="wait">
@@ -342,6 +244,90 @@ export default function MenuBar({ showHidden, onShowHiddenChange }: MenuBarProps
             }}
           >
             <Box sx={{ p: 2, border: "1px solid", borderColor: "grey.300" }}>
+              {open === "admin" && (
+                <Box sx={{ maxWidth: 1200, mx: "auto" }}>
+                  <Typography variant="h6" sx={{ mb: 3, display: "flex", alignItems: "center", gap: 1 }}>
+                    <MdAdminPanelSettings size={24} />
+                    Fight Admin
+                  </Typography>
+                  
+                  <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
+                    {/* Sequence Controls */}
+                    <Paper elevation={1} sx={{ p: 2, flex: 1 }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
+                        Sequence Control
+                      </Typography>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <Typography sx={{ mr: 1 }}>
+                          Current: {encounter.sequence || 1}
+                        </Typography>
+                        <ButtonGroup size="small" variant="contained">
+                          <Button
+                            onClick={() => handleSequenceChange(-1)}
+                            sx={{
+                              minWidth: 32,
+                              p: 0.5,
+                            }}
+                          >
+                            <FaMinus size={12} />
+                          </Button>
+                          <Button
+                            onClick={() => handleSequenceChange(1)}
+                            sx={{
+                              minWidth: 32,
+                              p: 0.5,
+                            }}
+                          >
+                            <FaPlus size={12} />
+                          </Button>
+                        </ButtonGroup>
+                      </Box>
+                    </Paper>
+
+                    {/* Initiative Button */}
+                    {showStartSequence && (
+                      <Paper elevation={1} sx={{ p: 2, flex: 1 }}>
+                        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
+                          Initiative
+                        </Typography>
+                        <Button
+                          variant="contained"
+                          startIcon={<FaPlay />}
+                          onClick={handleStartSequence}
+                          fullWidth
+                          sx={{
+                            backgroundColor: initiativeDialogOpen ? "primary.dark" : "primary.main",
+                          }}
+                        >
+                          Roll Initiative
+                        </Button>
+                      </Paper>
+                    )}
+
+                    {/* View Options */}
+                    <Paper elevation={1} sx={{ p: 2, flex: 1 }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
+                        View Options
+                      </Typography>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={showHidden}
+                            onChange={(e) => onShowHiddenChange(e.target.checked)}
+                            size="small"
+                          />
+                        }
+                        label="Show Hidden Characters"
+                        sx={{ 
+                          "& .MuiFormControlLabel-label": { 
+                            fontSize: "0.875rem" 
+                          } 
+                        }}
+                      />
+                    </Paper>
+                  </Stack>
+                </Box>
+              )}
               {open === "character" && (
                 <AddCharacter
                   open={open === "character"}
