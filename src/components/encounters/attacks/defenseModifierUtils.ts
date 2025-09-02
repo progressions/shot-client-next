@@ -1,5 +1,5 @@
 import type { Character, Encounter } from "@/types"
-import { CharacterEffectService as CES, CS } from "@/services"
+import { CES, CS } from "@/services"
 
 /**
  * Generate defense modifier text for a character

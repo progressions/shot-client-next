@@ -1,4 +1,4 @@
-import { CS, CharacterEffectService } from "@/services"
+import { CS, CES } from "@/services"
 import type { Character, Shot, Weapon, Encounter } from "@/types"
 
 /**
@@ -52,7 +52,7 @@ export const calculateTargetDefense = (
   if (encounter) {
     // Use adjustedActionValue to get defense with all effects and impairments
     const [_defenseChange, adjustedDefense] =
-      CharacterEffectService.adjustedActionValue(
+      CES.adjustedActionValue(
         target,
         "Defense",
         encounter,

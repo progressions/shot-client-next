@@ -3,7 +3,7 @@
 import { Box, Typography, Button } from "@mui/material"
 import { NumberField } from "@/components/ui"
 import CharacterLink from "@/components/ui/links/CharacterLink"
-import { CS, CharacterEffectService } from "@/services"
+import { CS, CES } from "@/services"
 import type {
   Character,
   Shot,
@@ -300,7 +300,7 @@ export default function TargetDefenseDisplay({
               if (encounter) {
                 const baseValue = CS.rawActionValue(char, "Defense")
                 const [effectsAndImpairments] =
-                  CharacterEffectService.adjustedValue(
+                  CES.adjustedValue(
                     char,
                     baseValue,
                     "Defense",
@@ -371,7 +371,7 @@ export default function TargetDefenseDisplay({
               {(() => {
                 if (encounter) {
                   const baseValue = CS.toughness(char)
-                  const [effectChange] = CharacterEffectService.adjustedValue(
+                  const [effectChange] = CES.adjustedValue(
                     char,
                     baseValue,
                     "Toughness",

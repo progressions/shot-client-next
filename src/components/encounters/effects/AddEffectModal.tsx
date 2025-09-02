@@ -79,16 +79,12 @@ export default function AddEffectModal({
     }
 
   const handleSubmit = async () => {
-    if (!effect.name) {
-      toastError("Effect name is required")
-      return
-    }
-
     setSaving(true)
     try {
       // Only send action_value and change if they have values
       const effectToSend: Partial<CharacterEffect> = {
         ...effect,
+        name: effect.name || undefined,
         action_value: effect.action_value || undefined,
         change: effect.change || undefined,
       }
@@ -97,7 +93,7 @@ export default function AddEffectModal({
         encounter,
         effectToSend as CharacterEffect
       )
-      toastSuccess(`Added effect: ${effect.name}`)
+      toastSuccess(effect.name ? `Added effect: ${effect.name}` : "Added effect")
       handleClose()
     } catch (error) {
       toastError("Failed to add effect")
@@ -126,11 +122,16 @@ export default function AddEffectModal({
         <Stack spacing={2} sx={{ mt: 1 }}>
           <Stack direction="row" spacing={2} alignItems="center">
             <TextField
-              label="Effect Name"
+              label="Effect Name (Optional)"
               value={effect.name}
               onChange={handleChange("name")}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !saving) {
+                  e.preventDefault()
+                  handleSubmit()
+                }
+              }}
               fullWidth
-              required
               autoFocus
               placeholder="e.g., Stunned, Blessed, Wounded"
             />
@@ -178,6 +179,12 @@ export default function AddEffectModal({
                 label="Attribute"
                 value={effect.action_value}
                 onChange={handleChange("action_value")}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !saving) {
+                    e.preventDefault()
+                    handleSubmit()
+                  }
+                }}
                 fullWidth
               >
                 <MenuItem value="">None</MenuItem>
@@ -191,6 +198,12 @@ export default function AddEffectModal({
                 label="Change"
                 value={effect.change}
                 onChange={handleChange("change")}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !saving) {
+                    e.preventDefault()
+                    handleSubmit()
+                  }
+                }}
                 fullWidth
                 placeholder="+2, -1, or 18"
                 helperText="Use +/- for modifiers or number for absolute"
@@ -206,7 +219,7 @@ export default function AddEffectModal({
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={saving || !effect.name}
+          disabled={saving}
         >
           {saving ? "Adding..." : "Add Effect"}
         </Button>

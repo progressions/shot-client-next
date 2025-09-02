@@ -120,16 +120,19 @@ export default function MenuBar() {
             </Tooltip>
           )}
           <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
-            <Typography variant="h6" sx={{ mr: 2 }}>
-              Sequence {encounter.sequence || 1}
+            <Typography variant="h6" sx={{ mr: { xs: 1, sm: 2 } }}>
+              <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
+                Sequence{" "}
+              </Box>
+              {encounter.sequence || 1}
             </Typography>
             <ButtonGroup size="small" variant="contained">
               <Button
                 onClick={() => handleSequenceChange(-1)}
                 sx={{
-                  minWidth: 24,
-                  width: 24,
-                  height: 24,
+                  minWidth: { xs: 32, sm: 24 },
+                  width: { xs: 32, sm: 24 },
+                  height: { xs: 32, sm: 24 },
                   p: 0,
                   backgroundColor: "primary.dark",
                   "&:hover": { backgroundColor: "primary.main" },
@@ -140,9 +143,9 @@ export default function MenuBar() {
               <Button
                 onClick={() => handleSequenceChange(1)}
                 sx={{
-                  minWidth: 24,
-                  width: 24,
-                  height: 24,
+                  minWidth: { xs: 32, sm: 24 },
+                  width: { xs: 32, sm: 24 },
+                  height: { xs: 32, sm: 24 },
                   p: 0,
                   backgroundColor: "primary.dark",
                   "&:hover": { backgroundColor: "primary.main" },
@@ -154,39 +157,45 @@ export default function MenuBar() {
           </Box>
           <IconButton
             onClick={() => toggleBox("attack")}
-            sx={{ color: "white" }}
+            sx={{ color: "white", px: { xs: 0.5, sm: 1 } }}
             title="Attack Resolution"
           >
-            <FaGun size={24} />
+            <FaGun size={20} />
           </IconButton>
           <Divider
             orientation="vertical"
             sx={{
-              mx: 1,
+              mx: { xs: 0.5, sm: 1 },
               height: 24,
               backgroundColor: "rgba(255, 255, 255, 0.3)",
             }}
           />
-          <IconButton onClick={() => toggleBox("vehicle")}>
+          <IconButton 
+            onClick={() => toggleBox("vehicle")}
+            sx={{ px: { xs: 0.5, sm: 1 } }}
+          >
             <Icon keyword="Add Vehicle" color="white" />
           </IconButton>
-          <IconButton onClick={() => toggleBox("character")}>
+          <IconButton 
+            onClick={() => toggleBox("character")}
+            sx={{ px: { xs: 0.5, sm: 1 } }}
+          >
             <Icon keyword="Add Character" color="white" />
           </IconButton>
           <Divider
             orientation="vertical"
             sx={{
-              mx: 1,
+              mx: { xs: 0.5, sm: 1 },
               height: 24,
               backgroundColor: "rgba(255, 255, 255, 0.3)",
             }}
           />
           <IconButton
             onClick={() => setLocationsDialogOpen(true)}
-            sx={{ color: "white" }}
+            sx={{ color: "white", px: { xs: 0.5, sm: 1 } }}
             title="View Locations"
           >
-            <FaMapMarkerAlt size={20} />
+            <FaMapMarkerAlt size={18} />
           </IconButton>
         </Toolbar>
       </AppBar>
@@ -217,7 +226,9 @@ export default function MenuBar() {
                   onClose={() => setOpen(null)}
                 />
               )}
-              {open === "attack" && <AttackPanel />}
+              {open === "attack" && (
+                <AttackPanel onClose={() => setOpen(null)} />
+              )}
             </Box>
           </motion.div>
         )}

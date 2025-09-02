@@ -1,9 +1,9 @@
 "use client"
 
-import { useMemo, useEffect } from "react"
-import { Box, Card, CardContent, Typography } from "@mui/material"
+import { useMemo, useEffect, useState } from "react"
+import { Box, Typography } from "@mui/material"
 import { useEncounter, useToast } from "@/contexts"
-import { CS, DS, CharacterEffectService } from "@/services"
+import { CS, DS, CES } from "@/services"
 import type {
   Character,
   Shot,
@@ -36,9 +36,16 @@ import {
 } from "./attacks/attackHandlers"
 
 export default function AttackPanel({ onClose }: AttackPanelProps) {
+  const [isReady, setIsReady] = useState(false)
   const { encounter, weapons: encounterWeapons, ec } = useEncounter()
   const { toastSuccess, toastError, toastInfo } = useToast()
   const { client } = useClient()
+
+  // Delay rendering of heavy content to allow animation to start
+  useEffect(() => {
+    const timer = setTimeout(() => setIsReady(true), 50)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Initialize form state with useForm
   const { formState, dispatchForm } = useForm<AttackFormData>({
@@ -146,8 +153,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
   // Sort attacker shots by: shot position (higher first), character type priority, then speed
   const sortedAttackerShots = useMemo(
-    () => sortAttackerShots(allShots),
-    [allShots]
+    () => sortAttackerShots(allShots, encounter),
+    [allShots, encounter]
   )
 
   // Get selected attacker and targets
@@ -193,7 +200,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
       // Get action value with effects applied
       // adjustedActionValue returns [change, adjustedValue]
-      const [changeAV, av] = CharacterEffectService.adjustedActionValue(
+      const [changeAV, av] = CES.adjustedActionValue(
         attacker,
         mainAttack,
         encounter,
@@ -201,7 +208,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       )
 
       // Get just the effects change (without impairments) for display
-      const [effectsOnlyChange] = CharacterEffectService.adjustedActionValue(
+      const [effectsOnlyChange] = CES.adjustedActionValue(
         attacker,
         mainAttack,
         encounter,
@@ -225,7 +232,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
         // Apply effects to weapon damage if applicable
         const [damageChange, _modifiedDamage] =
-          CharacterEffectService.adjustedActionValue(
+          CES.adjustedActionValue(
             attacker,
             "Damage",
             encounter,
@@ -238,7 +245,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         updates.selectedWeaponId = "unarmed"
         const baseDamage = CS.damage(attacker) || 7
         const [damageChange, _modifiedDamage] =
-          CharacterEffectService.adjustedActionValue(
+          CES.adjustedActionValue(
             attacker,
             "Damage",
             encounter,
@@ -476,7 +483,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
         // Get toughness with effects applied
         const [_toughnessChange, toughness] =
-          CharacterEffectService.adjustedActionValue(
+          CES.adjustedActionValue(
             target,
             "Toughness",
             encounter,
@@ -1004,48 +1011,49 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   }
 
   return (
-    <Card sx={{ mb: 2 }}>
-      <CardContent sx={{ p: 0 }}>
-        <Typography
-          variant="h6"
-          sx={{
-            textAlign: "center",
-            py: 2,
-            borderBottom: "1px solid",
-            borderColor: "divider",
-          }}
-        >
-          Attack Resolution
-        </Typography>
+    <Box sx={{ overflow: "hidden", minHeight: isReady ? "auto" : "100px" }}>
+      <Typography
+        variant="h6"
+        sx={{
+          textAlign: "center",
+          py: 2,
+          borderBottom: "1px solid",
+          borderColor: "divider",
+        }}
+      >
+        Attack Resolution
+      </Typography>
 
-        {/* Main Content - Attacker then Target */}
-        <Box sx={{ backgroundColor: "action.hover" }}>
-          {/* Attacker Section */}
-          <AttackerSection
-            sortedAttackerShots={sortedAttackerShots}
-            formState={formState}
-            dispatchForm={dispatchForm}
-            attacker={attacker}
-            attackerWeapons={attackerWeapons}
-            allShots={allShots}
-            selectedTargetIds={selectedTargetIds}
-          />
+      {/* Main Content - Attacker then Target */}
+      {isReady ? (
+        <>
+          <Box sx={{ backgroundColor: "action.hover" }}>
+            {/* Attacker Section */}
+            <AttackerSection
+              sortedAttackerShots={sortedAttackerShots}
+              formState={formState}
+              dispatchForm={dispatchForm}
+              attacker={attacker}
+              attackerWeapons={attackerWeapons}
+              allShots={allShots}
+              selectedTargetIds={selectedTargetIds}
+            />
 
-          {/* Target Section */}
-          <TargetSection
-            allShots={allShots}
-            sortedTargetShots={sortedTargetShots}
-            formState={formState}
-            dispatchForm={dispatchForm}
-            attacker={attacker}
-            attackerShotId={attackerShotId}
-            updateField={updateField}
-            updateFields={updateFields}
-            updateDefenseAndToughness={updateDefenseAndToughness}
-            distributeMooks={distributeMooks}
-            calculateTargetDefense={calculateTargetDefense}
-            encounter={encounter}
-          />
+            {/* Target Section */}
+            <TargetSection
+              allShots={allShots}
+              sortedTargetShots={sortedTargetShots}
+              formState={formState}
+              dispatchForm={dispatchForm}
+              attacker={attacker}
+              attackerShotId={attackerShotId}
+              updateField={updateField}
+              updateFields={updateFields}
+              updateDefenseAndToughness={updateDefenseAndToughness}
+              distributeMooks={distributeMooks}
+              calculateTargetDefense={calculateTargetDefense}
+              encounter={encounter}
+            />
         </Box>
 
         {/* Bottom Section - Combat Resolution */}
@@ -1130,7 +1138,8 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             />
           )}
         </Box>
-      </CardContent>
-    </Card>
+        </>
+      ) : null}
+    </Box>
   )
 }
