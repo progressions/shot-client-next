@@ -47,20 +47,21 @@ export const calculateTargetDefense = (
     return parseInt(manualDefensePerTarget[targetId]) || 0
   }
 
-  // Start with defense that already includes impairments
-  let defense = CS.defense(target)
-
-  // Add effects if encounter exists
+  // Get defense with effects properly applied
+  let defense: number
   if (encounter) {
-    const baseValue = CS.rawActionValue(target, "Defense")
-    const [effectChange] = CharacterEffectService.adjustedValue(
-      target,
-      baseValue,
-      "Defense",
-      encounter,
-      true // ignore impairments since CS.defense already includes them
-    )
-    defense += effectChange
+    // Use adjustedActionValue to get defense with all effects and impairments
+    const [_defenseChange, adjustedDefense] =
+      CharacterEffectService.adjustedActionValue(
+        target,
+        "Defense",
+        encounter,
+        false // don't ignore impairments
+      )
+    defense = adjustedDefense
+  } else {
+    // No encounter, just use base defense
+    defense = CS.defense(target)
   }
 
   const choice = defenseChoicePerTarget[targetId] || "none"

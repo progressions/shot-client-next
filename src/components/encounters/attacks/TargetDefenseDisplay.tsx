@@ -447,49 +447,28 @@ export default function TargetDefenseDisplay({
               variant="outlined"
               size="small"
               onClick={() => {
-                // Update the dodge choice
+                // Update the dodge choice and clear manual override in one batch
+                const newOverrides = { ...manualDefensePerTarget }
+                delete newOverrides[targetId]
+                
                 const newDefenseChoices = {
                   ...defenseChoicePerTarget,
                   [targetId]: "dodge" as DefenseChoice,
                 }
-                updateField("defenseChoicePerTarget", newDefenseChoices)
                 
-                // Clear any manual defense override so calculateTargetDefense takes over
-                const newOverrides = { ...manualDefensePerTarget }
-                delete newOverrides[targetId]
-                updateField("manualDefensePerTarget", newOverrides)
-                
-                // Recalculate defense using the standard function with updated choices
-                const updatedDefenses = selectedTargetIds.map(tid => {
-                  const targetShot = allShots.find(
-                    s => s.character?.shot_id === tid
-                  )
-                  const targetChar = targetShot?.character
-                  if (!targetChar) return 0
-                  
-                  // Use the updated defense choices when calculating
-                  const currentChoice = tid === targetId ? "dodge" : (defenseChoicePerTarget[tid] || "none")
-                  return calculateTargetDefense(
-                    targetChar,
-                    tid,
-                    newOverrides,
-                    { ...defenseChoicePerTarget, [targetId]: "dodge" },
-                    fortuneDiePerTarget,
-                    stunt,
-                    attacker,
-                    targetMookCountPerTarget[tid],
-                    encounter
-                  )
+                updateFields({
+                  defenseChoicePerTarget: newDefenseChoices,
+                  manualDefensePerTarget: newOverrides,
                 })
-
-                if (selectedTargetIds.length > 1) {
-                  const highestDefense = Math.max(...updatedDefenses)
-                  const combinedDefense =
-                    highestDefense + selectedTargetIds.length
-                  updateField("defenseValue", combinedDefense.toString())
-                } else if (updatedDefenses.length > 0) {
-                  updateField("defenseValue", updatedDefenses[0].toString())
-                }
+                
+                // Recalculate defense immediately with the new values
+                updateDefenseAndToughness(
+                  selectedTargetIds, 
+                  stunt,
+                  newDefenseChoices,
+                  fortuneDiePerTarget,
+                  newOverrides
+                )
               }}
               sx={{ minWidth: "80px" }}
             >
@@ -502,14 +481,26 @@ export default function TargetDefenseDisplay({
                 size="small"
                 color="success"
                 onClick={() => {
-                  // Remove dodge choice
+                  // Remove dodge choice and clear manual override
                   const newChoices = { ...defenseChoicePerTarget }
                   delete newChoices[targetId]
-                  updateField("defenseChoicePerTarget", newChoices)
-                  // Recalculate defense without dodge
-                  if (selectedTargetIds.length > 0) {
-                    updateDefenseAndToughness(selectedTargetIds, stunt)
-                  }
+                  
+                  const newOverrides = { ...manualDefensePerTarget }
+                  delete newOverrides[targetId]
+                  
+                  updateFields({
+                    defenseChoicePerTarget: newChoices,
+                    manualDefensePerTarget: newOverrides,
+                  })
+                  
+                  // Recalculate defense immediately with the new values
+                  updateDefenseAndToughness(
+                    selectedTargetIds, 
+                    stunt,
+                    newChoices,
+                    fortuneDiePerTarget,
+                    newOverrides
+                  )
                 }}
                 sx={{ minWidth: "80px" }}
               >
@@ -523,48 +514,34 @@ export default function TargetDefenseDisplay({
                   size="small"
                   color="secondary"
                   onClick={() => {
-                    // Upgrade to fortune defense choice
+                    // Update all state in one batch
+                    const newOverrides = { ...manualDefensePerTarget }
+                    delete newOverrides[targetId]
+                    
                     const newDefenseChoices = {
                       ...defenseChoicePerTarget,
                       [targetId]: "fortune" as DefenseChoice,
                     }
-                    updateField("defenseChoicePerTarget", newDefenseChoices)
                     
-                    // Initialize fortune die to 0
                     const newFortuneDice = {
                       ...fortuneDiePerTarget,
                       [targetId]: "0",
                     }
-                    updateField("fortuneDiePerTarget", newFortuneDice)
                     
-                    // Recalculate defense with fortune
-                    const updatedDefenses = selectedTargetIds.map(tid => {
-                      const targetShot = allShots.find(
-                        s => s.character?.shot_id === tid
-                      )
-                      const targetChar = targetShot?.character
-                      if (!targetChar) return 0
-                      return calculateTargetDefense(
-                        targetChar,
-                        tid,
-                        manualDefensePerTarget,
-                        newDefenseChoices,
-                        newFortuneDice,
-                        stunt,
-                        attacker,
-                        targetMookCountPerTarget[tid],
-                        encounter
-                      )
+                    updateFields({
+                      defenseChoicePerTarget: newDefenseChoices,
+                      fortuneDiePerTarget: newFortuneDice,
+                      manualDefensePerTarget: newOverrides,
                     })
-
-                    if (selectedTargetIds.length > 1) {
-                      const highestDefense = Math.max(...updatedDefenses)
-                      const combinedDefense =
-                        highestDefense + selectedTargetIds.length
-                      updateField("defenseValue", combinedDefense.toString())
-                    } else if (updatedDefenses.length > 0) {
-                      updateField("defenseValue", updatedDefenses[0].toString())
-                    }
+                    
+                    // Recalculate defense immediately with the new values
+                    updateDefenseAndToughness(
+                      selectedTargetIds, 
+                      stunt,
+                      newDefenseChoices,
+                      newFortuneDice,
+                      newOverrides
+                    )
                   }}
                   sx={{ minWidth: "40px", px: 1 }}
                   title="Add Fortune to Dodge"
@@ -581,46 +558,32 @@ export default function TargetDefenseDisplay({
                 size="small"
                 color="secondary"
                 onClick={() => {
-                  // Go back to regular dodge
+                  // Update all state in one batch
+                  const newFortuneDice = { ...fortuneDiePerTarget }
+                  delete newFortuneDice[targetId]
+                  
+                  const newOverrides = { ...manualDefensePerTarget }
+                  delete newOverrides[targetId]
+                  
                   const newDefenseChoices = {
                     ...defenseChoicePerTarget,
                     [targetId]: "dodge" as DefenseChoice,
                   }
-                  updateField("defenseChoicePerTarget", newDefenseChoices)
                   
-                  // Clear fortune die
-                  const newFortuneDice = { ...fortuneDiePerTarget }
-                  delete newFortuneDice[targetId]
-                  updateField("fortuneDiePerTarget", newFortuneDice)
-                  
-                  // Recalculate defense using the standard function with updated choices
-                  const updatedDefenses = selectedTargetIds.map(tid => {
-                    const targetShot = allShots.find(
-                      s => s.character?.shot_id === tid
-                    )
-                    const targetChar = targetShot?.character
-                    if (!targetChar) return 0
-                    return calculateTargetDefense(
-                      targetChar,
-                      tid,
-                      manualDefensePerTarget,
-                      newDefenseChoices,
-                      newFortuneDice,
-                      stunt,
-                      attacker,
-                      targetMookCountPerTarget[tid],
-                      encounter
-                    )
+                  updateFields({
+                    defenseChoicePerTarget: newDefenseChoices,
+                    fortuneDiePerTarget: newFortuneDice,
+                    manualDefensePerTarget: newOverrides,
                   })
-
-                  if (selectedTargetIds.length > 1) {
-                    const highestDefense = Math.max(...updatedDefenses)
-                    const combinedDefense =
-                      highestDefense + selectedTargetIds.length
-                    updateField("defenseValue", combinedDefense.toString())
-                  } else if (updatedDefenses.length > 0) {
-                    updateField("defenseValue", updatedDefenses[0].toString())
-                  }
+                  
+                  // Recalculate defense immediately with the new values
+                  updateDefenseAndToughness(
+                    selectedTargetIds, 
+                    stunt,
+                    newDefenseChoices,
+                    newFortuneDice,
+                    newOverrides
+                  )
                 }}
                 sx={{ minWidth: "120px" }}
               >
@@ -634,37 +597,36 @@ export default function TargetDefenseDisplay({
                 error={false}
                 disabled={false}
                 onChange={e => {
-                  updateField("fortuneDiePerTarget", {
+                  const newFortuneDice = {
                     ...fortuneDiePerTarget,
                     [targetId]: e.target.value,
-                  })
-                  // Recalculate defense using the standard function
-                  // Wait for the state to update by using a small delay
-                  setTimeout(() => {
-                    const updatedDefenses = selectedTargetIds.map(tid => {
-                      const targetShot = allShots.find(
-                        s => s.character?.shot_id === tid
-                      )
-                      const targetChar = targetShot?.character
-                      if (!targetChar) return 0
-                      return calculateTargetDefense(targetChar, tid)
-                    })
-
-                    if (selectedTargetIds.length > 1) {
-                      const highestDefense = Math.max(...updatedDefenses)
-                      const combinedDefense =
-                        highestDefense + selectedTargetIds.length
-                      updateField("defenseValue", combinedDefense.toString())
-                    } else if (updatedDefenses.length > 0) {
-                      updateField("defenseValue", updatedDefenses[0].toString())
-                    }
-                  }, 0)
+                  }
+                  updateField("fortuneDiePerTarget", newFortuneDice)
+                  
+                  // Recalculate defense immediately with the new values
+                  updateDefenseAndToughness(
+                    selectedTargetIds, 
+                    stunt,
+                    defenseChoicePerTarget,
+                    newFortuneDice,
+                    manualDefensePerTarget
+                  )
                 }}
                 onBlur={e => {
-                  updateField("fortuneDiePerTarget", {
+                  const newFortuneDice = {
                     ...fortuneDiePerTarget,
                     [targetId]: e.target.value,
-                  })
+                  }
+                  updateField("fortuneDiePerTarget", newFortuneDice)
+                  
+                  // Recalculate defense immediately with the new values
+                  updateDefenseAndToughness(
+                    selectedTargetIds, 
+                    stunt,
+                    defenseChoicePerTarget,
+                    newFortuneDice,
+                    manualDefensePerTarget
+                  )
                 }}
               />
             </Box>
