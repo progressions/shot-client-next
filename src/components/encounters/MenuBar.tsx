@@ -1,17 +1,22 @@
 "use client"
 import { useTheme } from "@mui/material"
 import { useState, useRef, useEffect } from "react"
-import { AppBar, Toolbar, Typography, IconButton, Box } from "@mui/material"
+import { AppBar, Toolbar, Typography, IconButton, Box, Tooltip } from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
 import { Icon } from "@/components/ui"
-import { AddCharacter, AddVehicle, AttackPanel } from "@/components/encounters"
-import { FaGun } from "react-icons/fa6"
+import { AddCharacter, AddVehicle, AttackPanel, InitiativeDialog } from "@/components/encounters"
+import { FaGun, FaPlay } from "react-icons/fa6"
+import { useEncounter } from "@/contexts"
+import FightService from "@/services/FightService"
+import type { Character, Vehicle } from "@/types"
 
 export default function MenuBar() {
   const theme = useTheme()
+  const { encounter, updateEncounter } = useEncounter()
   const [open, setOpen] = useState<"character" | "vehicle" | "attack" | null>(
     null
   )
+  const [initiativeDialogOpen, setInitiativeDialogOpen] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
   const toggleBox = (type: "character" | "vehicle" | "attack") => {
@@ -32,6 +37,45 @@ export default function MenuBar() {
     }
   }, [open])
 
+  const handleStartSequence = () => {
+    setInitiativeDialogOpen(true)
+  }
+
+  const handleApplyInitiatives = async (updatedCharacters: (Character | Vehicle)[]) => {
+    // Update the encounter with the new character initiatives
+    const updatedShots = encounter.shots.map(shot => ({
+      ...shot,
+      characters: shot.characters.map(char => {
+        const updated = updatedCharacters.find(c => c.id === char.id)
+        return updated || char
+      }),
+      vehicles: shot.vehicles.map(veh => {
+        const updated = updatedCharacters.find(v => v.id === veh.id)
+        return updated || veh
+      }),
+    }))
+
+    const updatedEncounter = {
+      ...encounter,
+      shots: updatedShots,
+      sequence: encounter.sequence + 1, // Increment sequence to start new round
+    }
+
+    await updateEncounter(updatedEncounter)
+    setInitiativeDialogOpen(false)
+  }
+
+  // Get all characters and vehicles from the encounter
+  const getAllCombatants = () => {
+    const characters = FightService.charactersInFight(encounter)
+    const vehicles = FightService.vehiclesInFight(encounter)
+    return [...characters, ...vehicles]
+  }
+
+  // Check if we should show the Start Sequence button
+  // Temporarily always show for testing
+  const showStartSequence = true // FightService.startOfSequence(encounter)
+
   return (
     <>
       <AppBar position="sticky" sx={{ top: 0, zIndex: 1100 }}>
@@ -39,6 +83,16 @@ export default function MenuBar() {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Menu
           </Typography>
+          {showStartSequence && (
+            <Tooltip title="Start Sequence">
+              <IconButton
+                onClick={handleStartSequence}
+                sx={{ color: "white" }}
+              >
+                <FaPlay size={20} />
+              </IconButton>
+            </Tooltip>
+          )}
           <IconButton
             onClick={() => toggleBox("attack")}
             sx={{ color: "white" }}
@@ -86,6 +140,12 @@ export default function MenuBar() {
           </motion.div>
         )}
       </AnimatePresence>
+      <InitiativeDialog
+        open={initiativeDialogOpen}
+        onClose={() => setInitiativeDialogOpen(false)}
+        characters={getAllCombatants()}
+        onApply={handleApplyInitiatives}
+      />
     </>
   )
 }
