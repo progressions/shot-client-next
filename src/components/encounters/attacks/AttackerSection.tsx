@@ -311,7 +311,9 @@ export default function AttackerSection({
                       }
                       if (e.target.value === "unarmed") {
                         const damage = CS.damage(attacker) || 7
-                        updateField("weaponDamage", damage.toString())
+                        // Include damage change from effects
+                        const adjustedDamage = damage + damageChange
+                        updateField("weaponDamage", adjustedDamage.toString())
                         // Remove mook bonus when switching to unarmed (if targeting mooks)
                         if (targetingMooks) {
                           const oldWeapon = attackerWeapons.find(
@@ -327,7 +329,9 @@ export default function AttackerSection({
                           w => w.id?.toString() === e.target.value
                         )
                         if (weapon) {
-                          updateField("weaponDamage", weapon.damage.toString())
+                          // Include damage change from effects
+                          const adjustedDamage = weapon.damage + damageChange
+                          updateField("weaponDamage", adjustedDamage.toString())
                           // Update attack value with new weapon's mook bonus (only if targeting mooks)
                           if (targetingMooks) {
                             const oldWeapon = attackerWeapons.find(
@@ -422,14 +426,16 @@ export default function AttackerSection({
                             size="small"
                             onClick={() => {
                               if (kachunkActive) {
-                                // Deactivate kachunk
+                                // Deactivate kachunk - restore original weapon damage with effects
                                 updateField("kachunkActive", false)
-                                updateField("weaponDamage", weapon.damage.toString())
+                                const adjustedDamage = weapon.damage + damageChange
+                                updateField("weaponDamage", adjustedDamage.toString())
                                 updateField("shotCost", (parseInt(shotCost) - 1).toString())
                               } else {
-                                // Activate kachunk
+                                // Activate kachunk - set to 14 plus damage change from effects
                                 updateField("kachunkActive", true)
-                                updateField("weaponDamage", "14")
+                                const kachunkDamage = 14 + damageChange
+                                updateField("weaponDamage", kachunkDamage.toString())
                                 updateField("shotCost", (parseInt(shotCost) + 1).toString())
                               }
                             }}
