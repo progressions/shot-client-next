@@ -127,11 +127,11 @@ export default function MenuBar({ showHidden, onShowHiddenChange }: MenuBarProps
               variant="h6" 
               sx={{ 
                 mr: 1,
-                minWidth: 60,
+                minWidth: 80,
                 fontWeight: "bold"
               }}
             >
-              SEQ {encounter.sequence || 1}
+              Sequence {encounter.sequence || 1}
             </Typography>
             <Tooltip title={adminPanelOpen ? "Close Admin Panel" : "Open Admin Panel"}>
               <IconButton
