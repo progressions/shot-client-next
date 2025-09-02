@@ -3,20 +3,37 @@
 import { useState } from "react"
 import { Stack } from "@mui/material"
 import { CharacterFilter } from "@/components/characters"
-import { type Entity } from "@/types"
-import { useEncounter } from "@/contexts"
+import { type Character } from "@/types"
+import { useEncounter, useToast, useClient } from "@/contexts"
+import { FormActions } from "@/reducers"
 
-export default function AddCharacter() {
-  const { encounter, updateEncounter } = useEncounter()
-  const [entity, setEntity] = useState<Entity | null>(null)
+export default function AddCharacter({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { encounter } = useEncounter()
+  const { client } = useClient()
+  const { toastSuccess, toastError } = useToast()
+  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null)
 
-  const handleAdd = async () => {
-    const updatedEncounter = {
-      ...encounter,
-      character_ids: [...encounter.character_ids, entity!.id],
+  const handleAddMember = async (character: Character) => {
+    if (!character || !encounter) {
+      console.log("Missing character or encounter", { character, encounter })
+      return
     }
-    await updateEncounter(updatedEncounter)
-    setEntity(null)
+    
+    try {
+      console.log("Adding character to fight:", character.name)
+      await client.addCharacter(encounter, character)
+      toastSuccess(`Added ${character.name} to the fight`)
+      setSelectedCharacter(null)
+      onClose()
+    } catch (error) {
+      console.error("Error adding character to fight:", error)
+      toastError(`Failed to add ${character.name} to the fight`)
+    }
+  }
+
+  const handleDispatch = (action: any) => {
+    // CharacterFilter expects a dispatch function for managing its internal state
+    // We don't need to handle this externally for our use case
   }
 
   return (
@@ -27,9 +44,11 @@ export default function AddCharacter() {
       spacing={1}
     >
       <CharacterFilter
-        entity={entity}
-        setEntity={setEntity}
-        handleAddCharacter={handleAdd}
+        value={selectedCharacter?.id || null}
+        setSelectedChild={setSelectedCharacter}
+        addMember={handleAddMember}
+        dispatch={handleDispatch}
+        omit={[]}
       />
     </Stack>
   )

@@ -231,6 +231,7 @@ export interface Vehicle extends BaseEntity {
   wealth: string
   juncture_id: string | null
   juncture: Juncture | null
+  effects?: CharacterEffect[]
 }
 
 export interface Person extends BaseEntity {
@@ -270,6 +271,8 @@ export interface Person extends BaseEntity {
   juncture_id: string | null
   juncture: Juncture | null
   is_template?: boolean
+  shot_id?: string
+  effects?: CharacterEffect[]
 }
 
 // Entity union type - all entity types that can be displayed with avatars

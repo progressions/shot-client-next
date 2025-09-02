@@ -234,7 +234,7 @@ export function createCharacterClient(deps: ClientDependencies) {
     character: Character | string
   ): Promise<AxiosResponse<Character>> {
     return post(api.addCharacter(fight, character), {
-      character: { current_shot: 0 },
+      character: { current_shot: null },
     })
   }
 

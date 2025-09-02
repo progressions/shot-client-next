@@ -1,13 +1,31 @@
 import type { Character } from "@/types"
-import { CS } from "@/services"
+import { CS, CharacterEffectService as CES } from "@/services"
 import { Stack } from "@mui/material"
 import { AV } from "@/components/ui"
+import { useEncounter } from "@/contexts"
 
 type ActionValuesProps = {
   character: Character
 }
 
 export default function ActionValues({ character }: ActionValuesProps) {
+  const { encounter } = useEncounter()
+  
+  // Get adjusted values with effect indicators
+  const getAdjustedValue = (name: string, baseValue: number, ignoreImpairments: boolean = false) => {
+    if (!encounter) return { value: baseValue, change: 0 }
+    
+    const [change, adjustedValue] = CES.adjustedValue(character, baseValue, name, encounter, ignoreImpairments)
+    return { value: adjustedValue, change }
+  }
+
+  const mainAttackData = getAdjustedValue(CS.mainAttack(character), CS.mainAttackValue(character))
+  const secondaryAttackData = getAdjustedValue(CS.secondaryAttack(character), CS.secondaryAttackValue(character))
+  const defenseData = getAdjustedValue("Defense", CS.defense(character))
+  const toughnessData = getAdjustedValue("Toughness", CS.toughness(character))
+  const speedData = getAdjustedValue("Speed", CS.speed(character))
+  const damageData = getAdjustedValue("Damage", CS.damage(character), true)
+
   return (
     <Stack
       component="span"
@@ -22,21 +40,39 @@ export default function ActionValues({ character }: ActionValuesProps) {
     >
       <AV
         label={CS.mainAttack(character)}
-        value={CS.mainAttackValue(character)}
+        value={mainAttackData.value}
+        change={mainAttackData.change}
       />
       <AV
         label={CS.secondaryAttack(character)}
-        value={CS.secondaryAttackValue(character)}
+        value={secondaryAttackData.value}
+        change={secondaryAttackData.change}
       />
-      <AV label="Defense" value={CS.defense(character)} />
+      <AV 
+        label="Defense" 
+        value={defenseData.value}
+        change={defenseData.change}
+      />
       <AV
         label={CS.fortuneType(character)}
         value={CS.fortune(character)}
         maxValue={CS.maxFortune(character)}
       />
-      <AV label="Toughness" value={CS.toughness(character)} />
-      <AV label="Speed" value={CS.speed(character)} />
-      <AV label="Damage" value={CS.damage(character)} />
+      <AV 
+        label="Toughness" 
+        value={toughnessData.value}
+        change={toughnessData.change}
+      />
+      <AV 
+        label="Speed" 
+        value={speedData.value}
+        change={speedData.change}
+      />
+      <AV 
+        label="Damage" 
+        value={damageData.value}
+        change={damageData.change}
+      />
     </Stack>
   )
 }
