@@ -24,7 +24,6 @@ type VehicleFilterProps = {
 }
 
 export default function VehicleFilter({
-  value: _value,
   setSelectedVehicle,
   addMember,
   omit = [],
