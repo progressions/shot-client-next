@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useState, useMemo } from "react"
 import {
   Box,
   Typography,
@@ -38,6 +38,7 @@ export default function ChaseTargetSection({
   attacker,
   attackerShotId,
 }: ChaseTargetSectionProps) {
+  const [showAll, setShowAll] = useState(false)
   const targetShotId = (formState.data as ChaseFormData & { targetShotId?: string }).targetShotId
   const stunt = (formState.data as ChaseFormData & { stunt?: boolean }).stunt
 
@@ -57,7 +58,7 @@ export default function ChaseTargetSection({
   }, [attacker])
 
   // Filter shots to only include characters with driving_id, excluding the attacker
-  // and filtering based on attacker's allegiance
+  // and filtering based on attacker's allegiance (unless showAll is true)
   const targetDriverShots = useMemo(() => {
     return shots.filter(shot => {
       // Exclude the attacker's shot
@@ -68,32 +69,35 @@ export default function ChaseTargetSection({
         return false
       }
       
-      // If attacker is friendly (PC/Ally), exclude other friendlies from targets
-      if (attackerIsFriendly) {
-        if (shot.character && CS.isType(shot.character, ["PC", "Ally"])) {
-          return false
-        }
-        if (shot.characters) {
-          // Filter out shots that only contain PCs/Allies
-          const nonFriendlyDrivers = shot.characters.filter((c: Character) => 
-            (c as CharacterWithShotData).driving_id && !CS.isType(c, ["PC", "Ally"])
-          )
-          if (nonFriendlyDrivers.length === 0) {
+      // If showAll is true, skip faction-based filtering
+      if (!showAll) {
+        // If attacker is friendly (PC/Ally), exclude other friendlies from targets
+        if (attackerIsFriendly) {
+          if (shot.character && CS.isType(shot.character, ["PC", "Ally"])) {
             return false
           }
-        }
-      } else {
-        // If attacker is NOT friendly (enemy), only include PCs/Allies as targets
-        if (shot.character && !CS.isType(shot.character, ["PC", "Ally"])) {
-          return false
-        }
-        if (shot.characters) {
-          // Filter out shots that don't contain any PCs/Allies
-          const friendlyDrivers = shot.characters.filter((c: Character) => 
-            (c as CharacterWithShotData).driving_id && CS.isType(c, ["PC", "Ally"])
-          )
-          if (friendlyDrivers.length === 0) {
+          if (shot.characters) {
+            // Filter out shots that only contain PCs/Allies
+            const nonFriendlyDrivers = shot.characters.filter((c: Character) => 
+              (c as CharacterWithShotData).driving_id && !CS.isType(c, ["PC", "Ally"])
+            )
+            if (nonFriendlyDrivers.length === 0) {
+              return false
+            }
+          }
+        } else {
+          // If attacker is NOT friendly (enemy), only include PCs/Allies as targets
+          if (shot.character && !CS.isType(shot.character, ["PC", "Ally"])) {
             return false
+          }
+          if (shot.characters) {
+            // Filter out shots that don't contain any PCs/Allies
+            const friendlyDrivers = shot.characters.filter((c: Character) => 
+              (c as CharacterWithShotData).driving_id && CS.isType(c, ["PC", "Ally"])
+            )
+            if (friendlyDrivers.length === 0) {
+              return false
+            }
           }
         }
       }
@@ -107,7 +111,7 @@ export default function ChaseTargetSection({
       }
       return false
     })
-  }, [shots, attackerShotId, attackerIsFriendly])
+  }, [shots, attackerShotId, attackerIsFriendly, showAll])
 
 
   // Get the vehicle being driven by the selected target
@@ -131,6 +135,25 @@ export default function ChaseTargetSection({
       <Typography variant="h6" sx={{ mb: 2, color: "error.main" }}>
         🎯 Target
       </Typography>
+
+      {/* Show All Checkbox */}
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={showAll}
+            onChange={(e) => setShowAll(e.target.checked)}
+            size="small"
+          />
+        }
+        label="Show all characters"
+        sx={{ 
+          mb: 1, 
+          ml: 1,
+          "& .MuiFormControlLabel-label": {
+            fontSize: "0.875rem",
+          }
+        }}
+      />
 
       {/* Target Driver Selection */}
       <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ mb: 3 }}>
