@@ -114,12 +114,19 @@ export default function ChaseResolution({
         edited: true,
       }
       
+      console.log("Chase Resolution - State to process:", {
+        method: stateToProcess.method,
+        position: stateToProcess.position,
+        success: stateToProcess.success,
+      })
+      
       const result = CRS.process(stateToProcess)
       
       console.log("Chase Resolution - Result from CRS.process:", {
         success: result.success,
         chasePoints: result.chasePoints,
         conditionPoints: result.conditionPoints,
+        position: result.position,
         targetActionValues: result.target?.action_values,
         attackerActionValues: result.attacker?.action_values
       })
@@ -176,7 +183,18 @@ export default function ChaseResolution({
         // Get the shot cost from form state
         const shotCost = parseInt((formState.data as ChaseFormData & { shotCost?: string }).shotCost || "3")
         
-        console.log("Chase Resolution - Position being sent:", result.position)
+        // Calculate the actual new position based on success and method
+        let finalPosition = formState.data.position
+        if (result.success) {
+          if (result.method === ChaseMethod.NARROW_THE_GAP && formState.data.position === "far") {
+            finalPosition = "near"
+          } else if (result.method === ChaseMethod.WIDEN_THE_GAP && formState.data.position === "near") {
+            finalPosition = "far"
+          }
+        }
+        
+        console.log("Chase Resolution - Original position from form:", formState.data.position)
+        console.log("Chase Resolution - Calculated new position:", finalPosition)
         console.log("Chase Resolution - Method:", result.method)
         console.log("Chase Resolution - Success:", result.success)
         
@@ -187,10 +205,8 @@ export default function ChaseResolution({
             role: formState.data.attackerRole || "pursuer", // Include attacker's role
             shot_cost: shotCost, // Add shot cost for the attacker
             character_id: attacker.id, // Include character ID to spend shots
-            action_values: {
-              ...attackerVehicleValues,
-              Position: result.position // Include position for ChaseRelationship update
-            },
+            action_values: attackerVehicleValues,
+            position: finalPosition, // Use the calculated position
             event: {
               type: "chase_action",
               description: `${attacker.name} ${result.method === ChaseMethod.RAM_SIDESWIPE ? "rams" : result.method === ChaseMethod.NARROW_THE_GAP ? "narrows gap with" : result.method === ChaseMethod.WIDEN_THE_GAP ? "widens gap from" : "evades"} ${target.name}`,
@@ -198,7 +214,7 @@ export default function ChaseResolution({
                 method: result.method,
                 chase_points: result.chasePoints,
                 condition_points: result.conditionPoints,
-                position: result.position,
+                position: finalPosition,
                 success: result.success,
                 shot_cost: shotCost
               }
@@ -208,10 +224,8 @@ export default function ChaseResolution({
             vehicle_id: targetVehicleId,
             target_vehicle_id: attackerVehicleId,
             role: formState.data.attackerRole === "pursuer" ? "evader" : "pursuer", // Target has opposite role
-            action_values: {
-              ...targetVehicleValues,
-              Position: result.position // Both vehicles need the position update
-            }
+            position: finalPosition, // Use the calculated position
+            action_values: targetVehicleValues
           }
         ]
         
@@ -320,7 +334,7 @@ export default function ChaseResolution({
                 }
               </Typography>
               <Typography variant="caption" sx={{ display: "block", mt: 1 }}>
-                New position: {showPreview ? (previewPosition === "near" ? "Near" : "Far") : (formState.data.position === "near" ? "Near" : "Far")}
+                New position: {showPreview ? (previewPosition === "near" ? "Near" : "Far") : (position === "near" ? "Near" : "Far")}
               </Typography>
             </>
           )}

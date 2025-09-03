@@ -9,13 +9,16 @@ const ChaseReducerService = {
   // calculate the results.
   process: function(state: ChaseFormData): ChaseFormData {
     let st = this.convertToNumber(state)
+    console.log("ChaseReducerService.process - Input position:", state.position, "edited:", st.edited)
 
     if (st.edited) {
       // roll attacks for all mooks
       if (this.VS.isMook(st.attacker)) return this.resolveMookAttacks(st)
 
       // roll the attack and apply the attack results
-      return this.resolveAttack(st)
+      const result = this.resolveAttack(st)
+      console.log("ChaseReducerService.process - Final result position:", result.position)
+      return result
     }
 
     return st
@@ -34,6 +37,7 @@ const ChaseReducerService = {
   //
   resolveAttack: function(state: ChaseFormData): ChaseFormData {
     const st = this.calculateAttackValues(state)
+    console.log("ChaseReducerService - After calculateAttackValues, position:", st.position)
     if (this.VS.isMook(state.target)) return this.killMooks(st)
 
     const { method, attacker, smackdown, target } = st
@@ -45,13 +49,16 @@ const ChaseReducerService = {
     const afterChasePoints = this.VS.chasePoints(updatedTarget)
     const afterConditionPoints = this.VS.conditionPoints(updatedTarget)
 
-    return {
+    const result = {
       ...st,
+      position: st.position, // Keep the position from calculateAttackValues which has the updated value
       chasePoints: afterChasePoints - beforeChasePoints,
       conditionPoints: afterConditionPoints - beforeConditionPoints,
       attacker: updatedAttacker,
       target: updatedTarget,
     }
+    console.log("ChaseReducerService - Returning from resolveAttack, position:", result.position)
+    return result
   },
 
   // roll the dice for a single attack
@@ -102,9 +109,12 @@ const ChaseReducerService = {
       // - If currently FAR and successful, position becomes NEAR
       // - If currently NEAR, position stays NEAR
       let newPosition = st.position
+      console.log("ChaseReducerService - Pursuer calculation: method=", st.method, "ChaseMethod.NARROW_THE_GAP=", ChaseMethod.NARROW_THE_GAP, "position=", st.position, "match=", st.method === ChaseMethod.NARROW_THE_GAP)
       if (st.method === ChaseMethod.NARROW_THE_GAP && st.position === "far") {
+        console.log("ChaseReducerService - Changing position from far to near")
         newPosition = "near"
       }
+      console.log("ChaseReducerService - New position:", newPosition)
 
       return {
         ...st,
