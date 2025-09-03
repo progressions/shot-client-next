@@ -169,8 +169,10 @@ export default function ChaseTargetSection({
                 
                 if (vehicle) {
                   // Update target vehicle-related fields
-                  updateField("handling", VS.isMook(vehicle) ? 0 : VS.handling(vehicle))
-                  updateField("frame", VS.isMook(vehicle) ? 0 : VS.frame(vehicle))
+                  const targetDriving = CS.skill(selectedChar, "Driving")
+                  updateField("defense", targetDriving) // Target's Driving is the difficulty
+                  // Note: These values will be used to subtract from attacker's damage in the formula
+                  // Chase Points = Outcome + Attacker's Squeal - Target's Handling
                   updateField("targetVehicle", vehicle) // Store the vehicle reference
                 }
               }
@@ -222,6 +224,10 @@ export default function ChaseTargetSection({
             </Typography>
             <Stack direction="row" spacing={3} sx={{ mt: 1 }}>
               <Typography variant="body2">
+                Driving: <strong>{CS.skill(target, "Driving")}</strong>
+                {stunt && " (+2 Stunt)"}
+              </Typography>
+              <Typography variant="body2">
                 Handling: <strong>{VS.handling(selectedVehicle)}</strong>
               </Typography>
               <Typography variant="body2">
@@ -248,7 +254,7 @@ export default function ChaseTargetSection({
                 onChange={(e) => updateField("stunt", e.target.checked)}
               />
             }
-            label="Target performing stunt (+2 to Handling roll)"
+            label="Attacker performing stunt (+2 to target's Driving)"
             sx={{ ml: 1 }}
           />
         </>

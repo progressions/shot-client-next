@@ -70,25 +70,40 @@ const ChaseReducerService = {
   // If the attack is a success, return the number of Chase Points to apply to the target
   // return the position 'near'.
   pursue: function(st: ChaseFormData): ChaseFormData {
-    const { success, actionResult, outcome, smackdown, wounds, wayAwfulFailure } = this.AS.wounds({
+    // Calculate the basic attack outcome (Driving + Swerve vs Target's Driving)
+    const { success, actionResult, outcome, wayAwfulFailure } = this.AS.outcome({
       swerve: st.swerve,
       actionValue: st.actionValue,
       defense: st.mookDefense,
       stunt: st.stunt,
-      toughness: this.R.calculateToughness(st),
-      damage: this.R.calculateDamage(st),
     })
 
     if (success) {
+      // For chase rules: Chase Points = Outcome + Attacker's Squeal - Target's Handling
+      // For ram/sideswipe: use Crunch - Frame instead
+      let chasePoints: number
+      let conditionPoints: number | null = null
+      
+      if (st.method === ChaseMethod.RAM_SIDESWIPE) {
+        // Ram/Sideswipe: Outcome + Attacker's Crunch - Target's Frame
+        const targetFrame = this.VS.isMook(st.target) ? 0 : this.VS.frame(st.target)
+        chasePoints = Math.max(0, (outcome || 0) + st.crunch - targetFrame)
+        conditionPoints = chasePoints
+      } else {
+        // Other methods: Outcome + Attacker's Squeal - Target's Handling  
+        const targetHandling = this.VS.isMook(st.target) ? 0 : this.VS.handling(st.target)
+        chasePoints = Math.max(0, (outcome || 0) + st.squeal - targetHandling)
+      }
+
       return {
         ...st,
         success: true,
         actionResult: actionResult,
         outcome: outcome || null,
-        smackdown: smackdown || null,
+        smackdown: null,
         position: "near",
-        chasePoints: wounds || null,
-        conditionPoints: st.method === ChaseMethod.RAM_SIDESWIPE ? wounds as number : null,
+        chasePoints: chasePoints,
+        conditionPoints: conditionPoints,
         boxcars: st.swerve.boxcars,
         wayAwfulFailure: wayAwfulFailure,
       }
@@ -110,25 +125,27 @@ const ChaseReducerService = {
   // If the attack is a success, apply Chase Points to the Target and
   // return the position 'far'.
   evade: function(st: ChaseFormData): ChaseFormData {
-    const attack = AS.wounds({
+    // Calculate the basic attack outcome (Driving + Swerve vs Target's Driving)
+    const { success, actionResult, outcome, wayAwfulFailure } = this.AS.outcome({
       swerve: st.swerve,
       actionValue: st.actionValue,
       defense: st.mookDefense,
       stunt: st.stunt,
-      toughness: this.R.calculateToughness(st),
-      damage: this.R.calculateDamage(st),
     })
-    const { success, actionResult, outcome, smackdown, wounds, wayAwfulFailure } = attack
 
     if (success) {
+      // For evade actions: Chase Points = Outcome + Attacker's Squeal - Target's Handling
+      const targetHandling = this.VS.isMook(st.target) ? 0 : this.VS.handling(st.target)
+      const chasePoints = Math.max(0, (outcome || 0) + st.squeal - targetHandling)
+      
       return {
         ...st,
         success: true,
         position: "far",
         actionResult: actionResult,
         outcome: outcome || null,
-        smackdown: smackdown || null,
-        chasePoints: wounds || null,
+        smackdown: null,
+        chasePoints: chasePoints,
         conditionPoints: null,
         boxcars: st.swerve.boxcars,
         wayAwfulFailure: wayAwfulFailure,

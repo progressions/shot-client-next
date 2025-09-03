@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Box, Button, Stack, Typography } from "@mui/material"
+import { Box, Button, Stack, Typography, Alert } from "@mui/material"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { VS, CRS } from "@/services"
 import type { ChaseFormData, Vehicle } from "@/types"
@@ -11,6 +11,7 @@ import { NumberField } from "@/components/ui"
 import { useToast } from "@/contexts"
 import { useClient } from "@/contexts/AppContext"
 import { useEncounter } from "@/contexts"
+import { parseToNumber } from "@/lib/parseToNumber"
 
 interface ChaseResolutionProps {
   formState: { data: ChaseFormData }
@@ -33,6 +34,28 @@ export default function ChaseResolution({
   const { encounter } = useEncounter()
   
   const { method, position, typedSwerve, swerve, success, chasePoints, conditionPoints } = formState.data
+  
+  // Show preview when swerve is typed but not yet resolved
+  const showPreview = typedSwerve !== "" && !formState.data.edited
+  
+  // Calculate preview values when showing preview
+  const previewActionResult = showPreview && attacker && target ? 
+    parseToNumber(formState.data.actionValue) + parseToNumber(typedSwerve) : null
+  const previewOutcome = previewActionResult !== null ? 
+    previewActionResult - parseToNumber(formState.data.defense) - (formState.data.stunt ? 2 : 0) : null
+  const previewSuccess = previewOutcome !== null && previewOutcome >= 0
+  
+  // Calculate preview chase points
+  let previewChasePoints: number | null = null
+  if (previewSuccess && previewOutcome !== null) {
+    if (formState.data.method === ChaseMethod.RAM_SIDESWIPE) {
+      const targetFrame = VS.isMook(target) ? 0 : VS.frame(target)
+      previewChasePoints = Math.max(0, previewOutcome + parseToNumber(formState.data.crunch) - targetFrame)
+    } else {
+      const targetHandling = VS.isMook(target) ? 0 : VS.handling(target)
+      previewChasePoints = Math.max(0, previewOutcome + parseToNumber(formState.data.squeal) - targetHandling)
+    }
+  }
 
   // Helper to update a field
   const updateField = (name: string, value: unknown) => {
@@ -172,53 +195,56 @@ export default function ChaseResolution({
         </Button>
       </Stack>
 
-      {/* Results Display */}
-      {formState.data.edited && formState.data.actionResult !== null && (
-        <Box
-          sx={{
-            mt: 3,
-            p: 2,
-            bgcolor: success ? "success.dark" : "error.dark",
-            color: "white",
-            borderRadius: 1,
-          }}
+      {/* Results Display - Show when swerve is typed or after resolve */}
+      {(showPreview || (formState.data.edited && formState.data.actionResult !== null)) && (
+        <Alert 
+          severity={(showPreview ? previewSuccess : success) ? "success" : "error"} 
+          sx={{ mt: 3, mb: 2 }}
         >
-          <Typography variant="h6" sx={{ mb: 1 }}>
-            {success ? "🎯 HIT!" : "❌ MISS!"}
+          <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
+            {(showPreview ? previewSuccess : success) ? "Hit!" : "Miss!"} Driving {formState.data.actionValue} + Swerve {showPreview ? typedSwerve : (swerve?.result || 0)} = Action Result {showPreview ? previewActionResult : formState.data.actionResult}
           </Typography>
-          
-          <Typography variant="body2">
-            Roll: {swerve?.result || 0} + {formState.data.actionValue} - {formState.data.modifiedDefense} = {formState.data.actionResult}
+          <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
+            Action Result {showPreview ? previewActionResult : formState.data.actionResult} - Driving {formState.data.defense}{formState.data.stunt ? " + 2 (stunt)" : ""} = Outcome {showPreview ? previewOutcome : formState.data.outcome}
           </Typography>
-          
-          {success && (
-            <>
-              {chasePoints !== null && chasePoints > 0 && (
-                <Typography variant="body1" fontWeight="bold">
-                  Chase Points: {chasePoints}
-                </Typography>
-              )}
-              {conditionPoints !== null && conditionPoints > 0 && (
-                <Typography variant="body1" fontWeight="bold">
-                  Condition Points: {conditionPoints}
-                </Typography>
-              )}
-              <Typography variant="body1">
-                New Position: {formState.data.position === "near" ? "NEAR" : "FAR"}
-              </Typography>
-            </>
+          {(showPreview ? previewSuccess : success) && (
+            <Typography variant="caption" sx={{ display: "block" }}>
+              {formState.data.method === ChaseMethod.RAM_SIDESWIPE 
+                ? `Outcome ${showPreview ? previewOutcome : formState.data.outcome} + Crunch ${formState.data.crunch} - Frame ${target ? VS.frame(target) : 0} = Chase Points ${showPreview ? previewChasePoints : chasePoints}`
+                : `Outcome ${showPreview ? previewOutcome : formState.data.outcome} + Squeal ${formState.data.squeal} - Handling ${target ? VS.handling(target) : 0} = Chase Points ${showPreview ? previewChasePoints : chasePoints}`
+              }
+            </Typography>
           )}
+        </Alert>
+      )}
+      
+      {/* Additional results - only show after resolve, not in preview */}
+      {!showPreview && formState.data.edited && success && (
+        <Box sx={{ mt: 2, p: 2, bgcolor: "background.paper", borderRadius: 1 }}>
+          {chasePoints !== null && chasePoints > 0 && (
+            <Typography variant="body1" fontWeight="bold">
+              Chase Points Dealt: {chasePoints}
+            </Typography>
+          )}
+          {conditionPoints !== null && conditionPoints > 0 && (
+            <Typography variant="body1" fontWeight="bold">
+              Condition Points Dealt: {conditionPoints}
+            </Typography>
+          )}
+          <Typography variant="body1">
+            New Position: {formState.data.position === "near" ? "NEAR" : "FAR"}
+          </Typography>
           
           {/* Victory Check */}
-          {success && target && VS.chasePoints(target) >= 35 && (
-            <Box sx={{ mt: 2, p: 1, bgcolor: "rgba(0,0,0,0.3)", borderRadius: 1 }}>
+          {target && VS.chasePoints(target) >= 35 && (
+            <Box sx={{ mt: 2, p: 1, bgcolor: "warning.main", color: "warning.contrastText", borderRadius: 1 }}>
               {VS.chasePoints(target) >= 50 ? (
-                <Typography color="error.light" fontWeight="bold">
+                <Typography fontWeight="bold">
                   💥 TOTAL VICTORY! Target defeated!
                 </Typography>
               ) : (
-                <Typography color="warning.light" fontWeight="bold">
-                  ⚠️ VICTORY IMMINENT! ({VS.chasePoints(target)}/35)
+                <Typography fontWeight="bold">
+                  ⚠️ VICTORY! ({VS.chasePoints(target)}/35)
                 </Typography>
               )}
             </Box>

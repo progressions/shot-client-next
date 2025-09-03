@@ -247,21 +247,21 @@ export default function ChaseAttackerSection({
               </Stack>
             </Box>
 
-            {/* Damage Block */}
+            {/* Squeal Block */}
             <Box sx={{ width: { xs: "100%", sm: "50%" } }}>
               <Typography variant="body2" sx={{ mb: 2, fontWeight: "medium" }}>
-                Damage
+                Squeal
               </Typography>
               <Stack direction="row" spacing={1} alignItems="flex-start">
                 <Box>
                   <NumberField
-                    name="crunch"
-                    value={parseInt(formState.data.crunch?.toString() || "0") || 0}
+                    name="squeal"
+                    value={parseInt(formState.data.squeal?.toString() || "0") || 0}
                     size="small"
                     width="80px"
                     error={false}
-                    onChange={e => updateField("crunch", e.target.value)}
-                    onBlur={e => updateField("crunch", e.target.value)}
+                    onChange={e => updateField("squeal", e.target.value)}
+                    onBlur={e => updateField("squeal", e.target.value)}
                   />
                 </Box>
                 <FormControl
@@ -278,7 +278,7 @@ export default function ChaseAttackerSection({
                     disabled
                   >
                     <MenuItem value={selectedVehicle.id || ""}>
-                      {selectedVehicle.name} (Crunch: {VS.crunch(selectedVehicle)})
+                      {selectedVehicle.name} (Squeal: {VS.squeal(selectedVehicle)})
                     </MenuItem>
                   </Select>
                   <Typography
@@ -291,7 +291,7 @@ export default function ChaseAttackerSection({
                       fontStyle: "italic",
                     }}
                   >
-                    Handling: {VS.handling(selectedVehicle)}, Squeal: {VS.squeal(selectedVehicle)}
+                    Handling: {VS.handling(selectedVehicle)}, Crunch: {VS.crunch(selectedVehicle)}
                   </Typography>
                 </FormControl>
               </Stack>
