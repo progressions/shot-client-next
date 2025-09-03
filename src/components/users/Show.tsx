@@ -22,7 +22,7 @@ interface ShowProperties {
 
 export default function Show({
   user: initialUser,
-  initialIsMobile,
+  initialIsMobile: _initialIsMobile,
 }: ShowProperties) {
   const { campaignData } = useCampaign()
   const { client } = useClient()

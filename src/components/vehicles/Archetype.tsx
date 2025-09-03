@@ -20,8 +20,6 @@ export default function EditArchetype({
   const [archetypes, setArchetypes] = useState<VehicleArchetype[]>([])
   const isMounted = useRef(false)
 
-  const selectedArchetype = archetypes.find(arch => arch.name === archetype)
-
   const fetchRecords = async () => {
     const response = await client.getVehicleArchetypes()
     setArchetypes(response.data)

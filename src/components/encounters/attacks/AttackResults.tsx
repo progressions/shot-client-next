@@ -17,7 +17,7 @@ export default function AttackResults({
   smackdown,
   defenseChoicePerTarget,
   calculateEffectiveAttackValue,
-  calculateTargetDefense,
+  calculateTargetDefense: _calculateTargetDefense,
 }: AttackResultsProps) {
   if (CS.isMook(attacker) || multiTargetResults.length === 0) {
     return null
