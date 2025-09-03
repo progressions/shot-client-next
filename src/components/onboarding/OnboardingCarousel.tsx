@@ -30,7 +30,6 @@ import {
   isRelevantPage,
 } from "@/lib/onboarding"
 import { collectionNames } from "@/lib/maps"
-import { useClient, useToast, useApp } from "@/contexts"
 
 export interface OnboardingCarouselProps {
   progress: OnboardingProgress
@@ -69,9 +68,6 @@ export const OnboardingCarousel: React.FC<OnboardingCarouselProps> = ({
   currentPath,
 }) => {
   const router = useRouter()
-  const { client } = useClient()
-  const { toastSuccess, toastError } = useToast()
-  const { refreshUser } = useApp()
 
   // Get remaining milestones (only show incomplete ones, but don&rsquo;t skip campaign creation by default)
   const remainingMilestones = ONBOARDING_MILESTONES.filter(

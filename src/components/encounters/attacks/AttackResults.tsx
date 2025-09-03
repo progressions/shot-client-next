@@ -17,7 +17,7 @@ export default function AttackResults({
   smackdown,
   defenseChoicePerTarget,
   calculateEffectiveAttackValue,
-  calculateTargetDefense,
+  calculateTargetDefense: _calculateTargetDefense,
 }: AttackResultsProps) {
   if (CS.isMook(attacker) || multiTargetResults.length === 0) {
     return null
@@ -70,10 +70,6 @@ export default function AttackResults({
             const targetChar = targetShot?.character
             if (!targetChar) return null
 
-            const currentDefense = calculateTargetDefense(
-              targetChar,
-              result.targetId
-            )
             const hasDefenseModifier =
               defenseChoicePerTarget[result.targetId] &&
               defenseChoicePerTarget[result.targetId] !== "none"

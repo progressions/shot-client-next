@@ -238,8 +238,7 @@ export async function handleMookAttack(
     shots: Shot[]
   ) => number,
   attackerWeapons: Weapon[],
-  toastSuccess: (msg: string) => void,
-  toastError: (msg: string) => void
+  toastSuccess: (msg: string) => void
 ): Promise<void> {
   const shots = parseInt(shotCost) || 3
   const characterUpdates: CharacterUpdate[] = []
@@ -335,7 +334,7 @@ export async function handleSingleTargetAttack(
   weaponDamage: string,
   stunt: boolean,
   toastSuccess: (msg: string) => void,
-  toastError: (msg: string) => void
+  _toastError: (msg: string) => void
 ): Promise<void> {
   const shots = parseInt(shotCost) || 3
   const damage = parseInt(finalDamage) || 0

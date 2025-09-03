@@ -1,11 +1,16 @@
-import { CS } from "@/services"
-import type { Character, Shot } from "@/types"
+import { CS, CES } from "@/services"
+import type { Character, Shot, Encounter } from "@/types"
 
 /**
  * Sort shots for attacker selection
+ * Order: Shot number (desc) -> Character Type -> Speed (desc) -> Name (asc)
+ * Type order: Uber-Boss, Boss, PC, Ally, Featured Foe, Mook
  */
-export const sortAttackerShots = (shots: Shot[]): Shot[] => {
-  const typeOrder: { [key: string]: number } = {
+export const sortAttackerShots = (
+  shots: Shot[],
+  encounter?: Encounter
+): Shot[] => {
+  const typeOrder: Record<string, number> = {
     "Uber-Boss": 1,
     Boss: 2,
     PC: 3,
@@ -26,18 +31,49 @@ export const sortAttackerShots = (shots: Shot[]): Shot[] => {
     if (!charA || !charB) return 0
 
     // Then sort by character type priority
-    const typeA = typeOrder[CS.type(charA)] || 999
-    const typeB = typeOrder[CS.type(charB)] || 999
+    const typeA = CS.type(charA)
+    const typeB = CS.type(charB)
+    const orderA = typeOrder[typeA] || 999
+    const orderB = typeOrder[typeB] || 999
 
-    if (typeA !== typeB) {
-      return typeA - typeB
+    if (orderA !== orderB) {
+      return orderA - orderB
     }
 
-    // Finally sort by Speed (higher speed first)
-    const speedA = CS.speed(charA) || 0
-    const speedB = CS.speed(charB) || 0
+    // Then sort by Speed (higher speed first)
+    // Get adjusted speed values if encounter is provided
+    let speedA = CS.speed(charA) || 0
+    let speedB = CS.speed(charB) || 0
 
-    return speedB - speedA
+    if (encounter) {
+      // Get adjusted speed accounting for effects but not impairments
+      const [, adjustedSpeedA] = CES.adjustedValue(
+        charA,
+        speedA,
+        "Speed",
+        encounter,
+        true
+      )
+      const [, adjustedSpeedB] = CES.adjustedValue(
+        charB,
+        speedB,
+        "Speed",
+        encounter,
+        true
+      )
+      speedA = adjustedSpeedA
+      speedB = adjustedSpeedB
+    }
+
+    if (speedA !== speedB) {
+      return speedB - speedA
+    }
+
+    // Finally sort by name alphabetically (ascending)
+    const nameA = charA.name || ""
+    const nameB = charB.name || ""
+
+    return nameA.localeCompare(nameB)
   })
 }
 

@@ -41,7 +41,7 @@ export function GenericFilter({
   onChange,
   onFiltersUpdate,
   omit = [],
-  excludeIds = [],
+  excludeIds: _excludeIds = [],
 }: GenericFilterProps) {
   const config = filterConfigs[entity]
   const { filters, ...data } = formState.data
@@ -104,7 +104,6 @@ export function GenericFilter({
     const displayName =
       field.displayName ||
       field.name.charAt(0).toUpperCase() + field.name.slice(1)
-    const isPrimaryField = field.name.toLowerCase() === entity.toLowerCase()
 
     if (field.type === "static") {
       return (

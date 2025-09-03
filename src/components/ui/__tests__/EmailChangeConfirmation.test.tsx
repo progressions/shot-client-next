@@ -122,7 +122,6 @@ describe("EmailChangeConfirmation", () => {
     render(<EmailChangeConfirmation {...defaultProps} />)
 
     const dialog = screen.getByRole("dialog")
-    const dialogParent = dialog.closest(".MuiDialog-root")
 
     // Check that dialog paper has proper styling applied
     expect(dialog).toBeInTheDocument()

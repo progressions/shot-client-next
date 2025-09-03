@@ -11,6 +11,10 @@ import {
   ButtonGroup,
   Button,
   Divider,
+  FormControlLabel,
+  Checkbox,
+  Stack,
+  Paper,
 } from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
 import { Icon } from "@/components/ui"
@@ -22,22 +26,31 @@ import {
   LocationsDialog,
 } from "@/components/encounters"
 import { FaGun, FaPlay, FaPlus, FaMinus } from "react-icons/fa6"
-import { FaMapMarkerAlt } from "react-icons/fa"
+import { FaMapMarkerAlt, FaCaretRight, FaCaretDown } from "react-icons/fa"
+import { MdAdminPanelSettings } from "react-icons/md"
 import { useEncounter } from "@/contexts"
 import FightService from "@/services/FightService"
 import type { Character, Vehicle } from "@/types"
 
-export default function MenuBar() {
+interface MenuBarProps {
+  showHidden: boolean
+  onShowHiddenChange: (show: boolean) => void
+}
+
+export default function MenuBar({
+  showHidden,
+  onShowHiddenChange,
+}: MenuBarProps) {
   const theme = useTheme()
   const { encounter, updateEncounter } = useEncounter()
-  const [open, setOpen] = useState<"character" | "vehicle" | "attack" | null>(
-    null
-  )
+  const [open, setOpen] = useState<
+    "character" | "vehicle" | "attack" | "admin" | null
+  >(null)
   const [initiativeDialogOpen, setInitiativeDialogOpen] = useState(false)
   const [locationsDialogOpen, setLocationsDialogOpen] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
-  const toggleBox = (type: "character" | "vehicle" | "attack") => {
+  const toggleBox = (type: "character" | "vehicle" | "attack" | "admin") => {
     setOpen(current => (current === type ? null : type))
   }
 
@@ -109,87 +122,147 @@ export default function MenuBar() {
     <>
       <AppBar position="sticky" sx={{ top: 0, zIndex: 1100 }}>
         <Toolbar>
-          {showStartSequence && (
-            <Tooltip title="Start Sequence">
+          {/* Admin Panel Toggle and Sequence Display */}
+          <Box sx={{ display: "flex", alignItems: "center", mr: 2 }}>
+            <Tooltip
+              title={
+                open === "admin" ? "Close Admin Panel" : "Open Admin Panel"
+              }
+            >
               <IconButton
-                onClick={handleStartSequence}
-                sx={{ color: "white", mr: 2 }}
+                onClick={() => toggleBox("admin")}
+                sx={{
+                  color: "white",
+                  p: 0.5,
+                  mr: 1,
+                  backgroundColor:
+                    open === "admin"
+                      ? "rgba(255, 255, 255, 0.2)"
+                      : "transparent",
+                  borderRadius: 1,
+                  "&:hover": {
+                    backgroundColor:
+                      open === "admin"
+                        ? "rgba(255, 255, 255, 0.3)"
+                        : "rgba(255, 255, 255, 0.1)",
+                  },
+                }}
               >
-                <FaPlay size={20} />
+                {open === "admin" ? (
+                  <FaCaretDown size={20} />
+                ) : (
+                  <FaCaretRight size={20} />
+                )}
               </IconButton>
             </Tooltip>
-          )}
-          <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
-            <Typography variant="h6" sx={{ mr: 2 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                minWidth: 80,
+                fontWeight: "bold",
+              }}
+            >
               Sequence {encounter.sequence || 1}
             </Typography>
-            <ButtonGroup size="small" variant="contained">
-              <Button
-                onClick={() => handleSequenceChange(-1)}
-                sx={{
-                  minWidth: 24,
-                  width: 24,
-                  height: 24,
-                  p: 0,
-                  backgroundColor: "primary.dark",
-                  "&:hover": { backgroundColor: "primary.main" },
-                }}
-              >
-                <FaMinus size={10} />
-              </Button>
-              <Button
-                onClick={() => handleSequenceChange(1)}
-                sx={{
-                  minWidth: 24,
-                  width: 24,
-                  height: 24,
-                  p: 0,
-                  backgroundColor: "primary.dark",
-                  "&:hover": { backgroundColor: "primary.main" },
-                }}
-              >
-                <FaPlus size={10} />
-              </Button>
-            </ButtonGroup>
           </Box>
+
+          <Box sx={{ flexGrow: 1 }} />
+
+          {/* Action Buttons */}
           <IconButton
             onClick={() => toggleBox("attack")}
-            sx={{ color: "white" }}
+            sx={{
+              color: "white",
+              px: { xs: 0.5, sm: 1 },
+              backgroundColor:
+                open === "attack" ? "rgba(255, 255, 255, 0.2)" : "transparent",
+              borderRadius: 1,
+              "&:hover": {
+                backgroundColor:
+                  open === "attack"
+                    ? "rgba(255, 255, 255, 0.3)"
+                    : "rgba(255, 255, 255, 0.1)",
+              },
+            }}
             title="Attack Resolution"
           >
-            <FaGun size={24} />
+            <FaGun size={20} />
           </IconButton>
           <Divider
             orientation="vertical"
             sx={{
-              mx: 1,
+              mx: { xs: 0.5, sm: 1 },
               height: 24,
               backgroundColor: "rgba(255, 255, 255, 0.3)",
             }}
           />
-          <IconButton onClick={() => toggleBox("vehicle")}>
+          <IconButton
+            onClick={() => toggleBox("vehicle")}
+            sx={{
+              px: { xs: 0.5, sm: 1 },
+              backgroundColor:
+                open === "vehicle" ? "rgba(255, 255, 255, 0.2)" : "transparent",
+              borderRadius: 1,
+              "&:hover": {
+                backgroundColor:
+                  open === "vehicle"
+                    ? "rgba(255, 255, 255, 0.3)"
+                    : "rgba(255, 255, 255, 0.1)",
+              },
+            }}
+          >
             <Icon keyword="Add Vehicle" color="white" />
           </IconButton>
-          <IconButton onClick={() => toggleBox("character")}>
+          <IconButton
+            onClick={() => toggleBox("character")}
+            sx={{
+              px: { xs: 0.5, sm: 1 },
+              backgroundColor:
+                open === "character"
+                  ? "rgba(255, 255, 255, 0.2)"
+                  : "transparent",
+              borderRadius: 1,
+              "&:hover": {
+                backgroundColor:
+                  open === "character"
+                    ? "rgba(255, 255, 255, 0.3)"
+                    : "rgba(255, 255, 255, 0.1)",
+              },
+            }}
+          >
             <Icon keyword="Add Character" color="white" />
           </IconButton>
           <Divider
             orientation="vertical"
             sx={{
-              mx: 1,
+              mx: { xs: 0.5, sm: 1 },
               height: 24,
               backgroundColor: "rgba(255, 255, 255, 0.3)",
             }}
           />
           <IconButton
             onClick={() => setLocationsDialogOpen(true)}
-            sx={{ color: "white" }}
+            sx={{
+              color: "white",
+              px: { xs: 0.5, sm: 1 },
+              backgroundColor: locationsDialogOpen
+                ? "rgba(255, 255, 255, 0.2)"
+                : "transparent",
+              borderRadius: 1,
+              "&:hover": {
+                backgroundColor: locationsDialogOpen
+                  ? "rgba(255, 255, 255, 0.3)"
+                  : "rgba(255, 255, 255, 0.1)",
+              },
+            }}
             title="View Locations"
           >
-            <FaMapMarkerAlt size={20} />
+            <FaMapMarkerAlt size={18} />
           </IconButton>
         </Toolbar>
       </AppBar>
+
+      {/* Collapsible Panels */}
       <AnimatePresence mode="wait">
         {open && (
           <motion.div
@@ -205,6 +278,111 @@ export default function MenuBar() {
             }}
           >
             <Box sx={{ p: 2, border: "1px solid", borderColor: "grey.300" }}>
+              {open === "admin" && (
+                <Box sx={{ maxWidth: 1200, mx: "auto" }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      mb: 3,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <MdAdminPanelSettings size={24} />
+                    Fight Admin
+                  </Typography>
+
+                  <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
+                    {/* Sequence Controls */}
+                    <Paper elevation={1} sx={{ p: 2, flex: 1 }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ mb: 1, fontWeight: "bold" }}
+                      >
+                        Sequence Control
+                      </Typography>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        <Typography sx={{ mr: 1 }}>
+                          Current: {encounter.sequence || 1}
+                        </Typography>
+                        <ButtonGroup size="small" variant="contained">
+                          <Button
+                            onClick={() => handleSequenceChange(-1)}
+                            sx={{
+                              minWidth: 32,
+                              p: 0.5,
+                            }}
+                          >
+                            <FaMinus size={12} />
+                          </Button>
+                          <Button
+                            onClick={() => handleSequenceChange(1)}
+                            sx={{
+                              minWidth: 32,
+                              p: 0.5,
+                            }}
+                          >
+                            <FaPlus size={12} />
+                          </Button>
+                        </ButtonGroup>
+                      </Box>
+                    </Paper>
+
+                    {/* Initiative Button */}
+                    {showStartSequence && (
+                      <Paper elevation={1} sx={{ p: 2, flex: 1 }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ mb: 1, fontWeight: "bold" }}
+                        >
+                          Initiative
+                        </Typography>
+                        <Button
+                          variant="contained"
+                          startIcon={<FaPlay />}
+                          onClick={handleStartSequence}
+                          fullWidth
+                          sx={{
+                            backgroundColor: initiativeDialogOpen
+                              ? "primary.dark"
+                              : "primary.main",
+                          }}
+                        >
+                          Roll Initiative
+                        </Button>
+                      </Paper>
+                    )}
+
+                    {/* View Options */}
+                    <Paper elevation={1} sx={{ p: 2, flex: 1 }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ mb: 1, fontWeight: "bold" }}
+                      >
+                        View Options
+                      </Typography>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={showHidden}
+                            onChange={e => onShowHiddenChange(e.target.checked)}
+                            size="small"
+                          />
+                        }
+                        label="Show Hidden Characters"
+                        sx={{
+                          "& .MuiFormControlLabel-label": {
+                            fontSize: "0.875rem",
+                          },
+                        }}
+                      />
+                    </Paper>
+                  </Stack>
+                </Box>
+              )}
               {open === "character" && (
                 <AddCharacter
                   open={open === "character"}
@@ -217,11 +395,15 @@ export default function MenuBar() {
                   onClose={() => setOpen(null)}
                 />
               )}
-              {open === "attack" && <AttackPanel />}
+              {open === "attack" && (
+                <AttackPanel onClose={() => setOpen(null)} />
+              )}
             </Box>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Dialogs */}
       <InitiativeDialog
         open={initiativeDialogOpen}
         onClose={() => setInitiativeDialogOpen(false)}

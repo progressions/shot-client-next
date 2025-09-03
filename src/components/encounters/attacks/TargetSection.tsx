@@ -69,7 +69,6 @@ export default function TargetSection({
   allShots,
   sortedTargetShots,
   formState,
-  dispatchForm,
   attacker,
   attackerShotId,
   updateField,

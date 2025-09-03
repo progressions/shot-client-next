@@ -81,7 +81,7 @@ export default function AttackerSection({
       }
     }
     prevTargetingMooks.current = targetingMooks
-  }, [targetingMooks, selectedWeapon, attackValue])
+  }, [targetingMooks, selectedWeapon, attackValue, updateField])
 
   // Get attack skills for the selected attacker
   const attackOptions = useMemo(() => {

@@ -7,7 +7,7 @@ import Image from "next/image"
 import { RocketLaunch, Login } from "@mui/icons-material"
 import { MARKETING_IMAGES } from "@/lib/marketingImages"
 
-const HeroContainer = styled(Box)(({ theme }) => ({
+const HeroContainer = styled(Box)(() => ({
   color: "white",
   minHeight: "100vh",
   display: "flex",

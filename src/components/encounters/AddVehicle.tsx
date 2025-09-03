@@ -7,7 +7,7 @@ import { type Vehicle } from "@/types"
 import { useEncounter, useToast, useClient } from "@/contexts"
 
 export default function AddVehicle({
-  open,
+  open: _open,
   onClose,
 }: {
   open: boolean

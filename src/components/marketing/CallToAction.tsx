@@ -25,7 +25,7 @@ const CTASection = styled(Box)(({ theme }) => ({
   alignItems: "center",
 }))
 
-const CTAContent = styled(Container)(({ theme }) => ({
+const CTAContent = styled(Container)(() => ({
   position: "relative",
   zIndex: 2,
   textAlign: "center",

@@ -63,7 +63,7 @@ export default function LocationsDialog({
     })
 
     // Sort entities within each location by name
-    sortedGroups.forEach(([location, entities]) => {
+    sortedGroups.forEach(([_location, entities]) => {
       entities.sort((a, b) => a.name.localeCompare(b.name))
     })
 

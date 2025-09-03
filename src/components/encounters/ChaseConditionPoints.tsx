@@ -17,43 +17,81 @@ export default function ChaseConditionPoints({
   const conditionPoints = VS.conditionPoints(vehicle)
 
   return (
-    <Stack direction="column" spacing={1}>
-      <Stack
-        direction="column"
+    <Stack
+      direction={{ xs: "row", sm: "column" }}
+      spacing={{ xs: 0.5, sm: 1 }}
+      sx={{
+        alignItems: "center",
+        m: 0,
+        p: 0,
+      }}
+    >
+      <Box
         sx={{
           backgroundColor: theme.palette.divider,
-          width: { xs: "3.5rem", md: "4.5rem" },
-          textAlign: "center",
-          py: 1,
-          borderRadius: "8px",
+          width: { xs: "2.25rem", sm: "3rem", md: "3.5rem" },
+          height: { xs: "2.25rem", sm: "3rem", md: "auto" },
+          borderRadius: { xs: "50%", sm: "50%", md: "8px" },
+          display: "flex",
+          flexDirection: "column",
           alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          py: { xs: 0, md: 0.75 },
         }}
       >
         <Box
-          sx={{ fontSize: { xs: "1.5rem", md: "1.75rem" }, fontWeight: 800 }}
+          sx={{
+            fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
+            fontWeight: 800,
+            lineHeight: 1,
+          }}
         >
           {chasePoints}
         </Box>
-        <Box sx={{ fontSize: { xs: "0.75rem", md: "0.75rem" } }}>Chase</Box>
-      </Stack>
-      <Stack
-        direction="column"
+        <Box
+          sx={{
+            fontSize: { xs: "0.4rem", sm: "0.5rem", md: "0.65rem" },
+            lineHeight: 1,
+            mt: { xs: 0, md: 0.25 },
+          }}
+        >
+          Chase
+        </Box>
+      </Box>
+      <Box
         sx={{
           backgroundColor: theme.palette.divider,
-          width: { xs: "3.5rem", md: "4.5rem" },
-          textAlign: "center",
-          py: 1,
-          borderRadius: "8px",
+          width: { xs: "2.25rem", sm: "3rem", md: "3.5rem" },
+          height: { xs: "2.25rem", sm: "3rem", md: "auto" },
+          borderRadius: { xs: "50%", sm: "50%", md: "8px" },
+          display: "flex",
+          flexDirection: "column",
           alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          py: { xs: 0, md: 0.75 },
         }}
       >
         <Box
-          sx={{ fontSize: { xs: "1.5rem", md: "1.75rem" }, fontWeight: 800 }}
+          sx={{
+            fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
+            fontWeight: 800,
+            lineHeight: 1,
+          }}
         >
           {conditionPoints}
         </Box>
-        <Box sx={{ fontSize: { xs: "0.75rem", md: "0.75rem" } }}>Condition</Box>
-      </Stack>
+        <Box
+          sx={{
+            fontSize: { xs: "0.4rem", sm: "0.5rem", md: "0.65rem" },
+            lineHeight: 1,
+            mt: { xs: 0, md: 0.25 },
+          }}
+        >
+          Cond
+        </Box>
+      </Box>
     </Stack>
   )
 }

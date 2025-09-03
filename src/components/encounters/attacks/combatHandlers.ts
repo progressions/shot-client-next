@@ -75,8 +75,7 @@ export function createAttackerUpdate(
 export function createDodgeUpdate(
   targetShot: Shot,
   targetChar: Character,
-  defenseChoice: string,
-  fortuneDie?: string
+  defenseChoice: string
 ): CharacterUpdate {
   const currentShot = targetShot.shot || 0
   const newShot = currentShot - 1

@@ -7,14 +7,14 @@ import type { WoundsSummaryProps } from "@/types"
 export default function WoundsSummary({
   multiTargetResults,
   allShots,
-  calculateTargetDefense,
+  calculateTargetDefense: _calculateTargetDefense,
   defenseChoicePerTarget,
-  selectedTargetIds,
-  attackValue,
-  swerve,
-  weaponDamage,
-  targetMookCount,
-  finalDamage,
+  selectedTargetIds: _selectedTargetIds,
+  attackValue: _attackValue,
+  swerve: _swerve,
+  weaponDamage: _weaponDamage,
+  targetMookCount: _targetMookCount,
+  finalDamage: _finalDamage,
 }: WoundsSummaryProps) {
   return (
     <Alert severity="warning" sx={{ mt: 2 }}>

@@ -43,9 +43,25 @@ export default function InitiativeDialog({
   >([])
 
   // Initialize character initiatives when dialog opens
+  // Filter out characters with current_shot > 0
   useEffect(() => {
     if (open && characters.length > 0) {
-      const initiatives = characters.map(char => ({
+      const eligibleCharacters = characters.filter(char => {
+        const charWithShot = char as (Character | Vehicle) & {
+          current_shot?: number | string | null
+        }
+        const currentShot =
+          typeof charWithShot.current_shot === "number"
+            ? charWithShot.current_shot
+            : typeof charWithShot.current_shot === "string"
+              ? parseInt(charWithShot.current_shot)
+              : null
+
+        // Include if shot is null (hidden), 0, or negative
+        return currentShot === null || currentShot <= 0
+      })
+
+      const initiatives = eligibleCharacters.map(char => ({
         character: char,
         initiative: null,
         rolled: false,
@@ -111,7 +127,24 @@ export default function InitiativeDialog({
   const handleApply = () => {
     const updatedCharacters = characterInitiatives.map(ci => {
       if (ci.initiative !== null) {
-        return SharedService.setInitiative(ci.character, ci.initiative)
+        // Get current shot to apply as modifier
+        const charWithShot = ci.character as (Character | Vehicle) & {
+          current_shot?: number | string | null
+        }
+        const currentShot =
+          typeof charWithShot.current_shot === "number"
+            ? charWithShot.current_shot
+            : typeof charWithShot.current_shot === "string"
+              ? parseInt(charWithShot.current_shot)
+              : null
+
+        // Apply negative shot modifier (if character is at -2, subtract 2 from initiative)
+        const finalInitiative =
+          currentShot !== null && currentShot < 0
+            ? ci.initiative + currentShot // Adding negative number subtracts
+            : ci.initiative
+
+        return SharedService.setInitiative(ci.character, finalInitiative)
       }
       return ci.character
     })
@@ -125,6 +158,20 @@ export default function InitiativeDialog({
   const renderCharacterRow = (ci: CharacterInitiative) => {
     const speed = CharacterService.speed(ci.character)
     const isPC = SharedService.isType(ci.character, ["PC", "Ally"])
+
+    // Get current shot for display
+    const charWithShot = ci.character as (Character | Vehicle) & {
+      current_shot?: number | string | null
+    }
+    const currentShot =
+      typeof charWithShot.current_shot === "number"
+        ? charWithShot.current_shot
+        : typeof charWithShot.current_shot === "string"
+          ? parseInt(charWithShot.current_shot)
+          : null
+
+    const hasNegativeShot = currentShot !== null && currentShot < 0
+    const shotModifier = hasNegativeShot ? currentShot : 0
 
     return (
       <Box
@@ -140,22 +187,39 @@ export default function InitiativeDialog({
       >
         <Typography sx={{ flex: 1, minWidth: 120 }}>
           {ci.character.name}
+          {hasNegativeShot && (
+            <Typography
+              component="span"
+              variant="body2"
+              color="warning.main"
+              sx={{ ml: 1 }}
+            >
+              (Shot {currentShot})
+            </Typography>
+          )}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>
           Speed: {speed}
         </Typography>
-        <TextField
-          type="number"
-          value={ci.initiative ?? ""}
-          onChange={e => handleInitiativeChange(ci.character, e.target.value)}
-          placeholder={isPC ? "Enter" : "Auto"}
-          size="small"
-          sx={{ width: 80 }}
-          inputProps={{
-            min: 0,
-            max: 30,
-          }}
-        />
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <TextField
+            type="number"
+            value={ci.initiative ?? ""}
+            onChange={e => handleInitiativeChange(ci.character, e.target.value)}
+            placeholder={isPC ? "Enter" : "Auto"}
+            size="small"
+            sx={{ width: 80 }}
+            inputProps={{
+              min: 0,
+              max: 30,
+            }}
+          />
+          {hasNegativeShot && ci.initiative !== null && (
+            <Typography variant="body2" color="text.secondary">
+              = {ci.initiative + shotModifier}
+            </Typography>
+          )}
+        </Box>
         <IconButton
           onClick={() => rollInitiativeForCharacter(ci.character)}
           size="small"
@@ -173,8 +237,9 @@ export default function InitiativeDialog({
       <DialogTitle>Set Initiative for Sequence</DialogTitle>
       <DialogContent>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Set initiative values for all characters. PCs typically roll or enter
-          manually, NPCs can be auto-rolled.
+          Set initiative values for characters at shot 0 or below. Characters
+          with negative shots will have their modifier applied (e.g., a
+          character at shot -1 entering 9 will start at shot 8).
         </Typography>
 
         <Grid container spacing={3}>

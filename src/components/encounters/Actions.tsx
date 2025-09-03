@@ -8,12 +8,11 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  TextField,
   Box,
   Typography,
 } from "@mui/material"
 import { useEncounter, useToast } from "@/contexts"
-import { Icon } from "@/components/ui"
+import { Icon, NumberField } from "@/components/ui"
 import { CS } from "@/services"
 
 type ActionsProps = {
@@ -21,7 +20,7 @@ type ActionsProps = {
 }
 
 export default function Actions({ entity }: ActionsProps) {
-  const { ec } = useEncounter()
+  const { ec, encounter } = useEncounter()
   const { toastSuccess, toastError } = useToast()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [shotCost, setShotCost] = useState(3)
@@ -62,38 +61,62 @@ export default function Actions({ entity }: ActionsProps) {
     setShotCost(Math.max(0, Math.min(20, value))) // Clamp between 0 and 20
   }
 
+  // Get current shot for the entity
+  const getCurrentShot = () => {
+    if (!encounter?.shots) return null
+
+    for (const shot of encounter.shots) {
+      const character = shot.characters?.find(c => c.id === entity.id)
+      if (character && character.current_shot !== undefined) {
+        return character.current_shot
+      }
+      const vehicle = shot.vehicles?.find(v => v.id === entity.id)
+      if (vehicle && vehicle.current_shot !== undefined) {
+        return vehicle.current_shot
+      }
+    }
+    return null
+  }
+
+  const currentShot = getCurrentShot()
+  const newShot = currentShot !== null ? currentShot - shotCost : null
+
   return (
     <>
       <IconButton onClick={handleOpen} sx={{ p: 1 }}>
         <Icon keyword="Actions" size={24} />
       </IconButton>
 
-      <Dialog open={dialogOpen} onClose={handleClose} maxWidth="xs" fullWidth>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleClose}
+        maxWidth={false}
+        sx={{ "& .MuiDialog-paper": { width: 280 } }}
+      >
         <DialogTitle>Spend Shots</DialogTitle>
         <DialogContent>
-          <Box sx={{ pt: 2 }}>
-            <Typography variant="body2" sx={{ mb: 2 }}>
-              How many shots does {entity.name} spend?
-            </Typography>
-            <TextField
-              autoFocus
-              type="number"
-              label="Shot Cost"
-              value={shotCost}
-              onChange={handleShotChange}
-              onKeyDown={e => {
-                if (e.key === "Enter") {
-                  e.preventDefault()
-                  handleSpendShots()
-                }
-              }}
-              sx={{ width: 120 }}
-              inputProps={{
-                min: 0,
-                max: 20,
-                step: 1,
-              }}
-            />
+          <Box sx={{ pt: 1 }}>
+            {currentShot !== null && shotCost > 0 && (
+              <Typography variant="body2" sx={{ mb: 1.5, textAlign: "center" }}>
+                <Box component="span" sx={{ fontWeight: 600 }}>
+                  {entity.name}
+                </Box>
+                <Box sx={{ mt: 0.5 }}>
+                  Shot&nbsp;{currentShot} → Shot&nbsp;{newShot}
+                </Box>
+              </Typography>
+            )}
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <NumberField
+                name="shotCost"
+                value={shotCost}
+                size="small"
+                width="80px"
+                error={false}
+                onChange={handleShotChange}
+                onBlur={() => {}}
+              />
+            </Box>
           </Box>
         </DialogContent>
         <DialogActions>
@@ -103,7 +126,7 @@ export default function Actions({ entity }: ActionsProps) {
             variant="contained"
             disabled={shotCost < 0 || shotCost > 20}
           >
-            Spend {shotCost} {shotCost === 1 ? "Shot" : "Shots"}
+            OK
           </Button>
         </DialogActions>
       </Dialog>

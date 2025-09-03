@@ -3,7 +3,7 @@
 import { Box, Typography, Button } from "@mui/material"
 import { NumberField } from "@/components/ui"
 import CharacterLink from "@/components/ui/links/CharacterLink"
-import { CS, CharacterEffectService } from "@/services"
+import { CS, CES } from "@/services"
 import type {
   Character,
   Shot,
@@ -48,7 +48,6 @@ export default function TargetDefenseDisplay({
   allShots,
   attacker,
   stunt,
-  targetMookCount,
   targetMookCountPerTarget,
   defenseChoicePerTarget,
   fortuneDiePerTarget,
@@ -70,8 +69,6 @@ export default function TargetDefenseDisplay({
   const mookCount = CS.isMook(char)
     ? targetMookCountPerTarget[targetId] || 1
     : 1
-  const defenseWithMookCount =
-    CS.isMook(char) && mookCount > 1 ? baseDefense + mookCount : baseDefense
   // Calculate the actual current defense using the same function used everywhere else
   const currentDefense = manualDefensePerTarget[targetId]
     ? parseInt(manualDefensePerTarget[targetId])
@@ -299,14 +296,13 @@ export default function TargetDefenseDisplay({
               // Add effects and impairments
               if (encounter) {
                 const baseValue = CS.rawActionValue(char, "Defense")
-                const [effectsAndImpairments] =
-                  CharacterEffectService.adjustedValue(
-                    char,
-                    baseValue,
-                    "Defense",
-                    encounter,
-                    false // don't ignore impairments - this will include both effects and impairments
-                  )
+                const [effectsAndImpairments] = CES.adjustedValue(
+                  char,
+                  baseValue,
+                  "Defense",
+                  encounter,
+                  false // don't ignore impairments - this will include both effects and impairments
+                )
                 totalChange += effectsAndImpairments
               } else if (char.impairments > 0) {
                 // No encounter, but subtract impairments
@@ -371,7 +367,7 @@ export default function TargetDefenseDisplay({
               {(() => {
                 if (encounter) {
                   const baseValue = CS.toughness(char)
-                  const [effectChange] = CharacterEffectService.adjustedValue(
+                  const [effectChange] = CES.adjustedValue(
                     char,
                     baseValue,
                     "Toughness",

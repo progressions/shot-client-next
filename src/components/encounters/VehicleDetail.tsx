@@ -19,13 +19,16 @@ import {
   Typography,
   TextField,
 } from "@mui/material"
-import { FaTimes } from "react-icons/fa"
+import { FaTimes, FaEyeSlash, FaEye } from "react-icons/fa"
+import { MdEdit } from "react-icons/md"
 import {
   VehicleHeader,
   ChaseConditionPoints,
   Vehicle,
+  VehicleEditDialog,
   Actions,
 } from "@/components/encounters"
+import { CharacterLink } from "@/components/ui/links"
 import { encounterTransition } from "@/contexts/EncounterContext"
 import { useEncounter, useClient, useToast } from "@/contexts"
 
@@ -38,8 +41,53 @@ export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [locationDialogOpen, setLocationDialogOpen] = useState(false)
   const [newLocation, setNewLocation] = useState(vehicle.location || "")
+
+  // Check if vehicle is hidden (current_shot is null)
+  const vehicleWithShot = vehicle as Vehicle & {
+    current_shot?: number | string | null
+  }
+  const isHidden =
+    vehicleWithShot.current_shot === null ||
+    vehicleWithShot.current_shot === undefined
+
+  const handleEditClick = () => {
+    setEditDialogOpen(true)
+  }
+
+  const handleEditClose = () => {
+    setEditDialogOpen(false)
+  }
+
+  const handleHideClick = async () => {
+    try {
+      // Update shot to null to hide the vehicle
+      await client.updateVehicleShot(encounter, vehicle, {
+        shot_id: vehicle.shot_id,
+        current_shot: null,
+      })
+      toastSuccess(`${vehicle.name} is now hidden`)
+    } catch (error) {
+      console.error("Error hiding vehicle:", error)
+      toastError(`Failed to hide ${vehicle.name}`)
+    }
+  }
+
+  const handleShowClick = async () => {
+    try {
+      // Update shot to 0 to show the vehicle
+      await client.updateVehicleShot(encounter, vehicle, {
+        shot_id: vehicle.shot_id,
+        current_shot: 0,
+      })
+      toastSuccess(`${vehicle.name} is now visible at shot 0`)
+    } catch (error) {
+      console.error("Error showing vehicle:", error)
+      toastError(`Failed to show ${vehicle.name}`)
+    }
+  }
 
   const handleRemoveClick = () => {
     setConfirmOpen(true)
@@ -99,20 +147,32 @@ export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
         sx={{
           alignItems: "flex-start",
           position: "relative",
-          pr: 0,
+          pr: { xs: 0, sm: 0 },
+          pl: { xs: 1, sm: 2 },
+          py: { xs: 1, sm: 1.5 },
           "& .MuiListItemSecondaryAction-root": {
             right: 0,
-            top: "50%",
-            transform: "translateY(-50%)",
+            top: { xs: "8px", sm: "50%" },
+            transform: { xs: "none", sm: "translateY(-50%)" },
           },
         }}
-        secondaryAction={<Actions entity={vehicle} />}
+        secondaryAction={
+          <Box sx={{ display: { xs: "none", sm: "block" } }}>
+            <Actions entity={vehicle} />
+          </Box>
+        }
       >
-        <ListItemIcon sx={{ mt: 0 }}>
+        <ListItemIcon
+          sx={{
+            mt: 0,
+            minWidth: { xs: 40, sm: 56 },
+            mr: { xs: 1, sm: 0 },
+          }}
+        >
           <ChaseConditionPoints vehicle={vehicle} />
         </ListItemIcon>
         <ListItemText
-          sx={{ ml: 2 }}
+          sx={{ ml: { xs: 0.5, sm: 2 }, pr: { xs: 10, sm: 0 } }}
           primary={
             <VehicleHeader
               vehicle={vehicle}
@@ -120,27 +180,105 @@ export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
               onLocationClick={handleLocationClick}
             />
           }
-          secondary={<Vehicle vehicle={vehicle} />}
+          secondary={
+            <Box component="span" sx={{ display: "block", mt: 0.5 }}>
+              <Vehicle vehicle={vehicle} />
+              {vehicle.driver && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    mt: 0.5,
+                    color: "info.main",
+                    fontStyle: "italic",
+                  }}
+                >
+                  Driven by <CharacterLink character={vehicle.driver} />
+                </Typography>
+              )}
+            </Box>
+          }
         />
-        <Tooltip title="Remove from encounter">
-          <IconButton
-            aria-label="remove"
-            onClick={handleRemoveClick}
-            size="small"
-            sx={{
-              position: "absolute",
-              top: 8,
-              right: 8,
-              color: "text.secondary",
-              "&:hover": {
-                color: "error.main",
-                backgroundColor: "action.hover",
-              },
-            }}
-          >
-            <FaTimes />
-          </IconButton>
-        </Tooltip>
+        <Box
+          sx={{
+            position: "absolute",
+            top: { xs: 4, sm: 8 },
+            right: { xs: 4, sm: 8 },
+            display: "flex",
+            gap: { xs: 0.25, sm: 0.5 },
+          }}
+        >
+          <Tooltip title="Edit vehicle details">
+            <IconButton
+              aria-label="edit"
+              onClick={handleEditClick}
+              size="small"
+              sx={{
+                p: { xs: 0.5, sm: 1 },
+                color: "text.secondary",
+                "&:hover": {
+                  color: "primary.main",
+                  backgroundColor: "action.hover",
+                },
+              }}
+            >
+              <MdEdit size={16} />
+            </IconButton>
+          </Tooltip>
+          {isHidden ? (
+            <Tooltip title="Show vehicle">
+              <IconButton
+                aria-label="show"
+                onClick={handleShowClick}
+                size="small"
+                sx={{
+                  p: { xs: 0.5, sm: 1 },
+                  color: "text.secondary",
+                  "&:hover": {
+                    color: "success.main",
+                    backgroundColor: "action.hover",
+                  },
+                }}
+              >
+                <FaEye size={16} />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <Tooltip title="Hide vehicle">
+              <IconButton
+                aria-label="hide"
+                onClick={handleHideClick}
+                size="small"
+                sx={{
+                  p: { xs: 0.5, sm: 1 },
+                  color: "text.secondary",
+                  "&:hover": {
+                    color: "warning.main",
+                    backgroundColor: "action.hover",
+                  },
+                }}
+              >
+                <FaEyeSlash size={16} />
+              </IconButton>
+            </Tooltip>
+          )}
+          <Tooltip title="Remove from encounter">
+            <IconButton
+              aria-label="remove"
+              onClick={handleRemoveClick}
+              size="small"
+              sx={{
+                p: { xs: 0.5, sm: 1 },
+                color: "text.secondary",
+                "&:hover": {
+                  color: "error.main",
+                  backgroundColor: "action.hover",
+                },
+              }}
+            >
+              <FaTimes size={16} />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </ListItem>
 
       {/* Confirmation Dialog */}
@@ -194,6 +332,12 @@ export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
                   handleLocationSave()
                 }
               }}
+              inputProps={{
+                onFocus: e => {
+                  // Small delay to ensure the field is ready
+                  setTimeout(() => e.target.select(), 0)
+                },
+              }}
               placeholder="e.g., On the highway, In pursuit, At the dock"
             />
           </Box>
@@ -205,6 +349,13 @@ export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Vehicle Edit Dialog */}
+      <VehicleEditDialog
+        open={editDialogOpen}
+        onClose={handleEditClose}
+        vehicle={vehicle}
+      />
     </motion.div>
   )
 }
