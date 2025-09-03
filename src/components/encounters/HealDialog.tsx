@@ -9,6 +9,7 @@ import {
   Button,
   Stack,
   Typography,
+  Box,
 } from "@mui/material"
 import { NumberField } from "@/components/ui"
 import { useClient, useToast, useEncounter } from "@/contexts"
@@ -41,21 +42,12 @@ export default function HealDialog({
   useEffect(() => {
     if (open) {
       setHealAmount(0)
-      // Small delay to ensure the field is ready for selection
-      setTimeout(() => {
-        const input = document.querySelector('input[type="number"]') as HTMLInputElement
-        if (input) {
-          input.focus()
-          input.select()
-        }
-      }, 100)
     }
   }, [open])
   
   const handleHeal = async () => {
     if (healAmount <= 0) {
-      toastError("Please enter a healing amount greater than 0")
-      return
+      return  // Don't show error, just don't submit
     }
     
     setLoading(true)
@@ -117,31 +109,34 @@ export default function HealDialog({
             Current {woundsLabel}: {currentWounds}
           </Typography>
           
-          <NumberField
-            label={`${woundsLabel} to Heal`}
-            value={healAmount}
-            onChange={(e: React.ChangeEvent<HTMLInputElement> | number) => {
-              const val = typeof e === "object" && "target" in e ? e.target.value : e
-              setHealAmount(typeof val === "number" ? val : parseInt(String(val)) || 0)
-            }}
-            onBlur={() => {}}
-            min={0}
-            max={currentWounds}
-            disabled={loading}
-            size="small"
-            fullWidth
-            autoFocus
-            inputProps={{
-              onFocus: (e: React.FocusEvent<HTMLInputElement>) => {
-                e.target.select()
+          <Box
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && healAmount > 0 && !loading) {
+                e.preventDefault()
+                handleHeal()
               }
             }}
-            helperText={
-              healAmount > 0
-                ? `Will reduce ${woundsLabel.toLowerCase()} to ${Math.max(0, currentWounds - healAmount)}`
-                : ""
-            }
-          />
+          >
+            <NumberField
+              value={healAmount}
+              onChange={(e: React.ChangeEvent<HTMLInputElement> | number) => {
+                const val = typeof e === "object" && "target" in e ? e.target.value : e
+                setHealAmount(typeof val === "number" ? val : parseInt(String(val)) || 0)
+              }}
+              onBlur={() => {}}
+              min={0}
+              max={currentWounds}
+              disabled={loading}
+              size="small"
+              fullWidth
+            />
+          </Box>
+          
+          {healAmount > 0 && (
+            <Typography variant="caption" color="text.secondary">
+              Will reduce {woundsLabel.toLowerCase()} to {Math.max(0, currentWounds - healAmount)}
+            </Typography>
+          )}
         </Stack>
       </DialogContent>
       <DialogActions>
