@@ -1,5 +1,5 @@
 import React from "react"
-import { Badge, Box } from "@mui/material"
+import { Badge } from "@mui/material"
 import { styled } from "@mui/material/styles"
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
