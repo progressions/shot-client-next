@@ -169,7 +169,6 @@ export default function ChaseTargetSection({
                 
                 if (vehicle) {
                   // Update target vehicle-related fields
-                  updateField("defense", VS.defense(vehicle))
                   updateField("handling", VS.isMook(vehicle) ? 0 : VS.handling(vehicle))
                   updateField("frame", VS.isMook(vehicle) ? 0 : VS.frame(vehicle))
                   updateField("targetVehicle", vehicle) // Store the vehicle reference
@@ -223,10 +222,6 @@ export default function ChaseTargetSection({
             </Typography>
             <Stack direction="row" spacing={3} sx={{ mt: 1 }}>
               <Typography variant="body2">
-                Defense: <strong>{formState.data.defense}</strong>
-                {stunt && " (+2 Stunt)"}
-              </Typography>
-              <Typography variant="body2">
                 Handling: <strong>{VS.handling(selectedVehicle)}</strong>
               </Typography>
               <Typography variant="body2">
@@ -254,7 +249,7 @@ export default function ChaseTargetSection({
                 onChange={(e) => updateField("stunt", e.target.checked)}
               />
             }
-            label="Stunt (+2 Defense)"
+            label="Target performing stunt (+2 to Handling roll)"
             sx={{ ml: 1 }}
           />
         </>
