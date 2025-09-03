@@ -98,7 +98,6 @@ export default function ChaseAttackerSection({
             shots={driverShots}
             selectedShotId={attackerShotId}
             onSelect={(shotId) => {
-              console.log("Selected shot ID:", shotId)
               updateField("attackerShotId", shotId)
               
               // Find the character that was selected
@@ -106,7 +105,6 @@ export default function ChaseAttackerSection({
                 (s.character && s.character.shot_id === shotId) ||
                 (s.characters && s.characters.some((c: Character) => c.shot_id === shotId))
               )
-              console.log("Found shot:", shot)
               
               let selectedChar: Character | null = null
               if (shot) {
@@ -125,16 +123,29 @@ export default function ChaseAttackerSection({
                 const vehicle = vehicles.find(v => v.id === drivingInfo.id) || drivingInfo
                 
                 if (vehicle) {
+                  
                   // Update vehicle-related fields
                   const drivingValue = CS.skill(selectedChar, "Driving")
+                  const position = VS.position(vehicle)
+                  const isPursuer = VS.isPursuer(vehicle)
+                  
                   updateField("actionValue", drivingValue)
                   updateField("handling", VS.handling(vehicle))
                   updateField("squeal", VS.squeal(vehicle))
                   updateField("frame", VS.frame(vehicle))
                   updateField("crunch", VS.crunch(vehicle))
-                  updateField("position", VS.position(vehicle))
+                  updateField("position", position)
                   updateField("impairments", VS.impairments(vehicle))
                   updateField("vehicle", vehicle) // Store the vehicle reference
+                  
+                  // Set default method based on pursuer/evader and position
+                  let defaultMethod = "EVADE"
+                  if (isPursuer) {
+                    defaultMethod = position === "near" ? "RAM_SIDESWIPE" : "NARROW_THE_GAP"
+                  } else {
+                    defaultMethod = position === "near" ? "WIDEN_THE_GAP" : "EVADE"
+                  }
+                  updateField("method", defaultMethod)
                 }
               }
             }}
@@ -298,13 +309,46 @@ export default function ChaseAttackerSection({
             </Box>
           </Stack>
 
+          {/* Chase Method Selection */}
+          <Box sx={{ mb: 3 }}>
+            <FormControl fullWidth>
+              <InputLabel>Chase Action</InputLabel>
+              <Select
+                value={formState.data.method || ""}
+                onChange={e => updateField("method", e.target.value)}
+                label="Chase Action"
+              >
+                {VS.isPursuer(selectedVehicle) ? (
+                  // Pursuer options
+                  VS.position(selectedVehicle) === "near" ? [
+                    // When NEAR, pursuer can ram/sideswipe or evade
+                    <MenuItem key="RAM_SIDESWIPE" value="RAM_SIDESWIPE">Ram/Sideswipe (Attack with Crunch)</MenuItem>,
+                    <MenuItem key="EVADE" value="EVADE">Evade (Maintain position)</MenuItem>
+                  ] : (
+                    // When FAR, pursuer can only narrow the gap
+                    <MenuItem value="NARROW_THE_GAP">Narrow the Gap (Get closer)</MenuItem>
+                  )
+                ) : (
+                  // Evader options
+                  VS.position(selectedVehicle) === "near" ? (
+                    // When NEAR, evader tries to widen the gap
+                    <MenuItem value="WIDEN_THE_GAP">Widen the Gap (Get away)</MenuItem>
+                  ) : (
+                    // When FAR, evader tries to maintain distance
+                    <MenuItem value="EVADE">Evade (Maintain distance)</MenuItem>
+                  )
+                )}
+              </Select>
+            </FormControl>
+          </Box>
+
           {/* Vehicle Status Display */}
-          <Box sx={{ p: 2, bgcolor: "background.paper", borderRadius: 1 }}>
+          <Box sx={{ p: 2, bgcolor: "background.paper", borderRadius: 1, mb: 2 }}>
             <Typography variant="subtitle1" fontWeight="bold">
               {attacker.name} driving {selectedVehicle.name}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {VS.isPursuer(selectedVehicle) ? "Pursuer" : "Evader"} • Position: {VS.position(selectedVehicle)}
+              {VS.isPursuer(selectedVehicle) ? "Pursuer" : "Evader"} • Gap: {VS.position(selectedVehicle).toUpperCase()}
             </Typography>
             {VS.chasePoints(selectedVehicle) > 0 && (
               <Typography variant="body2" color="warning.main" sx={{ mt: 1 }}>

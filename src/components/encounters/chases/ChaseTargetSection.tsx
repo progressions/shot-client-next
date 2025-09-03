@@ -169,6 +169,7 @@ export default function ChaseTargetSection({
                 const vehicle = vehicles.find(v => v.id === drivingInfo.id) || drivingInfo
                 
                 if (vehicle) {
+                  
                   // Update target vehicle-related fields
                   const targetDriving = CS.skill(selectedChar, "Driving")
                   const targetHandling = VS.isMook(vehicle) ? 0 : VS.handling(vehicle)

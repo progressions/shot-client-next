@@ -131,6 +131,11 @@ export const getAllVisibleShots = (encounterShots: unknown[]): Shot[] => {
   const shots: Shot[] = []
   let index = 0
 
+  // Handle undefined or null encounterShots
+  if (!encounterShots || !Array.isArray(encounterShots)) {
+    return shots
+  }
+
   encounterShots.forEach(shotGroupUnknown => {
     const shotGroup = shotGroupUnknown as Record<string, unknown>
     // Only include if shot value is not null (not hidden)

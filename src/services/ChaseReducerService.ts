@@ -67,8 +67,8 @@ const ChaseReducerService = {
     return this.VS.isPursuer(st.attacker) ? this.pursue(st) : this.evade(st)
   },
 
-  // If the attack is a success, return the number of Chase Points to apply to the target
-  // return the position 'near'.
+  // Pursuer's goal: Get NEAR to the target
+  // If successful when FAR, position changes to NEAR
   pursue: function(st: ChaseFormData): ChaseFormData {
     // Calculate the basic attack outcome (Driving + Swerve vs Target's Driving)
     const { success, actionResult, outcome, wayAwfulFailure } = this.AS.outcome({
@@ -96,13 +96,21 @@ const ChaseReducerService = {
         chasePoints = Math.max(0, (outcome || 0) + st.squeal - st.handling)
       }
 
+      // Position logic for pursuers:
+      // - If currently FAR and successful, position becomes NEAR
+      // - If currently NEAR, position stays NEAR
+      let newPosition = st.position
+      if (st.method === ChaseMethod.NARROW_THE_GAP && st.position === "far") {
+        newPosition = "near"
+      }
+
       return {
         ...st,
         success: true,
         actionResult: actionResult,
         outcome: outcome || null,
         smackdown: null,
-        position: "near",
+        position: newPosition,
         chasePoints: chasePoints,
         conditionPoints: conditionPoints,
         boxcars: st.swerve.boxcars,
@@ -123,8 +131,8 @@ const ChaseReducerService = {
     }
   },
 
-  // If the attack is a success, apply Chase Points to the Target and
-  // return the position 'far'.
+  // Evader's goal: Stay FAR from the pursuer
+  // If successful when NEAR, position changes to FAR
   evade: function(st: ChaseFormData): ChaseFormData {
     // Calculate the basic attack outcome (Driving + Swerve vs Target's Driving)
     const { success, actionResult, outcome, wayAwfulFailure } = this.AS.outcome({
@@ -139,10 +147,18 @@ const ChaseReducerService = {
       // Use the handling value from form state (which can be manually edited)
       const chasePoints = Math.max(0, (outcome || 0) + st.squeal - st.handling)
       
+      // Position logic for evaders:
+      // - If currently NEAR and successful with WIDEN_THE_GAP, position becomes FAR
+      // - If currently FAR, position stays FAR
+      let newPosition = st.position
+      if (st.method === ChaseMethod.WIDEN_THE_GAP && st.position === "near") {
+        newPosition = "far"
+      }
+      
       return {
         ...st,
         success: true,
-        position: "far",
+        position: newPosition,
         actionResult: actionResult,
         outcome: outcome || null,
         smackdown: null,

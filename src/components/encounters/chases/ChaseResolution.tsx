@@ -29,6 +29,7 @@ export default function ChaseResolution({
   onClose,
 }: ChaseResolutionProps) {
   const [isProcessing, setIsProcessing] = useState(false)
+  const [initialPosition, setInitialPosition] = useState<"near" | "far" | null>(null)
   const { toastSuccess, toastError } = useToast()
   const { client } = useClient()
   const { encounter } = useEncounter()
@@ -47,6 +48,7 @@ export default function ChaseResolution({
   
   // Calculate preview chase points
   let previewChasePoints: number | null = null
+  let previewPosition: "near" | "far" = formState.data.position
   if (previewSuccess && previewOutcome !== null) {
     if (formState.data.method === ChaseMethod.RAM_SIDESWIPE) {
       const targetFrame = VS.isMook(target) ? 0 : VS.frame(target)
@@ -55,6 +57,13 @@ export default function ChaseResolution({
       // Use the editable handling value from the form
       const targetHandling = parseToNumber(formState.data.handling)
       previewChasePoints = Math.max(0, previewOutcome + parseToNumber(formState.data.squeal) - targetHandling)
+    }
+    
+    // Calculate preview position change
+    if (formState.data.method === ChaseMethod.NARROW_THE_GAP && formState.data.position === "far") {
+      previewPosition = "near"
+    } else if (formState.data.method === ChaseMethod.WIDEN_THE_GAP && formState.data.position === "near") {
+      previewPosition = "far"
     }
   }
 
@@ -81,6 +90,9 @@ export default function ChaseResolution({
     
     setIsProcessing(true)
     
+    // Store initial position before processing
+    setInitialPosition(formState.data.position)
+    
     try {
       // Roll swerve if not provided
       let swerveValue = swerve
@@ -103,16 +115,70 @@ export default function ChaseResolution({
       
       // Update vehicles in the backend if successful
       if (result.success) {
-        // Update attacker
-        const attackerFormData = new FormData()
-        attackerFormData.append("vehicle[action_values]", JSON.stringify(result.attacker.action_values))
-        await client.updateVehicle(result.attacker.id, attackerFormData)
+        // Extract only vehicle-specific action values
+        const attackerVehicleValues: any = {}
+        const targetVehicleValues: any = {}
         
-        // Update target
-        const targetFormData = new FormData()
-        targetFormData.append("vehicle[action_values]", JSON.stringify(result.target.action_values))
-        await client.updateVehicle(result.target.id, targetFormData)
+        // Vehicle-specific keys that should be updated
+        const vehicleKeys = ['Position', 'Chase Points', 'Condition Points', 'Pursuer']
         
+        // Filter attacker action_values to only include vehicle-specific ones
+        if (result.attacker.action_values) {
+          vehicleKeys.forEach(key => {
+            if (result.attacker.action_values.hasOwnProperty(key)) {
+              attackerVehicleValues[key] = result.attacker.action_values[key]
+            }
+          })
+        }
+        
+        // Filter target action_values to only include vehicle-specific ones
+        if (result.target.action_values) {
+          vehicleKeys.forEach(key => {
+            if (result.target.action_values.hasOwnProperty(key)) {
+              targetVehicleValues[key] = result.target.action_values[key]
+            }
+          })
+        }
+        
+        // Get the actual vehicle IDs from the stored vehicle references
+        // or from the driving relationship if needed
+        const attackerVehicle = (formState.data as any).vehicle || 
+          (result.attacker?.driving ? result.attacker.driving : null)
+        const targetVehicle = (formState.data as any).targetVehicle || 
+          (result.target?.driving ? result.target.driving : null)
+        
+        const attackerVehicleId = attackerVehicle?.id
+        const targetVehicleId = targetVehicle?.id
+        
+        if (!attackerVehicleId || !targetVehicleId) {
+          toastError("Unable to identify vehicles for chase action")
+          setIsProcessing(false)
+          return
+        }
+        
+        const vehicleUpdates = [
+          {
+            vehicle_id: attackerVehicleId,
+            action_values: attackerVehicleValues,
+            event: {
+              type: "chase_action",
+              description: `${attacker.name} ${result.method === ChaseMethod.RAM_SIDESWIPE ? "rams" : result.method === ChaseMethod.NARROW_THE_GAP ? "narrows gap with" : result.method === ChaseMethod.WIDEN_THE_GAP ? "widens gap from" : "evades"} ${target.name}`,
+              details: {
+                method: result.method,
+                chase_points: result.chasePoints,
+                condition_points: result.conditionPoints,
+                position: result.position,
+                success: result.success
+              }
+            }
+          },
+          {
+            vehicle_id: targetVehicleId,
+            action_values: targetVehicleValues
+          }
+        ]
+        
+        await client.applyChaseAction(encounter, vehicleUpdates)
         toastSuccess("Chase action resolved successfully!")
         onClose()
       }
@@ -209,49 +275,21 @@ export default function ChaseResolution({
             Action Result {showPreview ? previewActionResult : formState.data.actionResult} - Driving {formState.data.defense}{formState.data.stunt ? " + 2 (stunt)" : ""} = Outcome {showPreview ? previewOutcome : formState.data.outcome}
           </Typography>
           {(showPreview ? previewSuccess : success) && (
-            <Typography variant="caption" sx={{ display: "block" }}>
-              {formState.data.method === ChaseMethod.RAM_SIDESWIPE 
-                ? `Outcome ${showPreview ? previewOutcome : formState.data.outcome} + Crunch ${formState.data.crunch} - Frame ${target ? VS.frame(target) : 0} = Chase Points ${showPreview ? previewChasePoints : chasePoints}`
-                : `Outcome ${showPreview ? previewOutcome : formState.data.outcome} + Squeal ${formState.data.squeal} - Handling ${formState.data.handling} = Chase Points ${showPreview ? previewChasePoints : chasePoints}`
-              }
-            </Typography>
+            <>
+              <Typography variant="caption" sx={{ display: "block" }}>
+                {formState.data.method === ChaseMethod.RAM_SIDESWIPE 
+                  ? `Outcome ${showPreview ? previewOutcome : formState.data.outcome} + Crunch ${formState.data.crunch} - Frame ${target ? VS.frame(target) : 0} = Chase Points ${showPreview ? previewChasePoints : chasePoints}`
+                  : `Outcome ${showPreview ? previewOutcome : formState.data.outcome} + Squeal ${formState.data.squeal} - Handling ${formState.data.handling} = Chase Points ${showPreview ? previewChasePoints : chasePoints}`
+                }
+              </Typography>
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                New position: {showPreview ? (previewPosition === "near" ? "Near" : "Far") : (formState.data.position === "near" ? "Near" : "Far")}
+              </Typography>
+            </>
           )}
         </Alert>
       )}
       
-      {/* Additional results - only show after resolve, not in preview */}
-      {!showPreview && formState.data.edited && success && (
-        <Box sx={{ mt: 2, p: 2, bgcolor: "background.paper", borderRadius: 1 }}>
-          {chasePoints !== null && chasePoints > 0 && (
-            <Typography variant="body1" fontWeight="bold">
-              Chase Points Dealt: {chasePoints}
-            </Typography>
-          )}
-          {conditionPoints !== null && conditionPoints > 0 && (
-            <Typography variant="body1" fontWeight="bold">
-              Condition Points Dealt: {conditionPoints}
-            </Typography>
-          )}
-          <Typography variant="body1">
-            New Position: {formState.data.position === "near" ? "NEAR" : "FAR"}
-          </Typography>
-          
-          {/* Victory Check */}
-          {target && VS.chasePoints(target) >= 35 && (
-            <Box sx={{ mt: 2, p: 1, bgcolor: "warning.main", color: "warning.contrastText", borderRadius: 1 }}>
-              {VS.chasePoints(target) >= 50 ? (
-                <Typography fontWeight="bold">
-                  💥 TOTAL VICTORY! Target defeated!
-                </Typography>
-              ) : (
-                <Typography fontWeight="bold">
-                  ⚠️ VICTORY! ({VS.chasePoints(target)}/35)
-                </Typography>
-              )}
-            </Box>
-          )}
-        </Box>
-      )}
     </Box>
   )
 }
