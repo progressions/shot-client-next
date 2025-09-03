@@ -136,25 +136,6 @@ export default function ChaseTargetSection({
         🎯 Target
       </Typography>
 
-      {/* Show All Checkbox */}
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={showAll}
-            onChange={(e) => setShowAll(e.target.checked)}
-            size="small"
-          />
-        }
-        label="Show all characters"
-        sx={{ 
-          mb: 1, 
-          ml: 1,
-          "& .MuiFormControlLabel-label": {
-            fontSize: "0.875rem",
-          }
-        }}
-      />
-
       {/* Target Driver Selection */}
       <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ mb: 3 }}>
         <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -197,6 +178,25 @@ export default function ChaseTargetSection({
             }}
             borderColor="error.main"
             excludeShotId={attackerShotId}
+          />
+          
+          {/* Show All Checkbox */}
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={showAll}
+                onChange={(e) => setShowAll(e.target.checked)}
+                size="small"
+              />
+            }
+            label="Show all characters"
+            sx={{ 
+              mt: 0.5,
+              ml: 1,
+              "& .MuiFormControlLabel-label": {
+                fontSize: "0.75rem",
+              }
+            }}
           />
         </Box>
       </Stack>
