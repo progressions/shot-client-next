@@ -41,6 +41,14 @@ export default function HealDialog({
   useEffect(() => {
     if (open) {
       setHealAmount(0)
+      // Small delay to ensure the field is ready for selection
+      setTimeout(() => {
+        const input = document.querySelector('input[type="number"]') as HTMLInputElement
+        if (input) {
+          input.focus()
+          input.select()
+        }
+      }, 100)
     }
   }, [open])
   
@@ -123,6 +131,11 @@ export default function HealDialog({
             size="small"
             fullWidth
             autoFocus
+            inputProps={{
+              onFocus: (e: React.FocusEvent<HTMLInputElement>) => {
+                e.target.select()
+              }
+            }}
             helperText={
               healAmount > 0
                 ? `Will reduce ${woundsLabel.toLowerCase()} to ${Math.max(0, currentWounds - healAmount)}`
