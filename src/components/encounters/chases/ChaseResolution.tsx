@@ -52,7 +52,8 @@ export default function ChaseResolution({
       const targetFrame = VS.isMook(target) ? 0 : VS.frame(target)
       previewChasePoints = Math.max(0, previewOutcome + parseToNumber(formState.data.crunch) - targetFrame)
     } else {
-      const targetHandling = VS.isMook(target) ? 0 : VS.handling(target)
+      // Use the editable handling value from the form
+      const targetHandling = parseToNumber(formState.data.handling)
       previewChasePoints = Math.max(0, previewOutcome + parseToNumber(formState.data.squeal) - targetHandling)
     }
   }
@@ -211,7 +212,7 @@ export default function ChaseResolution({
             <Typography variant="caption" sx={{ display: "block" }}>
               {formState.data.method === ChaseMethod.RAM_SIDESWIPE 
                 ? `Outcome ${showPreview ? previewOutcome : formState.data.outcome} + Crunch ${formState.data.crunch} - Frame ${target ? VS.frame(target) : 0} = Chase Points ${showPreview ? previewChasePoints : chasePoints}`
-                : `Outcome ${showPreview ? previewOutcome : formState.data.outcome} + Squeal ${formState.data.squeal} - Handling ${target ? VS.handling(target) : 0} = Chase Points ${showPreview ? previewChasePoints : chasePoints}`
+                : `Outcome ${showPreview ? previewOutcome : formState.data.outcome} + Squeal ${formState.data.squeal} - Handling ${formState.data.handling} = Chase Points ${showPreview ? previewChasePoints : chasePoints}`
               }
             </Typography>
           )}

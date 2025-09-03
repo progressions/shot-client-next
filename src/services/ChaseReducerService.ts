@@ -86,13 +86,14 @@ const ChaseReducerService = {
       
       if (st.method === ChaseMethod.RAM_SIDESWIPE) {
         // Ram/Sideswipe: Outcome + Attacker's Crunch - Target's Frame
+        // Note: Frame is still calculated from vehicle as it's not editable
         const targetFrame = this.VS.isMook(st.target) ? 0 : this.VS.frame(st.target)
         chasePoints = Math.max(0, (outcome || 0) + st.crunch - targetFrame)
         conditionPoints = chasePoints
       } else {
-        // Other methods: Outcome + Attacker's Squeal - Target's Handling  
-        const targetHandling = this.VS.isMook(st.target) ? 0 : this.VS.handling(st.target)
-        chasePoints = Math.max(0, (outcome || 0) + st.squeal - targetHandling)
+        // Other methods: Outcome + Attacker's Squeal - Target's Handling
+        // Use the handling value from form state (which can be manually edited)
+        chasePoints = Math.max(0, (outcome || 0) + st.squeal - st.handling)
       }
 
       return {
@@ -135,8 +136,8 @@ const ChaseReducerService = {
 
     if (success) {
       // For evade actions: Chase Points = Outcome + Attacker's Squeal - Target's Handling
-      const targetHandling = this.VS.isMook(st.target) ? 0 : this.VS.handling(st.target)
-      const chasePoints = Math.max(0, (outcome || 0) + st.squeal - targetHandling)
+      // Use the handling value from form state (which can be manually edited)
+      const chasePoints = Math.max(0, (outcome || 0) + st.squeal - st.handling)
       
       return {
         ...st,

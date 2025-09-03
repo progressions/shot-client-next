@@ -11,6 +11,7 @@ import {
 import { VS, CS } from "@/services"
 import type { ChaseFormData, Shot, Vehicle, Character } from "@/types"
 import { FormActions } from "@/reducers"
+import { NumberField } from "@/components/ui"
 import CharacterSelector from "../CharacterSelector"
 
 // Character with shot-specific data from encounter
@@ -170,9 +171,10 @@ export default function ChaseTargetSection({
                 if (vehicle) {
                   // Update target vehicle-related fields
                   const targetDriving = CS.skill(selectedChar, "Driving")
+                  const targetHandling = VS.isMook(vehicle) ? 0 : VS.handling(vehicle)
+                  
                   updateField("defense", targetDriving) // Target's Driving is the difficulty
-                  // Note: These values will be used to subtract from attacker's damage in the formula
-                  // Chase Points = Outcome + Attacker's Squeal - Target's Handling
+                  updateField("handling", targetHandling) // Target's Handling for chase point calculation
                   updateField("targetVehicle", vehicle) // Store the vehicle reference
                 }
               }
@@ -222,20 +224,64 @@ export default function ChaseTargetSection({
             <Typography variant="body2" color="text.secondary">
               {VS.isPursuer(selectedVehicle) ? "Pursuer" : "Evader"} • Position: {VS.position(selectedVehicle)}
             </Typography>
-            <Stack direction="row" spacing={3} sx={{ mt: 1 }}>
-              <Typography variant="body2">
-                Driving: <strong>{CS.skill(target, "Driving")}</strong>
-                {stunt && " (+2 Stunt)"}
-              </Typography>
-              <Typography variant="body2">
-                Handling: <strong>{VS.handling(selectedVehicle)}</strong>
-              </Typography>
-              <Typography variant="body2">
-                Frame: <strong>{VS.frame(selectedVehicle)}</strong>
-              </Typography>
+            
+            {/* Editable Defense Values */}
+            <Stack 
+              direction={{ xs: "column", sm: "row" }} 
+              spacing={{ xs: 2, sm: 4 }}
+              sx={{ mt: 2 }}
+              alignItems="flex-start"
+            >
+              {/* Driving Value */}
+              <Box>
+                <Typography variant="body2" sx={{ mb: 1, fontWeight: "medium" }}>
+                  Driving
+                </Typography>
+                <NumberField
+                  name="defense"
+                  value={parseInt(formState.data.defense?.toString() || "0") || 0}
+                  size="small"
+                  width="80px"
+                  error={false}
+                  onChange={e => updateField("defense", e.target.value)}
+                  onBlur={e => updateField("defense", e.target.value)}
+                />
+                {stunt && (
+                  <Typography variant="caption" sx={{ display: "block", mt: 0.5, color: "text.secondary" }}>
+                    +2 (stunt)
+                  </Typography>
+                )}
+              </Box>
+              
+              {/* Handling Value */}
+              <Box>
+                <Typography variant="body2" sx={{ mb: 1, fontWeight: "medium" }}>
+                  Handling
+                </Typography>
+                <NumberField
+                  name="handling"
+                  value={parseInt(formState.data.handling?.toString() || "0") || 0}
+                  size="small"
+                  width="80px"
+                  error={false}
+                  onChange={e => updateField("handling", e.target.value)}
+                  onBlur={e => updateField("handling", e.target.value)}
+                />
+              </Box>
+              
+              {/* Frame Value (for display) */}
+              <Box>
+                <Typography variant="body2" sx={{ mb: 1, fontWeight: "medium" }}>
+                  Frame
+                </Typography>
+                <Typography variant="body1">
+                  <strong>{VS.frame(selectedVehicle)}</strong>
+                </Typography>
+              </Box>
             </Stack>
+            
             {VS.chasePoints(selectedVehicle) > 0 && (
-              <Typography variant="body2" color="warning.main" sx={{ mt: 1 }}>
+              <Typography variant="body2" color="warning.main" sx={{ mt: 2 }}>
                 Chase Points: {VS.chasePoints(selectedVehicle)}/35
               </Typography>
             )}
@@ -254,7 +300,7 @@ export default function ChaseTargetSection({
                 onChange={(e) => updateField("stunt", e.target.checked)}
               />
             }
-            label="Attacker performing stunt (+2 to target's Driving)"
+            label="Stunt (+2 Defense)"
             sx={{ ml: 1 }}
           />
         </>
