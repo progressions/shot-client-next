@@ -176,6 +176,10 @@ export default function ChaseResolution({
         // Get the shot cost from form state
         const shotCost = parseInt((formState.data as ChaseFormData & { shotCost?: string }).shotCost || "3")
         
+        console.log("Chase Resolution - Position being sent:", result.position)
+        console.log("Chase Resolution - Method:", result.method)
+        console.log("Chase Resolution - Success:", result.success)
+        
         const vehicleUpdates = [
           {
             vehicle_id: attackerVehicleId,
@@ -204,7 +208,10 @@ export default function ChaseResolution({
             vehicle_id: targetVehicleId,
             target_vehicle_id: attackerVehicleId,
             role: formState.data.attackerRole === "pursuer" ? "evader" : "pursuer", // Target has opposite role
-            action_values: targetVehicleValues
+            action_values: {
+              ...targetVehicleValues,
+              Position: result.position // Both vehicles need the position update
+            }
           }
         ]
         
