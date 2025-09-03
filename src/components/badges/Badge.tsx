@@ -36,10 +36,15 @@ export default function Badge({
   const [entity, setEntity] = useState<Entity>(initialEntity)
   const { avatar, titleFont, subtitleFont } = sizes[size]
   const initials = entity.name
-    ? entity.name
-        .split(" ")
-        .map((part: string) => part.charAt(0).toUpperCase())
-        .join("")
+    ? (() => {
+        const words = entity.name.trim().split(/\s+/)
+        if (words.length === 0) return ""
+        if (words.length === 1) return words[0].charAt(0).toUpperCase()
+        
+        const firstLetter = words[0].charAt(0).toUpperCase()
+        const lastLetter = words[words.length - 1].charAt(0).toUpperCase()
+        return firstLetter + lastLetter
+      })()
     : ""
 
   useEffect(() => {

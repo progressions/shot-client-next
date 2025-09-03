@@ -168,6 +168,7 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
             mt: 0,
             minWidth: { xs: 40, sm: 56 },
             mr: { xs: 1, sm: 0 },
+            p: 0,
           }}
         >
           <Wounds character={character} />

@@ -32,15 +32,13 @@ export default function ImpairmentBadge({
   }
 
   return (
-    <Box sx={{ padding: "4px", display: "inline-flex" }}>
-      <StyledBadge
-        badgeContent={impairments}
-        color="error"
-        overlap="circular"
-        className={className}
-      >
-        {children}
-      </StyledBadge>
-    </Box>
+    <StyledBadge
+      badgeContent={impairments}
+      color="error"
+      overlap="circular"
+      className={className}
+    >
+      {children}
+    </StyledBadge>
   )
 }
