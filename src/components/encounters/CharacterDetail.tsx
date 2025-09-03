@@ -19,7 +19,7 @@ import {
   Typography,
   TextField,
 } from "@mui/material"
-import { FaTimes, FaEyeSlash, FaEye } from "react-icons/fa"
+import { FaTimes, FaEyeSlash, FaEye, FaHeart } from "react-icons/fa"
 import { MdEdit } from "react-icons/md"
 import {
   CharacterHeader,
@@ -30,6 +30,7 @@ import {
   VehicleEditDialog,
   VehicleActionValues,
   ChaseConditionPoints,
+  HealDialog,
 } from "@/components/encounters"
 import { VehicleAvatar } from "@/components/avatars"
 import CharacterEffectsDisplay from "./effects/CharacterEffectsDisplay"
@@ -50,6 +51,7 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
   const [newLocation, setNewLocation] = useState(character.location || "")
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [vehicleEditDialogOpen, setVehicleEditDialogOpen] = useState(false)
+  const [healDialogOpen, setHealDialogOpen] = useState(false)
 
   // Use the vehicle data from character.driving which now has full data from serializer
   const drivingVehicle = useMemo(() => {
@@ -78,6 +80,14 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
 
   const handleVehicleEditClose = () => {
     setVehicleEditDialogOpen(false)
+  }
+
+  const handleHealClick = () => {
+    setHealDialogOpen(true)
+  }
+
+  const handleHealClose = () => {
+    setHealDialogOpen(false)
   }
 
   const handleHideClick = async () => {
@@ -283,6 +293,23 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
               <MdEdit size={16} />
             </IconButton>
           </Tooltip>
+          <Tooltip title="Heal wounds">
+            <IconButton
+              aria-label="heal"
+              onClick={handleHealClick}
+              size="small"
+              sx={{
+                p: { xs: 0.5, sm: 1 },
+                color: "text.secondary",
+                "&:hover": {
+                  color: "success.main",
+                  backgroundColor: "action.hover",
+                },
+              }}
+            >
+              <FaHeart size={16} />
+            </IconButton>
+          </Tooltip>
           {isHidden ? (
             <Tooltip title="Show character">
               <IconButton
@@ -425,6 +452,13 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
           vehicle={drivingVehicle}
         />
       )}
+      
+      {/* Heal Dialog */}
+      <HealDialog
+        open={healDialogOpen}
+        onClose={handleHealClose}
+        character={character}
+      />
     </motion.div>
   )
 }

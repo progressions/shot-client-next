@@ -24,3 +24,4 @@ export { default as InitiativeDialog } from "@/components/encounters/InitiativeD
 export { default as LocationsDialog } from "@/components/encounters/LocationsDialog"
 export { default as CharacterEditDialog } from "@/components/encounters/CharacterEditDialog"
 export { default as VehicleEditDialog } from "@/components/encounters/VehicleEditDialog"
+export { default as HealDialog } from "@/components/encounters/HealDialog"
