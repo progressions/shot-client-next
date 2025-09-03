@@ -48,6 +48,7 @@ export default function CharacterEditDialog({
 
   // Helper to check if character is PC
   const isPC = () => CS.isPC(character)
+  const isMook = () => CS.isMook(character)
 
   // Collect all vehicles from the encounter (including hidden ones)
   const availableVehicles = useMemo(() => {
@@ -197,19 +198,23 @@ export default function CharacterEditDialog({
 
       // Handle wounds and marks of death based on character type
       if (isPC()) {
-        // PCs: wounds and impairments are always on the character model
+        // PCs: wounds, marks of death, and impairments are always on the character model
         characterUpdate.action_values = {
           ...character.action_values,
           Wounds: wounds,
           "Marks of Death": marksOfDeath,
         }
         characterUpdate.impairments = impairments
+      } else if (isMook()) {
+        // Mooks: no marks of death or impairments
+        characterUpdate.action_values = {
+          ...character.action_values,
+        }
       } else {
-        // Non-PCs: only marks of death on character
+        // Other NPCs: no marks of death on character
         // Count and impairments are ONLY relevant in fights (stored on Shot)
         characterUpdate.action_values = {
           ...character.action_values,
-          "Marks of Death": marksOfDeath,
         }
       }
 
@@ -272,11 +277,16 @@ export default function CharacterEditDialog({
           current_shot: currentShot,
         }
 
-        // For non-PCs, impairments and count go on the shot
+        // For non-PCs (except Mooks), impairments and count go on the shot
         // For PCs, only current_shot goes on the shot (impairments are on character)
+        // For Mooks, only count goes on the shot (no impairments)
         if (!isPC()) {
-          shotUpdate.impairments = impairments
-          shotUpdate.count = wounds
+          if (isMook()) {
+            shotUpdate.count = wounds  // Count for mooks
+          } else {
+            shotUpdate.impairments = impairments
+            shotUpdate.count = wounds
+          }
         }
 
         // Add driving_id to shot update (use vehicle's shot_id, not vehicle id)
@@ -352,7 +362,7 @@ export default function CharacterEditDialog({
           {/* Combat Stats Row */}
           <Box>
             <Grid container spacing={2}>
-              <Grid item xs={3}>
+              <Grid item xs={isMook() ? 6 : (isPC() ? 3 : 4)}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -386,7 +396,7 @@ export default function CharacterEditDialog({
                 />
               </Grid>
 
-              <Grid item xs={3}>
+              <Grid item xs={isMook() ? 6 : (isPC() ? 3 : 4)}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -415,63 +425,67 @@ export default function CharacterEditDialog({
                 />
               </Grid>
 
-              <Grid item xs={3}>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block", mb: 0.5 }}
-                >
-                  Impairments
-                </Typography>
-                <NumberField
-                  value={impairments}
-                  onChange={(
-                    e: React.ChangeEvent<HTMLInputElement> | number
-                  ) => {
-                    const val =
-                      typeof e === "object" && "target" in e
-                        ? e.target.value
-                        : e
-                    setImpairments(
-                      typeof val === "number" ? val : parseInt(String(val)) || 0
-                    )
-                  }}
-                  onBlur={() => {}}
-                  min={0}
-                  disabled={loading}
-                  size="small"
-                  fullWidth
-                />
-              </Grid>
+              {!isMook() && (
+                <Grid item xs={isPC() ? 3 : 4}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: "block", mb: 0.5 }}
+                  >
+                    Impairments
+                  </Typography>
+                  <NumberField
+                    value={impairments}
+                    onChange={(
+                      e: React.ChangeEvent<HTMLInputElement> | number
+                    ) => {
+                      const val =
+                        typeof e === "object" && "target" in e
+                          ? e.target.value
+                          : e
+                      setImpairments(
+                        typeof val === "number" ? val : parseInt(String(val)) || 0
+                      )
+                    }}
+                    onBlur={() => {}}
+                    min={0}
+                    disabled={loading}
+                    size="small"
+                    fullWidth
+                  />
+                </Grid>
+              )}
 
-              <Grid item xs={3}>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block", mb: 0.5 }}
-                >
-                  Marks of Death
-                </Typography>
-                <NumberField
-                  value={marksOfDeath}
-                  onChange={(
-                    e: React.ChangeEvent<HTMLInputElement> | number
-                  ) => {
-                    const val =
-                      typeof e === "object" && "target" in e
-                        ? e.target.value
-                        : e
-                    setMarksOfDeath(
-                      typeof val === "number" ? val : parseInt(String(val)) || 0
-                    )
-                  }}
-                  onBlur={() => {}}
-                  min={0}
-                  disabled={loading}
-                  size="small"
-                  fullWidth
-                />
-              </Grid>
+              {isPC() && (
+                <Grid item xs={3}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: "block", mb: 0.5 }}
+                  >
+                    Marks of Death
+                  </Typography>
+                  <NumberField
+                    value={marksOfDeath}
+                    onChange={(
+                      e: React.ChangeEvent<HTMLInputElement> | number
+                    ) => {
+                      const val =
+                        typeof e === "object" && "target" in e
+                          ? e.target.value
+                          : e
+                      setMarksOfDeath(
+                        typeof val === "number" ? val : parseInt(String(val)) || 0
+                      )
+                    }}
+                    onBlur={() => {}}
+                    min={0}
+                    disabled={loading}
+                    size="small"
+                    fullWidth
+                  />
+                </Grid>
+              )}
             </Grid>
           </Box>
 
