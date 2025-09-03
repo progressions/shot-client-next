@@ -57,7 +57,7 @@ export default function ChaseTargetSection({
   }, [attacker])
 
   // Filter shots to only include characters with driving_id, excluding the attacker
-  // and excluding friendly targets if attacker is PC/Ally
+  // and filtering based on attacker's allegiance
   const targetDriverShots = useMemo(() => {
     return shots.filter(shot => {
       // Exclude the attacker's shot
@@ -79,6 +79,20 @@ export default function ChaseTargetSection({
             (c as CharacterWithShotData).driving_id && !CS.isType(c, ["PC", "Ally"])
           )
           if (nonFriendlyDrivers.length === 0) {
+            return false
+          }
+        }
+      } else {
+        // If attacker is NOT friendly (enemy), only include PCs/Allies as targets
+        if (shot.character && !CS.isType(shot.character, ["PC", "Ally"])) {
+          return false
+        }
+        if (shot.characters) {
+          // Filter out shots that don't contain any PCs/Allies
+          const friendlyDrivers = shot.characters.filter((c: Character) => 
+            (c as CharacterWithShotData).driving_id && CS.isType(c, ["PC", "Ally"])
+          )
+          if (friendlyDrivers.length === 0) {
             return false
           }
         }
@@ -169,7 +183,7 @@ export default function ChaseTargetSection({
         <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>
           {attackerIsFriendly 
             ? "No enemy vehicles available as targets (friendly fire not allowed)."
-            : "No other characters driving vehicles available as targets."}
+            : "No player or ally vehicles available as targets."}
         </Typography>
       )}
 
