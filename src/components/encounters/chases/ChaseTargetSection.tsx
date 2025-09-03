@@ -231,7 +231,6 @@ export default function ChaseTargetSection({
             {VS.chasePoints(selectedVehicle) > 0 && (
               <Typography variant="body2" color="warning.main" sx={{ mt: 1 }}>
                 Chase Points: {VS.chasePoints(selectedVehicle)}/35
-                {VS.chasePoints(selectedVehicle) >= 35 && " - VICTORY IMMINENT!"}
               </Typography>
             )}
             {VS.conditionPoints(selectedVehicle) > 0 && (
