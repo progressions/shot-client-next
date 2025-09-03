@@ -29,7 +29,7 @@ import {
 import { FaGun, FaPlay, FaPlus, FaMinus, FaCar } from "react-icons/fa6"
 import { FaMapMarkerAlt, FaCaretRight, FaCaretDown } from "react-icons/fa"
 import { MdAdminPanelSettings } from "react-icons/md"
-import { useEncounter } from "@/contexts"
+import { useEncounter, useClient, useToast } from "@/contexts"
 import FightService from "@/services/FightService"
 import type { Character, Vehicle } from "@/types"
 
@@ -44,6 +44,8 @@ export default function MenuBar({
 }: MenuBarProps) {
   const theme = useTheme()
   const { encounter, updateEncounter } = useEncounter()
+  const { client } = useClient()
+  const { toastSuccess, toastError } = useToast()
   const [open, setOpen] = useState<
     "character" | "vehicle" | "attack" | "chase" | "admin" | null
   >(null)
@@ -85,27 +87,40 @@ export default function MenuBar({
   const handleApplyInitiatives = async (
     updatedCharacters: (Character | Vehicle)[]
   ) => {
-    // Update the encounter with the new character initiatives
-    const updatedShots = encounter.shots.map(shot => ({
-      ...shot,
-      characters: shot.characters.map(char => {
-        const updated = updatedCharacters.find(c => c.id === char.id)
-        return updated || char
-      }),
-      vehicles: shot.vehicles.map(veh => {
-        const updated = updatedCharacters.find(v => v.id === veh.id)
-        return updated || veh
-      }),
-    }))
+    try {
+      // Build shots array for batch update
+      const shots = updatedCharacters.map(char => {
+        // Find the shot_id for this character
+        const shot = encounter.shots
+          .flatMap(s => s.characters || [])
+          .find(c => c.id === char.id)
+        
+        if (shot && shot.shot_id) {
+          return {
+            id: shot.shot_id,
+            shot: char.current_shot
+          }
+        }
+        return null
+      }).filter(Boolean)
 
-    const updatedEncounter = {
-      ...encounter,
-      shots: updatedShots,
-      sequence: encounter.sequence + 1, // Increment sequence to start new round
+      // Batch update all shots with new initiative values
+      if (shots.length > 0) {
+        await client.updateInitiatives(encounter.id, shots)
+      }
+      
+      // Increment the sequence
+      await updateEncounter({
+        ...encounter,
+        sequence: encounter.sequence + 1,
+      })
+      
+      toastSuccess("Initiative set and sequence started!")
+      setInitiativeDialogOpen(false)
+    } catch (error) {
+      console.error("Error applying initiatives:", error)
+      toastError("Failed to apply initiatives")
     }
-
-    await updateEncounter(updatedEncounter)
-    setInitiativeDialogOpen(false)
   }
 
   // Get all characters and vehicles from the encounter

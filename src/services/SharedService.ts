@@ -45,7 +45,7 @@ const SharedService = {
   },
 
   isVehicle: function (character: Character | Vehicle): boolean {
-    return character.category === "vehicle"
+    return character.entity_class === "Vehicle"
   },
 
   isFriendly: function (character: Character | Vehicle): boolean {

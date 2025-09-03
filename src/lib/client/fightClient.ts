@@ -127,6 +127,16 @@ export function createFightClient(deps: ClientDependencies) {
     })
   }
 
+  async function updateInitiatives(
+    fight: Fight | string,
+    shots: Array<{ id: string; shot: number }>
+  ): Promise<AxiosResponse<Encounter>> {
+    const fightId = typeof fight === "string" ? fight : fight.id
+    return patch(`${apiV2.encounters()}/${fightId}/update_initiatives`, {
+      shots,
+    })
+  }
+
   return {
     getEncounter,
     getFights,
@@ -139,5 +149,6 @@ export function createFightClient(deps: ClientDependencies) {
     createFightEvent,
     spendShots,
     applyCombatAction,
+    updateInitiatives,
   }
 }
