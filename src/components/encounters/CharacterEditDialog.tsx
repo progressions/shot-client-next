@@ -20,7 +20,7 @@ import {
 import { NumberField } from "@/components/ui"
 import { useClient, useToast, useEncounter } from "@/contexts"
 import { CS } from "@/services"
-import type { Character } from "@/types"
+import type { Character, Vehicle } from "@/types"
 
 interface CharacterEditDialogProps {
   open: boolean
@@ -53,13 +53,13 @@ export default function CharacterEditDialog({
   const availableVehicles = useMemo(() => {
     if (!encounter?.shots) return []
     
-    const vehicles: any[] = []
+    const vehicles: Vehicle[] = []
     const vehicleIds = new Set<string>()
     
     // Collect visible vehicles from shots
     encounter.shots.forEach(shot => {
       if (shot.vehicles && shot.vehicles.length > 0) {
-        shot.vehicles.forEach((v: any) => {
+        shot.vehicles.forEach((v: Vehicle) => {
           if (!vehicleIds.has(v.id)) {
             vehicles.push(v)
             vehicleIds.add(v.id)
@@ -72,7 +72,7 @@ export default function CharacterEditDialog({
     // (vehicles with null shot are hidden but still driveable)
     encounter.shots.forEach(shot => {
       if (shot.characters && shot.characters.length > 0) {
-        shot.characters.forEach((c: any) => {
+        shot.characters.forEach((c: Character & { driving?: Vehicle; driving_id?: string }) => {
           if (c.driving && c.driving.id && !vehicleIds.has(c.driving.id)) {
             vehicles.push(c.driving)
             vehicleIds.add(c.driving.id)
@@ -82,7 +82,7 @@ export default function CharacterEditDialog({
     })
     
     // Finally, make sure the current character's vehicle is included
-    const characterWithDriving = character as any
+    const characterWithDriving = character as Character & { driving?: Vehicle; driving_id?: string }
     if (characterWithDriving.driving && characterWithDriving.driving.id && !vehicleIds.has(characterWithDriving.driving.id)) {
       vehicles.push(characterWithDriving.driving)
       vehicleIds.add(characterWithDriving.driving.id)
@@ -135,7 +135,7 @@ export default function CharacterEditDialog({
       }
 
       // Set driving vehicle if character has driving_id or driving property
-      const characterWithDriving = character as any
+      const characterWithDriving = character as Character & { driving?: Vehicle; driving_id?: string }
       
       // Find the matching vehicle ID from availableVehicles
       let vehicleIdToSet = ""
@@ -213,26 +213,21 @@ export default function CharacterEditDialog({
         }
       }
 
-      // Add driving_id to character update (use vehicle's shot_id, not vehicle id)
-      const characterWithDriving = characterUpdate as any
-      if (drivingVehicleId) {
-        // Find the vehicle to get its shot_id
-        const vehicle = availableVehicles.find(v => v.id === drivingVehicleId)
-        characterWithDriving.driving_id = vehicle?.shot_id || null
-      } else {
-        characterWithDriving.driving_id = null
-      }
-
-      // Update character
+      // Update character (without driving_id - that goes on the shot)
+      console.log("Updating character with:", characterUpdate)
       await client.updateCharacterCombatStats(character.id, characterUpdate)
 
       // Handle vehicle driver updates
       if (drivingVehicleId) {
         // Find the vehicle and update its driver_id
         const vehicle = availableVehicles.find(v => v.id === drivingVehicleId)
+        console.log("Found vehicle to update:", vehicle)
         if (vehicle) {
-          // Update vehicle's driver_id
-          await client.updateVehicle(vehicle.id, { driver_id: character.id })
+          // Update vehicle's driver_id - need to use FormData
+          const vehicleFormData = new FormData()
+          vehicleFormData.append("vehicle[driver_id]", character.id)
+          console.log("Updating vehicle", vehicle.id, "with driver_id:", character.id)
+          await client.updateVehicle(vehicle.id, vehicleFormData)
           
           // If vehicle had a previous driver, clear their driving_id
           if (vehicle.driver_id && vehicle.driver_id !== character.id) {
@@ -250,11 +245,14 @@ export default function CharacterEditDialog({
         }
       } else {
         // Clear any vehicle that this character was previously driving
-        const characterWithDriving = character as any
+        const characterWithDriving = character as Character & { driving_id?: string }
         if (characterWithDriving.driving_id) {
-          const previousVehicle = availableVehicles.find(v => v.id === characterWithDriving.driving_id)
+          // Find vehicle by shot_id since driving_id is actually the shot_id
+          const previousVehicle = availableVehicles.find(v => v.shot_id === characterWithDriving.driving_id)
           if (previousVehicle) {
-            await client.updateVehicle(previousVehicle.id, { driver_id: null })
+            const vehicleFormData = new FormData()
+            vehicleFormData.append("vehicle[driver_id]", "")
+            await client.updateVehicle(previousVehicle.id, vehicleFormData)
           }
         }
       }
@@ -266,6 +264,7 @@ export default function CharacterEditDialog({
           current_shot: number | null
           impairments?: number
           count?: number
+          driving_id?: string | null
         }
 
         const shotUpdate: ShotUpdate = {
@@ -280,8 +279,41 @@ export default function CharacterEditDialog({
           shotUpdate.count = wounds
         }
 
+        // Add driving_id to shot update (use vehicle's shot_id, not vehicle id)
+        if (drivingVehicleId) {
+          // Find the vehicle to get its shot_id
+          const vehicle = availableVehicles.find(v => v.id === drivingVehicleId)
+          shotUpdate.driving_id = vehicle?.shot_id || null
+        } else {
+          shotUpdate.driving_id = null
+        }
+
         // Update shot
         await client.updateCharacterShot(encounter, character, shotUpdate)
+
+        // Also update the vehicle's shot with driver_id if assigning a vehicle
+        if (drivingVehicleId) {
+          const vehicle = availableVehicles.find(v => v.id === drivingVehicleId)
+          if (vehicle && vehicle.shot_id) {
+            await client.updateVehicleShot(encounter, vehicle, {
+              shot_id: vehicle.shot_id,
+              driver_id: character.shot_id
+            })
+          }
+        } else {
+          // Clear driver_id from any previously driven vehicle
+          const characterWithDriving = character as Character & { driving_id?: string }
+          if (characterWithDriving.driving_id) {
+            // driving_id IS the vehicle's shot_id
+            const previousVehicle = availableVehicles.find(v => v.shot_id === characterWithDriving.driving_id)
+            if (previousVehicle && previousVehicle.shot_id) {
+              await client.updateVehicleShot(encounter, previousVehicle, {
+                shot_id: previousVehicle.shot_id,
+                driver_id: null
+              })
+            }
+          }
+        }
       }
 
       // Fetch the updated encounter to refresh the display
@@ -456,7 +488,7 @@ export default function CharacterEditDialog({
               <MenuItem value="">
                 <em>None</em>
               </MenuItem>
-              {availableVehicles.map((vehicle: any) => (
+              {availableVehicles.map((vehicle: Vehicle) => (
                 <MenuItem key={vehicle.id} value={vehicle.id}>
                   <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                     <span>{vehicle.name}</span>
