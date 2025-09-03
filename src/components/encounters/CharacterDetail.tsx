@@ -27,6 +27,7 @@ import {
   Actions,
   ActionValues,
   CharacterEditDialog,
+  VehicleEditDialog,
   VehicleActionValues,
   ChaseConditionPoints,
 } from "@/components/encounters"
@@ -48,6 +49,7 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
   const [locationDialogOpen, setLocationDialogOpen] = useState(false)
   const [newLocation, setNewLocation] = useState(character.location || "")
   const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [vehicleEditDialogOpen, setVehicleEditDialogOpen] = useState(false)
 
   // Use the vehicle data from character.driving which now has full data from serializer
   const drivingVehicle = useMemo(() => {
@@ -68,6 +70,14 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
 
   const handleEditClose = () => {
     setEditDialogOpen(false)
+  }
+
+  const handleVehicleEditClick = () => {
+    setVehicleEditDialogOpen(true)
+  }
+
+  const handleVehicleEditClose = () => {
+    setVehicleEditDialogOpen(false)
   }
 
   const handleHideClick = async () => {
@@ -190,23 +200,41 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
                     mt: 1, 
                     p: 1, 
                     bgcolor: "action.hover", 
-                    borderRadius: 1 
+                    borderRadius: 1,
+                    position: "relative",
                   }}
                 >
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: "text.secondary",
-                      fontStyle: "italic",
-                      display: "block",
-                      mb: 0.5,
-                      fontSize: "0.7rem",
-                      textTransform: "uppercase",
-                      letterSpacing: 1,
-                    }}
-                  >
-                    Driving
-                  </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "text.secondary",
+                        fontStyle: "italic",
+                        display: "block",
+                        mb: 0.5,
+                        fontSize: "0.7rem",
+                        textTransform: "uppercase",
+                        letterSpacing: 1,
+                      }}
+                    >
+                      Driving
+                    </Typography>
+                    <Tooltip title="Edit vehicle">
+                      <IconButton
+                        size="small"
+                        onClick={handleVehicleEditClick}
+                        sx={{
+                          p: 0.25,
+                          color: "text.secondary",
+                          "&:hover": {
+                            color: "primary.main",
+                          },
+                        }}
+                      >
+                        <MdEdit size={14} />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
                     <VehicleAvatar entity={drivingVehicle} />
                     <VehicleLink vehicle={drivingVehicle} />
@@ -388,6 +416,15 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
         onClose={handleEditClose}
         character={character}
       />
+      
+      {/* Vehicle Edit Dialog */}
+      {drivingVehicle && (
+        <VehicleEditDialog
+          open={vehicleEditDialogOpen}
+          onClose={handleVehicleEditClose}
+          vehicle={drivingVehicle}
+        />
+      )}
     </motion.div>
   )
 }

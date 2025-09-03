@@ -223,6 +223,7 @@ export interface Vehicle extends BaseEntity {
   count: number
   shot_id: string
   driver?: Character
+  driver_id?: string
   location?: string
   image_url: string
   task: boolean
