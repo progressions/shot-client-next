@@ -159,17 +159,7 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
           pr: { xs: 0, sm: 0 },
           pl: { xs: 1, sm: 2 },
           py: { xs: 1, sm: 1.5 },
-          "& .MuiListItemSecondaryAction-root": {
-            right: 0,
-            top: { xs: "8px", sm: "50%" },
-            transform: { xs: "none", sm: "translateY(-50%)" },
-          },
         }}
-        secondaryAction={
-          <Box sx={{ display: { xs: "none", sm: "block" } }}>
-            <Actions entity={character} />
-          </Box>
-        }
       >
         <ListItemIcon
           sx={{
@@ -243,92 +233,83 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
             top: { xs: 4, sm: 8 },
             right: { xs: 4, sm: 8 },
             display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            gap: { xs: 0.5, sm: 0.5 },
+            flexDirection: "row",
+            gap: { xs: 0.25, sm: 0.5 },
             alignItems: "flex-end",
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              gap: { xs: 0.25, sm: 0.5 },
-            }}
-          >
-            <Tooltip title="Edit character details">
+          <Tooltip title="Edit character details">
+            <IconButton
+              aria-label="edit"
+              onClick={handleEditClick}
+              size="small"
+              sx={{
+                p: { xs: 0.5, sm: 1 },
+                color: "text.secondary",
+                "&:hover": {
+                  color: "primary.main",
+                  backgroundColor: "action.hover",
+                },
+              }}
+            >
+              <MdEdit size={16} />
+            </IconButton>
+          </Tooltip>
+          {isHidden ? (
+            <Tooltip title="Show character">
               <IconButton
-                aria-label="edit"
-                onClick={handleEditClick}
+                aria-label="show"
+                onClick={handleShowClick}
                 size="small"
                 sx={{
                   p: { xs: 0.5, sm: 1 },
                   color: "text.secondary",
                   "&:hover": {
-                    color: "primary.main",
+                    color: "success.main",
                     backgroundColor: "action.hover",
                   },
                 }}
               >
-                <MdEdit size={16} />
+                <FaEye size={16} />
               </IconButton>
             </Tooltip>
-            {isHidden ? (
-              <Tooltip title="Show character">
-                <IconButton
-                  aria-label="show"
-                  onClick={handleShowClick}
-                  size="small"
-                  sx={{
-                    p: { xs: 0.5, sm: 1 },
-                    color: "text.secondary",
-                    "&:hover": {
-                      color: "success.main",
-                      backgroundColor: "action.hover",
-                    },
-                  }}
-                >
-                  <FaEye size={16} />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <Tooltip title="Hide character">
-                <IconButton
-                  aria-label="hide"
-                  onClick={handleHideClick}
-                  size="small"
-                  sx={{
-                    p: { xs: 0.5, sm: 1 },
-                    color: "text.secondary",
-                    "&:hover": {
-                      color: "warning.main",
-                      backgroundColor: "action.hover",
-                    },
-                  }}
-                >
-                  <FaEyeSlash size={16} />
-                </IconButton>
-              </Tooltip>
-            )}
-            <Tooltip title="Remove from encounter">
+          ) : (
+            <Tooltip title="Hide character">
               <IconButton
-                aria-label="remove"
-                onClick={handleRemoveClick}
+                aria-label="hide"
+                onClick={handleHideClick}
                 size="small"
                 sx={{
                   p: { xs: 0.5, sm: 1 },
                   color: "text.secondary",
                   "&:hover": {
-                    color: "error.main",
+                    color: "warning.main",
                     backgroundColor: "action.hover",
                   },
                 }}
               >
-                <FaTimes size={16} />
+                <FaEyeSlash size={16} />
               </IconButton>
             </Tooltip>
-          </Box>
-          <Box sx={{ display: { xs: "block", sm: "none" } }}>
-            <Actions entity={character} />
-          </Box>
+          )}
+          <Tooltip title="Remove from encounter">
+            <IconButton
+              aria-label="remove"
+              onClick={handleRemoveClick}
+              size="small"
+              sx={{
+                p: { xs: 0.5, sm: 1 },
+                color: "text.secondary",
+                "&:hover": {
+                  color: "error.main",
+                  backgroundColor: "action.hover",
+                },
+              }}
+            >
+              <FaTimes size={16} />
+            </IconButton>
+          </Tooltip>
+          <Actions entity={character} />
         </Box>
       </ListItem>
 
