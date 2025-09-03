@@ -30,6 +30,7 @@ import {
   VehicleActionValues,
   ChaseConditionPoints,
 } from "@/components/encounters"
+import { VehicleAvatar } from "@/components/avatars"
 import CharacterEffectsDisplay from "./effects/CharacterEffectsDisplay"
 import { VehicleLink } from "@/components/ui/links"
 import { encounterTransition } from "@/contexts/EncounterContext"
@@ -48,18 +49,10 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
   const [newLocation, setNewLocation] = useState(character.location || "")
   const [editDialogOpen, setEditDialogOpen] = useState(false)
 
-  // Find the full vehicle object if character is driving
+  // Use the vehicle data from character.driving which now has full data from serializer
   const drivingVehicle = useMemo(() => {
-    if (!character.driving || !encounter?.shots) return null
-    
-    for (const shot of encounter.shots) {
-      if (shot.vehicles) {
-        const vehicle = shot.vehicles.find(v => v.id === character.driving?.id)
-        if (vehicle) return vehicle
-      }
-    }
-    return character.driving // Fallback to the subset if not found
-  }, [character.driving, encounter?.shots])
+    return character.driving || null
+  }, [character.driving])
 
   // Check if character is hidden (current_shot is null)
   const characterWithShot = character as Character & {
@@ -202,7 +195,6 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
               <ActionValues character={character} />
               {drivingVehicle && (
                 <Box 
-                  component="span"
                   sx={{ 
                     display: "block",
                     mt: 1, 
@@ -213,18 +205,25 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
                 >
                   <Typography
                     variant="caption"
-                    component="span"
                     sx={{
-                      color: "info.main",
+                      color: "text.secondary",
                       fontStyle: "italic",
                       display: "block",
-                      mb: 1,
+                      mb: 0.5,
+                      fontSize: "0.7rem",
+                      textTransform: "uppercase",
+                      letterSpacing: 1,
                     }}
                   >
-                    Driving <VehicleLink vehicle={drivingVehicle} />
+                    Driving
                   </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+                    {console.log("Vehicle data being passed to VehicleAvatar:", drivingVehicle)}
+                    <VehicleAvatar entity={drivingVehicle} />
+                    <VehicleLink vehicle={drivingVehicle} />
+                  </Box>
                   <VehicleActionValues vehicle={drivingVehicle} />
-                  <Box component="span" sx={{ display: "block", mt: 1 }}>
+                  <Box sx={{ mt: 1 }}>
                     <ChaseConditionPoints vehicle={drivingVehicle} />
                   </Box>
                 </Box>
@@ -235,6 +234,9 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
               />
             </>
           }
+          secondaryTypographyProps={{
+            component: "div"
+          }}
         />
         <Box
           sx={{
