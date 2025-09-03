@@ -13,12 +13,19 @@ import type { ChaseFormData, Shot, Vehicle, Character } from "@/types"
 import { FormActions } from "@/reducers"
 import CharacterSelector from "../CharacterSelector"
 
+// Character with shot-specific data from encounter
+interface CharacterWithShotData extends Character {
+  driving_id?: string
+  current_shot?: number | string | null
+}
+
 interface ChaseTargetSectionProps {
   shots: Shot[]  // All shots from encounter
   vehicles: Vehicle[]  // All vehicles from encounter
   formState: { data: ChaseFormData }
-  dispatchForm: (action: any) => void
+  dispatchForm: (action: { type: string; name?: string; value?: unknown }) => void
   target: Character | null  // Character who is driving
+  attacker: Character | null  // Attacker character
   attackerShotId?: string
 }
 
@@ -28,9 +35,11 @@ export default function ChaseTargetSection({
   formState,
   dispatchForm,
   target,
+  attacker,
   attackerShotId,
 }: ChaseTargetSectionProps) {
-  const { targetShotId, stunt } = formState.data as any
+  const targetShotId = (formState.data as ChaseFormData & { targetShotId?: string }).targetShotId
+  const stunt = (formState.data as ChaseFormData & { stunt?: boolean }).stunt
 
   // Helper to update a field
   const updateField = (name: string, value: unknown) => {
@@ -41,7 +50,14 @@ export default function ChaseTargetSection({
     })
   }
 
+  // Check if attacker is friendly (PC or Ally)
+  const attackerIsFriendly = useMemo(() => {
+    if (!attacker) return false
+    return CS.isType(attacker, ["PC", "Ally"])
+  }, [attacker])
+
   // Filter shots to only include characters with driving_id, excluding the attacker
+  // and excluding friendly targets if attacker is PC/Ally
   const targetDriverShots = useMemo(() => {
     return shots.filter(shot => {
       // Exclude the attacker's shot
@@ -52,22 +68,38 @@ export default function ChaseTargetSection({
         return false
       }
       
+      // If attacker is friendly (PC/Ally), exclude other friendlies from targets
+      if (attackerIsFriendly) {
+        if (shot.character && CS.isType(shot.character, ["PC", "Ally"])) {
+          return false
+        }
+        if (shot.characters) {
+          // Filter out shots that only contain PCs/Allies
+          const nonFriendlyDrivers = shot.characters.filter((c: Character) => 
+            (c as CharacterWithShotData).driving_id && !CS.isType(c, ["PC", "Ally"])
+          )
+          if (nonFriendlyDrivers.length === 0) {
+            return false
+          }
+        }
+      }
+      
       // Include only if character has driving_id
       if (shot.character) {
-        return !!(shot.character as any).driving_id
+        return !!(shot.character as CharacterWithShotData).driving_id
       }
       if (shot.characters && shot.characters.length > 0) {
-        return shot.characters.some((c: Character) => !!(c as any).driving_id)
+        return shot.characters.some((c: Character) => !!(c as CharacterWithShotData).driving_id)
       }
       return false
     })
-  }, [shots, attackerShotId])
+  }, [shots, attackerShotId, attackerIsFriendly])
 
 
   // Get the vehicle being driven by the selected target
   const selectedVehicle = useMemo(() => {
-    if (!target || !(target as any).driving) return null
-    const drivingInfo = (target as any).driving
+    if (!target || !target.driving) return null
+    const drivingInfo = target.driving
     
     // Find the full vehicle data from vehicles array
     const fullVehicle = vehicles.find(v => v.id === drivingInfo.id)
@@ -110,11 +142,11 @@ export default function ChaseTargetSection({
                 }
               }
               
-              if (selectedChar && (selectedChar as any).driving) {
+              if (selectedChar && selectedChar.driving) {
                 updateField("target", selectedChar)
                 
                 // Get the vehicle they're driving
-                const drivingInfo = (selectedChar as any).driving
+                const drivingInfo = selectedChar.driving
                 const vehicle = vehicles.find(v => v.id === drivingInfo.id) || drivingInfo
                 
                 if (vehicle) {
@@ -135,7 +167,9 @@ export default function ChaseTargetSection({
       {/* Show message if no targets available */}
       {targetDriverShots.length === 0 && (
         <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>
-          No other characters driving vehicles available as targets.
+          {attackerIsFriendly 
+            ? "No enemy vehicles available as targets (friendly fire not allowed)."
+            : "No other characters driving vehicles available as targets."}
         </Typography>
       )}
 

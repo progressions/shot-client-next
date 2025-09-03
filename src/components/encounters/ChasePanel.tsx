@@ -91,6 +91,7 @@ export default function ChasePanel({ onClose }: ChasePanelProps) {
                 formState={formState}
                 dispatchForm={dispatchForm}
                 target={target}
+                attacker={attacker}
                 attackerShotId={attackerShotId}
               />
             )}
