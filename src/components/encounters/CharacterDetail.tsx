@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { motion } from "motion/react"
 import type { Character } from "@/types"
 import {
@@ -27,6 +27,8 @@ import {
   Actions,
   ActionValues,
   CharacterEditDialog,
+  VehicleActionValues,
+  ChaseConditionPoints,
 } from "@/components/encounters"
 import CharacterEffectsDisplay from "./effects/CharacterEffectsDisplay"
 import { VehicleLink } from "@/components/ui/links"
@@ -45,6 +47,19 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
   const [locationDialogOpen, setLocationDialogOpen] = useState(false)
   const [newLocation, setNewLocation] = useState(character.location || "")
   const [editDialogOpen, setEditDialogOpen] = useState(false)
+
+  // Find the full vehicle object if character is driving
+  const drivingVehicle = useMemo(() => {
+    if (!character.driving || !encounter?.shots) return null
+    
+    for (const shot of encounter.shots) {
+      if (shot.vehicles) {
+        const vehicle = shot.vehicles.find(v => v.id === character.driving?.id)
+        if (vehicle) return vehicle
+      }
+    }
+    return character.driving // Fallback to the subset if not found
+  }, [character.driving, encounter?.shots])
 
   // Check if character is hidden (current_shot is null)
   const characterWithShot = character as Character & {
@@ -183,32 +198,42 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
             />
           }
           secondary={
-            <Box
-              component="span"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: { xs: 0.5, sm: 1 },
-                mt: 0.5,
-              }}
-            >
+            <>
               <ActionValues character={character} />
-              {character.driving && (
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: "info.main",
-                    fontStyle: "italic",
+              {drivingVehicle && (
+                <Box 
+                  component="span"
+                  sx={{ 
+                    display: "block",
+                    mt: 1, 
+                    p: 1, 
+                    bgcolor: "action.hover", 
+                    borderRadius: 1 
                   }}
                 >
-                  Driving <VehicleLink vehicle={character.driving} />
-                </Typography>
+                  <Typography
+                    variant="caption"
+                    component="span"
+                    sx={{
+                      color: "info.main",
+                      fontStyle: "italic",
+                      display: "block",
+                      mb: 1,
+                    }}
+                  >
+                    Driving <VehicleLink vehicle={drivingVehicle} />
+                  </Typography>
+                  <VehicleActionValues vehicle={drivingVehicle} />
+                  <Box component="span" sx={{ display: "block", mt: 1 }}>
+                    <ChaseConditionPoints vehicle={drivingVehicle} />
+                  </Box>
+                </Box>
               )}
               <CharacterEffectsDisplay
                 character={character}
                 effects={character.effects || []}
               />
-            </Box>
+            </>
           }
         />
         <Box

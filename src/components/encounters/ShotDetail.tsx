@@ -1,9 +1,9 @@
 "use client"
 
 import { useMemo } from "react"
-import type { Character, Shot, Vehicle } from "@/types"
+import type { Character, Shot } from "@/types"
 import { ListSubheader, Box } from "@mui/material"
-import { CharacterDetail, VehicleDetail } from "@/components/encounters"
+import { CharacterDetail } from "@/components/encounters"
 import { CS, CES } from "@/services"
 import { useEncounter } from "@/contexts"
 
@@ -13,6 +13,11 @@ type ShotDetailProps = {
 
 export default function ShotDetail({ shot }: ShotDetailProps) {
   const { encounter } = useEncounter()
+
+  // Don't render the shot if it only has vehicles (no characters)
+  if (!shot.characters || shot.characters.length === 0) {
+    return null
+  }
 
   // Sort characters by type, then adjusted speed, then name
   const sortedCharacters = useMemo(() => {
@@ -94,12 +99,6 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
         <CharacterDetail
           key={`fred-${shot.shot}-character-${character.shot_id}`}
           character={character}
-        />
-      ))}
-      {shot.vehicles.map((vehicle: Vehicle) => (
-        <VehicleDetail
-          key={`${shot.shot}-vehicle-${vehicle.id}`}
-          vehicle={vehicle}
         />
       ))}
     </Box>
