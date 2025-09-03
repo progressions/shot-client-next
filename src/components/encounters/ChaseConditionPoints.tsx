@@ -20,7 +20,7 @@ export default function ChaseConditionPoints({
     <Stack
       direction={{ xs: "row", sm: "column" }}
       spacing={{ xs: 0.5, sm: 1 }}
-      sx={{ 
+      sx={{
         alignItems: "center",
         m: 0,
         p: 0,

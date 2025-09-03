@@ -64,7 +64,7 @@ export default function Actions({ entity }: ActionsProps) {
   // Get current shot for the entity
   const getCurrentShot = () => {
     if (!encounter?.shots) return null
-    
+
     for (const shot of encounter.shots) {
       const character = shot.characters?.find(c => c.id === entity.id)
       if (character && character.current_shot !== undefined) {
@@ -87,7 +87,12 @@ export default function Actions({ entity }: ActionsProps) {
         <Icon keyword="Actions" size={24} />
       </IconButton>
 
-      <Dialog open={dialogOpen} onClose={handleClose} maxWidth={false} sx={{ "& .MuiDialog-paper": { width: 280 } }}>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleClose}
+        maxWidth={false}
+        sx={{ "& .MuiDialog-paper": { width: 280 } }}
+      >
         <DialogTitle>Spend Shots</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 1 }}>

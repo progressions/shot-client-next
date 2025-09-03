@@ -38,7 +38,10 @@ export default function ShotCounter() {
 
   return (
     <>
-      <MenuBar showHidden={showHidden} onShowHiddenChange={handleShowHiddenChange} />
+      <MenuBar
+        showHidden={showHidden}
+        onShowHiddenChange={handleShowHiddenChange}
+      />
       <List>
         {visibleShots.map((shot, index) => (
           <ShotDetail key={`${shot.shot}-${index}`} shot={shot} />

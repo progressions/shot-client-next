@@ -64,7 +64,7 @@ const Avatar = ({
         const words = entity.name.trim().split(/\s+/)
         if (words.length === 0) return ""
         if (words.length === 1) return words[0].charAt(0).toUpperCase()
-        
+
         const firstLetter = words[0].charAt(0).toUpperCase()
         const lastLetter = words[words.length - 1].charAt(0).toUpperCase()
         return firstLetter + lastLetter
