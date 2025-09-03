@@ -249,7 +249,7 @@ export default function ChaseResolution({
           size="large"
           startIcon={<CheckCircleIcon />}
           onClick={handleResolve}
-          disabled={!attacker || !target || isProcessing}
+          disabled={!attacker || !target || isProcessing || typedSwerve === ""}
           sx={{
             ml: { xs: 0, sm: 2 },
             mt: { xs: 1, sm: 0 },

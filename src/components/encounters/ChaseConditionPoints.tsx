@@ -15,6 +15,7 @@ export default function ChaseConditionPoints({
   const theme = useTheme()
   const chasePoints = VS.chasePoints(vehicle)
   const conditionPoints = VS.conditionPoints(vehicle)
+  console.log("vehicle", vehicle)
 
   return (
     <Box

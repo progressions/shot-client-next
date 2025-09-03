@@ -83,30 +83,26 @@ export default function ChasePanel({ onClose }: ChasePanelProps) {
               attacker={attacker}
             />
 
-            {/* Target Section - Only show if attacker selected */}
-            {attackerShotId && (
-              <ChaseTargetSection
-                shots={allShots}
-                vehicles={allVehicles}
-                formState={formState}
-                dispatchForm={dispatchForm}
-                target={target}
-                attacker={attacker}
-                attackerShotId={attackerShotId}
-              />
-            )}
-          </Box>
-
-          {/* Resolution Section - Only show if both attacker and target selected */}
-          {attackerShotId && targetShotId && (
-            <ChaseResolution
+            {/* Target Section - Always show */}
+            <ChaseTargetSection
+              shots={allShots}
+              vehicles={allVehicles}
               formState={formState}
               dispatchForm={dispatchForm}
-              attacker={attacker}
               target={target}
-              onClose={onClose}
+              attacker={attacker}
+              attackerShotId={attackerShotId}
             />
-          )}
+          </Box>
+
+          {/* Resolution Section - Always show */}
+          <ChaseResolution
+            formState={formState}
+            dispatchForm={dispatchForm}
+            attacker={attacker}
+            target={target}
+            onClose={onClose}
+          />
         </>
       ) : (
         <Box sx={{ p: 3, textAlign: "center" }}>
