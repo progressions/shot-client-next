@@ -1,106 +1,118 @@
-import type { Vehicle } from "@/types"
+import type { Vehicle, Character } from "@/types/types"
 import { defaultVehicle } from "@/types/defaults"
-import { brick, carolina, shing } from "./Characters"
+import { brick, carolina, shing } from "@/__tests__/factories/Characters"
+import VS from "@/services/VehicleService"
 
-// Helper functions for vehicle setup (to be implemented later with VehicleService)
-export function pursuer(vehicle: Vehicle, position: string) {
+export const createMockVehicle = (overrides: Partial<Vehicle> = {}): Vehicle => {
   return {
-    ...vehicle,
+    ...defaultVehicle,
+    id: "test-vehicle-1",
+    name: "Test Vehicle",
+    active: true,
+    color: "#4caf50",
     action_values: {
-      ...vehicle.action_values,
-      Pursuer: "true",
-      Position: position,
+      ...defaultVehicle.action_values,
+      "Type": "PC",
+      "Acceleration": 7,
+      "Handling": 7,
+      "Squeal": 8,
+      "Frame": 6,
+      "Crunch": 7
     },
+    ...overrides
   }
 }
 
+export function pursuer(vehicle: Vehicle, position: string) {
+  return VS.chain(vehicle, [
+    ["updateActionValue", "Pursuer", "true"],
+    ["updatePosition", position]
+  ])
+}
 export function evader(vehicle: Vehicle, position: string) {
-  return {
-    ...vehicle,
-    action_values: {
-      ...vehicle.action_values,
-      Pursuer: "false",
-      Position: position,
-    },
-  }
+  return VS.chain(vehicle, [
+    ["updateActionValue", "Pursuer", "false"],
+    ["updatePosition", position]
+  ])
 }
 
 export const brickMobile: Vehicle = {
   ...defaultVehicle,
   name: "Brickmobile",
-  id: "brickmobile",
   driver: brick,
+  // Driving: 7
   action_values: {
-    ...defaultVehicle.action_values,
-    Type: "PC",
-    Acceleration: 8,
-    Handling: 8,
-    Squeal: 10,
-    Frame: 6,
-    Crunch: 8,
-  },
+    "Type": "PC",
+    "Acceleration": 8,
+    "Handling": 8,
+    "Squeal": 10,
+    "Frame": 6,
+    "Crunch": 8,
+    "Chase Points": 0,
+    "Condition Points": 0,
+    "Position": "far",
+    "Pursuer": "true"
+  }
 }
 
 export const copCar: Vehicle = {
   ...defaultVehicle,
-  name: "PC",
-  id: "copcar",
+  name: "Cop Car",
   driver: carolina,
+  // Driving: 13
   action_values: {
-    ...defaultVehicle.action_values,
-    Type: "Featured Foe",
-    Acceleration: 8,
-    Handling: 8,
-    Squeal: 10,
-    Frame: 6,
-    Crunch: 8,
-  },
+    "Type": "Featured Foe",
+    "Acceleration": 8,
+    "Handling": 8,
+    "Squeal": 10,
+    "Frame": 6,
+    "Crunch": 8,
+    "Chase Points": 0,
+    "Condition Points": 0,
+    "Position": "far",
+    "Pursuer": "false"
+  }
 }
 
 export const battleTruck: Vehicle = {
   ...defaultVehicle,
   name: "Battle Truck",
-  id: "battletruck",
   driver: shing,
+  // Driving: 15
   action_values: {
-    ...defaultVehicle.action_values,
-    Type: "Boss",
-    Acceleration: 6,
-    Handling: 6,
-    Squeal: 8,
-    Frame: 10,
-    Crunch: 12,
-  },
+    "Type": "Boss",
+    "Acceleration": 6,
+    "Handling": 6,
+    "Squeal": 8,
+    "Frame": 10,
+    "Crunch": 12
+  }
 }
 
 export const motorcycles: Vehicle = {
   ...defaultVehicle,
   name: "Motorcycles",
-  id: "motorcycles",
   count: 15,
   action_values: {
-    ...defaultVehicle.action_values,
-    Type: "Mook",
-    Acceleration: 6,
-    Handling: 8,
-    Squeal: 10,
-    Frame: 0,
-    Crunch: 0,
-  },
+    "Type": "Mook",
+    "Acceleration": 6,
+    "Handling": 8,
+    "Squeal": 10,
+    "Frame": 0,
+    "Crunch": 0
+  }
 }
 
 export const hondas: Vehicle = {
   ...defaultVehicle,
   name: "Hondas",
-  id: "hondas",
   count: 15,
   action_values: {
-    ...defaultVehicle.action_values,
-    Type: "Mook",
-    Acceleration: 6,
-    Handling: 9,
-    Squeal: 11,
-    Frame: 5,
-    Crunch: 7,
-  },
+    "Type": "Mook",
+    "Acceleration": 6,
+    "Handling": 9,
+    "Squeal": 11,
+    "Frame": 5,
+    "Crunch": 7
+  }
 }

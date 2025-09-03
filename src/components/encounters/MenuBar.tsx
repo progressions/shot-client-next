@@ -22,10 +22,11 @@ import {
   AddCharacter,
   AddVehicle,
   AttackPanel,
+  ChasePanel,
   InitiativeDialog,
   LocationsDialog,
 } from "@/components/encounters"
-import { FaGun, FaPlay, FaPlus, FaMinus } from "react-icons/fa6"
+import { FaGun, FaPlay, FaPlus, FaMinus, FaCar } from "react-icons/fa6"
 import { FaMapMarkerAlt, FaCaretRight, FaCaretDown } from "react-icons/fa"
 import { MdAdminPanelSettings } from "react-icons/md"
 import { useEncounter } from "@/contexts"
@@ -44,13 +45,13 @@ export default function MenuBar({
   const theme = useTheme()
   const { encounter, updateEncounter } = useEncounter()
   const [open, setOpen] = useState<
-    "character" | "vehicle" | "attack" | "admin" | null
+    "character" | "vehicle" | "attack" | "chase" | "admin" | null
   >(null)
   const [initiativeDialogOpen, setInitiativeDialogOpen] = useState(false)
   const [locationsDialogOpen, setLocationsDialogOpen] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
-  const toggleBox = (type: "character" | "vehicle" | "attack" | "admin") => {
+  const toggleBox = (type: "character" | "vehicle" | "attack" | "chase" | "admin") => {
     setOpen(current => (current === type ? null : type))
   }
 
@@ -187,6 +188,25 @@ export default function MenuBar({
             title="Attack Resolution"
           >
             <FaGun size={20} />
+          </IconButton>
+          <IconButton
+            onClick={() => toggleBox("chase")}
+            sx={{
+              color: "white",
+              px: { xs: 0.5, sm: 1 },
+              backgroundColor:
+                open === "chase" ? "rgba(255, 255, 255, 0.2)" : "transparent",
+              borderRadius: 1,
+              "&:hover": {
+                backgroundColor:
+                  open === "chase"
+                    ? "rgba(255, 255, 255, 0.3)"
+                    : "rgba(255, 255, 255, 0.1)",
+              },
+            }}
+            title="Vehicle Chase"
+          >
+            <FaCar size={20} />
           </IconButton>
           <Divider
             orientation="vertical"
@@ -397,6 +417,9 @@ export default function MenuBar({
               )}
               {open === "attack" && (
                 <AttackPanel onClose={() => setOpen(null)} />
+              )}
+              {open === "chase" && (
+                <ChasePanel onClose={() => setOpen(null)} />
               )}
             </Box>
           </motion.div>
