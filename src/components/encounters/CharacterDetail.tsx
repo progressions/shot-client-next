@@ -218,7 +218,6 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
                     Driving
                   </Typography>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-                    {console.log("Vehicle data being passed to VehicleAvatar:", drivingVehicle)}
                     <VehicleAvatar entity={drivingVehicle} />
                     <VehicleLink vehicle={drivingVehicle} />
                   </Box>

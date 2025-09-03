@@ -152,6 +152,18 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   )
   const attacker = attackerShot?.character
 
+  // Debug logging
+  useEffect(() => {
+    if (attackerShot) {
+      console.log("[AttackPanel] Attacker shot updated:", {
+        attacker: attacker?.name,
+        shot_id: attackerShot.character?.shot_id,
+        current_shot: attackerShot.shot,
+        attackerShotId,
+      })
+    }
+  }, [attackerShot, attacker, attackerShotId])
+
   // Get all selected targets
   const selectedTargets = selectedTargetIds
     .map(id => allShots.find(s => s.character?.shot_id === id)?.character)
