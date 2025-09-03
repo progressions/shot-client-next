@@ -83,16 +83,19 @@ const ChaseReducerService = {
       // For ram/sideswipe: use Crunch - Frame instead
       let chasePoints: number
       let conditionPoints: number | null = null
+      let rawDamage: number  // The damage before reduction
       
       if (st.method === ChaseMethod.RAM_SIDESWIPE) {
         // Ram/Sideswipe: Outcome + Attacker's Crunch - Target's Frame
         // Use the frame value from form state (which can be manually edited)
-        chasePoints = Math.max(0, (outcome || 0) + st.crunch - st.frame)
+        rawDamage = Math.max(0, (outcome || 0) + st.crunch)
+        chasePoints = Math.max(0, rawDamage - st.frame)
         conditionPoints = chasePoints
       } else {
         // Other methods: Outcome + Attacker's Squeal - Target's Handling
         // Use the handling value from form state (which can be manually edited)
-        chasePoints = Math.max(0, (outcome || 0) + st.squeal - st.handling)
+        rawDamage = Math.max(0, (outcome || 0) + st.squeal)
+        chasePoints = Math.max(0, rawDamage - st.handling)
       }
 
       // Position logic for pursuers:
@@ -108,7 +111,7 @@ const ChaseReducerService = {
         success: true,
         actionResult: actionResult,
         outcome: outcome || null,
-        smackdown: chasePoints,  // smackdown should be the chase points to apply
+        smackdown: rawDamage,  // smackdown should be the raw damage before reduction
         position: newPosition,
         chasePoints: chasePoints,
         conditionPoints: conditionPoints,
@@ -145,15 +148,18 @@ const ChaseReducerService = {
       // Calculate chase points based on method
       let chasePoints: number
       let conditionPoints: number | null = null
+      let rawDamage: number  // The damage before reduction
       
       if (st.method === ChaseMethod.RAM_SIDESWIPE) {
         // Ram/Sideswipe: Outcome + Attacker's Crunch - Target's Frame
         // Evaders can also ram/sideswipe when near
-        chasePoints = Math.max(0, (outcome || 0) + st.crunch - st.frame)
+        rawDamage = Math.max(0, (outcome || 0) + st.crunch)
+        chasePoints = Math.max(0, rawDamage - st.frame)
         conditionPoints = chasePoints
       } else {
         // Other methods: Outcome + Attacker's Squeal - Target's Handling
-        chasePoints = Math.max(0, (outcome || 0) + st.squeal - st.handling)
+        rawDamage = Math.max(0, (outcome || 0) + st.squeal)
+        chasePoints = Math.max(0, rawDamage - st.handling)
       }
       
       // Position logic for evaders:
@@ -170,7 +176,7 @@ const ChaseReducerService = {
         position: newPosition,
         actionResult: actionResult,
         outcome: outcome || null,
-        smackdown: chasePoints,  // smackdown should be the chase points to apply
+        smackdown: rawDamage,  // smackdown should be the raw damage before reduction
         chasePoints: chasePoints,
         conditionPoints: conditionPoints,
         boxcars: st.swerve.boxcars,
