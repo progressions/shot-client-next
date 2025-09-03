@@ -40,6 +40,7 @@ export type ChaseFormData = {
   typedSwerve: string
   stunt: boolean
   position: "near" | "far"
+  attackerRole: "pursuer" | "evader"
   
   // Results (calculated by service)
   success: boolean

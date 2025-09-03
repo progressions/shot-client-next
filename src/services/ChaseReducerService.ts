@@ -86,9 +86,8 @@ const ChaseReducerService = {
       
       if (st.method === ChaseMethod.RAM_SIDESWIPE) {
         // Ram/Sideswipe: Outcome + Attacker's Crunch - Target's Frame
-        // Note: Frame is still calculated from vehicle as it's not editable
-        const targetFrame = this.VS.isMook(st.target) ? 0 : this.VS.frame(st.target)
-        chasePoints = Math.max(0, (outcome || 0) + st.crunch - targetFrame)
+        // Use the frame value from form state (which can be manually edited)
+        chasePoints = Math.max(0, (outcome || 0) + st.crunch - st.frame)
         conditionPoints = chasePoints
       } else {
         // Other methods: Outcome + Attacker's Squeal - Target's Handling
@@ -143,9 +142,19 @@ const ChaseReducerService = {
     })
 
     if (success) {
-      // For evade actions: Chase Points = Outcome + Attacker's Squeal - Target's Handling
-      // Use the handling value from form state (which can be manually edited)
-      const chasePoints = Math.max(0, (outcome || 0) + st.squeal - st.handling)
+      // Calculate chase points based on method
+      let chasePoints: number
+      let conditionPoints: number | null = null
+      
+      if (st.method === ChaseMethod.RAM_SIDESWIPE) {
+        // Ram/Sideswipe: Outcome + Attacker's Crunch - Target's Frame
+        // Evaders can also ram/sideswipe when near
+        chasePoints = Math.max(0, (outcome || 0) + st.crunch - st.frame)
+        conditionPoints = chasePoints
+      } else {
+        // Other methods: Outcome + Attacker's Squeal - Target's Handling
+        chasePoints = Math.max(0, (outcome || 0) + st.squeal - st.handling)
+      }
       
       // Position logic for evaders:
       // - If currently NEAR and successful with WIDEN_THE_GAP, position becomes FAR
@@ -163,7 +172,7 @@ const ChaseReducerService = {
         outcome: outcome || null,
         smackdown: null,
         chasePoints: chasePoints,
-        conditionPoints: null,
+        conditionPoints: conditionPoints,
         boxcars: st.swerve.boxcars,
         wayAwfulFailure: wayAwfulFailure,
       }

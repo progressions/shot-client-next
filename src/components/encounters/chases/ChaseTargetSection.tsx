@@ -13,6 +13,8 @@ import type { ChaseFormData, Shot, Vehicle, Character } from "@/types"
 import { FormActions } from "@/reducers"
 import { NumberField } from "@/components/ui"
 import CharacterSelector from "../CharacterSelector"
+import Avatar from "@/components/avatars/Avatar"
+import { CharacterLink, VehicleLink } from "@/components/ui/links"
 
 // Character with shot-specific data from encounter
 interface CharacterWithShotData extends Character {
@@ -173,9 +175,11 @@ export default function ChaseTargetSection({
                   // Update target vehicle-related fields
                   const targetDriving = CS.skill(selectedChar, "Driving")
                   const targetHandling = VS.isMook(vehicle) ? 0 : VS.handling(vehicle)
+                  const targetFrame = VS.isMook(vehicle) ? 0 : VS.frame(vehicle)
                   
                   updateField("defense", targetDriving) // Target's Driving is the difficulty
                   updateField("handling", targetHandling) // Target's Handling for chase point calculation
+                  updateField("frame", targetFrame) // Target's Frame for damage calculation
                   updateField("targetVehicle", vehicle) // Store the vehicle reference
                 }
               }
@@ -219,12 +223,23 @@ export default function ChaseTargetSection({
         <>
           {/* Vehicle Info Display */}
           <Box sx={{ p: 2, bgcolor: "background.paper", borderRadius: 1, mb: 2 }}>
-            <Typography variant="subtitle1" fontWeight="bold">
-              {target.name} driving {selectedVehicle.name}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {VS.isPursuer(selectedVehicle) ? "Pursuer" : "Evader"} • Position: {VS.position(selectedVehicle)}
-            </Typography>
+            <Stack direction="row" spacing={2}>
+              <Avatar entity={selectedVehicle} sx={{ width: 48, height: 48 }} />
+              <Box>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  <CharacterLink character={target}>
+                    {target.name}
+                  </CharacterLink>
+                  {" driving "}
+                  <VehicleLink vehicle={selectedVehicle}>
+                    {selectedVehicle.name}
+                  </VehicleLink>
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
+                  <strong>Defense</strong> {formState.data.defense} • <strong>Handling</strong> {formState.data.handling} • <strong>Frame</strong> {formState.data.frame}
+                </Typography>
+              </Box>
+            </Stack>
             
             {/* Editable Defense Values */}
             <Stack 
@@ -247,11 +262,6 @@ export default function ChaseTargetSection({
                   onChange={e => updateField("defense", e.target.value)}
                   onBlur={e => updateField("defense", e.target.value)}
                 />
-                {stunt && (
-                  <Typography variant="caption" sx={{ display: "block", mt: 0.5, color: "text.secondary" }}>
-                    +2 (stunt)
-                  </Typography>
-                )}
               </Box>
               
               {/* Handling Value */}
@@ -270,14 +280,20 @@ export default function ChaseTargetSection({
                 />
               </Box>
               
-              {/* Frame Value (for display) */}
+              {/* Frame Value (editable) */}
               <Box>
                 <Typography variant="body2" sx={{ mb: 1, fontWeight: "medium" }}>
                   Frame
                 </Typography>
-                <Typography variant="body1">
-                  <strong>{VS.frame(selectedVehicle)}</strong>
-                </Typography>
+                <NumberField
+                  name="frame"
+                  value={parseInt(formState.data.frame?.toString() || "0") || 0}
+                  size="small"
+                  width="80px"
+                  error={false}
+                  onChange={e => updateField("frame", e.target.value)}
+                  onBlur={e => updateField("frame", e.target.value)}
+                />
               </Box>
             </Stack>
             
@@ -298,7 +314,20 @@ export default function ChaseTargetSection({
             control={
               <Checkbox
                 checked={stunt || false}
-                onChange={(e) => updateField("stunt", e.target.checked)}
+                onChange={(e) => {
+                  const isChecked = e.target.checked
+                  updateField("stunt", isChecked)
+                  
+                  // Update defense value when stunt is toggled
+                  const currentDefense = parseInt(formState.data.defense?.toString() || "0") || 0
+                  if (isChecked) {
+                    // Add 2 when stunt is checked
+                    updateField("defense", currentDefense + 2)
+                  } else {
+                    // Subtract 2 when stunt is unchecked
+                    updateField("defense", Math.max(0, currentDefense - 2))
+                  }
+                }}
               />
             }
             label="Stunt (+2 Defense)"

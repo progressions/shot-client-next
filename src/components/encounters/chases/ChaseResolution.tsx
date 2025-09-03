@@ -119,8 +119,8 @@ export default function ChaseResolution({
         const attackerVehicleValues: any = {}
         const targetVehicleValues: any = {}
         
-        // Vehicle-specific keys that should be updated
-        const vehicleKeys = ['Position', 'Chase Points', 'Condition Points', 'Pursuer']
+        // Vehicle-specific keys that should be updated (Position now managed via ChaseRelationship)
+        const vehicleKeys = ['Chase Points', 'Condition Points', 'Pursuer']
         
         // Filter attacker action_values to only include vehicle-specific ones
         if (result.attacker.action_values) {
@@ -159,7 +159,12 @@ export default function ChaseResolution({
         const vehicleUpdates = [
           {
             vehicle_id: attackerVehicleId,
-            action_values: attackerVehicleValues,
+            target_vehicle_id: targetVehicleId,
+            role: formState.data.attackerRole || "pursuer", // Include attacker's role
+            action_values: {
+              ...attackerVehicleValues,
+              Position: result.position // Include position for ChaseRelationship update
+            },
             event: {
               type: "chase_action",
               description: `${attacker.name} ${result.method === ChaseMethod.RAM_SIDESWIPE ? "rams" : result.method === ChaseMethod.NARROW_THE_GAP ? "narrows gap with" : result.method === ChaseMethod.WIDEN_THE_GAP ? "widens gap from" : "evades"} ${target.name}`,
@@ -174,6 +179,8 @@ export default function ChaseResolution({
           },
           {
             vehicle_id: targetVehicleId,
+            target_vehicle_id: attackerVehicleId,
+            role: formState.data.attackerRole === "pursuer" ? "evader" : "pursuer", // Target has opposite role
             action_values: targetVehicleValues
           }
         ]
@@ -278,11 +285,11 @@ export default function ChaseResolution({
             <>
               <Typography variant="caption" sx={{ display: "block" }}>
                 {formState.data.method === ChaseMethod.RAM_SIDESWIPE 
-                  ? `Outcome ${showPreview ? previewOutcome : formState.data.outcome} + Crunch ${formState.data.crunch} - Frame ${target ? VS.frame(target) : 0} = Chase Points ${showPreview ? previewChasePoints : chasePoints}`
+                  ? `Outcome ${showPreview ? previewOutcome : formState.data.outcome} + Crunch ${formState.data.crunch} - Frame ${formState.data.frame} = Chase Points ${showPreview ? previewChasePoints : chasePoints}, Condition Points ${showPreview ? previewChasePoints : conditionPoints}`
                   : `Outcome ${showPreview ? previewOutcome : formState.data.outcome} + Squeal ${formState.data.squeal} - Handling ${formState.data.handling} = Chase Points ${showPreview ? previewChasePoints : chasePoints}`
                 }
               </Typography>
-              <Typography variant="body2" sx={{ mt: 1 }}>
+              <Typography variant="caption" sx={{ display: "block", mt: 1 }}>
                 New position: {showPreview ? (previewPosition === "near" ? "Near" : "Far") : (formState.data.position === "near" ? "Near" : "Far")}
               </Typography>
             </>

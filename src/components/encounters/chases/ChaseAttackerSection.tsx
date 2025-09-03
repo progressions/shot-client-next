@@ -15,6 +15,8 @@ import type { ChaseFormData, Shot, Vehicle, Character } from "@/types"
 import { FormActions } from "@/reducers"
 import { NumberField } from "@/components/ui"
 import CharacterSelector from "../CharacterSelector"
+import Avatar from "@/components/avatars/Avatar"
+import { CharacterLink, VehicleLink } from "@/components/ui/links"
 
 interface ChaseAttackerSectionProps {
   shots: Shot[]  // All shots from encounter
@@ -170,6 +172,7 @@ export default function ChaseAttackerSection({
         </Box>
       </Stack>
 
+
       {/* Show message if no drivers available */}
       {driverShots.length === 0 && (
         <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>
@@ -180,187 +183,203 @@ export default function ChaseAttackerSection({
       {/* Chase Skill and Vehicle Stats */}
       {attacker && selectedVehicle && (
         <>
+          {/* Role, Chase Action, and Position Selection */}
+          <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
+            {/* Role Selection */}
+            <FormControl sx={{ flex: 1 }}>
+              <InputLabel>Role</InputLabel>
+              <Select
+                value={formState.data.attackerRole || "pursuer"}
+                onChange={e => {
+                  const newRole = e.target.value as "pursuer" | "evader"
+                  updateField("attackerRole", newRole)
+                  
+                  // Update default method based on new role and current position
+                  const position = formState.data.position
+                  let defaultMethod = "EVADE"
+                  if (newRole === "pursuer") {
+                    defaultMethod = position === "near" ? "RAM_SIDESWIPE" : "NARROW_THE_GAP"
+                  } else {
+                    defaultMethod = position === "near" ? "WIDEN_THE_GAP" : "EVADE"
+                  }
+                  updateField("method", defaultMethod)
+                }}
+                label="Role"
+              >
+                <MenuItem value="pursuer">Pursuer</MenuItem>
+                <MenuItem value="evader">Evader</MenuItem>
+              </Select>
+            </FormControl>
+
+            {/* Chase Action Selection */}
+            <FormControl sx={{ flex: 1 }}>
+              <InputLabel>Chase Action</InputLabel>
+              <Select
+                value={(() => {
+                  // Validate that current method is valid for role/position
+                  const role = formState.data.attackerRole || "pursuer"
+                  const position = formState.data.position
+                  const method = formState.data.method
+                  
+                  if (role === "pursuer") {
+                    if (position === "near") {
+                      // Valid methods: RAM_SIDESWIPE, EVADE
+                      return ["RAM_SIDESWIPE", "EVADE"].includes(method) ? method : "RAM_SIDESWIPE"
+                    } else {
+                      // Valid method: NARROW_THE_GAP
+                      return "NARROW_THE_GAP"
+                    }
+                  } else {
+                    if (position === "near") {
+                      // Valid methods: WIDEN_THE_GAP, RAM_SIDESWIPE
+                      return ["WIDEN_THE_GAP", "RAM_SIDESWIPE"].includes(method) ? method : "WIDEN_THE_GAP"
+                    } else {
+                      // Valid method: EVADE
+                      return "EVADE"
+                    }
+                  }
+                })()}
+                onChange={e => updateField("method", e.target.value)}
+                label="Chase Action"
+              >
+                {(formState.data.attackerRole || "pursuer") === "pursuer" ? (
+                  // Pursuer options
+                  formState.data.position === "near" ? [
+                    // When NEAR, pursuer can ram/sideswipe or evade
+                    <MenuItem key="RAM_SIDESWIPE" value="RAM_SIDESWIPE">Ram/Sideswipe</MenuItem>,
+                    <MenuItem key="EVADE" value="EVADE">Evade</MenuItem>
+                  ] : [
+                    // When FAR, pursuer can only narrow the gap
+                    <MenuItem key="NARROW_THE_GAP" value="NARROW_THE_GAP">Narrow the Gap</MenuItem>
+                  ]
+                ) : (
+                  // Evader options
+                  formState.data.position === "near" ? [
+                    // When NEAR, evader can widen the gap or ram/sideswipe
+                    <MenuItem key="WIDEN_THE_GAP" value="WIDEN_THE_GAP">Widen the Gap</MenuItem>,
+                    <MenuItem key="RAM_SIDESWIPE" value="RAM_SIDESWIPE">Ram/Sideswipe</MenuItem>
+                  ] : [
+                    // When FAR, evader tries to maintain distance
+                    <MenuItem key="EVADE" value="EVADE">Evade</MenuItem>
+                  ]
+                )}
+              </Select>
+            </FormControl>
+
+            {/* Position Selection */}
+            <FormControl sx={{ flex: 1 }}>
+              <InputLabel>Position</InputLabel>
+              <Select
+                value={formState.data.position || "far"}
+                onChange={e => {
+                  const newPosition = e.target.value as "near" | "far"
+                  updateField("position", newPosition)
+                  
+                  // Update method based on role and new position
+                  const role = formState.data.attackerRole || "pursuer"
+                  let defaultMethod = "EVADE"
+                  if (role === "pursuer") {
+                    defaultMethod = newPosition === "near" ? "RAM_SIDESWIPE" : "NARROW_THE_GAP"
+                  } else {
+                    defaultMethod = newPosition === "near" ? "WIDEN_THE_GAP" : "EVADE"
+                  }
+                  updateField("method", defaultMethod)
+                }}
+                label="Position"
+              >
+                <MenuItem value="near">Near</MenuItem>
+                <MenuItem value="far">Far</MenuItem>
+              </Select>
+            </FormControl>
+          </Stack>
+
+          {/* Chase Values and Vehicle Info */}
           <Stack
             direction={{ xs: "column", sm: "row" }}
             spacing={{ xs: 2, sm: 2 }}
             sx={{ mb: 3 }}
           >
-            {/* Driving Skill Block */}
-            <Box sx={{ width: { xs: "100%", sm: "50%" } }}>
-              <Typography variant="body2" sx={{ mb: 2, fontWeight: "medium" }}>
-                Chase Value
-              </Typography>
-              <Stack direction="row" spacing={1} alignItems="flex-start">
-                <Box>
-                  <NumberField
-                    name="actionValue"
-                    value={parseInt(formState.data.actionValue?.toString() || "0") || 0}
-                    size="small"
-                    width="80px"
-                    error={false}
-                    onChange={e => updateField("actionValue", e.target.value)}
-                    onBlur={e => updateField("actionValue", e.target.value)}
-                  />
-                  {formState.data.impairments > 0 && (
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        display: "block",
-                        mt: 0.25,
-                        color: "error.main",
-                        fontWeight: "bold",
-                        textAlign: "center",
-                      }}
-                    >
-                      -{formState.data.impairments}
-                    </Typography>
-                  )}
-                </Box>
-                <FormControl
-                  sx={{
-                    flex: 1,
-                    minWidth: { xs: 120, sm: 150 },
-                    "& .MuiInputBase-root": { height: 56 },
-                  }}
-                >
-                  <InputLabel>Chase Method</InputLabel>
-                  <Select
-                    value="Driving"
-                    onChange={e => {
-                      const option = chaseOptions.find(o => o.skill === e.target.value)
-                      if (option) {
-                        updateField("actionValue", option.value.toString())
-                      }
-                    }}
-                    label="Chase Method"
-                  >
-                    {chaseOptions.map(option => (
-                      <MenuItem key={option.skill} value={option.skill}>
-                        {option.skill} ({option.value})
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {formState.data.impairments > 0 && (
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        display: "block",
-                        mt: 0.5,
-                        ml: 1.75,
-                        color: "text.secondary",
-                        fontStyle: "italic",
-                      }}
-                    >
-                      -{formState.data.impairments} from condition points
-                    </Typography>
-                  )}
-                </FormControl>
-              </Stack>
-            </Box>
-
-            {/* Squeal Block */}
-            <Box sx={{ width: { xs: "100%", sm: "50%" } }}>
-              <Typography variant="body2" sx={{ mb: 2, fontWeight: "medium" }}>
-                Squeal
-              </Typography>
-              <Stack direction="row" spacing={1} alignItems="flex-start">
-                <Box>
-                  <NumberField
-                    name="squeal"
-                    value={parseInt(formState.data.squeal?.toString() || "0") || 0}
-                    size="small"
-                    width="80px"
-                    error={false}
-                    onChange={e => updateField("squeal", e.target.value)}
-                    onBlur={e => updateField("squeal", e.target.value)}
-                  />
-                </Box>
-                <FormControl
-                  sx={{
-                    flex: 1,
-                    minWidth: { xs: 120, sm: 150 },
-                    "& .MuiInputBase-root": { height: 56 },
-                  }}
-                >
-                  <InputLabel>Vehicle</InputLabel>
-                  <Select
-                    value={selectedVehicle.id || ""}
-                    label="Vehicle"
-                    disabled
-                  >
-                    <MenuItem value={selectedVehicle.id || ""}>
-                      {selectedVehicle.name} (Squeal: {VS.squeal(selectedVehicle)})
-                    </MenuItem>
-                  </Select>
+            {/* Left side: Chase Value and Squeal */}
+            <Stack direction="row" spacing={2}>
+              <Box>
+                <Typography variant="body2" sx={{ mb: 1, fontWeight: "medium" }}>
+                  Chase Value
+                </Typography>
+                <NumberField
+                  name="actionValue"
+                  value={parseInt(formState.data.actionValue?.toString() || "0") || 0}
+                  size="small"
+                  width="90px"
+                  error={false}
+                  onChange={e => updateField("actionValue", e.target.value)}
+                  onBlur={e => updateField("actionValue", e.target.value)}
+                />
+                {formState.data.impairments > 0 && (
                   <Typography
                     variant="caption"
                     sx={{
-                        display: "block",
+                      display: "block",
                       mt: 0.5,
-                      ml: 1.75,
-                      color: "text.secondary",
-                      fontStyle: "italic",
+                      color: "error.main",
+                      fontSize: "0.7rem",
                     }}
                   >
-                    Handling: {VS.handling(selectedVehicle)}, Crunch: {VS.crunch(selectedVehicle)}
+                    -{formState.data.impairments} impairments
                   </Typography>
-                </FormControl>
+                )}
+              </Box>
+
+              <Box>
+                <Typography variant="body2" sx={{ mb: 1, fontWeight: "medium" }}>
+                  Squeal
+                </Typography>
+                <NumberField
+                  name="squeal"
+                  value={parseInt(formState.data.squeal?.toString() || "0") || 0}
+                  size="small"
+                  width="90px"
+                  error={false}
+                  onChange={e => updateField("squeal", e.target.value)}
+                  onBlur={e => updateField("squeal", e.target.value)}
+                />
+              </Box>
+            </Stack>
+
+            {/* Right side: Vehicle Status Display */}
+            <Box sx={{ flex: 1, p: 2, bgcolor: "background.paper", borderRadius: 1 }}>
+              <Stack direction="row" spacing={2}>
+                <Avatar entity={selectedVehicle} sx={{ width: 48, height: 48 }} />
+                <Box>
+                  <Typography variant="subtitle1" fontWeight="bold">
+                    <CharacterLink character={attacker}>
+                      {attacker.name}
+                    </CharacterLink>
+                    {" driving "}
+                    <VehicleLink vehicle={selectedVehicle}>
+                      {selectedVehicle.name}
+                    </VehicleLink>
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
+                    <strong>Acceleration</strong> {VS.acceleration(selectedVehicle)} • <strong>Handling</strong> {VS.handling(selectedVehicle)} • <strong>Squeal</strong> {VS.squeal(selectedVehicle)} • <strong>Frame</strong> {VS.frame(selectedVehicle)} • <strong>Crunch</strong> {VS.crunch(selectedVehicle)}
+                  </Typography>
+                </Box>
               </Stack>
+              {(VS.chasePoints(selectedVehicle) > 0 || VS.conditionPoints(selectedVehicle) > 0) && (
+                <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
+                  {VS.chasePoints(selectedVehicle) > 0 && (
+                    <Typography variant="caption" color="warning.main">
+                      Chase Points: {VS.chasePoints(selectedVehicle)}/35
+                    </Typography>
+                  )}
+                  {VS.conditionPoints(selectedVehicle) > 0 && (
+                    <Typography variant="caption" color="error.main">
+                      Condition Points: {VS.conditionPoints(selectedVehicle)}
+                    </Typography>
+                  )}
+                </Stack>
+              )}
             </Box>
           </Stack>
-
-          {/* Chase Method Selection */}
-          <Box sx={{ mb: 3 }}>
-            <FormControl fullWidth>
-              <InputLabel>Chase Action</InputLabel>
-              <Select
-                value={formState.data.method || ""}
-                onChange={e => updateField("method", e.target.value)}
-                label="Chase Action"
-              >
-                {VS.isPursuer(selectedVehicle) ? (
-                  // Pursuer options
-                  VS.position(selectedVehicle) === "near" ? [
-                    // When NEAR, pursuer can ram/sideswipe or evade
-                    <MenuItem key="RAM_SIDESWIPE" value="RAM_SIDESWIPE">Ram/Sideswipe (Attack with Crunch)</MenuItem>,
-                    <MenuItem key="EVADE" value="EVADE">Evade (Maintain position)</MenuItem>
-                  ] : (
-                    // When FAR, pursuer can only narrow the gap
-                    <MenuItem value="NARROW_THE_GAP">Narrow the Gap (Get closer)</MenuItem>
-                  )
-                ) : (
-                  // Evader options
-                  VS.position(selectedVehicle) === "near" ? (
-                    // When NEAR, evader tries to widen the gap
-                    <MenuItem value="WIDEN_THE_GAP">Widen the Gap (Get away)</MenuItem>
-                  ) : (
-                    // When FAR, evader tries to maintain distance
-                    <MenuItem value="EVADE">Evade (Maintain distance)</MenuItem>
-                  )
-                )}
-              </Select>
-            </FormControl>
-          </Box>
-
-          {/* Vehicle Status Display */}
-          <Box sx={{ p: 2, bgcolor: "background.paper", borderRadius: 1, mb: 2 }}>
-            <Typography variant="subtitle1" fontWeight="bold">
-              {attacker.name} driving {selectedVehicle.name}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {VS.isPursuer(selectedVehicle) ? "Pursuer" : "Evader"} • Gap: {VS.position(selectedVehicle).toUpperCase()}
-            </Typography>
-            {VS.chasePoints(selectedVehicle) > 0 && (
-              <Typography variant="body2" color="warning.main" sx={{ mt: 1 }}>
-                Chase Points: {VS.chasePoints(selectedVehicle)}/35
-              </Typography>
-            )}
-            {VS.conditionPoints(selectedVehicle) > 0 && (
-              <Typography variant="body2" color="error.main">
-                Condition Points: {VS.conditionPoints(selectedVehicle)}
-              </Typography>
-            )}
-          </Box>
         </>
       )}
     </Box>

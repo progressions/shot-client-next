@@ -45,6 +45,14 @@ class ApiV2 {
       : `${this.api()}/vehicles`
   }
 
+  chaseRelationships(): string {
+    return `${this.api()}/chase_relationships`
+  }
+
+  chaseRelationship(id: string): string {
+    return `${this.api()}/chase_relationships/${id}`
+  }
+
   ai(): string {
     return `${this.api()}/ai`
   }

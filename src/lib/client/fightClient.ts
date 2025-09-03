@@ -131,6 +131,7 @@ export function createFightClient(deps: ClientDependencies) {
     fight: Fight | string,
     vehicleUpdates: Array<{
       vehicle_id: string
+      target_vehicle_id?: string
       action_values?: Record<string, number | string>
       event?: {
         type: string
