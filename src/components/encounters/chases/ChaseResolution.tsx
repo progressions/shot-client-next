@@ -156,11 +156,16 @@ export default function ChaseResolution({
           return
         }
         
+        // Get the shot cost from form state
+        const shotCost = parseInt((formState.data as any).shotCost || "3")
+        
         const vehicleUpdates = [
           {
             vehicle_id: attackerVehicleId,
             target_vehicle_id: targetVehicleId,
             role: formState.data.attackerRole || "pursuer", // Include attacker's role
+            shot_cost: shotCost, // Add shot cost for the attacker
+            character_id: attacker.id, // Include character ID to spend shots
             action_values: {
               ...attackerVehicleValues,
               Position: result.position // Include position for ChaseRelationship update
@@ -173,7 +178,8 @@ export default function ChaseResolution({
                 chase_points: result.chasePoints,
                 condition_points: result.conditionPoints,
                 position: result.position,
-                success: result.success
+                success: result.success,
+                shot_cost: shotCost
               }
             }
           },
