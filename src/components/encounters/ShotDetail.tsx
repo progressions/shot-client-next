@@ -25,11 +25,6 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
     return shot.vehicles.filter((v: Vehicle) => !v.driver || !v.driver.id)
   }, [shot.vehicles, shot.shot, hasVehicles])
 
-  // Don't render if there's nothing to show
-  if (!hasCharacters && vehiclesWithoutDrivers.length === 0) {
-    return null
-  }
-
   // Sort characters by type, then adjusted speed, then name
   const sortedCharacters = useMemo(() => {
     if (!hasCharacters) return []
@@ -90,6 +85,11 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
       return nameA.localeCompare(nameB)
     })
   }, [shot.characters, encounter])
+
+  // Don't render if there's nothing to show - MUST be after all hooks
+  if (!hasCharacters && vehiclesWithoutDrivers.length === 0) {
+    return null
+  }
 
   return (
     <Box>

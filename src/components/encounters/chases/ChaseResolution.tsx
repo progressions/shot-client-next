@@ -97,13 +97,19 @@ export default function ChaseResolution({
       // Roll swerve if not provided
       let swerveValue = swerve
       if (typedSwerve === "") {
-        const AS = (CRS as any).AS
+        const AS = (CRS as { AS: { swerve: () => typeof swerve } }).AS
         swerveValue = AS.swerve()
       }
 
       // Process the chase action
+      // Use the actual vehicles, not the characters
+      const attackerVehicle = (formState.data as ChaseFormData & { vehicle?: Vehicle }).vehicle
+      const targetVehicle = (formState.data as ChaseFormData & { targetVehicle?: Vehicle }).targetVehicle
+      
       const stateToProcess = {
         ...formState.data,
+        attacker: attackerVehicle || formState.data.attacker,
+        target: targetVehicle || formState.data.target,
         swerve: swerveValue,
         edited: true,
       }
@@ -124,8 +130,8 @@ export default function ChaseResolution({
       // Update vehicles in the backend if successful
       if (result.success) {
         // Extract only vehicle-specific action values
-        const attackerVehicleValues: any = {}
-        const targetVehicleValues: any = {}
+        const attackerVehicleValues: Record<string, number> = {}
+        const targetVehicleValues: Record<string, number> = {}
         
         // Vehicle-specific keys that should be updated (Position now managed via ChaseRelationship)
         const vehicleKeys = ['Chase Points', 'Condition Points', 'Pursuer']
@@ -153,9 +159,9 @@ export default function ChaseResolution({
         
         // Get the actual vehicle IDs from the stored vehicle references
         // or from the driving relationship if needed
-        const attackerVehicle = (formState.data as any).vehicle || 
+        const attackerVehicle = (formState.data as ChaseFormData & { vehicle?: Vehicle }).vehicle || 
           (result.attacker?.driving ? result.attacker.driving : null)
-        const targetVehicle = (formState.data as any).targetVehicle || 
+        const targetVehicle = (formState.data as ChaseFormData & { targetVehicle?: Vehicle }).targetVehicle || 
           (result.target?.driving ? result.target.driving : null)
         
         const attackerVehicleId = attackerVehicle?.id
@@ -168,7 +174,7 @@ export default function ChaseResolution({
         }
         
         // Get the shot cost from form state
-        const shotCost = parseInt((formState.data as any).shotCost || "3")
+        const shotCost = parseInt((formState.data as ChaseFormData & { shotCost?: string }).shotCost || "3")
         
         const vehicleUpdates = [
           {
