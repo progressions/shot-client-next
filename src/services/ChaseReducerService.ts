@@ -108,7 +108,7 @@ const ChaseReducerService = {
         success: true,
         actionResult: actionResult,
         outcome: outcome || null,
-        smackdown: null,
+        smackdown: chasePoints,  // smackdown should be the chase points to apply
         position: newPosition,
         chasePoints: chasePoints,
         conditionPoints: conditionPoints,
@@ -170,7 +170,7 @@ const ChaseReducerService = {
         position: newPosition,
         actionResult: actionResult,
         outcome: outcome || null,
-        smackdown: null,
+        smackdown: chasePoints,  // smackdown should be the chase points to apply
         chasePoints: chasePoints,
         conditionPoints: conditionPoints,
         boxcars: st.swerve.boxcars,
