@@ -110,6 +110,14 @@ export default function ChaseResolution({
       
       const result = CRS.process(stateToProcess)
       
+      console.log("Chase Resolution - Result from CRS.process:", {
+        success: result.success,
+        chasePoints: result.chasePoints,
+        conditionPoints: result.conditionPoints,
+        targetActionValues: result.target?.action_values,
+        attackerActionValues: result.attacker?.action_values
+      })
+      
       // Update form with results
       updateFields(result)
       
@@ -139,6 +147,9 @@ export default function ChaseResolution({
             }
           })
         }
+        
+        console.log("Chase Resolution - Target vehicle values being sent:", targetVehicleValues)
+        console.log("Chase Resolution - Result target action_values:", result.target.action_values)
         
         // Get the actual vehicle IDs from the stored vehicle references
         // or from the driving relationship if needed
