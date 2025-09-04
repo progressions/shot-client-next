@@ -218,7 +218,7 @@ describe("ChaseReducerService", () => {
       const processMethod = jest.spyOn(CRS, "processMethod")
       processMethod.mockReturnValueOnce([updatedAttacker, updatedTarget])
 
-      CRS.killMooks(state)
+      const result = CRS.killMooks(state)
       expect(VS.isNear(result.attacker)).toEqual(true)
       expect(VS.mooks(result.target)).toEqual(10)
     })
@@ -253,7 +253,7 @@ describe("ChaseReducerService", () => {
         defense: 13,
         actionValue: 15,
       }
-      CRS.calculateAttackValues(state)
+      const result = CRS.calculateAttackValues(state)
       expect(result.modifiedDefense).toEqual("13")
       expect(result.modifiedActionValue).toEqual("15")
       expect(result.mookDefense).toEqual(15)
@@ -274,7 +274,7 @@ describe("ChaseReducerService", () => {
         defense: 13,
         actionValue: 15,
       }
-      CRS.calculateAttackValues(state)
+      const result = CRS.calculateAttackValues(state)
       expect(result.modifiedDefense).toEqual("13")
       expect(result.modifiedActionValue).toEqual("15")
       expect(result.mookDefense).toEqual(13)
