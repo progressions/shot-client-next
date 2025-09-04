@@ -39,7 +39,7 @@ export default function VehicleEditDialog({
 
   // Form state
   const [name, setName] = useState(vehicle.name)
-  const [currentShot, setCurrentShot] = useState<number | null>(0)
+  // Current shot removed - no longer relevant for vehicles
   const [chasePoints, setChasePoints] = useState<number>(0)
   const [conditionPoints, setConditionPoints] = useState<number>(0)
   const [impairments, setImpairments] = useState<number>(0)
@@ -64,22 +64,12 @@ export default function VehicleEditDialog({
   // Initialize form values when dialog opens
   useEffect(() => {
     if (open) {
+      console.log("VehicleEditDialog - Vehicle data:", vehicle)
+      console.log("VehicleEditDialog - Vehicle driver:", vehicle.driver)
+
       setName(vehicle.name || "")
 
-      // Get current shot from vehicle's shot data
-      const vehicleWithShot = vehicle as Vehicle & {
-        current_shot?: number | string | null
-      }
-      const shot = vehicleWithShot.current_shot
-
-      // Handle null (hidden), 0 (shot 0), or other numbers
-      if (shot === null || shot === undefined || shot === "") {
-        setCurrentShot(null)
-      } else {
-        setCurrentShot(
-          typeof shot === "number" ? shot : parseInt(String(shot)) || 0
-        )
-      }
+      // Current shot initialization removed - no longer relevant
 
       // Get chase points from action_values
       setChasePoints(vehicle.action_values?.["Chase Points"] || 0)
@@ -95,14 +85,16 @@ export default function VehicleEditDialog({
         vehicleWithShotImpairments.shot_impairments || vehicle.impairments || 0
       )
 
-      // Set driver if vehicle has one
-      if (vehicle.driver?.shot_id) {
-        setDriverId(vehicle.driver.shot_id)
+      // Set driver if vehicle has one - driver_id is a shot_id
+      if (vehicle.driver_id) {
+        console.log("Setting driver_id (shot_id):", vehicle.driver_id)
+        setDriverId(vehicle.driver_id)
       } else {
+        console.log("No driver_id found on vehicle")
         setDriverId("")
       }
     }
-  }, [open, vehicle])
+  }, [open, vehicle, availableCharacters])
 
   // Validation
   const isValid = () => {
@@ -152,7 +144,7 @@ export default function VehicleEditDialog({
 
         const shotUpdate: ShotUpdate = {
           shot_id: vehicle.shot_id,
-          current_shot: currentShot,
+          current_shot: null, // Vehicles don't use current_shot
         }
 
         // Add impairments for vehicles (stored on shot)
@@ -220,35 +212,7 @@ export default function VehicleEditDialog({
           {/* Combat Stats Row */}
           <Box>
             <Grid container spacing={2}>
-              <Grid item xs={3}>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block", mb: 0.5 }}
-                >
-                  Current Shot
-                </Typography>
-                <NumberField
-                  value={currentShot}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    const val = e.target.value
-                    if (val === "") {
-                      setCurrentShot(null)
-                    } else {
-                      const num = parseInt(val)
-                      if (!isNaN(num)) {
-                        setCurrentShot(num)
-                      }
-                    }
-                  }}
-                  onBlur={() => {}}
-                  disabled={loading}
-                  size="small"
-                  fullWidth
-                />
-              </Grid>
-
-              <Grid item xs={3}>
+              <Grid item xs={4}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -277,7 +241,7 @@ export default function VehicleEditDialog({
                 />
               </Grid>
 
-              <Grid item xs={3}>
+              <Grid item xs={4}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -306,7 +270,7 @@ export default function VehicleEditDialog({
                 />
               </Grid>
 
-              <Grid item xs={3}>
+              <Grid item xs={4}>
                 <Typography
                   variant="caption"
                   color="text.secondary"

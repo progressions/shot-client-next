@@ -1,14 +1,15 @@
-import type { Person } from "@/types"
+import type { Character } from "@/types/types"
+import { CharacterTypes } from "@/types/types"
 import { defaultCharacter } from "@/types/defaults"
-import { derringer, ak47 } from "./Weapons"
+import { derringer, ak47 } from "@/__tests__/factories/Weapons"
 
-export const brick: Person = {
+export const brick: Character = {
   ...defaultCharacter,
   name: "Brick Manly",
   id: "brick",
   action_values: {
     ...defaultCharacter.action_values,
-    Type: "PC",
+    Type: CharacterTypes.PC,
     Archetype: "Everyday Hero",
     MainAttack: "Martial Arts",
     SecondaryAttack: null,
@@ -22,24 +23,23 @@ export const brick: Person = {
   },
 }
 
-export const carolina: Person = {
+export const carolina: Character = {
   ...defaultCharacter,
   name: "Carolina Kominsky",
   id: "carolina",
   action_values: {
     ...defaultCharacter.action_values,
-    Type: "PC",
+    Type: CharacterTypes.PC,
     Archetype: "Maverick Cop",
     MainAttack: "Guns",
     SecondaryAttack: "Martial Arts",
     Guns: 14,
     "Martial Arts": 12,
     Defense: 13,
-    Toughness: 8,
     Speed: 7,
     Fortune: 7,
-    FortuneType: "Fortune",
     "Max Fortune": 7,
+    Toughness: 8,
   },
   skills: {
     ...defaultCharacter.skills,
@@ -48,23 +48,19 @@ export const carolina: Person = {
   weapons: [derringer],
 }
 
-export const shing: Person = {
+export const shing: Character = {
   ...defaultCharacter,
   name: "Ugly Shing",
   id: "shing",
   action_values: {
     ...defaultCharacter.action_values,
-    Type: "Boss",
+    Type: CharacterTypes.Boss,
     MainAttack: "Guns",
     SecondaryAttack: null,
     Guns: 17,
     Defense: 14,
     Damage: 9,
     Toughness: 7,
-    Speed: 6,
-    Fortune: 4,
-    FortuneType: "Fortune",
-    "Max Fortune": 4,
   },
   skills: {
     Driving: 15,
@@ -72,61 +68,50 @@ export const shing: Person = {
   weapons: [ak47],
 }
 
-export const huanKen: Person = {
+export const huanKen: Character = {
   ...defaultCharacter,
   name: "Huan Ken",
   id: "huanKen",
   action_values: {
     ...defaultCharacter.action_values,
-    Type: "Uber-Boss",
+    Type: CharacterTypes.UberBoss,
     MainAttack: "Sorcery",
     SecondaryAttack: null,
     Sorcery: 19,
     Defense: 17,
     Damage: 12,
     Toughness: 8,
-    Speed: 5,
-    Fortune: 6,
-    FortuneType: "Chi",
-    "Max Fortune": 6,
   },
 }
 
-export const hitman: Person = {
+export const hitman: Character = {
   ...defaultCharacter,
   name: "Hitman",
   id: "hitman",
   action_values: {
     ...defaultCharacter.action_values,
-    Type: "Featured Foe",
+    Type: CharacterTypes.FeaturedFoe,
     MainAttack: "Guns",
     SecondaryAttack: null,
     Guns: 14,
     Defense: 13,
     Toughness: 7,
     Damage: 9,
-    Speed: 6,
-    Fortune: 3,
-    FortuneType: "Fortune",
-    "Max Fortune": 3,
   },
 }
 
-export const zombies: Person = {
+export const zombies: Character = {
   ...defaultCharacter,
   name: "Zombies",
   id: "zombies",
   count: 15,
   action_values: {
     ...defaultCharacter.action_values,
-    Type: "Mook",
+    Type: CharacterTypes.Mook,
     MainAttack: "Creature",
     SecondaryAttack: null,
     Creature: 8,
     Defense: 13,
     Damage: 7,
-    Toughness: 5,
-    Speed: 4,
-    // Mooks don't get Fortune
   },
 }

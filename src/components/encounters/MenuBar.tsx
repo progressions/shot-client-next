@@ -22,13 +22,14 @@ import {
   AddCharacter,
   AddVehicle,
   AttackPanel,
+  ChasePanel,
   InitiativeDialog,
   LocationsDialog,
 } from "@/components/encounters"
-import { FaGun, FaPlay, FaPlus, FaMinus } from "react-icons/fa6"
+import { FaGun, FaPlay, FaPlus, FaMinus, FaCar } from "react-icons/fa6"
 import { FaMapMarkerAlt, FaCaretRight, FaCaretDown } from "react-icons/fa"
 import { MdAdminPanelSettings } from "react-icons/md"
-import { useEncounter } from "@/contexts"
+import { useEncounter, useClient, useToast } from "@/contexts"
 import FightService from "@/services/FightService"
 import type { Character, Vehicle } from "@/types"
 
@@ -43,14 +44,18 @@ export default function MenuBar({
 }: MenuBarProps) {
   const theme = useTheme()
   const { encounter, updateEncounter } = useEncounter()
+  const { client } = useClient()
+  const { toastSuccess, toastError } = useToast()
   const [open, setOpen] = useState<
-    "character" | "vehicle" | "attack" | "admin" | null
+    "character" | "vehicle" | "attack" | "chase" | "admin" | null
   >(null)
   const [initiativeDialogOpen, setInitiativeDialogOpen] = useState(false)
   const [locationsDialogOpen, setLocationsDialogOpen] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
-  const toggleBox = (type: "character" | "vehicle" | "attack" | "admin") => {
+  const toggleBox = (
+    type: "character" | "vehicle" | "attack" | "chase" | "admin"
+  ) => {
     setOpen(current => (current === type ? null : type))
   }
 
@@ -84,27 +89,42 @@ export default function MenuBar({
   const handleApplyInitiatives = async (
     updatedCharacters: (Character | Vehicle)[]
   ) => {
-    // Update the encounter with the new character initiatives
-    const updatedShots = encounter.shots.map(shot => ({
-      ...shot,
-      characters: shot.characters.map(char => {
-        const updated = updatedCharacters.find(c => c.id === char.id)
-        return updated || char
-      }),
-      vehicles: shot.vehicles.map(veh => {
-        const updated = updatedCharacters.find(v => v.id === veh.id)
-        return updated || veh
-      }),
-    }))
+    try {
+      // Build shots array for batch update
+      const shots = updatedCharacters
+        .map(char => {
+          // Find the shot_id for this character
+          const shot = encounter.shots
+            .flatMap(s => s.characters || [])
+            .find(c => c.id === char.id)
 
-    const updatedEncounter = {
-      ...encounter,
-      shots: updatedShots,
-      sequence: encounter.sequence + 1, // Increment sequence to start new round
+          if (shot && shot.shot_id) {
+            return {
+              id: shot.shot_id,
+              shot: char.current_shot,
+            }
+          }
+          return null
+        })
+        .filter(Boolean)
+
+      // Batch update all shots with new initiative values
+      if (shots.length > 0) {
+        await client.updateInitiatives(encounter.id, shots)
+      }
+
+      // Increment the sequence
+      await updateEncounter({
+        ...encounter,
+        sequence: encounter.sequence + 1,
+      })
+
+      toastSuccess("Initiative set and sequence started!")
+      setInitiativeDialogOpen(false)
+    } catch (error) {
+      console.error("Error applying initiatives:", error)
+      toastError("Failed to apply initiatives")
     }
-
-    await updateEncounter(updatedEncounter)
-    setInitiativeDialogOpen(false)
   }
 
   // Get all characters and vehicles from the encounter
@@ -187,6 +207,25 @@ export default function MenuBar({
             title="Attack Resolution"
           >
             <FaGun size={20} />
+          </IconButton>
+          <IconButton
+            onClick={() => toggleBox("chase")}
+            sx={{
+              color: "white",
+              px: { xs: 0.5, sm: 1 },
+              backgroundColor:
+                open === "chase" ? "rgba(255, 255, 255, 0.2)" : "transparent",
+              borderRadius: 1,
+              "&:hover": {
+                backgroundColor:
+                  open === "chase"
+                    ? "rgba(255, 255, 255, 0.3)"
+                    : "rgba(255, 255, 255, 0.1)",
+              },
+            }}
+            title="Vehicle Chase"
+          >
+            <FaCar size={20} />
           </IconButton>
           <Divider
             orientation="vertical"
@@ -398,6 +437,7 @@ export default function MenuBar({
               {open === "attack" && (
                 <AttackPanel onClose={() => setOpen(null)} />
               )}
+              {open === "chase" && <ChasePanel onClose={() => setOpen(null)} />}
             </Box>
           </motion.div>
         )}

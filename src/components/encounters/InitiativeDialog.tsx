@@ -16,7 +16,7 @@ import {
 import { FaDice } from "react-icons/fa"
 import { Character, Vehicle } from "@/types"
 import CharacterService from "@/services/CharacterService"
-import SharedService from "@/services/SharedService"
+import { CS, VS } from "@/services"
 import Dice from "@/services/DiceService"
 
 interface InitiativeDialogProps {
@@ -42,11 +42,28 @@ export default function InitiativeDialog({
     CharacterInitiative[]
   >([])
 
+  // Helper function to get speed value - uses vehicle's Acceleration if driving
+  const getSpeedValue = (entity: Character | Vehicle): number => {
+    // Check if this is a character who is driving
+    const charWithDriving = entity as Character & { driving?: Vehicle }
+    if (charWithDriving.driving && !CS.isVehicle(entity)) {
+      // Use the vehicle's Acceleration value
+      return VS.acceleration(charWithDriving.driving)
+    }
+    // Otherwise use normal Speed
+    return CharacterService.speed(entity)
+  }
+
   // Initialize character initiatives when dialog opens
-  // Filter out characters with current_shot > 0
+  // Filter out characters with current_shot > 0 and vehicles
   useEffect(() => {
     if (open && characters.length > 0) {
       const eligibleCharacters = characters.filter(char => {
+        // Exclude vehicles from initiative
+        if (CS.isVehicle(char)) {
+          return false
+        }
+
         const charWithShot = char as (Character | Vehicle) & {
           current_shot?: number | string | null
         }
@@ -70,12 +87,13 @@ export default function InitiativeDialog({
     }
   }, [open, characters])
 
-  // Separate PCs from NPCs
-  const pcs = characterInitiatives.filter(ci =>
-    SharedService.isType(ci.character, ["PC", "Ally"])
+  // Separate PCs from NPCs (vehicles already filtered out)
+  const pcs = characterInitiatives.filter(
+    ci => !CS.isVehicle(ci.character) && CS.isType(ci.character, ["PC", "Ally"])
   )
   const npcs = characterInitiatives.filter(
-    ci => !SharedService.isType(ci.character, ["PC", "Ally"])
+    ci =>
+      !CS.isVehicle(ci.character) && !CS.isType(ci.character, ["PC", "Ally"])
   )
 
   // Handle manual initiative entry
@@ -96,7 +114,7 @@ export default function InitiativeDialog({
   // Roll initiative for a single character
   const rollInitiativeForCharacter = (character: Character | Vehicle) => {
     const dieResult = Dice.rollDie()
-    const speed = CharacterService.speed(character)
+    const speed = getSpeedValue(character)
     const initiative = dieResult + speed
 
     setCharacterInitiatives(prev =>
@@ -112,9 +130,9 @@ export default function InitiativeDialog({
   const rollAllNPCs = () => {
     setCharacterInitiatives(prev =>
       prev.map(ci => {
-        if (!SharedService.isType(ci.character, ["PC", "Ally"])) {
+        if (!CS.isType(ci.character, ["PC", "Ally"])) {
           const dieResult = Dice.rollDie()
-          const speed = CharacterService.speed(ci.character)
+          const speed = getSpeedValue(ci.character)
           const initiative = dieResult + speed
           return { ...ci, initiative, rolled: true }
         }
@@ -144,7 +162,7 @@ export default function InitiativeDialog({
             ? ci.initiative + currentShot // Adding negative number subtracts
             : ci.initiative
 
-        return SharedService.setInitiative(ci.character, finalInitiative)
+        return CS.setInitiative(ci.character, finalInitiative)
       }
       return ci.character
     })
@@ -156,8 +174,12 @@ export default function InitiativeDialog({
   const canApply = characterInitiatives.every(ci => ci.initiative !== null)
 
   const renderCharacterRow = (ci: CharacterInitiative) => {
-    const speed = CharacterService.speed(ci.character)
-    const isPC = SharedService.isType(ci.character, ["PC", "Ally"])
+    const speed = getSpeedValue(ci.character)
+    const isPC = CS.isType(ci.character, ["PC", "Ally"])
+
+    // Check if character is driving
+    const charWithDriving = ci.character as Character & { driving?: Vehicle }
+    const isDriving = charWithDriving.driving && !CS.isVehicle(ci.character)
 
     // Get current shot for display
     const charWithShot = ci.character as (Character | Vehicle) & {
@@ -179,27 +201,34 @@ export default function InitiativeDialog({
         sx={{
           display: "flex",
           alignItems: "center",
-          gap: 2,
+          gap: 1,
           py: 1,
           px: 1,
           "&:hover": { bgcolor: "action.hover" },
         }}
       >
-        <Typography sx={{ flex: 1, minWidth: 120 }}>
-          {ci.character.name}
-          {hasNegativeShot && (
-            <Typography
-              component="span"
-              variant="body2"
-              color="warning.main"
-              sx={{ ml: 1 }}
-            >
-              (Shot {currentShot})
+        <Box sx={{ flex: 1, minWidth: 120 }}>
+          <Typography>
+            {ci.character.name}
+            {hasNegativeShot && (
+              <Typography
+                component="span"
+                variant="body2"
+                color="warning.main"
+                sx={{ ml: 1 }}
+              >
+                (Shot {currentShot})
+              </Typography>
+            )}
+          </Typography>
+          {isDriving && (
+            <Typography variant="body2" color="info.main" sx={{ mt: 0.5 }}>
+              {charWithDriving.driving.name}
             </Typography>
           )}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>
-          Speed: {speed}
+        </Box>
+        <Typography variant="body2" color="text.secondary" sx={{ width: 70 }}>
+          {isDriving ? "Acc" : "Speed"}: {speed}
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <TextField

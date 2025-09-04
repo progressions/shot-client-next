@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { motion } from "motion/react"
 import type { Character } from "@/types"
 import {
@@ -19,7 +19,7 @@ import {
   Typography,
   TextField,
 } from "@mui/material"
-import { FaTimes, FaEyeSlash, FaEye } from "react-icons/fa"
+import { FaTimes, FaEyeSlash, FaEye, FaHeart } from "react-icons/fa"
 import { MdEdit } from "react-icons/md"
 import {
   CharacterHeader,
@@ -27,7 +27,12 @@ import {
   Actions,
   ActionValues,
   CharacterEditDialog,
+  VehicleEditDialog,
+  VehicleActionValues,
+  ChaseConditionPoints,
+  HealDialog,
 } from "@/components/encounters"
+import { VehicleAvatar } from "@/components/avatars"
 import CharacterEffectsDisplay from "./effects/CharacterEffectsDisplay"
 import { VehicleLink } from "@/components/ui/links"
 import { encounterTransition } from "@/contexts/EncounterContext"
@@ -45,6 +50,13 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
   const [locationDialogOpen, setLocationDialogOpen] = useState(false)
   const [newLocation, setNewLocation] = useState(character.location || "")
   const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [vehicleEditDialogOpen, setVehicleEditDialogOpen] = useState(false)
+  const [healDialogOpen, setHealDialogOpen] = useState(false)
+
+  // Use the vehicle data from character.driving which now has full data from serializer
+  const drivingVehicle = useMemo(() => {
+    return character.driving || null
+  }, [character.driving])
 
   // Check if character is hidden (current_shot is null)
   const characterWithShot = character as Character & {
@@ -60,6 +72,22 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
 
   const handleEditClose = () => {
     setEditDialogOpen(false)
+  }
+
+  const handleVehicleEditClick = () => {
+    setVehicleEditDialogOpen(true)
+  }
+
+  const handleVehicleEditClose = () => {
+    setVehicleEditDialogOpen(false)
+  }
+
+  const handleHealClick = () => {
+    setHealDialogOpen(true)
+  }
+
+  const handleHealClose = () => {
+    setHealDialogOpen(false)
   }
 
   const handleHideClick = async () => {
@@ -151,17 +179,7 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
           pr: { xs: 0, sm: 0 },
           pl: { xs: 1, sm: 2 },
           py: { xs: 1, sm: 1.5 },
-          "& .MuiListItemSecondaryAction-root": {
-            right: 0,
-            top: { xs: "8px", sm: "50%" },
-            transform: { xs: "none", sm: "translateY(-50%)" },
-          },
         }}
-        secondaryAction={
-          <Box sx={{ display: { xs: "none", sm: "block" } }}>
-            <Actions entity={character} />
-          </Box>
-        }
       >
         <ListItemIcon
           sx={{
@@ -183,33 +201,82 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
             />
           }
           secondary={
-            <Box
-              component="span"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: { xs: 0.5, sm: 1 },
-                mt: 0.5,
-              }}
-            >
+            <>
               <ActionValues character={character} />
-              {character.driving && (
-                <Typography
-                  variant="caption"
+              {drivingVehicle && (
+                <Box
                   sx={{
-                    color: "info.main",
-                    fontStyle: "italic",
+                    display: "block",
+                    mt: 1,
+                    p: 1,
+                    bgcolor: "action.hover",
+                    borderRadius: 1,
+                    position: "relative",
                   }}
                 >
-                  Driving <VehicleLink vehicle={character.driving} />
-                </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "text.secondary",
+                        fontStyle: "italic",
+                        display: "block",
+                        mb: 0.5,
+                        fontSize: "0.7rem",
+                        textTransform: "uppercase",
+                        letterSpacing: 1,
+                      }}
+                    >
+                      Driving
+                    </Typography>
+                    <Tooltip title="Edit vehicle">
+                      <IconButton
+                        size="small"
+                        onClick={handleVehicleEditClick}
+                        sx={{
+                          p: 0.25,
+                          color: "text.secondary",
+                          "&:hover": {
+                            color: "primary.main",
+                          },
+                        }}
+                      >
+                        <MdEdit size={14} />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      mb: 1,
+                    }}
+                  >
+                    <VehicleAvatar entity={drivingVehicle} />
+                    <VehicleLink vehicle={drivingVehicle} />
+                  </Box>
+                  <VehicleActionValues vehicle={drivingVehicle} />
+                  <Box sx={{ mt: 1 }}>
+                    <ChaseConditionPoints vehicle={drivingVehicle} />
+                  </Box>
+                </Box>
               )}
               <CharacterEffectsDisplay
                 character={character}
                 effects={character.effects || []}
               />
-            </Box>
+            </>
           }
+          secondaryTypographyProps={{
+            component: "div",
+          }}
         />
         <Box
           sx={{
@@ -217,92 +284,100 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
             top: { xs: 4, sm: 8 },
             right: { xs: 4, sm: 8 },
             display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            gap: { xs: 0.5, sm: 0.5 },
+            flexDirection: "row",
+            gap: { xs: 0.25, sm: 0.5 },
             alignItems: "flex-end",
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              gap: { xs: 0.25, sm: 0.5 },
-            }}
-          >
-            <Tooltip title="Edit character details">
+          <Tooltip title="Edit character details">
+            <IconButton
+              aria-label="edit"
+              onClick={handleEditClick}
+              size="small"
+              sx={{
+                p: { xs: 0.5, sm: 1 },
+                color: "text.secondary",
+                "&:hover": {
+                  color: "primary.main",
+                  backgroundColor: "action.hover",
+                },
+              }}
+            >
+              <MdEdit size={16} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Heal wounds">
+            <IconButton
+              aria-label="heal"
+              onClick={handleHealClick}
+              size="small"
+              sx={{
+                p: { xs: 0.5, sm: 1 },
+                color: "text.secondary",
+                "&:hover": {
+                  color: "success.main",
+                  backgroundColor: "action.hover",
+                },
+              }}
+            >
+              <FaHeart size={16} />
+            </IconButton>
+          </Tooltip>
+          {isHidden ? (
+            <Tooltip title="Show character">
               <IconButton
-                aria-label="edit"
-                onClick={handleEditClick}
+                aria-label="show"
+                onClick={handleShowClick}
                 size="small"
                 sx={{
                   p: { xs: 0.5, sm: 1 },
                   color: "text.secondary",
                   "&:hover": {
-                    color: "primary.main",
+                    color: "success.main",
                     backgroundColor: "action.hover",
                   },
                 }}
               >
-                <MdEdit size={16} />
+                <FaEye size={16} />
               </IconButton>
             </Tooltip>
-            {isHidden ? (
-              <Tooltip title="Show character">
-                <IconButton
-                  aria-label="show"
-                  onClick={handleShowClick}
-                  size="small"
-                  sx={{
-                    p: { xs: 0.5, sm: 1 },
-                    color: "text.secondary",
-                    "&:hover": {
-                      color: "success.main",
-                      backgroundColor: "action.hover",
-                    },
-                  }}
-                >
-                  <FaEye size={16} />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <Tooltip title="Hide character">
-                <IconButton
-                  aria-label="hide"
-                  onClick={handleHideClick}
-                  size="small"
-                  sx={{
-                    p: { xs: 0.5, sm: 1 },
-                    color: "text.secondary",
-                    "&:hover": {
-                      color: "warning.main",
-                      backgroundColor: "action.hover",
-                    },
-                  }}
-                >
-                  <FaEyeSlash size={16} />
-                </IconButton>
-              </Tooltip>
-            )}
-            <Tooltip title="Remove from encounter">
+          ) : (
+            <Tooltip title="Hide character">
               <IconButton
-                aria-label="remove"
-                onClick={handleRemoveClick}
+                aria-label="hide"
+                onClick={handleHideClick}
                 size="small"
                 sx={{
                   p: { xs: 0.5, sm: 1 },
                   color: "text.secondary",
                   "&:hover": {
-                    color: "error.main",
+                    color: "warning.main",
                     backgroundColor: "action.hover",
                   },
                 }}
               >
-                <FaTimes size={16} />
+                <FaEyeSlash size={16} />
               </IconButton>
             </Tooltip>
-          </Box>
-          <Box sx={{ display: { xs: "block", sm: "none" } }}>
-            <Actions entity={character} />
-          </Box>
+          )}
+          <Tooltip title="Remove from encounter">
+            <IconButton
+              aria-label="remove"
+              onClick={handleRemoveClick}
+              size="small"
+              sx={{
+                p: { xs: 0.5, sm: 1 },
+                color: "text.secondary",
+                "&:hover": {
+                  color: "error.main",
+                  backgroundColor: "action.hover",
+                },
+              }}
+            >
+              <FaTimes size={16} />
+            </IconButton>
+          </Tooltip>
+          <Actions entity={character} />
         </Box>
       </ListItem>
 
@@ -379,6 +454,22 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
       <CharacterEditDialog
         open={editDialogOpen}
         onClose={handleEditClose}
+        character={character}
+      />
+
+      {/* Vehicle Edit Dialog */}
+      {drivingVehicle && (
+        <VehicleEditDialog
+          open={vehicleEditDialogOpen}
+          onClose={handleVehicleEditClose}
+          vehicle={drivingVehicle}
+        />
+      )}
+
+      {/* Heal Dialog */}
+      <HealDialog
+        open={healDialogOpen}
+        onClose={handleHealClose}
         character={character}
       />
     </motion.div>

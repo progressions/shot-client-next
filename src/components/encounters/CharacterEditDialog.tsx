@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import {
   Dialog,
   DialogTitle,
@@ -12,11 +12,15 @@ import {
   Box,
   Typography,
   Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material"
 import { NumberField } from "@/components/ui"
 import { useClient, useToast, useEncounter } from "@/contexts"
 import { CS } from "@/services"
-import type { Character } from "@/types"
+import type { Character, Vehicle } from "@/types"
 
 interface CharacterEditDialogProps {
   open: boolean
@@ -39,10 +43,63 @@ export default function CharacterEditDialog({
   const [wounds, setWounds] = useState<number>(0)
   const [impairments, setImpairments] = useState<number>(0)
   const [marksOfDeath, setMarksOfDeath] = useState<number>(0)
+  const [drivingVehicleId, setDrivingVehicleId] = useState<string>("")
   const [loading, setLoading] = useState(false)
 
   // Helper to check if character is PC
   const isPC = () => CS.isPC(character)
+  const isMook = () => CS.isMook(character)
+
+  // Collect all vehicles from the encounter (including hidden ones)
+  const availableVehicles = useMemo(() => {
+    if (!encounter?.shots) return []
+
+    const vehicles: Vehicle[] = []
+    const vehicleIds = new Set<string>()
+
+    // Collect visible vehicles from shots
+    encounter.shots.forEach(shot => {
+      if (shot.vehicles && shot.vehicles.length > 0) {
+        shot.vehicles.forEach((v: Vehicle) => {
+          if (!vehicleIds.has(v.id)) {
+            vehicles.push(v)
+            vehicleIds.add(v.id)
+          }
+        })
+      }
+    })
+
+    // Also check if any character is driving a vehicle that's not in the visible list
+    // (vehicles with null shot are hidden but still driveable)
+    encounter.shots.forEach(shot => {
+      if (shot.characters && shot.characters.length > 0) {
+        shot.characters.forEach(
+          (c: Character & { driving?: Vehicle; driving_id?: string }) => {
+            if (c.driving && c.driving.id && !vehicleIds.has(c.driving.id)) {
+              vehicles.push(c.driving)
+              vehicleIds.add(c.driving.id)
+            }
+          }
+        )
+      }
+    })
+
+    // Finally, make sure the current character's vehicle is included
+    const characterWithDriving = character as Character & {
+      driving?: Vehicle
+      driving_id?: string
+    }
+    if (
+      characterWithDriving.driving &&
+      characterWithDriving.driving.id &&
+      !vehicleIds.has(characterWithDriving.driving.id)
+    ) {
+      vehicles.push(characterWithDriving.driving)
+      vehicleIds.add(characterWithDriving.driving.id)
+    }
+
+    return vehicles
+  }, [encounter?.shots, character])
 
   // Initialize form values when dialog opens
   useEffect(() => {
@@ -86,8 +143,49 @@ export default function CharacterEditDialog({
             0
         )
       }
+
+      // Set driving vehicle if character has driving_id or driving property
+      const characterWithDriving = character as Character & {
+        driving?: Vehicle
+        driving_id?: string
+      }
+
+      // Find the matching vehicle ID from availableVehicles
+      let vehicleIdToSet = ""
+
+      // The driving_id is actually the shot_id, not the vehicle id
+      // We need to find the vehicle by matching shot_id
+      if (characterWithDriving.driving_id) {
+        // Find vehicle with matching shot_id
+        const matchingVehicle = availableVehicles.find(
+          v => v.shot_id === characterWithDriving.driving_id
+        )
+        if (matchingVehicle) {
+          vehicleIdToSet = matchingVehicle.id
+        }
+      } else if (
+        characterWithDriving.driving &&
+        characterWithDriving.driving.id
+      ) {
+        // Check if character has a driving property with vehicle info
+        vehicleIdToSet = characterWithDriving.driving.id
+      }
+
+      // Debug logging
+      console.log("Character driving info:", {
+        driving_id: characterWithDriving.driving_id,
+        driving: characterWithDriving.driving,
+        vehicleIdToSet,
+        availableVehicles: availableVehicles.map(v => ({
+          id: v.id,
+          shot_id: v.shot_id,
+          name: v.name,
+        })),
+      })
+
+      setDrivingVehicleId(vehicleIdToSet)
     }
-  }, [open, character])
+  }, [open, character, availableVehicles])
 
   // Validation
   const isValid = () => {
@@ -121,24 +219,82 @@ export default function CharacterEditDialog({
 
       // Handle wounds and marks of death based on character type
       if (isPC()) {
-        // PCs: wounds and impairments are always on the character model
+        // PCs: wounds, marks of death, and impairments are always on the character model
         characterUpdate.action_values = {
           ...character.action_values,
           Wounds: wounds,
           "Marks of Death": marksOfDeath,
         }
         characterUpdate.impairments = impairments
+      } else if (isMook()) {
+        // Mooks: no marks of death or impairments
+        characterUpdate.action_values = {
+          ...character.action_values,
+        }
       } else {
-        // Non-PCs: only marks of death on character
+        // Other NPCs: no marks of death on character
         // Count and impairments are ONLY relevant in fights (stored on Shot)
         characterUpdate.action_values = {
           ...character.action_values,
-          "Marks of Death": marksOfDeath,
         }
       }
 
-      // Update character
+      // Update character (without driving_id - that goes on the shot)
+      console.log("Updating character with:", characterUpdate)
       await client.updateCharacterCombatStats(character.id, characterUpdate)
+
+      // Handle vehicle driver updates
+      if (drivingVehicleId) {
+        // Find the vehicle and update its driver_id
+        const vehicle = availableVehicles.find(v => v.id === drivingVehicleId)
+        console.log("Found vehicle to update:", vehicle)
+        if (vehicle) {
+          // Update vehicle's driver_id - need to use FormData
+          const vehicleFormData = new FormData()
+          vehicleFormData.append("vehicle[driver_id]", character.id)
+          console.log(
+            "Updating vehicle",
+            vehicle.id,
+            "with driver_id:",
+            character.id
+          )
+          await client.updateVehicle(vehicle.id, vehicleFormData)
+
+          // If vehicle had a previous driver, clear their driving_id
+          if (vehicle.driver_id && vehicle.driver_id !== character.id) {
+            // Find the previous driver and clear their driving_id
+            for (const shot of encounter.shots) {
+              if (shot.characters) {
+                const previousDriver = shot.characters.find(
+                  (c: Character) => c.id === vehicle.driver_id
+                )
+                if (previousDriver) {
+                  await client.updateCharacterCombatStats(previousDriver.id, {
+                    driving_id: null,
+                  })
+                  break
+                }
+              }
+            }
+          }
+        }
+      } else {
+        // Clear any vehicle that this character was previously driving
+        const characterWithDriving = character as Character & {
+          driving_id?: string
+        }
+        if (characterWithDriving.driving_id) {
+          // Find vehicle by shot_id since driving_id is actually the shot_id
+          const previousVehicle = availableVehicles.find(
+            v => v.shot_id === characterWithDriving.driving_id
+          )
+          if (previousVehicle) {
+            const vehicleFormData = new FormData()
+            vehicleFormData.append("vehicle[driver_id]", "")
+            await client.updateVehicle(previousVehicle.id, vehicleFormData)
+          }
+        }
+      }
 
       // Update shot if we have shot data
       if (character.shot_id && encounter) {
@@ -147,6 +303,7 @@ export default function CharacterEditDialog({
           current_shot: number | null
           impairments?: number
           count?: number
+          driving_id?: string | null
         }
 
         const shotUpdate: ShotUpdate = {
@@ -154,15 +311,57 @@ export default function CharacterEditDialog({
           current_shot: currentShot,
         }
 
-        // For non-PCs, impairments and count go on the shot
+        // For non-PCs (except Mooks), impairments and count go on the shot
         // For PCs, only current_shot goes on the shot (impairments are on character)
+        // For Mooks, only count goes on the shot (no impairments)
         if (!isPC()) {
-          shotUpdate.impairments = impairments
-          shotUpdate.count = wounds
+          if (isMook()) {
+            shotUpdate.count = wounds // Count for mooks
+          } else {
+            shotUpdate.impairments = impairments
+            shotUpdate.count = wounds
+          }
+        }
+
+        // Add driving_id to shot update (use vehicle's shot_id, not vehicle id)
+        if (drivingVehicleId) {
+          // Find the vehicle to get its shot_id
+          const vehicle = availableVehicles.find(v => v.id === drivingVehicleId)
+          shotUpdate.driving_id = vehicle?.shot_id || null
+        } else {
+          shotUpdate.driving_id = null
         }
 
         // Update shot
         await client.updateCharacterShot(encounter, character, shotUpdate)
+
+        // Also update the vehicle's shot with driver_id if assigning a vehicle
+        if (drivingVehicleId) {
+          const vehicle = availableVehicles.find(v => v.id === drivingVehicleId)
+          if (vehicle && vehicle.shot_id) {
+            await client.updateVehicleShot(encounter, vehicle, {
+              shot_id: vehicle.shot_id,
+              driver_id: character.shot_id,
+            })
+          }
+        } else {
+          // Clear driver_id from any previously driven vehicle
+          const characterWithDriving = character as Character & {
+            driving_id?: string
+          }
+          if (characterWithDriving.driving_id) {
+            // driving_id IS the vehicle's shot_id
+            const previousVehicle = availableVehicles.find(
+              v => v.shot_id === characterWithDriving.driving_id
+            )
+            if (previousVehicle && previousVehicle.shot_id) {
+              await client.updateVehicleShot(encounter, previousVehicle, {
+                shot_id: previousVehicle.shot_id,
+                driver_id: null,
+              })
+            }
+          }
+        }
       }
 
       // Fetch the updated encounter to refresh the display
@@ -201,7 +400,7 @@ export default function CharacterEditDialog({
           {/* Combat Stats Row */}
           <Box>
             <Grid container spacing={2}>
-              <Grid item xs={3}>
+              <Grid item xs={isMook() ? 6 : isPC() ? 3 : 4}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -235,7 +434,7 @@ export default function CharacterEditDialog({
                 />
               </Grid>
 
-              <Grid item xs={3}>
+              <Grid item xs={isMook() ? 6 : isPC() ? 3 : 4}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -264,65 +463,112 @@ export default function CharacterEditDialog({
                 />
               </Grid>
 
-              <Grid item xs={3}>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block", mb: 0.5 }}
-                >
-                  Impairments
-                </Typography>
-                <NumberField
-                  value={impairments}
-                  onChange={(
-                    e: React.ChangeEvent<HTMLInputElement> | number
-                  ) => {
-                    const val =
-                      typeof e === "object" && "target" in e
-                        ? e.target.value
-                        : e
-                    setImpairments(
-                      typeof val === "number" ? val : parseInt(String(val)) || 0
-                    )
-                  }}
-                  onBlur={() => {}}
-                  min={0}
-                  disabled={loading}
-                  size="small"
-                  fullWidth
-                />
-              </Grid>
+              {!isMook() && (
+                <Grid item xs={isPC() ? 3 : 4}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: "block", mb: 0.5 }}
+                  >
+                    Impairments
+                  </Typography>
+                  <NumberField
+                    value={impairments}
+                    onChange={(
+                      e: React.ChangeEvent<HTMLInputElement> | number
+                    ) => {
+                      const val =
+                        typeof e === "object" && "target" in e
+                          ? e.target.value
+                          : e
+                      setImpairments(
+                        typeof val === "number"
+                          ? val
+                          : parseInt(String(val)) || 0
+                      )
+                    }}
+                    onBlur={() => {}}
+                    min={0}
+                    disabled={loading}
+                    size="small"
+                    fullWidth
+                  />
+                </Grid>
+              )}
 
-              <Grid item xs={3}>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block", mb: 0.5 }}
-                >
-                  Marks of Death
-                </Typography>
-                <NumberField
-                  value={marksOfDeath}
-                  onChange={(
-                    e: React.ChangeEvent<HTMLInputElement> | number
-                  ) => {
-                    const val =
-                      typeof e === "object" && "target" in e
-                        ? e.target.value
-                        : e
-                    setMarksOfDeath(
-                      typeof val === "number" ? val : parseInt(String(val)) || 0
-                    )
-                  }}
-                  onBlur={() => {}}
-                  min={0}
-                  disabled={loading}
-                  size="small"
-                  fullWidth
-                />
-              </Grid>
+              {isPC() && (
+                <Grid item xs={3}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: "block", mb: 0.5 }}
+                  >
+                    Marks of Death
+                  </Typography>
+                  <NumberField
+                    value={marksOfDeath}
+                    onChange={(
+                      e: React.ChangeEvent<HTMLInputElement> | number
+                    ) => {
+                      const val =
+                        typeof e === "object" && "target" in e
+                          ? e.target.value
+                          : e
+                      setMarksOfDeath(
+                        typeof val === "number"
+                          ? val
+                          : parseInt(String(val)) || 0
+                      )
+                    }}
+                    onBlur={() => {}}
+                    min={0}
+                    disabled={loading}
+                    size="small"
+                    fullWidth
+                  />
+                </Grid>
+              )}
             </Grid>
           </Box>
+
+          {/* Driving dropdown */}
+          <FormControl fullWidth size="small">
+            <InputLabel id="driving-select-label">Driving</InputLabel>
+            <Select
+              labelId="driving-select-label"
+              value={drivingVehicleId}
+              onChange={e => setDrivingVehicleId(e.target.value as string)}
+              label="Driving"
+              disabled={loading}
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {availableVehicles.map((vehicle: Vehicle) => (
+                <MenuItem key={vehicle.id} value={vehicle.id}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      width: "100%",
+                    }}
+                  >
+                    <span>{vehicle.name}</span>
+                    {vehicle.driver && vehicle.driver.id !== character.id && (
+                      <Typography
+                        component="span"
+                        variant="caption"
+                        sx={{ ml: 1, color: "text.secondary" }}
+                      >
+                        (currently driven by{" "}
+                        {vehicle.driver.name || vehicle.driver})
+                      </Typography>
+                    )}
+                  </Box>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Stack>
       </DialogContent>
       <DialogActions>

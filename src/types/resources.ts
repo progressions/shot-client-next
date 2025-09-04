@@ -223,6 +223,7 @@ export interface Vehicle extends BaseEntity {
   count: number
   shot_id: string
   driver?: Character
+  driver_id?: string
   location?: string
   image_url: string
   task: boolean
@@ -232,6 +233,22 @@ export interface Vehicle extends BaseEntity {
   juncture_id: string | null
   juncture: Juncture | null
   effects?: CharacterEffect[]
+  chase_relationships?: ChaseRelationship[]
+}
+
+export interface ChaseRelationship extends BaseEntity {
+  id: string
+  pursuer_id: string
+  evader_id: string
+  pursuer?: Vehicle
+  evader?: Vehicle
+  fight_id: string
+  fight?: Fight
+  position: "near" | "far"
+  active: boolean
+  is_pursuer?: boolean
+  created_at: string
+  updated_at: string
 }
 
 export interface Person extends BaseEntity {

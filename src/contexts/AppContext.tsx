@@ -355,6 +355,28 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         connected: () => {}, // Connected to CampaignChannel
         disconnected: () => {}, // Disconnected from CampaignChannel
         received: (data: CampaignCableData) => {
+          console.log(
+            "[AppContext] WebSocket data received on CampaignChannel:",
+            data
+          )
+          // Handle both 'fight' and 'encounter' keys (backend sends 'fight', but we use 'encounter' in frontend)
+          if (data && data.fight) {
+            console.log("[AppContext] Fight/Encounter update received:", {
+              id: data.fight?.id,
+              firstShot: data.fight?.shots?.[0],
+              actionId: data.fight?.action_id,
+            })
+            // Convert 'fight' to 'encounter' for consistency
+            data = { ...data, encounter: data.fight }
+            delete data.fight
+          }
+          if (data && data.encounter) {
+            console.log("[AppContext] Encounter update received:", {
+              id: data.encounter?.id,
+              firstShot: data.encounter?.shots?.[0],
+              actionId: data.encounter?.action_id,
+            })
+          }
           if (data) {
             // Merge new data with existing to prevent overwrites
             setCampaignData(prev => ({ ...prev, ...data }))

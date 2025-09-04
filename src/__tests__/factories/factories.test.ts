@@ -52,7 +52,7 @@ describe("Test Factories", () => {
       expect(brickMobile.action_values.Type).toBe("PC")
       expect(brickMobile.action_values.Acceleration).toBe(8)
 
-      expect(copCar.name).toBe("PC")
+      expect(copCar.name).toBe("Cop Car")
       expect(copCar.action_values.Type).toBe("Featured Foe")
 
       expect(battleTruck.name).toBe("Battle Truck")

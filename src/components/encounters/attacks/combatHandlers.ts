@@ -42,6 +42,15 @@ export function createAttackerUpdate(
   const currentShot = attackerShot.shot || 0
   const newShot = currentShot - shotCost
 
+  console.log("[createAttackerUpdate] Creating update:", {
+    attacker: attacker.name,
+    currentShot,
+    shotCost,
+    newShot,
+    shot_id: attackerShot.character?.shot_id,
+    character_id: attackerShot.character?.id,
+  })
+
   const update: CharacterUpdate = {
     shot_id: attackerShot.character?.shot_id,
     character_id: attackerShot.character?.id,

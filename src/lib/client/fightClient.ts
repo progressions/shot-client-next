@@ -127,6 +127,35 @@ export function createFightClient(deps: ClientDependencies) {
     })
   }
 
+  async function applyChaseAction(
+    fight: Fight | string,
+    vehicleUpdates: Array<{
+      vehicle_id: string
+      target_vehicle_id?: string
+      action_values?: Record<string, number | string>
+      event?: {
+        type: string
+        description: string
+        details?: Record<string, unknown>
+      }
+    }>
+  ): Promise<AxiosResponse<Encounter>> {
+    const fightId = typeof fight === "string" ? fight : fight.id
+    return post(`${apiV2.encounters()}/${fightId}/apply_chase_action`, {
+      vehicle_updates: vehicleUpdates,
+    })
+  }
+
+  async function updateInitiatives(
+    fight: Fight | string,
+    shots: Array<{ id: string; shot: number }>
+  ): Promise<AxiosResponse<Encounter>> {
+    const fightId = typeof fight === "string" ? fight : fight.id
+    return patch(`${apiV2.encounters()}/${fightId}/update_initiatives`, {
+      shots,
+    })
+  }
+
   return {
     getEncounter,
     getFights,
@@ -139,5 +168,7 @@ export function createFightClient(deps: ClientDependencies) {
     createFightEvent,
     spendShots,
     applyCombatAction,
+    applyChaseAction,
+    updateInitiatives,
   }
 }

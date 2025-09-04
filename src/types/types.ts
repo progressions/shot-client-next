@@ -69,6 +69,7 @@ export type {
   ActionValues,
   SkillValues,
   Advancement,
+  ChaseRelationship,
 } from "./resources"
 
 // Re-export character enums
