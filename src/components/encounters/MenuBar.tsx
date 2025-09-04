@@ -21,12 +21,13 @@ import {
   AddCharacter,
   AddVehicle,
   AttackPanel,
+  BoostPanel,
   ChasePanel,
   InitiativeDialog,
   LocationsDialog,
   EndFightDialog,
 } from "@/components/encounters"
-import { FaGun, FaPlay, FaPlus, FaMinus, FaCar, FaStop } from "react-icons/fa6"
+import { FaGun, FaPlay, FaPlus, FaMinus, FaCar, FaStop, FaRocket } from "react-icons/fa6"
 import { FaMapMarkerAlt, FaCaretRight, FaCaretDown } from "react-icons/fa"
 import { MdAdminPanelSettings } from "react-icons/md"
 import { useEncounter, useClient, useToast } from "@/contexts"
@@ -47,7 +48,7 @@ export default function MenuBar({
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
   const [open, setOpen] = useState<
-    "character" | "vehicle" | "attack" | "chase" | "admin" | null
+    "character" | "vehicle" | "attack" | "boost" | "chase" | "admin" | null
   >(null)
   const [initiativeDialogOpen, setInitiativeDialogOpen] = useState(false)
   const [locationsDialogOpen, setLocationsDialogOpen] = useState(false)
@@ -55,7 +56,7 @@ export default function MenuBar({
   const panelRef = useRef<HTMLDivElement>(null)
 
   const toggleBox = (
-    type: "character" | "vehicle" | "attack" | "chase" | "admin"
+    type: "character" | "vehicle" | "attack" | "boost" | "chase" | "admin"
   ) => {
     setOpen(current => (current === type ? null : type))
   }
@@ -224,6 +225,25 @@ export default function MenuBar({
             title="Attack Resolution"
           >
             <FaGun size={20} />
+          </IconButton>
+          <IconButton
+            onClick={() => toggleBox("boost")}
+            sx={{
+              color: "white",
+              px: { xs: 0.5, sm: 1 },
+              backgroundColor:
+                open === "boost" ? "rgba(255, 255, 255, 0.2)" : "transparent",
+              borderRadius: 1,
+              "&:hover": {
+                backgroundColor:
+                  open === "boost"
+                    ? "rgba(255, 255, 255, 0.3)"
+                    : "rgba(255, 255, 255, 0.1)",
+              },
+            }}
+            title="Boost Action"
+          >
+            <FaRocket size={20} />
           </IconButton>
           <IconButton
             onClick={() => toggleBox("chase")}
@@ -494,6 +514,7 @@ export default function MenuBar({
               {open === "attack" && (
                 <AttackPanel onClose={() => setOpen(null)} />
               )}
+              {open === "boost" && <BoostPanel onClose={() => setOpen(null)} />}
               {open === "chase" && <ChasePanel onClose={() => setOpen(null)} />}
             </Box>
           </motion.div>
