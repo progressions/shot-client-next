@@ -5,7 +5,6 @@ import EncounterActionBar from "../EncounterActionBar"
 import type { Character } from "@/types"
 
 // Mock the useEncounter hook
-const mockSetSelectedActor = jest.fn()
 const mockEncounter = {
   id: "1",
   name: "Test Encounter",
@@ -16,7 +15,6 @@ jest.mock("@/contexts", () => ({
   useEncounter: () => ({
     selectedActorId: "shot_1",
     selectedActorShot: 12,
-    setSelectedActor: mockSetSelectedActor,
     encounter: mockEncounter,
   }),
 }))
@@ -74,7 +72,7 @@ describe("EncounterActionBar", () => {
         />
       )
 
-      expect(screen.getByText("Attack")).toBeInTheDocument()
+      expect(screen.getByTitle("Attack")).toBeInTheDocument()
     })
 
     it("should display boost button", () => {

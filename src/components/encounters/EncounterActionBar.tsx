@@ -3,8 +3,6 @@
 import React from "react"
 import {
   Box,
-  Button,
-  ButtonGroup,
   Typography,
   IconButton,
   Collapse,
@@ -12,7 +10,6 @@ import {
   Chip,
 } from "@mui/material"
 import {
-  Close as CloseIcon,
   Healing as HealIcon,
   Timer as TimerIcon,
 } from "@mui/icons-material"
@@ -34,14 +31,10 @@ export default function EncounterActionBar({
   selectedCharacter,
   onAction,
 }: EncounterActionBarProps) {
-  const { selectedActorShot, setSelectedActor } = useEncounter()
+  const { selectedActorShot } = useEncounter()
 
   if (!selectedCharacter) {
     return null
-  }
-
-  const handleClearSelection = () => {
-    setSelectedActor(null, null)
   }
 
   const handleAction = (action: string) => {
@@ -98,64 +91,52 @@ export default function EncounterActionBar({
         </Box>
 
         {/* Action Buttons */}
-        <ButtonGroup
-          variant="contained"
-          sx={{ flex: "1 1 auto", display: "flex", gap: 1 }}
-        >
-          <Button
-            startIcon={<FaGun />}
+        <Box sx={{ flex: "1 1 auto", display: "flex", gap: 1, ml: "auto", alignItems: "center" }}>
+          <IconButton
             onClick={() => handleAction("attack")}
             disabled={!hasAttackSkills}
             color="error"
+            title="Attack"
           >
-            Attack
-          </Button>
+            <FaGun size={20} />
+          </IconButton>
           
-          <Button
-            startIcon={<FaRocket />}
+          <IconButton
             onClick={() => handleAction("boost")}
             color="info"
+            title="Boost"
           >
-            Boost
-          </Button>
+            <FaRocket size={20} />
+          </IconButton>
 
           {isInChase && (
-            <Button
-              startIcon={<FaCar />}
+            <IconButton
               onClick={() => handleAction("chase")}
               color="warning"
+              title="Chase"
             >
-              Chase
-            </Button>
+              <FaCar size={20} />
+            </IconButton>
           )}
 
           {hasWounds && (
-            <Button
-              startIcon={<HealIcon />}
+            <IconButton
               onClick={() => handleAction("heal")}
               color="success"
+              title="Heal"
             >
-              Heal
-            </Button>
+              <HealIcon />
+            </IconButton>
           )}
 
-          <Button
-            startIcon={<TimerIcon />}
+          <IconButton
             onClick={() => handleAction("other")}
             color="inherit"
+            title="Other Action"
           >
-            Other
-          </Button>
-        </ButtonGroup>
-
-        {/* Close Button */}
-        <IconButton
-          aria-label="Clear selection"
-          onClick={handleClearSelection}
-          sx={{ ml: "auto" }}
-        >
-          <CloseIcon />
-        </IconButton>
+            <TimerIcon />
+          </IconButton>
+        </Box>
       </Paper>
     </Collapse>
   )

@@ -65,8 +65,8 @@ export default function ShotCounter() {
 
   // Handle character selection
   const handleCharacterSelect = (shotId: string) => {
-    if (shotId === selectedActorId) {
-      // Deselect if clicking the same character
+    if (!shotId || shotId === selectedActorId) {
+      // Deselect if empty string or clicking the same character
       setSelectedActor(null, null)
       setActivePanel(null)
     } else {
