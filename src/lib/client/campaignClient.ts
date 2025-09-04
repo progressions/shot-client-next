@@ -145,6 +145,13 @@ export function createCampaignClient(deps: ClientDependencies) {
     return get(apiV2.currentCampaign(), {}, cacheOptions)
   }
 
+  async function getCurrentFight(
+    campaignId: string,
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<import("@/types").Fight | null>> {
+    return get(`${apiV2.campaigns({ id: campaignId })}/current_fight`, {}, cacheOptions)
+  }
+
   return {
     addPlayer,
     removePlayer,
@@ -161,5 +168,6 @@ export function createCampaignClient(deps: ClientDependencies) {
     deleteCampaign,
     setCurrentCampaign,
     getCurrentCampaign,
+    getCurrentFight,
   }
 }

@@ -9,6 +9,7 @@ import {
   FightsModule,
   CampaignBanner,
   SitesModule,
+  ActiveFightBanner,
 } from "@/components/dashboard"
 
 interface DashboardProperties {
@@ -21,9 +22,16 @@ export default async function Dashboard({
   initialIsMobile: _initialIsMobile,
 }: DashboardProperties) {
   const user = await getCurrentUser()
+  const isGamemaster = user?.gamemaster || false
+  
   return (
     <Box>
       <CampaignBanner campaign={campaign} />
+      <ActiveFightBanner 
+        campaignId={campaign.id} 
+        userId={user.id}
+        isGamemaster={isGamemaster}
+      />
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 2 }}>
         <Suspense fallback={<LoadingModule />}>
           <FightsModule userId={user.id} />
