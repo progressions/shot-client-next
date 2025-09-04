@@ -64,7 +64,11 @@ export default function TargetDefenseDisplay({
   const char = shot?.character
   if (!char) return null
 
+  const _baseDefense = CS.defense(char)
   // For mooks, calculate defense including the count
+  const _mookCount = CS.isMook(char)
+    ? targetMookCountPerTarget[targetId] || 1
+    : 1
   // Calculate the actual current defense using the same function used everywhere else
   const currentDefense = manualDefensePerTarget[targetId]
     ? parseInt(manualDefensePerTarget[targetId])

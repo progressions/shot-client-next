@@ -31,6 +31,7 @@ describe("ChaseReducerService", () => {
         ...initialChaseFormData,
         edited: true,
         attacker: motorcycles,
+        target: copCar,
         count: 5,
         defense: 13,
       }
