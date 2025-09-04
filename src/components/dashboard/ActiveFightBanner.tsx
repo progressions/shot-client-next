@@ -128,26 +128,16 @@ export default function ActiveFightBanner({
             sx={{
               mb: 3,
               p: 2,
-              background: "linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%)",
+              background: currentFight?.image_url 
+                ? `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url('${currentFight.image_url}')`
+                : "#d32f2f",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
               color: "white",
               position: "relative",
               overflow: "hidden",
             }}
           >
-            {/* Background animation effect */}
-            <Box
-              sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                opacity: 0.1,
-                background: "url('/images/fight-pattern.png')",
-                backgroundSize: "cover",
-                pointerEvents: "none",
-              }}
-            />
 
             <Box sx={{ position: "relative", zIndex: 1 }}>
               {loading ? (
