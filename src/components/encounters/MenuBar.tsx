@@ -53,7 +53,9 @@ export default function MenuBar({
   const [locationsDialogOpen, setLocationsDialogOpen] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
-  const toggleBox = (type: "character" | "vehicle" | "attack" | "chase" | "admin") => {
+  const toggleBox = (
+    type: "character" | "vehicle" | "attack" | "chase" | "admin"
+  ) => {
     setOpen(current => (current === type ? null : type))
   }
 
@@ -89,32 +91,34 @@ export default function MenuBar({
   ) => {
     try {
       // Build shots array for batch update
-      const shots = updatedCharacters.map(char => {
-        // Find the shot_id for this character
-        const shot = encounter.shots
-          .flatMap(s => s.characters || [])
-          .find(c => c.id === char.id)
-        
-        if (shot && shot.shot_id) {
-          return {
-            id: shot.shot_id,
-            shot: char.current_shot
+      const shots = updatedCharacters
+        .map(char => {
+          // Find the shot_id for this character
+          const shot = encounter.shots
+            .flatMap(s => s.characters || [])
+            .find(c => c.id === char.id)
+
+          if (shot && shot.shot_id) {
+            return {
+              id: shot.shot_id,
+              shot: char.current_shot,
+            }
           }
-        }
-        return null
-      }).filter(Boolean)
+          return null
+        })
+        .filter(Boolean)
 
       // Batch update all shots with new initiative values
       if (shots.length > 0) {
         await client.updateInitiatives(encounter.id, shots)
       }
-      
+
       // Increment the sequence
       await updateEncounter({
         ...encounter,
         sequence: encounter.sequence + 1,
       })
-      
+
       toastSuccess("Initiative set and sequence started!")
       setInitiativeDialogOpen(false)
     } catch (error) {
@@ -433,9 +437,7 @@ export default function MenuBar({
               {open === "attack" && (
                 <AttackPanel onClose={() => setOpen(null)} />
               )}
-              {open === "chase" && (
-                <ChasePanel onClose={() => setOpen(null)} />
-              )}
+              {open === "chase" && <ChasePanel onClose={() => setOpen(null)} />}
             </Box>
           </motion.div>
         )}

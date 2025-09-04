@@ -9,18 +9,18 @@ export const brick: Character = {
   id: "brick",
   action_values: {
     ...defaultCharacter.action_values,
-    "Type": CharacterTypes.PC,
-    "Archetype": "Everyday Hero",
-    "MainAttack": "Martial Arts",
-    "SecondaryAttack": null,
+    Type: CharacterTypes.PC,
+    Archetype: "Everyday Hero",
+    MainAttack: "Martial Arts",
+    SecondaryAttack: null,
     "Martial Arts": 14,
-    "Defense": 13,
-    "Toughness": 7,
-    "FortuneType": "Fortune",
-    "MaxFortune": 5,
-    "Fortune": 5,
-    "Speed": 5
-  }
+    Defense: 13,
+    Toughness: 7,
+    FortuneType: "Fortune",
+    MaxFortune: 5,
+    Fortune: 5,
+    Speed: 5,
+  },
 }
 
 export const carolina: Character = {
@@ -29,23 +29,21 @@ export const carolina: Character = {
   id: "carolina",
   action_values: {
     ...defaultCharacter.action_values,
-    "Type": CharacterTypes.PC,
-    "Archetype": "Maverick Cop",
-    "MainAttack": "Guns",
-    "SecondaryAttack": "Martial Arts",
-    "Guns": 14,
+    Type: CharacterTypes.PC,
+    Archetype: "Maverick Cop",
+    MainAttack: "Guns",
+    SecondaryAttack: "Martial Arts",
+    Guns: 14,
     "Martial Arts": 12,
-    "Defense": 13,
-    "Speed": 7,
-    "Fortune": 7
+    Defense: 13,
+    Speed: 7,
+    Fortune: 7,
   },
   skills: {
     ...defaultCharacter.skills,
-    "Driving": 13
+    Driving: 13,
   },
-  weapons: [
-    derringer
-  ]
+  weapons: [derringer],
 }
 
 export const shing: Character = {
@@ -54,18 +52,18 @@ export const shing: Character = {
   id: "shing",
   action_values: {
     ...defaultCharacter.action_values,
-    "Type": CharacterTypes.Boss,
-    "MainAttack": "Guns",
-    "SecondaryAttack": null,
-    "Guns": 17,
-    "Defense": 14,
-    "Damage": 9,
-    "Toughness": 7
+    Type: CharacterTypes.Boss,
+    MainAttack: "Guns",
+    SecondaryAttack: null,
+    Guns: 17,
+    Defense: 14,
+    Damage: 9,
+    Toughness: 7,
   },
   skills: {
-    "Driving": 15
+    Driving: 15,
   },
-  weapons: [ak47]
+  weapons: [ak47],
 }
 
 export const huanKen: Character = {
@@ -74,13 +72,13 @@ export const huanKen: Character = {
   id: "huanKen",
   action_values: {
     ...defaultCharacter.action_values,
-    "Type": CharacterTypes.UberBoss,
-    "MainAttack": "Sorcery",
-    "SecondaryAttack": null,
-    "Sorcery": 19,
-    "Defense": 17,
-    "Damage": 12,
-    "Toughness": 8
+    Type: CharacterTypes.UberBoss,
+    MainAttack: "Sorcery",
+    SecondaryAttack: null,
+    Sorcery: 19,
+    Defense: 17,
+    Damage: 12,
+    Toughness: 8,
   },
 }
 
@@ -90,13 +88,13 @@ export const hitman: Character = {
   id: "hitman",
   action_values: {
     ...defaultCharacter.action_values,
-    "Type": CharacterTypes.FeaturedFoe,
-    "MainAttack": "Guns",
-    "SecondaryAttack": null,
-    "Guns": 14,
-    "Defense": 13,
-    "Toughness": 7,
-    "Damage": 9,
+    Type: CharacterTypes.FeaturedFoe,
+    MainAttack: "Guns",
+    SecondaryAttack: null,
+    Guns: 14,
+    Defense: 13,
+    Toughness: 7,
+    Damage: 9,
   },
 }
 
@@ -107,11 +105,11 @@ export const zombies: Character = {
   count: 15,
   action_values: {
     ...defaultCharacter.action_values,
-    "Type": CharacterTypes.Mook,
-    "MainAttack": "Creature",
-    "SecondaryAttack": null,
-    "Creature": 8,
-    "Defense": 13,
-    "Damage": 7
-  }
+    Type: CharacterTypes.Mook,
+    MainAttack: "Creature",
+    SecondaryAttack: null,
+    Creature: 8,
+    Defense: 13,
+    Damage: 7,
+  },
 }

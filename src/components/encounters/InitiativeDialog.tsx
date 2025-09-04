@@ -63,7 +63,7 @@ export default function InitiativeDialog({
         if (CS.isVehicle(char)) {
           return false
         }
-        
+
         const charWithShot = char as (Character | Vehicle) & {
           current_shot?: number | string | null
         }
@@ -88,13 +88,12 @@ export default function InitiativeDialog({
   }, [open, characters])
 
   // Separate PCs from NPCs (vehicles already filtered out)
-  const pcs = characterInitiatives.filter(ci =>
-    !CS.isVehicle(ci.character) &&
-    CS.isType(ci.character, ["PC", "Ally"])
+  const pcs = characterInitiatives.filter(
+    ci => !CS.isVehicle(ci.character) && CS.isType(ci.character, ["PC", "Ally"])
   )
   const npcs = characterInitiatives.filter(
-    ci => !CS.isVehicle(ci.character) &&
-    !CS.isType(ci.character, ["PC", "Ally"])
+    ci =>
+      !CS.isVehicle(ci.character) && !CS.isType(ci.character, ["PC", "Ally"])
   )
 
   // Handle manual initiative entry
@@ -177,7 +176,7 @@ export default function InitiativeDialog({
   const renderCharacterRow = (ci: CharacterInitiative) => {
     const speed = getSpeedValue(ci.character)
     const isPC = CS.isType(ci.character, ["PC", "Ally"])
-    
+
     // Check if character is driving
     const charWithDriving = ci.character as Character & { driving?: Vehicle }
     const isDriving = charWithDriving.driving && !CS.isVehicle(ci.character)
@@ -223,11 +222,7 @@ export default function InitiativeDialog({
             )}
           </Typography>
           {isDriving && (
-            <Typography
-              variant="body2"
-              color="info.main"
-              sx={{ mt: 0.5 }}
-            >
+            <Typography variant="body2" color="info.main" sx={{ mt: 0.5 }}>
               {charWithDriving.driving.name}
             </Typography>
           )}

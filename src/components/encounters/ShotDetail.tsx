@@ -17,7 +17,7 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
   // Check if we have any content to render
   const hasCharacters = shot.characters && shot.characters.length > 0
   const hasVehicles = shot.vehicles && shot.vehicles.length > 0
-  
+
   // For the Hidden section (shot === null), show vehicles without drivers
   const vehiclesWithoutDrivers = useMemo(() => {
     if (!hasVehicles || shot.shot !== null) return []
@@ -28,7 +28,7 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
   // Sort characters by type, then adjusted speed, then name
   const sortedCharacters = useMemo(() => {
     if (!hasCharacters) return []
-    
+
     const typeOrder: Record<string, number> = {
       "Uber-Boss": 1,
       Boss: 2,
@@ -108,12 +108,13 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
       >
         {shot.shot === null ? "Hidden" : `${shot.shot || "0"}`}
       </ListSubheader>
-      {hasCharacters && sortedCharacters.map((character: Character) => (
-        <CharacterDetail
-          key={`fred-${shot.shot}-character-${character.shot_id}`}
-          character={character}
-        />
-      ))}
+      {hasCharacters &&
+        sortedCharacters.map((character: Character) => (
+          <CharacterDetail
+            key={`fred-${shot.shot}-character-${character.shot_id}`}
+            character={character}
+          />
+        ))}
       {/* Only show vehicles without drivers in the Hidden section */}
       {vehiclesWithoutDrivers.map((vehicle: Vehicle) => (
         <VehicleDetail

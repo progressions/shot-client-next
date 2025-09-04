@@ -1,6 +1,5 @@
 import type { Vehicle } from "@/types/types"
 import { ChaseMethod, ChaseFormData, initialChaseFormData } from "@/types/chase"
-import { defaultSwerve } from "@/types/defaults"
 import VS from "@/services/VehicleService"
 import { pursuer, evader } from "@/__tests__/factories/Vehicles"
 import CRS from "@/services/ChaseReducerService"
@@ -23,7 +22,14 @@ interface PartialChaseState {
   mooks?: number
 }
 
-export function expectPursuitAttack(attacker: Vehicle, target: Vehicle, method: ChaseMethod, startingPosition: "near" | "far", dieRoll: number, stunt: boolean = false) {
+export function expectPursuitAttack(
+  attacker: Vehicle,
+  target: Vehicle,
+  method: ChaseMethod,
+  startingPosition: "near" | "far",
+  dieRoll: number,
+  stunt: boolean = false
+) {
   let state = { ...initialChaseFormData }
 
   attacker = pursuer(attacker, startingPosition)
@@ -37,25 +43,39 @@ export function expectPursuitAttack(attacker: Vehicle, target: Vehicle, method: 
 
   const result = CRS.process(state)
 
-  const toughness = method === ChaseMethod.RAM_SIDESWIPE ? state.frame : state.handling
-  const damage = method === ChaseMethod.RAM_SIDESWIPE ? state.crunch : state.squeal
+  const toughness =
+    method === ChaseMethod.RAM_SIDESWIPE ? state.frame : state.handling
+  const damage =
+    method === ChaseMethod.RAM_SIDESWIPE ? state.crunch : state.squeal
   const outcome = dieRoll + state.actionValue - state.defense - (stunt ? 2 : 0)
   const smackdown = outcome >= 0 ? outcome + damage : null
   const chasePoints = smackdown ? smackdown - toughness : 0
-  const bump = outcome >= 0 && method === ChaseMethod.RAM_SIDESWIPE && Math.max(0, VS.frame(target) - VS.frame(attacker))
+  const bump =
+    outcome >= 0 &&
+    method === ChaseMethod.RAM_SIDESWIPE &&
+    Math.max(0, VS.frame(target) - VS.frame(attacker))
 
   expectChaseResults(state, result, {
     swerve: dieRoll,
     outcome: outcome,
     smackdown: smackdown as number,
     chasePoints: chasePoints as number,
-    conditionPoints: (method === ChaseMethod.RAM_SIDESWIPE ? chasePoints : 0) as number,
+    conditionPoints: (method === ChaseMethod.RAM_SIDESWIPE
+      ? chasePoints
+      : 0) as number,
     position: outcome >= 0 ? "near" : startingPosition,
     bump: bump as number,
   })
 }
 
-export function expectEvasionAttack(attacker: Vehicle, target: Vehicle, method: ChaseMethod, startingPosition: "near" | "far", dieRoll: number, stunt: boolean = false) {
+export function expectEvasionAttack(
+  attacker: Vehicle,
+  target: Vehicle,
+  method: ChaseMethod,
+  startingPosition: "near" | "far",
+  dieRoll: number,
+  stunt: boolean = false
+) {
   let state = { ...initialChaseFormData }
 
   attacker = evader(attacker, startingPosition)
@@ -69,13 +89,18 @@ export function expectEvasionAttack(attacker: Vehicle, target: Vehicle, method: 
 
   const result = CRS.process(state)
 
-  const toughness = method === ChaseMethod.RAM_SIDESWIPE ? state.frame : state.handling
-  const damage = method === ChaseMethod.RAM_SIDESWIPE ? state.crunch : state.squeal
+  const toughness =
+    method === ChaseMethod.RAM_SIDESWIPE ? state.frame : state.handling
+  const damage =
+    method === ChaseMethod.RAM_SIDESWIPE ? state.crunch : state.squeal
   const outcome = dieRoll + state.actionValue - state.defense - (stunt ? 2 : 0)
   const success = outcome >= 0
   const smackdown = success ? outcome + damage : null
   const chasePoints = smackdown ? smackdown - toughness : 0
-  const bump = success && method === ChaseMethod.RAM_SIDESWIPE && Math.max(0, VS.frame(target) - VS.frame(attacker))
+  const bump =
+    success &&
+    method === ChaseMethod.RAM_SIDESWIPE &&
+    Math.max(0, VS.frame(target) - VS.frame(attacker))
   let endingPosition = success ? "far" : startingPosition
   if (success && method === ChaseMethod.RAM_SIDESWIPE) endingPosition = "near"
 
@@ -84,28 +109,45 @@ export function expectEvasionAttack(attacker: Vehicle, target: Vehicle, method: 
     outcome: outcome,
     smackdown: smackdown as number,
     chasePoints: chasePoints as number,
-    conditionPoints: (method === ChaseMethod.RAM_SIDESWIPE ? chasePoints : 0) as number,
+    conditionPoints: (method === ChaseMethod.RAM_SIDESWIPE
+      ? chasePoints
+      : 0) as number,
     position: endingPosition,
     bump: bump as number,
   })
 }
 
-export function expectTargetUnharmed(state: ChaseFormData, result: ChaseFormData) {
+export function expectTargetUnharmed(
+  state: ChaseFormData,
+  result: ChaseFormData
+) {
   // the target has taken no damage
   expect(VS.chasePoints(result.target)).toEqual(VS.chasePoints(state.target))
-  expect(VS.conditionPoints(result.target)).toEqual(VS.conditionPoints(state.target))
+  expect(VS.conditionPoints(result.target)).toEqual(
+    VS.conditionPoints(state.target)
+  )
 }
 
-export function expectAttackerUnharmed(state: ChaseFormData, result: ChaseFormData) {
+export function expectAttackerUnharmed(
+  state: ChaseFormData,
+  result: ChaseFormData
+) {
   if (VS.isMook(result.attacker)) {
     expect(VS.mooks(result.attacker)).toEqual(VS.mooks(state.attacker))
   }
   // the attacker has taken no damage
-  expect(VS.chasePoints(result.attacker)).toEqual(VS.chasePoints(state.attacker))
-  expect(VS.conditionPoints(result.attacker)).toEqual(VS.conditionPoints(state.attacker))
+  expect(VS.chasePoints(result.attacker)).toEqual(
+    VS.chasePoints(state.attacker)
+  )
+  expect(VS.conditionPoints(result.attacker)).toEqual(
+    VS.conditionPoints(state.attacker)
+  )
 }
 
-export function expectPositionsUnchanged(state: ChaseFormData, result: ChaseFormData) {
+export function expectPositionsUnchanged(
+  state: ChaseFormData,
+  result: ChaseFormData
+) {
   // their positions haven't changed
   expect(VS.position(result.attacker)).toEqual(VS.position(state.attacker))
   expect(VS.position(result.target)).toEqual(VS.position(state.target))
@@ -117,7 +159,11 @@ export function expectNoChanges(state: ChaseFormData, result: ChaseFormData) {
   expectPositionsUnchanged(state, result)
 }
 
-export function expectChaseResults(state: ChaseFormData, result: ChaseFormData, values: PartialChaseState) {
+export function expectChaseResults(
+  state: ChaseFormData,
+  result: ChaseFormData,
+  values: PartialChaseState
+) {
   const { swerve, outcome } = values
 
   const smackdown = values.smackdown

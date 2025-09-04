@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Stack } from "@mui/material"
+import { Box } from "@mui/material"
 import type { Vehicle } from "@/types"
 import { VS } from "@/services"
 import { useTheme } from "@mui/material/styles"

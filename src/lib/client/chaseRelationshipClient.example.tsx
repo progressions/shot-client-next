@@ -1,12 +1,12 @@
 /**
  * Example usage of ChaseRelationship API following API_PATTERNS.md
- * 
+ *
  * This file demonstrates the correct way to use the chase relationship API
  * in components using the useClient hook.
  */
 
 import { useClient } from "@/contexts"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import type { ChaseRelationship, Fight, Vehicle } from "@/types"
 
 // ✅ CORRECT: Using useClient hook
@@ -69,11 +69,7 @@ export function ChaseRelationshipExample() {
     }
   }
 
-  return (
-    <div>
-      {/* Component UI */}
-    </div>
-  )
+  return <div>{/* Component UI */}</div>
 }
 
 // ❌ INCORRECT: Don't use fetch or axios directly
@@ -82,7 +78,7 @@ export function IncorrectExample() {
   const loadRelationships = async () => {
     // ❌ Wrong - direct fetch
     const response = await fetch("/api/v2/chase_relationships")
-    
+
     // ❌ Wrong - direct axios
     // const response = await axios.get("/api/v2/chase_relationships")
   }

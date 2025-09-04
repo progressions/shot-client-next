@@ -66,7 +66,7 @@ export default function VehicleEditDialog({
     if (open) {
       console.log("VehicleEditDialog - Vehicle data:", vehicle)
       console.log("VehicleEditDialog - Vehicle driver:", vehicle.driver)
-      
+
       setName(vehicle.name || "")
 
       // Current shot initialization removed - no longer relevant

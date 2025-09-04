@@ -53,10 +53,10 @@ export default function CharacterEditDialog({
   // Collect all vehicles from the encounter (including hidden ones)
   const availableVehicles = useMemo(() => {
     if (!encounter?.shots) return []
-    
+
     const vehicles: Vehicle[] = []
     const vehicleIds = new Set<string>()
-    
+
     // Collect visible vehicles from shots
     encounter.shots.forEach(shot => {
       if (shot.vehicles && shot.vehicles.length > 0) {
@@ -68,27 +68,36 @@ export default function CharacterEditDialog({
         })
       }
     })
-    
+
     // Also check if any character is driving a vehicle that's not in the visible list
     // (vehicles with null shot are hidden but still driveable)
     encounter.shots.forEach(shot => {
       if (shot.characters && shot.characters.length > 0) {
-        shot.characters.forEach((c: Character & { driving?: Vehicle; driving_id?: string }) => {
-          if (c.driving && c.driving.id && !vehicleIds.has(c.driving.id)) {
-            vehicles.push(c.driving)
-            vehicleIds.add(c.driving.id)
+        shot.characters.forEach(
+          (c: Character & { driving?: Vehicle; driving_id?: string }) => {
+            if (c.driving && c.driving.id && !vehicleIds.has(c.driving.id)) {
+              vehicles.push(c.driving)
+              vehicleIds.add(c.driving.id)
+            }
           }
-        })
+        )
       }
     })
-    
+
     // Finally, make sure the current character's vehicle is included
-    const characterWithDriving = character as Character & { driving?: Vehicle; driving_id?: string }
-    if (characterWithDriving.driving && characterWithDriving.driving.id && !vehicleIds.has(characterWithDriving.driving.id)) {
+    const characterWithDriving = character as Character & {
+      driving?: Vehicle
+      driving_id?: string
+    }
+    if (
+      characterWithDriving.driving &&
+      characterWithDriving.driving.id &&
+      !vehicleIds.has(characterWithDriving.driving.id)
+    ) {
       vehicles.push(characterWithDriving.driving)
       vehicleIds.add(characterWithDriving.driving.id)
     }
-    
+
     return vehicles
   }, [encounter?.shots, character])
 
@@ -136,32 +145,44 @@ export default function CharacterEditDialog({
       }
 
       // Set driving vehicle if character has driving_id or driving property
-      const characterWithDriving = character as Character & { driving?: Vehicle; driving_id?: string }
-      
+      const characterWithDriving = character as Character & {
+        driving?: Vehicle
+        driving_id?: string
+      }
+
       // Find the matching vehicle ID from availableVehicles
       let vehicleIdToSet = ""
-      
+
       // The driving_id is actually the shot_id, not the vehicle id
       // We need to find the vehicle by matching shot_id
       if (characterWithDriving.driving_id) {
         // Find vehicle with matching shot_id
-        const matchingVehicle = availableVehicles.find(v => v.shot_id === characterWithDriving.driving_id)
+        const matchingVehicle = availableVehicles.find(
+          v => v.shot_id === characterWithDriving.driving_id
+        )
         if (matchingVehicle) {
           vehicleIdToSet = matchingVehicle.id
         }
-      } else if (characterWithDriving.driving && characterWithDriving.driving.id) {
+      } else if (
+        characterWithDriving.driving &&
+        characterWithDriving.driving.id
+      ) {
         // Check if character has a driving property with vehicle info
         vehicleIdToSet = characterWithDriving.driving.id
       }
-      
+
       // Debug logging
       console.log("Character driving info:", {
         driving_id: characterWithDriving.driving_id,
         driving: characterWithDriving.driving,
         vehicleIdToSet,
-        availableVehicles: availableVehicles.map(v => ({ id: v.id, shot_id: v.shot_id, name: v.name }))
+        availableVehicles: availableVehicles.map(v => ({
+          id: v.id,
+          shot_id: v.shot_id,
+          name: v.name,
+        })),
       })
-      
+
       setDrivingVehicleId(vehicleIdToSet)
     }
   }, [open, character, availableVehicles])
@@ -231,17 +252,26 @@ export default function CharacterEditDialog({
           // Update vehicle's driver_id - need to use FormData
           const vehicleFormData = new FormData()
           vehicleFormData.append("vehicle[driver_id]", character.id)
-          console.log("Updating vehicle", vehicle.id, "with driver_id:", character.id)
+          console.log(
+            "Updating vehicle",
+            vehicle.id,
+            "with driver_id:",
+            character.id
+          )
           await client.updateVehicle(vehicle.id, vehicleFormData)
-          
+
           // If vehicle had a previous driver, clear their driving_id
           if (vehicle.driver_id && vehicle.driver_id !== character.id) {
             // Find the previous driver and clear their driving_id
             for (const shot of encounter.shots) {
               if (shot.characters) {
-                const previousDriver = shot.characters.find((c: any) => c.id === vehicle.driver_id)
+                const previousDriver = shot.characters.find(
+                  (c: Character) => c.id === vehicle.driver_id
+                )
                 if (previousDriver) {
-                  await client.updateCharacterCombatStats(previousDriver.id, { driving_id: null })
+                  await client.updateCharacterCombatStats(previousDriver.id, {
+                    driving_id: null,
+                  })
                   break
                 }
               }
@@ -250,10 +280,14 @@ export default function CharacterEditDialog({
         }
       } else {
         // Clear any vehicle that this character was previously driving
-        const characterWithDriving = character as Character & { driving_id?: string }
+        const characterWithDriving = character as Character & {
+          driving_id?: string
+        }
         if (characterWithDriving.driving_id) {
           // Find vehicle by shot_id since driving_id is actually the shot_id
-          const previousVehicle = availableVehicles.find(v => v.shot_id === characterWithDriving.driving_id)
+          const previousVehicle = availableVehicles.find(
+            v => v.shot_id === characterWithDriving.driving_id
+          )
           if (previousVehicle) {
             const vehicleFormData = new FormData()
             vehicleFormData.append("vehicle[driver_id]", "")
@@ -282,7 +316,7 @@ export default function CharacterEditDialog({
         // For Mooks, only count goes on the shot (no impairments)
         if (!isPC()) {
           if (isMook()) {
-            shotUpdate.count = wounds  // Count for mooks
+            shotUpdate.count = wounds // Count for mooks
           } else {
             shotUpdate.impairments = impairments
             shotUpdate.count = wounds
@@ -307,19 +341,23 @@ export default function CharacterEditDialog({
           if (vehicle && vehicle.shot_id) {
             await client.updateVehicleShot(encounter, vehicle, {
               shot_id: vehicle.shot_id,
-              driver_id: character.shot_id
+              driver_id: character.shot_id,
             })
           }
         } else {
           // Clear driver_id from any previously driven vehicle
-          const characterWithDriving = character as Character & { driving_id?: string }
+          const characterWithDriving = character as Character & {
+            driving_id?: string
+          }
           if (characterWithDriving.driving_id) {
             // driving_id IS the vehicle's shot_id
-            const previousVehicle = availableVehicles.find(v => v.shot_id === characterWithDriving.driving_id)
+            const previousVehicle = availableVehicles.find(
+              v => v.shot_id === characterWithDriving.driving_id
+            )
             if (previousVehicle && previousVehicle.shot_id) {
               await client.updateVehicleShot(encounter, previousVehicle, {
                 shot_id: previousVehicle.shot_id,
-                driver_id: null
+                driver_id: null,
               })
             }
           }
@@ -362,7 +400,7 @@ export default function CharacterEditDialog({
           {/* Combat Stats Row */}
           <Box>
             <Grid container spacing={2}>
-              <Grid item xs={isMook() ? 6 : (isPC() ? 3 : 4)}>
+              <Grid item xs={isMook() ? 6 : isPC() ? 3 : 4}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -396,7 +434,7 @@ export default function CharacterEditDialog({
                 />
               </Grid>
 
-              <Grid item xs={isMook() ? 6 : (isPC() ? 3 : 4)}>
+              <Grid item xs={isMook() ? 6 : isPC() ? 3 : 4}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -444,7 +482,9 @@ export default function CharacterEditDialog({
                           ? e.target.value
                           : e
                       setImpairments(
-                        typeof val === "number" ? val : parseInt(String(val)) || 0
+                        typeof val === "number"
+                          ? val
+                          : parseInt(String(val)) || 0
                       )
                     }}
                     onBlur={() => {}}
@@ -475,7 +515,9 @@ export default function CharacterEditDialog({
                           ? e.target.value
                           : e
                       setMarksOfDeath(
-                        typeof val === "number" ? val : parseInt(String(val)) || 0
+                        typeof val === "number"
+                          ? val
+                          : parseInt(String(val)) || 0
                       )
                     }}
                     onBlur={() => {}}
@@ -504,7 +546,13 @@ export default function CharacterEditDialog({
               </MenuItem>
               {availableVehicles.map((vehicle: Vehicle) => (
                 <MenuItem key={vehicle.id} value={vehicle.id}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      width: "100%",
+                    }}
+                  >
                     <span>{vehicle.name}</span>
                     {vehicle.driver && vehicle.driver.id !== character.id && (
                       <Typography
@@ -512,7 +560,8 @@ export default function CharacterEditDialog({
                         variant="caption"
                         sx={{ ml: 1, color: "text.secondary" }}
                       >
-                        (currently driven by {vehicle.driver.name || vehicle.driver})
+                        (currently driven by{" "}
+                        {vehicle.driver.name || vehicle.driver})
                       </Typography>
                     )}
                   </Box>

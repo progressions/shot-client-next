@@ -204,17 +204,23 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
             <>
               <ActionValues character={character} />
               {drivingVehicle && (
-                <Box 
-                  sx={{ 
+                <Box
+                  sx={{
                     display: "block",
-                    mt: 1, 
-                    p: 1, 
-                    bgcolor: "action.hover", 
+                    mt: 1,
+                    p: 1,
+                    bgcolor: "action.hover",
                     borderRadius: 1,
                     position: "relative",
                   }}
                 >
-                  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
                     <Typography
                       variant="caption"
                       sx={{
@@ -245,7 +251,14 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
                       </IconButton>
                     </Tooltip>
                   </Box>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      mb: 1,
+                    }}
+                  >
                     <VehicleAvatar entity={drivingVehicle} />
                     <VehicleLink vehicle={drivingVehicle} />
                   </Box>
@@ -262,7 +275,7 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
             </>
           }
           secondaryTypographyProps={{
-            component: "div"
+            component: "div",
           }}
         />
         <Box
@@ -443,7 +456,7 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
         onClose={handleEditClose}
         character={character}
       />
-      
+
       {/* Vehicle Edit Dialog */}
       {drivingVehicle && (
         <VehicleEditDialog
@@ -452,7 +465,7 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
           vehicle={drivingVehicle}
         />
       )}
-      
+
       {/* Heal Dialog */}
       <HealDialog
         open={healDialogOpen}

@@ -19,11 +19,11 @@ export type ChaseFormData = {
   // Shot IDs for selection
   attackerShotId?: string
   targetShotId?: string
-  
+
   // Vehicles
   attacker: Vehicle
   target: Vehicle
-  
+
   // Vehicle stats (from attacker/target action_values)
   actionValue: number
   defense: number
@@ -33,7 +33,7 @@ export type ChaseFormData = {
   crunch: number
   count: number
   impairments: number
-  
+
   // Action configuration
   method: ChaseMethod
   swerve: Swerve
@@ -41,7 +41,7 @@ export type ChaseFormData = {
   stunt: boolean
   position: "near" | "far"
   attackerRole: "pursuer" | "evader"
-  
+
   // Results (calculated by service)
   success: boolean
   actionResult: number | null
@@ -52,12 +52,12 @@ export type ChaseFormData = {
   mookResults: ChaseMookResult[]
   boxcars: boolean
   wayAwfulFailure: boolean
-  
+
   // Display values (calculated)
   modifiedDefense: string
   modifiedActionValue: string
   mookDefense: number
-  
+
   // UI control
   edited: boolean
 }

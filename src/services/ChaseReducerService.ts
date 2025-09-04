@@ -1,4 +1,4 @@
-import type { Position, Fight, Character, Vehicle } from "@/types/types"
+import type { Vehicle } from "@/types/types"
 import AS from "@/services/ActionService"
 import VS from "@/services/VehicleService"
 import { ChaseMookResult, ChaseMethod, ChaseFormData } from "@/types/chase"
@@ -7,9 +7,14 @@ import { parseToNumber } from "@/lib/parseToNumber"
 const ChaseReducerService = {
   // change the "edited" flag to true to roll the attack and
   // calculate the results.
-  process: function(state: ChaseFormData): ChaseFormData {
-    let st = this.convertToNumber(state)
-    console.log("ChaseReducerService.process - Input position:", state.position, "edited:", st.edited)
+  process: function (state: ChaseFormData): ChaseFormData {
+    const st = this.convertToNumber(state)
+    console.log(
+      "ChaseReducerService.process - Input position:",
+      state.position,
+      "edited:",
+      st.edited
+    )
 
     if (st.edited) {
       // roll attacks for all mooks
@@ -17,7 +22,10 @@ const ChaseReducerService = {
 
       // roll the attack and apply the attack results
       const result = this.resolveAttack(st)
-      console.log("ChaseReducerService.process - Final result position:", result.position)
+      console.log(
+        "ChaseReducerService.process - Final result position:",
+        result.position
+      )
       return result
     }
 
@@ -35,16 +43,22 @@ const ChaseReducerService = {
   // If the target's Frame is higher than the attacker's Frame, the Attacker will
   // take a Bump of damage to its Chase Points and Condition Points.
   //
-  resolveAttack: function(state: ChaseFormData): ChaseFormData {
+  resolveAttack: function (state: ChaseFormData): ChaseFormData {
     const st = this.calculateAttackValues(state)
-    console.log("ChaseReducerService - After calculateAttackValues, position:", st.position)
+    console.log(
+      "ChaseReducerService - After calculateAttackValues, position:",
+      st.position
+    )
     if (this.VS.isMook(state.target)) return this.killMooks(st)
 
     const { method, attacker, smackdown, target } = st
     const beforeChasePoints = this.VS.chasePoints(target)
     const beforeConditionPoints = this.VS.conditionPoints(target)
 
-    const [updatedAttacker, updatedTarget] = this.processMethod(st, smackdown as number)
+    const [updatedAttacker, updatedTarget] = this.processMethod(
+      st,
+      smackdown as number
+    )
 
     const afterChasePoints = this.VS.chasePoints(updatedTarget)
     const afterConditionPoints = this.VS.conditionPoints(updatedTarget)
@@ -57,12 +71,15 @@ const ChaseReducerService = {
       attacker: updatedAttacker,
       target: updatedTarget,
     }
-    console.log("ChaseReducerService - Returning from resolveAttack, position:", result.position)
+    console.log(
+      "ChaseReducerService - Returning from resolveAttack, position:",
+      result.position
+    )
     return result
   },
 
   // roll the dice for a single attack
-  calculateAttackValues: function(st: ChaseFormData): ChaseFormData {
+  calculateAttackValues: function (st: ChaseFormData): ChaseFormData {
     if (st.typedSwerve !== "") {
       st.swerve = { ...st.swerve, result: parseToNumber(st.typedSwerve) }
     }
@@ -76,22 +93,24 @@ const ChaseReducerService = {
 
   // Pursuer's goal: Get NEAR to the target
   // If successful when FAR, position changes to NEAR
-  pursue: function(st: ChaseFormData): ChaseFormData {
+  pursue: function (st: ChaseFormData): ChaseFormData {
     // Calculate the basic attack outcome (Driving + Swerve vs Target's Driving)
-    const { success, actionResult, outcome, wayAwfulFailure } = this.AS.outcome({
-      swerve: st.swerve,
-      actionValue: st.actionValue,
-      defense: st.mookDefense,
-      stunt: st.stunt,
-    })
+    const { success, actionResult, outcome, wayAwfulFailure } = this.AS.outcome(
+      {
+        swerve: st.swerve,
+        actionValue: st.actionValue,
+        defense: st.mookDefense,
+        stunt: st.stunt,
+      }
+    )
 
     if (success) {
       // For chase rules: Chase Points = Outcome + Attacker's Squeal - Target's Handling
       // For ram/sideswipe: use Crunch - Frame instead
       let chasePoints: number
       let conditionPoints: number | null = null
-      let smackdown: number  // The raw damage before reduction
-      
+      let smackdown: number // The raw damage before reduction
+
       if (st.method === ChaseMethod.RAM_SIDESWIPE) {
         // Ram/Sideswipe: Outcome + Attacker's Crunch - Target's Frame
         // Use the frame value from form state (which can be manually edited)
@@ -109,7 +128,16 @@ const ChaseReducerService = {
       // - If currently FAR and successful, position becomes NEAR
       // - If currently NEAR, position stays NEAR
       let newPosition = st.position
-      console.log("ChaseReducerService - Pursuer calculation: method=", st.method, "ChaseMethod.NARROW_THE_GAP=", ChaseMethod.NARROW_THE_GAP, "position=", st.position, "match=", st.method === ChaseMethod.NARROW_THE_GAP)
+      console.log(
+        "ChaseReducerService - Pursuer calculation: method=",
+        st.method,
+        "ChaseMethod.NARROW_THE_GAP=",
+        ChaseMethod.NARROW_THE_GAP,
+        "position=",
+        st.position,
+        "match=",
+        st.method === ChaseMethod.NARROW_THE_GAP
+      )
       if (st.method === ChaseMethod.NARROW_THE_GAP && st.position === "far") {
         console.log("ChaseReducerService - Changing position from far to near")
         newPosition = "near"
@@ -121,7 +149,7 @@ const ChaseReducerService = {
         success: true,
         actionResult: actionResult,
         outcome: outcome || null,
-        smackdown: smackdown,  // The raw damage before reduction
+        smackdown: smackdown, // The raw damage before reduction
         position: newPosition,
         chasePoints: chasePoints,
         conditionPoints: conditionPoints,
@@ -145,21 +173,23 @@ const ChaseReducerService = {
 
   // Evader's goal: Stay FAR from the pursuer
   // If successful when NEAR, position changes to FAR
-  evade: function(st: ChaseFormData): ChaseFormData {
+  evade: function (st: ChaseFormData): ChaseFormData {
     // Calculate the basic attack outcome (Driving + Swerve vs Target's Driving)
-    const { success, actionResult, outcome, wayAwfulFailure } = this.AS.outcome({
-      swerve: st.swerve,
-      actionValue: st.actionValue,
-      defense: st.mookDefense,
-      stunt: st.stunt,
-    })
+    const { success, actionResult, outcome, wayAwfulFailure } = this.AS.outcome(
+      {
+        swerve: st.swerve,
+        actionValue: st.actionValue,
+        defense: st.mookDefense,
+        stunt: st.stunt,
+      }
+    )
 
     if (success) {
       // Calculate chase points based on method
       let chasePoints: number
       let conditionPoints: number | null = null
-      let smackdown: number  // The raw damage before reduction
-      
+      let smackdown: number // The raw damage before reduction
+
       if (st.method === ChaseMethod.RAM_SIDESWIPE) {
         // Ram/Sideswipe: Outcome + Attacker's Crunch - Target's Frame
         // Evaders can also ram/sideswipe when near
@@ -171,7 +201,7 @@ const ChaseReducerService = {
         smackdown = Math.max(0, (outcome || 0) + st.squeal)
         chasePoints = Math.max(0, smackdown - st.handling)
       }
-      
+
       // Position logic for evaders:
       // - If currently NEAR and successful with WIDEN_THE_GAP, position becomes FAR
       // - If currently FAR, position stays FAR
@@ -179,14 +209,14 @@ const ChaseReducerService = {
       if (st.method === ChaseMethod.WIDEN_THE_GAP && st.position === "near") {
         newPosition = "far"
       }
-      
+
       return {
         ...st,
         success: true,
         position: newPosition,
         actionResult: actionResult,
         outcome: outcome || null,
-        smackdown: smackdown,  // The raw damage before reduction
+        smackdown: smackdown, // The raw damage before reduction
         chasePoints: chasePoints,
         conditionPoints: conditionPoints,
         boxcars: st.swerve.boxcars,
@@ -207,8 +237,8 @@ const ChaseReducerService = {
     }
   },
 
-  rollMookAttacks: function(st: ChaseFormData): ChaseFormData {
-    const results:ChaseMookResult[] = []
+  rollMookAttacks: function (st: ChaseFormData): ChaseFormData {
+    const results: ChaseMookResult[] = []
     let chasePoints = 0
     let conditionPoints = 0
     let success = st.success
@@ -248,13 +278,15 @@ const ChaseReducerService = {
   //
   // This version ignores the position and bump rules.
   //
-  resolveMookAttacks: function(state: ChaseFormData): ChaseFormData {
-    const results:ChaseMookResult[] = []
+  resolveMookAttacks: function (state: ChaseFormData): ChaseFormData {
+    const results: ChaseMookResult[] = []
     const st = this.rollMookAttacks(state)
 
     // apply changes to the attacker and target based on the method
     // but don't add Chase Points
-    let [attacker, target] = this.processMethod(st, 0)
+    const processedResult = this.processMethod(st, 0)
+    const attacker = processedResult[0]
+    let target = processedResult[1]
 
     if (st.success) {
       target = VS.takeRawChasePoints(target, st.chasePoints || 0)
@@ -266,13 +298,13 @@ const ChaseReducerService = {
     return {
       ...st,
       attacker: attacker,
-      target: target
+      target: target,
     }
   },
 
   // Remove a number of mooks if the attack was successful, factoring in any
   // changes to the position of the attacker or target based on the method.
-  killMooks: function(st: ChaseFormData): ChaseFormData {
+  killMooks: function (st: ChaseFormData): ChaseFormData {
     if (!st.success) return st
 
     // We send st.count explicitly here because processMethod lets us
@@ -283,7 +315,7 @@ const ChaseReducerService = {
     return {
       ...st,
       attacker: updatedAttacker,
-      target: updatedTarget
+      target: updatedTarget,
     }
   },
 
@@ -305,7 +337,10 @@ const ChaseReducerService = {
    * uses Squeal as the damage value and Handling as defense.
    *
    */
-  processMethod: function(state: ChaseFormData, damage: number): [Vehicle, Vehicle] {
+  processMethod: function (
+    state: ChaseFormData,
+    damage: number
+  ): [Vehicle, Vehicle] {
     if (!state.success) return [state.attacker, state.target]
 
     const { method, attacker, target } = state
@@ -323,7 +358,10 @@ const ChaseReducerService = {
     return [attacker, target]
   },
 
-  setAttacker: function(state: ChaseFormData, attacker: Vehicle): ChaseFormData {
+  setAttacker: function (
+    state: ChaseFormData,
+    attacker: Vehicle
+  ): ChaseFormData {
     return this.process({
       ...state,
       attacker: attacker,
@@ -339,7 +377,7 @@ const ChaseReducerService = {
     })
   },
 
-  setTarget: function(state: ChaseFormData, target: Vehicle): ChaseFormData {
+  setTarget: function (state: ChaseFormData, target: Vehicle): ChaseFormData {
     return this.process({
       ...state,
       target: target,
@@ -351,7 +389,7 @@ const ChaseReducerService = {
 
   /* These functions return values but don't make any changes */
   R: {
-    defenseString: function(st: ChaseFormData): string {
+    defenseString: function (st: ChaseFormData): string {
       if (st.stunt) {
         return `${st.defense + 2}*`
       } else if (this.VS.impairments(st.target) > 0) {
@@ -360,18 +398,18 @@ const ChaseReducerService = {
       return `${st.defense}`
     },
 
-    mainAttackString: function(st: ChaseFormData): string {
+    mainAttackString: function (st: ChaseFormData): string {
       return `${st.actionValue}`
     },
 
-    targetMookDefense: function(st: ChaseFormData): number {
+    targetMookDefense: function (st: ChaseFormData): number {
       if (this.VS.isMook(st.target) && st.count > 1) {
         return st.defense + st.count
       }
       return st.defense
     },
 
-    calculateToughness: function(st: ChaseFormData): number {
+    calculateToughness: function (st: ChaseFormData): number {
       switch (st.method) {
         case ChaseMethod.RAM_SIDESWIPE:
           return st.frame
@@ -380,7 +418,7 @@ const ChaseReducerService = {
       }
     },
 
-    calculateDamage: function(st: ChaseFormData): number {
+    calculateDamage: function (st: ChaseFormData): number {
       switch (st.method) {
         case ChaseMethod.RAM_SIDESWIPE:
           return st.crunch
@@ -389,10 +427,13 @@ const ChaseReducerService = {
       }
     },
 
-    defaultMethod: function(attacker: Vehicle): string {
-      if (this.VS.isPursuer(attacker) && VS.isNear(attacker)) return ChaseMethod.RAM_SIDESWIPE
-      if (this.VS.isPursuer(attacker) && VS.isFar(attacker)) return ChaseMethod.NARROW_THE_GAP
-      if (this.VS.isEvader(attacker) && VS.isNear(attacker)) return ChaseMethod.WIDEN_THE_GAP
+    defaultMethod: function (attacker: Vehicle): string {
+      if (this.VS.isPursuer(attacker) && VS.isNear(attacker))
+        return ChaseMethod.RAM_SIDESWIPE
+      if (this.VS.isPursuer(attacker) && VS.isFar(attacker))
+        return ChaseMethod.NARROW_THE_GAP
+      if (this.VS.isEvader(attacker) && VS.isNear(attacker))
+        return ChaseMethod.WIDEN_THE_GAP
       return ChaseMethod.EVADE
     },
 
@@ -402,8 +443,8 @@ const ChaseReducerService = {
   },
 
   /* These functions make changes to the state. The forms give us strings, but
-  *  we need number values. */
-  convertToNumber: function(state: ChaseFormData): ChaseFormData {
+   *  we need number values. */
+  convertToNumber: function (state: ChaseFormData): ChaseFormData {
     return {
       ...state,
       swerve: {

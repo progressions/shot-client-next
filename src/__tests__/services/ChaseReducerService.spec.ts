@@ -1,14 +1,19 @@
-import type { Swerve, Character, Vehicle } from "@/types/types"
-import { defaultSwerve, defaultCharacter, defaultVehicle } from "@/types/types"
+import type { Vehicle } from "@/types/types"
+import { defaultSwerve } from "@/types/types"
 import { ChaseMethod, ChaseFormData, initialChaseFormData } from "@/types/chase"
 import CRS from "@/services/ChaseReducerService"
 import VS from "@/services/VehicleService"
-import { pursuer, evader, hondas, brickMobile, copCar, battleTruck, motorcycles } from "@/__tests__/factories/Vehicles"
+import {
+  brickMobile,
+  copCar,
+  battleTruck,
+  motorcycles,
+} from "@/__tests__/factories/Vehicles"
 
 function roll(result: number) {
   return {
     ...defaultSwerve,
-    result: result
+    result: result,
   }
 }
 
@@ -17,7 +22,7 @@ describe("ChaseReducerService", () => {
 
   beforeEach(() => {
     // Reset the mocked function before each test
-    jest.restoreAllMocks();
+    jest.restoreAllMocks()
   })
 
   describe("process", () => {
@@ -29,7 +34,7 @@ describe("ChaseReducerService", () => {
         count: 5,
         defense: 13,
       }
-      const resolveMookAttacksMock = jest.spyOn(CRS, 'resolveMookAttacks')
+      const resolveMookAttacksMock = jest.spyOn(CRS, "resolveMookAttacks")
       CRS.process(state)
       expect(resolveMookAttacksMock).toHaveBeenCalled()
     })
@@ -40,7 +45,7 @@ describe("ChaseReducerService", () => {
         ...initialChaseFormData,
         attacker: brickMobile,
         target: copCar,
-        edited: true
+        edited: true,
       }
       CRS.process(state)
       expect(resolveAttackMock).toHaveBeenCalled()
@@ -50,7 +55,7 @@ describe("ChaseReducerService", () => {
       const resolveAttackMock = jest.spyOn(CRS, "resolveAttack")
       const state = {
         ...initialChaseFormData,
-        edited: false
+        edited: false,
       }
       CRS.process(state)
       expect(resolveAttackMock).not.toHaveBeenCalled()
@@ -66,7 +71,7 @@ describe("ChaseReducerService", () => {
         count: 5,
         defense: 13,
       }
-      const killMooksMock = jest.spyOn(CRS, 'killMooks')
+      const killMooksMock = jest.spyOn(CRS, "killMooks")
       CRS.resolveAttack(state)
       expect(killMooksMock).toHaveBeenCalled()
     })
@@ -77,7 +82,7 @@ describe("ChaseReducerService", () => {
         attacker: brickMobile,
         target: battleTruck,
         defense: 13,
-        smackdown: 15
+        smackdown: 15,
       }
       const updatedTarget = {
         ...brickMobile,
@@ -85,11 +90,11 @@ describe("ChaseReducerService", () => {
           ...brickMobile.action_values,
           "Chase Points": 10,
           "Condition Points": 10,
-        }
+        },
       }
-      const processMethodMock = jest.spyOn(CRS, 'processMethod')
+      const processMethodMock = jest.spyOn(CRS, "processMethod")
       processMethodMock.mockReturnValue([brickMobile, updatedTarget])
-      const calculateAttackValuesMock = jest.spyOn(CRS, 'calculateAttackValues')
+      const calculateAttackValuesMock = jest.spyOn(CRS, "calculateAttackValues")
       calculateAttackValuesMock.mockReturnValue(state)
 
       const result = CRS.resolveAttack(state)
@@ -120,12 +125,12 @@ describe("ChaseReducerService", () => {
         .mockReturnValueOnce({
           ...state,
           success: true,
-          chasePoints: 5
+          chasePoints: 5,
         })
         .mockReturnValueOnce({
           ...state,
           success: true,
-          chasePoints: 10
+          chasePoints: 10,
         })
 
       const result = CRS.resolveMookAttacks(state)
@@ -151,12 +156,12 @@ describe("ChaseReducerService", () => {
         .mockReturnValueOnce({
           ...state,
           success: false,
-          chasePoints: null
+          chasePoints: null,
         })
         .mockReturnValueOnce({
           ...state,
           success: false,
-          chasePoints: null
+          chasePoints: null,
         })
 
       const result = CRS.resolveMookAttacks(state)
@@ -182,12 +187,12 @@ describe("ChaseReducerService", () => {
         .mockReturnValueOnce({
           ...state,
           success: false,
-          chasePoints: null
+          chasePoints: null,
         })
         .mockReturnValueOnce({
           ...state,
           success: true,
-          chasePoints: 5
+          chasePoints: 5,
         })
 
       const result = CRS.resolveMookAttacks(state)
@@ -206,7 +211,7 @@ describe("ChaseReducerService", () => {
         ...initialChaseFormData,
         success: true,
         attacker: attacker,
-        target: target
+        target: target,
       }
       const updatedAttacker = VS.updatePosition(attacker, "near")
       const updatedTarget = { ...target, count: 10 }
@@ -237,7 +242,7 @@ describe("ChaseReducerService", () => {
 
       const swerve6 = {
         ...defaultSwerve,
-        result: 6
+        result: 6,
       }
       const state = {
         ...initialChaseFormData,
@@ -259,7 +264,7 @@ describe("ChaseReducerService", () => {
       const target = copCar
       const swerve6 = {
         ...defaultSwerve,
-        result: 6
+        result: 6,
       }
       const state = {
         ...initialChaseFormData,
@@ -280,7 +285,7 @@ describe("ChaseReducerService", () => {
       const target = VS.updateActionValue(motorcycles, "Pursuer", "false")
       const swerve6 = {
         ...defaultSwerve,
-        result: 6
+        result: 6,
       }
       const state = {
         ...initialChaseFormData,
@@ -294,7 +299,7 @@ describe("ChaseReducerService", () => {
         ...state,
         modifiedDefense: "13",
         modifiedActionValue: "15",
-        mookDefense: 13
+        mookDefense: 13,
       }
 
       const pursueMock = jest.spyOn(CRS, "pursue")
@@ -313,7 +318,7 @@ describe("ChaseReducerService", () => {
       const target = VS.updateActionValue(motorcycles, "Pursuer", "true")
       const swerve6 = {
         ...defaultSwerve,
-        result: 6
+        result: 6,
       }
       const state = {
         ...initialChaseFormData,
@@ -327,7 +332,7 @@ describe("ChaseReducerService", () => {
         ...state,
         modifiedDefense: "13",
         modifiedActionValue: "15",
-        mookDefense: 13
+        mookDefense: 13,
       }
 
       const pursueMock = jest.spyOn(CRS, "pursue")
@@ -351,7 +356,7 @@ describe("ChaseReducerService", () => {
         ...initialChaseFormData,
         swerve: {
           ...defaultSwerve,
-          result: 6
+          result: 6,
         },
         attacker: attacker,
         target: target,
@@ -382,7 +387,7 @@ describe("ChaseReducerService", () => {
         ...initialChaseFormData,
         swerve: {
           ...defaultSwerve,
-          result: 6
+          result: 6,
         },
         attacker: attacker,
         target: target,
@@ -392,7 +397,7 @@ describe("ChaseReducerService", () => {
         crunch: 11,
         actionValue: 15,
         mookDefense: 13,
-        method: ChaseMethod.RAM_SIDESWIPE
+        method: ChaseMethod.RAM_SIDESWIPE,
       }
       const result = CRS.pursue(state)
       expect(result.actionResult).toEqual(21)
@@ -416,7 +421,7 @@ describe("ChaseReducerService", () => {
         ...initialChaseFormData,
         swerve: {
           ...defaultSwerve,
-          result: -6
+          result: -6,
         },
         attacker: attacker,
         target: target,
@@ -448,7 +453,7 @@ describe("ChaseReducerService", () => {
         ...initialChaseFormData,
         swerve: {
           ...defaultSwerve,
-          result: 6
+          result: 6,
         },
         attacker: attacker,
         target: target,
@@ -479,7 +484,7 @@ describe("ChaseReducerService", () => {
       it("returns the state's action value", () => {
         const state = {
           ...initialChaseFormData,
-          actionValue: 13
+          actionValue: 13,
         }
         const actionValue = CRS.R.mainAttackString(state)
         expect(actionValue).toEqual("13")
@@ -493,7 +498,7 @@ describe("ChaseReducerService", () => {
           ...initialChaseFormData,
           target: vehicle,
           count: 1,
-          defense: 13
+          defense: 13,
         }
         const defense = CRS.R.targetMookDefense(state)
         expect(defense).toEqual(13)
@@ -505,7 +510,7 @@ describe("ChaseReducerService", () => {
           ...initialChaseFormData,
           target: vehicle,
           count: 1,
-          defense: 13
+          defense: 13,
         }
         const defense = CRS.R.targetMookDefense(state)
         expect(defense).toEqual(13)
@@ -517,7 +522,7 @@ describe("ChaseReducerService", () => {
           ...initialChaseFormData,
           target: vehicle,
           count: 5,
-          defense: 13
+          defense: 13,
         }
         const defense = CRS.R.targetMookDefense(state)
         expect(defense).toEqual(18)
@@ -530,7 +535,7 @@ describe("ChaseReducerService", () => {
         const state = {
           ...initialChaseFormData,
           defense: 13,
-          target: vehicle
+          target: vehicle,
         }
         const defense = CRS.R.defenseString(state)
         expect(defense).toEqual("13")
@@ -542,7 +547,7 @@ describe("ChaseReducerService", () => {
           ...initialChaseFormData,
           defense: 13,
           target: vehicle,
-          stunt: true
+          stunt: true,
         }
         const defense = CRS.R.defenseString(state)
         expect(defense).toEqual("15*")
@@ -556,7 +561,7 @@ describe("ChaseReducerService", () => {
         const state = {
           ...initialChaseFormData,
           defense: 13,
-          target: vehicle
+          target: vehicle,
         }
         const defense = CRS.R.defenseString(state)
         expect(defense).toEqual("13*")
@@ -569,7 +574,7 @@ describe("ChaseReducerService", () => {
           ...initialChaseFormData,
           frame: 7,
           handling: 5,
-          method: ChaseMethod.RAM_SIDESWIPE
+          method: ChaseMethod.RAM_SIDESWIPE,
         }
         expect(CRS.R.calculateToughness(state)).toEqual(state.frame)
       })
@@ -579,7 +584,7 @@ describe("ChaseReducerService", () => {
           ...initialChaseFormData,
           frame: 7,
           handling: 5,
-          method: ChaseMethod.EVADE
+          method: ChaseMethod.EVADE,
         }
         expect(CRS.R.calculateToughness(state)).toEqual(state.handling)
       })
@@ -589,7 +594,7 @@ describe("ChaseReducerService", () => {
           ...initialChaseFormData,
           frame: 7,
           handling: 5,
-          method: ChaseMethod.NARROW_THE_GAP
+          method: ChaseMethod.NARROW_THE_GAP,
         }
         expect(CRS.R.calculateToughness(state)).toEqual(state.handling)
       })
@@ -599,7 +604,7 @@ describe("ChaseReducerService", () => {
           ...initialChaseFormData,
           frame: 7,
           handling: 5,
-          method: ChaseMethod.WIDEN_THE_GAP
+          method: ChaseMethod.WIDEN_THE_GAP,
         }
         expect(CRS.R.calculateToughness(state)).toEqual(state.handling)
       })
@@ -611,7 +616,7 @@ describe("ChaseReducerService", () => {
           ...initialChaseFormData,
           crunch: 9,
           squeal: 7,
-          method: ChaseMethod.RAM_SIDESWIPE
+          method: ChaseMethod.RAM_SIDESWIPE,
         }
         expect(CRS.R.calculateDamage(state)).toEqual(state.crunch)
       })
@@ -621,7 +626,7 @@ describe("ChaseReducerService", () => {
           ...initialChaseFormData,
           crunch: 9,
           squeal: 7,
-          method: ChaseMethod.EVADE
+          method: ChaseMethod.EVADE,
         }
         expect(CRS.R.calculateDamage(state)).toEqual(state.squeal)
       })
@@ -631,7 +636,7 @@ describe("ChaseReducerService", () => {
           ...initialChaseFormData,
           crunch: 9,
           squeal: 7,
-          method: ChaseMethod.NARROW_THE_GAP
+          method: ChaseMethod.NARROW_THE_GAP,
         }
         expect(CRS.R.calculateDamage(state)).toEqual(state.squeal)
       })
@@ -641,7 +646,7 @@ describe("ChaseReducerService", () => {
           ...initialChaseFormData,
           crunch: 9,
           squeal: 7,
-          method: ChaseMethod.WIDEN_THE_GAP
+          method: ChaseMethod.WIDEN_THE_GAP,
         }
         expect(CRS.R.calculateDamage(state)).toEqual(state.squeal)
       })

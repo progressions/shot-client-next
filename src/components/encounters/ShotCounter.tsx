@@ -14,7 +14,7 @@ export default function ShotCounter() {
   // Load the persisted setting on mount
   useEffect(() => {
     if (!encounter?.id) return
-    
+
     const savedShowHidden = getLocally(`fight_${encounter.id}_showHidden`)
     if (savedShowHidden !== null) {
       setShowHidden(savedShowHidden as boolean)
@@ -34,7 +34,7 @@ export default function ShotCounter() {
     if (!encounter?.shots) {
       return []
     }
-    
+
     if (showHidden) {
       // Show all shots including hidden ones
       return encounter.shots

@@ -30,45 +30,45 @@ export default function HealDialog({
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
   const { encounter, updateEncounter } = useEncounter()
-  
+
   const [healAmount, setHealAmount] = useState<number>(0)
   const [loading, setLoading] = useState(false)
-  
+
   // Get current wounds
   const currentWounds = CS.wounds(character) || 0
   const woundsLabel = CS.isMook(character) ? "Mooks" : "Wounds"
-  
+
   // Reset heal amount when dialog opens
   useEffect(() => {
     if (open) {
       setHealAmount(0)
     }
   }, [open])
-  
+
   const handleHeal = async () => {
     if (healAmount <= 0) {
-      return  // Don't show error, just don't submit
+      return // Don't show error, just don't submit
     }
-    
+
     setLoading(true)
     try {
       // Calculate new wounds value (minimum 0)
       const newWounds = Math.max(0, currentWounds - healAmount)
-      
+
       // Prepare update based on character type
       interface CharacterUpdate {
         action_values?: Record<string, unknown>
       }
-      
+
       const characterUpdate: CharacterUpdate = {}
-      
+
       if (CS.isPC(character)) {
         // For PCs, wounds are stored in action_values
         characterUpdate.action_values = {
           ...character.action_values,
           Wounds: newWounds,
         }
-        
+
         // Update the character
         await client.updateCharacterCombatStats(character.id, characterUpdate)
       } else {
@@ -80,7 +80,7 @@ export default function HealDialog({
           })
         }
       }
-      
+
       // Refresh the encounter
       if (encounter) {
         const updatedEncounterResponse = await client.getEncounter(encounter)
@@ -88,9 +88,11 @@ export default function HealDialog({
           updateEncounter(updatedEncounterResponse.data)
         }
       }
-      
+
       const healedAmount = currentWounds - newWounds
-      toastSuccess(`Healed ${healedAmount} ${woundsLabel.toLowerCase()} from ${character.name}`)
+      toastSuccess(
+        `Healed ${healedAmount} ${woundsLabel.toLowerCase()} from ${character.name}`
+      )
       onClose()
     } catch (error) {
       console.error("Error healing character:", error)
@@ -99,7 +101,7 @@ export default function HealDialog({
       setLoading(false)
     }
   }
-  
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle>Heal {character.name}</DialogTitle>
@@ -108,9 +110,9 @@ export default function HealDialog({
           <Typography variant="body2">
             Current {woundsLabel}: {currentWounds}
           </Typography>
-          
+
           <Box
-            onKeyDown={(e) => {
+            onKeyDown={e => {
               if (e.key === "Enter" && healAmount > 0 && !loading) {
                 e.preventDefault()
                 handleHeal()
@@ -120,8 +122,11 @@ export default function HealDialog({
             <NumberField
               value={healAmount}
               onChange={(e: React.ChangeEvent<HTMLInputElement> | number) => {
-                const val = typeof e === "object" && "target" in e ? e.target.value : e
-                setHealAmount(typeof val === "number" ? val : parseInt(String(val)) || 0)
+                const val =
+                  typeof e === "object" && "target" in e ? e.target.value : e
+                setHealAmount(
+                  typeof val === "number" ? val : parseInt(String(val)) || 0
+                )
               }}
               onBlur={() => {}}
               min={0}
@@ -131,10 +136,11 @@ export default function HealDialog({
               fullWidth
             />
           </Box>
-          
+
           {healAmount > 0 && (
             <Typography variant="caption" color="text.secondary">
-              Will reduce {woundsLabel.toLowerCase()} to {Math.max(0, currentWounds - healAmount)}
+              Will reduce {woundsLabel.toLowerCase()} to{" "}
+              {Math.max(0, currentWounds - healAmount)}
             </Typography>
           )}
         </Stack>
