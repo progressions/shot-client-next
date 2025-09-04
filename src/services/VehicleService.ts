@@ -84,7 +84,7 @@ const VehicleService = {
       return vehicle.chase_relationships[0].position as Position
     }
     // Check action_values for position
-    const pos = this.rawOtherActionValue(vehicle, "Position")
+    const pos = this.otherActionValue(vehicle, "Position")
     if (pos === "near" || pos === "far") {
       return pos as Position
     }

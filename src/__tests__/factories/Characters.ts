@@ -17,7 +17,7 @@ export const brick: Character = {
     Defense: 13,
     Toughness: 7,
     FortuneType: "Fortune",
-    MaxFortune: 5,
+    "Max Fortune": 5,
     Fortune: 5,
     Speed: 5,
   },
