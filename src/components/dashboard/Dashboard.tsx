@@ -23,12 +23,12 @@ export default async function Dashboard({
 }: DashboardProperties) {
   const user = await getCurrentUser()
   const isGamemaster = user?.gamemaster || false
-  
+
   return (
     <Box>
       <CampaignBanner campaign={campaign} />
-      <ActiveFightBanner 
-        campaignId={campaign.id} 
+      <ActiveFightBanner
+        campaignId={campaign.id}
         userId={user.id}
         isGamemaster={isGamemaster}
       />

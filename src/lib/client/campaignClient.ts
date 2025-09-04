@@ -149,7 +149,11 @@ export function createCampaignClient(deps: ClientDependencies) {
     campaignId: string,
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<import("@/types").Fight | null>> {
-    return get(`${apiV2.campaigns({ id: campaignId })}/current_fight`, {}, cacheOptions)
+    return get(
+      `${apiV2.campaigns({ id: campaignId })}/current_fight`,
+      {},
+      cacheOptions
+    )
   }
 
   return {

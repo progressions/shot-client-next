@@ -161,7 +161,10 @@ export function createFightClient(deps: ClientDependencies) {
     notes?: string
   ): Promise<AxiosResponse<Fight>> {
     const fightId = typeof fight === "string" ? fight : fight.id
-    return patch(`${apiV2.fights({ id: fightId })}/end_fight`, notes ? { notes } : {})
+    return patch(
+      `${apiV2.fights({ id: fightId })}/end_fight`,
+      notes ? { notes } : {}
+    )
   }
 
   return {

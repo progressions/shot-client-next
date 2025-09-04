@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import {
   Paper,
@@ -23,8 +23,6 @@ interface ActiveFightBannerProps {
 
 export default function ActiveFightBanner({
   campaignId,
-  userId,
-  isGamemaster = false,
 }: ActiveFightBannerProps) {
   const router = useRouter()
   const { subscription } = useApp()
@@ -33,16 +31,60 @@ export default function ActiveFightBanner({
   const [loading, setLoading] = useState(true)
   const [participantCount, setParticipantCount] = useState(0)
 
+  const fetchCurrentFight = useCallback(async () => {
+    if (!client) {
+      console.log("Client not ready yet")
+      setLoading(false)
+      return
+    }
+
+    try {
+      setLoading(true)
+      const response = await client.getCurrentFight(campaignId)
+
+      if (response.status === 204 || !response.data) {
+        // No active fight
+        setCurrentFight(null)
+      } else {
+        const fight = response.data
+        setCurrentFight(fight)
+        // Count participants (characters and vehicles in the fight)
+        const characterCount = fight.characters?.length || 0
+        const vehicleCount = fight.vehicles?.length || 0
+        const totalCount = characterCount + vehicleCount
+        setParticipantCount(totalCount)
+      }
+    } catch (error) {
+      // Check if it's a 204 response (no content)
+      if (
+        error &&
+        typeof error === "object" &&
+        "response" in error &&
+        error.response &&
+        typeof error.response === "object" &&
+        "status" in error.response &&
+        error.response.status === 204
+      ) {
+        setCurrentFight(null)
+      } else {
+        console.error("Error fetching current fight:", error)
+        setCurrentFight(null)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }, [campaignId, client])
+
   // Fetch current fight on mount and when campaign changes
   useEffect(() => {
     fetchCurrentFight()
-  }, [campaignId, client])
+  }, [fetchCurrentFight])
 
   // Subscribe to WebSocket events for fight updates
   useEffect(() => {
     if (!subscription) return
 
-    const handleFightUpdate = (data: any) => {
+    const handleFightUpdate = (data: { type: string; fight_id?: string }) => {
       if (data.type === "fight_ended" && data.fight_id === currentFight?.id) {
         // Fight has ended, clear the banner
         setCurrentFight(null)
@@ -59,43 +101,7 @@ export default function ActiveFightBanner({
         subscription.received = () => {}
       }
     }
-  }, [subscription, currentFight?.id])
-
-  const fetchCurrentFight = async () => {
-    if (!client) {
-      console.log("Client not ready yet")
-      setLoading(false)
-      return
-    }
-    
-    try {
-      setLoading(true)
-      const response = await client.getCurrentFight(campaignId)
-      
-      if (response.status === 204 || !response.data) {
-        // No active fight
-        setCurrentFight(null)
-      } else {
-        const fight = response.data
-        setCurrentFight(fight)
-        // Count participants (characters and vehicles in the fight)
-        const characterCount = fight.characters?.length || 0
-        const vehicleCount = fight.vehicles?.length || 0
-        const totalCount = characterCount + vehicleCount
-        setParticipantCount(totalCount)
-      }
-    } catch (error: any) {
-      // Check if it's a 204 response (no content)
-      if (error?.response?.status === 204) {
-        setCurrentFight(null)
-      } else {
-        console.error("Error fetching current fight:", error)
-        setCurrentFight(null)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [subscription, currentFight?.id, fetchCurrentFight])
 
   const handleJoinFight = () => {
     if (currentFight) {
@@ -167,7 +173,12 @@ export default function ActiveFightBanner({
                   spacing={2}
                 >
                   <Box>
-                    <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      spacing={1}
+                      mb={1}
+                    >
                       <FaFire size={24} />
                       <Typography variant="h5" fontWeight="bold">
                         Active Fight: {currentFight?.name}

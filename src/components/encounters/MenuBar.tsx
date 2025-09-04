@@ -13,7 +13,6 @@ import {
   Divider,
   FormControlLabel,
   Checkbox,
-  Stack,
   Paper,
 } from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
@@ -350,19 +349,22 @@ export default function MenuBar({
                     Fight Admin
                   </Typography>
 
-                  <Box 
-                    sx={{ 
-                      display: "grid", 
-                      gridTemplateColumns: { 
-                        xs: "1fr", 
-                        sm: "repeat(2, 1fr)", 
-                        md: "repeat(4, 1fr)" 
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: {
+                        xs: "1fr",
+                        sm: "repeat(2, 1fr)",
+                        md: "repeat(4, 1fr)",
                       },
                       gap: 2,
                     }}
                   >
                     {/* Sequence Controls */}
-                    <Paper elevation={1} sx={{ p: 2, height: "100%", minHeight: 100 }}>
+                    <Paper
+                      elevation={1}
+                      sx={{ p: 2, height: "100%", minHeight: 100 }}
+                    >
                       <Typography
                         variant="subtitle2"
                         sx={{ mb: 2, fontWeight: "bold" }}
@@ -393,7 +395,10 @@ export default function MenuBar({
                     </Paper>
 
                     {/* Initiative Button */}
-                    <Paper elevation={1} sx={{ p: 2, height: "100%", minHeight: 100 }}>
+                    <Paper
+                      elevation={1}
+                      sx={{ p: 2, height: "100%", minHeight: 100 }}
+                    >
                       <Typography
                         variant="subtitle2"
                         sx={{ mb: 2, fontWeight: "bold" }}
@@ -418,7 +423,10 @@ export default function MenuBar({
                     </Paper>
 
                     {/* View Options */}
-                    <Paper elevation={1} sx={{ p: 2, height: "100%", minHeight: 100 }}>
+                    <Paper
+                      elevation={1}
+                      sx={{ p: 2, height: "100%", minHeight: 100 }}
+                    >
                       <Typography
                         variant="subtitle2"
                         sx={{ mb: 2, fontWeight: "bold" }}
@@ -443,7 +451,10 @@ export default function MenuBar({
                     </Paper>
 
                     {/* End Fight */}
-                    <Paper elevation={1} sx={{ p: 2, height: "100%", minHeight: 100 }}>
+                    <Paper
+                      elevation={1}
+                      sx={{ p: 2, height: "100%", minHeight: 100 }}
+                    >
                       <Typography
                         variant="subtitle2"
                         sx={{ mb: 2, fontWeight: "bold" }}

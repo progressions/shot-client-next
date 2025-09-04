@@ -7,7 +7,6 @@ import {
   DialogActions,
   Button,
   TextField,
-  Box,
   Alert,
 } from "@mui/material"
 import { useState } from "react"
@@ -39,23 +38,18 @@ export default function EndFightDialog({
   }
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={handleClose}
-      maxWidth="sm"
-      fullWidth
-    >
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1 }}>
         <FaTriangleExclamation color="#ff9800" />
         End Fight: {fightName}
       </DialogTitle>
       <DialogContent>
         <Alert severity="warning" sx={{ mb: 2 }}>
-          This action cannot be undone. Once ended, the fight will be closed 
-          and no further modifications will be allowed.
+          This action cannot be undone. Once ended, the fight will be closed and
+          no further modifications will be allowed.
         </Alert>
         <DialogContentText sx={{ mb: 2 }}>
-          Are you sure you want to end this fight? All participants will be 
+          Are you sure you want to end this fight? All participants will be
           notified and the fight will become read-only.
         </DialogContentText>
         <TextField
@@ -65,7 +59,7 @@ export default function EndFightDialog({
           label="Closing Notes (Optional)"
           placeholder="Add any notes about how the fight ended..."
           value={notes}
-          onChange={(e) => setNotes(e.target.value)}
+          onChange={e => setNotes(e.target.value)}
           variant="outlined"
         />
       </DialogContent>
@@ -73,9 +67,9 @@ export default function EndFightDialog({
         <Button onClick={handleClose} color="inherit">
           Cancel
         </Button>
-        <Button 
-          onClick={handleConfirm} 
-          color="error" 
+        <Button
+          onClick={handleConfirm}
+          color="error"
           variant="contained"
           autoFocus
         >
