@@ -24,7 +24,7 @@ import type { Character } from "@/types"
 
 interface EncounterActionBarProps {
   selectedCharacter: Character | null
-  onAction: (action: string, character: Character) => void
+  onAction: (action: string) => void
 }
 
 export default function EncounterActionBar({
@@ -38,7 +38,7 @@ export default function EncounterActionBar({
   }
 
   const handleAction = (action: string) => {
-    onAction(action, selectedCharacter)
+    onAction(action)
   }
 
   // Determine which actions are available

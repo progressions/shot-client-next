@@ -91,7 +91,11 @@ export default function ShotCounter() {
 
   // Handle action from EncounterActionBar
   const handleAction = (action: string) => {
+    console.log("Handle action called with:", action)
+    console.log("Selected character:", selectedCharacter)
+    console.log("Setting activePanel to:", action)
     setActivePanel(action)
+    console.log("Active panel is now:", action)
   }
 
   const handlePanelClose = () => {
@@ -119,13 +123,9 @@ export default function ShotCounter() {
         showHidden={showHidden}
         onShowHiddenChange={handleShowHiddenChange}
       />
-      <List>
-        {visibleShots.map((shot, index) => (
-          <ShotDetail key={`${shot.shot}-${index}`} shot={shot} />
-        ))}
-      </List>
-
-      {/* Action Panels */}
+      
+      {/* Action Panels - Place them here, before the shot list */}
+      {console.log("Rendering check - activePanel:", activePanel, "selectedCharacter:", selectedCharacter)}
       {activePanel === "attack" && selectedCharacter && (
         <AttackPanel
           preselectedAttacker={selectedCharacter}
@@ -160,6 +160,13 @@ export default function ShotCounter() {
           onClose={handlePanelClose}
         />
       )}
+      
+      {/* Shot List */}
+      <List>
+        {visibleShots.map((shot, index) => (
+          <ShotDetail key={`${shot.shot}-${index}`} shot={shot} />
+        ))}
+      </List>
     </>
   )
 }
