@@ -17,7 +17,7 @@ interface ChasePanelProps {
 
 export default function ChasePanel({ onClose }: ChasePanelProps) {
   const [isReady, setIsReady] = useState(false)
-  const { encounter, ec } = useEncounter()
+  const { encounter } = useEncounter()
   const { client } = useClient()
 
   // Delay rendering for animation

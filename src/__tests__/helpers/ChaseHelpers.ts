@@ -164,7 +164,7 @@ export function expectChaseResults(
   result: ChaseFormData,
   values: PartialChaseState
 ) {
-  const { swerve, outcome } = values
+  const { swerve, outcome: _outcome } = values
 
   const smackdown = values.smackdown
   const chasePoints = values.chasePoints

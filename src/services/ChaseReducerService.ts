@@ -51,7 +51,7 @@ const ChaseReducerService = {
     )
     if (this.VS.isMook(state.target)) return this.killMooks(st)
 
-    const { method, attacker, smackdown, target } = st
+    const { smackdown, target } = st
     const beforeChasePoints = this.VS.chasePoints(target)
     const beforeConditionPoints = this.VS.conditionPoints(target)
 
@@ -238,7 +238,7 @@ const ChaseReducerService = {
   },
 
   rollMookAttacks: function (st: ChaseFormData): ChaseFormData {
-    const results: ChaseMookResult[] = []
+    const _results: ChaseMookResult[] = []
     let chasePoints = 0
     let conditionPoints = 0
     let success = st.success
@@ -279,7 +279,7 @@ const ChaseReducerService = {
   // This version ignores the position and bump rules.
   //
   resolveMookAttacks: function (state: ChaseFormData): ChaseFormData {
-    const results: ChaseMookResult[] = []
+    const _results: ChaseMookResult[] = []
     const st = this.rollMookAttacks(state)
 
     // apply changes to the attacker and target based on the method

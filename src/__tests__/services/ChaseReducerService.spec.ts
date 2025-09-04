@@ -10,7 +10,7 @@ import {
   motorcycles,
 } from "@/__tests__/factories/Vehicles"
 
-function roll(result: number) {
+function _roll(result: number) {
   return {
     ...defaultSwerve,
     result: result,
@@ -18,7 +18,7 @@ function roll(result: number) {
 }
 
 describe("ChaseReducerService", () => {
-  let state: ChaseFormData
+  let _state: ChaseFormData
 
   beforeEach(() => {
     // Reset the mocked function before each test

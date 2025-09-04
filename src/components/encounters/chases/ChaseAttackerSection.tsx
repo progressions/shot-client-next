@@ -33,7 +33,7 @@ export default function ChaseAttackerSection({
   formState,
   dispatchForm,
   attacker,
-  target,
+  target: _target,
 }: ChaseAttackerSectionProps) {
   const { attackerShotId, shotCost } = formState.data as { attackerShotId?: string; shotCost?: number }
 
