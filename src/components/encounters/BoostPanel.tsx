@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useEffect, useState, useCallback } from "react"
+import { useMemo, useEffect, useState } from "react"
 import {
   Box,
   Typography,
@@ -11,7 +11,6 @@ import {
   FormLabel,
   Alert,
   CircularProgress,
-  Stack,
 } from "@mui/material"
 import { useEncounter, useToast, useClient } from "@/contexts"
 import { CS, CES } from "@/services"
@@ -82,22 +81,28 @@ export default function BoostPanel({ onClose }: BoostPanelProps) {
   }, [allShots])
 
   // Get selected booster
-  const boosterShot = allShots.find(s => s.character?.shot_id === formData.boosterShotId || s.vehicle?.shot_id === formData.boosterShotId)
+  const boosterShot = allShots.find(
+    s =>
+      s.character?.shot_id === formData.boosterShotId ||
+      s.vehicle?.shot_id === formData.boosterShotId
+  )
   const booster = boosterShot?.character || boosterShot?.vehicle
 
-  // Get valid targets based on booster
+  // Get valid targets - show all when no booster, filter when booster selected
   const validTargetShots = useMemo(() => {
-    if (!booster) return []
+    if (!booster) {
+      // Show all shots when no booster selected (matching AttackPanel behavior)
+      return allShots
+    }
 
-    // If booster is a good guy (PC/Ally), default to showing other good guys
-    // Otherwise show all characters
+    // If booster is selected, filter based on booster type
     const boosterType = CS.type(booster as Character)
     const isBoosterGoodGuy = boosterType === "PC" || boosterType === "Ally"
 
     return allShots.filter(shot => {
       const target = shot.character || shot.vehicle
       if (!target) return false
-      
+
       // Can't boost yourself
       if (target.shot_id === formData.boosterShotId) return false
 
@@ -115,7 +120,11 @@ export default function BoostPanel({ onClose }: BoostPanelProps) {
   }, [allShots, booster, formData.boosterShotId])
 
   // Get selected target
-  const targetShot = allShots.find(s => s.character?.shot_id === formData.targetShotId || s.vehicle?.shot_id === formData.targetShotId)
+  const targetShot = allShots.find(
+    s =>
+      s.character?.shot_id === formData.targetShotId ||
+      s.vehicle?.shot_id === formData.targetShotId
+  )
   const target = targetShot?.character || targetShot?.vehicle
 
   // Check if booster is a PC (can use Fortune)
@@ -237,33 +246,34 @@ export default function BoostPanel({ onClose }: BoostPanelProps) {
           borderColor: "divider",
         }}
       >
-        🚀 Boost Action
+        Boost Action
       </Typography>
 
+      {/* Main Content - Attacker then Target */}
       {isReady ? (
         <>
-          {/* Booster Section */}
-          <Box
-            sx={{
-              p: { xs: 2, sm: 3 },
-              borderBottom: "2px solid",
-              borderBottomColor: "divider",
-            }}
-          >
-            <Typography variant="h6" sx={{ mb: 2, color: "primary.main" }}>
-              💪 Booster
-            </Typography>
-            <CharacterSelector
-              shots={sortedBoosterShots}
-              selectedShotId={formData.boosterShotId}
-              onSelect={handleBoosterSelect}
-              borderColor="primary.main"
-              disabled={formData.isProcessing}
-            />
-          </Box>
+          <Box sx={{ backgroundColor: "action.hover" }}>
+            {/* Booster Section */}
+            <Box
+              sx={{
+                p: { xs: 2, sm: 3 },
+                borderBottom: "2px solid",
+                borderBottomColor: "divider",
+              }}
+            >
+              <Typography variant="h6" sx={{ mb: 2, color: "primary.main" }}>
+                💪 Booster
+              </Typography>
+              <CharacterSelector
+                shots={sortedBoosterShots}
+                selectedShotId={formData.boosterShotId}
+                onSelect={handleBoosterSelect}
+                borderColor="primary.main"
+                disabled={formData.isProcessing}
+              />
+            </Box>
 
-          {/* Target Section */}
-          {booster && (
+            {/* Target Section */}
             <Box
               sx={{
                 p: { xs: 2, sm: 3 },
@@ -283,90 +293,119 @@ export default function BoostPanel({ onClose }: BoostPanelProps) {
                 excludeShotId={formData.boosterShotId}
               />
             </Box>
-          )}
+          </Box>
 
-          {/* Boost Options Section */}
-          {target && (
-            <Box sx={{ p: { xs: 2, sm: 3 } }}>
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{ mb: 3, textAlign: "center" }}
-              >
-                ⚡ Boost Options
-              </Typography>
+          {/* Bottom Section - Boost Resolution */}
+          <Box
+            sx={{ p: { xs: 2, sm: 3 }, backgroundColor: "background.default" }}
+          >
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ textAlign: "center", mb: { xs: 2, sm: 3 } }}
+            >
+              ⚡ Boost Resolution
+            </Typography>
 
-              {/* Boost Type Selection */}
-              <FormLabel component="legend" sx={{ mb: 2 }}>
-                Boost Type (3 shot action)
-              </FormLabel>
-              <RadioGroup
-                row
-                value={formData.boostType}
-                onChange={handleBoostTypeChange}
-                sx={{ mb: 3, justifyContent: "center" }}
-              >
-                <FormControlLabel
-                  value="attack"
-                  control={<Radio />}
-                  label={`Attack Boost (+${formData.useFortune ? "2" : "1"})`}
-                  disabled={formData.isProcessing}
-                />
-                <FormControlLabel
-                  value="defense"
-                  control={<Radio />}
-                  label={`Defense Boost (+${formData.useFortune ? "5" : "3"})`}
-                  disabled={formData.isProcessing}
-                />
-              </RadioGroup>
-
-              {/* Fortune Enhancement (PC only) */}
-              {canUseFortune && formData.boostType && (
-                <Box sx={{ mb: 3, textAlign: "center" }}>
-                  <Button
-                    variant={formData.useFortune ? "contained" : "outlined"}
-                    onClick={handleFortuneToggle}
-                    disabled={formData.isProcessing}
-                    color="secondary"
+            {booster && target ? (
+              <>
+                {/* Boost Type Selection */}
+                <Box sx={{ mb: 3 }}>
+                  <FormLabel component="legend" sx={{ mb: 1 }}>
+                    Boost Type (3 shot action)
+                  </FormLabel>
+                  <RadioGroup
+                    row
+                    value={formData.boostType}
+                    onChange={handleBoostTypeChange}
+                    sx={{ justifyContent: "center" }}
                   >
-                    {formData.useFortune ? "✨ Fortune Enhanced" : "Use Fortune"}
-                  </Button>
-                  {canUseFortune && (
-                    <Typography variant="caption" sx={{ display: "block", mt: 1 }}>
-                      Fortune: {(booster as Character).action_values?.Fortune || 0}
-                    </Typography>
-                  )}
+                    <FormControlLabel
+                      value="attack"
+                      control={<Radio />}
+                      label={`Attack Boost (+${
+                        formData.useFortune ? "2" : "1"
+                      })`}
+                      disabled={formData.isProcessing}
+                    />
+                    <FormControlLabel
+                      value="defense"
+                      control={<Radio />}
+                      label={`Defense Boost (+${
+                        formData.useFortune ? "5" : "3"
+                      })`}
+                      disabled={formData.isProcessing}
+                    />
+                  </RadioGroup>
                 </Box>
-              )}
 
-              {/* Boost Summary */}
-              {formData.boostType && (
-                <Alert severity="info" sx={{ mb: 3 }}>
-                  <Typography variant="body2">
-                    <strong>{booster.name}</strong> will spend 3 shots to boost{" "}
-                    <strong>{target.name}'s</strong>{" "}
-                    {formData.boostType === "attack" ? "Attack" : "Defense"} by{" "}
-                    <strong>+{getBoostValue()}</strong>
-                    {formData.useFortune && " (Fortune enhanced)"}
-                  </Typography>
-                </Alert>
-              )}
+                {/* Fortune Enhancement (PC only) */}
+                {canUseFortune && formData.boostType && (
+                  <Box sx={{ mb: 3, textAlign: "center" }}>
+                    <Button
+                      variant={formData.useFortune ? "contained" : "outlined"}
+                      onClick={handleFortuneToggle}
+                      disabled={formData.isProcessing}
+                      color="secondary"
+                      size="small"
+                    >
+                      {formData.useFortune
+                        ? "✨ Fortune Enhanced"
+                        : "Use Fortune"}
+                    </Button>
+                    {canUseFortune && (
+                      <Typography
+                        variant="caption"
+                        sx={{ display: "block", mt: 1 }}
+                      >
+                        Fortune:{" "}
+                        {(booster as Character).action_values?.Fortune || 0}
+                      </Typography>
+                    )}
+                  </Box>
+                )}
 
-              {/* Action Button */}
-              <Box sx={{ display: "flex", justifyContent: "center" }}>
-                <Button
-                  variant="contained"
-                  onClick={handleApplyBoost}
-                  disabled={!isFormValid || formData.isProcessing}
-                  startIcon={
-                    formData.isProcessing && <CircularProgress size={20} />
-                  }
-                >
-                  {formData.isProcessing ? "Applying..." : "Apply Boost"}
-                </Button>
+                {/* Boost Summary */}
+                {formData.boostType && (
+                  <Alert severity="info" sx={{ mb: 3 }}>
+                    <Typography variant="body2">
+                      <strong>{booster.name}</strong> will spend 3 shots to
+                      boost <strong>{target.name}'s</strong>{" "}
+                      {formData.boostType === "attack" ? "Attack" : "Defense"}{" "}
+                      by <strong>+{getBoostValue()}</strong>
+                      {formData.useFortune && " (Fortune enhanced)"}
+                    </Typography>
+                  </Alert>
+                )}
+              </>
+            ) : (
+              <Box sx={{ textAlign: "center", py: 4 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Select a booster and target to apply a boost
+                </Typography>
               </Box>
+            )}
+
+            {/* Action Button */}
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+              <Button
+                variant="contained"
+                onClick={handleApplyBoost}
+                disabled={!isFormValid || formData.isProcessing}
+                startIcon={
+                  formData.isProcessing && <CircularProgress size={20} />
+                }
+                sx={{
+                  backgroundColor: isFormValid ? "primary.main" : "action.disabled",
+                  "&:hover": {
+                    backgroundColor: isFormValid ? "primary.dark" : "action.disabled",
+                  },
+                }}
+              >
+                {formData.isProcessing ? "APPLYING..." : "✓ APPLY"}
+              </Button>
             </Box>
-          )}
+          </Box>
         </>
       ) : (
         <Box sx={{ p: 4, textAlign: "center" }}>
