@@ -13,12 +13,14 @@ import {
 } from "@mui/material"
 import {
   Close as CloseIcon,
-  SportsMma as AttackIcon,
-  Shield as ShieldIcon,
-  DirectionsCar as ChaseIcon,
   Healing as HealIcon,
   Timer as TimerIcon,
 } from "@mui/icons-material"
+import {
+  FaGun,
+  FaRocket,
+  FaCar,
+} from "react-icons/fa6"
 import { useEncounter } from "@/contexts"
 import { CS } from "@/services"
 import type { Character } from "@/types"
@@ -101,7 +103,7 @@ export default function EncounterActionBar({
           sx={{ flex: "1 1 auto", display: "flex", gap: 1 }}
         >
           <Button
-            startIcon={<AttackIcon />}
+            startIcon={<FaGun />}
             onClick={() => handleAction("attack")}
             disabled={!hasAttackSkills}
             color="error"
@@ -110,7 +112,7 @@ export default function EncounterActionBar({
           </Button>
           
           <Button
-            startIcon={<ShieldIcon />}
+            startIcon={<FaRocket />}
             onClick={() => handleAction("boost")}
             color="info"
           >
@@ -119,7 +121,7 @@ export default function EncounterActionBar({
 
           {isInChase && (
             <Button
-              startIcon={<ChaseIcon />}
+              startIcon={<FaCar />}
               onClick={() => handleAction("chase")}
               color="warning"
             >
