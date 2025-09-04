@@ -63,28 +63,31 @@ export default function Show({
     return unsubscribe
   }, [subscribeToEntity, initialCharacter.id])
 
-  const updateCharacter = async updatedCharacter => {
-    try {
-      setCharacter(updatedCharacter)
+  const updateCharacter = useCallback(
+    async updatedCharacter => {
+      try {
+        setCharacter(updatedCharacter)
 
-      const formData = new FormData()
-      const characterData = {
-        ...updatedCharacter,
-        schticks: undefined,
-        parties: undefined,
-        sites: undefined,
-        weapons: undefined,
+        const formData = new FormData()
+        const characterData = {
+          ...updatedCharacter,
+          schticks: undefined,
+          parties: undefined,
+          sites: undefined,
+          weapons: undefined,
+        }
+        formData.append("character", JSON.stringify(characterData))
+        const response = await client.updateCharacter(character.id, formData)
+        setCharacter(response.data)
+        toastSuccess("Character updated successfully")
+
+        return response.data
+      } catch (error) {
+        console.error("Error updating character:", error)
       }
-      formData.append("character", JSON.stringify(characterData))
-      const response = await client.updateCharacter(character.id, formData)
-      setCharacter(response.data)
-      toastSuccess("Character updated successfully")
-
-      return response.data
-    } catch (error) {
-      console.error("Error updating character:", error)
-    }
-  }
+    },
+    [character.id, client, toastSuccess]
+  )
 
   // Handle change and save for EntityActiveToggle
   const handleChangeAndSave = useCallback(
@@ -95,7 +98,7 @@ export default function Show({
       }
       await updateCharacter(updatedCharacter)
     },
-    [character, updateCharacter]
+    [character]
   )
 
   // Memoize character to prevent unnecessary re-renders
