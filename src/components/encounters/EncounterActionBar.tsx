@@ -126,15 +126,13 @@ export default function EncounterActionBar({
             </IconButton>
           )}
 
-          {hasWounds && (
-            <IconButton
-              onClick={() => handleAction("heal")}
-              color="success"
-              title="Heal"
-            >
-              <HealIcon />
-            </IconButton>
-          )}
+          <IconButton
+            onClick={() => handleAction("heal")}
+            color="success"
+            title="Heal"
+          >
+            <HealIcon />
+          </IconButton>
 
         </Box>
       </Paper>

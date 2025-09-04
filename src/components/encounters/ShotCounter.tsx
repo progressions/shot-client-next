@@ -10,7 +10,7 @@ import {
   AttackPanel,
   BoostPanel,
   ChasePanel,
-  HealDialog 
+  HealPanel 
 } from "@/components/encounters"
 import { useEncounter } from "@/contexts"
 import { useLocalStorage } from "@/contexts/LocalStorageContext"
@@ -152,10 +152,9 @@ export default function ShotCounter() {
       )}
       
       {activePanel === "heal" && selectedCharacter && (
-        <HealDialog
-          open={true}
+        <HealPanel
+          preselectedCharacter={selectedCharacter}
           onClose={handlePanelClose}
-          character={selectedCharacter}
         />
       )}
       

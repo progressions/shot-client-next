@@ -31,6 +31,7 @@ interface CharacterSelectorProps {
   showAllCheckbox?: boolean
   excludeShotId?: string
   multiSelect?: boolean
+  showShotNumbers?: boolean
 }
 
 export default function CharacterSelector({
@@ -44,6 +45,7 @@ export default function CharacterSelector({
   showAllCheckbox = false,
   excludeShotId,
   multiSelect = false,
+  showShotNumbers = true,
 }: CharacterSelectorProps) {
   const [showAll, setShowAll] = useState(false)
   const theme = useTheme()
@@ -117,24 +119,26 @@ export default function CharacterSelector({
         {shotGroups.map(([shotNumber, shotsInGroup]) => (
           <React.Fragment key={`shot-group-${shotNumber}`}>
             {/* Shot label */}
-            <Box
-              data-testid={`shot-label-${shotNumber}`}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                minWidth: "auto",
-                px: { xs: 1, sm: 2 },
-                height: { xs: 56, sm: 72 },
-                flexShrink: 0,
-                fontWeight: "bold",
-                color: "text.primary",
-                fontSize: { xs: "1rem", sm: "1.25rem" },
-                whiteSpace: "nowrap",
-              }}
-            >
-              {shotNumber}
-            </Box>
+            {showShotNumbers && (
+              <Box
+                data-testid={`shot-label-${shotNumber}`}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minWidth: "auto",
+                  px: { xs: 1, sm: 2 },
+                  height: { xs: 56, sm: 72 },
+                  flexShrink: 0,
+                  fontWeight: "bold",
+                  color: "text.primary",
+                  fontSize: { xs: "1rem", sm: "1.25rem" },
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {shotNumber}
+              </Box>
+            )}
             
             {/* Characters at this shot */}
             {shotsInGroup.map(shot => {
