@@ -41,7 +41,7 @@ export default async function FightsPage({
           f => f.name === "status"
         )
         const defaultStatus = statusField?.defaultValue || ""
-        
+
         return {
           fights: data.fights,
           seasons: data.seasons || [],

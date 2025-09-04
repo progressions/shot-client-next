@@ -158,8 +158,9 @@ export function FilterAccordion({
 
   const handleRemoveFilter = (filterName: string) => {
     const option = filterOptions.find(opt => opt.name === filterName)
-    let newValue = option?.defaultValue || (option?.type === "dropdown" ? "" : false)
-    
+    let newValue =
+      option?.defaultValue || (option?.type === "dropdown" ? "" : false)
+
     // Check if it's a GenericFilter field
     if (!option && entity) {
       const config = filterConfigs[entity]
