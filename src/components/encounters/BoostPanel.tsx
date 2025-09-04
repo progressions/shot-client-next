@@ -131,7 +131,10 @@ export default function BoostPanel({ onClose }: BoostPanelProps) {
   const canUseFortune = booster && CS.type(booster as Character) === "PC"
 
   // Handle form field changes
-  const handleFieldChange = (field: keyof BoostFormData, value: string | boolean | number) => {
+  const handleFieldChange = (
+    field: keyof BoostFormData,
+    value: string | boolean | number
+  ) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
@@ -419,4 +422,3 @@ export default function BoostPanel({ onClose }: BoostPanelProps) {
     </Box>
   )
 }
-
