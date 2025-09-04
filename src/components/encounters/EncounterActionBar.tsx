@@ -60,20 +60,26 @@ export default function EncounterActionBar({
           position: "sticky",
           top: 0,
           zIndex: 100,
-          p: 2,
-          mb: 2,
+          p: { xs: 1, sm: 2 },
+          mb: { xs: 1, sm: 2 },
           backgroundColor: "background.paper",
           borderRadius: 2,
           boxShadow: 3,
           display: "flex",
           alignItems: "center",
-          gap: 2,
+          gap: { xs: 1, sm: 2 },
           flexWrap: "wrap",
         }}
       >
         {/* Character Info */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, flex: "0 1 auto" }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 0.5, sm: 1 }, flex: "0 1 auto" }}>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              fontWeight: "bold",
+              fontSize: { xs: "1rem", sm: "1.25rem" }
+            }}
+          >
             {selectedCharacter.name}
           </Typography>
           <Chip
@@ -81,12 +87,14 @@ export default function EncounterActionBar({
             size="small"
             color="primary"
             variant="outlined"
+            sx={{ display: { xs: "none", sm: "flex" } }}
           />
           <Chip
             label={CS.type(selectedCharacter)}
             size="small"
             color="default"
             variant="outlined"
+            sx={{ display: { xs: "none", sm: "flex" } }}
           />
         </Box>
 

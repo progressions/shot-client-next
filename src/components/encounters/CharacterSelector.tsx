@@ -124,12 +124,12 @@ export default function CharacterSelector({
                 alignItems: "center",
                 justifyContent: "center",
                 minWidth: "auto",
-                px: 2,
-                height: 72,
+                px: { xs: 1, sm: 2 },
+                height: { xs: 56, sm: 72 },
                 flexShrink: 0,
                 fontWeight: "bold",
                 color: "text.primary",
-                fontSize: "1.25rem",
+                fontSize: { xs: "1rem", sm: "1.25rem" },
                 whiteSpace: "nowrap",
               }}
             >
@@ -165,9 +165,9 @@ export default function CharacterSelector({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    minWidth: 80, // Use minWidth instead of width
-                    width: 80,
-                    height: 72,
+                    minWidth: { xs: 60, sm: 80 },
+                    width: { xs: 60, sm: 80 },
+                    height: { xs: 56, sm: 72 },
                     flexShrink: 0, // Prevent shrinking
                     borderRadius: 2,
                     border: isSelected ? "3px solid" : "3px solid transparent",
@@ -176,7 +176,7 @@ export default function CharacterSelector({
                     "&:hover": {
                       backgroundColor: "action.hover",
                     },
-                    pl: 1,
+                    pl: { xs: 0.5, sm: 1 },
                     transition: "all 0.2s",
                   }}
                 >
@@ -195,9 +195,9 @@ export default function CharacterSelector({
                       disablePopup={isMobile}
                       disableImageViewer={true}
                       sx={{
-                        width: 64,
-                        height: 64,
-                        ml: 0.5,
+                        width: { xs: 48, sm: 64 },
+                        height: { xs: 48, sm: 64 },
+                        ml: { xs: 0.25, sm: 0.5 },
                       }}
                     />
                   </Box>
