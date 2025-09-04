@@ -13,9 +13,9 @@ import {
   CircularProgress,
 } from "@mui/material"
 import { useEncounter, useToast, useClient } from "@/contexts"
-import { CS, CES } from "@/services"
+import { CS } from "@/services"
 import CharacterSelector from "./CharacterSelector"
-import type { Shot, Character } from "@/types"
+import type { Character } from "@/types"
 import { getAllVisibleShots } from "./attacks/shotSorting"
 
 interface BoostPanelProps {
@@ -131,7 +131,7 @@ export default function BoostPanel({ onClose }: BoostPanelProps) {
   const canUseFortune = booster && CS.type(booster as Character) === "PC"
 
   // Handle form field changes
-  const handleFieldChange = (field: keyof BoostFormData, value: any) => {
+  const handleFieldChange = (field: keyof BoostFormData, value: string | boolean | number) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
@@ -370,7 +370,7 @@ export default function BoostPanel({ onClose }: BoostPanelProps) {
                   <Alert severity="info" sx={{ mb: 3 }}>
                     <Typography variant="body2">
                       <strong>{booster.name}</strong> will spend 3 shots to
-                      boost <strong>{target.name}'s</strong>{" "}
+                      boost <strong>{target.name}&apos;s</strong>{" "}
                       {formData.boostType === "attack" ? "Attack" : "Defense"}{" "}
                       by <strong>+{getBoostValue()}</strong>
                       {formData.useFortune && " (Fortune enhanced)"}
@@ -396,9 +396,13 @@ export default function BoostPanel({ onClose }: BoostPanelProps) {
                   formData.isProcessing && <CircularProgress size={20} />
                 }
                 sx={{
-                  backgroundColor: isFormValid ? "primary.main" : "action.disabled",
+                  backgroundColor: isFormValid
+                    ? "primary.main"
+                    : "action.disabled",
                   "&:hover": {
-                    backgroundColor: isFormValid ? "primary.dark" : "action.disabled",
+                    backgroundColor: isFormValid
+                      ? "primary.dark"
+                      : "action.disabled",
                   },
                 }}
               >
@@ -415,3 +419,4 @@ export default function BoostPanel({ onClose }: BoostPanelProps) {
     </Box>
   )
 }
+

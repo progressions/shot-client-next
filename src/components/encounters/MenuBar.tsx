@@ -27,7 +27,15 @@ import {
   LocationsDialog,
   EndFightDialog,
 } from "@/components/encounters"
-import { FaGun, FaPlay, FaPlus, FaMinus, FaCar, FaStop, FaRocket } from "react-icons/fa6"
+import {
+  FaGun,
+  FaPlay,
+  FaPlus,
+  FaMinus,
+  FaCar,
+  FaStop,
+  FaRocket,
+} from "react-icons/fa6"
 import { FaMapMarkerAlt, FaCaretRight, FaCaretDown } from "react-icons/fa"
 import { MdAdminPanelSettings } from "react-icons/md"
 import { useEncounter, useClient, useToast } from "@/contexts"
