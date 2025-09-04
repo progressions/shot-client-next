@@ -213,14 +213,7 @@ export default function ChasePanel({ onClose }: ChasePanelProps) {
     }
 
     fetchExistingRelationship()
-  }, [
-    (formState.data as ChaseFormData & { vehicle?: Vehicle }).vehicle?.id,
-    (formState.data as ChaseFormData & { targetVehicle?: Vehicle })
-      .targetVehicle?.id,
-    encounter?.id,
-    client,
-    dispatchForm,
-  ])
+  }, [attacker, formState.data, target, encounter?.id, client, dispatchForm])
 
   return (
     <Box sx={{ overflow: "hidden", minHeight: isReady ? "auto" : "100px" }}>

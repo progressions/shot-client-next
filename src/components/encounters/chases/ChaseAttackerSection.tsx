@@ -83,7 +83,7 @@ export default function ChaseAttackerSection({
   }, [attacker, vehicles])
 
   // Get chase options based on the selected character's skills
-  const _chaseOptions = useMemo(() => {
+  useMemo(() => {
     if (!attacker) return []
 
     // Character uses their Driving skill

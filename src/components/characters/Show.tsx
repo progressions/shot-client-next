@@ -98,7 +98,7 @@ export default function Show({
       }
       await updateCharacter(updatedCharacter)
     },
-    [character]
+    [character, updateCharacter]
   )
 
   // Memoize character to prevent unnecessary re-renders

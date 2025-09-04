@@ -264,7 +264,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
       updateFields(updates)
     }
-  }, [attacker, encounterWeapons, targetShotId])
+  }, [attacker, encounterWeapons, targetShotId, encounter, updateFields])
 
   // Calculate damage when swerve is entered (only for non-mook attackers)
   useMemo(() => {
@@ -365,6 +365,10 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     selectedTargetIds,
     allShots,
     targetMookCount,
+    attackerWeapons,
+    calculateEffectiveAttackValue,
+    targetMookCountPerTarget,
+    updateFields,
   ])
 
   // Function to recalculate wounds based on smackdown
@@ -429,7 +433,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       fortuneDiePerTarget: {},
       defenseAppliedPerTarget: {},
     })
-  }, [selectedTargetIds])
+  }, [selectedTargetIds, updateFields])
 
   // Helper function to update defense and toughness based on selected targets
   const updateDefenseAndToughness = (
@@ -646,7 +650,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       multiTargetResults: {}, // Clear multi-target results
       showMultiTargetResults: false, // Hide multi-target results display
     })
-  }, [attackerShotId, allShots])
+  }, [attackerShotId, allShots, updateFields])
 
   // Recalculate defense when mook counts change
   useEffect(() => {
@@ -686,7 +690,18 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         updateField("defenseValue", combinedDefense.toString())
       }
     }
-  }, [targetMookCountPerTarget, selectedTargetIds, formState.data.stunt])
+  }, [
+    targetMookCountPerTarget,
+    selectedTargetIds,
+    formState.data.stunt,
+    allShots,
+    attacker,
+    defenseChoicePerTarget,
+    encounter,
+    fortuneDiePerTarget,
+    manualDefensePerTarget,
+    updateField,
+  ])
 
   // Clear attack results when targets change
   useEffect(() => {
@@ -715,7 +730,15 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         totalAttackingMooks: 0,
       })
     }
-  }, [selectedTargetIds, targetShotId])
+  }, [
+    selectedTargetIds,
+    targetShotId,
+    attacker,
+    distributeMooks,
+    formState.data.stunt,
+    updateDefenseAndToughness,
+    updateFields,
+  ])
 
   const handleRollMookAttacks = () => {
     if (!attacker || !CS.isMook(attacker)) return

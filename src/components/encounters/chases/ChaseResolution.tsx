@@ -33,15 +33,12 @@ export default function ChaseResolution({
   onClose,
 }: ChaseResolutionProps) {
   const [isProcessing, setIsProcessing] = useState(false)
-  const [initialPosition, setInitialPosition] = useState<"near" | "far" | null>(
-    null
-  )
+  const [, setInitialPosition] = useState<"near" | "far" | null>(null)
   const { toastSuccess, toastError } = useToast()
   const { client } = useClient()
   const { encounter } = useEncounter()
 
   const {
-    method,
     position,
     typedSwerve,
     swerve,

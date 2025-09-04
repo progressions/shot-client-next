@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import {
   Dialog,
   DialogTitle,
@@ -47,8 +47,8 @@ export default function CharacterEditDialog({
   const [loading, setLoading] = useState(false)
 
   // Helper to check if character is PC
-  const isPC = () => CS.isPC(character)
-  const isMook = () => CS.isMook(character)
+  const isPC = useCallback(() => CS.isPC(character), [character])
+  const isMook = useCallback(() => CS.isMook(character), [character])
 
   // Collect all vehicles from the encounter (including hidden ones)
   const availableVehicles = useMemo(() => {
@@ -185,7 +185,7 @@ export default function CharacterEditDialog({
 
       setDrivingVehicleId(vehicleIdToSet)
     }
-  }, [open, character, availableVehicles, isPC])
+  }, [open, character, availableVehicles])
 
   // Validation
   const isValid = () => {

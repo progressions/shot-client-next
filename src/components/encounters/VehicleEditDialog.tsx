@@ -59,7 +59,7 @@ export default function VehicleEditDialog({
 
     console.log("Available characters:", characters)
     return characters
-  }, [encounter?.shots, encounter])
+  }, [encounter])
 
   // Initialize form values when dialog opens
   useEffect(() => {
