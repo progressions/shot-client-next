@@ -152,18 +152,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   )
   const attacker = attackerShot?.character
 
-  // Debug logging
-  useEffect(() => {
-    if (attackerShot) {
-      console.log("[AttackPanel] Attacker shot updated:", {
-        attacker: attacker?.name,
-        shot_id: attackerShot.character?.shot_id,
-        current_shot: attackerShot.shot,
-        attackerShotId,
-      })
-    }
-  }, [attackerShot, attacker, attackerShotId])
-
   // Get all selected targets
   const selectedTargets = selectedTargetIds
     .map(id => allShots.find(s => s.character?.shot_id === id)?.character)
@@ -264,13 +252,17 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
       updateFields(updates)
     }
-  }, [attacker, encounterWeapons, encounter, updateFields])
+  }, [attacker, encounterWeapons, targetShotId])
 
   // Calculate damage when swerve is entered (only for non-mook attackers)
   useMemo(() => {
     if (attacker && !CS.isMook(attacker)) {
       if (swerve && attackValue && defenseValue) {
-        const av = calculateEffectiveAttackValue()
+        const av = calculateEffectiveAttackValue(
+          attacker,
+          attackerWeapons,
+          allShots
+        )
         const dv = parseInt(defenseValue) || 0
         const sw = parseInt(swerve) || 0
         const weaponDmg = parseInt(weaponDamage) || 0
@@ -361,8 +353,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     selectedTargetIds,
     allShots,
     targetMookCount,
-    targetMookCountPerTarget,
-    updateFields,
   ])
 
   // Function to recalculate wounds based on smackdown
@@ -427,7 +417,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       fortuneDiePerTarget: {},
       defenseAppliedPerTarget: {},
     })
-  }, [selectedTargetIds, updateFields])
+  }, [selectedTargetIds])
 
   // Helper function to update defense and toughness based on selected targets
   const updateDefenseAndToughness = (
@@ -441,8 +431,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     const currentDefenseChoices =
       overrideDefenseChoices || defenseChoicePerTarget
     const currentFortuneDice = overrideFortuneDice || fortuneDiePerTarget
-    const currentManualDefense =
-      overrideManualDefense || manualDefensePerTarget
+    const currentManualDefense = overrideManualDefense || manualDefensePerTarget
     if (targetIds.length === 0) {
       updateFields({
         defenseValue: "0",
@@ -645,7 +634,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
       multiTargetResults: {}, // Clear multi-target results
       showMultiTargetResults: false, // Hide multi-target results display
     })
-  }, [attackerShotId, allShots, updateFields])
+  }, [attackerShotId, allShots])
 
   // Recalculate defense when mook counts change
   useEffect(() => {
@@ -685,18 +674,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         updateField("defenseValue", combinedDefense.toString())
       }
     }
-  }, [
-    targetMookCountPerTarget,
-    selectedTargetIds,
-    formState.data.stunt,
-    allShots,
-    attacker,
-    defenseChoicePerTarget,
-    encounter,
-    fortuneDiePerTarget,
-    manualDefensePerTarget,
-    updateField,
-  ])
+  }, [targetMookCountPerTarget, selectedTargetIds, formState.data.stunt])
 
   // Clear attack results when targets change
   useEffect(() => {
@@ -725,18 +703,16 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
         totalAttackingMooks: 0,
       })
     }
-  }, [
-    selectedTargetIds,
-    targetShotId,
-    attacker,
-    formState.data.stunt,
-    updateFields,
-  ])
+  }, [selectedTargetIds, targetShotId])
 
   const handleRollMookAttacks = () => {
     if (!attacker || !CS.isMook(attacker)) return
 
-    const av = calculateEffectiveAttackValue()
+    const av = calculateEffectiveAttackValue(
+      attacker,
+      attackerWeapons,
+      allShots
+    )
     const weaponDmg = parseInt(weaponDamage) || 0
 
     const allTargetRolls = []
@@ -1053,10 +1029,13 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
               formState={formState}
               dispatchForm={dispatchForm}
               attacker={attacker}
+              attackerShotId={attackerShotId}
+              updateField={updateField}
+              updateFields={updateFields}
               updateDefenseAndToughness={updateDefenseAndToughness}
-              encounter={encounter}
               distributeMooks={distributeMooks}
               calculateTargetDefense={calculateTargetDefense}
+              encounter={encounter}
             />
           </Box>
 
