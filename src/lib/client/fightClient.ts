@@ -156,6 +156,17 @@ export function createFightClient(deps: ClientDependencies) {
     })
   }
 
+  async function endFight(
+    fight: Fight | string,
+    notes?: string
+  ): Promise<AxiosResponse<Fight>> {
+    const fightId = typeof fight === "string" ? fight : fight.id
+    return patch(
+      `${apiV2.fights({ id: fightId })}/end_fight`,
+      notes ? { notes } : {}
+    )
+  }
+
   return {
     getEncounter,
     getFights,
@@ -170,5 +181,6 @@ export function createFightClient(deps: ClientDependencies) {
     applyCombatAction,
     applyChaseAction,
     updateInitiatives,
+    endFight,
   }
 }

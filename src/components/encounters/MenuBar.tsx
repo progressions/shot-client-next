@@ -13,7 +13,6 @@ import {
   Divider,
   FormControlLabel,
   Checkbox,
-  Stack,
   Paper,
 } from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
@@ -25,8 +24,9 @@ import {
   ChasePanel,
   InitiativeDialog,
   LocationsDialog,
+  EndFightDialog,
 } from "@/components/encounters"
-import { FaGun, FaPlay, FaPlus, FaMinus, FaCar } from "react-icons/fa6"
+import { FaGun, FaPlay, FaPlus, FaMinus, FaCar, FaStop } from "react-icons/fa6"
 import { FaMapMarkerAlt, FaCaretRight, FaCaretDown } from "react-icons/fa"
 import { MdAdminPanelSettings } from "react-icons/md"
 import { useEncounter, useClient, useToast } from "@/contexts"
@@ -51,6 +51,7 @@ export default function MenuBar({
   >(null)
   const [initiativeDialogOpen, setInitiativeDialogOpen] = useState(false)
   const [locationsDialogOpen, setLocationsDialogOpen] = useState(false)
+  const [endFightDialogOpen, setEndFightDialogOpen] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
   const toggleBox = (
@@ -124,6 +125,22 @@ export default function MenuBar({
     } catch (error) {
       console.error("Error applying initiatives:", error)
       toastError("Failed to apply initiatives")
+    }
+  }
+
+  const handleEndFight = async (notes?: string) => {
+    try {
+      const response = await client.endFight(encounter.id, notes)
+
+      if (response.status === 200) {
+        toastSuccess("Fight ended successfully")
+        setEndFightDialogOpen(false)
+        // Update the local encounter state to reflect the ended status
+        await updateEncounter(response.data)
+      }
+    } catch (error) {
+      console.error("Error ending fight:", error)
+      toastError("Failed to end fight")
     }
   }
 
@@ -332,37 +349,44 @@ export default function MenuBar({
                     Fight Admin
                   </Typography>
 
-                  <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: {
+                        xs: "1fr",
+                        sm: "repeat(2, 1fr)",
+                        md: "repeat(4, 1fr)",
+                      },
+                      gap: 2,
+                    }}
+                  >
                     {/* Sequence Controls */}
-                    <Paper elevation={1} sx={{ p: 2, flex: 1 }}>
+                    <Paper
+                      elevation={1}
+                      sx={{ p: 2, height: "100%", minHeight: 100 }}
+                    >
                       <Typography
                         variant="subtitle2"
-                        sx={{ mb: 1, fontWeight: "bold" }}
+                        sx={{ mb: 2, fontWeight: "bold" }}
                       >
-                        Sequence Control
+                        Sequence
                       </Typography>
                       <Box
                         sx={{ display: "flex", alignItems: "center", gap: 1 }}
                       >
-                        <Typography sx={{ mr: 1 }}>
+                        <Typography sx={{ fontSize: "0.875rem", flex: 1 }}>
                           Current: {encounter.sequence || 1}
                         </Typography>
                         <ButtonGroup size="small" variant="contained">
                           <Button
                             onClick={() => handleSequenceChange(-1)}
-                            sx={{
-                              minWidth: 32,
-                              p: 0.5,
-                            }}
+                            sx={{ minWidth: 28, p: 0.25 }}
                           >
                             <FaMinus size={12} />
                           </Button>
                           <Button
                             onClick={() => handleSequenceChange(1)}
-                            sx={{
-                              minWidth: 32,
-                              p: 0.5,
-                            }}
+                            sx={{ minWidth: 28, p: 0.25 }}
                           >
                             <FaPlus size={12} />
                           </Button>
@@ -371,35 +395,41 @@ export default function MenuBar({
                     </Paper>
 
                     {/* Initiative Button */}
-                    {showStartSequence && (
-                      <Paper elevation={1} sx={{ p: 2, flex: 1 }}>
-                        <Typography
-                          variant="subtitle2"
-                          sx={{ mb: 1, fontWeight: "bold" }}
-                        >
-                          Initiative
-                        </Typography>
-                        <Button
-                          variant="contained"
-                          startIcon={<FaPlay />}
-                          onClick={handleStartSequence}
-                          fullWidth
-                          sx={{
-                            backgroundColor: initiativeDialogOpen
-                              ? "primary.dark"
-                              : "primary.main",
-                          }}
-                        >
-                          Roll Initiative
-                        </Button>
-                      </Paper>
-                    )}
-
-                    {/* View Options */}
-                    <Paper elevation={1} sx={{ p: 2, flex: 1 }}>
+                    <Paper
+                      elevation={1}
+                      sx={{ p: 2, height: "100%", minHeight: 100 }}
+                    >
                       <Typography
                         variant="subtitle2"
-                        sx={{ mb: 1, fontWeight: "bold" }}
+                        sx={{ mb: 2, fontWeight: "bold" }}
+                      >
+                        Initiative
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        startIcon={<FaPlay />}
+                        onClick={handleStartSequence}
+                        fullWidth
+                        disabled={!showStartSequence}
+                        sx={{
+                          backgroundColor: initiativeDialogOpen
+                            ? "primary.dark"
+                            : "primary.main",
+                        }}
+                      >
+                        Roll Initiative
+                      </Button>
+                    </Paper>
+
+                    {/* View Options */}
+                    <Paper
+                      elevation={1}
+                      sx={{ p: 2, height: "100%", minHeight: 100 }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ mb: 2, fontWeight: "bold" }}
                       >
                         View Options
                       </Typography>
@@ -411,7 +441,7 @@ export default function MenuBar({
                             size="small"
                           />
                         }
-                        label="Show Hidden Characters"
+                        label="Show Hidden"
                         sx={{
                           "& .MuiFormControlLabel-label": {
                             fontSize: "0.875rem",
@@ -419,7 +449,34 @@ export default function MenuBar({
                         }}
                       />
                     </Paper>
-                  </Stack>
+
+                    {/* End Fight */}
+                    <Paper
+                      elevation={1}
+                      sx={{ p: 2, height: "100%", minHeight: 100 }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ mb: 2, fontWeight: "bold" }}
+                      >
+                        End Fight
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        color="error"
+                        size="small"
+                        startIcon={<FaStop />}
+                        onClick={() => setEndFightDialogOpen(true)}
+                        fullWidth
+                        disabled={encounter.ended_at !== null}
+                        sx={{
+                          opacity: encounter.ended_at !== null ? 0.5 : 1,
+                        }}
+                      >
+                        {encounter.ended_at !== null ? "Ended" : "End Fight"}
+                      </Button>
+                    </Paper>
+                  </Box>
                 </Box>
               )}
               {open === "character" && (
@@ -453,6 +510,12 @@ export default function MenuBar({
       <LocationsDialog
         open={locationsDialogOpen}
         onClose={() => setLocationsDialogOpen(false)}
+      />
+      <EndFightDialog
+        open={endFightDialogOpen}
+        onClose={() => setEndFightDialogOpen(false)}
+        onConfirm={handleEndFight}
+        fightName={encounter.name || ""}
       />
     </>
   )
