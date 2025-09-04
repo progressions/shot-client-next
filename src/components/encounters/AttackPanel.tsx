@@ -128,11 +128,11 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
   // Helper function to calculate effective attack value
   // Note: The attack value already includes effects and impairments from the UI
-  const calculateEffectiveAttackValue = (): number => {
+  const calculateEffectiveAttackValue = useCallback((): number => {
     // The attackValue from the form already includes all modifiers
     // (effects, impairments, mook bonuses) as calculated in the UI
     return parseInt(attackValue) || 0
-  }
+  }, [attackValue])
 
   // Get all characters in the fight (excluding hidden ones)
   const allShots = useMemo(
@@ -264,17 +264,13 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
       updateFields(updates)
     }
-  }, [attacker, encounterWeapons, targetShotId, encounter, updateFields])
+  }, [attacker, encounterWeapons, encounter, updateFields])
 
   // Calculate damage when swerve is entered (only for non-mook attackers)
   useMemo(() => {
     if (attacker && !CS.isMook(attacker)) {
       if (swerve && attackValue && defenseValue) {
-        const av = calculateEffectiveAttackValue(
-          attacker,
-          attackerWeapons,
-          allShots
-        )
+        const av = calculateEffectiveAttackValue()
         const dv = parseInt(defenseValue) || 0
         const sw = parseInt(swerve) || 0
         const weaponDmg = parseInt(weaponDamage) || 0
@@ -365,7 +361,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     selectedTargetIds,
     allShots,
     targetMookCount,
-    attackerWeapons,
     calculateEffectiveAttackValue,
     targetMookCountPerTarget,
     updateFields,
@@ -436,128 +431,75 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   }, [selectedTargetIds, updateFields])
 
   // Helper function to update defense and toughness based on selected targets
-  const updateDefenseAndToughness = (
-    targetIds: string[],
-    includeStunt: boolean = false,
-    overrideDefenseChoices?: { [key: string]: "none" | "dodge" | "fortune" },
-    overrideFortuneDice?: { [key: string]: string },
-    overrideManualDefense?: { [key: string]: string }
-  ) => {
-    // Use overrides if provided, otherwise use state values
-    const currentDefenseChoices =
-      overrideDefenseChoices || defenseChoicePerTarget
-    const currentFortuneDice = overrideFortuneDice || fortuneDiePerTarget
-    const currentManualDefense = overrideManualDefense || manualDefensePerTarget
-    if (targetIds.length === 0) {
-      updateFields({
-        defenseValue: "0",
-        toughnessValue: "0",
-        manualDefensePerTarget: {}, // Clear manual overrides
-      })
-      return
-    }
-
-    const targets = targetIds
-      .map(id => allShots.find(s => s.character?.shot_id === id)?.character)
-      .filter((char): char is Character => char !== undefined)
-
-    if (targetIds.length === 1) {
-      // Single target - show actual defense and toughness
-      const target = targets[0]
-      const targetId = targetIds[0]
-      if (target) {
-        // Use calculateTargetDefense to include all modifiers (effects, dodge, fortune, etc.)
-        const finalDefense = calcTargetDefense(
-          target,
-          targetId,
-          currentManualDefense,
-          currentDefenseChoices,
-          currentFortuneDice,
-          includeStunt,
-          attacker,
-          CS.isMook(target)
-            ? targetMookCountPerTarget[targetId] || targetMookCount || 1
-            : 1,
-          encounter
-        )
-
-        // Get toughness with effects applied
-        const [_toughnessChange, toughness] = CES.adjustedActionValue(
-          target,
-          "Toughness",
-          encounter,
-          true // ignore impairments for toughness
-        )
-
-        // Update the defense value - don't set manual override anymore since calculateTargetDefense handles it
+  const updateDefenseAndToughness = useCallback(
+    (
+      targetIds: string[],
+      includeStunt: boolean = false,
+      overrideDefenseChoices?: { [key: string]: "none" | "dodge" | "fortune" },
+      overrideFortuneDice?: { [key: string]: string },
+      overrideManualDefense?: { [key: string]: string }
+    ) => {
+      // Use overrides if provided, otherwise use state values
+      const currentDefenseChoices =
+        overrideDefenseChoices || defenseChoicePerTarget
+      const currentFortuneDice = overrideFortuneDice || fortuneDiePerTarget
+      const currentManualDefense =
+        overrideManualDefense || manualDefensePerTarget
+      if (targetIds.length === 0) {
         updateFields({
-          defenseValue: finalDefense.toString(),
-          toughnessValue: toughness.toString(),
+          defenseValue: "0",
+          toughnessValue: "0",
+          manualDefensePerTarget: {}, // Clear manual overrides
         })
+        return
       }
-    } else {
-      // Multiple targets
-      if (attacker && CS.isMook(attacker)) {
-        // Mooks attacking multiple targets - no defense modifier, just show highest for reference
-        const defenses = targetIds.map((id, index) => {
-          const target = targets[index]
-          if (!target) return 0
-          // Use calculateTargetDefense to include all modifiers
-          return calcTargetDefense(
+
+      const targets = targetIds
+        .map(id => allShots.find(s => s.character?.shot_id === id)?.character)
+        .filter((char): char is Character => char !== undefined)
+
+      if (targetIds.length === 1) {
+        // Single target - show actual defense and toughness
+        const target = targets[0]
+        const targetId = targetIds[0]
+        if (target) {
+          // Use calculateTargetDefense to include all modifiers (effects, dodge, fortune, etc.)
+          const finalDefense = calcTargetDefense(
             target,
-            id,
+            targetId,
             currentManualDefense,
             currentDefenseChoices,
             currentFortuneDice,
             includeStunt,
             attacker,
-            targetMookCount,
+            CS.isMook(target)
+              ? targetMookCountPerTarget[targetId] || targetMookCount || 1
+              : 1,
             encounter
           )
-        })
-        const highestDefense = Math.max(...defenses)
-        updateFields({
-          defenseValue: highestDefense.toString(),
-          toughnessValue: "0",
-        })
-      } else {
-        // Non-mook attacking multiple targets
 
-        // Check if all targets are mooks
-        const allTargetsAreMooks = targets.every(t => CS.isMook(t))
+          // Get toughness with effects applied
+          const [_toughnessChange, toughness] = CES.adjustedActionValue(
+            target,
+            "Toughness",
+            encounter,
+            true // ignore impairments for toughness
+          )
 
-        if (allTargetsAreMooks) {
-          // Multiple mook groups - calculate each group's defense (base + count), then add number of groups
-          const defenses = targetIds.map((id, index) => {
-            const target = targets[index]
-            if (!target) return 0
-            // Use calculateTargetDefense which includes effects, dodge, and mook count
-            const mookCount = targetMookCountPerTarget[id] || 1
-            return calcTargetDefense(
-              target,
-              id,
-              currentManualDefense,
-              currentDefenseChoices,
-              currentFortuneDice,
-              includeStunt,
-              attacker,
-              mookCount, // Pass the specific mook count for this group
-              encounter
-            )
-          })
-          const highestDefense = Math.max(...defenses)
-          // Add the number of groups (not individual mooks)
-          const combinedDefense = highestDefense + targetIds.length
+          // Update the defense value - don't set manual override anymore since calculateTargetDefense handles it
           updateFields({
-            defenseValue: combinedDefense.toString(),
-            toughnessValue: "0",
+            defenseValue: finalDefense.toString(),
+            toughnessValue: toughness.toString(),
           })
-        } else {
-          // Mixed or non-mook targets - highest defense + number of targets
+        }
+      } else {
+        // Multiple targets
+        if (attacker && CS.isMook(attacker)) {
+          // Mooks attacking multiple targets - no defense modifier, just show highest for reference
           const defenses = targetIds.map((id, index) => {
             const target = targets[index]
             if (!target) return 0
-            // Use calculateTargetDefense to include all modifiers (effects, dodge, fortune, etc.)
+            // Use calculateTargetDefense to include all modifiers
             return calcTargetDefense(
               target,
               id,
@@ -571,37 +513,109 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
             )
           })
           const highestDefense = Math.max(...defenses)
-          const combinedDefense = highestDefense + targetIds.length
           updateFields({
-            defenseValue: combinedDefense.toString(),
+            defenseValue: highestDefense.toString(),
             toughnessValue: "0",
           })
+        } else {
+          // Non-mook attacking multiple targets
+
+          // Check if all targets are mooks
+          const allTargetsAreMooks = targets.every(t => CS.isMook(t))
+
+          if (allTargetsAreMooks) {
+            // Multiple mook groups - calculate each group's defense (base + count), then add number of groups
+            const defenses = targetIds.map((id, index) => {
+              const target = targets[index]
+              if (!target) return 0
+              // Use calculateTargetDefense which includes effects, dodge, and mook count
+              const mookCount = targetMookCountPerTarget[id] || 1
+              return calcTargetDefense(
+                target,
+                id,
+                currentManualDefense,
+                currentDefenseChoices,
+                currentFortuneDice,
+                includeStunt,
+                attacker,
+                mookCount, // Pass the specific mook count for this group
+                encounter
+              )
+            })
+            const highestDefense = Math.max(...defenses)
+            // Add the number of groups (not individual mooks)
+            const combinedDefense = highestDefense + targetIds.length
+            updateFields({
+              defenseValue: combinedDefense.toString(),
+              toughnessValue: "0",
+            })
+          } else {
+            // Mixed or non-mook targets - highest defense + number of targets
+            const defenses = targetIds.map((id, index) => {
+              const target = targets[index]
+              if (!target) return 0
+              // Use calculateTargetDefense to include all modifiers (effects, dodge, fortune, etc.)
+              return calcTargetDefense(
+                target,
+                id,
+                currentManualDefense,
+                currentDefenseChoices,
+                currentFortuneDice,
+                includeStunt,
+                attacker,
+                targetMookCount,
+                encounter
+              )
+            })
+            const highestDefense = Math.max(...defenses)
+            const combinedDefense = highestDefense + targetIds.length
+            updateFields({
+              defenseValue: combinedDefense.toString(),
+              toughnessValue: "0",
+            })
+          }
         }
       }
-    }
-  }
+    },
+    [
+      defenseChoicePerTarget,
+      fortuneDiePerTarget,
+      manualDefensePerTarget,
+      updateFields,
+      allShots,
+      calcTargetDefense,
+      attacker,
+      targetMookCountPerTarget,
+      targetMookCount,
+      encounter,
+      CES,
+    ]
+  )
 
   // Helper function to distribute mooks among targets
-  const distributeMooks = (targetIds: string[]) => {
-    if (!attacker || !CS.isMook(attacker)) return
+  const distributeMooks = useCallback(
+    (targetIds: string[]) => {
+      if (!attacker || !CS.isMook(attacker)) return
 
-    const totalMooks = attacker.count || 0
+      const totalMooks = attacker.count || 0
 
-    if (targetIds.length === 0) {
+      if (targetIds.length === 0) {
+        updateFields({
+          mookDistribution: {},
+          totalAttackingMooks: 0,
+        })
+        return
+      }
+
+      const distribution = distributeMooksAmongTargets(totalMooks, targetIds)
+
       updateFields({
-        mookDistribution: {},
-        totalAttackingMooks: 0,
+        mookDistribution: distribution,
+        totalAttackingMooks: totalMooks,
       })
-      return
-    }
-
-    const distribution = distributeMooksAmongTargets(totalMooks, targetIds)
-
-    updateFields({
-      mookDistribution: distribution,
-      totalAttackingMooks: totalMooks,
-    })
-  }
+    },
+    [attacker, updateFields]
+  )
 
   // Helper function to calculate effective defense for a target based on their defense choice
   const calculateTargetDefense = (

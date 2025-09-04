@@ -295,12 +295,6 @@ describe("ChaseReducerService", () => {
         defense: 13,
         actionValue: 15,
       }
-      const resultState = {
-        ...state,
-        modifiedDefense: "13",
-        modifiedActionValue: "15",
-        mookDefense: 13,
-      }
 
       const pursueMock = jest.spyOn(CRS, "pursue")
       const evadeMock = jest.spyOn(CRS, "evade")
@@ -327,12 +321,6 @@ describe("ChaseReducerService", () => {
         target: target,
         defense: 13,
         actionValue: 15,
-      }
-      const resultState = {
-        ...state,
-        modifiedDefense: "13",
-        modifiedActionValue: "15",
-        mookDefense: 13,
       }
 
       const pursueMock = jest.spyOn(CRS, "pursue")

@@ -185,7 +185,7 @@ export default function CharacterEditDialog({
 
       setDrivingVehicleId(vehicleIdToSet)
     }
-  }, [open, character, availableVehicles])
+  }, [open, character, availableVehicles, isPC])
 
   // Validation
   const isValid = () => {
