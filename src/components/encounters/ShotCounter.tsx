@@ -10,8 +10,7 @@ import {
   AttackPanel,
   BoostPanel,
   ChasePanel,
-  HealPanel,
-  OtherActionPanel 
+  HealDialog 
 } from "@/components/encounters"
 import { useEncounter } from "@/contexts"
 import { useLocalStorage } from "@/contexts/LocalStorageContext"
@@ -92,10 +91,15 @@ export default function ShotCounter() {
   // Handle action from EncounterActionBar
   const handleAction = (action: string) => {
     console.log("Handle action called with:", action)
-    console.log("Selected character:", selectedCharacter)
-    console.log("Setting activePanel to:", action)
-    setActivePanel(action)
-    console.log("Active panel is now:", action)
+    console.log("Current activePanel:", activePanel)
+    // Toggle panel - if clicking same action, close it
+    if (activePanel === action) {
+      console.log("Closing panel")
+      setActivePanel(null)
+    } else {
+      console.log("Opening panel:", action)
+      setActivePanel(action)
+    }
   }
 
   const handlePanelClose = () => {
@@ -148,16 +152,10 @@ export default function ShotCounter() {
       )}
       
       {activePanel === "heal" && selectedCharacter && (
-        <HealPanel
-          preselectedCharacter={selectedCharacter}
+        <HealDialog
+          open={true}
           onClose={handlePanelClose}
-        />
-      )}
-      
-      {activePanel === "other" && selectedCharacter && (
-        <OtherActionPanel
-          preselectedCharacter={selectedCharacter}
-          onClose={handlePanelClose}
+          character={selectedCharacter}
         />
       )}
       

@@ -11,7 +11,6 @@ import {
 } from "@mui/material"
 import {
   Healing as HealIcon,
-  Timer as TimerIcon,
 } from "@mui/icons-material"
 import {
   FaGun,
@@ -137,13 +136,6 @@ export default function EncounterActionBar({
             </IconButton>
           )}
 
-          <IconButton
-            onClick={() => handleAction("other")}
-            color="inherit"
-            title="Other Action"
-          >
-            <TimerIcon />
-          </IconButton>
         </Box>
       </Paper>
     </Collapse>
