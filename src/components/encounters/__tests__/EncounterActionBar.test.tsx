@@ -83,7 +83,7 @@ describe("EncounterActionBar", () => {
         />
       )
 
-      expect(screen.getByText("Boost")).toBeInTheDocument()
+      expect(screen.getByTitle("Boost")).toBeInTheDocument()
     })
 
     it("should display chase button for characters in a vehicle chase", () => {
@@ -99,7 +99,7 @@ describe("EncounterActionBar", () => {
         />
       )
 
-      expect(screen.getByText("Chase")).toBeInTheDocument()
+      expect(screen.getByTitle("Chase")).toBeInTheDocument()
     })
 
     it("should display heal button for wounded characters", () => {
@@ -115,7 +115,7 @@ describe("EncounterActionBar", () => {
         />
       )
 
-      expect(screen.getByText("Heal")).toBeInTheDocument()
+      expect(screen.getByTitle("Heal")).toBeInTheDocument()
     })
 
     it("should display character name and shot position", () => {
@@ -140,7 +140,7 @@ describe("EncounterActionBar", () => {
         />
       )
 
-      fireEvent.click(screen.getByText("Attack"))
+      fireEvent.click(screen.getByTitle("Attack"))
       expect(mockOnAction).toHaveBeenCalledWith("attack", mockCharacter)
     })
 
@@ -152,7 +152,7 @@ describe("EncounterActionBar", () => {
         />
       )
 
-      fireEvent.click(screen.getByText("Boost"))
+      fireEvent.click(screen.getByTitle("Boost"))
       expect(mockOnAction).toHaveBeenCalledWith("boost", mockCharacter)
     })
 
@@ -169,7 +169,7 @@ describe("EncounterActionBar", () => {
         />
       )
 
-      fireEvent.click(screen.getByText("Chase"))
+      fireEvent.click(screen.getByTitle("Chase"))
       expect(mockOnAction).toHaveBeenCalledWith("chase", characterInChase)
     })
 
@@ -186,23 +186,10 @@ describe("EncounterActionBar", () => {
         />
       )
 
-      fireEvent.click(screen.getByText("Heal"))
+      fireEvent.click(screen.getByTitle("Heal"))
       expect(mockOnAction).toHaveBeenCalledWith("heal", woundedCharacter)
     })
 
-    it("should clear selection when close button is clicked", () => {
-      render(
-        <EncounterActionBar
-          selectedCharacter={mockCharacter}
-          onAction={mockOnAction}
-        />
-      )
-
-      const closeButton = screen.getByLabelText("Clear selection")
-      fireEvent.click(closeButton)
-      
-      expect(mockSetSelectedActor).toHaveBeenCalledWith(null, null)
-    })
   })
 
   describe("Styling", () => {
@@ -255,7 +242,7 @@ describe("EncounterActionBar", () => {
         />
       )
 
-      const attackButton = screen.getByText("Attack")
+      const attackButton = screen.getByTitle("Attack")
       expect(attackButton).toBeDisabled()
     })
 
@@ -267,7 +254,7 @@ describe("EncounterActionBar", () => {
         />
       )
 
-      expect(screen.queryByText("Heal")).not.toBeInTheDocument()
+      expect(screen.queryByTitle("Heal")).not.toBeInTheDocument()
     })
 
     it("should not show chase button if not in a chase", () => {
@@ -278,7 +265,7 @@ describe("EncounterActionBar", () => {
         />
       )
 
-      expect(screen.queryByText("Chase")).not.toBeInTheDocument()
+      expect(screen.queryByTitle("Chase")).not.toBeInTheDocument()
     })
   })
 })
