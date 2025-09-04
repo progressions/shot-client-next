@@ -11,9 +11,12 @@ const ActionService = {
     attackRolls: { wounds?: number }[]
     _toughness: number
   }): number {
-    return attackRolls.reduce((total: number, attackRoll: { wounds?: number }) => {
-      return total + (attackRoll.wounds || 0)
-    }, 0)
+    return attackRolls.reduce(
+      (total: number, attackRoll: { wounds?: number }) => {
+        return total + (attackRoll.wounds || 0)
+      },
+      0
+    )
   },
 
   attacks: function ({

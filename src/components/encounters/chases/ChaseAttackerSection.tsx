@@ -22,7 +22,11 @@ interface ChaseAttackerSectionProps {
   shots: Shot[] // All shots from encounter
   vehicles: Vehicle[] // All vehicles from encounter
   formState: { data: ChaseFormData }
-  dispatchForm: (action: { type: string; name?: string; value?: unknown }) => void
+  dispatchForm: (action: {
+    type: string
+    name?: string
+    value?: unknown
+  }) => void
   attacker: Character | null // Character who is driving
   target: Character | null // Target character who is driving
 }
@@ -35,7 +39,10 @@ export default function ChaseAttackerSection({
   attacker,
   target: _target,
 }: ChaseAttackerSectionProps) {
-  const { attackerShotId, shotCost } = formState.data as { attackerShotId?: string; shotCost?: number }
+  const { attackerShotId, shotCost } = formState.data as {
+    attackerShotId?: string
+    shotCost?: number
+  }
 
   // Helper to update a field
   const updateField = (name: string, value: unknown) => {
@@ -50,11 +57,15 @@ export default function ChaseAttackerSection({
   const driverShots = useMemo(() => {
     return shots.filter(shot => {
       if (shot.character) {
-        return !!(shot.character as Character & { driving_id?: string }).driving_id
+        return !!(shot.character as Character & { driving_id?: string })
+          .driving_id
       }
       if (shot.characters && shot.characters.length > 0) {
         // Keep shot if any character has driving_id
-        return shot.characters.some((c: Character) => !!(c as Character & { driving_id?: string }).driving_id)
+        return shot.characters.some(
+          (c: Character) =>
+            !!(c as Character & { driving_id?: string }).driving_id
+        )
       }
       return false
     })
@@ -62,7 +73,8 @@ export default function ChaseAttackerSection({
 
   // Get the vehicle being driven by the selected character
   const selectedVehicle = useMemo(() => {
-    if (!attacker || !(attacker as Character & { driving?: Vehicle }).driving) return null
+    if (!attacker || !(attacker as Character & { driving?: Vehicle }).driving)
+      return null
     const drivingInfo = (attacker as Character & { driving?: Vehicle }).driving
 
     // Find the full vehicle data from vehicles array
@@ -121,18 +133,22 @@ export default function ChaseAttackerSection({
                 }
               }
 
-              if (selectedChar && (selectedChar as Character & { driving?: Vehicle }).driving) {
+              if (
+                selectedChar &&
+                (selectedChar as Character & { driving?: Vehicle }).driving
+              ) {
                 updateField("attacker", selectedChar)
 
                 // Get the vehicle they're driving
-                const drivingInfo = (selectedChar as Character & { driving?: Vehicle }).driving
+                const drivingInfo = (
+                  selectedChar as Character & { driving?: Vehicle }
+                ).driving
                 const vehicle =
                   vehicles.find(v => v.id === drivingInfo.id) || drivingInfo
 
                 if (vehicle) {
                   // Update vehicle-related fields
                   const drivingValue = CS.skill(selectedChar, "Driving")
-                  const isPursuer = VS.isPursuer(vehicle)
 
                   updateField("actionValue", drivingValue)
                   updateField("handling", VS.handling(vehicle))

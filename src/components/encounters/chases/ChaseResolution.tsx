@@ -15,7 +15,11 @@ import { parseToNumber } from "@/lib/parseToNumber"
 
 interface ChaseResolutionProps {
   formState: { data: ChaseFormData }
-  dispatchForm: (action: { type: string; name?: string; value?: unknown }) => void
+  dispatchForm: (action: {
+    type: string
+    name?: string
+    value?: unknown
+  }) => void
   attacker: Vehicle | null
   target: Vehicle | null
   onClose: () => void

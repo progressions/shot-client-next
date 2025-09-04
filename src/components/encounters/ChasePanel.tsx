@@ -53,8 +53,10 @@ export default function ChasePanel({ onClose }: ChasePanelProps) {
   }, [encounter?.shots])
 
   const { attacker, target } = formState.data
-  const attackerShotId = (formState.data as { attackerShotId?: string }).attackerShotId
-  const _targetShotId = (formState.data as { targetShotId?: string }).targetShotId
+  const attackerShotId = (formState.data as { attackerShotId?: string })
+    .attackerShotId
+  const _targetShotId = (formState.data as { targetShotId?: string })
+    .targetShotId
 
   // Monitor position changes
   useEffect(() => {
