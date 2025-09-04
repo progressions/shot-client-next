@@ -31,6 +31,7 @@ describe("ChaseReducerService", () => {
         ...initialChaseFormData,
         edited: true,
         attacker: motorcycles,
+        target: copCar,
         count: 5,
         defense: 13,
       }
@@ -218,7 +219,7 @@ describe("ChaseReducerService", () => {
       const processMethod = jest.spyOn(CRS, "processMethod")
       processMethod.mockReturnValueOnce([updatedAttacker, updatedTarget])
 
-      const _result = CRS.killMooks(state)
+      const result = CRS.killMooks(state)
       expect(VS.isNear(result.attacker)).toEqual(true)
       expect(VS.mooks(result.target)).toEqual(10)
     })
@@ -230,7 +231,7 @@ describe("ChaseReducerService", () => {
         success: false,
       }
 
-      const _result = CRS.killMooks(state)
+      const result = CRS.killMooks(state)
       expect(processMethod).not.toHaveBeenCalled()
     })
   })
@@ -253,7 +254,7 @@ describe("ChaseReducerService", () => {
         defense: 13,
         actionValue: 15,
       }
-      const _result = CRS.calculateAttackValues(state)
+      const result = CRS.calculateAttackValues(state)
       expect(result.modifiedDefense).toEqual("13")
       expect(result.modifiedActionValue).toEqual("15")
       expect(result.mookDefense).toEqual(15)
@@ -274,7 +275,7 @@ describe("ChaseReducerService", () => {
         defense: 13,
         actionValue: 15,
       }
-      const _result = CRS.calculateAttackValues(state)
+      const result = CRS.calculateAttackValues(state)
       expect(result.modifiedDefense).toEqual("13")
       expect(result.modifiedActionValue).toEqual("15")
       expect(result.mookDefense).toEqual(13)
@@ -295,7 +296,7 @@ describe("ChaseReducerService", () => {
         defense: 13,
         actionValue: 15,
       }
-      const _resultState = {
+      const resultState = {
         ...state,
         modifiedDefense: "13",
         modifiedActionValue: "15",
@@ -304,7 +305,7 @@ describe("ChaseReducerService", () => {
 
       const pursueMock = jest.spyOn(CRS, "pursue")
       const evadeMock = jest.spyOn(CRS, "evade")
-      const _result = CRS.calculateAttackValues(state)
+      const result = CRS.calculateAttackValues(state)
 
       expect(evadeMock).not.toHaveBeenCalled()
       const calls = pursueMock.mock.calls
@@ -328,7 +329,7 @@ describe("ChaseReducerService", () => {
         defense: 13,
         actionValue: 15,
       }
-      const _resultState = {
+      const resultState = {
         ...state,
         modifiedDefense: "13",
         modifiedActionValue: "15",
@@ -338,7 +339,7 @@ describe("ChaseReducerService", () => {
       const pursueMock = jest.spyOn(CRS, "pursue")
       const evadeMock = jest.spyOn(CRS, "evade")
 
-      const _result = CRS.calculateAttackValues(state)
+      const result = CRS.calculateAttackValues(state)
 
       expect(pursueMock).not.toHaveBeenCalled()
       const calls = evadeMock.mock.calls
