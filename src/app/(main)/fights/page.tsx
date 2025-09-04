@@ -1,7 +1,7 @@
 // app/fights/page.tsx
 import { List } from "@/components/fights"
 import ResourcePage from "@/components/ResourcePage"
-import { requireCampaign } from "@/lib"
+import { requireCampaign, filterConfigs } from "@/lib"
 import type { FightsResponse } from "@/types"
 
 export const metadata = {
@@ -35,21 +35,29 @@ export default async function FightsPage({
         order,
         search,
         additionalParams
-      ) => ({
-        fights: data.fights,
-        seasons: data.seasons || [],
-        meta: data.meta,
-        filters: {
-          sort,
-          order,
-          page,
-          search: search || "",
-          season: "",
-          status: "",
-          show_hidden: additionalParams?.show_hidden || false,
-        },
-        drawerOpen: false,
-      })}
+      ) => {
+        // Get the status field config to access defaultValue
+        const statusField = filterConfigs.Fight.fields.find(
+          f => f.name === "status"
+        )
+        const defaultStatus = statusField?.defaultValue || ""
+        
+        return {
+          fights: data.fights,
+          seasons: data.seasons || [],
+          meta: data.meta,
+          filters: {
+            sort,
+            order,
+            page,
+            search: search || "",
+            season: additionalParams?.season || "",
+            status: additionalParams?.status || defaultStatus,
+            show_hidden: additionalParams?.show_hidden || false,
+          },
+          drawerOpen: false,
+        }
+      }}
       ListComponent={List}
       searchParams={searchParams}
     />

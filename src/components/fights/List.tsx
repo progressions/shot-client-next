@@ -23,7 +23,7 @@ export type FormStateData = {
     order: string
     page: number
     season: string
-    status: "Started" | "Unended" | "Ended" | ""
+    status: "Started" | "Unstarted" | "Ended" | ""
     search: string
     show_hidden?: boolean
   }

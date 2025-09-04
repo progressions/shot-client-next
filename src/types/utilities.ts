@@ -10,6 +10,7 @@ export interface FilterFieldConfig {
   allowNone?: boolean
   responseKey?: string
   displayName?: string
+  defaultValue?: string | null
 }
 
 export interface FilterConfig {

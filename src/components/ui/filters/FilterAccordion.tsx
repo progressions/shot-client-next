@@ -100,7 +100,8 @@ export function FilterAccordion({
       config.fields.forEach(field => {
         if (!omit.includes(field.name)) {
           const value = formState.data.filters[field.name]
-          if (value) {
+          // Only show as active if value exists and is different from default
+          if (value && value !== field.defaultValue) {
             const displayName = field.displayName || field.name
             if (typeof value === "object" && value.name) {
               active.push({
@@ -109,11 +110,14 @@ export function FilterAccordion({
                 label: `${displayName}: ${value.name}`,
               })
             } else if (typeof value === "string" && value !== "") {
-              active.push({
-                name: field.name,
-                value: value,
-                label: `${displayName}: ${value}`,
-              })
+              // Don't show as active if it matches the default value
+              if (value !== field.defaultValue) {
+                active.push({
+                  name: field.name,
+                  value: value,
+                  label: `${displayName}: ${value}`,
+                })
+              }
             }
           }
         }
@@ -135,12 +139,13 @@ export function FilterAccordion({
     // Clear search
     clearedFilters.search = ""
 
-    // Clear GenericFilter fields
+    // Clear GenericFilter fields - restore to default values
     if (entity) {
       const config = filterConfigs[entity]
       config.fields.forEach(field => {
         if (!omit.includes(field.name)) {
-          clearedFilters[field.name] = null
+          // Use defaultValue if available, otherwise null
+          clearedFilters[field.name] = field.defaultValue ?? null
         }
       })
     }
@@ -153,8 +158,16 @@ export function FilterAccordion({
 
   const handleRemoveFilter = (filterName: string) => {
     const option = filterOptions.find(opt => opt.name === filterName)
-    const newValue =
-      option?.defaultValue || (option?.type === "dropdown" ? "" : false)
+    let newValue = option?.defaultValue || (option?.type === "dropdown" ? "" : false)
+    
+    // Check if it's a GenericFilter field
+    if (!option && entity) {
+      const config = filterConfigs[entity]
+      const field = config.fields.find(f => f.name === filterName)
+      if (field) {
+        newValue = field.defaultValue ?? null
+      }
+    }
 
     onFiltersUpdate({
       ...filters,

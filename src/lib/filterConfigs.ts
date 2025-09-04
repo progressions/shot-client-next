@@ -93,6 +93,7 @@ export const filterConfigs: Record<string, FilterConfig> = {
         name: "status",
         type: "static",
         staticOptions: ["Started", "Unstarted", "Ended"],
+        defaultValue: "Unstarted",
       },
       { name: "fight", type: "entity", allowNone: false },
       { name: "search", type: "search" },
