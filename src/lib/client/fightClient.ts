@@ -101,6 +101,23 @@ export function createFightClient(deps: ClientDependencies) {
     })
   }
 
+  async function applyBoostAction(
+    fight: Fight | string,
+    boosterId: string,
+    targetId: string,
+    boostType: "attack" | "defense",
+    useFortune: boolean = false
+  ): Promise<AxiosResponse<Encounter>> {
+    const fightId = typeof fight === "string" ? fight : fight.id
+    return post(`${apiV2.encounters()}/${fightId}/apply_combat_action`, {
+      action_type: "boost",
+      booster_id: boosterId,
+      target_id: targetId,
+      boost_type: boostType,
+      use_fortune: useFortune,
+    })
+  }
+
   async function applyCombatAction(
     fight: Fight | string,
     characterUpdates: Array<{
@@ -178,6 +195,7 @@ export function createFightClient(deps: ClientDependencies) {
     getFightEvents,
     createFightEvent,
     spendShots,
+    applyBoostAction,
     applyCombatAction,
     applyChaseAction,
     updateInitiatives,
