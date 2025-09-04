@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
-import { List } from "@mui/material"
-import { MenuBar, ShotDetail } from "@/components/encounters"
+import { List, Box } from "@mui/material"
+import { MenuBar, ShotDetail, CharacterSelector } from "@/components/encounters"
 import { useEncounter } from "@/contexts"
 import { useLocalStorage } from "@/contexts/LocalStorageContext"
+import { getAllVisibleShots } from "@/components/encounters/attacks/shotSorting"
 
 export default function ShotCounter() {
-  const { encounter } = useEncounter()
+  const { encounter, selectedActorId, setSelectedActor } = useEncounter()
   const { getLocally, saveLocally } = useLocalStorage()
   const [showHidden, setShowHidden] = useState(false)
 
@@ -44,8 +45,41 @@ export default function ShotCounter() {
     }
   }, [encounter?.shots, showHidden])
 
+  // Get all visible shots as individual Shot objects for CharacterSelector
+  const allVisibleShots = useMemo(() => {
+    if (!encounter?.shots) {
+      return []
+    }
+    return getAllVisibleShots(encounter.shots)
+  }, [encounter?.shots])
+
+  // Handle character selection
+  const handleCharacterSelect = (shotId: string) => {
+    if (shotId === selectedActorId) {
+      // Deselect if clicking the same character
+      setSelectedActor(null, null)
+    } else {
+      // Find the shot number for this character
+      const selectedShot = allVisibleShots.find(
+        s => s.character?.shot_id === shotId
+      )
+      if (selectedShot) {
+        setSelectedActor(shotId, selectedShot.shot)
+      }
+    }
+  }
+
   return (
     <>
+      {/* Character selector at the top */}
+      <Box sx={{ mb: 2, mt: 1 }}>
+        <CharacterSelector
+          shots={allVisibleShots}
+          selectedShotId={selectedActorId}
+          onSelect={handleCharacterSelect}
+        />
+      </Box>
+      
       <MenuBar
         showHidden={showHidden}
         onShowHiddenChange={handleShowHiddenChange}
