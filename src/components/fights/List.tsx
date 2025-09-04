@@ -59,7 +59,12 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
       name: "meta",
       value: initialFormData.meta,
     })
-  }, []) // Remove dependencies to only run on mount
+  }, [
+    dispatchForm,
+    initialFormData.fights,
+    initialFormData.meta,
+    initialFormData.seasons,
+  ])
 
   const fetchFights = useCallback(
     async filters => {
