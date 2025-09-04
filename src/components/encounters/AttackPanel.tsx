@@ -34,7 +34,12 @@ import {
   handleSingleTargetAttack,
 } from "./attacks/attackHandlers"
 
-export default function AttackPanel({ onClose }: AttackPanelProps) {
+interface ExtendedAttackPanelProps {
+  onClose?: () => void
+  preselectedAttacker?: Character
+}
+
+export default function AttackPanel({ onClose, preselectedAttacker }: ExtendedAttackPanelProps) {
   const [isReady, setIsReady] = useState(false)
   const { encounter, weapons: encounterWeapons } = useEncounter()
   const { toastSuccess, toastError, toastInfo } = useToast()
@@ -49,11 +54,11 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   // Initialize form state with useForm
   const { formState, dispatchForm } = useForm<AttackFormData>({
     // Attacker state
-    attackerShotId: "",
-    attackSkill: "",
-    attackValue: "",
+    attackerShotId: preselectedAttacker?.shot_id || "",
+    attackSkill: preselectedAttacker ? CS.mainAttack(preselectedAttacker) : "",
+    attackValue: preselectedAttacker ? String(CS.skill(preselectedAttacker, CS.mainAttack(preselectedAttacker))) : "",
     attackValueChange: 0, // Track effect changes
-    selectedWeaponId: "",
+    selectedWeaponId: preselectedAttacker?.weapon_ids?.[0] || "",
     weaponDamage: "",
     damageChange: 0, // Track effect changes
     shotCost: "3",

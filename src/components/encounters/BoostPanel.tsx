@@ -30,7 +30,12 @@ interface BoostFormData {
   isProcessing: boolean
 }
 
-export default function BoostPanel({ onClose }: BoostPanelProps) {
+interface ExtendedBoostPanelProps {
+  onClose?: () => void
+  preselectedBooster?: Character
+}
+
+export default function BoostPanel({ onClose, preselectedBooster }: ExtendedBoostPanelProps) {
   const [isReady, setIsReady] = useState(false)
   const { encounter } = useEncounter()
   const { toastSuccess, toastError } = useToast()
@@ -38,7 +43,7 @@ export default function BoostPanel({ onClose }: BoostPanelProps) {
 
   // Form state
   const [formData, setFormData] = useState<BoostFormData>({
-    boosterShotId: "",
+    boosterShotId: preselectedBooster?.shot_id || "",
     targetShotId: "",
     boostType: "",
     useFortune: false,

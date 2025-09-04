@@ -4,7 +4,7 @@ import { useMemo, useEffect, useState } from "react"
 import { Box, Typography } from "@mui/material"
 import { useEncounter, useClient } from "@/contexts"
 import { useForm, FormActions } from "@/reducers"
-import type { Vehicle, Shot, ChaseRelationship } from "@/types"
+import type { Vehicle, Shot, ChaseRelationship, Character } from "@/types"
 import { ChaseFormData, initialChaseFormData } from "@/types/chase"
 import { getAllVisibleShots } from "./attacks/shotSorting"
 import ChaseAttackerSection from "./chases/ChaseAttackerSection"
@@ -12,10 +12,11 @@ import ChaseTargetSection from "./chases/ChaseTargetSection"
 import ChaseResolution from "./chases/ChaseResolution"
 
 interface ChasePanelProps {
-  onClose: () => void
+  onClose?: () => void
+  preselectedCharacter?: Character
 }
 
-export default function ChasePanel({ onClose }: ChasePanelProps) {
+export default function ChasePanel({ onClose, preselectedCharacter }: ChasePanelProps) {
   const [isReady, setIsReady] = useState(false)
   const { encounter } = useEncounter()
   const { client } = useClient()
@@ -29,6 +30,7 @@ export default function ChasePanel({ onClose }: ChasePanelProps) {
   // Initialize form state with useForm
   const { formState, dispatchForm } = useForm<ChaseFormData>({
     ...initialChaseFormData,
+    attackerShotId: preselectedCharacter?.shot_id || "",
     shotCost: "3", // Default shot cost
   })
 
