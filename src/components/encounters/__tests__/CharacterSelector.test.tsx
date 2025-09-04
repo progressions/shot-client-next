@@ -61,9 +61,9 @@ describe("CharacterSelector", () => {
       )
 
       // Check for shot labels
-      expect(screen.getByText("Shot 12")).toBeInTheDocument()
-      expect(screen.getByText("Shot 10")).toBeInTheDocument()
-      expect(screen.getByText("Shot 8")).toBeInTheDocument()
+      expect(screen.getByText("12")).toBeInTheDocument()
+      expect(screen.getByText("10")).toBeInTheDocument()
+      expect(screen.getByText("8")).toBeInTheDocument()
     })
 
     it("should not display duplicate shot labels for characters on the same shot", () => {
@@ -84,8 +84,8 @@ describe("CharacterSelector", () => {
         />
       )
 
-      // Should only have one "Shot 15" label
-      const shotLabels = screen.getAllByText("Shot 15")
+      // Should only have one "15" label
+      const shotLabels = screen.getAllByText("15")
       expect(shotLabels).toHaveLength(1)
     })
 
@@ -113,10 +113,10 @@ describe("CharacterSelector", () => {
       const shotLabels = container.querySelectorAll("[data-testid^='shot-label-']")
       
       // Check order is descending
-      expect(shotLabels[0]).toHaveTextContent("Shot 20")
-      expect(shotLabels[1]).toHaveTextContent("Shot 15")
-      expect(shotLabels[2]).toHaveTextContent("Shot 10")
-      expect(shotLabels[3]).toHaveTextContent("Shot 5")
+      expect(shotLabels[0]).toHaveTextContent("20")
+      expect(shotLabels[1]).toHaveTextContent("15")
+      expect(shotLabels[2]).toHaveTextContent("10")
+      expect(shotLabels[3]).toHaveTextContent("5")
     })
 
     it("should update shot labels when characters change positions", () => {
@@ -135,8 +135,8 @@ describe("CharacterSelector", () => {
         />
       )
 
-      expect(screen.getByText("Shot 12")).toBeInTheDocument()
-      expect(screen.getByText("Shot 10")).toBeInTheDocument()
+      expect(screen.getByText("12")).toBeInTheDocument()
+      expect(screen.getByText("10")).toBeInTheDocument()
 
       // Update character positions
       const updatedChar1 = { ...char1 }
@@ -154,12 +154,12 @@ describe("CharacterSelector", () => {
       )
 
       // Old labels should be gone
-      expect(screen.queryByText("Shot 12")).not.toBeInTheDocument()
-      expect(screen.queryByText("Shot 10")).not.toBeInTheDocument()
+      expect(screen.queryByText("12")).not.toBeInTheDocument()
+      expect(screen.queryByText("10")).not.toBeInTheDocument()
 
       // New labels should appear
-      expect(screen.getByText("Shot 15")).toBeInTheDocument()
-      expect(screen.getByText("Shot 8")).toBeInTheDocument()
+      expect(screen.getByText("15")).toBeInTheDocument()
+      expect(screen.getByText("8")).toBeInTheDocument()
     })
 
     it("should handle shot 0 correctly", () => {
@@ -173,7 +173,7 @@ describe("CharacterSelector", () => {
         />
       )
 
-      expect(screen.getByText("Shot 0")).toBeInTheDocument()
+      expect(screen.getByText("0")).toBeInTheDocument()
     })
 
     it("should handle negative shot values", () => {
@@ -187,7 +187,7 @@ describe("CharacterSelector", () => {
         />
       )
 
-      expect(screen.getByText("Shot -3")).toBeInTheDocument()
+      expect(screen.getByText("-3")).toBeInTheDocument()
     })
 
     it("should style shot labels differently from character avatars", () => {
@@ -202,8 +202,8 @@ describe("CharacterSelector", () => {
       )
 
       const shotLabel = screen.getByTestId("shot-label-12")
-      // Check that the shot label has the text "Shot 12"
-      expect(shotLabel).toHaveTextContent("Shot 12")
+      // Check that the shot label has the text "12"
+      expect(shotLabel).toHaveTextContent("12")
       // Check that the shot label element exists and is different from avatars
       expect(shotLabel).not.toHaveAttribute("data-testid", expect.stringContaining("avatar"))
     })
@@ -254,8 +254,8 @@ describe("CharacterSelector", () => {
       )
 
       // Should show shot labels for shots that have visible characters
-      expect(screen.getByText("Shot 12")).toBeInTheDocument()
-      expect(screen.getByText("Shot 10")).toBeInTheDocument()
+      expect(screen.getByText("12")).toBeInTheDocument()
+      expect(screen.getByText("10")).toBeInTheDocument()
 
       // PC characters should be visible
       expect(screen.getByText("Alice")).toBeInTheDocument()
@@ -284,7 +284,7 @@ describe("CharacterSelector", () => {
         />
       )
 
-      expect(screen.getByText("Shot 12")).toBeInTheDocument()
+      expect(screen.getByText("12")).toBeInTheDocument()
       
       // Click second character
       const bobAvatar = screen.getByTestId("avatar-shot_2").closest(".MuiBox-root")
@@ -340,9 +340,9 @@ describe("CharacterSelector", () => {
       )
 
       // Should only show label for valid shot
-      expect(screen.getByText("Shot 12")).toBeInTheDocument()
-      expect(screen.queryByText("Shot null")).not.toBeInTheDocument()
-      expect(screen.queryByText("Shot undefined")).not.toBeInTheDocument()
+      expect(screen.getByText("12")).toBeInTheDocument()
+      expect(screen.queryByText("null")).not.toBeInTheDocument()
+      expect(screen.queryByText("undefined")).not.toBeInTheDocument()
     })
   })
 })

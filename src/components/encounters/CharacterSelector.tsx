@@ -129,11 +129,11 @@ export default function CharacterSelector({
                 flexShrink: 0,
                 fontWeight: "bold",
                 color: "text.primary",
-                fontSize: "0.875rem",
+                fontSize: "1.25rem",
                 whiteSpace: "nowrap",
               }}
             >
-              Shot {shotNumber}
+              {shotNumber}
             </Box>
             
             {/* Characters at this shot */}
