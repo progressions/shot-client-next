@@ -29,4 +29,5 @@ export { default as VehicleEditDialog } from "@/components/encounters/VehicleEdi
 export { default as HealDialog } from "@/components/encounters/HealDialog"
 export { default as EndFightDialog } from "@/components/encounters/EndFightDialog"
 export { default as EncounterActionBar } from "@/components/encounters/EncounterActionBar"
-export { default as OtherActionDialog } from "@/components/encounters/OtherActionDialog"
+export { default as HealPanel } from "@/components/encounters/HealPanel"
+export { default as OtherActionPanel } from "@/components/encounters/OtherActionPanel"
