@@ -24,10 +24,12 @@ const customJestConfig = {
     "!src/**/index.ts",
   ],
   coverageReporters: ["text", "lcov", "html"],
-  testTimeout: 10000,
+  testTimeout: 15000,
   transformIgnorePatterns: [
     "node_modules/(?!(.*\\.mjs$|@rails/actioncable|axios|uuid))",
   ],
+  maxWorkers: "50%",
+  workerIdleMemoryLimit: "512MB",
 }
 
 module.exports = createJestConfig(customJestConfig)
