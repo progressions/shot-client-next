@@ -38,6 +38,8 @@ export const carolina: Character = {
     Defense: 13,
     Speed: 7,
     Fortune: 7,
+    "Max Fortune": 7,
+    Toughness: 8,
   },
   skills: {
     ...defaultCharacter.skills,

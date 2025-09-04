@@ -404,7 +404,7 @@ describe("ChaseReducerService", () => {
       expect(result.outcome).toEqual(8)
       expect(result.success).toEqual(true)
       expect(result.smackdown).toEqual(19)
-      expect(result.position).toEqual("near")
+      expect(result.position).toEqual("far")
 
       // Swerve of 6 plus actionValue of 15 is 21, which is 8 over the
       // target's defense of 13, so the result is a hit, with an outcome

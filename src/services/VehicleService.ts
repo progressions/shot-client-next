@@ -83,7 +83,12 @@ const VehicleService = {
       // Return the position from the first relationship
       return vehicle.chase_relationships[0].position as Position
     }
-    // Fallback to default if no relationships
+    // Check action_values for position
+    const pos = this.rawOtherActionValue(vehicle, "Position")
+    if (pos === "near" || pos === "far") {
+      return pos as Position
+    }
+    // Fallback to default if no relationships or action_values
     return "far" as Position
   },
 

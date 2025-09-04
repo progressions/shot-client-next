@@ -1,5 +1,5 @@
 import type { Weapon } from "@/types/types"
-import { defaultWeapon } from "@/types/types"
+import { defaultWeapon } from "@/types/defaults"
 
 export const derringer: Weapon = {
   ...defaultWeapon,
@@ -18,6 +18,7 @@ export const derringer: Weapon = {
 }
 
 export const ak47: Weapon = {
+  ...defaultWeapon,
   name: "AK-47",
   id: "ak47",
   description:
