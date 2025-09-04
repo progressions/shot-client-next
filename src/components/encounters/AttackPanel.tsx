@@ -1016,16 +1016,18 @@ export default function AttackPanel({ onClose, preselectedAttacker }: ExtendedAt
       {isReady ? (
         <>
           <Box sx={{ backgroundColor: "action.hover" }}>
-            {/* Attacker Section */}
-            <AttackerSection
-              sortedAttackerShots={sortedAttackerShots}
-              formState={formState}
-              dispatchForm={dispatchForm}
-              attacker={attacker}
-              attackerWeapons={attackerWeapons}
-              allShots={allShots}
-              selectedTargetIds={selectedTargetIds}
-            />
+            {/* Attacker Section - Only show if not preselected */}
+            {!preselectedAttacker && (
+              <AttackerSection
+                sortedAttackerShots={sortedAttackerShots}
+                formState={formState}
+                dispatchForm={dispatchForm}
+                attacker={attacker}
+                attackerWeapons={attackerWeapons}
+                allShots={allShots}
+                selectedTargetIds={selectedTargetIds}
+              />
+            )}
 
             {/* Target Section */}
             <TargetSection

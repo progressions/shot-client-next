@@ -235,15 +235,17 @@ export default function ChasePanel({ onClose, preselectedCharacter }: ChasePanel
       {isReady ? (
         <>
           <Box sx={{ backgroundColor: "action.hover" }}>
-            {/* Attacker Section */}
-            <ChaseAttackerSection
-              shots={allShots}
-              vehicles={allVehicles}
-              formState={formState}
-              dispatchForm={dispatchForm}
-              attacker={attacker}
-              target={target}
-            />
+            {/* Attacker Section - Only show if not preselected */}
+            {!preselectedCharacter && (
+              <ChaseAttackerSection
+                shots={allShots}
+                vehicles={allVehicles}
+                formState={formState}
+                dispatchForm={dispatchForm}
+                attacker={attacker}
+                target={target}
+              />
+            )}
 
             {/* Target Section - Always show */}
             <ChaseTargetSection

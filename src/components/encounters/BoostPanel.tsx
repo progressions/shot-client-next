@@ -261,25 +261,27 @@ export default function BoostPanel({ onClose, preselectedBooster }: ExtendedBoos
       {isReady ? (
         <>
           <Box sx={{ backgroundColor: "action.hover" }}>
-            {/* Booster Section */}
-            <Box
-              sx={{
-                p: { xs: 2, sm: 3 },
-                borderBottom: "2px solid",
-                borderBottomColor: "divider",
-              }}
-            >
-              <Typography variant="h6" sx={{ mb: 2, color: "primary.main" }}>
-                💪 Booster
-              </Typography>
-              <CharacterSelector
-                shots={sortedBoosterShots}
-                selectedShotId={formData.boosterShotId}
-                onSelect={handleBoosterSelect}
-                borderColor="primary.main"
-                disabled={formData.isProcessing}
-              />
-            </Box>
+            {/* Booster Section - Only show if not preselected */}
+            {!preselectedBooster && (
+              <Box
+                sx={{
+                  p: { xs: 2, sm: 3 },
+                  borderBottom: "2px solid",
+                  borderBottomColor: "divider",
+                }}
+              >
+                <Typography variant="h6" sx={{ mb: 2, color: "primary.main" }}>
+                  💪 Booster
+                </Typography>
+                <CharacterSelector
+                  shots={sortedBoosterShots}
+                  selectedShotId={formData.boosterShotId}
+                  onSelect={handleBoosterSelect}
+                  borderColor="primary.main"
+                  disabled={formData.isProcessing}
+                />
+              </Box>
+            )}
 
             {/* Target Section */}
             <Box
