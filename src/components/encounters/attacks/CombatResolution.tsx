@@ -19,7 +19,6 @@ export default function CombatResolution({
   isProcessing,
   updateField,
   handleApplyDamage,
-  handleSmackdownChange,
 }: CombatResolutionProps) {
   // Get single target if applicable
   const target =
@@ -69,7 +68,7 @@ export default function CombatResolution({
         />
       </Box>
 
-      {/* Final Damage Override - Show for single non-mook target */}
+      {/* Smackdown Display - Show for single non-mook target */}
       {selectedTargetIds.length === 1 &&
         (() => {
           const targetShot = allShots.find(
@@ -92,29 +91,23 @@ export default function CombatResolution({
               >
                 Smackdown
               </Typography>
-              <NumberField
-                name="smackdown"
-                value={parseInt(smackdown) || 0}
-                size="large"
-                width="120px"
-                error={false}
-                onChange={e => {
-                  const value = e.target.value
-                  if (handleSmackdownChange) {
-                    handleSmackdownChange(value)
-                  } else {
-                    updateField("smackdown", value)
-                  }
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "120px",
+                  height: 56,
+                  backgroundColor: "action.hover",
+                  borderRadius: 1,
+                  border: "1px solid",
+                  borderColor: "divider",
                 }}
-                onBlur={e => {
-                  const value = e.target.value
-                  if (handleSmackdownChange) {
-                    handleSmackdownChange(value)
-                  } else {
-                    updateField("smackdown", value)
-                  }
-                }}
-              />
+              >
+                <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                  {parseInt(smackdown) || 0}
+                </Typography>
+              </Box>
             </Box>
           ) : null
         })()}

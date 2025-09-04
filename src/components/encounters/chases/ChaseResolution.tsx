@@ -23,6 +23,7 @@ interface ChaseResolutionProps {
   attacker: Vehicle | null
   target: Vehicle | null
   onClose: () => void
+  onComplete?: () => void
 }
 
 export default function ChaseResolution({
@@ -31,6 +32,7 @@ export default function ChaseResolution({
   attacker,
   target,
   onClose,
+  onComplete,
 }: ChaseResolutionProps) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [, setInitialPosition] = useState<"near" | "far" | null>(null)
@@ -289,6 +291,7 @@ export default function ChaseResolution({
 
         await client.applyChaseAction(encounter, vehicleUpdates)
         toastSuccess("Chase action resolved successfully!")
+        if (onComplete) onComplete()
         onClose()
       }
     } catch (error) {

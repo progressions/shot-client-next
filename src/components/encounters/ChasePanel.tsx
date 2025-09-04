@@ -13,10 +13,11 @@ import ChaseResolution from "./chases/ChaseResolution"
 
 interface ChasePanelProps {
   onClose?: () => void
+  onComplete?: () => void
   preselectedCharacter?: Character
 }
 
-export default function ChasePanel({ onClose, preselectedCharacter }: ChasePanelProps) {
+export default function ChasePanel({ onClose, onComplete, preselectedCharacter }: ChasePanelProps) {
   const [isReady, setIsReady] = useState(false)
   const { encounter } = useEncounter()
   const { client } = useClient()
@@ -266,6 +267,7 @@ export default function ChasePanel({ onClose, preselectedCharacter }: ChasePanel
             attacker={attacker}
             target={target}
             onClose={onClose}
+            onComplete={onComplete}
           />
         </>
       ) : (

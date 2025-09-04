@@ -32,10 +32,11 @@ interface BoostFormData {
 
 interface ExtendedBoostPanelProps {
   onClose?: () => void
+  onComplete?: () => void
   preselectedBooster?: Character
 }
 
-export default function BoostPanel({ onClose, preselectedBooster }: ExtendedBoostPanelProps) {
+export default function BoostPanel({ onClose, onComplete, preselectedBooster }: ExtendedBoostPanelProps) {
   const [isReady, setIsReady] = useState(false)
   const { encounter } = useEncounter()
   const { toastSuccess, toastError } = useToast()
@@ -231,6 +232,7 @@ export default function BoostPanel({ onClose, preselectedBooster }: ExtendedBoos
         isProcessing: false,
       })
 
+      if (onComplete) onComplete()
       if (onClose) onClose()
     } catch (error) {
       console.error("Failed to apply boost:", error)

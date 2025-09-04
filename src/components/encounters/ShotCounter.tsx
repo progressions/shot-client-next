@@ -90,14 +90,10 @@ export default function ShotCounter() {
 
   // Handle action from EncounterActionBar
   const handleAction = (action: string) => {
-    console.log("Handle action called with:", action)
-    console.log("Current activePanel:", activePanel)
     // Toggle panel - if clicking same action, close it
     if (activePanel === action) {
-      console.log("Closing panel")
       setActivePanel(null)
     } else {
-      console.log("Opening panel:", action)
       setActivePanel(action)
     }
   }
@@ -106,9 +102,21 @@ export default function ShotCounter() {
     setActivePanel(null)
   }
 
+  const handleActionComplete = () => {
+    // Clear selection after completing an action
+    setSelectedActor(null, null)
+    setActivePanel(null)
+  }
+
   return (
     <>
-      {/* Character selector at the top */}
+      {/* MenuBar at the top */}
+      <MenuBar
+        showHidden={showHidden}
+        onShowHiddenChange={handleShowHiddenChange}
+      />
+      
+      {/* Character selector below MenuBar */}
       <Box sx={{ mb: 2, mt: 1 }}>
         <CharacterSelector
           shots={allVisibleShots}
@@ -121,19 +129,15 @@ export default function ShotCounter() {
       <EncounterActionBar
         selectedCharacter={selectedCharacter}
         onAction={handleAction}
-      />
-      
-      <MenuBar
-        showHidden={showHidden}
-        onShowHiddenChange={handleShowHiddenChange}
+        activePanel={activePanel}
       />
       
       {/* Action Panels - Place them here, before the shot list */}
-      {console.log("Rendering check - activePanel:", activePanel, "selectedCharacter:", selectedCharacter)}
       {activePanel === "attack" && selectedCharacter && (
         <AttackPanel
           preselectedAttacker={selectedCharacter}
           onClose={handlePanelClose}
+          onComplete={handleActionComplete}
         />
       )}
       
@@ -141,6 +145,7 @@ export default function ShotCounter() {
         <BoostPanel
           preselectedBooster={selectedCharacter}
           onClose={handlePanelClose}
+          onComplete={handleActionComplete}
         />
       )}
       
@@ -148,6 +153,7 @@ export default function ShotCounter() {
         <ChasePanel
           preselectedCharacter={selectedCharacter}
           onClose={handlePanelClose}
+          onComplete={handleActionComplete}
         />
       )}
       
@@ -155,6 +161,7 @@ export default function ShotCounter() {
         <HealPanel
           preselectedCharacter={selectedCharacter}
           onClose={handlePanelClose}
+          onComplete={handleActionComplete}
         />
       )}
       

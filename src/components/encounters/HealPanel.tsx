@@ -20,10 +20,11 @@ import type { Character } from "@/types"
 
 interface HealPanelProps {
   onClose?: () => void
+  onComplete?: () => void
   preselectedCharacter?: Character
 }
 
-export default function HealPanel({ onClose, preselectedCharacter }: HealPanelProps) {
+export default function HealPanel({ onClose, onComplete, preselectedCharacter }: HealPanelProps) {
   const [isReady, setIsReady] = useState(false)
   const { encounter } = useEncounter()
   const { toastSuccess, toastError } = useToast()
@@ -176,6 +177,7 @@ export default function HealPanel({ onClose, preselectedCharacter }: HealPanelPr
       setMedicineValue("7")
       setShotsSpent("5")
       setUseFortune(false)
+      if (onComplete) onComplete()
       if (onClose) onClose()
     } catch (error) {
       console.error("Failed to apply healing:", error)
@@ -296,6 +298,8 @@ export default function HealPanel({ onClose, preselectedCharacter }: HealPanelPr
                 borderColor="error.main"
                 disabled={isProcessing}
                 showShotNumbers={false}
+                characterTypes={["Ally", "PC"]}
+                showAllCheckbox={true}
               />
               {target && (
                 <Box sx={{ mt: 2 }}>

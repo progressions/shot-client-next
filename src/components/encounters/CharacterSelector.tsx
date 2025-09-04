@@ -32,6 +32,7 @@ interface CharacterSelectorProps {
   excludeShotId?: string
   multiSelect?: boolean
   showShotNumbers?: boolean
+  filterFunction?: (character: Character) => boolean
 }
 
 export default function CharacterSelector({
@@ -46,6 +47,7 @@ export default function CharacterSelector({
   excludeShotId,
   multiSelect = false,
   showShotNumbers = true,
+  filterFunction,
 }: CharacterSelectorProps) {
   const [showAll, setShowAll] = useState(false)
   const theme = useTheme()
@@ -59,15 +61,27 @@ export default function CharacterSelector({
       // Exclude specific shot if provided
       if (excludeShotId && entity.shot_id === excludeShotId) return false
 
-      // If showing all or no filter specified, include all
-      if (showAll || !characterTypes || characterTypes.length === 0) return true
+      // If showing all, bypass all filters
+      if (showAll) return true
 
-      // Filter by character types - use CS.type to get the properly formatted type
       const char = entity as Character
-      const charType = CS.type(char)
-      return characterTypes.includes(charType as CharacterTypeFilter)
+
+      // Apply custom filter function if provided
+      if (filterFunction && !filterFunction(char)) {
+        return false
+      }
+
+      // Apply character type filter if provided
+      if (characterTypes && characterTypes.length > 0) {
+        const charType = CS.type(char)
+        if (!characterTypes.includes(charType as CharacterTypeFilter)) {
+          return false
+        }
+      }
+
+      return true
     })
-  }, [shots, showAll, characterTypes, excludeShotId])
+  }, [shots, showAll, characterTypes, excludeShotId, filterFunction])
 
   // Group filtered shots by shot number for label display
   const shotGroups = useMemo(() => {
@@ -211,7 +225,7 @@ export default function CharacterSelector({
           </React.Fragment>
         ))}
       </Box>
-      {showAllCheckbox && characterTypes && characterTypes.length > 0 && (
+      {showAllCheckbox && ((characterTypes && characterTypes.length > 0) || filterFunction) && (
         <FormControlLabel
           control={
             <Checkbox

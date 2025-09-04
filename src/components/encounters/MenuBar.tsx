@@ -20,21 +20,15 @@ import { Icon } from "@/components/ui"
 import {
   AddCharacter,
   AddVehicle,
-  AttackPanel,
-  BoostPanel,
-  ChasePanel,
   InitiativeDialog,
   LocationsDialog,
   EndFightDialog,
 } from "@/components/encounters"
 import {
-  FaGun,
   FaPlay,
   FaPlus,
   FaMinus,
-  FaCar,
   FaStop,
-  FaRocket,
 } from "react-icons/fa6"
 import { FaMapMarkerAlt, FaCaretRight, FaCaretDown } from "react-icons/fa"
 import { MdAdminPanelSettings } from "react-icons/md"
@@ -56,7 +50,7 @@ export default function MenuBar({
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
   const [open, setOpen] = useState<
-    "character" | "vehicle" | "attack" | "boost" | "chase" | "admin" | null
+    "character" | "vehicle" | "admin" | null
   >(null)
   const [initiativeDialogOpen, setInitiativeDialogOpen] = useState(false)
   const [locationsDialogOpen, setLocationsDialogOpen] = useState(false)
@@ -64,7 +58,7 @@ export default function MenuBar({
   const panelRef = useRef<HTMLDivElement>(null)
 
   const toggleBox = (
-    type: "character" | "vehicle" | "attack" | "boost" | "chase" | "admin"
+    type: "character" | "vehicle" | "admin"
   ) => {
     setOpen(current => (current === type ? null : type))
   }
@@ -215,71 +209,6 @@ export default function MenuBar({
           <Box sx={{ flexGrow: 1 }} />
 
           {/* Action Buttons */}
-          <IconButton
-            onClick={() => toggleBox("attack")}
-            sx={{
-              color: "white",
-              px: { xs: 0.5, sm: 1 },
-              backgroundColor:
-                open === "attack" ? "rgba(255, 255, 255, 0.2)" : "transparent",
-              borderRadius: 1,
-              "&:hover": {
-                backgroundColor:
-                  open === "attack"
-                    ? "rgba(255, 255, 255, 0.3)"
-                    : "rgba(255, 255, 255, 0.1)",
-              },
-            }}
-            title="Attack Resolution"
-          >
-            <FaGun size={20} />
-          </IconButton>
-          <IconButton
-            onClick={() => toggleBox("boost")}
-            sx={{
-              color: "white",
-              px: { xs: 0.5, sm: 1 },
-              backgroundColor:
-                open === "boost" ? "rgba(255, 255, 255, 0.2)" : "transparent",
-              borderRadius: 1,
-              "&:hover": {
-                backgroundColor:
-                  open === "boost"
-                    ? "rgba(255, 255, 255, 0.3)"
-                    : "rgba(255, 255, 255, 0.1)",
-              },
-            }}
-            title="Boost Action"
-          >
-            <FaRocket size={20} />
-          </IconButton>
-          <IconButton
-            onClick={() => toggleBox("chase")}
-            sx={{
-              color: "white",
-              px: { xs: 0.5, sm: 1 },
-              backgroundColor:
-                open === "chase" ? "rgba(255, 255, 255, 0.2)" : "transparent",
-              borderRadius: 1,
-              "&:hover": {
-                backgroundColor:
-                  open === "chase"
-                    ? "rgba(255, 255, 255, 0.3)"
-                    : "rgba(255, 255, 255, 0.1)",
-              },
-            }}
-            title="Vehicle Chase"
-          >
-            <FaCar size={20} />
-          </IconButton>
-          <Divider
-            orientation="vertical"
-            sx={{
-              mx: { xs: 0.5, sm: 1 },
-              height: 24,
-              backgroundColor: "rgba(255, 255, 255, 0.3)",
-            }}
-          />
           <IconButton
             onClick={() => toggleBox("vehicle")}
             sx={{
@@ -519,11 +448,6 @@ export default function MenuBar({
                   onClose={() => setOpen(null)}
                 />
               )}
-              {open === "attack" && (
-                <AttackPanel onClose={() => setOpen(null)} />
-              )}
-              {open === "boost" && <BoostPanel onClose={() => setOpen(null)} />}
-              {open === "chase" && <ChasePanel onClose={() => setOpen(null)} />}
             </Box>
           </motion.div>
         )}

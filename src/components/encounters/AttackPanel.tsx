@@ -36,10 +36,11 @@ import {
 
 interface ExtendedAttackPanelProps {
   onClose?: () => void
+  onComplete?: () => void
   preselectedAttacker?: Character
 }
 
-export default function AttackPanel({ onClose, preselectedAttacker }: ExtendedAttackPanelProps) {
+export default function AttackPanel({ onClose, onComplete, preselectedAttacker }: ExtendedAttackPanelProps) {
   const [isReady, setIsReady] = useState(false)
   const { encounter, weapons: encounterWeapons } = useEncounter()
   const { toastSuccess, toastError, toastInfo } = useToast()
@@ -360,60 +361,6 @@ export default function AttackPanel({ onClose, preselectedAttacker }: ExtendedAt
     targetMookCount,
   ])
 
-  // Function to recalculate wounds based on smackdown
-  const recalculateWoundsFromSmackdown = (smackdownValue: string) => {
-    if (selectedTargetIds.length > 0 && !CS.isMook(attacker)) {
-      const smackdown = parseInt(smackdownValue) || 0
-
-      const results = selectedTargetIds
-        .map(targetId => {
-          const targetShot = allShots.find(
-            s => s.character?.shot_id === targetId
-          )
-          const targetChar = targetShot?.character
-          if (!targetChar) return null
-
-          const targetDefense = CS.defense(targetChar)
-          const targetToughness = CS.toughness(targetChar)
-
-          let wounds = 0
-
-          // For mooks, if smackdown > 0, take out the targeted number
-          if (CS.isMook(targetChar)) {
-            if (smackdown > 0) {
-              wounds =
-                targetMookCountPerTarget[targetId] || targetMookCount || 1
-            }
-          } else {
-            // For non-mooks, subtract toughness from smackdown
-            wounds = Math.max(0, smackdown - targetToughness)
-          }
-
-          return {
-            targetId,
-            targetName: targetChar.name,
-            defense: targetDefense,
-            toughness: targetToughness,
-            wounds,
-          }
-        })
-        .filter(r => r !== null) as typeof multiTargetResults
-
-      // Calculate total wounds from all targets
-      const totalWounds = results.reduce((sum, r) => sum + r.wounds, 0)
-
-      updateFields({
-        multiTargetResults: results,
-        finalDamage: totalWounds.toString(),
-      })
-    }
-  }
-
-  // Handle smackdown field change
-  const handleSmackdownChange = (value: string) => {
-    updateField("smackdown", value)
-    recalculateWoundsFromSmackdown(value)
-  }
 
   // Reset defense choices when targets change
   useEffect(() => {
@@ -901,6 +848,7 @@ export default function AttackPanel({ onClose, preselectedAttacker }: ExtendedAt
           targetMookCount: 1,
         })
 
+        if (onComplete) onComplete()
         if (onClose) onClose()
         return
       }
@@ -942,6 +890,7 @@ export default function AttackPanel({ onClose, preselectedAttacker }: ExtendedAt
           defenseAppliedPerTarget: {},
         })
 
+        if (onComplete) onComplete()
         if (onClose) onClose()
         return
       }
@@ -987,6 +936,7 @@ export default function AttackPanel({ onClose, preselectedAttacker }: ExtendedAt
           defenseAppliedPerTarget: {},
         })
 
+        if (onComplete) onComplete()
         if (onClose) onClose()
         return
       }
@@ -1089,7 +1039,6 @@ export default function AttackPanel({ onClose, preselectedAttacker }: ExtendedAt
                 isProcessing={isProcessing}
                 updateField={updateField}
                 handleApplyDamage={handleApplyDamage}
-                handleSmackdownChange={handleSmackdownChange}
               />
             )}
 

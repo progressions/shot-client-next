@@ -51,6 +51,7 @@ export interface ConfirmationResponse {
 
 export interface CampaignCableData {
   fight: Fight | null
+  encounter: Fight | null
   character: Character | null
   campaign: Campaign | null
   user: User | null

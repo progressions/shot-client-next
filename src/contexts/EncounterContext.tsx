@@ -74,11 +74,14 @@ export function EncounterProvider({
     setSelectedActorShot(shot)
   }
 
-  // Clear selection when encounter changes
+  // Clear selection only when switching to a different encounter
   useEffect(() => {
-    setSelectedActorId(null)
-    setSelectedActorShot(null)
-  }, [encounter.id])
+    // Only clear if we're actually switching encounters, not just updating the same one
+    if (contextEncounter && contextEncounter.id !== encounter.id) {
+      setSelectedActorId(null)
+      setSelectedActorShot(null)
+    }
+  }, [encounter.id, contextEncounter?.id])
 
   const encounterClient: EncounterClient = {
     async spendShots(entity: Entity, shotCost: number) {

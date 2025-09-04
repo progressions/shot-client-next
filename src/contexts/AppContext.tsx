@@ -359,16 +359,11 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
             "[AppContext] WebSocket data received on CampaignChannel:",
             data
           )
-          // Handle both 'fight' and 'encounter' keys (backend sends 'fight', but we use 'encounter' in frontend)
           if (data && data.fight) {
-            console.log("[AppContext] Fight/Encounter update received:", {
+            console.log("[AppContext] Fight update received:", {
               id: data.fight?.id,
-              firstShot: data.fight?.shots?.[0],
-              actionId: data.fight?.action_id,
+              name: data.fight?.name,
             })
-            // Convert 'fight' to 'encounter' for consistency
-            data = { ...data, encounter: data.fight }
-            delete data.fight
           }
           if (data && data.encounter) {
             console.log("[AppContext] Encounter update received:", {
