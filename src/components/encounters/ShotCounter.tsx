@@ -2,7 +2,16 @@
 
 import { useState, useMemo, useEffect } from "react"
 import { List, Box } from "@mui/material"
-import { MenuBar, ShotDetail, CharacterSelector } from "@/components/encounters"
+import { 
+  MenuBar, 
+  ShotDetail, 
+  CharacterSelector, 
+  EncounterActionBar,
+  AttackPanel,
+  BoostPanel,
+  ChasePanel,
+  HealDialog 
+} from "@/components/encounters"
 import { useEncounter } from "@/contexts"
 import { useLocalStorage } from "@/contexts/LocalStorageContext"
 import { getAllVisibleShots } from "@/components/encounters/attacks/shotSorting"
@@ -11,6 +20,7 @@ export default function ShotCounter() {
   const { encounter, selectedActorId, setSelectedActor } = useEncounter()
   const { getLocally, saveLocally } = useLocalStorage()
   const [showHidden, setShowHidden] = useState(false)
+  const [activePanel, setActivePanel] = useState<string | null>(null)
 
   // Load the persisted setting on mount
   useEffect(() => {
@@ -58,6 +68,7 @@ export default function ShotCounter() {
     if (shotId === selectedActorId) {
       // Deselect if clicking the same character
       setSelectedActor(null, null)
+      setActivePanel(null)
     } else {
       // Find the shot number for this character
       const selectedShot = allVisibleShots.find(
@@ -65,8 +76,25 @@ export default function ShotCounter() {
       )
       if (selectedShot) {
         setSelectedActor(shotId, selectedShot.shot)
+        setActivePanel(null) // Reset panel when selecting new character
       }
     }
+  }
+
+  // Get the selected character object
+  const selectedCharacter = useMemo(() => {
+    if (!selectedActorId) return null
+    const shot = allVisibleShots.find(s => s.character?.shot_id === selectedActorId)
+    return shot?.character || null
+  }, [selectedActorId, allVisibleShots])
+
+  // Handle action from EncounterActionBar
+  const handleAction = (action: string) => {
+    setActivePanel(action)
+  }
+
+  const handlePanelClose = () => {
+    setActivePanel(null)
   }
 
   return (
@@ -80,6 +108,12 @@ export default function ShotCounter() {
         />
       </Box>
       
+      {/* Action bar appears when character is selected */}
+      <EncounterActionBar
+        selectedCharacter={selectedCharacter}
+        onAction={handleAction}
+      />
+      
       <MenuBar
         showHidden={showHidden}
         onShowHiddenChange={handleShowHiddenChange}
@@ -89,6 +123,36 @@ export default function ShotCounter() {
           <ShotDetail key={`${shot.shot}-${index}`} shot={shot} />
         ))}
       </List>
+
+      {/* Action Panels */}
+      {activePanel === "attack" && selectedCharacter && (
+        <AttackPanel
+          preselectedAttacker={selectedCharacter}
+          onClose={handlePanelClose}
+        />
+      )}
+      
+      {activePanel === "boost" && selectedCharacter && (
+        <BoostPanel
+          preselectedBooster={selectedCharacter}
+          onClose={handlePanelClose}
+        />
+      )}
+      
+      {activePanel === "chase" && selectedCharacter && (
+        <ChasePanel
+          preselectedCharacter={selectedCharacter}
+          onClose={handlePanelClose}
+        />
+      )}
+      
+      {activePanel === "heal" && selectedCharacter && (
+        <HealDialog
+          open={true}
+          onClose={handlePanelClose}
+          character={selectedCharacter}
+        />
+      )}
     </>
   )
 }
