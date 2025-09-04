@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import React, { useState, useMemo } from "react"
 import {
   Box,
   FormControlLabel,
@@ -67,8 +67,27 @@ export default function CharacterSelector({
     })
   }, [shots, showAll, characterTypes, excludeShotId])
 
+  // Group filtered shots by shot number for label display
+  const shotGroups = useMemo(() => {
+    const groups = new Map<number, Shot[]>()
+    
+    filteredShots.forEach(shot => {
+      const shotNumber = shot.shot
+      if (shotNumber === null || shotNumber === undefined) return
+      
+      if (!groups.has(shotNumber)) {
+        groups.set(shotNumber, [])
+      }
+      groups.get(shotNumber)!.push(shot)
+    })
+    
+    // Sort by shot number descending
+    return Array.from(groups.entries())
+      .sort(([a], [b]) => b - a)
+  }, [filteredShots])
+
   return (
-    <Box sx={{ opacity: disabled ? 0.5 : 1 }}>
+    <Box sx={{ opacity: disabled ? 0.5 : 1 }} data-testid="character-selector-container">
       <Box
         sx={{
           display: "flex",
@@ -95,73 +114,98 @@ export default function CharacterSelector({
           },
         }}
       >
-        {filteredShots.map(shot => {
-          const entity = shot.character || shot.vehicle
-          if (!entity) return null
-          const isSelected = multiSelect
-            ? selectedShotIds.includes(entity.shot_id || "")
-            : entity.shot_id === selectedShotId
-
-          return (
+        {shotGroups.map(([shotNumber, shotsInGroup]) => (
+          <React.Fragment key={`shot-group-${shotNumber}`}>
+            {/* Shot label */}
             <Box
-              key={entity.shot_id}
-              onClick={e => {
-                // Only prevent default and set selection if clicking on the box itself, not the popup
-                if ((e.target as HTMLElement).closest(".MuiPopover-root")) {
-                  return // Allow clicks in popup to work normally
-                }
-                e.preventDefault()
-                // Toggle selection - if already selected, pass empty string to deselect
-                if (isSelected && !multiSelect) {
-                  onSelect("")
-                } else {
-                  onSelect(entity.shot_id || "")
-                }
-              }}
+              data-testid={`shot-label-${shotNumber}`}
               sx={{
-                cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                minWidth: 80, // Use minWidth instead of width
-                width: 80,
+                minWidth: "auto",
+                px: 2,
                 height: 72,
-                flexShrink: 0, // Prevent shrinking
-                borderRadius: 2,
-                border: isSelected ? "3px solid" : "3px solid transparent",
-                borderColor: isSelected ? borderColor : "transparent",
-                backgroundColor: isSelected ? "action.selected" : "transparent",
-                "&:hover": {
-                  backgroundColor: "action.hover",
-                },
-                pl: 1,
-                transition: "all 0.2s",
+                flexShrink: 0,
+                fontWeight: "bold",
+                color: "text.primary",
+                fontSize: "0.875rem",
+                whiteSpace: "nowrap",
               }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "100%",
-                  height: "100%",
-                }}
-              >
-                <Avatar
-                  entity={entity}
-                  href={`/characters/${entity.id}`}
-                  disablePopup={isMobile}
-                  disableImageViewer={true}
-                  sx={{
-                    width: 64,
-                    height: 64,
-                    ml: 0.5,
-                  }}
-                />
-              </Box>
+              Shot {shotNumber}
             </Box>
-          )
-        })}
+            
+            {/* Characters at this shot */}
+            {shotsInGroup.map(shot => {
+              const entity = shot.character || shot.vehicle
+              if (!entity) return null
+              const isSelected = multiSelect
+                ? selectedShotIds.includes(entity.shot_id || "")
+                : entity.shot_id === selectedShotId
+
+              return (
+                <Box
+                  key={entity.shot_id}
+                  onClick={e => {
+                    // Only prevent default and set selection if clicking on the box itself, not the popup
+                    if ((e.target as HTMLElement).closest(".MuiPopover-root")) {
+                      return // Allow clicks in popup to work normally
+                    }
+                    e.preventDefault()
+                    // Toggle selection - if already selected, pass empty string to deselect
+                    if (isSelected && !multiSelect) {
+                      onSelect("")
+                    } else {
+                      onSelect(entity.shot_id || "")
+                    }
+                  }}
+                  sx={{
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    minWidth: 80, // Use minWidth instead of width
+                    width: 80,
+                    height: 72,
+                    flexShrink: 0, // Prevent shrinking
+                    borderRadius: 2,
+                    border: isSelected ? "3px solid" : "3px solid transparent",
+                    borderColor: isSelected ? borderColor : "transparent",
+                    backgroundColor: isSelected ? "action.selected" : "transparent",
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
+                    pl: 1,
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  >
+                    <Avatar
+                      entity={entity}
+                      href={`/characters/${entity.id}`}
+                      disablePopup={isMobile}
+                      disableImageViewer={true}
+                      sx={{
+                        width: 64,
+                        height: 64,
+                        ml: 0.5,
+                      }}
+                    />
+                  </Box>
+                </Box>
+              )
+            })}
+          </React.Fragment>
+        ))}
       </Box>
       {showAllCheckbox && characterTypes && characterTypes.length > 0 && (
         <FormControlLabel
