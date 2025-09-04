@@ -15,6 +15,7 @@ type CharacterLinkProperties = {
   disablePopup?: boolean
   children: React.ReactNode
   sx?: React.CSSProperties
+  noUnderline?: boolean
 }
 
 export default function CharacterLink({
@@ -23,6 +24,7 @@ export default function CharacterLink({
   disablePopup = false,
   children,
   sx,
+  noUnderline = false,
 }: CharacterLinkProperties) {
   return (
     <EntityLink
@@ -31,6 +33,7 @@ export default function CharacterLink({
       disablePopup={disablePopup}
       popupOverride={CharacterPopup}
       sx={sx}
+      noUnderline={noUnderline}
     >
       {children || character.name}
     </EntityLink>

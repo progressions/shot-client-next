@@ -142,6 +142,7 @@ const Avatar = ({
         data-mention-id={entity.id}
         data-mention-class-name={entity.entity_class}
         sx={{ padding: 0, ml: -1.5 }}
+        noUnderline={true}
       >
         {baseAvatar}
       </CharacterLink>

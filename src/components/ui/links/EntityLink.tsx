@@ -27,6 +27,7 @@ type EntityLinkProperties = {
     open: boolean
   }>
   href?: string
+  noUnderline?: boolean
 }
 
 export default function EntityLink({
@@ -37,6 +38,7 @@ export default function EntityLink({
   sx,
   popupOverride,
   href,
+  noUnderline = false,
 }: EntityLinkProperties) {
   const [anchorEl, setAnchorEl] = useState<HTMLAnchorElement | null>(null)
   const [isOpen, setIsOpen] = useState(false)
@@ -134,7 +136,9 @@ export default function EntityLink({
         data-mention-data={data ? JSON.stringify(data) : undefined}
         sx={{
           fontWeight: "bold",
-          textDecoration: "underline !important",
+          textDecoration: noUnderline
+            ? "none !important"
+            : "underline !important",
           color: "#fff !important",
           ...sx,
         }}

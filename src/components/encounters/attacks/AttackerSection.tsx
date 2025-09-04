@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useEffect, useRef } from "react"
+import { useMemo, useEffect, useRef, useCallback } from "react"
 import {
   Box,
   FormControl,
@@ -41,13 +41,16 @@ export default function AttackerSection({
   } = formState.data
 
   // Helper to update a field
-  const updateField = (name: keyof AttackFormData, value: unknown) => {
-    dispatchForm({
-      type: FormActions.UPDATE,
-      name,
-      value,
-    })
-  }
+  const updateField = useCallback(
+    (name: keyof AttackFormData, value: unknown) => {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name,
+        value,
+      })
+    },
+    [dispatchForm]
+  )
 
   // Check if any selected targets are mooks
   const targetingMooks = selectedTargetIds.some(id => {

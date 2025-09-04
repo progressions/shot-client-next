@@ -86,7 +86,7 @@ export default function CharacterFilter({
       console.error("Error fetching characters:", error)
       return []
     }
-  }, [client, formState.data.filters, dispatchForm]) // Only depend on filters
+  }, [client, formState.data, dispatchForm]) // Only depend on filters
 
   useEffect(() => {
     fetchCharacters().catch(error => {

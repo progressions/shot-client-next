@@ -84,7 +84,7 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
 
       return nameA.localeCompare(nameB)
     })
-  }, [shot.characters, encounter])
+  }, [shot.characters, encounter, hasCharacters])
 
   // Don't render if there's nothing to show - MUST be after all hooks
   if (!hasCharacters && vehiclesWithoutDrivers.length === 0) {
