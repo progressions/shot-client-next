@@ -381,8 +381,8 @@ const ChaseReducerService = {
       ...state,
       target: target,
       defense: this.VS.defense(target),
-      handling: this.VS.isMook(target) ? 0 : this.VS.handling(target),
-      frame: this.VS.isMook(target) ? 0 : this.VS.frame(target),
+      handling: this.VS.handling(target),
+      frame: this.VS.frame(target),
     })
   },
 

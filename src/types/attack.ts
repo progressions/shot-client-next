@@ -179,7 +179,6 @@ export interface CombatResolutionProps {
   isProcessing: boolean
   updateField: (name: string, value: unknown) => void
   handleApplyDamage: () => void
-  handleSmackdownChange?: (value: string) => void
 }
 
 /**

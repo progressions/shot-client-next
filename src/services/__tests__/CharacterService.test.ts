@@ -308,8 +308,12 @@ describe("CharacterService", () => {
         const invalidCharacter = { ...brick }
         delete (invalidCharacter as unknown).action_values
 
-        // fullHeal tries to access action_values.Max Fortune which will throw an error
-        expect(() => CS.fullHeal(invalidCharacter as unknown)).toThrow()
+        // fullHeal now handles missing action_values gracefully
+        const result = CS.fullHeal(invalidCharacter as unknown)
+        expect(result.action_values.Wounds).toBe(0)
+        expect(result.action_values.Fortune).toBe(0) // Uses 0 as default when Max Fortune is missing
+        expect(result.action_values["Marks of Death"]).toBe(0)
+        expect(result.impairments).toBe(0)
       })
 
       it("handles character with missing specific action values", () => {

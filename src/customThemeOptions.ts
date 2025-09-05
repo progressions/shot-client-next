@@ -14,6 +14,9 @@ export const customThemeOptions: ThemeOptions = {
         main: "#ab47bc", // Darker, less lavender purple for Details
         light: "#ce93d8", // Lighter purple for hover
       },
+      grey: {
+        main: "#424242", // Opaque grey for wounds background
+      },
     },
   },
 }

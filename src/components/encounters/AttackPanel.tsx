@@ -4,14 +4,9 @@ import { useMemo, useEffect, useState } from "react"
 import { Box, Typography } from "@mui/material"
 import { useEncounter, useToast } from "@/contexts"
 import { CS, DS, CES } from "@/services"
-import type {
-  Character,
-  Weapon,
-  AttackFormData,
-  AttackPanelProps,
-} from "@/types"
+import type { Character, Weapon, AttackFormData } from "@/types"
 import { useClient } from "@/contexts/AppContext"
-import AttackerSection from "./attacks/AttackerSection"
+import AttackerCombatFields from "./attacks/AttackerCombatFields"
 import TargetSection from "./attacks/TargetSection"
 import WoundsSummary from "./attacks/WoundsSummary"
 import MookAttackSection from "./attacks/MookAttackSection"
@@ -34,7 +29,17 @@ import {
   handleSingleTargetAttack,
 } from "./attacks/attackHandlers"
 
-export default function AttackPanel({ onClose }: AttackPanelProps) {
+interface ExtendedAttackPanelProps {
+  onClose?: () => void
+  onComplete?: () => void
+  preselectedAttacker: Character
+}
+
+export default function AttackPanel({
+  onClose,
+  onComplete,
+  preselectedAttacker,
+}: ExtendedAttackPanelProps) {
   const [isReady, setIsReady] = useState(false)
   const { encounter, weapons: encounterWeapons } = useEncounter()
   const { toastSuccess, toastError, toastInfo } = useToast()
@@ -49,11 +54,13 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
   // Initialize form state with useForm
   const { formState, dispatchForm } = useForm<AttackFormData>({
     // Attacker state
-    attackerShotId: "",
-    attackSkill: "",
-    attackValue: "",
+    attackerShotId: preselectedAttacker.shot_id,
+    attackSkill: CS.mainAttack(preselectedAttacker),
+    attackValue: String(
+      CS.skill(preselectedAttacker, CS.mainAttack(preselectedAttacker))
+    ),
     attackValueChange: 0, // Track effect changes
-    selectedWeaponId: "",
+    selectedWeaponId: preselectedAttacker.weapon_ids?.[0] || "",
     weaponDamage: "",
     damageChange: 0, // Track effect changes
     shotCost: "3",
@@ -354,61 +361,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
     allShots,
     targetMookCount,
   ])
-
-  // Function to recalculate wounds based on smackdown
-  const recalculateWoundsFromSmackdown = (smackdownValue: string) => {
-    if (selectedTargetIds.length > 0 && !CS.isMook(attacker)) {
-      const smackdown = parseInt(smackdownValue) || 0
-
-      const results = selectedTargetIds
-        .map(targetId => {
-          const targetShot = allShots.find(
-            s => s.character?.shot_id === targetId
-          )
-          const targetChar = targetShot?.character
-          if (!targetChar) return null
-
-          const targetDefense = CS.defense(targetChar)
-          const targetToughness = CS.toughness(targetChar)
-
-          let wounds = 0
-
-          // For mooks, if smackdown > 0, take out the targeted number
-          if (CS.isMook(targetChar)) {
-            if (smackdown > 0) {
-              wounds =
-                targetMookCountPerTarget[targetId] || targetMookCount || 1
-            }
-          } else {
-            // For non-mooks, subtract toughness from smackdown
-            wounds = Math.max(0, smackdown - targetToughness)
-          }
-
-          return {
-            targetId,
-            targetName: targetChar.name,
-            defense: targetDefense,
-            toughness: targetToughness,
-            wounds,
-          }
-        })
-        .filter(r => r !== null) as typeof multiTargetResults
-
-      // Calculate total wounds from all targets
-      const totalWounds = results.reduce((sum, r) => sum + r.wounds, 0)
-
-      updateFields({
-        multiTargetResults: results,
-        finalDamage: totalWounds.toString(),
-      })
-    }
-  }
-
-  // Handle smackdown field change
-  const handleSmackdownChange = (value: string) => {
-    updateField("smackdown", value)
-    recalculateWoundsFromSmackdown(value)
-  }
 
   // Reset defense choices when targets change
   useEffect(() => {
@@ -896,6 +848,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           targetMookCount: 1,
         })
 
+        if (onComplete) onComplete()
         if (onClose) onClose()
         return
       }
@@ -937,6 +890,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           defenseAppliedPerTarget: {},
         })
 
+        if (onComplete) onComplete()
         if (onClose) onClose()
         return
       }
@@ -982,6 +936,7 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           defenseAppliedPerTarget: {},
         })
 
+        if (onComplete) onComplete()
         if (onClose) onClose()
         return
       }
@@ -995,31 +950,32 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
 
   return (
     <Box sx={{ overflow: "hidden", minHeight: isReady ? "auto" : "100px" }}>
+      {/* Panel Heading */}
       <Typography
         variant="h6"
         sx={{
-          textAlign: "center",
-          py: 2,
-          borderBottom: "1px solid",
-          borderColor: "divider",
+          p: 1,
+          fontWeight: "bold",
+          backgroundColor: "background.paper",
+          borderBottom: "2px solid",
+          borderBottomColor: "divider",
         }}
       >
-        Attack Resolution
+        Attack
       </Typography>
 
       {/* Main Content - Attacker then Target */}
       {isReady ? (
         <>
           <Box sx={{ backgroundColor: "action.hover" }}>
-            {/* Attacker Section */}
-            <AttackerSection
-              sortedAttackerShots={sortedAttackerShots}
+            {/* Attacker Combat Fields - Always show since attacker is preselected */}
+            <AttackerCombatFields
               formState={formState}
               dispatchForm={dispatchForm}
               attacker={attacker}
               attackerWeapons={attackerWeapons}
-              allShots={allShots}
               selectedTargetIds={selectedTargetIds}
+              allShots={allShots}
             />
 
             {/* Target Section */}
@@ -1043,14 +999,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
           <Box
             sx={{ p: { xs: 2, sm: 3 }, backgroundColor: "background.default" }}
           >
-            <Typography
-              variant="h6"
-              gutterBottom
-              sx={{ textAlign: "center", mb: { xs: 2, sm: 3 } }}
-            >
-              🎲 Combat Resolution
-            </Typography>
-
             {/* Show different UI for mook attackers */}
             {attacker && CS.isMook(attacker) ? (
               <MookAttackSection
@@ -1082,7 +1030,6 @@ export default function AttackPanel({ onClose }: AttackPanelProps) {
                 isProcessing={isProcessing}
                 updateField={updateField}
                 handleApplyDamage={handleApplyDamage}
-                handleSmackdownChange={handleSmackdownChange}
               />
             )}
 

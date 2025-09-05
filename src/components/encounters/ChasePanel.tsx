@@ -4,18 +4,25 @@ import { useMemo, useEffect, useState } from "react"
 import { Box, Typography } from "@mui/material"
 import { useEncounter, useClient } from "@/contexts"
 import { useForm, FormActions } from "@/reducers"
-import type { Vehicle, Shot, ChaseRelationship } from "@/types"
+import type { Vehicle, Shot, ChaseRelationship, Character } from "@/types"
 import { ChaseFormData, initialChaseFormData } from "@/types/chase"
 import { getAllVisibleShots } from "./attacks/shotSorting"
 import ChaseAttackerSection from "./chases/ChaseAttackerSection"
 import ChaseTargetSection from "./chases/ChaseTargetSection"
+import ChaseMethodSection from "./chases/ChaseMethodSection"
 import ChaseResolution from "./chases/ChaseResolution"
 
 interface ChasePanelProps {
-  onClose: () => void
+  onClose?: () => void
+  onComplete?: () => void
+  preselectedCharacter?: Character
 }
 
-export default function ChasePanel({ onClose }: ChasePanelProps) {
+export default function ChasePanel({
+  onClose,
+  onComplete,
+  preselectedCharacter,
+}: ChasePanelProps) {
   const [isReady, setIsReady] = useState(false)
   const { encounter } = useEncounter()
   const { client } = useClient()
@@ -26,19 +33,13 @@ export default function ChasePanel({ onClose }: ChasePanelProps) {
     return () => clearTimeout(timer)
   }, [])
 
-  // Initialize form state with useForm
-  const { formState, dispatchForm } = useForm<ChaseFormData>({
-    ...initialChaseFormData,
-    shotCost: "3", // Default shot cost
-  })
-
   // Get all characters in the fight (excluding hidden ones)
   const allShots = useMemo(
     () => getAllVisibleShots(encounter.shots),
     [encounter.shots]
   )
 
-  // Get all vehicles from encounter
+  // Get all vehicles from encounter - moved up so it's available for initialization
   const allVehicles = useMemo(() => {
     const vehicles: Vehicle[] = []
     if (!encounter?.shots) return vehicles
@@ -51,6 +52,28 @@ export default function ChasePanel({ onClose }: ChasePanelProps) {
 
     return vehicles
   }, [encounter?.shots])
+
+  // Get the attacker's vehicle if they're driving
+  const getAttackerVehicle = () => {
+    if (!preselectedCharacter) return undefined
+    const drivingInfo = (
+      preselectedCharacter as Character & { driving?: Vehicle }
+    ).driving
+    if (!drivingInfo) return undefined
+
+    // Try to find the full vehicle data from allVehicles
+    const fullVehicle = allVehicles.find(v => v.id === drivingInfo.id)
+    return fullVehicle || drivingInfo
+  }
+
+  // Initialize form state with useForm
+  const { formState, dispatchForm } = useForm<ChaseFormData>({
+    ...initialChaseFormData,
+    attackerShotId: preselectedCharacter?.shot_id || "",
+    shotCost: "3", // Default shot cost
+    attacker: preselectedCharacter || undefined,
+    vehicle: getAttackerVehicle(),
+  })
 
   const { attacker, target } = formState.data
   const attackerShotId = (formState.data as { attackerShotId?: string })
@@ -213,34 +236,52 @@ export default function ChasePanel({ onClose }: ChasePanelProps) {
     }
 
     fetchExistingRelationship()
-  }, [attacker, formState.data, target, encounter?.id, client, dispatchForm])
+  }, [attacker?.id, target?.id, encounter?.id, client, dispatchForm])
 
   return (
     <Box sx={{ overflow: "hidden", minHeight: isReady ? "auto" : "100px" }}>
+      {/* Panel Heading */}
       <Typography
         variant="h6"
         sx={{
-          textAlign: "center",
-          py: 2,
-          borderBottom: "1px solid",
-          borderColor: "divider",
+          p: 1,
+          fontWeight: "bold",
+          backgroundColor: "background.paper",
+          borderBottom: "2px solid",
+          borderBottomColor: "divider",
         }}
       >
-        Chase Resolution
+        Chase
       </Typography>
 
       {/* Main Content - Attacker then Target */}
       {isReady ? (
         <>
           <Box sx={{ backgroundColor: "action.hover" }}>
-            {/* Attacker Section */}
-            <ChaseAttackerSection
-              shots={allShots}
-              vehicles={allVehicles}
+            {/* Attacker Section - Only show if not preselected */}
+            {!preselectedCharacter && (
+              <ChaseAttackerSection
+                shots={allShots}
+                vehicles={allVehicles}
+                formState={formState}
+                dispatchForm={dispatchForm}
+                attacker={attacker}
+                target={target}
+              />
+            )}
+
+            {/* Method Section - Always show, disabled until target selected */}
+            <ChaseMethodSection
               formState={formState}
               dispatchForm={dispatchForm}
-              attacker={attacker}
-              target={target}
+              hasTarget={
+                !!(formState.data as { targetShotId?: string }).targetShotId
+              }
+              attacker={preselectedCharacter}
+              vehicle={
+                (formState.data as ChaseFormData & { vehicle?: Vehicle })
+                  .vehicle || null
+              }
             />
 
             {/* Target Section - Always show */}
@@ -262,6 +303,7 @@ export default function ChasePanel({ onClose }: ChasePanelProps) {
             attacker={attacker}
             target={target}
             onClose={onClose}
+            onComplete={onComplete}
           />
         </>
       ) : (

@@ -38,6 +38,9 @@ interface EncounterContextType {
   changeAndSaveEncounter: (event: React.ChangeEvent<HTMLInputElement>) => void
   currentShot: number | undefined
   ec: EncounterClient
+  selectedActorId: string | null
+  selectedActorShot: number | null
+  setSelectedActor: (actorId: string | null, shot: number | null) => void
 }
 
 export function EncounterProvider({
@@ -63,6 +66,24 @@ export function EncounterProvider({
   )
   const currentShot = contextEncounter?.shots?.[0]?.shot
   const [localAction, setLocalAction] = useState<string | null>(null)
+  const [selectedActorId, setSelectedActorId] = useState<string | null>(null)
+  const [selectedActorShot, setSelectedActorShot] = useState<number | null>(
+    null
+  )
+
+  const setSelectedActor = (actorId: string | null, shot: number | null) => {
+    setSelectedActorId(actorId)
+    setSelectedActorShot(shot)
+  }
+
+  // Clear selection only when switching to a different encounter
+  useEffect(() => {
+    // Only clear if we're actually switching encounters, not just updating the same one
+    if (contextEncounter && contextEncounter.id !== encounter.id) {
+      setSelectedActorId(null)
+      setSelectedActorShot(null)
+    }
+  }, [encounter.id, contextEncounter?.id])
 
   const encounterClient: EncounterClient = {
     async spendShots(entity: Entity, shotCost: number) {
@@ -221,6 +242,9 @@ export function EncounterProvider({
         changeAndSaveEncounter: handleChangeAndSave,
         currentShot,
         ec: encounterClient,
+        selectedActorId,
+        selectedActorShot,
+        setSelectedActor,
       }}
     >
       {children}

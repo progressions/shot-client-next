@@ -23,6 +23,7 @@ interface ChaseResolutionProps {
   attacker: Vehicle | null
   target: Vehicle | null
   onClose: () => void
+  onComplete?: () => void
 }
 
 export default function ChaseResolution({
@@ -31,6 +32,7 @@ export default function ChaseResolution({
   attacker,
   target,
   onClose,
+  onComplete,
 }: ChaseResolutionProps) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [, setInitialPosition] = useState<"near" | "far" | null>(null)
@@ -169,29 +171,25 @@ export default function ChaseResolution({
 
       // Update vehicles in the backend if successful
       if (result.success) {
-        // Extract only vehicle-specific action values
+        // For chase actions, the damage (chase points) is applied to the target
+        // result.chasePoints contains the amount of damage dealt
         const attackerVehicleValues: Record<string, number> = {}
         const targetVehicleValues: Record<string, number> = {}
 
-        // Vehicle-specific keys that should be updated (Position now managed via ChaseRelationship)
-        const vehicleKeys = ["Chase Points", "Condition Points", "Pursuer"]
+        // The attacker doesn't take damage (unless it's a ram/sideswipe with bump)
+        // So we don't need to update the attacker's chase points
 
-        // Filter attacker action_values to only include vehicle-specific ones
-        if (result.attacker.action_values) {
-          vehicleKeys.forEach(key => {
-            if (result.attacker.action_values.hasOwnProperty(key)) {
-              attackerVehicleValues[key] = result.attacker.action_values[key]
-            }
-          })
+        // The target takes the chase points damage
+        if (result.chasePoints) {
+          targetVehicleValues["Chase Points"] = result.chasePoints
         }
 
-        // Filter target action_values to only include vehicle-specific ones
-        if (result.target.action_values) {
-          vehicleKeys.forEach(key => {
-            if (result.target.action_values.hasOwnProperty(key)) {
-              targetVehicleValues[key] = result.target.action_values[key]
-            }
-          })
+        // For RAM_SIDESWIPE, also apply condition points
+        if (
+          result.method === ChaseMethod.RAM_SIDESWIPE &&
+          result.conditionPoints
+        ) {
+          targetVehicleValues["Condition Points"] = result.conditionPoints
         }
 
         console.log(
@@ -289,6 +287,7 @@ export default function ChaseResolution({
 
         await client.applyChaseAction(encounter, vehicleUpdates)
         toastSuccess("Chase action resolved successfully!")
+        if (onComplete) onComplete()
         onClose()
       }
     } catch (error) {
@@ -308,10 +307,6 @@ export default function ChaseResolution({
         backgroundColor: "background.default",
       }}
     >
-      <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
-        🏁 Combat Resolution
-      </Typography>
-
       <Stack
         direction="row"
         spacing={{ xs: 1, sm: 2 }}

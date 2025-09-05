@@ -24,7 +24,7 @@ export default function Wounds({ character }: WoundsProps) {
       sx={{
         backgroundColor: exceedsThreshold
           ? theme.palette.error.dark
-          : theme.palette.divider,
+          : theme.palette.custom?.grey?.main || "#424242",
         width: { xs: "2.5rem", sm: "3rem", md: "3.5rem" },
         height: { xs: "2.5rem", sm: "3rem", md: "auto" },
         borderRadius: { xs: "50%", sm: "50%", md: "8px" },

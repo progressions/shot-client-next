@@ -45,10 +45,11 @@ describe("Service Integration Tests", () => {
         impairments: 2,
       }
 
+      // Import zombies which is actually a mook
+      const { zombies } = require("@/__tests__/factories/Characters")
       const woundedMook: Person = {
-        ...shing,
-        type: "mook",
-        action_values: { ...shing.action_values, Wounds: 10 },
+        ...zombies,
+        action_values: { ...zombies.action_values, Wounds: 10 },
         impairments: 1,
       }
 
@@ -58,8 +59,8 @@ describe("Service Integration Tests", () => {
       // PCs heal fully, mooks don't heal at all
       expect(healedPC.action_values.Wounds).toBe(0)
       expect(healedPC.impairments).toBe(0)
-      expect(healedMook.action_values.Wounds).toBe(0) // Mooks heal fully too in current implementation
-      expect(healedMook.impairments).toBe(0) // Healed
+      expect(healedMook.action_values.Wounds).toBe(10) // Mooks don't heal
+      expect(healedMook.impairments).toBe(1) // Mooks keep their impairments
     })
 
     it("chains multiple character operations for complex character modifications", () => {
@@ -334,8 +335,11 @@ describe("Service Integration Tests", () => {
       expect(skill).toBe(7) // Default value
       expect(mainAttack).toBe("") // Returns empty string when action_values is null
 
-      // fullHeal will throw when trying to access null action_values
-      expect(() => CharacterService.fullHeal(invalidCharacter)).toThrow()
+      // fullHeal now handles null action_values gracefully
+      const healedResult = CharacterService.fullHeal(invalidCharacter)
+      expect(healedResult.action_values.Wounds).toBe(0)
+      expect(healedResult.action_values.Fortune).toBe(0) // Uses 0 as default when Max Fortune is missing
+      expect(healedResult.impairments).toBe(0)
 
       // Chain operations should handle invalid data
       expect(() => {

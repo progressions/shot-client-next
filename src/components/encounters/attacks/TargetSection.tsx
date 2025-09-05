@@ -6,13 +6,14 @@ import {
   Stack,
   FormControlLabel,
   Checkbox,
+  Button,
 } from "@mui/material"
 import { CS } from "@/services"
 import type { TargetSectionProps, Encounter } from "@/types"
 import { NumberField } from "@/components/ui"
 import CharacterSelector from "../CharacterSelector"
-import TargetDefenseDisplay from "./TargetDefenseDisplay"
 import { getDefenseModifiersText } from "./defenseModifierUtils"
+import { CharacterHeader, Wounds, ActionValues } from "@/components/encounters"
 
 // Helper function to handle mook distribution updates
 const updateMookDistribution = (
@@ -102,7 +103,7 @@ export default function TargetSection({
   return (
     <Box
       sx={{
-        p: { xs: 2, sm: 3 },
+        p: { xs: 1, sm: 1.5 },
         borderBottom: "2px solid",
         borderBottomColor: "divider",
       }}
@@ -116,6 +117,7 @@ export default function TargetSection({
       <CharacterSelector
         shots={sortedTargetShots}
         selectedShotIds={selectedTargetIds}
+        showShotNumbers={false}
         onSelect={shotId => {
           if (selectedTargetIds.includes(shotId)) {
             // Deselect if already selected
@@ -181,46 +183,18 @@ export default function TargetSection({
         }}
         borderColor="error.main"
         disabled={!attackerShotId}
-        showAllCheckbox={true}
         excludeShotId={attackerShotId}
         multiSelect={true}
+        showAllCheckbox={true}
         characterTypes={(() => {
           if (!attacker) return undefined
 
-          // Check if any selected targets are mooks or non-mooks
-          const hasSelectedMooks = selectedTargetIds.some(id => {
-            const shot = allShots.find(s => s.character?.shot_id === id)
-            return shot?.character && CS.isMook(shot.character)
-          })
-          const hasSelectedNonMooks = selectedTargetIds.some(id => {
-            const shot = allShots.find(s => s.character?.shot_id === id)
-            return shot?.character && !CS.isMook(shot.character)
-          })
-
-          // If a mook is selected, only show other mooks
-          if (hasSelectedMooks) {
-            return ["Mook"]
-          }
-
-          // If a non-mook is selected, exclude mooks
-          if (hasSelectedNonMooks) {
-            if (CS.isPC(attacker) || CS.isAlly(attacker)) {
-              return ["Featured Foe", "Boss", "Uber-Boss"]
-            }
-            if (
-              CS.isMook(attacker) ||
-              CS.isFeaturedFoe(attacker) ||
-              CS.isBoss(attacker) ||
-              CS.isUberBoss(attacker)
-            ) {
-              return ["PC", "Ally"]
-            }
-          }
-
-          // No targets selected yet, show based on attacker type
+          // If attacker is PC or Ally, show enemies
           if (CS.isPC(attacker) || CS.isAlly(attacker)) {
-            return ["Mook", "Featured Foe", "Boss", "Uber-Boss"]
+            return ["Uber-Boss", "Boss", "Featured Foe", "Mook"]
           }
+
+          // If attacker is enemy, show PCs and Allies
           if (
             CS.isMook(attacker) ||
             CS.isFeaturedFoe(attacker) ||
@@ -229,6 +203,7 @@ export default function TargetSection({
           ) {
             return ["PC", "Ally"]
           }
+
           return undefined
         })()}
       />
@@ -343,31 +318,386 @@ export default function TargetSection({
         </Box>
       )}
 
-      {/* Target Defense Display - Only show when non-mook attacker (mook attackers have distribution display above) */}
+      {/* Target Details with Defense Controls - Only show when non-mook attacker */}
       {selectedTargetIds.length > 0 && attacker && !CS.isMook(attacker) && (
         <Box sx={{ mt: 2, mb: 2 }}>
-          <Stack spacing={1}>
-            {selectedTargetIds.map(targetId => (
-              <TargetDefenseDisplay
-                key={targetId}
-                targetId={targetId}
-                allShots={allShots}
-                attacker={attacker}
-                stunt={stunt}
-                targetMookCount={targetMookCount}
-                targetMookCountPerTarget={targetMookCountPerTarget}
-                defenseChoicePerTarget={defenseChoicePerTarget}
-                fortuneDiePerTarget={fortuneDiePerTarget}
-                manualDefensePerTarget={manualDefensePerTarget}
-                manualToughnessPerTarget={manualToughnessPerTarget}
-                selectedTargetIds={selectedTargetIds}
-                calculateTargetDefense={calculateTargetDefense}
-                updateField={updateField}
-                updateFields={updateFields}
-                updateDefenseAndToughness={updateDefenseAndToughness}
-                encounter={encounter}
-              />
-            ))}
+          <Stack spacing={2}>
+            {selectedTargetIds.map(targetId => {
+              const shot = allShots.find(s => s.character?.shot_id === targetId)
+              const target = shot?.character
+              if (!target) return null
+
+              return (
+                <Box key={targetId}>
+                  {/* All content in single paper background box */}
+                  <Box
+                    sx={{
+                      p: 2,
+                      backgroundColor: "background.paper",
+                      borderRadius: 1,
+                      border: "1px solid",
+                      borderColor: "divider",
+                    }}
+                  >
+                    <Box
+                      sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}
+                    >
+                      {/* Character Display on the left - without its own paper box */}
+                      <Box sx={{ flex: 1 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              minWidth: { xs: 40, sm: 56 },
+                              mr: { xs: 1, sm: 2 },
+                            }}
+                          >
+                            <Wounds character={target} />
+                          </Box>
+                          <Box sx={{ flex: 1 }}>
+                            <CharacterHeader character={target} />
+                            <ActionValues character={target} />
+                          </Box>
+                        </Box>
+
+                        {/* Dodge buttons integrated with character display */}
+                        {!CS.isMook(target) && (
+                          <Box sx={{ mt: 1.5 }}>
+                            {defenseChoicePerTarget[targetId] !== "dodge" &&
+                            defenseChoicePerTarget[targetId] !== "fortune" ? (
+                              <Button
+                                variant="outlined"
+                                size="small"
+                                onClick={() => {
+                                  // Calculate new defense with dodge bonus
+                                  const baseDefense = CS.defense(target)
+                                  const dodgeDefense = baseDefense + 3
+
+                                  const newOverrides = {
+                                    ...manualDefensePerTarget,
+                                    [targetId]: dodgeDefense,
+                                  }
+
+                                  const newDefenseChoices = {
+                                    ...defenseChoicePerTarget,
+                                    [targetId]: "dodge",
+                                  }
+
+                                  updateFields({
+                                    defenseChoicePerTarget: newDefenseChoices,
+                                    manualDefensePerTarget: newOverrides,
+                                  })
+
+                                  // Recalculate defense immediately
+                                  updateDefenseAndToughness(
+                                    selectedTargetIds,
+                                    stunt,
+                                    newDefenseChoices,
+                                    fortuneDiePerTarget,
+                                    newOverrides
+                                  )
+                                }}
+                                sx={{ minWidth: "80px" }}
+                              >
+                                Dodge
+                              </Button>
+                            ) : defenseChoicePerTarget[targetId] === "dodge" ? (
+                              <Box sx={{ display: "flex", gap: 0.5 }}>
+                                <Button
+                                  variant="contained"
+                                  size="small"
+                                  color="success"
+                                  onClick={() => {
+                                    // Remove dodge choice and reset to base defense
+                                    const newChoices = {
+                                      ...defenseChoicePerTarget,
+                                    }
+                                    delete newChoices[targetId]
+
+                                    const baseDefense = CS.defense(target)
+                                    const newOverrides = {
+                                      ...manualDefensePerTarget,
+                                      [targetId]: baseDefense,
+                                    }
+
+                                    updateFields({
+                                      defenseChoicePerTarget: newChoices,
+                                      manualDefensePerTarget: newOverrides,
+                                    })
+
+                                    // Recalculate defense immediately
+                                    updateDefenseAndToughness(
+                                      selectedTargetIds,
+                                      stunt,
+                                      newChoices,
+                                      fortuneDiePerTarget,
+                                      newOverrides
+                                    )
+                                  }}
+                                  sx={{ minWidth: "80px" }}
+                                >
+                                  ✓ Dodging
+                                </Button>
+
+                                {/* Fortune button for PCs - only shows when regular dodge is active */}
+                                {CS.isPC(target) && (
+                                  <Button
+                                    variant="outlined"
+                                    size="small"
+                                    color="secondary"
+                                    onClick={() => {
+                                      // Calculate defense with dodge bonus (fortune starts at 0)
+                                      const baseDefense = CS.defense(target)
+                                      const dodgeDefense = baseDefense + 3
+
+                                      const newOverrides = {
+                                        ...manualDefensePerTarget,
+                                        [targetId]: dodgeDefense,
+                                      }
+
+                                      const newDefenseChoices = {
+                                        ...defenseChoicePerTarget,
+                                        [targetId]: "fortune",
+                                      }
+
+                                      const newFortuneDice = {
+                                        ...fortuneDiePerTarget,
+                                        [targetId]: "0",
+                                      }
+
+                                      updateFields({
+                                        defenseChoicePerTarget:
+                                          newDefenseChoices,
+                                        fortuneDiePerTarget: newFortuneDice,
+                                        manualDefensePerTarget: newOverrides,
+                                      })
+
+                                      // Recalculate defense immediately with the new values
+                                      updateDefenseAndToughness(
+                                        selectedTargetIds,
+                                        stunt,
+                                        newDefenseChoices,
+                                        newFortuneDice,
+                                        newOverrides
+                                      )
+                                    }}
+                                    sx={{ minWidth: "40px", px: 1 }}
+                                    title="Add Fortune to Dodge"
+                                  >
+                                    +🎲
+                                  </Button>
+                                )}
+                              </Box>
+                            ) : (
+                              // Fortune dodge is active - show button and number field
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "row",
+                                  gap: 1,
+                                  alignItems: "flex-start",
+                                }}
+                              >
+                                <Button
+                                  variant="contained"
+                                  size="small"
+                                  color="secondary"
+                                  onClick={() => {
+                                    // Go back to regular dodge (remove fortune but keep dodge bonus)
+                                    const newFortuneDice = {
+                                      ...fortuneDiePerTarget,
+                                    }
+                                    delete newFortuneDice[targetId]
+
+                                    const baseDefense = CS.defense(target)
+                                    const dodgeDefense = baseDefense + 3
+                                    const newOverrides = {
+                                      ...manualDefensePerTarget,
+                                      [targetId]: dodgeDefense,
+                                    }
+
+                                    const newDefenseChoices = {
+                                      ...defenseChoicePerTarget,
+                                      [targetId]: "dodge",
+                                    }
+
+                                    updateFields({
+                                      defenseChoicePerTarget: newDefenseChoices,
+                                      fortuneDiePerTarget: newFortuneDice,
+                                      manualDefensePerTarget: newOverrides,
+                                    })
+
+                                    // Recalculate defense immediately with the new values
+                                    updateDefenseAndToughness(
+                                      selectedTargetIds,
+                                      stunt,
+                                      newDefenseChoices,
+                                      newFortuneDice,
+                                      newOverrides
+                                    )
+                                  }}
+                                  sx={{ minWidth: "120px" }}
+                                >
+                                  ✓ Fortune Dodge
+                                </Button>
+                                <NumberField
+                                  name={`fortuneDie-${targetId}`}
+                                  value={
+                                    parseInt(
+                                      fortuneDiePerTarget[targetId] || "0"
+                                    ) || 0
+                                  }
+                                  size="small"
+                                  width="80px"
+                                  error={false}
+                                  disabled={false}
+                                  onChange={e => {
+                                    const fortuneValue =
+                                      parseInt(e.target.value) || 0
+                                    const newFortuneDice = {
+                                      ...fortuneDiePerTarget,
+                                      [targetId]: e.target.value,
+                                    }
+
+                                    // Update defense with dodge + fortune
+                                    const baseDefense = CS.defense(target)
+                                    const totalDefense =
+                                      baseDefense + 3 + fortuneValue
+                                    const newOverrides = {
+                                      ...manualDefensePerTarget,
+                                      [targetId]: totalDefense,
+                                    }
+
+                                    updateFields({
+                                      fortuneDiePerTarget: newFortuneDice,
+                                      manualDefensePerTarget: newOverrides,
+                                    })
+
+                                    // Recalculate defense immediately with the new values
+                                    updateDefenseAndToughness(
+                                      selectedTargetIds,
+                                      stunt,
+                                      defenseChoicePerTarget,
+                                      newFortuneDice,
+                                      newOverrides
+                                    )
+                                  }}
+                                  onBlur={e => {
+                                    const fortuneValue =
+                                      parseInt(e.target.value) || 0
+                                    const newFortuneDice = {
+                                      ...fortuneDiePerTarget,
+                                      [targetId]: e.target.value,
+                                    }
+
+                                    // Update defense with dodge + fortune
+                                    const baseDefense = CS.defense(target)
+                                    const totalDefense =
+                                      baseDefense + 3 + fortuneValue
+                                    const newOverrides = {
+                                      ...manualDefensePerTarget,
+                                      [targetId]: totalDefense,
+                                    }
+
+                                    updateFields({
+                                      fortuneDiePerTarget: newFortuneDice,
+                                      manualDefensePerTarget: newOverrides,
+                                    })
+
+                                    // Recalculate defense immediately with the new values
+                                    updateDefenseAndToughness(
+                                      selectedTargetIds,
+                                      stunt,
+                                      defenseChoicePerTarget,
+                                      newFortuneDice,
+                                      newOverrides
+                                    )
+                                  }}
+                                />
+                              </Box>
+                            )}
+                          </Box>
+                        )}
+                      </Box>
+
+                      {/* Defense/Toughness Controls on the right */}
+                      <Box sx={{ flexShrink: 0 }}>
+                        <Stack spacing={1}>
+                          <Box>
+                            <Typography
+                              variant="caption"
+                              sx={{ mb: 0.5, display: "block" }}
+                            >
+                              Defense
+                            </Typography>
+                            <NumberField
+                              name={`defense-${targetId}`}
+                              value={
+                                manualDefensePerTarget[targetId] ??
+                                CS.defense(target)
+                              }
+                              size="small"
+                              width="80px"
+                              error={false}
+                              onChange={e => {
+                                const newVal = parseInt(e.target.value) || 0
+                                updateField("manualDefensePerTarget", {
+                                  ...manualDefensePerTarget,
+                                  [targetId]: newVal,
+                                })
+                              }}
+                              onBlur={e => {
+                                const newVal = parseInt(e.target.value) || 0
+                                updateField("manualDefensePerTarget", {
+                                  ...manualDefensePerTarget,
+                                  [targetId]: newVal,
+                                })
+                              }}
+                            />
+                          </Box>
+                          <Box>
+                            <Typography
+                              variant="caption"
+                              sx={{ mb: 0.5, display: "block" }}
+                            >
+                              Toughness
+                            </Typography>
+                            <NumberField
+                              name={`toughness-${targetId}`}
+                              value={
+                                manualToughnessPerTarget[targetId] ??
+                                CS.toughness(target)
+                              }
+                              size="small"
+                              width="80px"
+                              error={false}
+                              onChange={e => {
+                                const newVal = parseInt(e.target.value) || 0
+                                updateField("manualToughnessPerTarget", {
+                                  ...manualToughnessPerTarget,
+                                  [targetId]: newVal,
+                                })
+                              }}
+                              onBlur={e => {
+                                const newVal = parseInt(e.target.value) || 0
+                                updateField("manualToughnessPerTarget", {
+                                  ...manualToughnessPerTarget,
+                                  [targetId]: newVal,
+                                })
+                              }}
+                            />
+                          </Box>
+                        </Stack>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Box>
+              )
+            })}
           </Stack>
         </Box>
       )}
