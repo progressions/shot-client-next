@@ -40,62 +40,38 @@ export default function ChaseResolution({
   const { client } = useClient()
   const { encounter } = useEncounter()
 
-  const {
-    position,
-    typedSwerve,
-    swerve,
-    success,
-    chasePoints,
-    conditionPoints,
-  } = formState.data
+  const { typedSwerve, swerve } = formState.data
 
-  // Show preview when swerve is typed but not yet resolved
-  const showPreview = typedSwerve !== "" && !formState.data.edited
-
-  // Calculate preview values when showing preview
-  const previewActionResult =
-    showPreview && attacker && target
-      ? parseToNumber(formState.data.actionValue) + parseToNumber(typedSwerve)
-      : null
-  const previewOutcome =
-    previewActionResult !== null
-      ? previewActionResult -
-        parseToNumber(formState.data.defense) -
-        (formState.data.stunt ? 2 : 0)
-      : null
-  const previewSuccess = previewOutcome !== null && previewOutcome >= 0
-
-  // Calculate preview chase points
-  let previewChasePoints: number | null = null
-  let previewPosition: "near" | "far" = formState.data.position
-  if (previewSuccess && previewOutcome !== null) {
+  // Only show results display when user has typed a swerve value
+  const showResults = typedSwerve !== ""
+  
+  // Always calculate using editable form values with the typed or rolled swerve
+  const currentSwerve = typedSwerve !== "" ? parseToNumber(typedSwerve) : (swerve?.result || 0)
+  const actionResult = parseToNumber(formState.data.actionValue) + currentSwerve
+  const outcome = actionResult - parseToNumber(formState.data.defense) - (formState.data.stunt ? 2 : 0)
+  const isSuccess = outcome >= 0
+  
+  // Calculate chase points using editable form values
+  let calculatedChasePoints = 0
+  let calculatedConditionPoints = 0
+  let calculatedPosition: "near" | "far" = formState.data.position
+  
+  if (isSuccess) {
     if (formState.data.method === ChaseMethod.RAM_SIDESWIPE) {
-      const targetFrame = VS.isMook(target) ? 0 : VS.frame(target)
+      const targetFrame = parseToNumber(formState.data.frame)
       const targetCrunch = parseToNumber((formState.data as ChaseFormData & { targetCrunch?: string }).targetCrunch || "0")
-      previewChasePoints = Math.max(
-        0,
-        previewOutcome + targetCrunch - targetFrame
-      )
+      calculatedChasePoints = Math.max(0, outcome + targetCrunch - targetFrame)
+      calculatedConditionPoints = calculatedChasePoints
     } else {
-      // Use the editable handling value from the form
       const targetHandling = parseToNumber(formState.data.handling)
-      previewChasePoints = Math.max(
-        0,
-        previewOutcome + parseToNumber(formState.data.squeal) - targetHandling
-      )
+      calculatedChasePoints = Math.max(0, outcome + parseToNumber(formState.data.squeal) - targetHandling)
     }
-
-    // Calculate preview position change
-    if (
-      formState.data.method === ChaseMethod.NARROW_THE_GAP &&
-      formState.data.position === "far"
-    ) {
-      previewPosition = "near"
-    } else if (
-      formState.data.method === ChaseMethod.WIDEN_THE_GAP &&
-      formState.data.position === "near"
-    ) {
-      previewPosition = "far"
+    
+    // Calculate position change
+    if (formState.data.method === ChaseMethod.NARROW_THE_GAP && formState.data.position === "far") {
+      calculatedPosition = "near"
+    } else if (formState.data.method === ChaseMethod.WIDEN_THE_GAP && formState.data.position === "near") {
+      calculatedPosition = "far"
     }
   }
 
@@ -126,14 +102,23 @@ export default function ChaseResolution({
     setInitialPosition(formState.data.position)
 
     try {
-      // Roll swerve if not provided
-      let swerveValue = swerve
+      // Just use the SAME values we're already calculating for display!
+      // If user hasn't typed a swerve, roll one
       if (typedSwerve === "") {
         const AS = (CRS as { AS: { swerve: () => typeof swerve } }).AS
-        swerveValue = AS.swerve()
+        const rolledSwerve = AS.swerve()
+        updateField("typedSwerve", String(rolledSwerve?.result || 0))
       }
 
-      // Process the chase action
+      // Now use the EXACT same calculated values from the display
+      const finalChasePoints = calculatedChasePoints
+      const finalConditionPoints = calculatedConditionPoints
+      const actualSuccess = isSuccess
+      const finalPosition = calculatedPosition
+      const actualOutcome = outcome
+      const actualActionResult = actionResult
+
+      // Process the chase action for other side effects
       // Use the actual vehicles, not the characters
       const attackerVehicle = (
         formState.data as ChaseFormData & { vehicle?: Vehicle }
@@ -146,29 +131,36 @@ export default function ChaseResolution({
         ...formState.data,
         attacker: attackerVehicle || formState.data.attacker,
         target: targetVehicle || formState.data.target,
-        swerve: swerveValue,
+        targetCrunch: (formState.data as ChaseFormData & { targetCrunch?: number }).targetCrunch,
+        swerve: { result: currentSwerve }, // Use the same currentSwerve from display
         edited: true,
       }
 
-      console.log("Chase Resolution - State to process:", {
-        method: stateToProcess.method,
-        position: stateToProcess.position,
-        success: stateToProcess.success,
+      console.log("Chase Resolution - Using display values:", {
+        currentSwerve,
+        actionResult: actualActionResult,
+        outcome: actualOutcome,
+        isSuccess: actualSuccess,
+        calculatedChasePoints: finalChasePoints,
+        calculatedConditionPoints: finalConditionPoints,
+        calculatedPosition: finalPosition,
       })
 
       const result = CRS.process(stateToProcess)
 
-      console.log("Chase Resolution - Result from CRS.process:", {
-        success: result.success,
-        chasePoints: result.chasePoints,
-        conditionPoints: result.conditionPoints,
-        position: result.position,
-        targetActionValues: result.target?.action_values,
-        attackerActionValues: result.attacker?.action_values,
-      })
+      // Override with our display values
+      const correctedResult = {
+        ...result,
+        success: actualSuccess,
+        chasePoints: finalChasePoints,
+        conditionPoints: finalConditionPoints,
+        outcome: actualOutcome,
+        actionResult: actualActionResult,
+        position: finalPosition,
+      }
 
-      // Update form with results
-      updateFields(result)
+      // Update form with corrected results
+      updateFields(correctedResult)
 
       // Update vehicles in the backend (even for failed attempts - attacker still spends shots)
       // For chase actions, the damage (chase points) is applied to the target
@@ -180,17 +172,18 @@ export default function ChaseResolution({
       // So we don't need to update the attacker's chase points
 
       // The target takes the chase points damage (only if successful)
-      if (result.success && result.chasePoints) {
-        targetVehicleValues["Chase Points"] = result.chasePoints
+      // Use our calculated values
+      if (actualSuccess && finalChasePoints > 0) {
+        targetVehicleValues["Chase Points"] = finalChasePoints
       }
 
       // For RAM_SIDESWIPE, also apply condition points (only if successful)
       if (
-        result.success &&
-        result.method === ChaseMethod.RAM_SIDESWIPE &&
-        result.conditionPoints
+        actualSuccess &&
+        formState.data.method === ChaseMethod.RAM_SIDESWIPE &&
+        finalConditionPoints > 0
       ) {
-        targetVehicleValues["Condition Points"] = result.conditionPoints
+        targetVehicleValues["Condition Points"] = finalConditionPoints
       }
 
       console.log(
@@ -218,38 +211,18 @@ export default function ChaseResolution({
           "3"
       )
 
-      // Calculate the actual new position based on success and method
-      let finalPosition = formState.data.position
-      if (result.success) {
-        if (
-          result.method === ChaseMethod.NARROW_THE_GAP &&
-          formState.data.position === "far"
-        ) {
-          finalPosition = "near"
-        } else if (
-          result.method === ChaseMethod.WIDEN_THE_GAP &&
-          formState.data.position === "near"
-        ) {
-          finalPosition = "far"
-        }
-      }
-
       console.log(
-        "Chase Resolution - Original position from form:",
-        formState.data.position
-      )
-      console.log(
-        "Chase Resolution - Calculated new position:",
+        "Chase Resolution - Position change:",
+        formState.data.position,
+        "->",
         finalPosition
       )
-      console.log("Chase Resolution - Method:", result.method)
-      console.log("Chase Resolution - Success:", result.success)
 
       // Include action_type for ram/sideswipe tracking
-      const actionType = result.method === ChaseMethod.RAM_SIDESWIPE 
+      const actionType = formState.data.method === ChaseMethod.RAM_SIDESWIPE 
         ? "ram" 
-        : result.method === ChaseMethod.NARROW_THE_GAP || 
-          result.method === ChaseMethod.WIDEN_THE_GAP 
+        : formState.data.method === ChaseMethod.NARROW_THE_GAP || 
+          formState.data.method === ChaseMethod.WIDEN_THE_GAP 
         ? "chase_maneuver" 
         : "evade"
 
@@ -264,13 +237,13 @@ export default function ChaseResolution({
           position: finalPosition, // Use the calculated position
           event: {
             type: "chase_action",
-            description: `${attacker.name} ${result.method === ChaseMethod.RAM_SIDESWIPE ? "rams" : result.method === ChaseMethod.NARROW_THE_GAP ? "narrows gap with" : result.method === ChaseMethod.WIDEN_THE_GAP ? "widens gap from" : "evades"} ${target.name}${result.success ? "" : " (missed)"}`,
+            description: `${attacker.name} ${formState.data.method === ChaseMethod.RAM_SIDESWIPE ? "rams" : formState.data.method === ChaseMethod.NARROW_THE_GAP ? "narrows gap with" : formState.data.method === ChaseMethod.WIDEN_THE_GAP ? "widens gap from" : "evades"} ${target.name}${actualSuccess ? "" : " (missed)"}`,
             details: {
-              method: result.method,
-              chase_points: result.chasePoints,
-              condition_points: result.conditionPoints,
+              method: formState.data.method,
+              chase_points: finalChasePoints,
+              condition_points: finalConditionPoints,
               position: finalPosition,
-              success: result.success,
+              success: actualSuccess,
               shot_cost: shotCost,
             },
           },
@@ -289,11 +262,11 @@ export default function ChaseResolution({
       await client.applyChaseAction(encounter, vehicleUpdates)
       
       // Check if target will be defeated after applying damage (only if successful)
-      if (result.success) {
-        const targetChasePoints = (target.action_values?.["Chase Points"] || 0) + (result.chasePoints || 0)
+      if (actualSuccess) {
+        const targetChasePoints = (target.action_values?.["Chase Points"] || 0) + finalChasePoints
         const defeatThreshold = VS.getDefeatThreshold(target)
         const willBeDefeated = targetChasePoints >= defeatThreshold
-        const defeatType = result.method === ChaseMethod.RAM_SIDESWIPE ? "crashed" : "boxed in"
+        const defeatType = formState.data.method === ChaseMethod.RAM_SIDESWIPE ? "crashed" : "boxed in"
         
         if (willBeDefeated) {
           toastSuccess(`${target.name} has been ${defeatType}!`)
@@ -382,44 +355,31 @@ export default function ChaseResolution({
         </Button>
       </Stack>
 
-      {/* Results Display - Show when swerve is typed or after resolve */}
-      {(showPreview ||
-        (formState.data.edited && formState.data.actionResult !== null)) && (
+      {/* Results Display - Only show when swerve is typed */}
+      {showResults && (
         <Alert
-          severity={
-            (showPreview ? previewSuccess : success) ? "success" : "error"
-          }
+          severity={isSuccess ? "success" : "error"}
           sx={{ mt: 3, mb: 2 }}
         >
           <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
-            {(showPreview ? previewSuccess : success) ? "Hit!" : "Miss!"}{" "}
+            {isSuccess ? "Hit!" : "Miss!"}{" "}
             Driving {formState.data.actionValue} + Swerve{" "}
-            {showPreview ? typedSwerve : swerve?.result || 0} = Action Result{" "}
-            {showPreview ? previewActionResult : formState.data.actionResult}
+            {currentSwerve} = Action Result {actionResult}
           </Typography>
           <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
-            Action Result{" "}
-            {showPreview ? previewActionResult : formState.data.actionResult} -
+            Action Result {actionResult} -
             Driving {formState.data.defense}
-            {formState.data.stunt ? " + 2 (stunt)" : ""} = Outcome{" "}
-            {showPreview ? previewOutcome : formState.data.outcome}
+            {formState.data.stunt ? " + 2 (stunt)" : ""} = Outcome {outcome}
           </Typography>
-          {(showPreview ? previewSuccess : success) && (
+          {isSuccess && (
             <>
               <Typography variant="caption" sx={{ display: "block" }}>
                 {formState.data.method === ChaseMethod.RAM_SIDESWIPE
-                  ? `Outcome ${showPreview ? previewOutcome : formState.data.outcome} + Crunch ${(formState.data as ChaseFormData & { targetCrunch?: string }).targetCrunch || "0"} - Frame ${formState.data.frame} = Chase Points ${showPreview ? previewChasePoints : chasePoints}, Condition Points ${showPreview ? previewChasePoints : conditionPoints}`
-                  : `Outcome ${showPreview ? previewOutcome : formState.data.outcome} + Squeal ${formState.data.squeal} - Handling ${formState.data.handling} = Chase Points ${showPreview ? previewChasePoints : chasePoints}`}
+                  ? `Outcome ${outcome} + Crunch ${(formState.data as ChaseFormData & { targetCrunch?: string }).targetCrunch || "0"} - Frame ${formState.data.frame} = Chase Points ${calculatedChasePoints}, Condition Points ${calculatedConditionPoints}`
+                  : `Outcome ${outcome} + Squeal ${formState.data.squeal} - Handling ${formState.data.handling} = Chase Points ${calculatedChasePoints}`}
               </Typography>
               <Typography variant="caption" sx={{ display: "block", mt: 1 }}>
-                New position:{" "}
-                {showPreview
-                  ? previewPosition === "near"
-                    ? "Near"
-                    : "Far"
-                  : position === "near"
-                    ? "Near"
-                    : "Far"}
+                New position: {calculatedPosition === "near" ? "Near" : "Far"}
               </Typography>
             </>
           )}

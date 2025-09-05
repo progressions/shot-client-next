@@ -99,7 +99,7 @@ const ChaseReducerService = {
       {
         swerve: st.swerve,
         actionValue: st.actionValue,
-        defense: st.mookDefense,
+        defense: st.defense || 0,
         stunt: st.stunt,
       }
     )
@@ -112,9 +112,18 @@ const ChaseReducerService = {
       let smackdown: number // The raw damage before reduction
 
       if (st.method === ChaseMethod.RAM_SIDESWIPE) {
-        // Ram/Sideswipe: Outcome + Attacker's Crunch - Target's Frame
-        // Use the frame value from form state (which can be manually edited)
-        smackdown = Math.max(0, (outcome || 0) + st.crunch)
+        // Ram/Sideswipe: Outcome + Target's Crunch - Target's Frame
+        // Use the targetCrunch and frame values from form state (which can be manually edited)
+        const targetCrunchRaw = (st as ChaseFormData & { targetCrunch?: number | string }).targetCrunch
+        const targetCrunch = typeof targetCrunchRaw === 'string' ? parseInt(targetCrunchRaw) || 0 : targetCrunchRaw || 0
+        console.log("RAM_SIDESWIPE calculation in pursue:", {
+          outcome,
+          targetCrunch,
+          frame: st.frame,
+          calculatedSmackdown: (outcome || 0) + targetCrunch,
+          calculatedChasePoints: Math.max(0, (outcome || 0) + targetCrunch - st.frame)
+        })
+        smackdown = Math.max(0, (outcome || 0) + targetCrunch)
         chasePoints = Math.max(0, smackdown - st.frame)
         conditionPoints = chasePoints
       } else {
@@ -179,7 +188,7 @@ const ChaseReducerService = {
       {
         swerve: st.swerve,
         actionValue: st.actionValue,
-        defense: st.mookDefense,
+        defense: st.defense || 0,
         stunt: st.stunt,
       }
     )
@@ -191,9 +200,11 @@ const ChaseReducerService = {
       let smackdown: number // The raw damage before reduction
 
       if (st.method === ChaseMethod.RAM_SIDESWIPE) {
-        // Ram/Sideswipe: Outcome + Attacker's Crunch - Target's Frame
+        // Ram/Sideswipe: Outcome + Target's Crunch - Target's Frame
         // Evaders can also ram/sideswipe when near
-        smackdown = Math.max(0, (outcome || 0) + st.crunch)
+        const targetCrunchRaw = (st as ChaseFormData & { targetCrunch?: number | string }).targetCrunch
+        const targetCrunch = typeof targetCrunchRaw === 'string' ? parseInt(targetCrunchRaw) || 0 : targetCrunchRaw || 0
+        smackdown = Math.max(0, (outcome || 0) + targetCrunch)
         chasePoints = Math.max(0, smackdown - st.frame)
         conditionPoints = chasePoints
       } else {

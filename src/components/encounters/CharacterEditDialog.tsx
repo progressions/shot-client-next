@@ -103,7 +103,7 @@ export default function CharacterEditDialog({
 
   // Initialize form values when dialog opens
   useEffect(() => {
-    if (open) {
+    if (open && !loading) {
       setName(character.name || "")
       // Get current shot from character's shot_id data
       // For now, using the current_shot field if available
@@ -376,7 +376,12 @@ export default function CharacterEditDialog({
       }
 
       toastSuccess(`Updated ${name}`)
+      // Close dialog before updating encounter to prevent flicker
       onClose()
+      // Update encounter after dialog closes
+      setTimeout(() => {
+        updateEncounter(updatedEncounterResponse.data)
+      }, 100)
     } catch (error) {
       console.error("Error updating character:", error)
       toastError(`Failed to update ${character.name}`)
