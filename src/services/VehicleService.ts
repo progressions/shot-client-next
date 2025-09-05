@@ -130,13 +130,22 @@ const VehicleService = {
 
   // Defeat detection methods
   isDefeated: function (vehicle: Vehicle): boolean {
+    // Use backend-provided defeat status if available
+    if (vehicle.is_defeated_in_chase !== undefined) {
+      return vehicle.is_defeated_in_chase
+    }
+    // Fallback to local calculation
     const chasePoints = this.chasePoints(vehicle)
     const threshold = this.getDefeatThreshold(vehicle)
     return chasePoints >= threshold
   },
 
   getDefeatThreshold: function (vehicle: Vehicle): number {
-    // Get driver type if available, otherwise use vehicle type
+    // Use backend-provided threshold if available
+    if (vehicle.defeat_threshold !== undefined) {
+      return vehicle.defeat_threshold
+    }
+    // Fallback to local calculation
     const driverType = vehicle.driver?.action_values?.Type
     const vehicleType = driverType || this.type(vehicle)
     
@@ -146,6 +155,11 @@ const VehicleService = {
   },
 
   getDefeatType: function (vehicle: Vehicle): "crashed" | "boxed_in" | null {
+    // Use backend-provided defeat type if available
+    if (vehicle.defeat_type !== undefined) {
+      return vehicle.defeat_type as "crashed" | "boxed_in" | null
+    }
+    // Fallback to local calculation
     if (!this.isDefeated(vehicle)) {
       return null
     }
