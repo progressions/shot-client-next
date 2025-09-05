@@ -10,8 +10,8 @@ import {
   Typography,
   Stack,
 } from "@mui/material"
-import { CS } from "@/services"
-import type { ChaseFormData, Character } from "@/types"
+import { CS, VS } from "@/services"
+import type { ChaseFormData, Character, Vehicle } from "@/types"
 import { FormActions } from "@/reducers"
 import { NumberField } from "@/components/ui"
 
@@ -24,6 +24,7 @@ interface ChaseMethodSectionProps {
   }) => void
   hasTarget: boolean
   attacker?: Character | null
+  vehicle?: Vehicle | null
 }
 
 export default function ChaseMethodSection({
@@ -31,6 +32,7 @@ export default function ChaseMethodSection({
   dispatchForm,
   hasTarget,
   attacker,
+  vehicle,
 }: ChaseMethodSectionProps) {
   // Helper to update a field
   const updateField = (name: string, value: unknown) => {
@@ -41,7 +43,7 @@ export default function ChaseMethodSection({
     })
   }
 
-  // Initialize driving skill when attacker changes
+  // Initialize driving skill and squeal when attacker/vehicle changes
   useEffect(() => {
     if (attacker && !formState.data.actionValue) {
       const drivingSkill = CS.skill(attacker, "Driving")
@@ -49,6 +51,13 @@ export default function ChaseMethodSection({
       updateField("actionValue", initialValue)
     }
   }, [attacker?.id])
+
+  useEffect(() => {
+    if (vehicle && !formState.data.squeal) {
+      const squealValue = VS.squeal(vehicle)
+      updateField("squeal", squealValue)
+    }
+  }, [vehicle?.id])
 
   return (
     <Box
@@ -88,8 +97,45 @@ export default function ChaseMethodSection({
             sx={{ fontSize: "1.5rem" }}
           />
         </FormControl>
+        
+        {/* Squeal Field - Always visible */}
+        <FormControl sx={{ minWidth: 100 }}>
+          <InputLabel 
+            shrink 
+            sx={{ 
+              backgroundColor: '#262626',
+              px: 0.5,
+              ml: -0.5
+            }}
+          >
+            Squeal
+          </InputLabel>
+          <NumberField
+            name="squeal"
+            value={formState.data.squeal || 0}
+            size="medium"
+            width="80px"
+            error={false}
+            onChange={e => updateField("squeal", parseInt(e.target.value) || 0)}
+            onBlur={e => {
+              const value = parseInt(e.target.value) || 0
+              if (value < 0) {
+                updateField("squeal", 0)
+              }
+            }}
+            sx={{ fontSize: "1.5rem" }}
+          />
+        </FormControl>
         {/* Role Selection */}
-        <FormControl sx={{ flex: 1 }} disabled={!hasTarget}>
+        <FormControl 
+          sx={{ 
+            flex: 1,
+            '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'primary.main',
+            },
+          }} 
+          disabled={!hasTarget}
+        >
           <InputLabel>Role</InputLabel>
           <Select
             disabled={!hasTarget}
@@ -120,7 +166,15 @@ export default function ChaseMethodSection({
         </FormControl>
 
         {/* Chase Action Selection */}
-        <FormControl sx={{ flex: 1 }} disabled={!hasTarget}>
+        <FormControl 
+          sx={{ 
+            flex: 1,
+            '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'primary.main',
+            },
+          }} 
+          disabled={!hasTarget}
+        >
           <InputLabel>Chase Action</InputLabel>
           <Select
             disabled={!hasTarget}
@@ -199,7 +253,15 @@ export default function ChaseMethodSection({
         </FormControl>
 
         {/* Position Selection */}
-        <FormControl sx={{ flex: 1 }} disabled={!hasTarget}>
+        <FormControl 
+          sx={{ 
+            flex: 1,
+            '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'primary.main',
+            },
+          }} 
+          disabled={!hasTarget}
+        >
           <InputLabel>Position</InputLabel>
           <Select
             disabled={!hasTarget}

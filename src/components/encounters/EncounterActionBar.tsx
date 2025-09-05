@@ -39,10 +39,10 @@ export default function EncounterActionBar({
   // Determine which actions are available
   const hasAttackSkills = selectedCharacter && 
     selectedCharacter.action_values &&
-    (selectedCharacter.action_values["Martial Arts"] ||
-     selectedCharacter.action_values["Guns"] ||
-     selectedCharacter.action_values["Sorcery"] ||
-     selectedCharacter.action_values["Creature"])
+    (selectedCharacter.action_values["Martial Arts"] !== undefined ||
+     selectedCharacter.action_values["Guns"] !== undefined ||
+     selectedCharacter.action_values["Sorcery"] !== undefined ||
+     selectedCharacter.action_values["Creature"] !== undefined)
   
   const isDriving = selectedCharacter && !!((selectedCharacter as Character & { driving?: boolean }).driving)
   
@@ -90,15 +90,6 @@ export default function EncounterActionBar({
           >
             <FaGun size={20} />
           </MenuButton>
-          
-          <MenuButton
-            onClick={() => handleAction("boost")}
-            disabled={!selectedCharacter}
-            title={!selectedCharacter ? "Select a character first" : "Boost"}
-            isActive={activePanel === "boost"}
-          >
-            <FaRocket size={20} />
-          </MenuButton>
 
           <MenuButton
             onClick={() => handleAction("chase")}
@@ -107,6 +98,15 @@ export default function EncounterActionBar({
             isActive={activePanel === "chase"}
           >
             <FaCar size={20} />
+          </MenuButton>
+          
+          <MenuButton
+            onClick={() => handleAction("boost")}
+            disabled={!selectedCharacter}
+            title={!selectedCharacter ? "Select a character first" : "Boost"}
+            isActive={activePanel === "boost"}
+          >
+            <FaRocket size={20} />
           </MenuButton>
 
           <MenuButton

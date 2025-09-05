@@ -257,6 +257,7 @@ export default function ChasePanel({ onClose, onComplete, preselectedCharacter }
               dispatchForm={dispatchForm}
               hasTarget={!!(formState.data as { targetShotId?: string }).targetShotId}
               attacker={preselectedCharacter}
+              vehicle={(formState.data as ChaseFormData & { vehicle?: Vehicle }).vehicle || null}
             />
 
             {/* Target Section - Always show */}

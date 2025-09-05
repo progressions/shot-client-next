@@ -7,6 +7,7 @@ import {
   ShotDetail, 
   CharacterSelector, 
   EncounterActionBar,
+  CharacterDetail,
   AttackPanel,
   BoostPanel,
   ChasePanel,
@@ -131,6 +132,13 @@ export default function ShotCounter() {
         onAction={handleAction}
         activePanel={activePanel}
       />
+      
+      {/* Character Detail for selected character */}
+      {selectedCharacter && (
+        <Box sx={{ mb: 1 }}>
+          <CharacterDetail character={selectedCharacter} />
+        </Box>
+      )}
       
       {/* Action Panels - Place them here, before the shot list */}
       {activePanel === "attack" && selectedCharacter && (

@@ -206,6 +206,9 @@ export default function AttackerSection({
                     flex: 1,
                     minWidth: { xs: 120, sm: 150 },
                     "& .MuiInputBase-root": { height: 56 },
+                    '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'primary.main',
+                    },
                   }}
                 >
                   <InputLabel>Attack Value</InputLabel>
@@ -312,6 +315,9 @@ export default function AttackerSection({
                     flex: 1,
                     minWidth: { xs: 120, sm: 150 },
                     "& .MuiInputBase-root": { height: 56 },
+                    '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'primary.main',
+                    },
                   }}
                 >
                   <InputLabel>Weapon</InputLabel>

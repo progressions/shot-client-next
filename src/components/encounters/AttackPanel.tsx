@@ -950,18 +950,6 @@ export default function AttackPanel({ onClose, onComplete, preselectedAttacker }
 
   return (
     <Box sx={{ overflow: "hidden", minHeight: isReady ? "auto" : "100px" }}>
-      <Typography
-        variant="h6"
-        sx={{
-          textAlign: "center",
-          py: 2,
-          borderBottom: "1px solid",
-          borderColor: "divider",
-        }}
-      >
-        Attack Resolution
-      </Typography>
-
       {/* Main Content - Attacker then Target */}
       {isReady ? (
         <>
@@ -1000,14 +988,6 @@ export default function AttackPanel({ onClose, onComplete, preselectedAttacker }
           <Box
             sx={{ p: { xs: 2, sm: 3 }, backgroundColor: "background.default" }}
           >
-            <Typography
-              variant="h6"
-              gutterBottom
-              sx={{ textAlign: "center", mb: { xs: 2, sm: 3 } }}
-            >
-              🎲 Combat Resolution
-            </Typography>
-
             {/* Show different UI for mook attackers */}
             {attacker && CS.isMook(attacker) ? (
               <MookAttackSection
