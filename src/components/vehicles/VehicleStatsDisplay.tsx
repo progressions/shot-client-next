@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Typography, Stack } from "@mui/material"
+import { Box, Typography, Stack, Chip } from "@mui/material"
 import { VS } from "@/services"
 import type { Vehicle } from "@/types"
 import Avatar from "@/components/avatars/Avatar"
@@ -16,17 +16,30 @@ export default function VehicleStatsDisplay({
   vehicle,
   showLink = true,
 }: VehicleStatsDisplayProps) {
+  const isDefeated = VS.isDefeated(vehicle)
+  const defeatType = VS.getDefeatType(vehicle)
+
   return (
     <Stack direction="row" spacing={2}>
       <Avatar entity={vehicle} sx={{ width: 64, height: 64 }} />
       <Box sx={{ flex: 1 }}>
-        <Typography variant="h6" fontWeight="bold">
-          {showLink ? (
-            <VehicleLink vehicle={vehicle}>{vehicle.name}</VehicleLink>
-          ) : (
-            vehicle.name
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Typography variant="h6" fontWeight="bold">
+            {showLink ? (
+              <VehicleLink vehicle={vehicle}>{vehicle.name}</VehicleLink>
+            ) : (
+              vehicle.name
+            )}
+          </Typography>
+          {isDefeated && defeatType && (
+            <Chip
+              label={defeatType === "crashed" ? "CRASHED" : "BOXED IN"}
+              color={defeatType === "crashed" ? "error" : "warning"}
+              size="small"
+              sx={{ fontWeight: "bold" }}
+            />
           )}
-        </Typography>
+        </Stack>
 
         {/* Vehicle Stats Row 1 */}
         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>

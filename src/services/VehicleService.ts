@@ -1,7 +1,13 @@
-import type { Character, Position, Vehicle, VehicleArchetype } from "@/types"
+import type {
+  Character,
+  CharacterTypes,
+  Position,
+  Vehicle,
+  VehicleArchetype,
+} from "@/types"
 import { VehicleDescriptionKeys } from "@/types"
 import CS from "@/services/CharacterService"
-import SharedService from "@/services/SharedService"
+import SharedService, { woundThresholds } from "@/services/SharedService"
 
 export type DamageReduction = "handling" | "frame"
 
@@ -126,6 +132,46 @@ const VehicleService = {
 
   description: function (vehicle: Vehicle): string {
     return this.descriptionValue(vehicle, VehicleDescriptionKeys.Appearance)
+  },
+
+  // Defeat detection methods
+  isDefeated: function (vehicle: Vehicle): boolean {
+    // Use backend-provided defeat status if available
+    if (vehicle.is_defeated_in_chase !== undefined) {
+      return vehicle.is_defeated_in_chase
+    }
+    // Fallback to local calculation
+    const chasePoints = this.chasePoints(vehicle)
+    const threshold = this.getDefeatThreshold(vehicle)
+    return chasePoints >= threshold
+  },
+
+  getDefeatThreshold: function (vehicle: Vehicle): number {
+    // Use backend-provided threshold if available
+    if (vehicle.defeat_threshold !== undefined) {
+      return vehicle.defeat_threshold
+    }
+    // Fallback to local calculation
+    const driverType = vehicle.driver?.action_values?.Type
+    const vehicleType = driverType || this.type(vehicle)
+
+    // Use wound thresholds
+    const thresholds = woundThresholds[vehicleType as CharacterTypes]
+    return thresholds?.serious || 35 // Default to 35 if type not found
+  },
+
+  getDefeatType: function (vehicle: Vehicle): "crashed" | "boxed_in" | null {
+    // Use backend-provided defeat type if available
+    if (vehicle.defeat_type !== undefined) {
+      return vehicle.defeat_type as "crashed" | "boxed_in" | null
+    }
+    // Fallback to local calculation
+    if (!this.isDefeated(vehicle)) {
+      return null
+    }
+
+    // Check if vehicle was rammed or damaged (from shot data passed by backend)
+    return vehicle.was_rammed_or_damaged ? "crashed" : "boxed_in"
   },
 
   // Writer functions, modify the vehicle

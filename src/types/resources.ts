@@ -229,6 +229,10 @@ export interface Vehicle extends BaseEntity {
   task: boolean
   notion_page_id: string | null
   driving?: Vehicle
+  was_rammed_or_damaged?: boolean
+  is_defeated_in_chase?: boolean
+  defeat_type?: "crashed" | "boxed_in" | null
+  defeat_threshold?: number
   wealth: string
   juncture_id: string | null
   juncture: Juncture | null
