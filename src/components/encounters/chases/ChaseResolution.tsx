@@ -311,9 +311,6 @@ export default function ChaseResolution({
         backgroundColor: "background.default",
       }}
     >
-      <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
-        🏁 Combat Resolution
-      </Typography>
 
       <Stack
         direction="row"

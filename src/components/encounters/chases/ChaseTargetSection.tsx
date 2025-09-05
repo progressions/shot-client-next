@@ -13,8 +13,7 @@ import type { ChaseFormData, Shot, Vehicle, Character } from "@/types"
 import { FormActions } from "@/reducers"
 import { NumberField } from "@/components/ui"
 import CharacterSelector from "../CharacterSelector"
-import Avatar from "@/components/avatars/Avatar"
-import { CharacterLink, VehicleLink } from "@/components/ui/links"
+import VehicleStatsDisplay from "@/components/vehicles/VehicleStatsDisplay"
 
 // Character with shot-specific data from encounter
 interface CharacterWithShotData extends Character {
@@ -159,6 +158,7 @@ export default function ChaseTargetSection({
           <CharacterSelector
             shots={targetDriverShots}
             selectedShotId={targetShotId}
+            showShotNumbers={false}
             onSelect={shotId => {
               updateField("targetShotId", shotId)
 
@@ -193,10 +193,8 @@ export default function ChaseTargetSection({
                 if (vehicle) {
                   // Update target vehicle-related fields
                   const targetDriving = CS.skill(selectedChar, "Driving")
-                  const targetHandling = VS.isMook(vehicle)
-                    ? 0
-                    : VS.handling(vehicle)
-                  const targetFrame = VS.isMook(vehicle) ? 0 : VS.frame(vehicle)
+                  const targetHandling = VS.handling(vehicle)
+                  const targetFrame = VS.frame(vehicle)
 
                   updateField("defense", targetDriving) // Target's Driving is the difficulty
                   updateField("handling", targetHandling) // Target's Handling for chase point calculation
@@ -242,33 +240,9 @@ export default function ChaseTargetSection({
       {/* Target Vehicle Details */}
       {target && selectedVehicle && (
         <>
-          {/* Vehicle Info Display */}
-          <Box
-            sx={{ p: 2, bgcolor: "background.paper", borderRadius: 1, mb: 2 }}
-          >
-            <Stack direction="row" spacing={2}>
-              <Avatar entity={selectedVehicle} sx={{ width: 48, height: 48 }} />
-              <Box>
-                <Typography variant="subtitle1" fontWeight="bold">
-                  <CharacterLink character={target}>
-                    {target.name}
-                  </CharacterLink>
-                  {" driving "}
-                  <VehicleLink vehicle={selectedVehicle}>
-                    {selectedVehicle.name}
-                  </VehicleLink>
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block" }}
-                >
-                  <strong>Defense</strong> {formState.data.defense} •{" "}
-                  <strong>Handling</strong> {formState.data.handling} •{" "}
-                  <strong>Frame</strong> {formState.data.frame}
-                </Typography>
-              </Box>
-            </Stack>
+          {/* Vehicle Info Display with Editable Values */}
+          <Box sx={{ p: 2, bgcolor: "background.paper", borderRadius: 1, mb: 2 }}>
+            <VehicleStatsDisplay vehicle={selectedVehicle} />
 
             {/* Editable Defense Values */}
             <Stack
@@ -338,17 +312,6 @@ export default function ChaseTargetSection({
                 />
               </Box>
             </Stack>
-
-            {VS.chasePoints(selectedVehicle) > 0 && (
-              <Typography variant="body2" color="warning.main" sx={{ mt: 2 }}>
-                Chase Points: {VS.chasePoints(selectedVehicle)}/35
-              </Typography>
-            )}
-            {VS.conditionPoints(selectedVehicle) > 0 && (
-              <Typography variant="body2" color="error.main">
-                Condition Points: {VS.conditionPoints(selectedVehicle)}
-              </Typography>
-            )}
           </Box>
 
           {/* Stunt Checkbox */}

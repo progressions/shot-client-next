@@ -110,6 +110,7 @@ export default function ChaseAttackerSection({
           <CharacterSelector
             shots={driverShots}
             selectedShotId={attackerShotId}
+            showShotNumbers={false}
             onSelect={shotId => {
               updateField("attackerShotId", shotId)
 
@@ -194,160 +195,9 @@ export default function ChaseAttackerSection({
         </Typography>
       )}
 
-      {/* Chase Skill and Vehicle Stats - Only show role/action/position when target is selected */}
+      {/* Chase Skill and Vehicle Stats */}
       {attacker && selectedVehicle && (
         <>
-          {/* Role, Chase Action, and Position Selection - Only show when target is selected */}
-          {(formState.data as ChaseFormData & { targetShotId?: string })
-            .targetShotId &&
-            formState.data.target && (
-              <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
-                {/* Role Selection */}
-                <FormControl sx={{ flex: 1 }}>
-                  <InputLabel>Role</InputLabel>
-                  <Select
-                    value={formState.data.attackerRole || "pursuer"}
-                    onChange={e => {
-                      const newRole = e.target.value as "pursuer" | "evader"
-                      updateField("attackerRole", newRole)
-
-                      // Update default method based on new role and current position
-                      const position = formState.data.position
-                      let defaultMethod = "EVADE"
-                      if (newRole === "pursuer") {
-                        defaultMethod =
-                          position === "near"
-                            ? "RAM_SIDESWIPE"
-                            : "NARROW_THE_GAP"
-                      } else {
-                        defaultMethod =
-                          position === "near" ? "WIDEN_THE_GAP" : "EVADE"
-                      }
-                      updateField("method", defaultMethod)
-                    }}
-                    label="Role"
-                  >
-                    <MenuItem value="pursuer">Pursuer</MenuItem>
-                    <MenuItem value="evader">Evader</MenuItem>
-                  </Select>
-                </FormControl>
-
-                {/* Chase Action Selection */}
-                <FormControl sx={{ flex: 1 }}>
-                  <InputLabel>Chase Action</InputLabel>
-                  <Select
-                    value={(() => {
-                      // Validate that current method is valid for role/position
-                      const role = formState.data.attackerRole || "pursuer"
-                      const position = formState.data.position
-                      const method = formState.data.method
-
-                      if (role === "pursuer") {
-                        if (position === "near") {
-                          // Valid methods: RAM_SIDESWIPE, EVADE
-                          return ["RAM_SIDESWIPE", "EVADE"].includes(method)
-                            ? method
-                            : "RAM_SIDESWIPE"
-                        } else {
-                          // Valid method: NARROW_THE_GAP
-                          return "NARROW_THE_GAP"
-                        }
-                      } else {
-                        if (position === "near") {
-                          // Valid methods: WIDEN_THE_GAP, RAM_SIDESWIPE
-                          return ["WIDEN_THE_GAP", "RAM_SIDESWIPE"].includes(
-                            method
-                          )
-                            ? method
-                            : "WIDEN_THE_GAP"
-                        } else {
-                          // Valid method: EVADE
-                          return "EVADE"
-                        }
-                      }
-                    })()}
-                    onChange={e => updateField("method", e.target.value)}
-                    label="Chase Action"
-                  >
-                    {(formState.data.attackerRole || "pursuer") === "pursuer"
-                      ? // Pursuer options
-                        formState.data.position === "near"
-                        ? [
-                            // When NEAR, pursuer can ram/sideswipe or evade
-                            <MenuItem key="RAM_SIDESWIPE" value="RAM_SIDESWIPE">
-                              Ram/Sideswipe
-                            </MenuItem>,
-                            <MenuItem key="EVADE" value="EVADE">
-                              Evade
-                            </MenuItem>,
-                          ]
-                        : [
-                            // When FAR, pursuer can only narrow the gap
-                            <MenuItem
-                              key="NARROW_THE_GAP"
-                              value="NARROW_THE_GAP"
-                            >
-                              Narrow the Gap
-                            </MenuItem>,
-                          ]
-                      : // Evader options
-                        formState.data.position === "near"
-                        ? [
-                            // When NEAR, evader can widen the gap or ram/sideswipe
-                            <MenuItem key="WIDEN_THE_GAP" value="WIDEN_THE_GAP">
-                              Widen the Gap
-                            </MenuItem>,
-                            <MenuItem key="RAM_SIDESWIPE" value="RAM_SIDESWIPE">
-                              Ram/Sideswipe
-                            </MenuItem>,
-                          ]
-                        : [
-                            // When FAR, evader tries to maintain distance
-                            <MenuItem key="EVADE" value="EVADE">
-                              Evade
-                            </MenuItem>,
-                          ]}
-                  </Select>
-                </FormControl>
-
-                {/* Position Selection */}
-                <FormControl sx={{ flex: 1 }}>
-                  <InputLabel>Position</InputLabel>
-                  <Select
-                    value={(() => {
-                      console.log(
-                        "Position dropdown value:",
-                        formState.data.position
-                      )
-                      return formState.data.position || "far"
-                    })()}
-                    onChange={e => {
-                      const newPosition = e.target.value as "near" | "far"
-                      updateField("position", newPosition)
-
-                      // Update method based on role and new position
-                      const role = formState.data.attackerRole || "pursuer"
-                      let defaultMethod = "EVADE"
-                      if (role === "pursuer") {
-                        defaultMethod =
-                          newPosition === "near"
-                            ? "RAM_SIDESWIPE"
-                            : "NARROW_THE_GAP"
-                      } else {
-                        defaultMethod =
-                          newPosition === "near" ? "WIDEN_THE_GAP" : "EVADE"
-                      }
-                      updateField("method", defaultMethod)
-                    }}
-                    label="Position"
-                  >
-                    <MenuItem value="near">Near</MenuItem>
-                    <MenuItem value="far">Far</MenuItem>
-                  </Select>
-                </FormControl>
-              </Stack>
-            )}
-
           {/* Chase Values and Vehicle Info */}
           <Stack
             direction={{ xs: "column", sm: "row" }}
