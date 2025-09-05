@@ -7,7 +7,6 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  TextField,
   Stack,
   Box,
   Typography,
@@ -17,7 +16,7 @@ import {
   FormControl,
   InputLabel,
 } from "@mui/material"
-import { NumberField } from "@/components/ui"
+import { NumberField, TextField } from "@/components/ui"
 import { useClient, useToast, useEncounter } from "@/contexts"
 import { CS } from "@/services"
 import type { Character, Vehicle } from "@/types"
@@ -43,6 +42,7 @@ export default function CharacterEditDialog({
   const [wounds, setWounds] = useState<number>(0)
   const [impairments, setImpairments] = useState<number>(0)
   const [marksOfDeath, setMarksOfDeath] = useState<number>(0)
+  const [fortune, setFortune] = useState<number>(0)
   const [drivingVehicleId, setDrivingVehicleId] = useState<string>("")
   const [loading, setLoading] = useState(false)
 
@@ -127,6 +127,9 @@ export default function CharacterEditDialog({
       // Get marks of death from action_values
       setMarksOfDeath(character.action_values?.["Marks of Death"] || 0)
 
+      // Get fortune from action_values (for PCs)
+      setFortune(CS.fortune(character) || 0)
+
       // Get impairments based on character type
       if (isPC()) {
         // For PCs, impairments are on the character model
@@ -193,7 +196,8 @@ export default function CharacterEditDialog({
       name.trim().length > 0 &&
       wounds >= 0 &&
       impairments >= 0 &&
-      marksOfDeath >= 0
+      marksOfDeath >= 0 &&
+      fortune >= 0
     )
   }
 
@@ -217,13 +221,14 @@ export default function CharacterEditDialog({
         name: name.trim(),
       }
 
-      // Handle wounds and marks of death based on character type
+      // Handle wounds, marks of death, and fortune based on character type
       if (isPC()) {
-        // PCs: wounds, marks of death, and impairments are always on the character model
+        // PCs: wounds, marks of death, fortune, and impairments are always on the character model
         characterUpdate.action_values = {
           ...character.action_values,
           Wounds: wounds,
           "Marks of Death": marksOfDeath,
+          Fortune: fortune,
         }
         characterUpdate.impairments = impairments
       } else if (isMook()) {
@@ -388,7 +393,7 @@ export default function CharacterEditDialog({
           {/* Name field */}
           <TextField
             fullWidth
-            label="Character Name"
+            label="Name"
             value={name}
             onChange={e => setName(e.target.value)}
             disabled={loading}
@@ -400,7 +405,7 @@ export default function CharacterEditDialog({
           {/* Combat Stats Row */}
           <Box>
             <Grid container spacing={2}>
-              <Grid item xs={isMook() ? 6 : isPC() ? 3 : 4}>
+              <Grid item xs={isMook() ? 6 : isPC() ? 2.4 : 4}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -434,7 +439,7 @@ export default function CharacterEditDialog({
                 />
               </Grid>
 
-              <Grid item xs={isMook() ? 6 : isPC() ? 3 : 4}>
+              <Grid item xs={isMook() ? 6 : isPC() ? 2.4 : 4}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -464,7 +469,7 @@ export default function CharacterEditDialog({
               </Grid>
 
               {!isMook() && (
-                <Grid item xs={isPC() ? 3 : 4}>
+                <Grid item xs={isPC() ? 2.4 : 4}>
                   <Typography
                     variant="caption"
                     color="text.secondary"
@@ -497,36 +502,68 @@ export default function CharacterEditDialog({
               )}
 
               {isPC() && (
-                <Grid item xs={3}>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ display: "block", mb: 0.5 }}
-                  >
-                    Marks of Death
-                  </Typography>
-                  <NumberField
-                    value={marksOfDeath}
-                    onChange={(
-                      e: React.ChangeEvent<HTMLInputElement> | number
-                    ) => {
-                      const val =
-                        typeof e === "object" && "target" in e
-                          ? e.target.value
-                          : e
-                      setMarksOfDeath(
-                        typeof val === "number"
-                          ? val
-                          : parseInt(String(val)) || 0
-                      )
-                    }}
-                    onBlur={() => {}}
-                    min={0}
-                    disabled={loading}
-                    size="small"
-                    fullWidth
-                  />
-                </Grid>
+                <>
+                  <Grid item xs={2.4}>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ display: "block", mb: 0.5 }}
+                    >
+                      Marks of Death
+                    </Typography>
+                    <NumberField
+                      value={marksOfDeath}
+                      onChange={(
+                        e: React.ChangeEvent<HTMLInputElement> | number
+                      ) => {
+                        const val =
+                          typeof e === "object" && "target" in e
+                            ? e.target.value
+                            : e
+                        setMarksOfDeath(
+                          typeof val === "number"
+                            ? val
+                            : parseInt(String(val)) || 0
+                        )
+                      }}
+                      onBlur={() => {}}
+                      min={0}
+                      disabled={loading}
+                      size="small"
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={2.4}>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ display: "block", mb: 0.5 }}
+                    >
+                      Fortune
+                    </Typography>
+                    <NumberField
+                      value={fortune}
+                      onChange={(
+                        e: React.ChangeEvent<HTMLInputElement> | number
+                      ) => {
+                        const val =
+                          typeof e === "object" && "target" in e
+                            ? e.target.value
+                            : e
+                        setFortune(
+                          typeof val === "number"
+                            ? val
+                            : parseInt(String(val)) || 0
+                        )
+                      }}
+                      onBlur={() => {}}
+                      min={0}
+                      disabled={loading}
+                      size="small"
+                      fullWidth
+                    />
+                  </Grid>
+                </>
               )}
             </Grid>
           </Box>
@@ -540,6 +577,17 @@ export default function CharacterEditDialog({
               onChange={e => setDrivingVehicleId(e.target.value as string)}
               label="Driving"
               disabled={loading}
+              sx={{
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "divider",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "primary.main",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "primary.main",
+                },
+              }}
             >
               <MenuItem value="">
                 <em>None</em>

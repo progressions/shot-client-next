@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useMemo, useEffect } from "react"
 import {
   Box,
   Typography,
@@ -45,7 +45,6 @@ export default function ChaseTargetSection({
   attacker,
   attackerShotId,
 }: ChaseTargetSectionProps) {
-  const [showAll, setShowAll] = useState(false)
   const targetShotId = (
     formState.data as ChaseFormData & { targetShotId?: string }
   ).targetShotId
@@ -67,7 +66,6 @@ export default function ChaseTargetSection({
   }, [attacker])
 
   // Filter shots to only include characters with driving_id, excluding the attacker
-  // and filtering based on attacker's allegiance (unless showAll is true)
   const targetDriverShots = useMemo(() => {
     return shots.filter(shot => {
       // Exclude the attacker's shot
@@ -81,43 +79,6 @@ export default function ChaseTargetSection({
         return false
       }
 
-      // If showAll is true, skip faction-based filtering
-      if (!showAll) {
-        // If attacker is friendly (PC/Ally), exclude other friendlies from targets
-        if (attackerIsFriendly) {
-          if (shot.character && CS.isType(shot.character, ["PC", "Ally"])) {
-            return false
-          }
-          if (shot.characters) {
-            // Filter out shots that only contain PCs/Allies
-            const nonFriendlyDrivers = shot.characters.filter(
-              (c: Character) =>
-                (c as CharacterWithShotData).driving_id &&
-                !CS.isType(c, ["PC", "Ally"])
-            )
-            if (nonFriendlyDrivers.length === 0) {
-              return false
-            }
-          }
-        } else {
-          // If attacker is NOT friendly (enemy), only include PCs/Allies as targets
-          if (shot.character && !CS.isType(shot.character, ["PC", "Ally"])) {
-            return false
-          }
-          if (shot.characters) {
-            // Filter out shots that don't contain any PCs/Allies
-            const friendlyDrivers = shot.characters.filter(
-              (c: Character) =>
-                (c as CharacterWithShotData).driving_id &&
-                CS.isType(c, ["PC", "Ally"])
-            )
-            if (friendlyDrivers.length === 0) {
-              return false
-            }
-          }
-        }
-      }
-
       // Include only if character has driving_id
       if (shot.character) {
         return !!(shot.character as CharacterWithShotData).driving_id
@@ -129,7 +90,7 @@ export default function ChaseTargetSection({
       }
       return false
     })
-  }, [shots, attackerShotId, attackerIsFriendly, showAll])
+  }, [shots, attackerShotId])
 
   // Get the vehicle being driven by the selected target
   const selectedVehicle = useMemo(() => {
@@ -140,6 +101,18 @@ export default function ChaseTargetSection({
     const fullVehicle = vehicles.find(v => v.id === drivingInfo.id)
     return fullVehicle || drivingInfo
   }, [target, vehicles])
+
+  // Initialize targetCrunch when selectedVehicle changes
+  useEffect(() => {
+    if (selectedVehicle) {
+      const currentCrunch = (formState.data as ChaseFormData & { targetCrunch?: string }).targetCrunch
+      const vehicleCrunch = VS.crunch(selectedVehicle)
+      // Only update if not already set or if it's 0 when vehicle has a different value
+      if (!currentCrunch || (currentCrunch === "0" && vehicleCrunch !== 0)) {
+        updateField("targetCrunch", vehicleCrunch)
+      }
+    }
+  }, [selectedVehicle])
 
   return (
     <Box
@@ -196,52 +169,44 @@ export default function ChaseTargetSection({
                   const targetDriving = CS.skill(selectedChar, "Driving")
                   const targetHandling = VS.handling(vehicle)
                   const targetFrame = VS.frame(vehicle)
+                  const targetCrunch = VS.crunch(vehicle)
 
                   updateField("defense", targetDriving) // Target's Driving is the difficulty
                   updateField("handling", targetHandling) // Target's Handling for chase point calculation
                   updateField("frame", targetFrame) // Target's Frame for damage calculation
+                  updateField("targetCrunch", targetCrunch) // Target's Crunch for ram calculation
                   updateField("targetVehicle", vehicle) // Store the vehicle reference
                 }
               }
             }}
             borderColor="error.main"
             excludeShotId={attackerShotId}
+            showAllCheckbox={true}
+            filterFunction={(character: Character) => {
+              // Filter based on attacker's allegiance
+              if (attackerIsFriendly) {
+                // If attacker is friendly, exclude other friendlies from targets
+                return !CS.isType(character, ["PC", "Ally"])
+              } else {
+                // If attacker is NOT friendly, only include PCs/Allies as targets
+                return CS.isType(character, ["PC", "Ally"])
+              }
+            }}
           />
 
           {/* Display selected target */}
           {target && (
-            <Box sx={{ mt: 1 }}>
+            <Box sx={{ mt: 2 }}>
               <TargetDisplay character={target} />
             </Box>
           )}
-
-          {/* Show All Checkbox */}
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={showAll}
-                onChange={e => setShowAll(e.target.checked)}
-                size="small"
-              />
-            }
-            label="Show all characters"
-            sx={{
-              mt: 0.5,
-              ml: 1,
-              "& .MuiFormControlLabel-label": {
-                fontSize: "0.75rem",
-              },
-            }}
-          />
         </Box>
       </Stack>
 
       {/* Show message if no targets available */}
       {targetDriverShots.length === 0 && (
         <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>
-          {attackerIsFriendly
-            ? "No enemy vehicles available as targets (friendly fire not allowed)."
-            : "No player or ally vehicles available as targets."}
+          No vehicles with drivers available as targets.
         </Typography>
       )}
 
@@ -320,6 +285,27 @@ export default function ChaseTargetSection({
                     error={false}
                     onChange={e => updateField("frame", e.target.value)}
                     onBlur={e => updateField("frame", e.target.value)}
+                  />
+                </Box>
+
+                {/* Crunch Value (editable) */}
+                <Box>
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 1, fontWeight: "medium" }}
+                  >
+                    Crunch
+                  </Typography>
+                  <NumberField
+                    name="targetCrunch"
+                    value={
+                      parseInt((formState.data as ChaseFormData & { targetCrunch?: string }).targetCrunch?.toString() || "0") || 0
+                    }
+                    size="small"
+                    width="80px"
+                    error={false}
+                    onChange={e => updateField("targetCrunch", e.target.value)}
+                    onBlur={e => updateField("targetCrunch", e.target.value)}
                   />
                 </Box>
               </Stack>

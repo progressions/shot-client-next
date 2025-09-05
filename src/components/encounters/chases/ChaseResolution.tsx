@@ -71,9 +71,10 @@ export default function ChaseResolution({
   if (previewSuccess && previewOutcome !== null) {
     if (formState.data.method === ChaseMethod.RAM_SIDESWIPE) {
       const targetFrame = VS.isMook(target) ? 0 : VS.frame(target)
+      const targetCrunch = parseToNumber((formState.data as ChaseFormData & { targetCrunch?: string }).targetCrunch || "0")
       previewChasePoints = Math.max(
         0,
-        previewOutcome + parseToNumber(formState.data.crunch) - targetFrame
+        previewOutcome + targetCrunch - targetFrame
       )
     } else {
       // Use the editable handling value from the form
@@ -169,134 +170,126 @@ export default function ChaseResolution({
       // Update form with results
       updateFields(result)
 
-      // Update vehicles in the backend if successful
+      // Update vehicles in the backend (even for failed attempts - attacker still spends shots)
+      // For chase actions, the damage (chase points) is applied to the target
+      // result.chasePoints contains the amount of damage dealt
+      const attackerVehicleValues: Record<string, number> = {}
+      const targetVehicleValues: Record<string, number> = {}
+
+      // The attacker doesn't take damage (unless it's a ram/sideswipe with bump)
+      // So we don't need to update the attacker's chase points
+
+      // The target takes the chase points damage (only if successful)
+      if (result.success && result.chasePoints) {
+        targetVehicleValues["Chase Points"] = result.chasePoints
+      }
+
+      // For RAM_SIDESWIPE, also apply condition points (only if successful)
+      if (
+        result.success &&
+        result.method === ChaseMethod.RAM_SIDESWIPE &&
+        result.conditionPoints
+      ) {
+        targetVehicleValues["Condition Points"] = result.conditionPoints
+      }
+
+      console.log(
+        "Chase Resolution - Target vehicle values being sent:",
+        targetVehicleValues
+      )
+      console.log(
+        "Chase Resolution - Result target action_values:",
+        result.target.action_values
+      )
+
+      // Get the vehicle IDs (vehicles were already extracted earlier)
+      const attackerVehicleId = attackerVehicle?.id
+      const targetVehicleId = targetVehicle?.id
+
+      if (!attackerVehicleId || !targetVehicleId) {
+        toastError("Unable to identify vehicles for chase action")
+        setIsProcessing(false)
+        return
+      }
+
+      // Get the shot cost from form state
+      const shotCost = parseInt(
+        (formState.data as ChaseFormData & { shotCost?: string }).shotCost ||
+          "3"
+      )
+
+      // Calculate the actual new position based on success and method
+      let finalPosition = formState.data.position
       if (result.success) {
-        // For chase actions, the damage (chase points) is applied to the target
-        // result.chasePoints contains the amount of damage dealt
-        const attackerVehicleValues: Record<string, number> = {}
-        const targetVehicleValues: Record<string, number> = {}
-
-        // The attacker doesn't take damage (unless it's a ram/sideswipe with bump)
-        // So we don't need to update the attacker's chase points
-
-        // The target takes the chase points damage
-        if (result.chasePoints) {
-          targetVehicleValues["Chase Points"] = result.chasePoints
-        }
-
-        // For RAM_SIDESWIPE, also apply condition points
         if (
-          result.method === ChaseMethod.RAM_SIDESWIPE &&
-          result.conditionPoints
+          result.method === ChaseMethod.NARROW_THE_GAP &&
+          formState.data.position === "far"
         ) {
-          targetVehicleValues["Condition Points"] = result.conditionPoints
+          finalPosition = "near"
+        } else if (
+          result.method === ChaseMethod.WIDEN_THE_GAP &&
+          formState.data.position === "near"
+        ) {
+          finalPosition = "far"
         }
+      }
 
-        console.log(
-          "Chase Resolution - Target vehicle values being sent:",
-          targetVehicleValues
-        )
-        console.log(
-          "Chase Resolution - Result target action_values:",
-          result.target.action_values
-        )
+      console.log(
+        "Chase Resolution - Original position from form:",
+        formState.data.position
+      )
+      console.log(
+        "Chase Resolution - Calculated new position:",
+        finalPosition
+      )
+      console.log("Chase Resolution - Method:", result.method)
+      console.log("Chase Resolution - Success:", result.success)
 
-        // Get the actual vehicle IDs from the stored vehicle references
-        // or from the driving relationship if needed
-        const attackerVehicle =
-          (formState.data as ChaseFormData & { vehicle?: Vehicle }).vehicle ||
-          (result.attacker?.driving ? result.attacker.driving : null)
-        const targetVehicle =
-          (formState.data as ChaseFormData & { targetVehicle?: Vehicle })
-            .targetVehicle ||
-          (result.target?.driving ? result.target.driving : null)
+      // Include action_type for ram/sideswipe tracking
+      const actionType = result.method === ChaseMethod.RAM_SIDESWIPE 
+        ? "ram" 
+        : result.method === ChaseMethod.NARROW_THE_GAP || 
+          result.method === ChaseMethod.WIDEN_THE_GAP 
+        ? "chase_maneuver" 
+        : "evade"
 
-        const attackerVehicleId = attackerVehicle?.id
-        const targetVehicleId = targetVehicle?.id
-
-        if (!attackerVehicleId || !targetVehicleId) {
-          toastError("Unable to identify vehicles for chase action")
-          setIsProcessing(false)
-          return
-        }
-
-        // Get the shot cost from form state
-        const shotCost = parseInt(
-          (formState.data as ChaseFormData & { shotCost?: string }).shotCost ||
-            "3"
-        )
-
-        // Calculate the actual new position based on success and method
-        let finalPosition = formState.data.position
-        if (result.success) {
-          if (
-            result.method === ChaseMethod.NARROW_THE_GAP &&
-            formState.data.position === "far"
-          ) {
-            finalPosition = "near"
-          } else if (
-            result.method === ChaseMethod.WIDEN_THE_GAP &&
-            formState.data.position === "near"
-          ) {
-            finalPosition = "far"
-          }
-        }
-
-        console.log(
-          "Chase Resolution - Original position from form:",
-          formState.data.position
-        )
-        console.log(
-          "Chase Resolution - Calculated new position:",
-          finalPosition
-        )
-        console.log("Chase Resolution - Method:", result.method)
-        console.log("Chase Resolution - Success:", result.success)
-
-        // Include action_type for ram/sideswipe tracking
-        const actionType = result.method === ChaseMethod.RAM_SIDESWIPE 
-          ? "ram" 
-          : result.method === ChaseMethod.NARROW_THE_GAP || 
-            result.method === ChaseMethod.WIDEN_THE_GAP 
-          ? "chase_maneuver" 
-          : "evade"
-
-        const vehicleUpdates = [
-          {
-            vehicle_id: attackerVehicleId,
-            target_vehicle_id: targetVehicleId,
-            role: formState.data.attackerRole || "pursuer", // Include attacker's role
-            shot_cost: shotCost, // Add shot cost for the attacker
-            character_id: attacker.id, // Include character ID to spend shots
-            action_values: attackerVehicleValues,
-            position: finalPosition, // Use the calculated position
-            event: {
-              type: "chase_action",
-              description: `${attacker.name} ${result.method === ChaseMethod.RAM_SIDESWIPE ? "rams" : result.method === ChaseMethod.NARROW_THE_GAP ? "narrows gap with" : result.method === ChaseMethod.WIDEN_THE_GAP ? "widens gap from" : "evades"} ${target.name}`,
-              details: {
-                method: result.method,
-                chase_points: result.chasePoints,
-                condition_points: result.conditionPoints,
-                position: finalPosition,
-                success: result.success,
-                shot_cost: shotCost,
-              },
+      const vehicleUpdates = [
+        {
+          vehicle_id: attackerVehicleId,
+          target_vehicle_id: targetVehicleId,
+          role: formState.data.attackerRole || "pursuer", // Include attacker's role
+          shot_cost: shotCost, // Add shot cost for the attacker
+          character_id: attacker.id, // Include character ID to spend shots
+          action_values: attackerVehicleValues,
+          position: finalPosition, // Use the calculated position
+          event: {
+            type: "chase_action",
+            description: `${attacker.name} ${result.method === ChaseMethod.RAM_SIDESWIPE ? "rams" : result.method === ChaseMethod.NARROW_THE_GAP ? "narrows gap with" : result.method === ChaseMethod.WIDEN_THE_GAP ? "widens gap from" : "evades"} ${target.name}${result.success ? "" : " (missed)"}`,
+            details: {
+              method: result.method,
+              chase_points: result.chasePoints,
+              condition_points: result.conditionPoints,
+              position: finalPosition,
+              success: result.success,
+              shot_cost: shotCost,
             },
           },
-          {
-            vehicle_id: targetVehicleId,
-            target_vehicle_id: attackerVehicleId,
-            role:
-              formState.data.attackerRole === "pursuer" ? "evader" : "pursuer", // Target has opposite role
-            position: finalPosition, // Use the calculated position
-            action_values: targetVehicleValues,
-            action_type: actionType, // Track if target was rammed
-          },
-        ]
+        },
+        {
+          vehicle_id: targetVehicleId,
+          target_vehicle_id: attackerVehicleId,
+          role:
+            formState.data.attackerRole === "pursuer" ? "evader" : "pursuer", // Target has opposite role
+          position: finalPosition, // Use the calculated position
+          action_values: targetVehicleValues,
+          action_type: actionType, // Track if target was rammed
+        },
+      ]
 
-        await client.applyChaseAction(encounter, vehicleUpdates)
-        
-        // Check if target will be defeated after applying damage
+      await client.applyChaseAction(encounter, vehicleUpdates)
+      
+      // Check if target will be defeated after applying damage (only if successful)
+      if (result.success) {
         const targetChasePoints = (target.action_values?.["Chase Points"] || 0) + (result.chasePoints || 0)
         const defeatThreshold = VS.getDefeatThreshold(target)
         const willBeDefeated = targetChasePoints >= defeatThreshold
@@ -307,10 +300,12 @@ export default function ChaseResolution({
         } else {
           toastSuccess("Chase action resolved successfully!")
         }
-        
-        if (onComplete) onComplete()
-        onClose()
+      } else {
+        toastSuccess("Chase action missed - shots spent")
       }
+      
+      if (onComplete) onComplete()
+      onClose()
     } catch (error) {
       toastError("Failed to process chase action")
       console.error(error)
@@ -413,7 +408,7 @@ export default function ChaseResolution({
             <>
               <Typography variant="caption" sx={{ display: "block" }}>
                 {formState.data.method === ChaseMethod.RAM_SIDESWIPE
-                  ? `Outcome ${showPreview ? previewOutcome : formState.data.outcome} + Crunch ${formState.data.crunch} - Frame ${formState.data.frame} = Chase Points ${showPreview ? previewChasePoints : chasePoints}, Condition Points ${showPreview ? previewChasePoints : conditionPoints}`
+                  ? `Outcome ${showPreview ? previewOutcome : formState.data.outcome} + Crunch ${(formState.data as ChaseFormData & { targetCrunch?: string }).targetCrunch || "0"} - Frame ${formState.data.frame} = Chase Points ${showPreview ? previewChasePoints : chasePoints}, Condition Points ${showPreview ? previewChasePoints : conditionPoints}`
                   : `Outcome ${showPreview ? previewOutcome : formState.data.outcome} + Squeal ${formState.data.squeal} - Handling ${formState.data.handling} = Chase Points ${showPreview ? previewChasePoints : chasePoints}`}
               </Typography>
               <Typography variant="caption" sx={{ display: "block", mt: 1 }}>

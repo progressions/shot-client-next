@@ -114,8 +114,8 @@ export default function ShotCounter() {
           const scrollTop =
             window.pageYOffset || document.documentElement.scrollTop
 
-          // Calculate position to bring action bar to top of viewport
-          const targetPosition = rect.top + scrollTop
+          // Calculate position to bring action bar to top of viewport with 50px buffer for sticky menu
+          const targetPosition = rect.top + scrollTop - 50
 
           // Smooth scroll to the calculated position
           window.scrollTo({

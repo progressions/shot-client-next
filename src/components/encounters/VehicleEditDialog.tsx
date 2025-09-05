@@ -7,13 +7,12 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  TextField,
   Stack,
   Box,
   Typography,
   Grid,
 } from "@mui/material"
-import { NumberField } from "@/components/ui"
+import { NumberField, TextField } from "@/components/ui"
 import { useClient, useToast, useEncounter } from "@/contexts"
 import type { Vehicle } from "@/types"
 
@@ -143,7 +142,7 @@ export default function VehicleEditDialog({
           {/* Name field */}
           <TextField
             fullWidth
-            label="Vehicle Name"
+            label="Name"
             value={name}
             onChange={e => setName(e.target.value)}
             disabled={loading}
