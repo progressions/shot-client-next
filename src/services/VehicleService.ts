@@ -21,19 +21,7 @@ const VehicleService = {
   },
 
   totalImpairments: function (vehicle: Vehicle): number {
-    if (this.isBoss(vehicle) || this.isUberBoss(vehicle)) {
-      return 0
-    }
-    if (
-      vehicle.driver?.id &&
-      (CS.isBoss(vehicle.driver) || CS.isUberBoss(vehicle.driver))
-    ) {
-      return 0
-    }
-    const driverImpairments = vehicle.driver
-      ? CS.impairments(vehicle.driver)
-      : 0
-    const impairments = driverImpairments + this.impairments(vehicle)
+    const impairments = this.impairments(vehicle)
     return Math.min(2, Math.max(0, impairments))
   },
 
@@ -147,10 +135,6 @@ const VehicleService = {
   },
 
   getDefeatThreshold: function (vehicle: Vehicle): number {
-    // Use backend-provided threshold if available
-    if (vehicle.defeat_threshold !== undefined) {
-      return vehicle.defeat_threshold
-    }
     // Fallback to local calculation
     const driverType = vehicle.driver?.action_values?.Type
     const vehicleType = driverType || this.type(vehicle)

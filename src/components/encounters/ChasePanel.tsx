@@ -81,6 +81,14 @@ export default function ChasePanel({
   const _targetShotId = (formState.data as { targetShotId?: string })
     .targetShotId
 
+  // Get the vehicles from formState - ChaseResolution needs Vehicle objects, not Characters
+  const attackerVehicle = (
+    formState.data as ChaseFormData & { vehicle?: Vehicle }
+  ).vehicle
+  const targetVehicle = (
+    formState.data as ChaseFormData & { targetVehicle?: Vehicle }
+  ).targetVehicle
+
   // Monitor position changes
   useEffect(() => {
     console.log("Position in formState changed to:", formState.data.position)
@@ -300,8 +308,8 @@ export default function ChasePanel({
           <ChaseResolution
             formState={formState}
             dispatchForm={dispatchForm}
-            attacker={attacker}
-            target={target}
+            attacker={attackerVehicle || null}
+            target={targetVehicle || null}
             onClose={onClose}
             onComplete={onComplete}
           />

@@ -73,6 +73,13 @@ export default function ChaseTargetSection({
         return false
       }
       if (
+        shot.character &&
+        shot.character.driving &&
+        VS.isDefeated(shot.character.driving)
+      ) {
+        return false
+      }
+      if (
         shot.characters &&
         shot.characters.some((c: Character) => c.shot_id === attackerShotId)
       ) {
@@ -179,6 +186,14 @@ export default function ChaseTargetSection({
                   updateField("targetCrunch", targetCrunch) // Target's Crunch for ram calculation
                   updateField("targetVehicle", vehicle) // Store the vehicle reference
                 }
+              } else {
+                // Clear target fields if no valid character/vehicle selected
+                updateField("target", null)
+                updateField("targetVehicle", null)
+                updateField("defense", "0")
+                updateField("handling", "0")
+                updateField("frame", "0")
+                updateField("targetCrunch", "0")
               }
             }}
             borderColor="error.main"
@@ -197,7 +212,7 @@ export default function ChaseTargetSection({
           />
 
           {/* Display selected target */}
-          {target && (
+          {target && selectedVehicle && (
             <Box sx={{ mt: 2 }}>
               <TargetDisplay character={target} />
             </Box>
@@ -208,7 +223,7 @@ export default function ChaseTargetSection({
       {/* Show message if no targets available */}
       {targetDriverShots.length === 0 && (
         <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>
-          No vehicles with drivers available as targets.
+          No vehicles available as targets.
         </Typography>
       )}
 
