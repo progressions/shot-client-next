@@ -85,12 +85,16 @@ export default function VehicleEditDialog({
         vehicleWithShotImpairments.shot_impairments || vehicle.impairments || 0
       )
 
-      // Set driver if vehicle has one - driver_id is a shot_id
-      if (vehicle.driver_id) {
-        console.log("Setting driver_id (shot_id):", vehicle.driver_id)
+      // Set driver if vehicle has one - use driver.shot_id
+      if (vehicle.driver?.shot_id) {
+        console.log("Setting driver shot_id:", vehicle.driver.shot_id)
+        setDriverId(vehicle.driver.shot_id)
+      } else if (vehicle.driver_id) {
+        // Fallback to driver_id if available
+        console.log("Setting driver_id (fallback):", vehicle.driver_id)
         setDriverId(vehicle.driver_id)
       } else {
-        console.log("No driver_id found on vehicle")
+        console.log("No driver found on vehicle")
         setDriverId("")
       }
     }
