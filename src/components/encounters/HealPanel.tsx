@@ -110,10 +110,24 @@ export default function HealPanel({
       }
 
       // Build character updates array
-      const characterUpdates = []
+      interface CharacterUpdate {
+        shot_id: string
+        character_id: string
+        shot?: number
+        event?: {
+          type: string
+          description: string
+          details: Record<string, unknown>
+        }
+        action_values?: Record<string, number>
+        wounds?: number
+        count?: number
+      }
+      
+      const characterUpdates: CharacterUpdate[] = []
 
       // Healer spends shots and optionally Fortune
-      const healerUpdate: Record<string, any> = {
+      const healerUpdate: CharacterUpdate = {
         shot_id: preselectedCharacter.shot_id,
         character_id: preselectedCharacter.id,
         shot: healerShot.shot - shots,
@@ -145,7 +159,7 @@ export default function HealPanel({
       characterUpdates.push(healerUpdate)
 
       // Target's wounds are reduced
-      const targetUpdate: Record<string, any> = {
+      const targetUpdate: CharacterUpdate = {
         shot_id: target.shot_id,
         character_id: target.id,
       }
