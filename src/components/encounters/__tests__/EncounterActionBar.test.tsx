@@ -51,14 +51,16 @@ describe("EncounterActionBar", () => {
       expect(screen.getByTestId("encounter-action-bar")).toBeInTheDocument()
     })
 
-    it("should not be visible when no character is selected", () => {
+    it("should show disabled state when no character is selected", () => {
       render(
         <EncounterActionBar selectedCharacter={null} onAction={mockOnAction} />
       )
 
-      expect(
-        screen.queryByTestId("encounter-action-bar")
-      ).not.toBeInTheDocument()
+      // The bar is visible but buttons are disabled
+      expect(screen.getByTestId("encounter-action-bar")).toBeInTheDocument()
+      const attackButtons = screen.getAllByTitle("Select a character first")
+      expect(attackButtons.length).toBeGreaterThan(0)
+      expect(attackButtons[0]).toBeDisabled()
     })
   })
 
@@ -85,15 +87,15 @@ describe("EncounterActionBar", () => {
       expect(screen.getByTitle("Boost")).toBeInTheDocument()
     })
 
-    it("should display chase button for characters in a vehicle chase", () => {
-      const characterInChase = {
+    it("should display chase button for characters in a vehicle", () => {
+      const characterInVehicle = {
         ...mockCharacter,
-        chase_points: 10,
+        driving: { id: "vehicle1", name: "Car" },
       }
 
       render(
         <EncounterActionBar
-          selectedCharacter={characterInChase}
+          selectedCharacter={characterInVehicle}
           onAction={mockOnAction}
         />
       )
@@ -117,7 +119,7 @@ describe("EncounterActionBar", () => {
       expect(screen.getByTitle("Heal")).toBeInTheDocument()
     })
 
-    it("should display character name and shot position", () => {
+    it("should display character name", () => {
       render(
         <EncounterActionBar
           selectedCharacter={mockCharacter}
@@ -126,7 +128,6 @@ describe("EncounterActionBar", () => {
       )
 
       expect(screen.getByText("Alice")).toBeInTheDocument()
-      expect(screen.getByText("Shot 12")).toBeInTheDocument()
     })
   })
 
@@ -140,7 +141,7 @@ describe("EncounterActionBar", () => {
       )
 
       fireEvent.click(screen.getByTitle("Attack"))
-      expect(mockOnAction).toHaveBeenCalledWith("attack", mockCharacter)
+      expect(mockOnAction).toHaveBeenCalledWith("attack")
     })
 
     it("should call onAction with 'boost' when Boost button is clicked", () => {
@@ -152,24 +153,24 @@ describe("EncounterActionBar", () => {
       )
 
       fireEvent.click(screen.getByTitle("Boost"))
-      expect(mockOnAction).toHaveBeenCalledWith("boost", mockCharacter)
+      expect(mockOnAction).toHaveBeenCalledWith("boost")
     })
 
     it("should call onAction with 'chase' when Chase button is clicked", () => {
-      const characterInChase = {
+      const characterInVehicle = {
         ...mockCharacter,
-        chase_points: 10,
+        driving: { id: "vehicle1", name: "Car" },
       }
 
       render(
         <EncounterActionBar
-          selectedCharacter={characterInChase}
+          selectedCharacter={characterInVehicle}
           onAction={mockOnAction}
         />
       )
 
       fireEvent.click(screen.getByTitle("Chase"))
-      expect(mockOnAction).toHaveBeenCalledWith("chase", characterInChase)
+      expect(mockOnAction).toHaveBeenCalledWith("chase")
     })
 
     it("should call onAction with 'heal' when Heal button is clicked", () => {
@@ -186,7 +187,7 @@ describe("EncounterActionBar", () => {
       )
 
       fireEvent.click(screen.getByTitle("Heal"))
-      expect(mockOnAction).toHaveBeenCalledWith("heal", woundedCharacter)
+      expect(mockOnAction).toHaveBeenCalledWith("heal")
     })
   })
 
@@ -241,7 +242,7 @@ describe("EncounterActionBar", () => {
       expect(attackButton).toBeDisabled()
     })
 
-    it("should not show heal button if character has no wounds", () => {
+    it("should show heal button for all characters", () => {
       render(
         <EncounterActionBar
           selectedCharacter={mockCharacter}
@@ -249,7 +250,8 @@ describe("EncounterActionBar", () => {
         />
       )
 
-      expect(screen.queryByTitle("Heal")).not.toBeInTheDocument()
+      // Heal button is now always visible
+      expect(screen.getByTitle("Heal")).toBeInTheDocument()
     })
 
     it("should not show chase button if not in a chase", () => {

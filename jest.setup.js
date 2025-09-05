@@ -1,5 +1,10 @@
 import "@testing-library/jest-dom"
 
+// Add TextEncoder/TextDecoder for Node.js environment
+import { TextEncoder, TextDecoder } from "util"
+global.TextEncoder = TextEncoder
+global.TextDecoder = TextDecoder
+
 // Mock environment variables
 process.env.NEXT_PUBLIC_API_BASE_URL = "http://localhost:3004"
 process.env.NEXT_PUBLIC_SERVER_URL = "http://localhost:3004"
