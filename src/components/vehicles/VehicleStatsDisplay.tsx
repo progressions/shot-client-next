@@ -22,34 +22,25 @@ export default function VehicleStatsDisplay({
       <Box sx={{ flex: 1 }}>
         <Typography variant="h6" fontWeight="bold">
           {showLink ? (
-            <VehicleLink vehicle={vehicle}>
-              {vehicle.name}
-            </VehicleLink>
+            <VehicleLink vehicle={vehicle}>{vehicle.name}</VehicleLink>
           ) : (
             vehicle.name
           )}
         </Typography>
-        
+
         {/* Vehicle Stats Row 1 */}
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ mt: 0.5 }}
-        >
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
           <strong>Acceleration</strong> {VS.acceleration(vehicle)} •{" "}
           <strong>Handling</strong> {VS.handling(vehicle)} •{" "}
           <strong>Squeal</strong> {VS.squeal(vehicle)}
         </Typography>
-        
+
         {/* Vehicle Stats Row 2 */}
-        <Typography
-          variant="body2"
-          color="text.secondary"
-        >
-          <strong>Frame</strong> {VS.frame(vehicle)} •{" "}
-          <strong>Crunch</strong> {VS.crunch(vehicle)}
+        <Typography variant="body2" color="text.secondary">
+          <strong>Frame</strong> {VS.frame(vehicle)} • <strong>Crunch</strong>{" "}
+          {VS.crunch(vehicle)}
         </Typography>
-        
+
         {/* Chase and Condition Points */}
         <Box sx={{ mt: 1 }}>
           <ChaseConditionPoints vehicle={vehicle} />

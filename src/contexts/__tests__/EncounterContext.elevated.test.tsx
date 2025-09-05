@@ -61,7 +61,8 @@ const mockEncounter: Encounter = {
 
 // Test component that uses the new selectedActorId functionality
 const TestComponent = () => {
-  const { selectedActorId, selectedActorShot, setSelectedActor } = useEncounter()
+  const { selectedActorId, selectedActorShot, setSelectedActor } =
+    useEncounter()
 
   return (
     <div>
@@ -70,9 +71,7 @@ const TestComponent = () => {
       <button onClick={() => setSelectedActor("shot_1", 12)}>
         Select Alice
       </button>
-      <button onClick={() => setSelectedActor("shot_2", 10)}>
-        Select Bob
-      </button>
+      <button onClick={() => setSelectedActor("shot_2", 10)}>Select Bob</button>
       <button onClick={() => setSelectedActor(null, null)}>
         Clear Selection
       </button>

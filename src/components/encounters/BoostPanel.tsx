@@ -36,7 +36,11 @@ interface ExtendedBoostPanelProps {
   preselectedBooster?: Character
 }
 
-export default function BoostPanel({ onClose, onComplete, preselectedBooster }: ExtendedBoostPanelProps) {
+export default function BoostPanel({
+  onClose,
+  onComplete,
+  preselectedBooster,
+}: ExtendedBoostPanelProps) {
   const [isReady, setIsReady] = useState(false)
   const { encounter } = useEncounter()
   const { toastSuccess, toastError } = useToast()

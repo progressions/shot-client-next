@@ -21,7 +21,7 @@ jest.mock("@/contexts", () => ({
 
 describe("EncounterActionBar", () => {
   const mockOnAction = jest.fn()
-  
+
   const mockCharacter: Character = {
     id: "char1",
     shot_id: "shot_1",
@@ -29,7 +29,7 @@ describe("EncounterActionBar", () => {
     character_type: "PC",
     action_values: {
       "Martial Arts": 15,
-      "Guns": 13,
+      Guns: 13,
     },
     wounds: 0,
     impairments: 0,
@@ -53,13 +53,12 @@ describe("EncounterActionBar", () => {
 
     it("should not be visible when no character is selected", () => {
       render(
-        <EncounterActionBar
-          selectedCharacter={null}
-          onAction={mockOnAction}
-        />
+        <EncounterActionBar selectedCharacter={null} onAction={mockOnAction} />
       )
 
-      expect(screen.queryByTestId("encounter-action-bar")).not.toBeInTheDocument()
+      expect(
+        screen.queryByTestId("encounter-action-bar")
+      ).not.toBeInTheDocument()
     })
   })
 
@@ -189,7 +188,6 @@ describe("EncounterActionBar", () => {
       fireEvent.click(screen.getByTitle("Heal"))
       expect(mockOnAction).toHaveBeenCalledWith("heal", woundedCharacter)
     })
-
   })
 
   describe("Styling", () => {
@@ -210,10 +208,7 @@ describe("EncounterActionBar", () => {
 
     it("should show transition animation when appearing", () => {
       const { rerender } = render(
-        <EncounterActionBar
-          selectedCharacter={null}
-          onAction={mockOnAction}
-        />
+        <EncounterActionBar selectedCharacter={null} onAction={mockOnAction} />
       )
 
       rerender(

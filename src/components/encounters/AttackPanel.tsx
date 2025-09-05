@@ -1,17 +1,12 @@
 "use client"
 
 import { useMemo, useEffect, useState } from "react"
-import { Box, Typography } from "@mui/material"
+import { Box } from "@mui/material"
 import { useEncounter, useToast } from "@/contexts"
 import { CS, DS, CES } from "@/services"
-import type {
-  Character,
-  Weapon,
-  AttackFormData,
-  AttackPanelProps,
-} from "@/types"
+import type { Character, Weapon, AttackFormData } from "@/types"
 import { useClient } from "@/contexts/AppContext"
-import AttackerSection from "./attacks/AttackerSection"
+import AttackerCombatFields from "./attacks/AttackerCombatFields"
 import TargetSection from "./attacks/TargetSection"
 import WoundsSummary from "./attacks/WoundsSummary"
 import MookAttackSection from "./attacks/MookAttackSection"
@@ -37,10 +32,14 @@ import {
 interface ExtendedAttackPanelProps {
   onClose?: () => void
   onComplete?: () => void
-  preselectedAttacker?: Character
+  preselectedAttacker: Character
 }
 
-export default function AttackPanel({ onClose, onComplete, preselectedAttacker }: ExtendedAttackPanelProps) {
+export default function AttackPanel({
+  onClose,
+  onComplete,
+  preselectedAttacker,
+}: ExtendedAttackPanelProps) {
   const [isReady, setIsReady] = useState(false)
   const { encounter, weapons: encounterWeapons } = useEncounter()
   const { toastSuccess, toastError, toastInfo } = useToast()
@@ -55,11 +54,13 @@ export default function AttackPanel({ onClose, onComplete, preselectedAttacker }
   // Initialize form state with useForm
   const { formState, dispatchForm } = useForm<AttackFormData>({
     // Attacker state
-    attackerShotId: preselectedAttacker?.shot_id || "",
-    attackSkill: preselectedAttacker ? CS.mainAttack(preselectedAttacker) : "",
-    attackValue: preselectedAttacker ? String(CS.skill(preselectedAttacker, CS.mainAttack(preselectedAttacker))) : "",
+    attackerShotId: preselectedAttacker.shot_id,
+    attackSkill: CS.mainAttack(preselectedAttacker),
+    attackValue: String(
+      CS.skill(preselectedAttacker, CS.mainAttack(preselectedAttacker))
+    ),
     attackValueChange: 0, // Track effect changes
-    selectedWeaponId: preselectedAttacker?.weapon_ids?.[0] || "",
+    selectedWeaponId: preselectedAttacker.weapon_ids?.[0] || "",
     weaponDamage: "",
     damageChange: 0, // Track effect changes
     shotCost: "3",
@@ -360,7 +361,6 @@ export default function AttackPanel({ onClose, onComplete, preselectedAttacker }
     allShots,
     targetMookCount,
   ])
-
 
   // Reset defense choices when targets change
   useEffect(() => {
@@ -954,18 +954,15 @@ export default function AttackPanel({ onClose, onComplete, preselectedAttacker }
       {isReady ? (
         <>
           <Box sx={{ backgroundColor: "action.hover" }}>
-            {/* Attacker Section - Only show if not preselected */}
-            {!preselectedAttacker && (
-              <AttackerSection
-                sortedAttackerShots={sortedAttackerShots}
-                formState={formState}
-                dispatchForm={dispatchForm}
-                attacker={attacker}
-                attackerWeapons={attackerWeapons}
-                allShots={allShots}
-                selectedTargetIds={selectedTargetIds}
-              />
-            )}
+            {/* Attacker Combat Fields - Always show since attacker is preselected */}
+            <AttackerCombatFields
+              formState={formState}
+              dispatchForm={dispatchForm}
+              attacker={attacker}
+              attackerWeapons={attackerWeapons}
+              selectedTargetIds={selectedTargetIds}
+              allShots={allShots}
+            />
 
             {/* Target Section */}
             <TargetSection

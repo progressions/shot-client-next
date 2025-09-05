@@ -86,24 +86,26 @@ export default function CharacterSelector({
   // Group filtered shots by shot number for label display
   const shotGroups = useMemo(() => {
     const groups = new Map<number, Shot[]>()
-    
+
     filteredShots.forEach(shot => {
       const shotNumber = shot.shot
       if (shotNumber === null || shotNumber === undefined) return
-      
+
       if (!groups.has(shotNumber)) {
         groups.set(shotNumber, [])
       }
       groups.get(shotNumber)!.push(shot)
     })
-    
+
     // Sort by shot number descending
-    return Array.from(groups.entries())
-      .sort(([a], [b]) => b - a)
+    return Array.from(groups.entries()).sort(([a], [b]) => b - a)
   }, [filteredShots])
 
   return (
-    <Box sx={{ opacity: disabled ? 0.5 : 1 }} data-testid="character-selector-container">
+    <Box
+      sx={{ opacity: disabled ? 0.5 : 1 }}
+      data-testid="character-selector-container"
+    >
       <Box
         sx={{
           display: "flex",
@@ -153,7 +155,7 @@ export default function CharacterSelector({
                 {shotNumber}
               </Box>
             )}
-            
+
             {/* Characters at this shot */}
             {shotsInGroup.map(shot => {
               const entity = shot.character || shot.vehicle
@@ -190,7 +192,9 @@ export default function CharacterSelector({
                     borderRadius: 2,
                     border: isSelected ? "3px solid" : "3px solid transparent",
                     borderColor: isSelected ? borderColor : "transparent",
-                    backgroundColor: isSelected ? "action.selected" : "transparent",
+                    backgroundColor: isSelected
+                      ? "action.selected"
+                      : "transparent",
                     "&:hover": {
                       backgroundColor: "action.hover",
                     },
@@ -225,25 +229,26 @@ export default function CharacterSelector({
           </React.Fragment>
         ))}
       </Box>
-      {showAllCheckbox && ((characterTypes && characterTypes.length > 0) || filterFunction) && (
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={showAll}
-              onChange={e => setShowAll(e.target.checked)}
-              size="small"
-              disabled={disabled}
-            />
-          }
-          label="Show all characters"
-          sx={{
-            mt: 0.5,
-            "& .MuiFormControlLabel-label": {
-              fontSize: "0.75rem",
-            },
-          }}
-        />
-      )}
+      {showAllCheckbox &&
+        ((characterTypes && characterTypes.length > 0) || filterFunction) && (
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={showAll}
+                onChange={e => setShowAll(e.target.checked)}
+                size="small"
+                disabled={disabled}
+              />
+            }
+            label="Show all characters"
+            sx={{
+              mt: 0.5,
+              "& .MuiFormControlLabel-label": {
+                fontSize: "0.75rem",
+              },
+            }}
+          />
+        )}
     </Box>
   )
 }

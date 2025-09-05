@@ -24,7 +24,11 @@ interface HealPanelProps {
   preselectedCharacter?: Character
 }
 
-export default function HealPanel({ onClose, onComplete, preselectedCharacter }: HealPanelProps) {
+export default function HealPanel({
+  onClose,
+  onComplete,
+  preselectedCharacter,
+}: HealPanelProps) {
   const [isReady, setIsReady] = useState(false)
   const { encounter } = useEncounter()
   const { toastSuccess, toastError } = useToast()
@@ -61,9 +65,7 @@ export default function HealPanel({ onClose, onComplete, preselectedCharacter }:
   }, [preselectedCharacter])
 
   // Get selected target
-  const targetShot = allShots.find(
-    s => s.character?.shot_id === targetShotId
-  )
+  const targetShot = allShots.find(s => s.character?.shot_id === targetShotId)
   const target = targetShot?.character
 
   // Calculate healing amount
@@ -109,7 +111,7 @@ export default function HealPanel({ onClose, onComplete, preselectedCharacter }:
 
       // Build character updates array
       const characterUpdates = []
-      
+
       // Healer spends shots and optionally Fortune
       const healerUpdate: any = {
         shot_id: preselectedCharacter.shot_id,
@@ -129,7 +131,7 @@ export default function HealPanel({ onClose, onComplete, preselectedCharacter }:
           },
         },
       }
-      
+
       // If using Fortune, update action_values for PCs
       if (useFortune && CS.isPC(preselectedCharacter)) {
         const currentFortune = CS.fortune(preselectedCharacter)
@@ -139,15 +141,15 @@ export default function HealPanel({ onClose, onComplete, preselectedCharacter }:
           }
         }
       }
-      
+
       characterUpdates.push(healerUpdate)
-      
+
       // Target's wounds are reduced
       const targetUpdate: any = {
         shot_id: target.shot_id,
         character_id: target.id,
       }
-      
+
       // For PCs, wounds go in action_values
       if (CS.isPC(target)) {
         targetUpdate.action_values = {
@@ -161,12 +163,12 @@ export default function HealPanel({ onClose, onComplete, preselectedCharacter }:
           targetUpdate.wounds = newWounds
         }
       }
-      
+
       characterUpdates.push(targetUpdate)
 
       // Apply the healing action
       await client.applyCombatAction(encounter, characterUpdates)
-      
+
       toastSuccess(
         `${preselectedCharacter.name} healed ${target.name} for ${actualHealing} wound${actualHealing !== 1 ? "s" : ""} (Medicine ${medicineValue} + Swerve ${swerve})`
       )
@@ -215,21 +217,26 @@ export default function HealPanel({ onClose, onComplete, preselectedCharacter }:
               <Typography variant="h6" sx={{ mb: 2, color: "success.main" }}>
                 💉 Healer
               </Typography>
-              
+
               {preselectedCharacter ? (
                 <Box>
                   <Typography variant="h5" gutterBottom>
                     {preselectedCharacter.name}
                   </Typography>
-                  <Box sx={{ display: "flex", gap: 2, mt: 2, flexWrap: "wrap" }}>
+                  <Box
+                    sx={{ display: "flex", gap: 2, mt: 2, flexWrap: "wrap" }}
+                  >
                     <Box sx={{ width: 100 }}>
-                      <Typography variant="caption" sx={{ mb: 0.5, display: "block" }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ mb: 0.5, display: "block" }}
+                      >
                         Medicine Skill
                       </Typography>
                       <NumberField
                         label=""
                         value={medicineValue}
-                        onChange={(e) => setMedicineValue(e.target.value)}
+                        onChange={e => setMedicineValue(e.target.value)}
                         onBlur={() => {
                           if (!medicineValue || medicineValue === "0") {
                             setMedicineValue("7")
@@ -242,13 +249,16 @@ export default function HealPanel({ onClose, onComplete, preselectedCharacter }:
                       />
                     </Box>
                     <Box sx={{ width: 100 }}>
-                      <Typography variant="caption" sx={{ mb: 0.5, display: "block" }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ mb: 0.5, display: "block" }}
+                      >
                         Shots to Spend
                       </Typography>
                       <NumberField
                         label=""
                         value={shotsSpent}
-                        onChange={(e) => setShotsSpent(e.target.value)}
+                        onChange={e => setShotsSpent(e.target.value)}
                         onBlur={() => {
                           if (!shotsSpent || parseInt(shotsSpent) < 1) {
                             setShotsSpent("5")
@@ -265,8 +275,10 @@ export default function HealPanel({ onClose, onComplete, preselectedCharacter }:
                     control={
                       <Checkbox
                         checked={useFortune}
-                        onChange={(e) => setUseFortune(e.target.checked)}
-                        disabled={isProcessing || CS.fortune(preselectedCharacter) <= 0}
+                        onChange={e => setUseFortune(e.target.checked)}
+                        disabled={
+                          isProcessing || CS.fortune(preselectedCharacter) <= 0
+                        }
                       />
                     }
                     label={`Use Fortune (${CS.fortune(preselectedCharacter)} available)`}
@@ -325,13 +337,16 @@ export default function HealPanel({ onClose, onComplete, preselectedCharacter }:
               <>
                 {/* Swerve Input */}
                 <Box sx={{ mb: 3, width: 100, mx: "auto" }}>
-                  <Typography variant="caption" sx={{ mb: 0.5, display: "block" }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ mb: 0.5, display: "block" }}
+                  >
                     Swerve
                   </Typography>
                   <NumberField
                     label=""
                     value={swerve}
-                    onChange={(e) => setSwerve(e.target.value)}
+                    onChange={e => setSwerve(e.target.value)}
                     onBlur={() => {}}
                     min={-10}
                     max={10}
@@ -346,13 +361,21 @@ export default function HealPanel({ onClose, onComplete, preselectedCharacter }:
                     <Typography variant="body2">
                       <strong>{preselectedCharacter.name}</strong> will heal{" "}
                       <strong>{target.name}</strong> for{" "}
-                      <strong>{Math.min(healingAmount, CS.wounds(target))}</strong> wounds
-                      {healingAmount > CS.wounds(target) && CS.wounds(target) > 0 ? (
+                      <strong>
+                        {Math.min(healingAmount, CS.wounds(target))}
+                      </strong>{" "}
+                      wounds
+                      {healingAmount > CS.wounds(target) &&
+                      CS.wounds(target) > 0 ? (
                         <> (limited by current wounds)</>
                       ) : null}
                     </Typography>
-                    <Typography variant="caption" sx={{ display: "block", mt: 1 }}>
-                      Medicine ({medicineValue}) + Swerve ({swerve}) = {healingAmount} wounds healed
+                    <Typography
+                      variant="caption"
+                      sx={{ display: "block", mt: 1 }}
+                    >
+                      Medicine ({medicineValue}) + Swerve ({swerve}) ={" "}
+                      {healingAmount} wounds healed
                     </Typography>
                     <Typography variant="caption" sx={{ display: "block" }}>
                       Cost: {shotsSpent} shots{useFortune && " + 1 Fortune"}
@@ -380,12 +403,12 @@ export default function HealPanel({ onClose, onComplete, preselectedCharacter }:
                 variant="contained"
                 onClick={handleApplyHeal}
                 disabled={!preselectedCharacter || !target || isProcessing}
-                startIcon={
-                  isProcessing && <CircularProgress size={20} />
-                }
+                startIcon={isProcessing && <CircularProgress size={20} />}
                 color="success"
               >
-                {isProcessing ? "APPLYING..." : `✓ APPLY HEALING (${shotsSpent} SHOTS)`}
+                {isProcessing
+                  ? "APPLYING..."
+                  : `✓ APPLY HEALING (${shotsSpent} SHOTS)`}
               </Button>
             </Box>
           </Box>

@@ -128,7 +128,7 @@ export default function ActiveFightBanner({
             sx={{
               mb: 3,
               p: 2,
-              background: currentFight?.image_url 
+              background: currentFight?.image_url
                 ? `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url('${currentFight.image_url}')`
                 : "#d32f2f",
               backgroundSize: "cover",
@@ -138,7 +138,6 @@ export default function ActiveFightBanner({
               overflow: "hidden",
             }}
           >
-
             <Box sx={{ position: "relative", zIndex: 1 }}>
               {loading ? (
                 <Stack spacing={1}>

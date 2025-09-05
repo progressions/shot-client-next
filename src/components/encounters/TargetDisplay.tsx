@@ -11,8 +11,8 @@ interface TargetDisplayProps {
 
 export default function TargetDisplay({ character }: TargetDisplayProps) {
   return (
-    <Box 
-      sx={{ 
+    <Box
+      sx={{
         p: 2,
         backgroundColor: "background.paper",
         borderRadius: 1,
@@ -22,8 +22,8 @@ export default function TargetDisplay({ character }: TargetDisplayProps) {
         alignItems: "flex-start",
       }}
     >
-      <Box 
-        sx={{ 
+      <Box
+        sx={{
           minWidth: { xs: 40, sm: 56 },
           mr: { xs: 1, sm: 2 },
         }}

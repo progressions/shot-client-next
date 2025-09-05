@@ -1,21 +1,9 @@
 "use client"
 
 import React from "react"
-import {
-  Box,
-  Typography,
-  Collapse,
-  Paper,
-} from "@mui/material"
-import {
-  Healing as HealIcon,
-} from "@mui/icons-material"
-import {
-  FaGun,
-  FaRocket,
-  FaCar,
-} from "react-icons/fa6"
-import { useEncounter } from "@/contexts"
+import { Box, Typography, Collapse, Paper } from "@mui/material"
+import { Healing as HealIcon } from "@mui/icons-material"
+import { FaGun, FaRocket, FaCar } from "react-icons/fa6"
 import { MenuButton } from "@/components/ui"
 import type { Character } from "@/types"
 
@@ -30,22 +18,23 @@ export default function EncounterActionBar({
   onAction,
   activePanel,
 }: EncounterActionBarProps) {
-  const { selectedActorShot } = useEncounter()
-
   const handleAction = (action: string) => {
     onAction(action)
   }
 
   // Determine which actions are available
-  const hasAttackSkills = selectedCharacter && 
+  const hasAttackSkills =
+    selectedCharacter &&
     selectedCharacter.action_values &&
     (selectedCharacter.action_values["Martial Arts"] !== undefined ||
-     selectedCharacter.action_values["Guns"] !== undefined ||
-     selectedCharacter.action_values["Sorcery"] !== undefined ||
-     selectedCharacter.action_values["Creature"] !== undefined)
-  
-  const isDriving = selectedCharacter && !!((selectedCharacter as Character & { driving?: boolean }).driving)
-  
+      selectedCharacter.action_values["Guns"] !== undefined ||
+      selectedCharacter.action_values["Sorcery"] !== undefined ||
+      selectedCharacter.action_values["Creature"] !== undefined)
+
+  const isDriving =
+    selectedCharacter &&
+    !!(selectedCharacter as Character & { driving?: boolean }).driving
+
   return (
     <Collapse in={true} timeout={300}>
       <Paper
@@ -66,13 +55,20 @@ export default function EncounterActionBar({
         }}
       >
         {/* Character Info */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 0.5, sm: 1 }, flex: "0 1 auto" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: { xs: 0.5, sm: 1 },
+            flex: "0 1 auto",
+          }}
+        >
           {selectedCharacter && (
-            <Typography 
-              variant="h6" 
-              sx={{ 
+            <Typography
+              variant="h6"
+              sx={{
                 fontWeight: "bold",
-                fontSize: { xs: "1rem", sm: "1.25rem" }
+                fontSize: { xs: "1rem", sm: "1.25rem" },
               }}
             >
               {selectedCharacter.name}
@@ -81,7 +77,15 @@ export default function EncounterActionBar({
         </Box>
 
         {/* Action Buttons */}
-        <Box sx={{ flex: "1 1 auto", display: "flex", gap: 1, ml: "auto", alignItems: "center" }}>
+        <Box
+          sx={{
+            flex: "1 1 auto",
+            display: "flex",
+            gap: 1,
+            ml: "auto",
+            alignItems: "center",
+          }}
+        >
           <MenuButton
             onClick={() => handleAction("attack")}
             disabled={!selectedCharacter || !hasAttackSkills}
@@ -93,13 +97,19 @@ export default function EncounterActionBar({
 
           <MenuButton
             onClick={() => handleAction("chase")}
-            title={!selectedCharacter ? "Select a character first" : isDriving ? "Chase" : "Character is not driving a vehicle"}
+            title={
+              !selectedCharacter
+                ? "Select a character first"
+                : isDriving
+                  ? "Chase"
+                  : "Character is not driving a vehicle"
+            }
             disabled={!selectedCharacter || !isDriving}
             isActive={activePanel === "chase"}
           >
             <FaCar size={20} />
           </MenuButton>
-          
+
           <MenuButton
             onClick={() => handleAction("boost")}
             disabled={!selectedCharacter}
@@ -117,7 +127,6 @@ export default function EncounterActionBar({
           >
             <HealIcon />
           </MenuButton>
-
         </Box>
       </Paper>
     </Collapse>

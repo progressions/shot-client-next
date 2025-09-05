@@ -24,12 +24,7 @@ import {
   LocationsDialog,
   EndFightDialog,
 } from "@/components/encounters"
-import {
-  FaPlay,
-  FaPlus,
-  FaMinus,
-  FaStop,
-} from "react-icons/fa6"
+import { FaPlay, FaPlus, FaMinus, FaStop } from "react-icons/fa6"
 import { FaMapMarkerAlt, FaCaretRight, FaCaretDown } from "react-icons/fa"
 import { MdAdminPanelSettings } from "react-icons/md"
 import { useEncounter, useClient, useToast } from "@/contexts"
@@ -49,17 +44,15 @@ export default function MenuBar({
   const { encounter, updateEncounter } = useEncounter()
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
-  const [open, setOpen] = useState<
-    "character" | "vehicle" | "admin" | null
-  >(null)
+  const [open, setOpen] = useState<"character" | "vehicle" | "admin" | null>(
+    null
+  )
   const [initiativeDialogOpen, setInitiativeDialogOpen] = useState(false)
   const [locationsDialogOpen, setLocationsDialogOpen] = useState(false)
   const [endFightDialogOpen, setEndFightDialogOpen] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
-  const toggleBox = (
-    type: "character" | "vehicle" | "admin"
-  ) => {
+  const toggleBox = (type: "character" | "vehicle" | "admin") => {
     setOpen(current => (current === type ? null : type))
   }
 

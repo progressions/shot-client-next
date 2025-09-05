@@ -1,15 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
-import {
-  Box,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Typography,
-  Stack,
-} from "@mui/material"
+import { Box, Typography, Stack } from "@mui/material"
 import { VS, CS } from "@/services"
 import type { ChaseFormData, Shot, Vehicle, Character } from "@/types"
 import { FormActions } from "@/reducers"

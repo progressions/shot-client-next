@@ -67,7 +67,9 @@ export function EncounterProvider({
   const currentShot = contextEncounter?.shots?.[0]?.shot
   const [localAction, setLocalAction] = useState<string | null>(null)
   const [selectedActorId, setSelectedActorId] = useState<string | null>(null)
-  const [selectedActorShot, setSelectedActorShot] = useState<number | null>(null)
+  const [selectedActorShot, setSelectedActorShot] = useState<number | null>(
+    null
+  )
 
   const setSelectedActor = (actorId: string | null, shot: number | null) => {
     setSelectedActorId(actorId)

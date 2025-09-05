@@ -24,13 +24,14 @@ describe("CharacterSelector", () => {
     name: string,
     shot: number,
     type: string = "PC"
-  ): Character => ({
-    id,
-    shot_id: `shot_${id}`,
-    name,
-    character_type: type,
-    action_values: {},
-  } as Character)
+  ): Character =>
+    ({
+      id,
+      shot_id: `shot_${id}`,
+      name,
+      character_type: type,
+      action_values: {},
+    }) as Character
 
   const createMockShot = (character: Character, shot: number): Shot => ({
     shot,
@@ -53,12 +54,7 @@ describe("CharacterSelector", () => {
         createMockShot(char4, 8),
       ]
 
-      render(
-        <CharacterSelector
-          shots={shots}
-          onSelect={jest.fn()}
-        />
-      )
+      render(<CharacterSelector shots={shots} onSelect={jest.fn()} />)
 
       // Check for shot labels
       expect(screen.getByText("12")).toBeInTheDocument()
@@ -77,12 +73,7 @@ describe("CharacterSelector", () => {
         createMockShot(char3, 15),
       ]
 
-      render(
-        <CharacterSelector
-          shots={shots}
-          onSelect={jest.fn()}
-        />
-      )
+      render(<CharacterSelector shots={shots} onSelect={jest.fn()} />)
 
       // Should only have one "15" label
       const shotLabels = screen.getAllByText("15")
@@ -102,16 +93,13 @@ describe("CharacterSelector", () => {
         createMockShot(char4, 5),
       ]
 
-      render(
-        <CharacterSelector
-          shots={shots}
-          onSelect={jest.fn()}
-        />
-      )
+      render(<CharacterSelector shots={shots} onSelect={jest.fn()} />)
 
       const container = screen.getByTestId("character-selector-container")
-      const shotLabels = container.querySelectorAll("[data-testid^='shot-label-']")
-      
+      const shotLabels = container.querySelectorAll(
+        "[data-testid^='shot-label-']"
+      )
+
       // Check order is descending
       expect(shotLabels[0]).toHaveTextContent("20")
       expect(shotLabels[1]).toHaveTextContent("15")
@@ -129,10 +117,7 @@ describe("CharacterSelector", () => {
       ]
 
       const { rerender } = render(
-        <CharacterSelector
-          shots={initialShots}
-          onSelect={jest.fn()}
-        />
+        <CharacterSelector shots={initialShots} onSelect={jest.fn()} />
       )
 
       expect(screen.getByText("12")).toBeInTheDocument()
@@ -146,12 +131,7 @@ describe("CharacterSelector", () => {
         createMockShot(updatedChar2, 8),
       ]
 
-      rerender(
-        <CharacterSelector
-          shots={updatedShots}
-          onSelect={jest.fn()}
-        />
-      )
+      rerender(<CharacterSelector shots={updatedShots} onSelect={jest.fn()} />)
 
       // Old labels should be gone
       expect(screen.queryByText("12")).not.toBeInTheDocument()
@@ -166,12 +146,7 @@ describe("CharacterSelector", () => {
       const char1 = createMockCharacter("1", "Alice", 0, "PC")
       const shots = [createMockShot(char1, 0)]
 
-      render(
-        <CharacterSelector
-          shots={shots}
-          onSelect={jest.fn()}
-        />
-      )
+      render(<CharacterSelector shots={shots} onSelect={jest.fn()} />)
 
       expect(screen.getByText("0")).toBeInTheDocument()
     })
@@ -180,12 +155,7 @@ describe("CharacterSelector", () => {
       const char1 = createMockCharacter("1", "Alice", -3, "PC")
       const shots = [createMockShot(char1, -3)]
 
-      render(
-        <CharacterSelector
-          shots={shots}
-          onSelect={jest.fn()}
-        />
-      )
+      render(<CharacterSelector shots={shots} onSelect={jest.fn()} />)
 
       expect(screen.getByText("-3")).toBeInTheDocument()
     })
@@ -194,18 +164,16 @@ describe("CharacterSelector", () => {
       const char1 = createMockCharacter("1", "Alice", 12, "PC")
       const shots = [createMockShot(char1, 12)]
 
-      render(
-        <CharacterSelector
-          shots={shots}
-          onSelect={jest.fn()}
-        />
-      )
+      render(<CharacterSelector shots={shots} onSelect={jest.fn()} />)
 
       const shotLabel = screen.getByTestId("shot-label-12")
       // Check that the shot label has the text "12"
       expect(shotLabel).toHaveTextContent("12")
       // Check that the shot label element exists and is different from avatars
-      expect(shotLabel).not.toHaveAttribute("data-testid", expect.stringContaining("avatar"))
+      expect(shotLabel).not.toHaveAttribute(
+        "data-testid",
+        expect.stringContaining("avatar")
+      )
     })
   })
 
@@ -215,20 +183,14 @@ describe("CharacterSelector", () => {
       const char1 = createMockCharacter("1", "Alice", 12, "PC")
       const char2 = createMockCharacter("2", "Bob", 10, "PC")
 
-      const shots = [
-        createMockShot(char1, 12),
-        createMockShot(char2, 10),
-      ]
+      const shots = [createMockShot(char1, 12), createMockShot(char2, 10)]
 
-      render(
-        <CharacterSelector
-          shots={shots}
-          onSelect={onSelect}
-        />
-      )
+      render(<CharacterSelector shots={shots} onSelect={onSelect} />)
 
       // Click on character avatar (not the shot label)
-      const aliceAvatar = screen.getByTestId("avatar-shot_1").closest(".MuiBox-root")
+      const aliceAvatar = screen
+        .getByTestId("avatar-shot_1")
+        .closest(".MuiBox-root")
       fireEvent.click(aliceAvatar!)
 
       expect(onSelect).toHaveBeenCalledWith("shot_1")
@@ -270,10 +232,7 @@ describe("CharacterSelector", () => {
       const char1 = createMockCharacter("1", "Alice", 12, "PC")
       const char2 = createMockCharacter("2", "Bob", 12, "PC")
 
-      const shots = [
-        createMockShot(char1, 12),
-        createMockShot(char2, 12),
-      ]
+      const shots = [createMockShot(char1, 12), createMockShot(char2, 12)]
 
       render(
         <CharacterSelector
@@ -285,9 +244,11 @@ describe("CharacterSelector", () => {
       )
 
       expect(screen.getByText("12")).toBeInTheDocument()
-      
+
       // Click second character
-      const bobAvatar = screen.getByTestId("avatar-shot_2").closest(".MuiBox-root")
+      const bobAvatar = screen
+        .getByTestId("avatar-shot_2")
+        .closest(".MuiBox-root")
       fireEvent.click(bobAvatar!)
 
       expect(onSelect).toHaveBeenCalledWith("shot_2")
@@ -296,12 +257,7 @@ describe("CharacterSelector", () => {
 
   describe("Edge Cases", () => {
     it("should handle empty shots array", () => {
-      render(
-        <CharacterSelector
-          shots={[]}
-          onSelect={jest.fn()}
-        />
-      )
+      render(<CharacterSelector shots={[]} onSelect={jest.fn()} />)
 
       // Should render without crashing
       const container = screen.getByTestId("character-selector-container")
@@ -313,12 +269,7 @@ describe("CharacterSelector", () => {
         { shot: 12, character: null, characters: [], uniqueIndex: 1 } as Shot,
       ]
 
-      render(
-        <CharacterSelector
-          shots={shots}
-          onSelect={jest.fn()}
-        />
-      )
+      render(<CharacterSelector shots={shots} onSelect={jest.fn()} />)
 
       // Should not display shot label for empty shot
       expect(screen.queryByText("Shot 12")).not.toBeInTheDocument()
@@ -328,16 +279,21 @@ describe("CharacterSelector", () => {
       const char1 = createMockCharacter("1", "Alice", 12, "PC")
       const shots = [
         createMockShot(char1, 12),
-        { shot: null, character: createMockCharacter("2", "Bob", 0, "PC"), characters: [], uniqueIndex: 2 } as any,
-        { shot: undefined, character: createMockCharacter("3", "Charlie", 0, "PC"), characters: [], uniqueIndex: 3 } as any,
+        {
+          shot: null,
+          character: createMockCharacter("2", "Bob", 0, "PC"),
+          characters: [],
+          uniqueIndex: 2,
+        } as any,
+        {
+          shot: undefined,
+          character: createMockCharacter("3", "Charlie", 0, "PC"),
+          characters: [],
+          uniqueIndex: 3,
+        } as any,
       ]
 
-      render(
-        <CharacterSelector
-          shots={shots}
-          onSelect={jest.fn()}
-        />
-      )
+      render(<CharacterSelector shots={shots} onSelect={jest.fn()} />)
 
       // Should only show label for valid shot
       expect(screen.getByText("12")).toBeInTheDocument()

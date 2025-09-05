@@ -241,7 +241,9 @@ export default function ChaseTargetSection({
       {target && selectedVehicle && (
         <>
           {/* Vehicle Info Display with Editable Values */}
-          <Box sx={{ p: 2, bgcolor: "background.paper", borderRadius: 1, mb: 2 }}>
+          <Box
+            sx={{ p: 2, bgcolor: "background.paper", borderRadius: 1, mb: 2 }}
+          >
             <Stack direction="row" spacing={3}>
               {/* Vehicle Stats Display */}
               <Box sx={{ flex: 1 }}>
@@ -249,11 +251,7 @@ export default function ChaseTargetSection({
               </Box>
 
               {/* Editable Defense Values */}
-              <Stack
-                direction="row"
-                spacing={2}
-                alignItems="flex-start"
-              >
+              <Stack direction="row" spacing={2} alignItems="flex-start">
                 {/* Driving Value */}
                 <Box>
                   <Typography
@@ -306,7 +304,9 @@ export default function ChaseTargetSection({
                   </Typography>
                   <NumberField
                     name="frame"
-                    value={parseInt(formState.data.frame?.toString() || "0") || 0}
+                    value={
+                      parseInt(formState.data.frame?.toString() || "0") || 0
+                    }
                     size="small"
                     width="80px"
                     error={false}

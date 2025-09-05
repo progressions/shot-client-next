@@ -178,14 +178,17 @@ export default function ChaseResolution({
 
         // The attacker doesn't take damage (unless it's a ram/sideswipe with bump)
         // So we don't need to update the attacker's chase points
-        
+
         // The target takes the chase points damage
         if (result.chasePoints) {
           targetVehicleValues["Chase Points"] = result.chasePoints
         }
-        
+
         // For RAM_SIDESWIPE, also apply condition points
-        if (result.method === ChaseMethod.RAM_SIDESWIPE && result.conditionPoints) {
+        if (
+          result.method === ChaseMethod.RAM_SIDESWIPE &&
+          result.conditionPoints
+        ) {
           targetVehicleValues["Condition Points"] = result.conditionPoints
         }
 
@@ -304,7 +307,6 @@ export default function ChaseResolution({
         backgroundColor: "background.default",
       }}
     >
-
       <Stack
         direction="row"
         spacing={{ xs: 1, sm: 2 }}

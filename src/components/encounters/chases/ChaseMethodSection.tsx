@@ -7,7 +7,6 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Typography,
   Stack,
 } from "@mui/material"
 import { CS, VS } from "@/services"
@@ -71,12 +70,12 @@ export default function ChaseMethodSection({
       <Stack direction="row" spacing={2} alignItems="flex-start">
         {/* Driving Skill Field - Always visible */}
         <FormControl sx={{ minWidth: 100 }}>
-          <InputLabel 
-            shrink 
-            sx={{ 
-              backgroundColor: '#262626',
+          <InputLabel
+            shrink
+            sx={{
+              backgroundColor: "#262626",
               px: 0.5,
-              ml: -0.5
+              ml: -0.5,
             }}
           >
             Driving
@@ -87,7 +86,9 @@ export default function ChaseMethodSection({
             size="medium"
             width="80px"
             error={false}
-            onChange={e => updateField("actionValue", parseInt(e.target.value) || 7)}
+            onChange={e =>
+              updateField("actionValue", parseInt(e.target.value) || 7)
+            }
             onBlur={e => {
               const value = parseInt(e.target.value) || 0
               if (value < 1) {
@@ -97,15 +98,15 @@ export default function ChaseMethodSection({
             sx={{ fontSize: "1.5rem" }}
           />
         </FormControl>
-        
+
         {/* Squeal Field - Always visible */}
         <FormControl sx={{ minWidth: 100 }}>
-          <InputLabel 
-            shrink 
-            sx={{ 
-              backgroundColor: '#262626',
+          <InputLabel
+            shrink
+            sx={{
+              backgroundColor: "#262626",
               px: 0.5,
-              ml: -0.5
+              ml: -0.5,
             }}
           >
             Squeal
@@ -127,13 +128,13 @@ export default function ChaseMethodSection({
           />
         </FormControl>
         {/* Role Selection */}
-        <FormControl 
-          sx={{ 
+        <FormControl
+          sx={{
             flex: 1,
-            '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'primary.main',
+            "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "primary.main",
             },
-          }} 
+          }}
           disabled={!hasTarget}
         >
           <InputLabel>Role</InputLabel>
@@ -149,12 +150,9 @@ export default function ChaseMethodSection({
               let defaultMethod = "EVADE"
               if (newRole === "pursuer") {
                 defaultMethod =
-                  position === "near"
-                    ? "RAM_SIDESWIPE"
-                    : "NARROW_THE_GAP"
+                  position === "near" ? "RAM_SIDESWIPE" : "NARROW_THE_GAP"
               } else {
-                defaultMethod =
-                  position === "near" ? "WIDEN_THE_GAP" : "EVADE"
+                defaultMethod = position === "near" ? "WIDEN_THE_GAP" : "EVADE"
               }
               updateField("method", defaultMethod)
             }}
@@ -166,13 +164,13 @@ export default function ChaseMethodSection({
         </FormControl>
 
         {/* Chase Action Selection */}
-        <FormControl 
-          sx={{ 
+        <FormControl
+          sx={{
             flex: 1,
-            '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'primary.main',
+            "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "primary.main",
             },
-          }} 
+          }}
           disabled={!hasTarget}
         >
           <InputLabel>Chase Action</InputLabel>
@@ -197,9 +195,7 @@ export default function ChaseMethodSection({
               } else {
                 if (position === "near") {
                   // Valid methods: WIDEN_THE_GAP, RAM_SIDESWIPE
-                  return ["WIDEN_THE_GAP", "RAM_SIDESWIPE"].includes(
-                    method
-                  )
+                  return ["WIDEN_THE_GAP", "RAM_SIDESWIPE"].includes(method)
                     ? method
                     : "WIDEN_THE_GAP"
                 } else {
@@ -225,10 +221,7 @@ export default function ChaseMethodSection({
                   ]
                 : [
                     // When FAR, pursuer can only narrow the gap
-                    <MenuItem
-                      key="NARROW_THE_GAP"
-                      value="NARROW_THE_GAP"
-                    >
+                    <MenuItem key="NARROW_THE_GAP" value="NARROW_THE_GAP">
                       Narrow the Gap
                     </MenuItem>,
                   ]
@@ -253,13 +246,13 @@ export default function ChaseMethodSection({
         </FormControl>
 
         {/* Position Selection */}
-        <FormControl 
-          sx={{ 
+        <FormControl
+          sx={{
             flex: 1,
-            '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'primary.main',
+            "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "primary.main",
             },
-          }} 
+          }}
           disabled={!hasTarget}
         >
           <InputLabel>Position</InputLabel>
@@ -275,9 +268,7 @@ export default function ChaseMethodSection({
               let defaultMethod = "EVADE"
               if (role === "pursuer") {
                 defaultMethod =
-                  newPosition === "near"
-                    ? "RAM_SIDESWIPE"
-                    : "NARROW_THE_GAP"
+                  newPosition === "near" ? "RAM_SIDESWIPE" : "NARROW_THE_GAP"
               } else {
                 defaultMethod =
                   newPosition === "near" ? "WIDEN_THE_GAP" : "EVADE"

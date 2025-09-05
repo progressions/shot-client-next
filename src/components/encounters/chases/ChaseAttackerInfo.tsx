@@ -1,11 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import {
-  Box,
-  Typography,
-  Stack,
-} from "@mui/material"
+import { Box, Typography, Stack } from "@mui/material"
 import { CS } from "@/services"
 import type { Character, ChaseFormData } from "@/types"
 import { FormActions } from "@/reducers"
@@ -69,26 +65,19 @@ export default function ChaseAttackerInfo({
         <Avatar entity={attacker} sx={{ width: 48, height: 48 }} />
         <Box sx={{ flex: 1 }}>
           <Typography variant="subtitle1" fontWeight="bold">
-            <CharacterLink character={attacker}>
-              {attacker.name}
-            </CharacterLink>
+            <CharacterLink character={attacker}>{attacker.name}</CharacterLink>
             {vehicle && (
               <>
                 {" driving "}
-                <VehicleLink vehicle={vehicle}>
-                  {vehicle.name}
-                </VehicleLink>
+                <VehicleLink vehicle={vehicle}>{vehicle.name}</VehicleLink>
               </>
             )}
           </Typography>
         </Box>
-        
+
         {/* Editable Driving Skill */}
         <Box>
-          <Typography
-            variant="caption"
-            sx={{ mb: 0.5, display: "block" }}
-          >
+          <Typography variant="caption" sx={{ mb: 0.5, display: "block" }}>
             Driving Skill
           </Typography>
           <NumberField
@@ -97,7 +86,9 @@ export default function ChaseAttackerInfo({
             size="small"
             width="80px"
             error={false}
-            onChange={e => updateField("actionValue", parseInt(e.target.value) || 7)}
+            onChange={e =>
+              updateField("actionValue", parseInt(e.target.value) || 7)
+            }
             onBlur={e => {
               const value = parseInt(e.target.value) || 0
               if (value < 1) {

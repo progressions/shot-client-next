@@ -2,16 +2,16 @@
 
 import { useState, useMemo, useEffect } from "react"
 import { List, Box } from "@mui/material"
-import { 
-  MenuBar, 
-  ShotDetail, 
-  CharacterSelector, 
+import {
+  MenuBar,
+  ShotDetail,
+  CharacterSelector,
   EncounterActionBar,
   CharacterDetail,
   AttackPanel,
   BoostPanel,
   ChasePanel,
-  HealPanel 
+  HealPanel,
 } from "@/components/encounters"
 import { useEncounter } from "@/contexts"
 import { useLocalStorage } from "@/contexts/LocalStorageContext"
@@ -85,7 +85,9 @@ export default function ShotCounter() {
   // Get the selected character object
   const selectedCharacter = useMemo(() => {
     if (!selectedActorId) return null
-    const shot = allVisibleShots.find(s => s.character?.shot_id === selectedActorId)
+    const shot = allVisibleShots.find(
+      s => s.character?.shot_id === selectedActorId
+    )
     return shot?.character || null
   }, [selectedActorId, allVisibleShots])
 
@@ -116,7 +118,7 @@ export default function ShotCounter() {
         showHidden={showHidden}
         onShowHiddenChange={handleShowHiddenChange}
       />
-      
+
       {/* Character selector below MenuBar */}
       <Box sx={{ mb: 2, mt: 1 }}>
         <CharacterSelector
@@ -125,21 +127,21 @@ export default function ShotCounter() {
           onSelect={handleCharacterSelect}
         />
       </Box>
-      
+
       {/* Action bar appears when character is selected */}
       <EncounterActionBar
         selectedCharacter={selectedCharacter}
         onAction={handleAction}
         activePanel={activePanel}
       />
-      
+
       {/* Character Detail for selected character */}
       {selectedCharacter && (
         <Box sx={{ mb: 1 }}>
           <CharacterDetail character={selectedCharacter} />
         </Box>
       )}
-      
+
       {/* Action Panels - Place them here, before the shot list */}
       {activePanel === "attack" && selectedCharacter && (
         <AttackPanel
@@ -148,7 +150,7 @@ export default function ShotCounter() {
           onComplete={handleActionComplete}
         />
       )}
-      
+
       {activePanel === "boost" && selectedCharacter && (
         <BoostPanel
           preselectedBooster={selectedCharacter}
@@ -156,7 +158,7 @@ export default function ShotCounter() {
           onComplete={handleActionComplete}
         />
       )}
-      
+
       {activePanel === "chase" && selectedCharacter && (
         <ChasePanel
           preselectedCharacter={selectedCharacter}
@@ -164,7 +166,7 @@ export default function ShotCounter() {
           onComplete={handleActionComplete}
         />
       )}
-      
+
       {activePanel === "heal" && selectedCharacter && (
         <HealPanel
           preselectedCharacter={selectedCharacter}
@@ -172,7 +174,7 @@ export default function ShotCounter() {
           onComplete={handleActionComplete}
         />
       )}
-      
+
       {/* Shot List */}
       <List>
         {visibleShots.map((shot, index) => (

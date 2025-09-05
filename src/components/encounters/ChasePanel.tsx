@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useEffect, useState, useRef } from "react"
+import { useMemo, useEffect, useState } from "react"
 import { Box, Typography } from "@mui/material"
 import { useEncounter, useClient } from "@/contexts"
 import { useForm, FormActions } from "@/reducers"
@@ -18,7 +18,11 @@ interface ChasePanelProps {
   preselectedCharacter?: Character
 }
 
-export default function ChasePanel({ onClose, onComplete, preselectedCharacter }: ChasePanelProps) {
+export default function ChasePanel({
+  onClose,
+  onComplete,
+  preselectedCharacter,
+}: ChasePanelProps) {
   const [isReady, setIsReady] = useState(false)
   const { encounter } = useEncounter()
   const { client } = useClient()
@@ -52,9 +56,11 @@ export default function ChasePanel({ onClose, onComplete, preselectedCharacter }
   // Get the attacker's vehicle if they're driving
   const getAttackerVehicle = () => {
     if (!preselectedCharacter) return undefined
-    const drivingInfo = (preselectedCharacter as Character & { driving?: Vehicle }).driving
+    const drivingInfo = (
+      preselectedCharacter as Character & { driving?: Vehicle }
+    ).driving
     if (!drivingInfo) return undefined
-    
+
     // Try to find the full vehicle data from allVehicles
     const fullVehicle = allVehicles.find(v => v.id === drivingInfo.id)
     return fullVehicle || drivingInfo
@@ -234,7 +240,6 @@ export default function ChasePanel({ onClose, onComplete, preselectedCharacter }
 
   return (
     <Box sx={{ overflow: "hidden", minHeight: isReady ? "auto" : "100px" }}>
-
       {/* Main Content - Attacker then Target */}
       {isReady ? (
         <>
@@ -255,9 +260,14 @@ export default function ChasePanel({ onClose, onComplete, preselectedCharacter }
             <ChaseMethodSection
               formState={formState}
               dispatchForm={dispatchForm}
-              hasTarget={!!(formState.data as { targetShotId?: string }).targetShotId}
+              hasTarget={
+                !!(formState.data as { targetShotId?: string }).targetShotId
+              }
               attacker={preselectedCharacter}
-              vehicle={(formState.data as ChaseFormData & { vehicle?: Vehicle }).vehicle || null}
+              vehicle={
+                (formState.data as ChaseFormData & { vehicle?: Vehicle })
+                  .vehicle || null
+              }
             />
 
             {/* Target Section - Always show */}
