@@ -123,7 +123,7 @@ export default function HealPanel({
         wounds?: number
         count?: number
       }
-      
+
       const characterUpdates: CharacterUpdate[] = []
 
       // Healer spends shots and optionally Fortune
