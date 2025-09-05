@@ -18,6 +18,7 @@ import {
   Box,
   Typography,
   TextField,
+  Chip,
 } from "@mui/material"
 import { FaTimes, FaEyeSlash, FaEye, FaHeart } from "react-icons/fa"
 import { MdEdit } from "react-icons/md"
@@ -37,6 +38,7 @@ import CharacterEffectsDisplay from "./effects/CharacterEffectsDisplay"
 import { VehicleLink } from "@/components/ui/links"
 import { encounterTransition } from "@/contexts/EncounterContext"
 import { useEncounter, useClient, useToast } from "@/contexts"
+import { VS } from "@/services"
 
 type CharacterDetailProps = {
   character: Character
@@ -261,6 +263,19 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
                   >
                     <VehicleAvatar entity={drivingVehicle} />
                     <VehicleLink vehicle={drivingVehicle} />
+                    {VS.isDefeated(drivingVehicle) && VS.getDefeatType(drivingVehicle) && (
+                      <Chip
+                        label={VS.getDefeatType(drivingVehicle) === "crashed" ? "CRASHED" : "BOXED IN"}
+                        color={VS.getDefeatType(drivingVehicle) === "crashed" ? "error" : "warning"}
+                        size="small"
+                        sx={{
+                          height: "20px",
+                          fontSize: "0.65rem",
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                        }}
+                      />
+                    )}
                   </Box>
                   <VehicleActionValues vehicle={drivingVehicle} />
                   <Box sx={{ mt: 1 }}>
