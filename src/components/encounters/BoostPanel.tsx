@@ -260,7 +260,7 @@ export default function BoostPanel({
       >
         Boost
       </Typography>
-      
+
       {/* Main Content - Attacker then Target */}
       {isReady ? (
         <>
@@ -317,7 +317,10 @@ export default function BoostPanel({
 
           {/* Bottom Section - Boost Resolution */}
           <Box
-            sx={{ p: { xs: 1, sm: 1.5 }, backgroundColor: "background.default" }}
+            sx={{
+              p: { xs: 1, sm: 1.5 },
+              backgroundColor: "background.default",
+            }}
           >
             {booster && target ? (
               <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
@@ -326,8 +329,8 @@ export default function BoostPanel({
                   <Typography variant="caption" sx={{ fontWeight: "medium" }}>
                     Boost Type (3 shots)
                   </Typography>
-                  <ButtonGroup 
-                    orientation="vertical" 
+                  <ButtonGroup
+                    orientation="vertical"
                     variant="contained"
                     size="small"
                     sx={{ width: 160 }}
@@ -335,19 +338,30 @@ export default function BoostPanel({
                     <Button
                       onClick={() => handleBoostTypeChange("attack")}
                       disabled={formData.isProcessing}
-                      variant={formData.boostType === "attack" ? "contained" : "outlined"}
-                      sx={{ 
-                        justifyContent: "flex-start", 
+                      variant={
+                        formData.boostType === "attack"
+                          ? "contained"
+                          : "outlined"
+                      }
+                      sx={{
+                        justifyContent: "flex-start",
                         pl: 2,
                         ...(formData.boostType === "attack" && {
                           backgroundColor: "primary.dark",
                           "&:hover": {
-                            backgroundColor: "primary.dark"
-                          }
-                        })
+                            backgroundColor: "primary.dark",
+                          },
+                        }),
                       }}
                     >
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1, width: "100%" }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          width: "100%",
+                        }}
+                      >
                         <Typography sx={{ fontWeight: "bold" }}>
                           Attack
                         </Typography>
@@ -359,19 +373,30 @@ export default function BoostPanel({
                     <Button
                       onClick={() => handleBoostTypeChange("defense")}
                       disabled={formData.isProcessing}
-                      variant={formData.boostType === "defense" ? "contained" : "outlined"}
-                      sx={{ 
-                        justifyContent: "flex-start", 
+                      variant={
+                        formData.boostType === "defense"
+                          ? "contained"
+                          : "outlined"
+                      }
+                      sx={{
+                        justifyContent: "flex-start",
                         pl: 2,
                         ...(formData.boostType === "defense" && {
                           backgroundColor: "primary.dark",
                           "&:hover": {
-                            backgroundColor: "primary.dark"
-                          }
-                        })
+                            backgroundColor: "primary.dark",
+                          },
+                        }),
                       }}
                     >
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1, width: "100%" }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          width: "100%",
+                        }}
+                      >
                         <Typography sx={{ fontWeight: "bold" }}>
                           Defense
                         </Typography>
@@ -393,15 +418,14 @@ export default function BoostPanel({
                         size="small"
                         fullWidth
                       >
-                        {formData.useFortune
-                          ? "✨ Fortune"
-                          : "Use Fortune"}
+                        {formData.useFortune ? "✨ Fortune" : "Use Fortune"}
                       </Button>
                       <Typography
                         variant="caption"
                         sx={{ display: "block", mt: 0.5, textAlign: "center" }}
                       >
-                        {(booster as Character).action_values?.Fortune || 0} available
+                        {(booster as Character).action_values?.Fortune || 0}{" "}
+                        available
                       </Typography>
                     </Box>
                   )}
@@ -420,9 +444,7 @@ export default function BoostPanel({
                       </Typography>
                     </Alert>
                   ) : (
-                    <Alert severity="warning">
-                      Select a boost type
-                    </Alert>
+                    <Alert severity="warning">Select a boost type</Alert>
                   )}
                 </Box>
               </Box>

@@ -963,7 +963,7 @@ export default function AttackPanel({
       >
         Attack
       </Typography>
-      
+
       {/* Main Content - Attacker then Target */}
       {isReady ? (
         <>

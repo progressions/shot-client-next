@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import { Box, Typography, Stack } from "@mui/material"
 import { CS } from "@/services"
-import type { Character, ChaseFormData } from "@/types"
+import type { Character, ChaseFormData, Vehicle } from "@/types"
 import { FormActions } from "@/reducers"
 import { NumberField } from "@/components/ui"
 import Avatar from "@/components/avatars/Avatar"
@@ -46,7 +46,7 @@ export default function ChaseAttackerInfo({
     return null
   }
 
-  const vehicle = (attacker as Character & { driving?: any }).driving
+  const vehicle = (attacker as Character & { driving?: Vehicle }).driving
 
   return (
     <Box

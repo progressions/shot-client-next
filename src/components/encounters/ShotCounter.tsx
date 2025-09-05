@@ -111,15 +111,16 @@ export default function ShotCounter() {
         if (actionBarRef?.current) {
           // Get the position of the action bar element
           const rect = actionBarRef.current.getBoundingClientRect()
-          const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-          
+          const scrollTop =
+            window.pageYOffset || document.documentElement.scrollTop
+
           // Calculate position to bring action bar to top of viewport
           const targetPosition = rect.top + scrollTop
-          
+
           // Smooth scroll to the calculated position
           window.scrollTo({
             top: targetPosition,
-            behavior: "smooth"
+            behavior: "smooth",
           })
         }
       }, 100)

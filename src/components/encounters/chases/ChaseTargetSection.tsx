@@ -207,7 +207,7 @@ export default function ChaseTargetSection({
             borderColor="error.main"
             excludeShotId={attackerShotId}
           />
-          
+
           {/* Display selected target */}
           {target && (
             <Box sx={{ mt: 1 }}>

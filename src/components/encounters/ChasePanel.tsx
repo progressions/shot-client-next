@@ -253,7 +253,7 @@ export default function ChasePanel({
       >
         Chase
       </Typography>
-      
+
       {/* Main Content - Attacker then Target */}
       {isReady ? (
         <>

@@ -113,7 +113,7 @@ export default function HealPanel({
       const characterUpdates = []
 
       // Healer spends shots and optionally Fortune
-      const healerUpdate: any = {
+      const healerUpdate: Record<string, any> = {
         shot_id: preselectedCharacter.shot_id,
         character_id: preselectedCharacter.id,
         shot: healerShot.shot - shots,
@@ -145,7 +145,7 @@ export default function HealPanel({
       characterUpdates.push(healerUpdate)
 
       // Target's wounds are reduced
-      const targetUpdate: any = {
+      const targetUpdate: Record<string, any> = {
         shot_id: target.shot_id,
         character_id: target.id,
       }
@@ -284,7 +284,8 @@ export default function HealPanel({
                             checked={useFortune}
                             onChange={e => setUseFortune(e.target.checked)}
                             disabled={
-                              isProcessing || CS.fortune(preselectedCharacter) <= 0
+                              isProcessing ||
+                              CS.fortune(preselectedCharacter) <= 0
                             }
                           />
                         }
@@ -331,7 +332,14 @@ export default function HealPanel({
             {preselectedCharacter ? (
               <>
                 {/* Swerve and Results Container */}
-                <Box sx={{ display: "flex", gap: 2, mb: 3, alignItems: "flex-start" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 2,
+                    mb: 3,
+                    alignItems: "flex-start",
+                  }}
+                >
                   {/* Swerve Input */}
                   <Box sx={{ width: 100, flexShrink: 0 }}>
                     <Typography
