@@ -12,7 +12,7 @@ type ShotDetailProps = {
 }
 
 export default function ShotDetail({ shot }: ShotDetailProps) {
-  const { encounter } = useEncounter()
+  const { encounter, selectedActorId } = useEncounter()
 
   // Check if we have any content to render
   const hasCharacters = shot.characters && shot.characters.length > 0
@@ -109,12 +109,14 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
         {shot.shot === null ? "Hidden" : `${shot.shot || "0"}`}
       </ListSubheader>
       {hasCharacters &&
-        sortedCharacters.map((character: Character) => (
-          <CharacterDetail
-            key={`fred-${shot.shot}-character-${character.shot_id}`}
-            character={character}
-          />
-        ))}
+        sortedCharacters
+          .filter((character: Character) => character.shot_id !== selectedActorId)
+          .map((character: Character) => (
+            <CharacterDetail
+              key={`fred-${shot.shot}-character-${character.shot_id}`}
+              character={character}
+            />
+          ))}
       {/* Only show vehicles without drivers in the Hidden section */}
       {vehiclesWithoutDrivers.map((vehicle: Vehicle) => (
         <VehicleDetail
