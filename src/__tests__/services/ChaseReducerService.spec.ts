@@ -352,7 +352,7 @@ describe("ChaseReducerService", () => {
         squeal: 8,
         handling: 6,
         actionValue: 15,
-        mookDefense: 13,
+        defense: 13,
       }
       const result = CRS.pursue(state)
       expect(result.actionResult).toEqual(21)
@@ -384,8 +384,9 @@ describe("ChaseReducerService", () => {
         handling: 6,
         frame: 9,
         crunch: 11,
+        targetCrunch: 11,
         actionValue: 15,
-        mookDefense: 13,
+        defense: 13,
         method: ChaseMethod.RAM_SIDESWIPE,
       }
       const result = CRS.pursue(state)
@@ -397,7 +398,7 @@ describe("ChaseReducerService", () => {
 
       // Swerve of 6 plus actionValue of 15 is 21, which is 8 over the
       // target's defense of 13, so the result is a hit, with an outcome
-      // of 8. The attacker's Crunch is 11, so the smackdown is 19.
+      // of 8. The target's Crunch is 11, so the smackdown is 19.
       // The target's Frame is 9, so the chasePoints are 10.
       expect(result.chasePoints).toEqual(10)
       expect(result.conditionPoints).toEqual(10)
@@ -417,7 +418,7 @@ describe("ChaseReducerService", () => {
         squeal: 8,
         handling: 6,
         actionValue: 15,
-        mookDefense: 13,
+        defense: 13,
       }
       const result = CRS.pursue(state)
       expect(result.actionResult).toEqual(9)
@@ -449,7 +450,7 @@ describe("ChaseReducerService", () => {
         squeal: 8,
         handling: 6,
         actionValue: 15,
-        mookDefense: 13,
+        defense: 13,
       }
       const result = CRS.evade(state)
 

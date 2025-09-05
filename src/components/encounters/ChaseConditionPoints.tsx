@@ -15,18 +15,7 @@ export default function ChaseConditionPoints({
   const theme = useTheme()
   const chasePoints = VS.chasePoints(vehicle)
   const conditionPoints = VS.conditionPoints(vehicle)
-  
-  console.log("ChaseConditionPoints - Vehicle data:", {
-    name: vehicle.name,
-    vehicle,
-    chasePoints,
-    conditionPoints,
-    was_rammed_or_damaged: vehicle.was_rammed_or_damaged,
-    is_defeated_in_chase: vehicle.is_defeated_in_chase,
-    defeat_type: vehicle.defeat_type,
-    isDefeated: VS.isDefeated(vehicle),
-    defeatType: VS.getDefeatType(vehicle),
-  })
+
 
   return (
     <Box

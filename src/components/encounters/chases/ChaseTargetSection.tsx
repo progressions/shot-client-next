@@ -105,7 +105,9 @@ export default function ChaseTargetSection({
   // Initialize targetCrunch when selectedVehicle changes
   useEffect(() => {
     if (selectedVehicle) {
-      const currentCrunch = (formState.data as ChaseFormData & { targetCrunch?: string }).targetCrunch
+      const currentCrunch = (
+        formState.data as ChaseFormData & { targetCrunch?: string }
+      ).targetCrunch
       const vehicleCrunch = VS.crunch(selectedVehicle)
       // Only update if not already set or if it's 0 when vehicle has a different value
       if (!currentCrunch || (currentCrunch === "0" && vehicleCrunch !== 0)) {
@@ -299,7 +301,13 @@ export default function ChaseTargetSection({
                   <NumberField
                     name="targetCrunch"
                     value={
-                      parseInt((formState.data as ChaseFormData & { targetCrunch?: string }).targetCrunch?.toString() || "0") || 0
+                      parseInt(
+                        (
+                          formState.data as ChaseFormData & {
+                            targetCrunch?: string
+                          }
+                        ).targetCrunch?.toString() || "0"
+                      ) || 0
                     }
                     size="small"
                     width="80px"

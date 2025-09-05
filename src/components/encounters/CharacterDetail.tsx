@@ -167,8 +167,6 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
     }
   }
 
-  console.log({ encounter, driving: character.driving })
-
   return (
     <motion.div
       key={`${character.id}-${character.shot_id}`}
@@ -265,19 +263,28 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
                   >
                     <VehicleAvatar entity={drivingVehicle} />
                     <VehicleLink vehicle={drivingVehicle} />
-                    {VS.isDefeated(drivingVehicle) && VS.getDefeatType(drivingVehicle) && (
-                      <Chip
-                        label={VS.getDefeatType(drivingVehicle) === "crashed" ? "CRASHED" : "BOXED IN"}
-                        color={VS.getDefeatType(drivingVehicle) === "crashed" ? "error" : "warning"}
-                        size="small"
-                        sx={{
-                          height: "20px",
-                          fontSize: "0.65rem",
-                          fontWeight: "bold",
-                          textTransform: "uppercase",
-                        }}
-                      />
-                    )}
+                    {VS.isDefeated(drivingVehicle) &&
+                      VS.getDefeatType(drivingVehicle) && (
+                        <Chip
+                          label={
+                            VS.getDefeatType(drivingVehicle) === "crashed"
+                              ? "CRASHED"
+                              : "BOXED IN"
+                          }
+                          color={
+                            VS.getDefeatType(drivingVehicle) === "crashed"
+                              ? "error"
+                              : "warning"
+                          }
+                          size="small"
+                          sx={{
+                            height: "20px",
+                            fontSize: "0.65rem",
+                            fontWeight: "bold",
+                            textTransform: "uppercase",
+                          }}
+                        />
+                      )}
                   </Box>
                   <VehicleActionValues vehicle={drivingVehicle} />
                   <Box sx={{ mt: 1 }}>

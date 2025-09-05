@@ -45,8 +45,6 @@ export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
   const [locationDialogOpen, setLocationDialogOpen] = useState(false)
   const [newLocation, setNewLocation] = useState(vehicle.location || "")
 
-  console.log("encounter, vehicle", { encounter, vehicle })
-
   // Check if vehicle is hidden (current_shot is null)
   const vehicleWithShot = vehicle as Vehicle & {
     current_shot?: number | string | null

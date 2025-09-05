@@ -1,4 +1,10 @@
-import type { Character, CharacterTypes, Position, Vehicle, VehicleArchetype } from "@/types"
+import type {
+  Character,
+  CharacterTypes,
+  Position,
+  Vehicle,
+  VehicleArchetype,
+} from "@/types"
 import { VehicleDescriptionKeys } from "@/types"
 import CS from "@/services/CharacterService"
 import SharedService, { woundThresholds } from "@/services/SharedService"
@@ -148,7 +154,7 @@ const VehicleService = {
     // Fallback to local calculation
     const driverType = vehicle.driver?.action_values?.Type
     const vehicleType = driverType || this.type(vehicle)
-    
+
     // Use wound thresholds
     const thresholds = woundThresholds[vehicleType as CharacterTypes]
     return thresholds?.serious || 35 // Default to 35 if type not found
@@ -163,7 +169,7 @@ const VehicleService = {
     if (!this.isDefeated(vehicle)) {
       return null
     }
-    
+
     // Check if vehicle was rammed or damaged (from shot data passed by backend)
     return vehicle.was_rammed_or_damaged ? "crashed" : "boxed_in"
   },

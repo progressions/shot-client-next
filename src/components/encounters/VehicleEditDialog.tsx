@@ -105,7 +105,7 @@ export default function VehicleEditDialog({
       if (encounter && vehicle.shot_id) {
         // First update the vehicle model
         await client.updateVehicleCombatStats(vehicle.id, vehicleUpdate)
-        
+
         // Then update the shot to trigger encounter broadcast
         interface ShotUpdate {
           shot_id: string

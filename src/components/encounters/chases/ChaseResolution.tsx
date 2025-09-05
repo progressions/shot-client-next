@@ -44,33 +44,49 @@ export default function ChaseResolution({
 
   // Only show results display when user has typed a swerve value
   const showResults = typedSwerve !== ""
-  
+
   // Always calculate using editable form values with the typed or rolled swerve
-  const currentSwerve = typedSwerve !== "" ? parseToNumber(typedSwerve) : (swerve?.result || 0)
+  const currentSwerve =
+    typedSwerve !== "" ? parseToNumber(typedSwerve) : swerve?.result || 0
   const actionResult = parseToNumber(formState.data.actionValue) + currentSwerve
-  const outcome = actionResult - parseToNumber(formState.data.defense) - (formState.data.stunt ? 2 : 0)
+  const outcome =
+    actionResult -
+    parseToNumber(formState.data.defense) -
+    (formState.data.stunt ? 2 : 0)
   const isSuccess = outcome >= 0
-  
+
   // Calculate chase points using editable form values
   let calculatedChasePoints = 0
   let calculatedConditionPoints = 0
   let calculatedPosition: "near" | "far" = formState.data.position
-  
+
   if (isSuccess) {
     if (formState.data.method === ChaseMethod.RAM_SIDESWIPE) {
       const targetFrame = parseToNumber(formState.data.frame)
-      const targetCrunch = parseToNumber((formState.data as ChaseFormData & { targetCrunch?: string }).targetCrunch || "0")
+      const targetCrunch = parseToNumber(
+        (formState.data as ChaseFormData & { targetCrunch?: string })
+          .targetCrunch || "0"
+      )
       calculatedChasePoints = Math.max(0, outcome + targetCrunch - targetFrame)
       calculatedConditionPoints = calculatedChasePoints
     } else {
       const targetHandling = parseToNumber(formState.data.handling)
-      calculatedChasePoints = Math.max(0, outcome + parseToNumber(formState.data.squeal) - targetHandling)
+      calculatedChasePoints = Math.max(
+        0,
+        outcome + parseToNumber(formState.data.squeal) - targetHandling
+      )
     }
-    
+
     // Calculate position change
-    if (formState.data.method === ChaseMethod.NARROW_THE_GAP && formState.data.position === "far") {
+    if (
+      formState.data.method === ChaseMethod.NARROW_THE_GAP &&
+      formState.data.position === "far"
+    ) {
       calculatedPosition = "near"
-    } else if (formState.data.method === ChaseMethod.WIDEN_THE_GAP && formState.data.position === "near") {
+    } else if (
+      formState.data.method === ChaseMethod.WIDEN_THE_GAP &&
+      formState.data.position === "near"
+    ) {
       calculatedPosition = "far"
     }
   }
@@ -131,7 +147,9 @@ export default function ChaseResolution({
         ...formState.data,
         attacker: attackerVehicle || formState.data.attacker,
         target: targetVehicle || formState.data.target,
-        targetCrunch: (formState.data as ChaseFormData & { targetCrunch?: number }).targetCrunch,
+        targetCrunch: (
+          formState.data as ChaseFormData & { targetCrunch?: number }
+        ).targetCrunch,
         swerve: { result: currentSwerve }, // Use the same currentSwerve from display
         edited: true,
       }
@@ -219,12 +237,13 @@ export default function ChaseResolution({
       )
 
       // Include action_type for ram/sideswipe tracking
-      const actionType = formState.data.method === ChaseMethod.RAM_SIDESWIPE 
-        ? "ram" 
-        : formState.data.method === ChaseMethod.NARROW_THE_GAP || 
-          formState.data.method === ChaseMethod.WIDEN_THE_GAP 
-        ? "chase_maneuver" 
-        : "evade"
+      const actionType =
+        formState.data.method === ChaseMethod.RAM_SIDESWIPE
+          ? "ram"
+          : formState.data.method === ChaseMethod.NARROW_THE_GAP ||
+              formState.data.method === ChaseMethod.WIDEN_THE_GAP
+            ? "chase_maneuver"
+            : "evade"
 
       const vehicleUpdates = [
         {
@@ -260,14 +279,18 @@ export default function ChaseResolution({
       ]
 
       await client.applyChaseAction(encounter, vehicleUpdates)
-      
+
       // Check if target will be defeated after applying damage (only if successful)
       if (actualSuccess) {
-        const targetChasePoints = (target.action_values?.["Chase Points"] || 0) + finalChasePoints
+        const targetChasePoints =
+          (target.action_values?.["Chase Points"] || 0) + finalChasePoints
         const defeatThreshold = VS.getDefeatThreshold(target)
         const willBeDefeated = targetChasePoints >= defeatThreshold
-        const defeatType = formState.data.method === ChaseMethod.RAM_SIDESWIPE ? "crashed" : "boxed in"
-        
+        const defeatType =
+          formState.data.method === ChaseMethod.RAM_SIDESWIPE
+            ? "crashed"
+            : "boxed in"
+
         if (willBeDefeated) {
           toastSuccess(`${target.name} has been ${defeatType}!`)
         } else {
@@ -276,7 +299,7 @@ export default function ChaseResolution({
       } else {
         toastSuccess("Chase action missed - shots spent")
       }
-      
+
       if (onComplete) onComplete()
       onClose()
     } catch (error) {
@@ -357,18 +380,13 @@ export default function ChaseResolution({
 
       {/* Results Display - Only show when swerve is typed */}
       {showResults && (
-        <Alert
-          severity={isSuccess ? "success" : "error"}
-          sx={{ mt: 3, mb: 2 }}
-        >
+        <Alert severity={isSuccess ? "success" : "error"} sx={{ mt: 3, mb: 2 }}>
           <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
-            {isSuccess ? "Hit!" : "Miss!"}{" "}
-            Driving {formState.data.actionValue} + Swerve{" "}
-            {currentSwerve} = Action Result {actionResult}
+            {isSuccess ? "Hit!" : "Miss!"} Driving {formState.data.actionValue}{" "}
+            + Swerve {currentSwerve} = Action Result {actionResult}
           </Typography>
           <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
-            Action Result {actionResult} -
-            Driving {formState.data.defense}
+            Action Result {actionResult} - Driving {formState.data.defense}
             {formState.data.stunt ? " + 2 (stunt)" : ""} = Outcome {outcome}
           </Typography>
           {isSuccess && (

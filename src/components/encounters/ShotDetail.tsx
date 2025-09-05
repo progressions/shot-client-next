@@ -110,7 +110,9 @@ export default function ShotDetail({ shot }: ShotDetailProps) {
       </ListSubheader>
       {hasCharacters &&
         sortedCharacters
-          .filter((character: Character) => character.shot_id !== selectedActorId)
+          .filter(
+            (character: Character) => character.shot_id !== selectedActorId
+          )
           .map((character: Character) => (
             <CharacterDetail
               key={`fred-${shot.shot}-character-${character.shot_id}`}

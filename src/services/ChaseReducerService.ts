@@ -114,14 +114,22 @@ const ChaseReducerService = {
       if (st.method === ChaseMethod.RAM_SIDESWIPE) {
         // Ram/Sideswipe: Outcome + Target's Crunch - Target's Frame
         // Use the targetCrunch and frame values from form state (which can be manually edited)
-        const targetCrunchRaw = (st as ChaseFormData & { targetCrunch?: number | string }).targetCrunch
-        const targetCrunch = typeof targetCrunchRaw === 'string' ? parseInt(targetCrunchRaw) || 0 : targetCrunchRaw || 0
+        const targetCrunchRaw = (
+          st as ChaseFormData & { targetCrunch?: number | string }
+        ).targetCrunch
+        const targetCrunch =
+          typeof targetCrunchRaw === "string"
+            ? parseInt(targetCrunchRaw) || 0
+            : targetCrunchRaw || 0
         console.log("RAM_SIDESWIPE calculation in pursue:", {
           outcome,
           targetCrunch,
           frame: st.frame,
           calculatedSmackdown: (outcome || 0) + targetCrunch,
-          calculatedChasePoints: Math.max(0, (outcome || 0) + targetCrunch - st.frame)
+          calculatedChasePoints: Math.max(
+            0,
+            (outcome || 0) + targetCrunch - st.frame
+          ),
         })
         smackdown = Math.max(0, (outcome || 0) + targetCrunch)
         chasePoints = Math.max(0, smackdown - st.frame)
@@ -202,8 +210,13 @@ const ChaseReducerService = {
       if (st.method === ChaseMethod.RAM_SIDESWIPE) {
         // Ram/Sideswipe: Outcome + Target's Crunch - Target's Frame
         // Evaders can also ram/sideswipe when near
-        const targetCrunchRaw = (st as ChaseFormData & { targetCrunch?: number | string }).targetCrunch
-        const targetCrunch = typeof targetCrunchRaw === 'string' ? parseInt(targetCrunchRaw) || 0 : targetCrunchRaw || 0
+        const targetCrunchRaw = (
+          st as ChaseFormData & { targetCrunch?: number | string }
+        ).targetCrunch
+        const targetCrunch =
+          typeof targetCrunchRaw === "string"
+            ? parseInt(targetCrunchRaw) || 0
+            : targetCrunchRaw || 0
         smackdown = Math.max(0, (outcome || 0) + targetCrunch)
         chasePoints = Math.max(0, smackdown - st.frame)
         conditionPoints = chasePoints

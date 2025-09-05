@@ -20,7 +20,7 @@ export default function VehicleHeader({
   const faction = VS.faction(vehicle)?.name
   const isDefeated = VS.isDefeated(vehicle)
   const defeatType = VS.getDefeatType(vehicle)
-  
+
   console.log("VehicleHeader - Vehicle data:", {
     name: vehicle.name,
     chasePoints: vehicle.action_values?.["Chase Points"],

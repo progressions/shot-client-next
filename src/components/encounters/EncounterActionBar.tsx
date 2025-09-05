@@ -35,9 +35,11 @@ export default function EncounterActionBar({
   const drivingVehicle = selectedCharacter
     ? (selectedCharacter as Character & { driving?: Vehicle }).driving
     : undefined
-  
+
   const isDriving = !!drivingVehicle
-  const isVehicleDefeated = drivingVehicle ? VS.isDefeated(drivingVehicle) : false
+  const isVehicleDefeated = drivingVehicle
+    ? VS.isDefeated(drivingVehicle)
+    : false
 
   return (
     <Collapse in={true} timeout={300}>
