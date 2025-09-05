@@ -253,6 +253,14 @@ export default function ChaseResolution({
         console.log("Chase Resolution - Method:", result.method)
         console.log("Chase Resolution - Success:", result.success)
 
+        // Include action_type for ram/sideswipe tracking
+        const actionType = result.method === ChaseMethod.RAM_SIDESWIPE 
+          ? "ram" 
+          : result.method === ChaseMethod.NARROW_THE_GAP || 
+            result.method === ChaseMethod.WIDEN_THE_GAP 
+          ? "chase_maneuver" 
+          : "evade"
+
         const vehicleUpdates = [
           {
             vehicle_id: attackerVehicleId,
@@ -282,11 +290,24 @@ export default function ChaseResolution({
               formState.data.attackerRole === "pursuer" ? "evader" : "pursuer", // Target has opposite role
             position: finalPosition, // Use the calculated position
             action_values: targetVehicleValues,
+            action_type: actionType, // Track if target was rammed
           },
         ]
 
         await client.applyChaseAction(encounter, vehicleUpdates)
-        toastSuccess("Chase action resolved successfully!")
+        
+        // Check if target will be defeated after applying damage
+        const targetChasePoints = (target.action_values?.["Chase Points"] || 0) + (result.chasePoints || 0)
+        const defeatThreshold = VS.getDefeatThreshold(target)
+        const willBeDefeated = targetChasePoints >= defeatThreshold
+        const defeatType = result.method === ChaseMethod.RAM_SIDESWIPE ? "crashed" : "boxed in"
+        
+        if (willBeDefeated) {
+          toastSuccess(`${target.name} has been ${defeatType}!`)
+        } else {
+          toastSuccess("Chase action resolved successfully!")
+        }
+        
         if (onComplete) onComplete()
         onClose()
       }

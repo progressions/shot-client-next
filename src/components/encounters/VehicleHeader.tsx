@@ -18,6 +18,8 @@ export default function VehicleHeader({
 }: VehicleHeaderProps) {
   const archetype = VS.archetype(vehicle)
   const faction = VS.faction(vehicle)?.name
+  const isDefeated = VS.isDefeated(vehicle)
+  const defeatType = VS.getDefeatType(vehicle)
 
   return (
     <Stack
@@ -44,6 +46,19 @@ export default function VehicleHeader({
           }}
         >
           <VehicleLink vehicle={vehicle} />
+          {isDefeated && defeatType && (
+            <Chip
+              label={defeatType === "crashed" ? "CRASHED" : "BOXED IN"}
+              color={defeatType === "crashed" ? "error" : "warning"}
+              size="small"
+              sx={{
+                height: "20px",
+                fontSize: "0.65rem",
+                fontWeight: "bold",
+                textTransform: "uppercase",
+              }}
+            />
+          )}
           {onLocationClick && location && (
             <Chip
               size="small"
