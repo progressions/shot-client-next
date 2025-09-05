@@ -16,7 +16,6 @@ export default function ChaseConditionPoints({
   const chasePoints = VS.chasePoints(vehicle)
   const conditionPoints = VS.conditionPoints(vehicle)
 
-
   return (
     <Box
       component="span"
