@@ -119,6 +119,7 @@ export default function VehicleEditDialog({
       interface VehicleUpdate {
         name: string
         action_values: Record<string, unknown>
+        impairments: number
       }
 
       const vehicleUpdate: VehicleUpdate = {
@@ -128,6 +129,7 @@ export default function VehicleEditDialog({
           "Chase Points": chasePoints,
           "Condition Points": conditionPoints,
         },
+        impairments: impairments,
       }
 
       // Update vehicle
