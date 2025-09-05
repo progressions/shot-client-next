@@ -100,6 +100,8 @@ const SharedService = {
   ): Record<string, number> {
     const actionValues: Record<string, number> = {}
 
+    if (!character?.action_values) return actionValues
+
     for (const key in character.action_values) {
       if (character.action_values.hasOwnProperty(key)) {
         actionValues[key] = this.actionValue(character, key)
@@ -121,6 +123,7 @@ const SharedService = {
     character: Character | Vehicle,
     key: string
   ): number {
+    if (!character?.action_values) return 0
     return (character.action_values[key] as number) || 0
   },
 
@@ -130,6 +133,7 @@ const SharedService = {
     key: string
   ): string {
     try {
+      if (!character?.action_values) return ""
       return (character.action_values[key] as string) || ""
     } catch (_error) {
       return ""

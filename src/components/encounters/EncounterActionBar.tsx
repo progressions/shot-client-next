@@ -19,8 +19,6 @@ export default function EncounterActionBar({
   activePanel,
 }: EncounterActionBarProps) {
   const handleAction = (action: string) => {
-    // Scroll to top when opening a panel
-    window.scrollTo({ top: 0, behavior: "smooth" })
     onAction(action)
   }
 

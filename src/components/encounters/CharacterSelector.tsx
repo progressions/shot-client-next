@@ -173,11 +173,18 @@ export default function CharacterSelector({
                       return // Allow clicks in popup to work normally
                     }
                     e.preventDefault()
+                    e.stopPropagation()
                     // Toggle selection - if already selected, pass empty string to deselect
                     if (isSelected && !multiSelect) {
                       onSelect("")
                     } else {
                       onSelect(entity.shot_id || "")
+                    }
+                  }}
+                  onMouseDown={e => {
+                    // Prevent middle click from opening in new tab
+                    if (e.button === 1) {
+                      e.preventDefault()
                     }
                   }}
                   sx={{
@@ -209,6 +216,9 @@ export default function CharacterSelector({
                       justifyContent: "center",
                       width: "100%",
                       height: "100%",
+                      "& a": {
+                        pointerEvents: "none",
+                      },
                     }}
                   >
                     <Avatar

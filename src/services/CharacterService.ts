@@ -167,7 +167,7 @@ const CharacterService = {
 
   addDeathMarks: function (character: Character, value: number): Character {
     const deathMarks =
-      (character.action_values["Marks of Death"] as number) || 0
+      (character?.action_values?.["Marks of Death"] as number) || 0
     return this.updateActionValue(
       character,
       "Marks of Death",
@@ -331,6 +331,7 @@ const CharacterService = {
   },
 
   fortuneType: function (character: Character): string {
+    if (!character?.action_values) return "Fortune"
     return (character.action_values["FortuneType"] as string) || "Fortune"
   },
 
@@ -368,6 +369,7 @@ const CharacterService = {
   },
 
   marksOfDeath: function (character: Character): number {
+    if (!character?.action_values) return 0
     return (character.action_values["Marks of Death"] as number) || 0
   },
 

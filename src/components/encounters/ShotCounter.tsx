@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
 import { List, Box } from "@mui/material"
 import {
   MenuBar,
@@ -22,6 +22,13 @@ export default function ShotCounter() {
   const { getLocally, saveLocally } = useLocalStorage()
   const [showHidden, setShowHidden] = useState(false)
   const [activePanel, setActivePanel] = useState<string | null>(null)
+
+  // Refs for each panel
+  const attackPanelRef = useRef<HTMLDivElement>(null)
+  const healPanelRef = useRef<HTMLDivElement>(null)
+  const boostPanelRef = useRef<HTMLDivElement>(null)
+  const chasePanelRef = useRef<HTMLDivElement>(null)
+  const actionBarRef = useRef<HTMLDivElement>(null)
 
   // Load the persisted setting on mount
   useEffect(() => {
@@ -98,6 +105,24 @@ export default function ShotCounter() {
       setActivePanel(null)
     } else {
       setActivePanel(action)
+
+      // Scroll the EncounterActionBar to the top after a brief delay to allow panel to render
+      setTimeout(() => {
+        if (actionBarRef?.current) {
+          // Get the position of the action bar element
+          const rect = actionBarRef.current.getBoundingClientRect()
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+          
+          // Calculate position to bring action bar to top of viewport
+          const targetPosition = rect.top + scrollTop
+          
+          // Smooth scroll to the calculated position
+          window.scrollTo({
+            top: targetPosition,
+            behavior: "smooth"
+          })
+        }
+      }, 100)
     }
   }
 
@@ -129,11 +154,13 @@ export default function ShotCounter() {
       </Box>
 
       {/* Action bar appears when character is selected */}
-      <EncounterActionBar
-        selectedCharacter={selectedCharacter}
-        onAction={handleAction}
-        activePanel={activePanel}
-      />
+      <Box ref={actionBarRef}>
+        <EncounterActionBar
+          selectedCharacter={selectedCharacter}
+          onAction={handleAction}
+          activePanel={activePanel}
+        />
+      </Box>
 
       {/* Character Detail for selected character */}
       {selectedCharacter && (
@@ -144,35 +171,43 @@ export default function ShotCounter() {
 
       {/* Action Panels - Place them here, before the shot list */}
       {activePanel === "attack" && selectedCharacter && (
-        <AttackPanel
-          preselectedAttacker={selectedCharacter}
-          onClose={handlePanelClose}
-          onComplete={handleActionComplete}
-        />
+        <Box ref={attackPanelRef}>
+          <AttackPanel
+            preselectedAttacker={selectedCharacter}
+            onClose={handlePanelClose}
+            onComplete={handleActionComplete}
+          />
+        </Box>
       )}
 
       {activePanel === "boost" && selectedCharacter && (
-        <BoostPanel
-          preselectedBooster={selectedCharacter}
-          onClose={handlePanelClose}
-          onComplete={handleActionComplete}
-        />
+        <Box ref={boostPanelRef}>
+          <BoostPanel
+            preselectedBooster={selectedCharacter}
+            onClose={handlePanelClose}
+            onComplete={handleActionComplete}
+          />
+        </Box>
       )}
 
       {activePanel === "chase" && selectedCharacter && (
-        <ChasePanel
-          preselectedCharacter={selectedCharacter}
-          onClose={handlePanelClose}
-          onComplete={handleActionComplete}
-        />
+        <Box ref={chasePanelRef}>
+          <ChasePanel
+            preselectedCharacter={selectedCharacter}
+            onClose={handlePanelClose}
+            onComplete={handleActionComplete}
+          />
+        </Box>
       )}
 
       {activePanel === "heal" && selectedCharacter && (
-        <HealPanel
-          preselectedCharacter={selectedCharacter}
-          onClose={handlePanelClose}
-          onComplete={handleActionComplete}
-        />
+        <Box ref={healPanelRef}>
+          <HealPanel
+            preselectedCharacter={selectedCharacter}
+            onClose={handlePanelClose}
+            onComplete={handleActionComplete}
+          />
+        </Box>
       )}
 
       {/* Shot List */}

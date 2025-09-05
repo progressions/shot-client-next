@@ -13,6 +13,7 @@ import type { ChaseFormData, Shot, Vehicle, Character } from "@/types"
 import { FormActions } from "@/reducers"
 import { NumberField } from "@/components/ui"
 import CharacterSelector from "../CharacterSelector"
+import { TargetDisplay } from "@/components/encounters"
 import VehicleStatsDisplay from "@/components/vehicles/VehicleStatsDisplay"
 
 // Character with shot-specific data from encounter
@@ -206,6 +207,13 @@ export default function ChaseTargetSection({
             borderColor="error.main"
             excludeShotId={attackerShotId}
           />
+          
+          {/* Display selected target */}
+          {target && (
+            <Box sx={{ mt: 1 }}>
+              <TargetDisplay character={target} />
+            </Box>
+          )}
 
           {/* Show All Checkbox */}
           <FormControlLabel

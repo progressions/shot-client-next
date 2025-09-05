@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useEffect, useState } from "react"
-import { Box } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import { useEncounter, useToast } from "@/contexts"
 import { CS, DS, CES } from "@/services"
 import type { Character, Weapon, AttackFormData } from "@/types"
@@ -950,6 +950,20 @@ export default function AttackPanel({
 
   return (
     <Box sx={{ overflow: "hidden", minHeight: isReady ? "auto" : "100px" }}>
+      {/* Panel Heading */}
+      <Typography
+        variant="h6"
+        sx={{
+          p: 1,
+          fontWeight: "bold",
+          backgroundColor: "background.paper",
+          borderBottom: "2px solid",
+          borderBottomColor: "divider",
+        }}
+      >
+        Attack
+      </Typography>
+      
       {/* Main Content - Attacker then Target */}
       {isReady ? (
         <>

@@ -194,130 +194,133 @@ export default function HealPanel({
       <Typography
         variant="h6"
         sx={{
-          textAlign: "center",
-          py: 2,
-          borderBottom: "1px solid",
-          borderColor: "divider",
+          p: 1,
+          fontWeight: "bold",
+          backgroundColor: "background.paper",
+          borderBottom: "2px solid",
+          borderBottomColor: "divider",
         }}
       >
-        Healing Action
+        Heal
       </Typography>
 
       {isReady ? (
         <>
-          {/* Healer Info Section */}
+          {/* Combined Healer and Target Section */}
           <Box sx={{ backgroundColor: "action.hover" }}>
             <Box
               sx={{
-                p: { xs: 2, sm: 3 },
+                p: { xs: 1, sm: 1.5 },
                 borderBottom: "2px solid",
                 borderBottomColor: "divider",
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
+                gap: { xs: 2, md: 3 },
               }}
             >
-              <Typography variant="h6" sx={{ mb: 2, color: "success.main" }}>
-                💉 Healer
-              </Typography>
-
-              {preselectedCharacter ? (
-                <Box>
-                  <Typography variant="h5" gutterBottom>
-                    {preselectedCharacter.name}
-                  </Typography>
-                  <Box
-                    sx={{ display: "flex", gap: 2, mt: 2, flexWrap: "wrap" }}
-                  >
-                    <Box sx={{ width: 100 }}>
-                      <Typography
-                        variant="caption"
-                        sx={{ mb: 0.5, display: "block" }}
-                      >
-                        Medicine Skill
-                      </Typography>
-                      <NumberField
-                        label=""
-                        value={medicineValue}
-                        onChange={e => setMedicineValue(e.target.value)}
-                        onBlur={() => {
-                          if (!medicineValue || medicineValue === "0") {
-                            setMedicineValue("7")
-                          }
-                        }}
-                        min={0}
-                        max={20}
-                        disabled={isProcessing}
-                        size="small"
-                      />
-                    </Box>
-                    <Box sx={{ width: 100 }}>
-                      <Typography
-                        variant="caption"
-                        sx={{ mb: 0.5, display: "block" }}
-                      >
-                        Shots to Spend
-                      </Typography>
-                      <NumberField
-                        label=""
-                        value={shotsSpent}
-                        onChange={e => setShotsSpent(e.target.value)}
-                        onBlur={() => {
-                          if (!shotsSpent || parseInt(shotsSpent) < 1) {
-                            setShotsSpent("5")
-                          }
-                        }}
-                        min={1}
-                        max={10}
-                        disabled={isProcessing}
-                        size="small"
-                      />
-                    </Box>
-                  </Box>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={useFortune}
-                        onChange={e => setUseFortune(e.target.checked)}
-                        disabled={
-                          isProcessing || CS.fortune(preselectedCharacter) <= 0
-                        }
-                      />
-                    }
-                    label={`Use Fortune (${CS.fortune(preselectedCharacter)} available)`}
-                    sx={{ mt: 1 }}
-                  />
-                </Box>
-              ) : (
-                <Typography color="text.secondary">
-                  No healer selected
+              {/* Left Side - Healer Info */}
+              <Box sx={{ flex: "0 0 auto" }}>
+                <Typography variant="h6" sx={{ mb: 1, color: "success.main" }}>
+                  💉 Healer
                 </Typography>
-              )}
-            </Box>
 
-            {/* Target Selection Section */}
-            <Box
-              sx={{
-                p: { xs: 2, sm: 3 },
-                borderBottom: "2px solid",
-                borderBottomColor: "divider",
-              }}
-            >
-              <Typography variant="h6" sx={{ mb: 2, color: "error.main" }}>
-                🎯 Healing Target
-              </Typography>
-              <CharacterSelector
-                shots={allShots}
-                selectedShotId={targetShotId}
-                onSelect={setTargetShotId}
-                borderColor="error.main"
-                disabled={isProcessing}
-                showShotNumbers={false}
-                characterTypes={["Ally", "PC"]}
-                showAllCheckbox={true}
-              />
-              {target && (
-                <Box sx={{ mt: 2 }}>
-                  <TargetDisplay character={target} />
-                </Box>
-              )}
+                {preselectedCharacter ? (
+                  <Box>
+                    <Typography variant="h5" gutterBottom>
+                      {preselectedCharacter.name}
+                    </Typography>
+                    <Box
+                      sx={{ display: "flex", gap: 2, mt: 2, flexWrap: "wrap" }}
+                    >
+                      <Box sx={{ width: 100 }}>
+                        <Typography
+                          variant="caption"
+                          sx={{ mb: 0.5, display: "block" }}
+                        >
+                          Medicine Skill
+                        </Typography>
+                        <NumberField
+                          label=""
+                          value={medicineValue}
+                          onChange={e => setMedicineValue(e.target.value)}
+                          onBlur={() => {
+                            if (!medicineValue || medicineValue === "0") {
+                              setMedicineValue("7")
+                            }
+                          }}
+                          min={0}
+                          max={20}
+                          disabled={isProcessing}
+                          size="small"
+                        />
+                      </Box>
+                      <Box sx={{ width: 100 }}>
+                        <Typography
+                          variant="caption"
+                          sx={{ mb: 0.5, display: "block" }}
+                        >
+                          Shot Cost
+                        </Typography>
+                        <NumberField
+                          label=""
+                          value={shotsSpent}
+                          onChange={e => setShotsSpent(e.target.value)}
+                          onBlur={() => {
+                            if (!shotsSpent || parseInt(shotsSpent) < 1) {
+                              setShotsSpent("5")
+                            }
+                          }}
+                          min={1}
+                          max={10}
+                          disabled={isProcessing}
+                          size="small"
+                        />
+                      </Box>
+                    </Box>
+                    {CS.isPC(preselectedCharacter) && (
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={useFortune}
+                            onChange={e => setUseFortune(e.target.checked)}
+                            disabled={
+                              isProcessing || CS.fortune(preselectedCharacter) <= 0
+                            }
+                          />
+                        }
+                        label={`Use Fortune (${CS.fortune(preselectedCharacter)} available)`}
+                        sx={{ mt: 1 }}
+                      />
+                    )}
+                  </Box>
+                ) : (
+                  <Typography color="text.secondary">
+                    No healer selected
+                  </Typography>
+                )}
+              </Box>
+
+              {/* Right Side - Target Selection */}
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="h6" sx={{ mb: 1, color: "error.main" }}>
+                  🎯 Healing Target
+                </Typography>
+                <CharacterSelector
+                  shots={allShots}
+                  selectedShotId={targetShotId}
+                  onSelect={setTargetShotId}
+                  borderColor="error.main"
+                  disabled={isProcessing}
+                  showShotNumbers={false}
+                  characterTypes={["Ally", "PC"]}
+                  showAllCheckbox={true}
+                />
+                {target && (
+                  <Box sx={{ mt: 1 }}>
+                    <TargetDisplay character={target} />
+                  </Box>
+                )}
+              </Box>
             </Box>
           </Box>
 
@@ -325,69 +328,64 @@ export default function HealPanel({
           <Box
             sx={{ p: { xs: 2, sm: 3 }, backgroundColor: "background.default" }}
           >
-            <Typography
-              variant="h6"
-              gutterBottom
-              sx={{ textAlign: "center", mb: { xs: 2, sm: 3 } }}
-            >
-              💊 Healing Resolution
-            </Typography>
-
             {preselectedCharacter ? (
               <>
-                {/* Swerve Input */}
-                <Box sx={{ mb: 3, width: 100, mx: "auto" }}>
-                  <Typography
-                    variant="caption"
-                    sx={{ mb: 0.5, display: "block" }}
-                  >
-                    Swerve
-                  </Typography>
-                  <NumberField
-                    label=""
-                    value={swerve}
-                    onChange={e => setSwerve(e.target.value)}
-                    onBlur={() => {}}
-                    min={-10}
-                    max={10}
-                    disabled={isProcessing}
-                    size="small"
-                  />
-                </Box>
-
-                {/* Healing Summary */}
-                {target && (
-                  <Alert severity="info" sx={{ mb: 3 }}>
-                    <Typography variant="body2">
-                      <strong>{preselectedCharacter.name}</strong> will heal{" "}
-                      <strong>{target.name}</strong> for{" "}
-                      <strong>
-                        {Math.min(healingAmount, CS.wounds(target))}
-                      </strong>{" "}
-                      wounds
-                      {healingAmount > CS.wounds(target) &&
-                      CS.wounds(target) > 0 ? (
-                        <> (limited by current wounds)</>
-                      ) : null}
-                    </Typography>
+                {/* Swerve and Results Container */}
+                <Box sx={{ display: "flex", gap: 2, mb: 3, alignItems: "flex-start" }}>
+                  {/* Swerve Input */}
+                  <Box sx={{ width: 100, flexShrink: 0 }}>
                     <Typography
                       variant="caption"
-                      sx={{ display: "block", mt: 1 }}
+                      sx={{ mb: 0.5, display: "block" }}
                     >
-                      Medicine ({medicineValue}) + Swerve ({swerve}) ={" "}
-                      {healingAmount} wounds healed
+                      Swerve
                     </Typography>
-                    <Typography variant="caption" sx={{ display: "block" }}>
-                      Cost: {shotsSpent} shots{useFortune && " + 1 Fortune"}
-                    </Typography>
-                  </Alert>
-                )}
+                    <NumberField
+                      label=""
+                      value={swerve}
+                      onChange={e => setSwerve(e.target.value)}
+                      onBlur={() => {}}
+                      min={-10}
+                      max={10}
+                      disabled={isProcessing}
+                      size="small"
+                    />
+                  </Box>
 
-                {!target && (
-                  <Alert severity="warning" sx={{ mb: 3 }}>
-                    Select a target to heal
-                  </Alert>
-                )}
+                  {/* Healing Summary */}
+                  {target && (
+                    <Alert severity="info" sx={{ flex: 1 }}>
+                      <Typography variant="body2">
+                        <strong>{preselectedCharacter.name}</strong> will heal{" "}
+                        <strong>{target.name}</strong> for{" "}
+                        <strong>
+                          {Math.min(healingAmount, CS.wounds(target))}
+                        </strong>{" "}
+                        wounds
+                        {healingAmount > CS.wounds(target) &&
+                        CS.wounds(target) > 0 ? (
+                          <> (limited by current wounds)</>
+                        ) : null}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{ display: "block", mt: 1 }}
+                      >
+                        Medicine ({medicineValue}) + Swerve ({swerve}) ={" "}
+                        {healingAmount} wounds healed
+                      </Typography>
+                      <Typography variant="caption" sx={{ display: "block" }}>
+                        Cost: {shotsSpent} shots{useFortune && " + 1 Fortune"}
+                      </Typography>
+                    </Alert>
+                  )}
+
+                  {!target && (
+                    <Alert severity="warning" sx={{ flex: 1 }}>
+                      Select a target to heal
+                    </Alert>
+                  )}
+                </Box>
               </>
             ) : (
               <Box sx={{ textAlign: "center", py: 4 }}>
