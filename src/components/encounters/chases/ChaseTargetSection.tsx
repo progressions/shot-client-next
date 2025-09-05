@@ -242,75 +242,79 @@ export default function ChaseTargetSection({
         <>
           {/* Vehicle Info Display with Editable Values */}
           <Box sx={{ p: 2, bgcolor: "background.paper", borderRadius: 1, mb: 2 }}>
-            <VehicleStatsDisplay vehicle={selectedVehicle} />
-
-            {/* Editable Defense Values */}
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={{ xs: 2, sm: 4 }}
-              sx={{ mt: 2 }}
-              alignItems="flex-start"
-            >
-              {/* Driving Value */}
-              <Box>
-                <Typography
-                  variant="body2"
-                  sx={{ mb: 1, fontWeight: "medium" }}
-                >
-                  Driving
-                </Typography>
-                <NumberField
-                  name="defense"
-                  value={
-                    parseInt(formState.data.defense?.toString() || "0") || 0
-                  }
-                  size="small"
-                  width="80px"
-                  error={false}
-                  onChange={e => updateField("defense", e.target.value)}
-                  onBlur={e => updateField("defense", e.target.value)}
-                />
+            <Stack direction="row" spacing={3}>
+              {/* Vehicle Stats Display */}
+              <Box sx={{ flex: 1 }}>
+                <VehicleStatsDisplay vehicle={selectedVehicle} />
               </Box>
 
-              {/* Handling Value */}
-              <Box>
-                <Typography
-                  variant="body2"
-                  sx={{ mb: 1, fontWeight: "medium" }}
-                >
-                  Handling
-                </Typography>
-                <NumberField
-                  name="handling"
-                  value={
-                    parseInt(formState.data.handling?.toString() || "0") || 0
-                  }
-                  size="small"
-                  width="80px"
-                  error={false}
-                  onChange={e => updateField("handling", e.target.value)}
-                  onBlur={e => updateField("handling", e.target.value)}
-                />
-              </Box>
+              {/* Editable Defense Values */}
+              <Stack
+                direction="row"
+                spacing={2}
+                alignItems="flex-start"
+              >
+                {/* Driving Value */}
+                <Box>
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 1, fontWeight: "medium" }}
+                  >
+                    Driving
+                  </Typography>
+                  <NumberField
+                    name="defense"
+                    value={
+                      parseInt(formState.data.defense?.toString() || "0") || 0
+                    }
+                    size="small"
+                    width="80px"
+                    error={false}
+                    onChange={e => updateField("defense", e.target.value)}
+                    onBlur={e => updateField("defense", e.target.value)}
+                  />
+                </Box>
 
-              {/* Frame Value (editable) */}
-              <Box>
-                <Typography
-                  variant="body2"
-                  sx={{ mb: 1, fontWeight: "medium" }}
-                >
-                  Frame
-                </Typography>
-                <NumberField
-                  name="frame"
-                  value={parseInt(formState.data.frame?.toString() || "0") || 0}
-                  size="small"
-                  width="80px"
-                  error={false}
-                  onChange={e => updateField("frame", e.target.value)}
-                  onBlur={e => updateField("frame", e.target.value)}
-                />
-              </Box>
+                {/* Handling Value */}
+                <Box>
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 1, fontWeight: "medium" }}
+                  >
+                    Handling
+                  </Typography>
+                  <NumberField
+                    name="handling"
+                    value={
+                      parseInt(formState.data.handling?.toString() || "0") || 0
+                    }
+                    size="small"
+                    width="80px"
+                    error={false}
+                    onChange={e => updateField("handling", e.target.value)}
+                    onBlur={e => updateField("handling", e.target.value)}
+                  />
+                </Box>
+
+                {/* Frame Value (editable) */}
+                <Box>
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 1, fontWeight: "medium" }}
+                  >
+                    Frame
+                  </Typography>
+                  <NumberField
+                    name="frame"
+                    value={parseInt(formState.data.frame?.toString() || "0") || 0}
+                    size="small"
+                    width="80px"
+                    error={false}
+                    onChange={e => updateField("frame", e.target.value)}
+                    onBlur={e => updateField("frame", e.target.value)}
+                  />
+                </Box>
+              </Stack>
             </Stack>
           </Box>
 
