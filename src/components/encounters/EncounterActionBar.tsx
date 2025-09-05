@@ -5,7 +5,8 @@ import { Box, Typography, Collapse, Paper } from "@mui/material"
 import { Healing as HealIcon } from "@mui/icons-material"
 import { FaGun, FaRocket, FaCar } from "react-icons/fa6"
 import { MenuButton } from "@/components/ui"
-import type { Character } from "@/types"
+import type { Character, Vehicle } from "@/types"
+import { VS } from "@/services"
 
 interface EncounterActionBarProps {
   selectedCharacter: Character | null
@@ -31,9 +32,12 @@ export default function EncounterActionBar({
       selectedCharacter.action_values["Sorcery"] !== undefined ||
       selectedCharacter.action_values["Creature"] !== undefined)
 
-  const isDriving =
-    selectedCharacter &&
-    !!(selectedCharacter as Character & { driving?: boolean }).driving
+  const drivingVehicle = selectedCharacter
+    ? (selectedCharacter as Character & { driving?: Vehicle }).driving
+    : undefined
+  
+  const isDriving = !!drivingVehicle
+  const isVehicleDefeated = drivingVehicle ? VS.isDefeated(drivingVehicle) : false
 
   return (
     <Collapse in={true} timeout={300}>
@@ -100,11 +104,13 @@ export default function EncounterActionBar({
             title={
               !selectedCharacter
                 ? "Select a character first"
-                : isDriving
-                  ? "Chase"
-                  : "Character is not driving a vehicle"
+                : !isDriving
+                  ? "Character is not driving a vehicle"
+                  : isVehicleDefeated
+                    ? "Vehicle has been defeated"
+                    : "Chase"
             }
-            disabled={!selectedCharacter || !isDriving}
+            disabled={!selectedCharacter || !isDriving || isVehicleDefeated}
             isActive={activePanel === "chase"}
           >
             <FaCar size={20} />

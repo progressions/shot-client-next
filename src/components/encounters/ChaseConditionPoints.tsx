@@ -18,12 +18,12 @@ export default function ChaseConditionPoints({
   
   console.log("ChaseConditionPoints - Vehicle data:", {
     name: vehicle.name,
+    vehicle,
     chasePoints,
     conditionPoints,
     was_rammed_or_damaged: vehicle.was_rammed_or_damaged,
     is_defeated_in_chase: vehicle.is_defeated_in_chase,
     defeat_type: vehicle.defeat_type,
-    defeat_threshold: vehicle.defeat_threshold,
     isDefeated: VS.isDefeated(vehicle),
     defeatType: VS.getDefeatType(vehicle),
   })

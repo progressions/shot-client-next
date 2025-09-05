@@ -167,6 +167,8 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
     }
   }
 
+  console.log({ encounter, driving: character.driving })
+
   return (
     <motion.div
       key={`${character.id}-${character.shot_id}`}

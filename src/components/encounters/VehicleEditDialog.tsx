@@ -101,11 +101,12 @@ export default function VehicleEditDialog({
         impairments: impairments,
       }
 
-      // Update vehicle
-      await client.updateVehicleCombatStats(vehicle.id, vehicleUpdate)
-
-      // Update shot if we have shot data
-      if (vehicle.shot_id) {
+      // If vehicle is in a fight, update through the encounter system for proper broadcasts
+      if (encounter && vehicle.shot_id) {
+        // First update the vehicle model
+        await client.updateVehicleCombatStats(vehicle.id, vehicleUpdate)
+        
+        // Then update the shot to trigger encounter broadcast
         interface ShotUpdate {
           shot_id: string
           current_shot: number | null
@@ -115,13 +116,14 @@ export default function VehicleEditDialog({
         const shotUpdate: ShotUpdate = {
           shot_id: vehicle.shot_id,
           current_shot: null, // Vehicles don't use current_shot
+          impairments: impairments,
         }
 
-        // Add impairments for vehicles (stored on shot)
-        shotUpdate.impairments = impairments
-
-        // Update shot
+        // Update shot - this will trigger encounter broadcast
         await client.updateVehicleShot(encounter, vehicle, shotUpdate)
+      } else {
+        // Not in a fight, just update the vehicle model
+        await client.updateVehicleCombatStats(vehicle.id, vehicleUpdate)
       }
 
       toastSuccess(`Updated ${name}`)
