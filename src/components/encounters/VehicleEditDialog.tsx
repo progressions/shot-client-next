@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect } from "react"
 import {
   Dialog,
   DialogTitle,
@@ -12,15 +12,10 @@ import {
   Box,
   Typography,
   Grid,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormHelperText,
 } from "@mui/material"
 import { NumberField } from "@/components/ui"
 import { useClient, useToast, useEncounter } from "@/contexts"
-import type { Vehicle, Character } from "@/types"
+import type { Vehicle } from "@/types"
 
 interface VehicleEditDialogProps {
   open: boolean
@@ -43,23 +38,7 @@ export default function VehicleEditDialog({
   const [chasePoints, setChasePoints] = useState<number>(0)
   const [conditionPoints, setConditionPoints] = useState<number>(0)
   const [impairments, setImpairments] = useState<number>(0)
-  const [driverId, setDriverId] = useState<string>("")
   const [loading, setLoading] = useState(false)
-
-  // Get available characters from the encounter
-  const availableCharacters = useMemo(() => {
-    console.log("VehicleEditDialog - encounter object:", encounter)
-    if (!encounter?.shots) return []
-
-    // Get all characters from shots that are not hidden (shot.shot is not null)
-    const characters = encounter.shots
-      .filter(shot => shot.shot !== null)
-      .flatMap(shot => shot.characters || [])
-      .filter((char): char is Character => char !== undefined)
-
-    console.log("Available characters:", characters)
-    return characters
-  }, [encounter?.shots, encounter])
 
   // Initialize form values when dialog opens
   useEffect(() => {
@@ -84,21 +63,8 @@ export default function VehicleEditDialog({
       setImpairments(
         vehicleWithShotImpairments.shot_impairments || vehicle.impairments || 0
       )
-
-      // Set driver if vehicle has one - use driver.shot_id
-      if (vehicle.driver?.shot_id) {
-        console.log("Setting driver shot_id:", vehicle.driver.shot_id)
-        setDriverId(vehicle.driver.shot_id)
-      } else if (vehicle.driver_id) {
-        // Fallback to driver_id if available
-        console.log("Setting driver_id (fallback):", vehicle.driver_id)
-        setDriverId(vehicle.driver_id)
-      } else {
-        console.log("No driver found on vehicle")
-        setDriverId("")
-      }
     }
-  }, [open, vehicle, availableCharacters])
+  }, [open, vehicle])
 
   // Validation
   const isValid = () => {
@@ -145,7 +111,6 @@ export default function VehicleEditDialog({
           shot_id: string
           current_shot: number | null
           impairments?: number
-          driver_id?: string
         }
 
         const shotUpdate: ShotUpdate = {
@@ -155,9 +120,6 @@ export default function VehicleEditDialog({
 
         // Add impairments for vehicles (stored on shot)
         shotUpdate.impairments = impairments
-
-        // Add driver_id if set (empty string means no driver)
-        shotUpdate.driver_id = driverId
 
         // Update shot
         await client.updateVehicleShot(encounter, vehicle, shotUpdate)
@@ -189,31 +151,6 @@ export default function VehicleEditDialog({
             error={name.trim().length === 0}
             helperText={name.trim().length === 0 ? "Name is required" : ""}
           />
-
-          {/* Driver selection */}
-          <FormControl fullWidth size="small">
-            <InputLabel id="driver-select-label">Driver</InputLabel>
-            <Select
-              labelId="driver-select-label"
-              id="driver-select"
-              value={driverId}
-              label="Driver"
-              onChange={e => setDriverId(e.target.value)}
-              disabled={loading}
-            >
-              <MenuItem value="">
-                <em>No driver</em>
-              </MenuItem>
-              {availableCharacters.map((character: Character) => (
-                <MenuItem key={character.shot_id} value={character.shot_id}>
-                  {character.name}
-                </MenuItem>
-              ))}
-            </Select>
-            <FormHelperText>
-              Select a character to drive this vehicle
-            </FormHelperText>
-          </FormControl>
 
           {/* Combat Stats Row */}
           <Box>
