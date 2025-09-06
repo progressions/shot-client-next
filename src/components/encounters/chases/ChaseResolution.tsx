@@ -252,13 +252,13 @@ export default function ChaseResolution({
 
       // Check if Fortune was used
       const fortuneUsed = fortuneBonus > 0 ? 1 : 0
-      
+
       // Find the driver character for the attacker vehicle
       const attackerShot = encounter.shots.find(
         (s: Shot) => s.vehicle?.id === attackerVehicleId
       )
       const driverCharacterId = attackerShot?.character?.id
-      
+
       const vehicleUpdates = [
         {
           vehicle_id: attackerVehicleId,

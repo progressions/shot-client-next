@@ -178,26 +178,29 @@ export default function ChaseMethodSection({
                 updateField("fortuneBonus", finalValue)
                 setUsingFortune(finalValue !== "0")
               }}
-              sx={{ 
+              sx={{
                 fontSize: "1.5rem",
                 "& .MuiOutlinedInput-root": {
                   "&.Mui-focused": {
                     "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: fortuneBonus !== "0" ? "warning.main" : "primary.main",
+                      borderColor:
+                        fortuneBonus !== "0" ? "warning.main" : "primary.main",
                     },
                   },
                 },
               }}
             />
-            <Typography 
-              variant="caption" 
-              sx={{ 
-                mt: 0.5, 
+            <Typography
+              variant="caption"
+              sx={{
+                mt: 0.5,
                 color: fortuneBonus !== "0" ? "warning.main" : "text.secondary",
                 fontSize: "0.65rem",
               }}
             >
-              {fortuneBonus !== "0" ? `Cost: 1 (${availableFortune - 1} left)` : `Available: ${availableFortune}`}
+              {fortuneBonus !== "0"
+                ? `Cost: 1 (${availableFortune - 1} left)`
+                : `Available: ${availableFortune}`}
             </Typography>
           </FormControl>
         )}

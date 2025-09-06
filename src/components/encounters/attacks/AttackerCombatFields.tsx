@@ -185,20 +185,22 @@ export default function AttackerCombatFields({
                 "& .MuiOutlinedInput-root": {
                   "&.Mui-focused": {
                     "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: fortuneBonus !== "0" ? "warning.main" : "primary.main",
+                      borderColor:
+                        fortuneBonus !== "0" ? "warning.main" : "primary.main",
                     },
                   },
                   "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: fortuneBonus !== "0" ? "warning.main" : undefined,
+                    borderColor:
+                      fortuneBonus !== "0" ? "warning.main" : undefined,
                   },
                 },
               }}
             />
-            <Typography 
-              variant="caption" 
-              sx={{ 
+            <Typography
+              variant="caption"
+              sx={{
                 display: "block",
-                mt: 0.25, 
+                mt: 0.25,
                 color: fortuneBonus !== "0" ? "warning.main" : "text.secondary",
                 fontSize: "0.65rem",
                 textAlign: "center",
