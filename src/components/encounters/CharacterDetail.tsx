@@ -21,7 +21,13 @@ import {
   Chip,
   Alert,
 } from "@mui/material"
-import { FaTimes, FaEyeSlash, FaEye, FaHeart, FaExclamationTriangle } from "react-icons/fa"
+import {
+  FaTimes,
+  FaEyeSlash,
+  FaEye,
+  FaHeart,
+  FaExclamationTriangle,
+} from "react-icons/fa"
 import { MdEdit } from "react-icons/md"
 import { FaCar } from "react-icons/fa6"
 import {
@@ -298,21 +304,25 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
                     }}
                   >
                     <VehicleAvatar entity={drivingVehicle} />
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    <Box
+                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                    >
                       <VehicleLink vehicle={drivingVehicle} />
                       {VS.isDefeated(drivingVehicle) &&
-                        VS.getDefeatType(drivingVehicle) && (
-                          VS.getDefeatType(drivingVehicle) === "crashed" ? (
-                            <FaCar size={16} color="error" />
-                          ) : (
-                            <FaExclamationTriangle size={16} color="warning" />
-                          )
-                        )}
+                        VS.getDefeatType(drivingVehicle) &&
+                        (VS.getDefeatType(drivingVehicle) === "crashed" ? (
+                          <FaCar size={16} color="error" />
+                        ) : (
+                          <FaExclamationTriangle size={16} color="warning" />
+                        ))}
                     </Box>
                   </Box>
                   <VehicleActionValues vehicle={drivingVehicle} />
                   <Box sx={{ mt: 1 }}>
-                    <ChaseConditionPoints vehicle={drivingVehicle} driver={character} />
+                    <ChaseConditionPoints
+                      vehicle={drivingVehicle}
+                      driver={character}
+                    />
                   </Box>
                 </Box>
               )}

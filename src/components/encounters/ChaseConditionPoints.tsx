@@ -20,7 +20,7 @@ export default function ChaseConditionPoints({
   const theme = useTheme()
   const chasePoints = VS.chasePoints(vehicle)
   const conditionPoints = VS.conditionPoints(vehicle)
-  
+
   // Determine the wound threshold based on the driver's type
   const woundThreshold = useMemo(() => {
     if (driver) {
@@ -31,7 +31,7 @@ export default function ChaseConditionPoints({
     // Fallback to vehicle's method if no driver provided
     return VS.getDefeatThreshold(vehicle)
   }, [driver, vehicle])
-  
+
   const chaseExceedsThreshold = chasePoints >= woundThreshold
   const conditionExceedsThreshold = conditionPoints >= woundThreshold
 

@@ -233,7 +233,9 @@ export default function ChaseResolution({
 
       // Get the driver character ID from form state
       // The 'attacker' in form state is actually the driver character
-      const driverCharacterId = (formState.data as ChaseFormData & { attacker?: Character }).attacker?.id
+      const driverCharacterId = (
+        formState.data as ChaseFormData & { attacker?: Character }
+      ).attacker?.id
 
       console.log("Chase Resolution - Shot cost:", shotCost)
       console.log("Chase Resolution - Driver character ID:", driverCharacterId)
