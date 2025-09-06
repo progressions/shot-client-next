@@ -229,11 +229,16 @@ export default function ChaseResolution({
       }
 
       // Get the shot cost from form state
-      const shotCost = parseInt(
-        (formState.data as ChaseFormData & { shotCost?: string }).shotCost ||
-          "3"
-      )
+      const shotCost = formState.data.shotCost || 3
 
+      // Get the driver character ID from form state
+      // The 'attacker' in form state is actually the driver character
+      const driverCharacterId = (
+        formState.data as ChaseFormData & { attacker?: Character }
+      ).attacker?.id
+
+      console.log("Chase Resolution - Shot cost:", shotCost)
+      console.log("Chase Resolution - Driver character ID:", driverCharacterId)
       console.log(
         "Chase Resolution - Position change:",
         formState.data.position,
@@ -252,12 +257,6 @@ export default function ChaseResolution({
 
       // Check if Fortune was used
       const fortuneUsed = fortuneBonus > 0 ? 1 : 0
-
-      // Find the driver character for the attacker vehicle
-      const attackerShot = encounter.shots.find(
-        (s: Shot) => s.vehicle?.id === attackerVehicleId
-      )
-      const driverCharacterId = attackerShot?.character?.id
 
       const vehicleUpdates = [
         {

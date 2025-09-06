@@ -6,6 +6,7 @@ import { useEncounter, useClient } from "@/contexts"
 import { useForm, FormActions } from "@/reducers"
 import type { Vehicle, Shot, ChaseRelationship, Character } from "@/types"
 import { ChaseFormData, initialChaseFormData } from "@/types/chase"
+import { CS } from "@/services"
 import { getAllVisibleShots } from "./attacks/shotSorting"
 import ChaseTargetSection from "./chases/ChaseTargetSection"
 import ChaseMethodSection from "./chases/ChaseMethodSection"
@@ -69,7 +70,11 @@ export default function ChasePanel({
   const { formState, dispatchForm } = useForm<ChaseFormData>({
     ...initialChaseFormData,
     attackerShotId: preselectedCharacter?.shot_id || "",
-    shotCost: "3", // Default shot cost
+    shotCost: preselectedCharacter
+      ? CS.isBoss(preselectedCharacter) || CS.isUberBoss(preselectedCharacter)
+        ? 2
+        : 3
+      : 3, // Set based on character type
     attacker: preselectedCharacter || undefined,
     vehicle: getAttackerVehicle(),
   })

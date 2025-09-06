@@ -19,9 +19,17 @@ import {
   Typography,
   TextField,
   Chip,
+  Alert,
 } from "@mui/material"
-import { FaTimes, FaEyeSlash, FaEye, FaHeart } from "react-icons/fa"
+import {
+  FaTimes,
+  FaEyeSlash,
+  FaEye,
+  FaHeart,
+  FaExclamationTriangle,
+} from "react-icons/fa"
 import { MdEdit } from "react-icons/md"
+import { FaCar } from "react-icons/fa6"
 import {
   CharacterHeader,
   Wounds,
@@ -216,6 +224,40 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
                     position: "relative",
                   }}
                 >
+                  {/* Alert banner for crashed/boxed in vehicles */}
+                  {VS.isDefeated(drivingVehicle) &&
+                    VS.getDefeatType(drivingVehicle) && (
+                      <Alert
+                        severity={
+                          VS.getDefeatType(drivingVehicle) === "crashed"
+                            ? "error"
+                            : "warning"
+                        }
+                        icon={
+                          VS.getDefeatType(drivingVehicle) === "crashed" ? (
+                            <FaCar size={20} />
+                          ) : (
+                            <FaExclamationTriangle size={20} />
+                          )
+                        }
+                        sx={{
+                          mb: 1,
+                          "& .MuiAlert-icon": {
+                            fontSize: "1.5rem",
+                          },
+                          "& .MuiAlert-message": {
+                            fontWeight: "bold",
+                            fontSize: "0.9rem",
+                            textTransform: "uppercase",
+                            letterSpacing: 1,
+                          },
+                        }}
+                      >
+                        {VS.getDefeatType(drivingVehicle) === "crashed"
+                          ? "Crashed"
+                          : "Boxed In"}
+                      </Alert>
+                    )}
                   <Box
                     sx={{
                       display: "flex",
@@ -262,33 +304,25 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
                     }}
                   >
                     <VehicleAvatar entity={drivingVehicle} />
-                    <VehicleLink vehicle={drivingVehicle} />
-                    {VS.isDefeated(drivingVehicle) &&
-                      VS.getDefeatType(drivingVehicle) && (
-                        <Chip
-                          label={
-                            VS.getDefeatType(drivingVehicle) === "crashed"
-                              ? "CRASHED"
-                              : "BOXED IN"
-                          }
-                          color={
-                            VS.getDefeatType(drivingVehicle) === "crashed"
-                              ? "error"
-                              : "warning"
-                          }
-                          size="small"
-                          sx={{
-                            height: "20px",
-                            fontSize: "0.65rem",
-                            fontWeight: "bold",
-                            textTransform: "uppercase",
-                          }}
-                        />
-                      )}
+                    <Box
+                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                    >
+                      <VehicleLink vehicle={drivingVehicle} />
+                      {VS.isDefeated(drivingVehicle) &&
+                        VS.getDefeatType(drivingVehicle) &&
+                        (VS.getDefeatType(drivingVehicle) === "crashed" ? (
+                          <FaCar size={16} color="error" />
+                        ) : (
+                          <FaExclamationTriangle size={16} color="warning" />
+                        ))}
+                    </Box>
                   </Box>
                   <VehicleActionValues vehicle={drivingVehicle} />
                   <Box sx={{ mt: 1 }}>
-                    <ChaseConditionPoints vehicle={drivingVehicle} />
+                    <ChaseConditionPoints
+                      vehicle={drivingVehicle}
+                      driver={character}
+                    />
                   </Box>
                 </Box>
               )}

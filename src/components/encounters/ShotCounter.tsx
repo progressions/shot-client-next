@@ -20,7 +20,7 @@ import { getAllVisibleShots } from "@/components/encounters/attacks/shotSorting"
 export default function ShotCounter() {
   const { encounter, selectedActorId, setSelectedActor } = useEncounter()
   const { getLocally, saveLocally } = useLocalStorage()
-  const [showHidden, setShowHidden] = useState(false)
+  const [showHidden, setShowHidden] = useState(true)
   const [activePanel, setActivePanel] = useState<string | null>(null)
 
   // Refs for each panel
@@ -37,6 +37,9 @@ export default function ShotCounter() {
     const savedShowHidden = getLocally(`fight_${encounter.id}_showHidden`)
     if (savedShowHidden !== null) {
       setShowHidden(savedShowHidden as boolean)
+    } else {
+      // Default to true if no saved preference exists
+      setShowHidden(true)
     }
   }, [encounter?.id, getLocally])
 
