@@ -229,10 +229,7 @@ export default function ChaseResolution({
       }
 
       // Get the shot cost from form state
-      const shotCost = parseInt(
-        (formState.data as ChaseFormData & { shotCost?: string }).shotCost ||
-          "3"
-      )
+      const shotCost = formState.data.shotCost || 3
 
       console.log(
         "Chase Resolution - Position change:",

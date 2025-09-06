@@ -359,6 +359,42 @@ export default function ChaseMethodSection({
             <MenuItem value="far">Far</MenuItem>
           </Select>
         </FormControl>
+
+        {/* Shot Cost Field - far right */}
+        <Box sx={{ ml: "auto" }}>
+          <Typography
+            variant="body2"
+            sx={{
+              mb: 0.5,
+              color: "text.secondary",
+              textAlign: "right",
+            }}
+          >
+            Shot Cost
+          </Typography>
+          <NumberField
+            name="shotCost"
+            value={formState.data.shotCost || 3}
+            size="large"
+            width="80px"
+            error={false}
+            onChange={e =>
+              updateField("shotCost", parseInt(e.target.value) || 3)
+            }
+            onBlur={e => {
+              const value = parseInt(e.target.value) || 0
+              if (value < 0) {
+                updateField("shotCost", 3)
+              }
+            }}
+            sx={{
+              fontSize: "1.8rem",
+              "& .MuiOutlinedInput-root": {
+                height: "56px",
+              },
+            }}
+          />
+        </Box>
       </Stack>
     </Box>
   )

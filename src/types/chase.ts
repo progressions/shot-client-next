@@ -41,6 +41,7 @@ export type ChaseFormData = {
   stunt: boolean
   position: "near" | "far"
   attackerRole: "pursuer" | "evader"
+  shotCost?: number
 
   // Results (calculated by service)
   success: boolean
@@ -80,6 +81,7 @@ export const initialChaseFormData: ChaseFormData = {
   typedSwerve: "",
   stunt: false,
   position: "far",
+  shotCost: 3,
   success: false,
   actionResult: null,
   outcome: null,
