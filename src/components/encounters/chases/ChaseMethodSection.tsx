@@ -75,6 +75,14 @@ export default function ChaseMethodSection({
     }
   }, [vehicle?.id])
 
+  // Set shot cost based on driver type (Boss/Uber Boss = 2, others = 3)
+  useEffect(() => {
+    if (attacker) {
+      const shotCost = CS.isBoss(attacker) || CS.isUberBoss(attacker) ? 2 : 3
+      updateField("shotCost", shotCost)
+    }
+  }, [attacker?.id])
+
   return (
     <Box
       sx={{
@@ -378,13 +386,21 @@ export default function ChaseMethodSection({
             size="large"
             width="100px"
             error={false}
-            onChange={e =>
-              updateField("shotCost", parseInt(e.target.value) || 3)
-            }
+            onChange={e => {
+              const value = parseInt(e.target.value)
+              if (!isNaN(value)) {
+                updateField("shotCost", value)
+              }
+            }}
             onBlur={e => {
               const value = parseInt(e.target.value) || 0
-              if (value < 0) {
-                updateField("shotCost", 3)
+              if (value <= 0) {
+                // Reset to default based on character type
+                const defaultCost =
+                  attacker && (CS.isBoss(attacker) || CS.isUberBoss(attacker))
+                    ? 2
+                    : 3
+                updateField("shotCost", defaultCost)
               }
             }}
             sx={{

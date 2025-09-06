@@ -69,7 +69,11 @@ export default function ChasePanel({
   const { formState, dispatchForm } = useForm<ChaseFormData>({
     ...initialChaseFormData,
     attackerShotId: preselectedCharacter?.shot_id || "",
-    shotCost: "3", // Default shot cost
+    shotCost: preselectedCharacter
+      ? CS.isBoss(preselectedCharacter) || CS.isUberBoss(preselectedCharacter)
+        ? 2
+        : 3
+      : 3, // Set based on character type
     attacker: preselectedCharacter || undefined,
     vehicle: getAttackerVehicle(),
   })
