@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState, useMemo } from "react"
 import {
   Box,
   FormControl,
@@ -8,6 +8,7 @@ import {
   MenuItem,
   Select,
   Stack,
+  Typography,
 } from "@mui/material"
 import { CS, VS } from "@/services"
 import type { ChaseFormData, Character, Vehicle } from "@/types"
@@ -33,6 +34,10 @@ export default function ChaseMethodSection({
   attacker,
   vehicle,
 }: ChaseMethodSectionProps) {
+  // Fortune spending state
+  const [usingFortune, setUsingFortune] = useState(false)
+  const [fortuneBonus, setFortuneBonus] = useState("0")
+
   // Helper to update a field
   const updateField = (name: string, value: unknown) => {
     dispatchForm({
@@ -41,6 +46,18 @@ export default function ChaseMethodSection({
       value,
     })
   }
+
+  // Get available Fortune points for the attacker
+  const availableFortune = useMemo(() => {
+    if (!attacker) return 0
+    return CS.fortune(attacker)
+  }, [attacker])
+
+  // Check if attacker is a PC
+  const isPC = useMemo(() => {
+    if (!attacker) return false
+    return CS.isPC(attacker)
+  }, [attacker])
 
   // Initialize driving skill and squeal when attacker/vehicle changes
   useEffect(() => {
@@ -127,6 +144,67 @@ export default function ChaseMethodSection({
             sx={{ fontSize: "1.5rem" }}
           />
         </FormControl>
+
+        {/* Fortune bonus field for PCs */}
+        {isPC && availableFortune > 0 && (
+          <FormControl sx={{ minWidth: 100 }}>
+            <InputLabel
+              shrink
+              sx={{
+                backgroundColor: "#262626",
+                px: 0.5,
+                ml: -0.5,
+                color: usingFortune ? "warning.main" : "text.primary",
+              }}
+            >
+              Fortune +
+            </InputLabel>
+            <NumberField
+              name="fortuneBonus"
+              value={fortuneBonus}
+              size="medium"
+              width="80px"
+              error={false}
+              onChange={e => {
+                const value = e.target.value
+                setFortuneBonus(value)
+                updateField("fortuneBonus", value)
+                setUsingFortune(value !== "" && value !== "0")
+              }}
+              onBlur={e => {
+                const value = parseInt(e.target.value) || 0
+                const finalValue = value < 0 ? "0" : value.toString()
+                setFortuneBonus(finalValue)
+                updateField("fortuneBonus", finalValue)
+                setUsingFortune(finalValue !== "0")
+              }}
+              sx={{
+                fontSize: "1.5rem",
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused": {
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor:
+                        fortuneBonus !== "0" ? "warning.main" : "primary.main",
+                    },
+                  },
+                },
+              }}
+            />
+            <Typography
+              variant="caption"
+              sx={{
+                mt: 0.5,
+                color: fortuneBonus !== "0" ? "warning.main" : "text.secondary",
+                fontSize: "0.65rem",
+              }}
+            >
+              {fortuneBonus !== "0"
+                ? `Cost: 1 (${availableFortune - 1} left)`
+                : `Available: ${availableFortune}`}
+            </Typography>
+          </FormControl>
+        )}
+
         {/* Role Selection */}
         <FormControl
           sx={{

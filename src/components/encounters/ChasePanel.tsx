@@ -7,7 +7,6 @@ import { useForm, FormActions } from "@/reducers"
 import type { Vehicle, Shot, ChaseRelationship, Character } from "@/types"
 import { ChaseFormData, initialChaseFormData } from "@/types/chase"
 import { getAllVisibleShots } from "./attacks/shotSorting"
-import ChaseAttackerSection from "./chases/ChaseAttackerSection"
 import ChaseTargetSection from "./chases/ChaseTargetSection"
 import ChaseMethodSection from "./chases/ChaseMethodSection"
 import ChaseResolution from "./chases/ChaseResolution"
@@ -80,6 +79,14 @@ export default function ChasePanel({
     .attackerShotId
   const _targetShotId = (formState.data as { targetShotId?: string })
     .targetShotId
+
+  // Get the vehicles from formState - ChaseResolution needs Vehicle objects, not Characters
+  const attackerVehicle = (
+    formState.data as ChaseFormData & { vehicle?: Vehicle }
+  ).vehicle
+  const targetVehicle = (
+    formState.data as ChaseFormData & { targetVehicle?: Vehicle }
+  ).targetVehicle
 
   // Monitor position changes
   useEffect(() => {
@@ -258,19 +265,7 @@ export default function ChasePanel({
       {isReady ? (
         <>
           <Box sx={{ backgroundColor: "action.hover" }}>
-            {/* Attacker Section - Only show if not preselected */}
-            {!preselectedCharacter && (
-              <ChaseAttackerSection
-                shots={allShots}
-                vehicles={allVehicles}
-                formState={formState}
-                dispatchForm={dispatchForm}
-                attacker={attacker}
-                target={target}
-              />
-            )}
-
-            {/* Method Section - Always show, disabled until target selected */}
+            {/* Method Section - disabled until target selected */}
             <ChaseMethodSection
               formState={formState}
               dispatchForm={dispatchForm}
@@ -284,7 +279,7 @@ export default function ChasePanel({
               }
             />
 
-            {/* Target Section - Always show */}
+            {/* Target Section */}
             <ChaseTargetSection
               shots={allShots}
               vehicles={allVehicles}
@@ -296,12 +291,12 @@ export default function ChasePanel({
             />
           </Box>
 
-          {/* Resolution Section - Always show */}
+          {/* Resolution Section */}
           <ChaseResolution
             formState={formState}
             dispatchForm={dispatchForm}
-            attacker={attacker}
-            target={target}
+            attacker={attackerVehicle || null}
+            target={targetVehicle || null}
             onClose={onClose}
             onComplete={onComplete}
           />

@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useEffect, useRef, useCallback } from "react"
+import { useMemo, useEffect, useRef, useCallback, useState } from "react"
 import {
   Box,
   FormControl,
@@ -51,6 +51,10 @@ export default function AttackerCombatFields({
     kachunkActive,
   } = formState.data
 
+  // Fortune state
+  const [fortuneBonus, setFortuneBonus] = useState("0")
+  const [usingFortune, setUsingFortune] = useState(false)
+
   // Helper to update a field
   const updateField = useCallback(
     (name: keyof AttackFormData, value: unknown) => {
@@ -62,6 +66,18 @@ export default function AttackerCombatFields({
     },
     [dispatchForm]
   )
+
+  // Get available Fortune points for the attacker
+  const availableFortune = useMemo(() => {
+    if (!attacker) return 0
+    return CS.fortune(attacker)
+  }, [attacker])
+
+  // Check if attacker is a PC
+  const isPC = useMemo(() => {
+    if (!attacker) return false
+    return CS.isPC(attacker)
+  }, [attacker])
 
   // Check if any selected targets are mooks
   const targetingMooks = selectedTargetIds.some(id => {
@@ -136,6 +152,65 @@ export default function AttackerCombatFields({
         sx={{ mb: 2 }}
         alignItems={{ xs: "stretch", sm: "flex-start" }}
       >
+        {/* Fortune field for PCs - only show if PC has Fortune */}
+        {isPC && availableFortune > 0 && (
+          <Box sx={{ flexShrink: 0 }}>
+            <Typography variant="body2" sx={{ mb: 1, fontWeight: "medium" }}>
+              Fortune +
+            </Typography>
+            <NumberField
+              name="fortuneBonus"
+              value={fortuneBonus}
+              size="small"
+              width="80px"
+              error={false}
+              onChange={e => {
+                const value = e.target.value
+                setFortuneBonus(value)
+                updateField("fortuneBonus", value)
+                const isUsing = value !== "" && value !== "0"
+                setUsingFortune(isUsing)
+                updateField("fortuneSpent", isUsing)
+              }}
+              onBlur={e => {
+                const value = parseInt(e.target.value) || 0
+                const finalValue = value < 0 ? "0" : value.toString()
+                setFortuneBonus(finalValue)
+                updateField("fortuneBonus", finalValue)
+                const isUsing = finalValue !== "0"
+                setUsingFortune(isUsing)
+                updateField("fortuneSpent", isUsing)
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused": {
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor:
+                        fortuneBonus !== "0" ? "warning.main" : "primary.main",
+                    },
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor:
+                      fortuneBonus !== "0" ? "warning.main" : undefined,
+                  },
+                },
+              }}
+            />
+            <Typography
+              variant="caption"
+              sx={{
+                display: "block",
+                mt: 0.25,
+                color: fortuneBonus !== "0" ? "warning.main" : "text.secondary",
+                fontSize: "0.65rem",
+                textAlign: "center",
+              }}
+            >
+              {fortuneBonus !== "0" ? `Cost: 1` : `Avail: ${availableFortune}`}
+            </Typography>
+          </Box>
+        )}
+
         {/* Attack Value Block - includes Shot Cost on mobile */}
         <Box
           sx={{ flex: { xs: "0 0 auto", sm: 1 }, minWidth: 0, width: "100%" }}

@@ -15,6 +15,7 @@ export default function AttackResults({
   defenseValue,
   weaponDamage,
   smackdown,
+  fortuneBonus,
   defenseChoicePerTarget,
   calculateEffectiveAttackValue,
   calculateTargetDefense: _calculateTargetDefense,
@@ -28,8 +29,9 @@ export default function AttackResults({
     attackerWeapons,
     allShots
   )
-  const outcome =
-    effectiveAttack + parseInt(swerve || "0") - parseInt(defenseValue || "0")
+  const fortuneValue = parseInt(fortuneBonus || "0")
+  const actionResult = effectiveAttack + parseInt(swerve || "0") + fortuneValue
+  const outcome = actionResult - parseInt(defenseValue || "0")
   const isHit = outcome >= 0
   const defenseLabel =
     selectedTargetIds.length === 1 ? "Defense" : "Combined Defense"
@@ -46,11 +48,13 @@ export default function AttackResults({
       <Alert severity={isHit ? "success" : "error"} sx={{ mb: 2 }}>
         <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
           {isHit ? "Hit!" : "Miss!"} Attack Value {attackValue} + Swerve{" "}
-          {swerve} = Action Result {effectiveAttack + parseInt(swerve || "0")}
+          {swerve}
+          {fortuneValue > 0 && ` + Fortune ${fortuneValue}`} = Action Result{" "}
+          {actionResult}
         </Typography>
         <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
-          Action Result {effectiveAttack + parseInt(swerve || "0")} -{" "}
-          {defenseLabel} {defenseValue} = Outcome {outcome}
+          Action Result {actionResult} - {defenseLabel} {defenseValue} = Outcome{" "}
+          {outcome}
         </Typography>
         {isHit && !allTargetsAreMooks && (
           <Typography variant="caption" sx={{ display: "block" }}>

@@ -145,7 +145,7 @@ describe("VehicleService", () => {
   })
 
   describe("totalImpairments", () => {
-    it("should combine driver and vehicle impairments", () => {
+    it("should return vehicle impairments only", () => {
       const impairedDriver: Person = {
         ...brick,
         impairments: 1,
@@ -156,7 +156,7 @@ describe("VehicleService", () => {
         impairments: 1,
       }
 
-      expect(VS.totalImpairments(impairedVehicle)).toBe(2)
+      expect(VS.totalImpairments(impairedVehicle)).toBe(1)
     })
 
     it("should cap impairments at 2", () => {
@@ -173,16 +173,16 @@ describe("VehicleService", () => {
       expect(VS.totalImpairments(veryImpairedVehicle)).toBe(2)
     })
 
-    it("should ignore impairments for boss vehicles", () => {
+    it("should return impairments for boss vehicles", () => {
       const impairedBoss: Vehicle = {
         ...battleTruck,
         impairments: 2,
       }
 
-      expect(VS.totalImpairments(impairedBoss)).toBe(0)
+      expect(VS.totalImpairments(impairedBoss)).toBe(2)
     })
 
-    it("should ignore impairments for vehicles with boss drivers", () => {
+    it("should return impairments for vehicles with boss drivers", () => {
       const bossDriver: Person = {
         ...shing, // shing is a Boss
       }
@@ -192,7 +192,7 @@ describe("VehicleService", () => {
         impairments: 2,
       }
 
-      expect(VS.totalImpairments(vehicleWithBossDriver)).toBe(0)
+      expect(VS.totalImpairments(vehicleWithBossDriver)).toBe(2)
     })
   })
 

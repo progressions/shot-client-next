@@ -334,7 +334,8 @@ export async function handleSingleTargetAttack(
   weaponDamage: string,
   stunt: boolean,
   toastSuccess: (msg: string) => void,
-  _toastError: (msg: string) => void
+  _toastError: (msg: string) => void,
+  formState: AttackFormState
 ): Promise<void> {
   const shots = parseInt(shotCost) || 3
   const damage = parseInt(finalDamage) || 0
@@ -342,7 +343,12 @@ export async function handleSingleTargetAttack(
   const characterUpdates: CharacterUpdate[] = []
 
   // Add attacker's shot spending
-  const attackerUpdate = createAttackerUpdate(attackerShot, attacker, shots)
+  const attackerUpdate = createAttackerUpdate(
+    attackerShot,
+    attacker,
+    shots,
+    formState.data.fortuneSpent
+  )
   characterUpdates.push(attackerUpdate)
 
   // Calculate actual wounds

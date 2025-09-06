@@ -240,7 +240,8 @@ export default function CharacterSelector({
         ))}
       </Box>
       {showAllCheckbox &&
-        ((characterTypes && characterTypes.length > 0) || filterFunction) && (
+        ((characterTypes && characterTypes.length > 0) || filterFunction) &&
+        shotGroups.length > 0 && (
           <FormControlLabel
             control={
               <Checkbox

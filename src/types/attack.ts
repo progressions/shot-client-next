@@ -42,6 +42,8 @@ export interface AttackFormData {
   multiTargetResults: MultiTargetResult[]
   showMultiTargetResults: boolean
   targetShotId?: string
+  fortuneBonus?: string
+  fortuneSpent?: boolean
   [key: string]: unknown
 }
 
@@ -195,6 +197,7 @@ export interface AttackResultsProps {
   defenseValue: string
   weaponDamage: string
   smackdown: string
+  fortuneBonus?: string
   defenseChoicePerTarget: { [targetId: string]: DefenseChoice }
   calculateEffectiveAttackValue: (
     attacker: Character | undefined,
