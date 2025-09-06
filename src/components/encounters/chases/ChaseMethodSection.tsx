@@ -361,13 +361,13 @@ export default function ChaseMethodSection({
         </FormControl>
 
         {/* Shot Cost Field - far right */}
-        <Box sx={{ ml: "auto" }}>
+        <Box sx={{ ml: "auto", minWidth: 100 }}>
           <Typography
             variant="body2"
             sx={{
               mb: 0.5,
               color: "text.secondary",
-              textAlign: "right",
+              textAlign: "center",
             }}
           >
             Shot Cost
@@ -376,7 +376,7 @@ export default function ChaseMethodSection({
             name="shotCost"
             value={formState.data.shotCost || 3}
             size="large"
-            width="80px"
+            width="100px"
             error={false}
             onChange={e =>
               updateField("shotCost", parseInt(e.target.value) || 3)
@@ -391,6 +391,9 @@ export default function ChaseMethodSection({
               fontSize: "1.8rem",
               "& .MuiOutlinedInput-root": {
                 height: "56px",
+              },
+              "& input": {
+                textAlign: "center",
               },
             }}
           />
