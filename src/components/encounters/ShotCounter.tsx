@@ -12,6 +12,7 @@ import {
   BoostPanel,
   ChasePanel,
   HealPanel,
+  UpCheckPanel,
 } from "@/components/encounters"
 import { useEncounter } from "@/contexts"
 import { useLocalStorage } from "@/contexts/LocalStorageContext"
@@ -28,6 +29,7 @@ export default function ShotCounter() {
   const healPanelRef = useRef<HTMLDivElement>(null)
   const boostPanelRef = useRef<HTMLDivElement>(null)
   const chasePanelRef = useRef<HTMLDivElement>(null)
+  const upCheckPanelRef = useRef<HTMLDivElement>(null)
   const actionBarRef = useRef<HTMLDivElement>(null)
 
   // Load the persisted setting on mount
@@ -208,6 +210,15 @@ export default function ShotCounter() {
         <Box ref={healPanelRef}>
           <HealPanel
             preselectedCharacter={selectedCharacter}
+            onClose={handlePanelClose}
+            onComplete={handleActionComplete}
+          />
+        </Box>
+      )}
+
+      {activePanel === "upcheck" && (
+        <Box ref={upCheckPanelRef}>
+          <UpCheckPanel
             onClose={handlePanelClose}
             onComplete={handleActionComplete}
           />

@@ -282,6 +282,8 @@ export function createCharacterClient(deps: ClientDependencies) {
       name?: string
       impairments?: number
       action_values?: Record<string, unknown>
+      status?: string[]
+      driving_id?: string | null
     }
   ): Promise<AxiosResponse<Character>> {
     return patch(`${apiV2.characters({ id: characterId })}`, {

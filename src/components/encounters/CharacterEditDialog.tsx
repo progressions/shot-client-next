@@ -15,6 +15,9 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Chip,
+  Autocomplete,
+  TextField as MuiTextField,
 } from "@mui/material"
 import { NumberField, TextField } from "@/components/ui"
 import { useClient, useToast, useEncounter } from "@/contexts"
@@ -44,6 +47,7 @@ export default function CharacterEditDialog({
   const [marksOfDeath, setMarksOfDeath] = useState<number>(0)
   const [fortune, setFortune] = useState<number>(0)
   const [drivingVehicleId, setDrivingVehicleId] = useState<string>("")
+  const [statuses, setStatuses] = useState<string[]>(character.status || [])
   const [loading, setLoading] = useState(false)
 
   // Helper to check if character is PC
@@ -174,6 +178,9 @@ export default function CharacterEditDialog({
         vehicleIdToSet = characterWithDriving.driving.id
       }
 
+      // Set statuses
+      setStatuses(character.status || [])
+
       // Debug logging
       console.log("Character driving info:", {
         driving_id: characterWithDriving.driving_id,
@@ -215,10 +222,12 @@ export default function CharacterEditDialog({
         name: string
         action_values?: Record<string, unknown>
         impairments?: number
+        status?: string[]
       }
 
       const characterUpdate: CharacterUpdate = {
         name: name.trim(),
+        status: statuses,
       }
 
       // Handle wounds, marks of death, and fortune based on character type
@@ -622,6 +631,58 @@ export default function CharacterEditDialog({
               ))}
             </Select>
           </FormControl>
+
+          {/* Status field */}
+          <Box>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: "block", mb: 1 }}
+            >
+              Status
+            </Typography>
+            <Autocomplete
+              multiple
+              freeSolo
+              value={statuses}
+              onChange={(_, newValue) => setStatuses(newValue)}
+              options={["up_check_required", "out_of_fight", "stunned", "hidden"]}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => {
+                  const { key, ...tagProps } = getTagProps({ index })
+                  return (
+                    <Chip
+                      key={key}
+                      variant="outlined"
+                      label={option.replace(/_/g, " ").toUpperCase()}
+                      {...tagProps}
+                      size="small"
+                      color={
+                        option === "out_of_fight" ? "error" :
+                        option === "up_check_required" ? "warning" :
+                        "default"
+                      }
+                    />
+                  )
+                })
+              }
+              renderInput={(params) => (
+                <MuiTextField
+                  {...params}
+                  variant="outlined"
+                  placeholder="Add status..."
+                  size="small"
+                  helperText="Click to add status, or type custom status and press Enter"
+                />
+              )}
+              disabled={loading}
+              sx={{
+                "& .MuiAutocomplete-tag": {
+                  margin: "2px",
+                },
+              }}
+            />
+          </Box>
         </Stack>
       </DialogContent>
       <DialogActions>

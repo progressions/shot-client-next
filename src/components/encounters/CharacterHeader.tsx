@@ -45,6 +45,32 @@ export default function CharacterHeader({
           }}
         >
           <CharacterLink character={character} />
+          {character.status?.includes("up_check_required") && (
+            <Chip
+              size="small"
+              label="UP CHECK"
+              color="warning"
+              sx={{
+                height: "20px",
+                fontSize: "0.7rem",
+                ml: 0.5,
+                fontWeight: "bold",
+              }}
+            />
+          )}
+          {character.status?.includes("out_of_fight") && (
+            <Chip
+              size="small"
+              label="OUT"
+              color="error"
+              sx={{
+                height: "20px",
+                fontSize: "0.7rem",
+                ml: 0.5,
+                fontWeight: "bold",
+              }}
+            />
+          )}
           {onLocationClick && location && (
             <Chip
               size="small"

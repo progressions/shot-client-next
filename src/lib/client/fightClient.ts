@@ -144,6 +144,21 @@ export function createFightClient(deps: ClientDependencies) {
     })
   }
 
+  async function applyUpCheck(
+    fight: Fight | string,
+    characterId: string,
+    swerve: number,
+    fortune: number = 0
+  ): Promise<AxiosResponse<Encounter>> {
+    const fightId = typeof fight === "string" ? fight : fight.id
+    return post(`${apiV2.encounters()}/${fightId}/apply_combat_action`, {
+      action_type: "up_check",
+      character_id: characterId,
+      swerve: swerve,
+      fortune: fortune,
+    })
+  }
+
   async function applyChaseAction(
     fight: Fight | string,
     vehicleUpdates: Array<{
@@ -197,6 +212,7 @@ export function createFightClient(deps: ClientDependencies) {
     spendShots,
     applyBoostAction,
     applyCombatAction,
+    applyUpCheck,
     applyChaseAction,
     updateInitiatives,
     endFight,

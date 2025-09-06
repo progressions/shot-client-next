@@ -274,8 +274,9 @@ export default function AttackPanel({
         const dv = parseInt(defenseValue) || 0
         const sw = parseInt(swerve) || 0
         const weaponDmg = parseInt(weaponDamage) || 0
+        const fortuneValue = parseInt(fortuneBonus || "0") || 0
 
-        const outcome = av - dv + sw
+        const outcome = av - dv + sw + fortuneValue
 
         // Handle all targets the same way (single or multiple)
         if (selectedTargetIds.length > 0) {
@@ -361,6 +362,7 @@ export default function AttackPanel({
     selectedTargetIds,
     allShots,
     targetMookCount,
+    fortuneBonus,
   ])
 
   // Reset defense choices when targets change
