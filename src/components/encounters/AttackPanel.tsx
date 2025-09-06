@@ -127,6 +127,7 @@ export default function AttackPanel({
     fortuneDiePerTarget,
     manualDefensePerTarget,
     targetShotId,
+    fortuneBonus,
   } = formState.data
 
   // Create form update helpers
@@ -690,7 +691,8 @@ export default function AttackPanel({
         for (let i = 1; i <= mookCount; i++) {
           // Roll swerve for each mook
           const swerveRoll = DS.rollSwerve()
-          const actionResult = av + swerveRoll.result
+          const fortuneValue = parseInt(formState.data.fortuneBonus || "0")
+          const actionResult = av + swerveRoll.result + fortuneValue
           const outcome = actionResult - targetDefense
           const hit = outcome >= 0
 
@@ -742,7 +744,8 @@ export default function AttackPanel({
 
       for (let i = 1; i <= mookCount; i++) {
         const swerveRoll = DS.rollSwerve()
-        const actionResult = av + swerveRoll.result
+        const fortuneValue = parseInt(formState.data.fortuneBonus || "0")
+        const actionResult = av + swerveRoll.result + fortuneValue
         const outcome = actionResult - dv
         const hit = outcome >= 0
 
@@ -917,7 +920,8 @@ export default function AttackPanel({
           weaponDamage,
           stunt,
           toastSuccess,
-          toastError
+          toastError,
+          formState
         )
 
         // Reset form
@@ -1046,6 +1050,7 @@ export default function AttackPanel({
                 defenseValue={defenseValue}
                 weaponDamage={weaponDamage}
                 smackdown={smackdown}
+                fortuneBonus={fortuneBonus}
                 defenseChoicePerTarget={defenseChoicePerTarget}
                 calculateEffectiveAttackValue={calculateEffectiveAttackValue}
                 calculateTargetDefense={calculateTargetDefense}

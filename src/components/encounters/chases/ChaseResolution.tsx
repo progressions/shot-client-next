@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Box, Button, Stack, Typography, Alert } from "@mui/material"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { VS, CRS } from "@/services"
-import type { ChaseFormData, Vehicle } from "@/types"
+import type { ChaseFormData, Vehicle, Shot } from "@/types"
 import { ChaseMethod } from "@/types/chase"
 import { FormActions } from "@/reducers"
 import { NumberField } from "@/components/ui"
@@ -48,7 +48,12 @@ export default function ChaseResolution({
   // Always calculate using editable form values with the typed or rolled swerve
   const currentSwerve =
     typedSwerve !== "" ? parseToNumber(typedSwerve) : swerve?.result || 0
-  const actionResult = parseToNumber(formState.data.actionValue) + currentSwerve
+  const fortuneBonus = parseToNumber(
+    (formState.data as ChaseFormData & { fortuneBonus?: string })
+      .fortuneBonus || "0"
+  )
+  const actionResult =
+    parseToNumber(formState.data.actionValue) + fortuneBonus + currentSwerve
   const outcome =
     actionResult -
     parseToNumber(formState.data.defense) -
@@ -245,18 +250,28 @@ export default function ChaseResolution({
             ? "chase_maneuver"
             : "evade"
 
+      // Check if Fortune was used
+      const fortuneUsed = fortuneBonus > 0 ? 1 : 0
+      
+      // Find the driver character for the attacker vehicle
+      const attackerShot = encounter.shots.find(
+        (s: Shot) => s.vehicle?.id === attackerVehicleId
+      )
+      const driverCharacterId = attackerShot?.character?.id
+      
       const vehicleUpdates = [
         {
           vehicle_id: attackerVehicleId,
           target_vehicle_id: targetVehicleId,
           role: formState.data.attackerRole || "pursuer", // Include attacker's role
           shot_cost: shotCost, // Add shot cost for the attacker
-          character_id: attacker.id, // Include character ID to spend shots
+          character_id: driverCharacterId, // Use driver's character ID to spend shots
+          fortune_spent: fortuneUsed, // Add fortune spent
           action_values: attackerVehicleValues,
           position: finalPosition, // Use the calculated position
           event: {
             type: "chase_action",
-            description: `${attacker.name} ${formState.data.method === ChaseMethod.RAM_SIDESWIPE ? "rams" : formState.data.method === ChaseMethod.NARROW_THE_GAP ? "narrows gap with" : formState.data.method === ChaseMethod.WIDEN_THE_GAP ? "widens gap from" : "evades"} ${target.name}${actualSuccess ? "" : " (missed)"}`,
+            description: `${attacker.name} ${formState.data.method === ChaseMethod.RAM_SIDESWIPE ? "rams" : formState.data.method === ChaseMethod.NARROW_THE_GAP ? "narrows gap with" : formState.data.method === ChaseMethod.WIDEN_THE_GAP ? "widens gap from" : "evades"} ${target.name}${actualSuccess ? "" : " (missed)"}${fortuneUsed > 0 ? " [Fortune]" : ""}`,
             details: {
               method: formState.data.method,
               chase_points: finalChasePoints,
@@ -264,6 +279,7 @@ export default function ChaseResolution({
               position: finalPosition,
               success: actualSuccess,
               shot_cost: shotCost,
+              fortune_spent: fortuneUsed,
             },
           },
         },
@@ -382,8 +398,9 @@ export default function ChaseResolution({
       {showResults && (
         <Alert severity={isSuccess ? "success" : "error"} sx={{ mt: 3, mb: 2 }}>
           <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
-            {isSuccess ? "Hit!" : "Miss!"} Driving {formState.data.actionValue}{" "}
-            + Swerve {currentSwerve} = Action Result {actionResult}
+            {isSuccess ? "Hit!" : "Miss!"} Driving {formState.data.actionValue}
+            {fortuneBonus > 0 && ` + Fortune ${fortuneBonus}`} + Swerve{" "}
+            {currentSwerve} = Action Result {actionResult}
           </Typography>
           <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
             Action Result {actionResult} - Driving {formState.data.defense}
