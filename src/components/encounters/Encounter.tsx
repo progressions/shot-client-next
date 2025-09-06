@@ -1,41 +1,18 @@
 "use client"
 import { useEffect } from "react"
-import { FormControl, FormHelperText, Box } from "@mui/material"
-import {
-  SpeedDialMenu,
-  Alert,
-  NameEditor,
-  HeroImage,
-  EditableRichText,
-} from "@/components/ui"
-import { FightChips } from "@/components/fights"
-import { FormActions } from "@/reducers"
-import { Encounter } from "@/types"
+import { Box, Typography } from "@mui/material"
+import { Alert } from "@/components/ui"
+import { FightName } from "@/components/fights"
 import { ShotCounter } from "@/components/encounters"
 import { useEncounter } from "@/contexts"
 
 export default function Encounter() {
-  const {
-    dispatchEncounter,
-    encounterState,
-    encounter,
-    updateEncounter,
-    deleteEncounter,
-    changeAndSaveEncounter,
-  } = useEncounter()
-  const { errors, status } = encounterState
+  const { encounterState, encounter } = useEncounter()
+  const { status } = encounterState
 
   useEffect(() => {
     document.title = encounter.name ? `${encounter.name} - Chi War` : "Chi War"
   }, [encounter.name])
-
-  const setEncounter = (updatedEncounter: Encounter) => {
-    dispatchEncounter({
-      type: FormActions.UPDATE,
-      name: "entity",
-      value: updatedEncounter,
-    })
-  }
 
   return (
     <Box
@@ -44,35 +21,10 @@ export default function Encounter() {
         position: "relative",
       }}
     >
-      <SpeedDialMenu onDelete={deleteEncounter} />
-      <HeroImage
-        entity={encounter}
-        setEntity={setEncounter}
-        pageContext="encounter"
-        height={200}
-      />
-      <FightChips fight={encounter} />
+      <Typography variant="h4" component="h4" gutterBottom>
+        <FightName fight={encounter} />
+      </Typography>
       <Alert status={status} />
-      <FormControl fullWidth margin="normal" error={!!errors.name}>
-        <NameEditor
-          entity={encounter}
-          setEntity={setEncounter}
-          updateEntity={updateEncounter}
-        />
-        {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
-      </FormControl>
-      <FormControl fullWidth margin="normal" error={!!errors.description}>
-        <EditableRichText
-          name="description"
-          html={encounter.description}
-          editable={true}
-          onChange={changeAndSaveEncounter}
-          fallback="No description available."
-        />
-        {errors.description && (
-          <FormHelperText>{errors.description}</FormHelperText>
-        )}
-      </FormControl>
       <ShotCounter />
     </Box>
   )
