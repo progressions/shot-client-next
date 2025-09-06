@@ -92,9 +92,16 @@ export default function ChaseMethodSection({
         backgroundColor: "action.hover",
       }}
     >
-      <Stack direction="row" spacing={2} alignItems="flex-start">
-        {/* Driving Skill Field - Always visible */}
-        <FormControl sx={{ minWidth: 100 }}>
+      <Stack 
+        direction="row" 
+        spacing={2} 
+        alignItems="flex-start"
+        justifyContent="space-between"
+      >
+        {/* Left group: Driving, Squeal, Fortune, Role, Chase Action, Position */}
+        <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ flex: 1 }}>
+          {/* Driving Skill Field - Always visible */}
+          <FormControl sx={{ minWidth: 100 }}>
           <InputLabel
             shrink
             sx={{
@@ -367,24 +374,25 @@ export default function ChaseMethodSection({
             <MenuItem value="far">Far</MenuItem>
           </Select>
         </FormControl>
+        </Stack>
 
-        {/* Shot Cost Field - far right */}
-        <Box sx={{ ml: "auto", minWidth: 100 }}>
-          <Typography
-            variant="body2"
+        {/* Shot Cost Field - separate on the right */}
+        <FormControl sx={{ minWidth: 100, flexShrink: 0 }}>
+          <InputLabel
+            shrink
             sx={{
-              mb: 0.5,
-              color: "text.secondary",
-              textAlign: "center",
+              backgroundColor: "#262626",
+              px: 0.5,
+              ml: -0.5,
             }}
           >
             Shot Cost
-          </Typography>
+          </InputLabel>
           <NumberField
             name="shotCost"
             value={formState.data.shotCost || 3}
-            size="large"
-            width="100px"
+            size="medium"
+            width="80px"
             error={false}
             onChange={e => {
               const value = parseInt(e.target.value)
@@ -403,17 +411,9 @@ export default function ChaseMethodSection({
                 updateField("shotCost", defaultCost)
               }
             }}
-            sx={{
-              fontSize: "1.8rem",
-              "& .MuiOutlinedInput-root": {
-                height: "56px",
-              },
-              "& input": {
-                textAlign: "center",
-              },
-            }}
+            sx={{ fontSize: "1.5rem" }}
           />
-        </Box>
+        </FormControl>
       </Stack>
     </Box>
   )
