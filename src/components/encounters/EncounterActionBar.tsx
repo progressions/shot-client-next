@@ -3,7 +3,7 @@
 import React, { useMemo } from "react"
 import { Box, Typography, Collapse, Paper, Badge } from "@mui/material"
 import { Healing as HealIcon } from "@mui/icons-material"
-import { FaGun, FaRocket, FaCar, FaDice, FaPersonRunning } from "react-icons/fa6"
+import { FaGun, FaRocket, FaCar, FaDice, FaPersonRunning, FaHandPaper } from "react-icons/fa6"
 import { MenuButton } from "@/components/ui"
 import type { Character, Vehicle } from "@/types"
 import { VS } from "@/services"
@@ -30,6 +30,16 @@ export default function EncounterActionBar({
     return getAllVisibleShots(encounter.shots).filter(shot => {
       const character = shot.character
       return character?.status?.includes("up_check_required")
+    }).length
+  }, [encounter?.shots])
+
+  // Count characters attempting to escape
+  const escapingCount = useMemo(() => {
+    if (!encounter?.shots) return 0
+
+    return getAllVisibleShots(encounter.shots).filter(shot => {
+      const character = shot.character
+      return character?.status?.includes("cheesing_it")
     }).length
   }, [encounter?.shots])
   const handleAction = (action: string) => {
@@ -157,6 +167,21 @@ export default function EncounterActionBar({
           >
             <FaPersonRunning size={20} />
           </MenuButton>
+
+          <Badge badgeContent={escapingCount} color="error">
+            <MenuButton
+              onClick={() => handleAction("speedcheck")}
+              disabled={escapingCount === 0}
+              title={
+                escapingCount > 0
+                  ? `${escapingCount} character${escapingCount > 1 ? "s" : ""} attempting escape`
+                  : "No characters attempting escape"
+              }
+              isActive={activePanel === "speedcheck"}
+            >
+              <FaHandPaper size={20} />
+            </MenuButton>
+          </Badge>
 
           <Badge badgeContent={upCheckCount} color="warning">
             <MenuButton

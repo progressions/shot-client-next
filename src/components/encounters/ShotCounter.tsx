@@ -14,6 +14,7 @@ import {
   HealPanel,
   UpCheckPanel,
   CheeseItPanel,
+  SpeedCheckPanel,
 } from "@/components/encounters"
 import { useEncounter } from "@/contexts"
 import { useLocalStorage } from "@/contexts/LocalStorageContext"
@@ -32,6 +33,7 @@ export default function ShotCounter() {
   const chasePanelRef = useRef<HTMLDivElement>(null)
   const upCheckPanelRef = useRef<HTMLDivElement>(null)
   const cheeseItPanelRef = useRef<HTMLDivElement>(null)
+  const speedCheckPanelRef = useRef<HTMLDivElement>(null)
   const actionBarRef = useRef<HTMLDivElement>(null)
 
   // Load the persisted setting on mount
@@ -222,6 +224,15 @@ export default function ShotCounter() {
         <Box ref={cheeseItPanelRef}>
           <CheeseItPanel
             preselectedCharacter={selectedCharacter}
+            onClose={handlePanelClose}
+            onComplete={handleActionComplete}
+          />
+        </Box>
+      )}
+
+      {activePanel === "speedcheck" && (
+        <Box ref={speedCheckPanelRef}>
+          <SpeedCheckPanel
             onClose={handlePanelClose}
             onComplete={handleActionComplete}
           />
