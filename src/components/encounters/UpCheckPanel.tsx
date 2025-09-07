@@ -312,7 +312,7 @@ export default function UpCheckPanel({
                         sx={{ mb: 2 }}
                       >
                         Roll 1d6: On 1-3, {selectedCharacter.name} stays in the
-                        fight. On 4-6, they're out.
+                        fight. On 4-6, they&apos;re out.
                       </Typography>
 
                       {/* Die Roll Input */}

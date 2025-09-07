@@ -154,7 +154,7 @@ export async function handleNonMookMultipleTargets(
     const currentWounds =
       CS.isPC(targetChar) || isAlly
         ? CS.wounds(targetChar)
-        : (targetShot as any).count || 0
+        : targetShot.count || 0
     const newWounds = CS.isMook(targetChar)
       ? Math.max(0, currentWounds - effectiveWounds) // Reduce mook count
       : currentWounds + effectiveWounds // Add wounds for non-mooks
@@ -163,7 +163,7 @@ export async function handleNonMookMultipleTargets(
     // For PCs, impairments are on character. For NPCs/Mooks, impairments are on shot.
     const originalImpairments = CS.isPC(targetChar)
       ? targetChar.impairments || 0
-      : (targetShot as any).impairments || 0
+      : targetShot.impairments || 0
     const impairmentChange = CS.calculateImpairments(
       targetChar,
       currentWounds,

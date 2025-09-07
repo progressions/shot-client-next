@@ -44,7 +44,7 @@ export default function CheeseItPanel({
     try {
       // Get the current shot from encounter shots
       const allShots = encounter.shots || []
-      const characterShot = allShots.find((shotGroup: any) =>
+      const characterShot = allShots.find((shotGroup: Shot) =>
         shotGroup.characters?.some(
           (c: Character) => c.id === preselectedCharacter.id
         )
@@ -94,7 +94,7 @@ export default function CheeseItPanel({
 
   // Get the current shot from encounter shots
   const allShots = encounter?.shots || []
-  const characterShot = allShots.find((shotGroup: any) =>
+  const characterShot = allShots.find((shotGroup: Shot) =>
     shotGroup.characters?.some(
       (c: Character) => c.id === preselectedCharacter.id
     )
