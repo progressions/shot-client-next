@@ -233,6 +233,7 @@ export default function ShotCounter() {
       {activePanel === "speedcheck" && (
         <Box ref={speedCheckPanelRef}>
           <SpeedCheckPanel
+            selectedCharacter={selectedCharacter}
             onClose={handlePanelClose}
             onComplete={handleActionComplete}
           />

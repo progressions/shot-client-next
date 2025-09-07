@@ -180,9 +180,11 @@ export default function EncounterActionBar({
           <Badge badgeContent={escapingCount} color="error">
             <MenuButton
               onClick={() => handleAction("speedcheck")}
-              disabled={escapingCount === 0}
+              disabled={escapingCount === 0 || !selectedCharacter}
               title={
-                escapingCount > 0
+                !selectedCharacter
+                  ? "Select a character first"
+                  : escapingCount > 0
                   ? `${escapingCount} character${escapingCount > 1 ? "s" : ""} attempting escape`
                   : "No characters attempting escape"
               }

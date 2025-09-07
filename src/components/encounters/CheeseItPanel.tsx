@@ -9,8 +9,7 @@ import {
   Alert,
 } from "@mui/material"
 import { FaPersonRunning } from "react-icons/fa6"
-import { useEncounter } from "@/contexts"
-import { useToast } from "@/contexts"
+import { useEncounter, useToast, useClient } from "@/contexts"
 import { CS } from "@/services"
 import { CharacterLink } from "@/components/ui/links"
 import { Avatar } from "@/components/avatars"
@@ -28,8 +27,9 @@ export default function CheeseItPanel({
   onClose,
   onComplete,
 }: CheeseItPanelProps) {
-  const { encounter, applyCharacterUpdates } = useEncounter()
+  const { encounter } = useEncounter()
   const { toastSuccess, toastError } = useToast()
+  const { client } = useClient()
   const [submitting, setSubmitting] = useState(false)
   
   // Calculate default shot cost based on character type
@@ -65,8 +65,9 @@ export default function CheeseItPanel({
       // Calculate new shot position
       const newShot = Math.max(0, currentShot - actualShotCost)
 
-      // Prepare character update
+      // Prepare character update - use shot_id for more reliable updates
       const characterUpdate = {
+        shot_id: preselectedCharacter.shot_id,
         character_id: preselectedCharacter.id,
         shot: newShot,
         add_status: ["cheesing_it"],
@@ -82,11 +83,11 @@ export default function CheeseItPanel({
         },
       }
 
-      // Apply the update
-      await applyCharacterUpdates([characterUpdate])
+      // Apply the update using client.applyCombatAction
+      await client.applyCombatAction(encounter, [characterUpdate])
 
       toastSuccess(`${preselectedCharacter.name} is cheesing it!`)
-      onComplete()
+      if (onComplete) onComplete()
     } catch (error) {
       console.error("Failed to cheese it:", error)
       toastError("Failed to cheese it")

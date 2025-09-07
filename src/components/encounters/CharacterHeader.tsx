@@ -71,6 +71,38 @@ export default function CharacterHeader({
               }}
             />
           )}
+          {character.status?.includes("cheesing_it") && (
+            <Chip
+              size="small"
+              label="ESCAPING"
+              color="warning"
+              sx={{
+                height: "20px",
+                fontSize: "0.7rem",
+                ml: 0.5,
+                fontWeight: "bold",
+                animation: "pulse 1s infinite",
+                "@keyframes pulse": {
+                  "0%": { opacity: 1 },
+                  "50%": { opacity: 0.6 },
+                  "100%": { opacity: 1 },
+                },
+              }}
+            />
+          )}
+          {character.status?.includes("cheesed_it") && (
+            <Chip
+              size="small"
+              label="ESCAPED"
+              color="success"
+              sx={{
+                height: "20px",
+                fontSize: "0.7rem",
+                ml: 0.5,
+                fontWeight: "bold",
+              }}
+            />
+          )}
           {onLocationClick && location && (
             <Chip
               size="small"
