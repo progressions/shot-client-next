@@ -129,11 +129,6 @@ export default function CheeseItPanel({
       <Box sx={{ mb: 3 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
           <Avatar character={preselectedCharacter} hideVehicle size={64} />
-          <Box>
-            <Typography variant="body2" color="text.secondary">
-              Current Shot: {currentShot}
-            </Typography>
-          </Box>
         </Box>
         
         {/* Shot Cost Input */}
