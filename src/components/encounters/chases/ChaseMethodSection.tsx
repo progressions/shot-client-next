@@ -87,23 +87,18 @@ export default function ChaseMethodSection({
     <Box
       sx={{
         p: { xs: 2, sm: 3 },
-        borderBottom: "2px solid",
-        borderBottomColor: "divider",
-        backgroundColor: "action.hover",
       }}
     >
-      <Stack
-        direction="row"
-        spacing={2}
-        alignItems="flex-start"
-        justifyContent="space-between"
-      >
-        {/* Left group: Driving, Squeal, Fortune, Role, Chase Action, Position */}
+      <Typography variant="h6" sx={{ mb: 2, color: "primary.main" }}>
+        🏁 Attacker
+      </Typography>
+      
+      <Stack spacing={2}>
+        {/* First row: Driving, Squeal, Fortune */}
         <Stack
           direction="row"
           spacing={2}
           alignItems="flex-start"
-          sx={{ flex: 1 }}
         >
           {/* Driving Skill Field - Always visible */}
           <FormControl sx={{ minWidth: 100 }}>
@@ -229,7 +224,14 @@ export default function ChaseMethodSection({
               </Typography>
             </FormControl>
           )}
+        </Stack>
 
+        {/* Second row: Role, Chase Action, Position, Shot Cost */}
+        <Stack
+          direction="row"
+          spacing={2}
+          alignItems="flex-start"
+        >
           {/* Role Selection */}
           <FormControl
             sx={{
@@ -388,46 +390,46 @@ export default function ChaseMethodSection({
               <MenuItem value="far">Far</MenuItem>
             </Select>
           </FormControl>
-        </Stack>
 
-        {/* Shot Cost Field - separate on the right */}
-        <FormControl sx={{ minWidth: 100, flexShrink: 0 }}>
-          <InputLabel
-            shrink
-            sx={{
-              backgroundColor: "#262626",
-              px: 0.5,
-              ml: -0.5,
-            }}
-          >
-            Shot Cost
-          </InputLabel>
-          <NumberField
-            name="shotCost"
-            value={formState.data.shotCost || 3}
-            size="medium"
-            width="80px"
-            error={false}
-            onChange={e => {
-              const value = parseInt(e.target.value)
-              if (!isNaN(value)) {
-                updateField("shotCost", value)
-              }
-            }}
-            onBlur={e => {
-              const value = parseInt(e.target.value) || 0
-              if (value <= 0) {
-                // Reset to default based on character type
-                const defaultCost =
-                  attacker && (CS.isBoss(attacker) || CS.isUberBoss(attacker))
-                    ? 2
-                    : 3
-                updateField("shotCost", defaultCost)
-              }
-            }}
-            sx={{ fontSize: "1.5rem" }}
-          />
-        </FormControl>
+          {/* Shot Cost Field */}
+          <FormControl sx={{ minWidth: 100 }}>
+            <InputLabel
+              shrink
+              sx={{
+                backgroundColor: "#262626",
+                px: 0.5,
+                ml: -0.5,
+              }}
+            >
+              Shot Cost
+            </InputLabel>
+            <NumberField
+              name="shotCost"
+              value={formState.data.shotCost || 3}
+              size="medium"
+              width="80px"
+              error={false}
+              onChange={e => {
+                const value = parseInt(e.target.value)
+                if (!isNaN(value)) {
+                  updateField("shotCost", value)
+                }
+              }}
+              onBlur={e => {
+                const value = parseInt(e.target.value) || 0
+                if (value <= 0) {
+                  // Reset to default based on character type
+                  const defaultCost =
+                    attacker && (CS.isBoss(attacker) || CS.isUberBoss(attacker))
+                      ? 2
+                      : 3
+                  updateField("shotCost", defaultCost)
+                }
+              }}
+              sx={{ fontSize: "1.5rem" }}
+            />
+          </FormControl>
+        </Stack>
       </Stack>
     </Box>
   )
