@@ -10,22 +10,22 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material"
+import { FaHeartPulse } from "react-icons/fa6"
 import { useEncounter, useToast, useClient } from "@/contexts"
 import { CS } from "@/services"
 import { NumberField } from "@/components/ui"
 import CharacterSelector from "./CharacterSelector"
 import { TargetDisplay } from "@/components/encounters"
+import BasePanel from "./BasePanel"
 import { getAllVisibleShots } from "./attacks/shotSorting"
 import type { Character } from "@/types"
 
 interface HealPanelProps {
-  onClose?: () => void
   onComplete?: () => void
   preselectedCharacter?: Character
 }
 
 export default function HealPanel({
-  onClose,
   onComplete,
   preselectedCharacter,
 }: HealPanelProps) {
@@ -194,7 +194,6 @@ export default function HealPanel({
       setShotsSpent("5")
       setUseFortune(false)
       if (onComplete) onComplete()
-      if (onClose) onClose()
     } catch (error) {
       console.error("Failed to apply healing:", error)
       toastError("Failed to apply healing")
@@ -204,20 +203,7 @@ export default function HealPanel({
   }
 
   return (
-    <Box sx={{ overflow: "hidden", minHeight: isReady ? "auto" : "100px" }}>
-      <Typography
-        variant="h6"
-        sx={{
-          p: 1,
-          fontWeight: "bold",
-          backgroundColor: "background.paper",
-          borderBottom: "2px solid",
-          borderBottomColor: "divider",
-        }}
-      >
-        Heal
-      </Typography>
-
+    <BasePanel title="Heal" icon={<FaHeartPulse />} borderColor="success.main">
       {isReady ? (
         <>
           {/* Combined Healer and Target Section */}
@@ -438,6 +424,6 @@ export default function HealPanel({
           <CircularProgress />
         </Box>
       )}
-    </Box>
+    </BasePanel>
   )
 }
