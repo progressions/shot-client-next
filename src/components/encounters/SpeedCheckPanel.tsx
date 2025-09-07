@@ -3,14 +3,11 @@
 import React, { useState, useMemo } from "react"
 import {
   Box,
-  Paper,
   Typography,
   Button,
   Alert,
-  IconButton,
   Grid,
 } from "@mui/material"
-import { Close as CloseIcon } from "@mui/icons-material"
 import { FaPersonRunning, FaDice } from "react-icons/fa6"
 import { useEncounter } from "@/contexts"
 import { useToast } from "@/contexts"
@@ -22,8 +19,8 @@ import { getAllVisibleShots } from "./attacks/shotSorting"
 import type { Character } from "@/types"
 
 interface SpeedCheckPanelProps {
-  onClose: () => void
-  onComplete: () => void
+  onClose?: () => void
+  onComplete?: () => void
 }
 
 export default function SpeedCheckPanel({
@@ -152,73 +149,27 @@ export default function SpeedCheckPanel({
 
   if (escapingCharacters.length === 0) {
     return (
-      <Paper
-        sx={{
-          p: 3,
-          mb: 2,
-          position: "relative",
-          border: "2px solid",
-          borderColor: "info.main",
-          backgroundColor: "background.paper",
-        }}
-      >
-        <IconButton
-          onClick={onClose}
-          sx={{
-            position: "absolute",
-            right: 8,
-            top: 8,
-          }}
-          size="small"
-        >
-          <CloseIcon />
-        </IconButton>
-
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-          <FaDice size={24} />
-          <Typography variant="h6" component="h2">
-            Speed Check
-          </Typography>
-        </Box>
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          <FaDice size={20} style={{ marginRight: 8, verticalAlign: "middle" }} />
+          Speed Check
+        </Typography>
 
         <Alert severity="info">
           No characters are currently attempting to escape.
         </Alert>
-      </Paper>
+      </Box>
     )
   }
 
   const targetEscaper = escapingCharacters[0]
 
   return (
-    <Paper
-      sx={{
-        p: 3,
-        mb: 2,
-        position: "relative",
-        border: "2px solid",
-        borderColor: "warning.main",
-        backgroundColor: "background.paper",
-      }}
-    >
-      <IconButton
-        onClick={onClose}
-        sx={{
-          position: "absolute",
-          right: 8,
-          top: 8,
-        }}
-        size="small"
-      >
-        <CloseIcon />
-      </IconButton>
-
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-        <FaDice size={24} />
-        <Typography variant="h6" component="h2">
-          Speed Check - Prevent Escape
-        </Typography>
-      </Box>
+    <Box sx={{ mb: 2 }}>
+      <Typography variant="h6" sx={{ mb: 2 }}>
+        <FaDice size={20} style={{ marginRight: 8, verticalAlign: "middle" }} />
+        Speed Check - Prevent Escape
+      </Typography>
 
       {/* Escaping Character Display */}
       <Box sx={{ mb: 3 }}>
@@ -313,12 +264,9 @@ export default function SpeedCheckPanel({
             >
               {submitting ? "Processing..." : "Resolve Speed Check"}
             </Button>
-            <Button variant="outlined" onClick={onClose} disabled={submitting}>
-              Cancel
-            </Button>
           </Box>
         </Box>
       )}
-    </Paper>
+    </Box>
   )
 }

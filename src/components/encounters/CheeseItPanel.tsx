@@ -1,27 +1,25 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Box,
-  Paper,
   Typography,
   Button,
   Alert,
-  IconButton,
 } from "@mui/material"
-import { Close as CloseIcon } from "@mui/icons-material"
 import { FaPersonRunning } from "react-icons/fa6"
 import { useEncounter } from "@/contexts"
 import { useToast } from "@/contexts"
 import { CS } from "@/services"
 import { CharacterLink } from "@/components/ui/links"
 import { Avatar } from "@/components/avatars"
+import { NumberField } from "@/components/ui"
 import type { Character } from "@/types"
 
 interface CheeseItPanelProps {
   preselectedCharacter: Character
-  onClose: () => void
-  onComplete: () => void
+  onClose?: () => void
+  onComplete?: () => void
 }
 
 export default function CheeseItPanel({
@@ -32,6 +30,19 @@ export default function CheeseItPanel({
   const { encounter, applyCharacterUpdates } = useEncounter()
   const { toastSuccess, toastError } = useToast()
   const [submitting, setSubmitting] = useState(false)
+  
+  // Calculate default shot cost based on character type
+  const characterType = preselectedCharacter.action_values?.["Type"]
+  const isBoss = characterType === "Boss" || characterType === "Uber-Boss"
+  const defaultShotCost = isBoss ? 2 : 3
+  
+  const [shotCost, setShotCost] = useState(defaultShotCost.toString())
+  
+  // Reset shot cost when character changes
+  useEffect(() => {
+    const newDefault = isBoss ? 2 : 3
+    setShotCost(newDefault.toString())
+  }, [preselectedCharacter?.id, isBoss])
 
   const handleCheeseIt = async () => {
     if (!preselectedCharacter || !encounter) return
@@ -47,13 +58,11 @@ export default function CheeseItPanel({
       )
       const currentShot = characterShot?.shot || 0
 
-      // Calculate shot cost
-      const characterType = preselectedCharacter.action_values?.["Type"]
-      const isBoss = characterType === "Boss" || characterType === "Uber-Boss"
-      const shotCost = isBoss ? 2 : 3
+      // Use the user-specified shot cost
+      const actualShotCost = parseInt(shotCost) || defaultShotCost
 
       // Calculate new shot position
-      const newShot = Math.max(0, currentShot - shotCost)
+      const newShot = Math.max(0, currentShot - actualShotCost)
 
       // Prepare character update
       const characterUpdate = {
@@ -65,7 +74,7 @@ export default function CheeseItPanel({
           description: `${preselectedCharacter.name} is attempting to cheese it!`,
           details: {
             character_id: preselectedCharacter.id,
-            shot_cost: shotCost,
+            shot_cost: actualShotCost,
             old_shot: currentShot,
             new_shot: newShot,
           },
@@ -98,42 +107,14 @@ export default function CheeseItPanel({
   )
   const currentShot = characterShot?.shot || 0
 
-  // Calculate shot cost for display
-  const characterType = preselectedCharacter.action_values?.["Type"]
-  const isBoss = characterType === "Boss" || characterType === "Uber-Boss"
-  const shotCost = isBoss ? 2 : 3
-
   return (
-    <Paper
-      sx={{
-        p: 3,
-        mb: 2,
-        position: "relative",
-        border: "2px solid",
-        borderColor: "warning.main",
-        backgroundColor: "background.paper",
-      }}
-    >
-      <IconButton
-        onClick={onClose}
-        sx={{
-          position: "absolute",
-          right: 8,
-          top: 8,
-        }}
-        size="small"
-      >
-        <CloseIcon />
-      </IconButton>
+    <Box sx={{ mb: 2 }}>
+      <Typography variant="h6" sx={{ mb: 2 }}>
+        <FaPersonRunning size={20} style={{ marginRight: 8, verticalAlign: "middle" }} />
+        Cheese It
+      </Typography>
 
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-        <FaPersonRunning size={24} />
-        <Typography variant="h6" component="h2">
-          Cheese It
-        </Typography>
-      </Box>
-
-      <Box sx={{ mb: 3 }}>
+      <Box sx={{ mb: 2 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
           <Avatar character={preselectedCharacter} hideVehicle size={64} />
           <Box>
@@ -141,10 +122,21 @@ export default function CheeseItPanel({
             <Typography variant="body2" color="text.secondary">
               Current Shot: {currentShot}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Shot Cost: {shotCost}
-            </Typography>
           </Box>
+        </Box>
+        
+        {/* Shot Cost Input */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+          <NumberField
+            name="shotCost"
+            label="Shots to Spend"
+            value={parseInt(shotCost) || 0}
+            onChange={(e) => setShotCost(e.target.value)}
+            width="100px"
+          />
+          <Typography variant="body2" color="text.secondary">
+            (Default: {defaultShotCost} for {isBoss ? "Boss/Uber-Boss" : "standard characters"})
+          </Typography>
         </Box>
 
         {isAlreadyCheesing && (
@@ -163,8 +155,7 @@ export default function CheeseItPanel({
           <>
             <Alert severity="info" sx={{ mb: 2 }}>
               <Typography variant="body2">
-                <strong>Cheese It:</strong> Spend {shotCost} shots to attempt
-                escape.
+                <strong>Cheese It:</strong> Spend shots to attempt escape.
               </Typography>
               <Typography variant="body2" sx={{ mt: 1 }}>
                 Characters acting after you can attempt to prevent your escape
@@ -177,22 +168,15 @@ export default function CheeseItPanel({
                 variant="contained"
                 color="warning"
                 onClick={handleCheeseIt}
-                disabled={submitting}
+                disabled={submitting || !shotCost || parseInt(shotCost) <= 0}
                 startIcon={<FaPersonRunning />}
               >
                 {submitting ? "Running..." : "Cheese It!"}
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={onClose}
-                disabled={submitting}
-              >
-                Cancel
               </Button>
             </Box>
           </>
         )}
       </Box>
-    </Paper>
+    </Box>
   )
 }
