@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect } from "react"
 import { Box, Button, Alert, Typography } from "@mui/material"
-import { FaPersonRunning } from "react-icons/fa6"
 import { useEncounter, useToast, useClient } from "@/contexts"
 import { Avatar } from "@/components/avatars"
-import { NumberField } from "@/components/ui"
+import { NumberField, Icon } from "@/components/ui"
 import BasePanel from "./BasePanel"
 import type { Character } from "@/types"
 
@@ -94,7 +93,7 @@ export default function CheeseItPanel({
   return (
     <BasePanel
       title="Cheese It"
-      icon={<FaPersonRunning />}
+      icon={<Icon keyword="Cheese It" />}
       borderColor="warning.main"
     >
       <Box sx={{ mb: 3 }}>
@@ -147,7 +146,7 @@ export default function CheeseItPanel({
                 color="warning"
                 onClick={handleCheeseIt}
                 disabled={submitting || !shotCost || parseInt(shotCost) <= 0}
-                startIcon={<FaPersonRunning />}
+                startIcon={<Icon keyword="Cheese It" />}
               >
                 {submitting ? "Running..." : "Cheese It!"}
               </Button>
