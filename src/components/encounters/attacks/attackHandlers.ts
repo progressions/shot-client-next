@@ -149,13 +149,19 @@ export async function handleNonMookMultipleTargets(
 
     if (effectiveWounds === 0) continue // Skip targets with no wounds
 
-    const currentWounds = CS.wounds(targetChar)
+    // For PCs, wounds are in action_values. For NPCs/Mooks, wounds are in shot.count
+    const currentWounds = CS.isPC(targetChar) 
+      ? CS.wounds(targetChar)
+      : (targetShot as any).count || 0
     const newWounds = CS.isMook(targetChar)
       ? Math.max(0, currentWounds - effectiveWounds) // Reduce mook count
       : currentWounds + effectiveWounds // Add wounds for non-mooks
 
     // Calculate impairments
-    const originalImpairments = targetChar.impairments || 0
+    // For PCs, impairments are on character. For NPCs/Mooks, impairments are on shot.
+    const originalImpairments = CS.isPC(targetChar)
+      ? targetChar.impairments || 0
+      : (targetShot as any).impairments || 0
     const impairmentChange = CS.calculateImpairments(
       targetChar,
       currentWounds,

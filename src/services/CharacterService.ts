@@ -397,6 +397,7 @@ const CharacterService = {
     if (this.isType(character, "PC")) {
       return this.rawActionValue(character, "Wounds")
     }
+    // NPCs and Mooks both use count field from Shot record
     return Math.max(0, character.count || 0)
   },
 
