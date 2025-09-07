@@ -92,14 +92,10 @@ export default function ChaseMethodSection({
       <Typography variant="h6" sx={{ mb: 2, color: "primary.main" }}>
         🏁 Attacker
       </Typography>
-      
+
       <Stack spacing={2}>
         {/* First row: Driving, Squeal, Fortune, Shot Cost */}
-        <Stack
-          direction="row"
-          spacing={2}
-          alignItems="flex-start"
-        >
+        <Stack direction="row" spacing={2} alignItems="flex-start">
           {/* Driving Skill Field - Always visible */}
           <FormControl sx={{ minWidth: 100 }}>
             <InputLabel
@@ -266,11 +262,7 @@ export default function ChaseMethodSection({
         </Stack>
 
         {/* Second row: Role, Position */}
-        <Stack
-          direction="row"
-          spacing={2}
-          alignItems="flex-start"
-        >
+        <Stack direction="row" spacing={2} alignItems="flex-start">
           {/* Role Selection */}
           <FormControl
             sx={{
@@ -349,11 +341,7 @@ export default function ChaseMethodSection({
         </Stack>
 
         {/* Third row: Chase Action */}
-        <Stack
-          direction="row"
-          spacing={2}
-          alignItems="flex-start"
-        >
+        <Stack direction="row" spacing={2} alignItems="flex-start">
           {/* Chase Action Selection */}
           <FormControl
             sx={{

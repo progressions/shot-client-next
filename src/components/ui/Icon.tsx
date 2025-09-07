@@ -8,7 +8,14 @@ import { GiMagicGate, GiSwordsPower } from "react-icons/gi"
 import BoltIcon from "@mui/icons-material/Bolt"
 import { FaBolt } from "react-icons/fa"
 import { VscGithubAction } from "react-icons/vsc"
-import { FaGun, FaCar, FaHeartPulse, FaHandFist, FaPersonRunning, FaDice } from "react-icons/fa6"
+import {
+  FaGun,
+  FaCar,
+  FaHeartPulse,
+  FaHandFist,
+  FaPersonRunning,
+  FaDice,
+} from "react-icons/fa6"
 import AutoStoriesIcon from "@mui/icons-material/AutoStories"
 import { GiClothes } from "react-icons/gi"
 import { GiDramaMasks } from "react-icons/gi"
