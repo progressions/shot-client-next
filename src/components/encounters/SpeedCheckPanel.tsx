@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react"
 import { Box, Paper, Typography, Button, Alert, Divider } from "@mui/material"
-import { FaPersonRunning, FaDice } from "react-icons/fa6"
+import { FaDice } from "react-icons/fa6"
 import { useEncounter, useToast, useClient } from "@/contexts"
 import { CS } from "@/services"
 import { CharacterLink } from "@/components/ui/links"
