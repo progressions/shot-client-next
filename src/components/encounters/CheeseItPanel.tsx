@@ -147,6 +147,8 @@ export default function CheeseItPanel({
               width: 100,
               "& .MuiOutlinedInput-root": {
                 height: 40,
+                "& input": { padding: "8px 12px" },
+                backgroundColor: "background.paper",
               },
             }}
           />
