@@ -1,22 +1,21 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Box, Paper, Typography, Button, Alert } from "@mui/material"
+import { Box, Button, Alert, Typography } from "@mui/material"
 import { FaPersonRunning } from "react-icons/fa6"
 import { useEncounter, useToast, useClient } from "@/contexts"
 import { Avatar } from "@/components/avatars"
 import { NumberField } from "@/components/ui"
+import BasePanel from "./BasePanel"
 import type { Character } from "@/types"
 
 interface CheeseItPanelProps {
   preselectedCharacter: Character
-  onClose?: () => void
   onComplete?: () => void
 }
 
 export default function CheeseItPanel({
   preselectedCharacter,
-  onClose,
   onComplete,
 }: CheeseItPanelProps) {
   const { encounter } = useEncounter()
@@ -92,33 +91,12 @@ export default function CheeseItPanel({
   const isAlreadyCheesing = preselectedCharacter.status?.includes("cheesing_it")
   const hasEscaped = preselectedCharacter.status?.includes("cheesed_it")
 
-  // Get the current shot from encounter shots
-  const allShots = encounter?.shots || []
-  const characterShot = allShots.find((shotGroup: Shot) =>
-    shotGroup.characters?.some(
-      (c: Character) => c.id === preselectedCharacter.id
-    )
-  )
-  const currentShot = characterShot?.shot || 0
-
   return (
-    <Paper
-      sx={{
-        p: 3,
-        mb: 2,
-        position: "relative",
-        border: "2px solid",
-        borderColor: "warning.main",
-        backgroundColor: "background.paper",
-      }}
+    <BasePanel
+      title="Cheese It"
+      icon={<FaPersonRunning />}
+      borderColor="warning.main"
     >
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-        <FaPersonRunning size={24} />
-        <Typography variant="h6" component="h2">
-          Cheese It
-        </Typography>
-      </Box>
-
       <Box sx={{ mb: 3 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
           <Avatar character={preselectedCharacter} hideVehicle size={64} />
@@ -177,6 +155,6 @@ export default function CheeseItPanel({
           </>
         )}
       </Box>
-    </Paper>
+    </BasePanel>
   )
 }

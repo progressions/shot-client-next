@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useMemo } from "react"
-import { Box, Paper, Typography, Button, Alert, Divider } from "@mui/material"
+import { Box, Typography, Button, Alert, Divider } from "@mui/material"
 import { FaDice } from "react-icons/fa6"
 import { useEncounter, useToast, useClient } from "@/contexts"
 import { CS } from "@/services"
@@ -10,17 +10,16 @@ import { Avatar } from "@/components/avatars"
 import { NumberField } from "@/components/ui"
 import { getAllVisibleShots } from "./attacks/shotSorting"
 import CharacterSelector from "./CharacterSelector"
+import BasePanel from "./BasePanel"
 import type { Character } from "@/types"
 
 interface SpeedCheckPanelProps {
   selectedCharacter: Character | null
-  onClose?: () => void
   onComplete?: () => void
 }
 
 export default function SpeedCheckPanel({
   selectedCharacter,
-  onClose,
   onComplete,
 }: SpeedCheckPanelProps) {
   const { encounter } = useEncounter()
@@ -30,7 +29,6 @@ export default function SpeedCheckPanel({
   const [selectedTargetShotId, setSelectedTargetShotId] = useState<string>("")
   const [swerve, setSwerve] = useState<number>(0)
   const [fortuneBonus, setFortuneBonus] = useState<string>("0")
-  const [usingFortune, setUsingFortune] = useState(false)
   const [shotCost, setShotCost] = useState<number>(3)
 
   // The selected character from the encounter is the preventer
@@ -104,39 +102,6 @@ export default function SpeedCheckPanel({
       success,
     }
   }, [selectedPreventer, selectedTarget, swerve, fortuneBonus])
-
-  // Get characters eligible to prevent escape of the selected target
-  const eligiblePreventers = useMemo(() => {
-    if (!encounter?.shots || !selectedTarget) return []
-
-    const allShots = getAllVisibleShots(encounter.shots)
-    // Find the shot of the selected target
-    const targetShot = allShots.find(s => s.character?.id === selectedTarget.id)
-    if (!targetShot) return []
-
-    const targetShotNumber = targetShot.shot || 0
-
-    // Characters acting after the selected escaping character can attempt prevention
-    return allShots
-      .filter(shot => {
-        const char = shot.character
-        if (!char) return false
-        // Must be acting after the selected escaping character
-        if ((shot.shot || 0) >= targetShotNumber) return false
-        // Cannot already be escaping or escaped
-        if (
-          char.status?.includes("cheesing_it") ||
-          char.status?.includes("cheesed_it")
-        )
-          return false
-        return true
-      })
-      .map(shot => ({
-        character: shot.character!,
-        shot: shot.shot,
-      }))
-      .sort((a, b) => (b.shot || 0) - (a.shot || 0)) // Highest shot first
-  }, [encounter?.shots, selectedTarget])
 
   const handlePreventEscape = async () => {
     if (!selectedPreventer || !selectedTarget || !encounter) return
@@ -284,48 +249,20 @@ export default function SpeedCheckPanel({
 
   if (escapingCharacters.length === 0) {
     return (
-      <Paper
-        sx={{
-          p: 3,
-          mb: 2,
-          position: "relative",
-          border: "2px solid",
-          borderColor: "info.main",
-          backgroundColor: "background.paper",
-        }}
-      >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-          <FaDice size={24} />
-          <Typography variant="h6" component="h2">
-            Speed Check
-          </Typography>
-        </Box>
-
+      <BasePanel title="Speed Check" icon={<FaDice />} borderColor="info.main">
         <Alert severity="info">
           No characters are currently attempting to escape.
         </Alert>
-      </Paper>
+      </BasePanel>
     )
   }
 
   return (
-    <Paper
-      sx={{
-        p: 3,
-        mb: 2,
-        position: "relative",
-        border: "2px solid",
-        borderColor: "warning.main",
-        backgroundColor: "background.paper",
-      }}
+    <BasePanel
+      title="Speed Check - Prevent Escape"
+      icon={<FaDice />}
+      borderColor="warning.main"
     >
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-        <FaDice size={24} />
-        <Typography variant="h6" component="h2">
-          Speed Check - Prevent Escape
-        </Typography>
-      </Box>
-
       {/* Two-column layout */}
       <Box sx={{ display: "flex", gap: 3 }}>
         {/* Left column - Target Selection */}
@@ -390,15 +327,11 @@ export default function SpeedCheckPanel({
                     onChange={e => {
                       const value = e.target.value
                       setFortuneBonus(value)
-                      const isUsing = value !== "" && value !== "0"
-                      setUsingFortune(isUsing)
                     }}
                     onBlur={e => {
                       const value = parseInt(e.target.value) || 0
                       const finalValue = value < 0 ? "0" : value.toString()
                       setFortuneBonus(finalValue)
-                      const isUsing = finalValue !== "0"
-                      setUsingFortune(isUsing)
                     }}
                     size="small"
                     sx={{
@@ -501,6 +434,6 @@ export default function SpeedCheckPanel({
           </Box>
         )}
       </Box>
-    </Paper>
+    </BasePanel>
   )
 }
