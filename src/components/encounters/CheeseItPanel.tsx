@@ -132,17 +132,23 @@ export default function CheeseItPanel({
         </Box>
         
         {/* Shot Cost Input */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-          <Typography variant="body2" color="text.secondary">
-            Shot Cost:
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+            Shot Cost
           </Typography>
           <NumberField
             name="shotCost"
-            label=""
             value={parseInt(shotCost) || 0}
             onChange={(e) => setShotCost(e.target.value)}
             onBlur={(e) => setShotCost(e.target.value)}
-            width="80px"
+            size="small"
+            error={false}
+            sx={{
+              width: 100,
+              "& .MuiOutlinedInput-root": {
+                height: 40,
+              },
+            }}
           />
         </Box>
 
