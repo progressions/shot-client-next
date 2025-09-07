@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react"
 import {
   Box,
+  Paper,
   Typography,
   Button,
   Alert,
@@ -149,27 +150,49 @@ export default function SpeedCheckPanel({
 
   if (escapingCharacters.length === 0) {
     return (
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          <FaDice size={20} style={{ marginRight: 8, verticalAlign: "middle" }} />
-          Speed Check
-        </Typography>
+      <Paper
+        sx={{
+          p: 3,
+          mb: 2,
+          position: "relative",
+          border: "2px solid",
+          borderColor: "info.main",
+          backgroundColor: "background.paper",
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+          <FaDice size={24} />
+          <Typography variant="h6" component="h2">
+            Speed Check
+          </Typography>
+        </Box>
 
         <Alert severity="info">
           No characters are currently attempting to escape.
         </Alert>
-      </Box>
+      </Paper>
     )
   }
 
   const targetEscaper = escapingCharacters[0]
 
   return (
-    <Box sx={{ mb: 2 }}>
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        <FaDice size={20} style={{ marginRight: 8, verticalAlign: "middle" }} />
-        Speed Check - Prevent Escape
-      </Typography>
+    <Paper
+      sx={{
+        p: 3,
+        mb: 2,
+        position: "relative",
+        border: "2px solid",
+        borderColor: "warning.main",
+        backgroundColor: "background.paper",
+      }}
+    >
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+        <FaDice size={24} />
+        <Typography variant="h6" component="h2">
+          Speed Check - Prevent Escape
+        </Typography>
+      </Box>
 
       {/* Escaping Character Display */}
       <Box sx={{ mb: 3 }}>
@@ -268,6 +291,6 @@ export default function SpeedCheckPanel({
           </Box>
         </Box>
       )}
-    </Box>
+    </Paper>
   )
 }

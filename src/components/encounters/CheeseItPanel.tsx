@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react"
 import {
   Box,
+  Paper,
   Typography,
   Button,
   Alert,
@@ -108,17 +109,27 @@ export default function CheeseItPanel({
   const currentShot = characterShot?.shot || 0
 
   return (
-    <Box sx={{ mb: 2 }}>
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        <FaPersonRunning size={20} style={{ marginRight: 8, verticalAlign: "middle" }} />
-        Cheese It
-      </Typography>
+    <Paper
+      sx={{
+        p: 3,
+        mb: 2,
+        position: "relative",
+        border: "2px solid",
+        borderColor: "warning.main",
+        backgroundColor: "background.paper",
+      }}
+    >
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+        <FaPersonRunning size={24} />
+        <Typography variant="h6" component="h2">
+          Cheese It
+        </Typography>
+      </Box>
 
-      <Box sx={{ mb: 2 }}>
+      <Box sx={{ mb: 3 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
           <Avatar character={preselectedCharacter} hideVehicle size={64} />
           <Box>
-            <CharacterLink character={preselectedCharacter} />
             <Typography variant="body2" color="text.secondary">
               Current Shot: {currentShot}
             </Typography>
@@ -127,17 +138,17 @@ export default function CheeseItPanel({
         
         {/* Shot Cost Input */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+          <Typography variant="body2" color="text.secondary">
+            Shot Cost:
+          </Typography>
           <NumberField
             name="shotCost"
-            label="Shots to Spend"
+            label=""
             value={parseInt(shotCost) || 0}
             onChange={(e) => setShotCost(e.target.value)}
             onBlur={(e) => setShotCost(e.target.value)}
-            width="100px"
+            width="80px"
           />
-          <Typography variant="body2" color="text.secondary">
-            (Default: {defaultShotCost} for {isBoss ? "Boss/Uber-Boss" : "standard characters"})
-          </Typography>
         </Box>
 
         {isAlreadyCheesing && (
@@ -178,6 +189,6 @@ export default function CheeseItPanel({
           </>
         )}
       </Box>
-    </Box>
+    </Paper>
   )
 }
