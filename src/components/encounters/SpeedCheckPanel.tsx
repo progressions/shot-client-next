@@ -31,6 +31,7 @@ export default function SpeedCheckPanel({
   const [swerve, setSwerve] = useState<number>(0)
   const [fortuneBonus, setFortuneBonus] = useState<string>("0")
   const [usingFortune, setUsingFortune] = useState(false)
+  const [shotCost, setShotCost] = useState<number>(3)
 
   // The selected character from the encounter is the preventer
   const selectedPreventer = selectedCharacter
@@ -40,6 +41,21 @@ export default function SpeedCheckPanel({
   const availableFortune = isPreventerPC
     ? CS.fortune(selectedPreventer) || 0
     : 0
+
+  // Check if preventer is Boss or Uber-Boss for shot cost default
+  const isBossType =
+    selectedPreventer &&
+    (CS.type(selectedPreventer) === "Boss" ||
+      CS.type(selectedPreventer) === "Uber-Boss")
+
+  // Update shot cost when selected preventer changes
+  React.useEffect(() => {
+    if (selectedPreventer) {
+      // Boss and Uber-Boss characters default to 2 shots, others default to 3
+      const defaultShotCost = isBossType ? 2 : 3
+      setShotCost(defaultShotCost)
+    }
+  }, [selectedPreventer, isBossType])
 
   // Get all shots for the CharacterSelector
   const allShots = useMemo(() => {
@@ -138,6 +154,15 @@ export default function SpeedCheckPanel({
 
       const success = totalRoll >= escapeeDifficulty
 
+      // Get the preventer's current shot position
+      const preventerShot = allShots.find(
+        s => s.character?.id === selectedPreventer.id
+      )
+      const currentPreventerShot = preventerShot?.shot || 0
+
+      // Calculate new shot position after spending shots
+      const newPreventerShot = Math.max(-10, currentPreventerShot - shotCost)
+
       const characterUpdates = []
 
       // If using Fortune, deduct it from the preventer (PC only)
@@ -163,6 +188,26 @@ export default function SpeedCheckPanel({
 
       if (success) {
         // Prevention succeeds - remove cheesing_it status
+        // First, update the preventer's shot position
+        if (shotCost > 0) {
+          characterUpdates.push({
+            shot_id: selectedPreventer.shot_id,
+            character_id: selectedPreventer.id,
+            shot: newPreventerShot,
+            event: {
+              type: "speed_check_attempt",
+              description: `${selectedPreventer.name} spends ${shotCost} shots on Speed Check`,
+              details: {
+                character_id: selectedPreventer.id,
+                shot_cost: shotCost,
+                old_shot: currentPreventerShot,
+                new_shot: newPreventerShot,
+              },
+            },
+          })
+        }
+
+        // Then update the target's status
         characterUpdates.push({
           character_id: targetEscaper.id,
           remove_status: ["cheesing_it"],
@@ -175,6 +220,7 @@ export default function SpeedCheckPanel({
               roll: totalRoll,
               swerve: swerve,
               fortune_bonus: fortuneBonusValue,
+              shot_cost: shotCost,
               difficulty: escapeeDifficulty,
               success: true,
             },
@@ -183,6 +229,26 @@ export default function SpeedCheckPanel({
         toastSuccess(`${selectedPreventer.name} prevents the escape!`)
       } else {
         // Prevention fails - escapee becomes "cheesed_it"
+        // First, update the preventer's shot position (they still spend shots even on failure)
+        if (shotCost > 0) {
+          characterUpdates.push({
+            shot_id: selectedPreventer.shot_id,
+            character_id: selectedPreventer.id,
+            shot: newPreventerShot,
+            event: {
+              type: "speed_check_attempt",
+              description: `${selectedPreventer.name} spends ${shotCost} shots on Speed Check`,
+              details: {
+                character_id: selectedPreventer.id,
+                shot_cost: shotCost,
+                old_shot: currentPreventerShot,
+                new_shot: newPreventerShot,
+              },
+            },
+          })
+        }
+
+        // Then update the target's status
         characterUpdates.push({
           character_id: targetEscaper.id,
           remove_status: ["cheesing_it"],
@@ -196,6 +262,7 @@ export default function SpeedCheckPanel({
               roll: totalRoll,
               swerve: swerve,
               fortune_bonus: fortuneBonusValue,
+              shot_cost: shotCost,
               difficulty: escapeeDifficulty,
               success: false,
             },
@@ -356,6 +423,29 @@ export default function SpeedCheckPanel({
                   </Typography>
                 </Box>
               )}
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{ display: "block", mb: 0.5, color: "text.secondary" }}
+                >
+                  Shot Cost
+                </Typography>
+                <NumberField
+                  name="shotCost"
+                  value={shotCost}
+                  onChange={e => setShotCost(parseInt(e.target.value) || 0)}
+                  onBlur={e => setShotCost(parseInt(e.target.value) || 0)}
+                  size="small"
+                  sx={{
+                    width: 80,
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: isBossType
+                        ? "info.light"
+                        : "background.paper",
+                    },
+                  }}
+                />
+              </Box>
               <Box sx={{ alignSelf: "center" }}>
                 <Typography variant="body2">
                   vs Difficulty {CS.speed(selectedTarget)}
