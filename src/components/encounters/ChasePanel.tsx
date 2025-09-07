@@ -252,37 +252,52 @@ export default function ChasePanel({
 
   return (
     <BasePanel title="Chase" icon={<FaCar />} borderColor="secondary.main">
-      {/* Main Content - Attacker then Target */}
+      {/* Main Content - Two Column Grid */}
       {isReady ? (
         <>
-          <Box sx={{ backgroundColor: "action.hover" }}>
-            {/* Method Section - disabled until target selected */}
-            <ChaseMethodSection
-              formState={formState}
-              dispatchForm={dispatchForm}
-              hasTarget={
-                !!(formState.data as { targetShotId?: string }).targetShotId
-              }
-              attacker={preselectedCharacter}
-              vehicle={
-                (formState.data as ChaseFormData & { vehicle?: Vehicle })
-                  .vehicle || null
-              }
-            />
+          {/* Two-column layout for Attacker/Method and Target */}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+              gap: 0.5,
+              p: 0.5,
+              backgroundColor: "action.hover",
+            }}
+          >
+            {/* Left Column: Attacker and Method */}
+            <Box sx={{ minWidth: 0 }}>
+              {/* Method Section - disabled until target selected */}
+              <ChaseMethodSection
+                formState={formState}
+                dispatchForm={dispatchForm}
+                hasTarget={
+                  !!(formState.data as { targetShotId?: string }).targetShotId
+                }
+                attacker={preselectedCharacter}
+                vehicle={
+                  (formState.data as ChaseFormData & { vehicle?: Vehicle })
+                    .vehicle || null
+                }
+              />
+            </Box>
 
-            {/* Target Section */}
-            <ChaseTargetSection
-              shots={allShots}
-              vehicles={allVehicles}
-              formState={formState}
-              dispatchForm={dispatchForm}
-              target={target}
-              attacker={attacker}
-              attackerShotId={attackerShotId}
-            />
+            {/* Right Column: Target */}
+            <Box sx={{ minWidth: 0 }}>
+              {/* Target Section */}
+              <ChaseTargetSection
+                shots={allShots}
+                vehicles={allVehicles}
+                formState={formState}
+                dispatchForm={dispatchForm}
+                target={target}
+                attacker={attacker}
+                attackerShotId={attackerShotId}
+              />
+            </Box>
           </Box>
 
-          {/* Resolution Section */}
+          {/* Resolution Section - Below the grid */}
           <ChaseResolution
             formState={formState}
             dispatchForm={dispatchForm}
