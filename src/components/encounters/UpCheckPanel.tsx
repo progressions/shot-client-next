@@ -87,11 +87,12 @@ export default function UpCheckPanel({
 
   // Calculate Boss Up Check result
   const bossUpCheckResult = useMemo(() => {
-    if (!selectedCharacter || !isBossType) return { willPass: false, dieValue: 0 }
-    
+    if (!selectedCharacter || !isBossType)
+      return { willPass: false, dieValue: 0 }
+
     const dieValue = parseInt(bossDieRoll, 10) || 0
     const willPass = dieValue >= 1 && dieValue <= 3 // 1-3 stays in fight, 4-6 is out
-    
+
     return { willPass, dieValue }
   }, [selectedCharacter, bossDieRoll, isBossType])
 
@@ -113,13 +114,13 @@ export default function UpCheckPanel({
         // Boss/Uber-Boss Up Check
         const dieValue = parseInt(bossDieRoll, 10) || 0
         const passed = dieValue >= 1 && dieValue <= 3
-        
+
         // For Boss types, send 1 for pass, 0 for fail as the swerve value
         // Backend will interpret this as pass/fail
         await client.applyUpCheck(
           encounter,
           selectedCharacter.id,
-          passed ? 1 : 0,  // 1 = passed, 0 = failed
+          passed ? 1 : 0, // 1 = passed, 0 = failed
           0
         )
 
@@ -305,10 +306,15 @@ export default function UpCheckPanel({
                       <Typography variant="h6" gutterBottom>
                         Boss Up Check
                       </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                        Roll 1d6: On 1-3, {selectedCharacter.name} stays in the fight. On 4-6, they're out.
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 2 }}
+                      >
+                        Roll 1d6: On 1-3, {selectedCharacter.name} stays in the
+                        fight. On 4-6, they're out.
                       </Typography>
-                      
+
                       {/* Die Roll Input */}
                       <Box sx={{ width: 120 }}>
                         <Typography
@@ -331,19 +337,25 @@ export default function UpCheckPanel({
                     </Box>
 
                     {/* Result Preview */}
-                    {parseInt(bossDieRoll) >= 1 && parseInt(bossDieRoll) <= 6 && (
-                      <Alert
-                        severity={bossUpCheckResult.willPass ? "success" : "error"}
-                        sx={{ mb: 3 }}
-                      >
-                        <Typography variant="body2">
-                          <strong>{selectedCharacter.name}</strong> rolled {bossUpCheckResult.dieValue} and will{" "}
-                          <strong>
-                            {bossUpCheckResult.willPass ? "STAY IN THE FIGHT" : "BE OUT OF THE FIGHT"}
-                          </strong>
-                        </Typography>
-                      </Alert>
-                    )}
+                    {parseInt(bossDieRoll) >= 1 &&
+                      parseInt(bossDieRoll) <= 6 && (
+                        <Alert
+                          severity={
+                            bossUpCheckResult.willPass ? "success" : "error"
+                          }
+                          sx={{ mb: 3 }}
+                        >
+                          <Typography variant="body2">
+                            <strong>{selectedCharacter.name}</strong> rolled{" "}
+                            {bossUpCheckResult.dieValue} and will{" "}
+                            <strong>
+                              {bossUpCheckResult.willPass
+                                ? "STAY IN THE FIGHT"
+                                : "BE OUT OF THE FIGHT"}
+                            </strong>
+                          </Typography>
+                        </Alert>
+                      )}
                   </>
                 ) : (
                   // PC/Ally Up Check Interface
@@ -385,7 +397,9 @@ export default function UpCheckPanel({
                               control={
                                 <Checkbox
                                   checked={useFortune}
-                                  onChange={e => setUseFortune(e.target.checked)}
+                                  onChange={e =>
+                                    setUseFortune(e.target.checked)
+                                  }
                                   disabled={isProcessing}
                                 />
                               }
@@ -434,7 +448,8 @@ export default function UpCheckPanel({
                       >
                         Toughness ({upCheckResult.toughness}) + Swerve (
                         {upCheckResult.swerveValue})
-                        {useFortune && ` + Fortune (${upCheckResult.fortuneValue})`}{" "}
+                        {useFortune &&
+                          ` + Fortune (${upCheckResult.fortuneValue})`}{" "}
                         = {upCheckResult.total}
                         {upCheckResult.willPass ? " ≥ " : " < "}5
                       </Typography>
@@ -472,25 +487,30 @@ export default function UpCheckPanel({
                 variant="contained"
                 onClick={handleApplyUpCheck}
                 disabled={
-                  !selectedCharacter || 
+                  !selectedCharacter ||
                   isProcessing ||
-                  (isBossType && (parseInt(bossDieRoll) < 1 || parseInt(bossDieRoll) > 6))
+                  (isBossType &&
+                    (parseInt(bossDieRoll) < 1 || parseInt(bossDieRoll) > 6))
                 }
                 startIcon={isProcessing && <CircularProgress size={20} />}
                 color={
-                  !selectedCharacter 
+                  !selectedCharacter
                     ? "primary"
-                    : isBossType 
-                      ? (bossUpCheckResult.willPass ? "success" : "error")
-                      : (upCheckResult.willPass ? "success" : "error")
+                    : isBossType
+                      ? bossUpCheckResult.willPass
+                        ? "success"
+                        : "error"
+                      : upCheckResult.willPass
+                        ? "success"
+                        : "error"
                 }
               >
-                {isProcessing 
-                  ? "RESOLVING..." 
+                {isProcessing
+                  ? "RESOLVING..."
                   : !selectedCharacter
                     ? "SELECT A CHARACTER"
-                    : isBossType 
-                      ? "🎲 RESOLVE UP CHECK" 
+                    : isBossType
+                      ? "🎲 RESOLVE UP CHECK"
                       : "🎲 ROLL UP CHECK"}
               </Button>
             </Box>

@@ -138,15 +138,21 @@ export default function AttackerCombatFields({
 
   return (
     <Box sx={{ p: 1 }}>
-      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold", color: "text.secondary" }}>
+      <Typography
+        variant="subtitle2"
+        sx={{ mb: 1, fontWeight: "bold", color: "text.secondary" }}
+      >
         ATTACKER
       </Typography>
-      
+
       {/* Stack layout: Attack Value, then Damage, then Fortune/Shot Cost */}
       <Box>
         {/* Attack Value - full width */}
         <Box sx={{ mb: 1 }}>
-          <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.7rem" }}>
+          <Typography
+            variant="caption"
+            sx={{ color: "text.secondary", fontSize: "0.7rem" }}
+          >
             Attack Value
           </Typography>
           <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5 }}>
@@ -195,7 +201,10 @@ export default function AttackerCombatFields({
 
         {/* Damage - full width */}
         <Box sx={{ mb: 1 }}>
-          <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.7rem" }}>
+          <Typography
+            variant="caption"
+            sx={{ color: "text.secondary", fontSize: "0.7rem" }}
+          >
             Damage
           </Typography>
           <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5 }}>
@@ -278,7 +287,10 @@ export default function AttackerCombatFields({
           {/* Fortune field for PCs */}
           {isPC && availableFortune > 0 && (
             <Box>
-              <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.7rem" }}>
+              <Typography
+                variant="caption"
+                sx={{ color: "text.secondary", fontSize: "0.7rem" }}
+              >
                 Fortune +
               </Typography>
               <NumberField
@@ -308,11 +320,21 @@ export default function AttackerCombatFields({
                   "& .MuiOutlinedInput-root": {
                     height: 40,
                     "& input": { padding: "8px 12px" },
-                    backgroundColor: fortuneBonus !== "0" ? "warning.light" : "background.paper",
+                    backgroundColor:
+                      fortuneBonus !== "0"
+                        ? "warning.light"
+                        : "background.paper",
                   },
                 }}
               />
-              <Typography variant="caption" sx={{ fontSize: "0.65rem", color: "text.secondary", display: "block" }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontSize: "0.65rem",
+                  color: "text.secondary",
+                  display: "block",
+                }}
+              >
                 {availableFortune} avail
               </Typography>
             </Box>
@@ -320,7 +342,10 @@ export default function AttackerCombatFields({
 
           {/* Shot Cost */}
           <Box>
-            <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.7rem" }}>
+            <Typography
+              variant="caption"
+              sx={{ color: "text.secondary", fontSize: "0.7rem" }}
+            >
               Shot Cost
             </Typography>
             <NumberField
@@ -362,12 +387,18 @@ export default function AttackerCombatFields({
                       updateField("kachunkActive", false)
                       const adjustedDamage = weapon.damage + damageChange
                       updateField("weaponDamage", adjustedDamage.toString())
-                      updateField("shotCost", (parseInt(shotCost) - 1).toString())
+                      updateField(
+                        "shotCost",
+                        (parseInt(shotCost) - 1).toString()
+                      )
                     } else {
                       updateField("kachunkActive", true)
                       const kachunkDamage = 14 + damageChange
                       updateField("weaponDamage", kachunkDamage.toString())
-                      updateField("shotCost", (parseInt(shotCost) + 1).toString())
+                      updateField(
+                        "shotCost",
+                        (parseInt(shotCost) + 1).toString()
+                      )
                     }
                   }}
                   sx={{

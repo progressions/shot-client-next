@@ -646,7 +646,12 @@ export default function CharacterEditDialog({
               freeSolo
               value={statuses}
               onChange={(_, newValue) => setStatuses(newValue)}
-              options={["up_check_required", "out_of_fight", "stunned", "hidden"]}
+              options={[
+                "up_check_required",
+                "out_of_fight",
+                "stunned",
+                "hidden",
+              ]}
               renderTags={(value, getTagProps) =>
                 value.map((option, index) => {
                   const { key, ...tagProps } = getTagProps({ index })
@@ -658,15 +663,17 @@ export default function CharacterEditDialog({
                       {...tagProps}
                       size="small"
                       color={
-                        option === "out_of_fight" ? "error" :
-                        option === "up_check_required" ? "warning" :
-                        "default"
+                        option === "out_of_fight"
+                          ? "error"
+                          : option === "up_check_required"
+                            ? "warning"
+                            : "default"
                       }
                     />
                   )
                 })
               }
-              renderInput={(params) => (
+              renderInput={params => (
                 <MuiTextField
                   {...params}
                   variant="outlined"

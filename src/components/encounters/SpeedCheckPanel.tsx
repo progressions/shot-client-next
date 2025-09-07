@@ -15,8 +15,8 @@ import { FaPersonRunning, FaDice } from "react-icons/fa6"
 import { useEncounter } from "@/contexts"
 import { useToast } from "@/contexts"
 import { CS } from "@/services"
-import { CharacterLink } from "@/components/characters"
-import { Avatar } from "@/components/ui"
+import { CharacterLink } from "@/components/ui/links"
+import { Avatar } from "@/components/avatars"
 import { NumberField } from "@/components/ui"
 import { getAllVisibleShots } from "./attacks/shotSorting"
 import type { Character } from "@/types"
@@ -33,19 +33,21 @@ export default function SpeedCheckPanel({
   const { encounter, applyCharacterUpdates } = useEncounter()
   const { toastSuccess, toastError } = useToast()
   const [submitting, setSubmitting] = useState(false)
-  const [selectedPreventer, setSelectedPreventer] = useState<Character | null>(null)
+  const [selectedPreventer, setSelectedPreventer] = useState<Character | null>(
+    null
+  )
   const [swerve, setSwerve] = useState<number>(0)
 
   // Get all characters attempting to escape
   const escapingCharacters = useMemo(() => {
     if (!encounter?.shots) return []
-    
+
     const allShots = getAllVisibleShots(encounter.shots)
     return allShots
       .filter(shot => shot.character?.status?.includes("cheesing_it"))
       .map(shot => ({
         character: shot.character!,
-        shot: shot.shot
+        shot: shot.shot,
       }))
       .sort((a, b) => (b.shot || 0) - (a.shot || 0)) // Highest shot first
   }, [encounter?.shots])
@@ -53,10 +55,12 @@ export default function SpeedCheckPanel({
   // Get characters eligible to prevent escape
   const eligiblePreventers = useMemo(() => {
     if (!encounter?.shots || escapingCharacters.length === 0) return []
-    
+
     const allShots = getAllVisibleShots(encounter.shots)
-    const highestEscapingShot = Math.max(...escapingCharacters.map(e => e.shot || 0))
-    
+    const highestEscapingShot = Math.max(
+      ...escapingCharacters.map(e => e.shot || 0)
+    )
+
     // Characters acting after the escaping character(s) can attempt prevention
     return allShots
       .filter(shot => {
@@ -65,24 +69,29 @@ export default function SpeedCheckPanel({
         // Must be acting after the highest escaping character
         if ((shot.shot || 0) >= highestEscapingShot) return false
         // Cannot already be escaping or escaped
-        if (char.status?.includes("cheesing_it") || char.status?.includes("cheesed_it")) return false
+        if (
+          char.status?.includes("cheesing_it") ||
+          char.status?.includes("cheesed_it")
+        )
+          return false
         return true
       })
       .map(shot => ({
         character: shot.character!,
-        shot: shot.shot
+        shot: shot.shot,
       }))
       .sort((a, b) => (b.shot || 0) - (a.shot || 0)) // Highest shot first
   }, [encounter?.shots, escapingCharacters])
 
   const handlePreventEscape = async () => {
-    if (!selectedPreventer || escapingCharacters.length === 0 || !encounter) return
+    if (!selectedPreventer || escapingCharacters.length === 0 || !encounter)
+      return
 
     setSubmitting(true)
     try {
       // Get the target escaper (highest shot among escaping characters)
       const targetEscaper = escapingCharacters[0]
-      
+
       // Calculate Speed Check difficulty
       const escapeeDifficulty = CS.speed(targetEscaper.character) || 5
       const roll = swerve
@@ -217,11 +226,7 @@ export default function SpeedCheckPanel({
           Attempting to Escape:
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Avatar
-            character={targetEscaper.character}
-            hideVehicle
-            size={48}
-          />
+          <Avatar character={targetEscaper.character} hideVehicle size={48} />
           <Box>
             <CharacterLink character={targetEscaper.character} />
             <Typography variant="body2" color="text.secondary">
@@ -236,17 +241,22 @@ export default function SpeedCheckPanel({
         <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
           Select Character to Prevent Escape:
         </Typography>
-        
+
         {eligiblePreventers.length === 0 ? (
           <Alert severity="warning">
-            No characters are eligible to prevent the escape. Only characters acting after the escaping character can attempt prevention.
+            No characters are eligible to prevent the escape. Only characters
+            acting after the escaping character can attempt prevention.
           </Alert>
         ) : (
           <Grid container spacing={1}>
             {eligiblePreventers.map(({ character, shot }) => (
               <Grid item xs={12} sm={6} key={character.id}>
                 <Button
-                  variant={selectedPreventer?.id === character.id ? "contained" : "outlined"}
+                  variant={
+                    selectedPreventer?.id === character.id
+                      ? "contained"
+                      : "outlined"
+                  }
                   onClick={() => setSelectedPreventer(character)}
                   sx={{
                     justifyContent: "flex-start",
@@ -261,9 +271,7 @@ export default function SpeedCheckPanel({
                     sx={{ mr: 1 }}
                   />
                   <Box sx={{ textAlign: "left" }}>
-                    <Typography variant="body2">
-                      {character.name}
-                    </Typography>
+                    <Typography variant="body2">{character.name}</Typography>
                     <Typography variant="caption" color="text.secondary">
                       Shot {shot} • Speed {CS.speed(character)}
                     </Typography>
@@ -281,13 +289,13 @@ export default function SpeedCheckPanel({
           <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
             Roll Speed Check:
           </Typography>
-          
+
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <NumberField
               name="swerve"
               label="Swerve"
               value={swerve}
-              onChange={(e) => setSwerve(parseInt(e.target.value) || 0)}
+              onChange={e => setSwerve(parseInt(e.target.value) || 0)}
               width="80px"
             />
             <Typography variant="body2">
@@ -305,11 +313,7 @@ export default function SpeedCheckPanel({
             >
               {submitting ? "Processing..." : "Resolve Speed Check"}
             </Button>
-            <Button
-              variant="outlined"
-              onClick={onClose}
-              disabled={submitting}
-            >
+            <Button variant="outlined" onClick={onClose} disabled={submitting}>
               Cancel
             </Button>
           </Box>

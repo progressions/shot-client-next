@@ -29,7 +29,10 @@ export default function CombatResolution({
 
   return (
     <Box sx={{ p: 1, backgroundColor: "action.hover", borderRadius: 1 }}>
-      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold", color: "text.secondary" }}>
+      <Typography
+        variant="subtitle2"
+        sx={{ mb: 1, fontWeight: "bold", color: "text.secondary" }}
+      >
         RESOLUTION
       </Typography>
       <Stack

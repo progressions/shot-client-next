@@ -3,7 +3,14 @@
 import React, { useMemo } from "react"
 import { Box, Typography, Collapse, Paper, Badge } from "@mui/material"
 import { Healing as HealIcon } from "@mui/icons-material"
-import { FaGun, FaRocket, FaCar, FaDice, FaPersonRunning, FaHandPaper } from "react-icons/fa6"
+import {
+  FaGun,
+  FaRocket,
+  FaCar,
+  FaDice,
+  FaPersonRunning,
+  FaHand,
+} from "react-icons/fa6"
 import { MenuButton } from "@/components/ui"
 import type { Character, Vehicle } from "@/types"
 import { VS } from "@/services"
@@ -162,7 +169,9 @@ export default function EncounterActionBar({
           <MenuButton
             onClick={() => handleAction("cheese")}
             disabled={!selectedCharacter}
-            title={!selectedCharacter ? "Select a character first" : "Cheese It"}
+            title={
+              !selectedCharacter ? "Select a character first" : "Cheese It"
+            }
             isActive={activePanel === "cheese"}
           >
             <FaPersonRunning size={20} />
@@ -179,7 +188,7 @@ export default function EncounterActionBar({
               }
               isActive={activePanel === "speedcheck"}
             >
-              <FaHandPaper size={20} />
+              <FaHand size={20} />
             </MenuButton>
           </Badge>
 

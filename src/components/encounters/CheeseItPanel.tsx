@@ -14,8 +14,8 @@ import { FaPersonRunning } from "react-icons/fa6"
 import { useEncounter } from "@/contexts"
 import { useToast } from "@/contexts"
 import { CS } from "@/services"
-import { CharacterLink } from "@/components/characters"
-import { Avatar } from "@/components/ui"
+import { CharacterLink } from "@/components/ui/links"
+import { Avatar } from "@/components/avatars"
 import type { Character } from "@/types"
 
 interface CheeseItPanelProps {
@@ -40,8 +40,10 @@ export default function CheeseItPanel({
     try {
       // Get the current shot from encounter shots
       const allShots = encounter.shots || []
-      const characterShot = allShots.find((shotGroup: any) => 
-        shotGroup.characters?.some((c: Character) => c.id === preselectedCharacter.id)
+      const characterShot = allShots.find((shotGroup: any) =>
+        shotGroup.characters?.some(
+          (c: Character) => c.id === preselectedCharacter.id
+        )
       )
       const currentShot = characterShot?.shot || 0
 
@@ -89,8 +91,10 @@ export default function CheeseItPanel({
 
   // Get the current shot from encounter shots
   const allShots = encounter?.shots || []
-  const characterShot = allShots.find((shotGroup: any) => 
-    shotGroup.characters?.some((c: Character) => c.id === preselectedCharacter.id)
+  const characterShot = allShots.find((shotGroup: any) =>
+    shotGroup.characters?.some(
+      (c: Character) => c.id === preselectedCharacter.id
+    )
   )
   const currentShot = characterShot?.shot || 0
 
@@ -131,11 +135,7 @@ export default function CheeseItPanel({
 
       <Box sx={{ mb: 3 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-          <Avatar
-            character={preselectedCharacter}
-            hideVehicle
-            size={64}
-          />
+          <Avatar character={preselectedCharacter} hideVehicle size={64} />
           <Box>
             <CharacterLink character={preselectedCharacter} />
             <Typography variant="body2" color="text.secondary">
@@ -163,10 +163,12 @@ export default function CheeseItPanel({
           <>
             <Alert severity="info" sx={{ mb: 2 }}>
               <Typography variant="body2">
-                <strong>Cheese It:</strong> Spend {shotCost} shots to attempt escape.
+                <strong>Cheese It:</strong> Spend {shotCost} shots to attempt
+                escape.
               </Typography>
               <Typography variant="body2" sx={{ mt: 1 }}>
-                Characters acting after you can attempt to prevent your escape with a Speed check.
+                Characters acting after you can attempt to prevent your escape
+                with a Speed check.
               </Typography>
             </Alert>
 

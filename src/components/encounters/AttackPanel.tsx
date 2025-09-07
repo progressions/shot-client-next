@@ -975,13 +975,13 @@ export default function AttackPanel({
       {isReady ? (
         <>
           {/* Two-column layout for Attacker/Resolution and Target */}
-          <Box 
-            sx={{ 
+          <Box
+            sx={{
               display: "grid",
               gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
               gap: 0.5,
               p: 0.5,
-              backgroundColor: "action.hover"
+              backgroundColor: "action.hover",
             }}
           >
             {/* Left Column: Attacker and Resolution */}
@@ -994,7 +994,7 @@ export default function AttackPanel({
                 selectedTargetIds={selectedTargetIds}
                 allShots={allShots}
               />
-              
+
               {/* Resolution Section - below Attacker */}
               <Box sx={{ mt: 1 }}>
                 {/* Show different UI for mook attackers */}
@@ -1047,16 +1047,13 @@ export default function AttackPanel({
                 updateDefenseAndToughness={updateDefenseAndToughness}
                 distributeMooks={distributeMooks}
                 calculateTargetDefense={calculateTargetDefense}
-              encounter={encounter}
-            />
+                encounter={encounter}
+              />
             </Box>
           </Box>
 
           {/* Bottom Section - Attack Results */}
-          <Box
-            sx={{ p: 0.5, backgroundColor: "background.default" }}
-          >
-
+          <Box sx={{ p: 0.5, backgroundColor: "background.default" }}>
             {/* Attack Results for Non-Mook Attackers (single or multiple targets) */}
             {showMultiTargetResults && (
               <AttackResults
