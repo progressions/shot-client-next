@@ -2,7 +2,9 @@
 
 import { useMemo, useEffect, useState } from "react"
 import { Box, Typography } from "@mui/material"
+import { FaCar } from "react-icons/fa6"
 import { useEncounter, useClient } from "@/contexts"
+import BasePanel from "./BasePanel"
 import { useForm, FormActions } from "@/reducers"
 import type { Vehicle, Shot, ChaseRelationship, Character } from "@/types"
 import { ChaseFormData, initialChaseFormData } from "@/types/chase"
@@ -13,13 +15,11 @@ import ChaseMethodSection from "./chases/ChaseMethodSection"
 import ChaseResolution from "./chases/ChaseResolution"
 
 interface ChasePanelProps {
-  onClose?: () => void
   onComplete?: () => void
   preselectedCharacter?: Character
 }
 
 export default function ChasePanel({
-  onClose,
   onComplete,
   preselectedCharacter,
 }: ChasePanelProps) {
@@ -251,21 +251,7 @@ export default function ChasePanel({
   }, [attacker?.id, target?.id, encounter?.id, client, dispatchForm])
 
   return (
-    <Box sx={{ overflow: "hidden", minHeight: isReady ? "auto" : "100px" }}>
-      {/* Panel Heading */}
-      <Typography
-        variant="h6"
-        sx={{
-          p: 1,
-          fontWeight: "bold",
-          backgroundColor: "background.paper",
-          borderBottom: "2px solid",
-          borderBottomColor: "divider",
-        }}
-      >
-        Chase
-      </Typography>
-
+    <BasePanel title="Chase" icon={<FaCar />} borderColor="secondary.main">
       {/* Main Content - Attacker then Target */}
       {isReady ? (
         <>
@@ -302,7 +288,6 @@ export default function ChasePanel({
             dispatchForm={dispatchForm}
             attacker={attackerVehicle || null}
             target={targetVehicle || null}
-            onClose={onClose}
             onComplete={onComplete}
           />
         </>
@@ -311,6 +296,6 @@ export default function ChasePanel({
           <Typography>Loading...</Typography>
         </Box>
       )}
-    </Box>
+    </BasePanel>
   )
 }
