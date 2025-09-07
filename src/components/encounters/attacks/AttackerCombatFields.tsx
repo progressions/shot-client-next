@@ -137,296 +137,99 @@ export default function AttackerCombatFields({
   }
 
   return (
-    <Box
-      sx={{
-        p: { xs: 1, sm: 1.5 },
-        borderBottom: "2px solid",
-        borderBottomColor: "divider",
-        backgroundColor: "action.hover",
-      }}
-    >
-      {/* All fields - responsive layout */}
-      <Stack
-        direction={{ xs: "column", sm: "row" }}
-        spacing={{ xs: 2, sm: 2 }}
-        sx={{ mb: 2 }}
-        alignItems={{ xs: "stretch", sm: "flex-start" }}
-      >
-        {/* Fortune field for PCs - only show if PC has Fortune */}
-        {isPC && availableFortune > 0 && (
-          <Box sx={{ flexShrink: 0 }}>
-            <Typography variant="body2" sx={{ mb: 1, fontWeight: "medium" }}>
-              Fortune +
-            </Typography>
+    <Box sx={{ p: 1 }}>
+      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold", color: "text.secondary" }}>
+        ATTACKER
+      </Typography>
+      
+      {/* Stack layout: Attack Value, then Damage, then Fortune/Shot Cost */}
+      <Box>
+        {/* Attack Value - full width */}
+        <Box sx={{ mb: 1 }}>
+          <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.7rem" }}>
+            Attack Value
+          </Typography>
+          <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5 }}>
             <NumberField
-              name="fortuneBonus"
-              value={fortuneBonus}
+              name="attackValue"
+              value={parseInt(attackValue) || 0}
               size="small"
-              width="80px"
               error={false}
-              onChange={e => {
-                const value = e.target.value
-                setFortuneBonus(value)
-                updateField("fortuneBonus", value)
-                const isUsing = value !== "" && value !== "0"
-                setUsingFortune(isUsing)
-                updateField("fortuneSpent", isUsing)
-              }}
-              onBlur={e => {
-                const value = parseInt(e.target.value) || 0
-                const finalValue = value < 0 ? "0" : value.toString()
-                setFortuneBonus(finalValue)
-                updateField("fortuneBonus", finalValue)
-                const isUsing = finalValue !== "0"
-                setUsingFortune(isUsing)
-                updateField("fortuneSpent", isUsing)
-              }}
+              onChange={e => updateField("attackValue", e.target.value)}
+              onBlur={e => updateField("attackValue", e.target.value)}
               sx={{
+                width: 80,
                 "& .MuiOutlinedInput-root": {
-                  "&.Mui-focused": {
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor:
-                        fortuneBonus !== "0" ? "warning.main" : "primary.main",
-                    },
-                  },
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor:
-                      fortuneBonus !== "0" ? "warning.main" : undefined,
-                  },
+                  height: 40,
+                  "& input": { padding: "8px 12px" },
+                  backgroundColor: "background.paper",
                 },
               }}
             />
-            <Typography
-              variant="caption"
-              sx={{
-                display: "block",
-                mt: 0.25,
-                color: fortuneBonus !== "0" ? "warning.main" : "text.secondary",
-                fontSize: "0.65rem",
-                textAlign: "center",
-              }}
-            >
-              {fortuneBonus !== "0" ? `Cost: 1` : `Avail: ${availableFortune}`}
-            </Typography>
+            <FormControl size="small" sx={{ flex: 1 }}>
+              <InputLabel>Attack Skill</InputLabel>
+              <Select
+                value={attackSkill}
+                label="Attack Skill"
+                onChange={e => {
+                  const selected = e.target.value
+                  updateField("attackSkill", selected)
+                  const option = attackOptions.find(o => o.skill === selected)
+                  if (option) {
+                    const baseValue = option.value
+                    const totalValue = baseValue + weaponMookBonus
+                    updateField("attackValue", totalValue.toString())
+                  }
+                }}
+                sx={{ height: 40 }}
+              >
+                {attackOptions.map(option => (
+                  <MenuItem key={option.skill} value={option.skill}>
+                    {option.skill} ({option.value})
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Box>
-        )}
-
-        {/* Attack Value Block - includes Shot Cost on mobile */}
-        <Box
-          sx={{ flex: { xs: "0 0 auto", sm: 1 }, minWidth: 0, width: "100%" }}
-        >
-          <Stack
-            direction="row"
-            spacing={2}
-            alignItems="flex-start"
-            sx={{ width: "100%" }}
-          >
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="body2" sx={{ mb: 1, fontWeight: "medium" }}>
-                Attack Value
-              </Typography>
-              <Stack direction="row" spacing={1} alignItems="flex-start">
-                <Box>
-                  <NumberField
-                    name="attackValue"
-                    value={parseInt(attackValue) || 0}
-                    size="small"
-                    width="80px"
-                    error={false}
-                    onChange={e => updateField("attackValue", e.target.value)}
-                    onBlur={e => updateField("attackValue", e.target.value)}
-                  />
-                  {(() => {
-                    // Calculate NET modifier from base value
-                    const impairmentPenalty = attacker?.impairments
-                      ? -attacker.impairments
-                      : 0
-                    const totalAttackModifier =
-                      impairmentPenalty + attackValueChange + weaponMookBonus
-
-                    if (totalAttackModifier !== 0) {
-                      return (
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            display: "block",
-                            mt: 0.25,
-                            color:
-                              totalAttackModifier > 0
-                                ? "success.main"
-                                : "error.main",
-                            fontWeight: "bold",
-                            textAlign: "center",
-                          }}
-                        >
-                          {totalAttackModifier > 0 ? "+" : ""}
-                          {totalAttackModifier}
-                        </Typography>
-                      )
-                    }
-                    return null
-                  })()}
-                </Box>
-                <FormControl
-                  sx={{
-                    flex: 1,
-                    minWidth: 0,
-                    "& .MuiInputBase-root": { height: 56 },
-                    "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
-                      {
-                        borderColor: "primary.main",
-                      },
-                  }}
-                >
-                  <InputLabel>Attack Value</InputLabel>
-                  <Select
-                    value={attackSkill}
-                    onChange={e => {
-                      const selected = e.target.value
-                      updateField("attackSkill", selected)
-                      const option = attackOptions.find(
-                        o => o.skill === selected
-                      )
-                      if (option) {
-                        // Include weapon mook bonus in the attack value (only if targeting mooks)
-                        const baseValue = option.value
-                        const totalValue = baseValue + weaponMookBonus
-                        updateField("attackValue", totalValue.toString())
-                      }
-                    }}
-                    label="Attack Value"
-                  >
-                    {attackOptions.map(option => (
-                      <MenuItem key={option.skill} value={option.skill}>
-                        {option.skill} ({option.value})
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {/* Display attack modifiers */}
-                  {(() => {
-                    const modifiers = []
-
-                    if (attacker && attacker.impairments > 0) {
-                      modifiers.push(
-                        `-${attacker.impairments} from impairments`
-                      )
-                    }
-
-                    if (weaponMookBonus > 0) {
-                      modifiers.push(`+${weaponMookBonus} AV vs mooks`)
-                    }
-
-                    if (attackValueChange !== 0) {
-                      modifiers.push(
-                        `${attackValueChange > 0 ? "+" : ""}${attackValueChange} from effects`
-                      )
-                    }
-
-                    if (modifiers.length > 0) {
-                      return (
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            display: "block",
-                            mt: 0.5,
-                            ml: 1.75,
-                            color: "text.secondary",
-                            fontStyle: "italic",
-                          }}
-                        >
-                          {modifiers.join(", ")}
-                        </Typography>
-                      )
-                    }
-
-                    return null
-                  })()}
-                </FormControl>
-              </Stack>
-            </Box>
-
-            {/* Shot Cost - Mobile only, shown next to Attack Value */}
-            <Box
-              sx={{
-                display: { xs: "block", sm: "none" },
-                flexShrink: 0,
-              }}
-            >
-              <Typography variant="body2" sx={{ mb: 1, fontWeight: "medium" }}>
-                Shot Cost
-              </Typography>
-              <NumberField
-                name="shotCost"
-                value={parseInt(shotCost) || 0}
-                size="small"
-                width="80px"
-                error={false}
-                onChange={e => updateField("shotCost", e.target.value)}
-                onBlur={e => updateField("shotCost", e.target.value)}
-              />
-            </Box>
-          </Stack>
         </Box>
 
-        {/* Damage and Weapon Block */}
-        <Box sx={{ flex: { xs: "0 0 auto", sm: 1 }, minWidth: 0 }}>
-          <Typography variant="body2" sx={{ mb: 1, fontWeight: "medium" }}>
+        {/* Damage - full width */}
+        <Box sx={{ mb: 1 }}>
+          <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.7rem" }}>
             Damage
           </Typography>
-          <Stack direction="row" spacing={1} alignItems="flex-start">
-            <Box>
-              <NumberField
-                name="weaponDamage"
-                value={parseInt(weaponDamage) || 0}
-                size="small"
-                width="80px"
-                error={false}
-                onChange={e => updateField("weaponDamage", e.target.value)}
-                onBlur={e => updateField("weaponDamage", e.target.value)}
-              />
-              {damageChange !== 0 && (
-                <Typography
-                  variant="caption"
-                  sx={{
-                    display: "block",
-                    mt: 0.25,
-                    color: damageChange > 0 ? "success.main" : "error.main",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  {damageChange > 0 ? "+" : ""}
-                  {damageChange}
-                </Typography>
-              )}
-            </Box>
-            <FormControl
+          <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5 }}>
+            <NumberField
+              name="weaponDamage"
+              value={parseInt(weaponDamage) || 0}
+              size="small"
+              error={false}
+              onChange={e => updateField("weaponDamage", e.target.value)}
+              onBlur={e => updateField("weaponDamage", e.target.value)}
               sx={{
-                flex: 1,
-                minWidth: 0,
-                "& .MuiInputBase-root": { height: 56 },
-                "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
-                  {
-                    borderColor: "primary.main",
-                  },
+                width: 80,
+                "& .MuiOutlinedInput-root": {
+                  height: 40,
+                  "& input": { padding: "8px 12px" },
+                  backgroundColor: "background.paper",
+                },
               }}
-            >
+            />
+            <FormControl size="small" sx={{ flex: 1 }}>
               <InputLabel>Weapon</InputLabel>
               <Select
                 value={selectedWeaponId}
+                label="Weapon"
                 onChange={e => {
                   updateField("selectedWeaponId", e.target.value)
-                  // Reset kachunk when switching weapons
                   if (kachunkActive) {
                     updateField("kachunkActive", false)
                     updateField("shotCost", (parseInt(shotCost) - 1).toString())
                   }
                   if (e.target.value === "unarmed") {
                     const damage = CS.damage(attacker) || 7
-                    // Include damage change from effects
                     const adjustedDamage = damage + damageChange
                     updateField("weaponDamage", adjustedDamage.toString())
-                    // Remove mook bonus when switching to unarmed (if targeting mooks)
                     if (targetingMooks) {
                       const oldWeapon = attackerWeapons.find(
                         w => w.id?.toString() === selectedWeaponId
@@ -440,10 +243,8 @@ export default function AttackerCombatFields({
                       w => w.id?.toString() === e.target.value
                     )
                     if (weapon) {
-                      // Include damage change from effects
                       const adjustedDamage = weapon.damage + damageChange
                       updateField("weaponDamage", adjustedDamage.toString())
-                      // Update attack value with new weapon's mook bonus (only if targeting mooks)
                       if (targetingMooks) {
                         const oldWeapon = attackerWeapons.find(
                           w => w.id?.toString() === selectedWeaponId
@@ -457,80 +258,92 @@ export default function AttackerCombatFields({
                     }
                   }
                 }}
-                label="Weapon"
+                sx={{ height: 40 }}
               >
                 <MenuItem value="unarmed">
                   Damage ({CS.damage(attacker) || 7})
                 </MenuItem>
                 {attackerWeapons.map(weapon => (
                   <MenuItem key={weapon.id} value={weapon.id?.toString() || ""}>
-                    {weapon.name} ({weapon.damage}/{weapon.concealment}/
-                    {weapon.reload_value || "-"})
-                    {weapon.mook_bonus > 0 &&
-                      ` [+${weapon.mook_bonus} AV vs mooks]`}
+                    {weapon.name} ({weapon.damage})
                   </MenuItem>
                 ))}
               </Select>
-              {/* Display selected weapon stats */}
-              {selectedWeaponId &&
-                selectedWeaponId !== "unarmed" &&
-                (() => {
-                  const weapon = attackerWeapons.find(
-                    w => w.id?.toString() === selectedWeaponId
-                  )
-                  if (weapon) {
-                    const attrs = `(${weapon.damage}/${weapon.concealment}/${weapon.reload_value || "-"})`
-                    const mookBonus =
-                      weapon.mook_bonus && weapon.mook_bonus > 0
-                        ? `, +${weapon.mook_bonus} AV vs mooks`
-                        : ""
-                    const kachunk = weapon.kachunk ? ", kachunk!" : ""
-                    return (
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          display: "block",
-                          mt: 0.5,
-                          ml: 1.75,
-                          color: "text.secondary",
-                          fontStyle: "italic",
-                        }}
-                      >
-                        {attrs}
-                        {mookBonus}
-                        {kachunk}
-                      </Typography>
-                    )
-                  }
-                  return null
-                })()}
             </FormControl>
-          </Stack>
+          </Box>
         </Box>
 
-        {/* Shot Cost - On mobile, display in a row with Attack Value */}
-        <Box
-          sx={{
-            flexShrink: 0,
-            display: { xs: "none", sm: "block" },
-          }}
-        >
-          <Typography variant="body2" sx={{ mb: 1, fontWeight: "medium" }}>
-            Shot Cost
-          </Typography>
-          <NumberField
-            name="shotCost"
-            value={parseInt(shotCost) || 0}
-            size="small"
-            width="80px"
-            error={false}
-            onChange={e => updateField("shotCost", e.target.value)}
-            onBlur={e => updateField("shotCost", e.target.value)}
-          />
-        </Box>
-      </Stack>
+        {/* Fortune and Shot Cost - side by side */}
+        <Box sx={{ display: "flex", gap: 2 }}>
+          {/* Fortune field for PCs */}
+          {isPC && availableFortune > 0 && (
+            <Box>
+              <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.7rem" }}>
+                Fortune +
+              </Typography>
+              <NumberField
+                name="fortuneBonus"
+                value={fortuneBonus}
+                size="small"
+                error={false}
+                onChange={e => {
+                  const value = e.target.value
+                  setFortuneBonus(value)
+                  updateField("fortuneBonus", value)
+                  const isUsing = value !== "" && value !== "0"
+                  setUsingFortune(isUsing)
+                  updateField("fortuneSpent", isUsing)
+                }}
+                onBlur={e => {
+                  const value = parseInt(e.target.value) || 0
+                  const finalValue = value < 0 ? "0" : value.toString()
+                  setFortuneBonus(finalValue)
+                  updateField("fortuneBonus", finalValue)
+                  const isUsing = finalValue !== "0"
+                  setUsingFortune(isUsing)
+                  updateField("fortuneSpent", isUsing)
+                }}
+                sx={{
+                  width: 80,
+                  "& .MuiOutlinedInput-root": {
+                    height: 40,
+                    "& input": { padding: "8px 12px" },
+                    backgroundColor: fortuneBonus !== "0" ? "warning.light" : "background.paper",
+                  },
+                }}
+              />
+              <Typography variant="caption" sx={{ fontSize: "0.65rem", color: "text.secondary", display: "block" }}>
+                {availableFortune} avail
+              </Typography>
+            </Box>
+          )}
 
-      {/* Kachunk Button on separate row */}
+          {/* Shot Cost */}
+          <Box>
+            <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.7rem" }}>
+              Shot Cost
+            </Typography>
+            <NumberField
+              name="shotCost"
+              value={parseInt(shotCost) || 0}
+              size="small"
+              error={false}
+              onChange={e => updateField("shotCost", e.target.value)}
+              onBlur={e => updateField("shotCost", e.target.value)}
+              sx={{
+                width: 80,
+                "& .MuiOutlinedInput-root": {
+                  height: 40,
+                  "& input": { padding: "8px 12px" },
+                  backgroundColor: "background.paper",
+                },
+              }}
+            />
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Kachunk Button inline if weapon has it */}
       {selectedWeaponId &&
         selectedWeaponId !== "unarmed" &&
         (() => {
@@ -539,55 +352,33 @@ export default function AttackerCombatFields({
           )
           if (weapon?.kachunk) {
             return (
-              <Box sx={{ ml: 2, mt: 1 }}>
-                <Tooltip
-                  title={
-                    kachunkActive
-                      ? "Click to deactivate kachunk mode"
-                      : "Weapon damage is 14 if you spend an extra shot to go 'ka-chunk!'"
-                  }
-                  placement="top"
+              <Box sx={{ mt: 0.5 }}>
+                <Button
+                  variant={kachunkActive ? "contained" : "outlined"}
+                  color="warning"
+                  size="small"
+                  onClick={() => {
+                    if (kachunkActive) {
+                      updateField("kachunkActive", false)
+                      const adjustedDamage = weapon.damage + damageChange
+                      updateField("weaponDamage", adjustedDamage.toString())
+                      updateField("shotCost", (parseInt(shotCost) - 1).toString())
+                    } else {
+                      updateField("kachunkActive", true)
+                      const kachunkDamage = 14 + damageChange
+                      updateField("weaponDamage", kachunkDamage.toString())
+                      updateField("shotCost", (parseInt(shotCost) + 1).toString())
+                    }
+                  }}
+                  sx={{
+                    textTransform: "none",
+                    fontSize: "0.75rem",
+                    py: 0.5,
+                    px: 1,
+                  }}
                 >
-                  <Button
-                    variant={kachunkActive ? "contained" : "outlined"}
-                    color="warning"
-                    size="small"
-                    onClick={() => {
-                      if (kachunkActive) {
-                        // Deactivate kachunk - restore original weapon damage with effects
-                        updateField("kachunkActive", false)
-                        const adjustedDamage = weapon.damage + damageChange
-                        updateField("weaponDamage", adjustedDamage.toString())
-                        updateField(
-                          "shotCost",
-                          (parseInt(shotCost) - 1).toString()
-                        )
-                      } else {
-                        // Activate kachunk - set to 14 plus damage change from effects
-                        updateField("kachunkActive", true)
-                        const kachunkDamage = 14 + damageChange
-                        updateField("weaponDamage", kachunkDamage.toString())
-                        updateField(
-                          "shotCost",
-                          (parseInt(shotCost) + 1).toString()
-                        )
-                      }
-                    }}
-                    sx={{
-                      textTransform: "none",
-                      fontWeight: "bold",
-                      fontSize: "0.875rem",
-                      ...(kachunkActive && {
-                        backgroundColor: "warning.dark",
-                        "&:hover": {
-                          backgroundColor: "warning.main",
-                        },
-                      }),
-                    }}
-                  >
-                    💥 Kachunk! {kachunkActive && "✓"}
-                  </Button>
-                </Tooltip>
+                  💥 Kachunk! {kachunkActive && "✓"}
+                </Button>
               </Box>
             )
           }

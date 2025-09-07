@@ -960,84 +960,102 @@ export default function AttackPanel({
       <Typography
         variant="h6"
         sx={{
-          p: 1,
+          p: 0.75,
           fontWeight: "bold",
           backgroundColor: "background.paper",
           borderBottom: "2px solid",
           borderBottomColor: "divider",
+          fontSize: "1.1rem",
         }}
       >
         Attack
       </Typography>
 
-      {/* Main Content - Attacker then Target */}
+      {/* Main Content - Two Column Grid */}
       {isReady ? (
         <>
-          <Box sx={{ backgroundColor: "action.hover" }}>
-            {/* Attacker Combat Fields - Always show since attacker is preselected */}
-            <AttackerCombatFields
-              formState={formState}
-              dispatchForm={dispatchForm}
-              attacker={attacker}
-              attackerWeapons={attackerWeapons}
-              selectedTargetIds={selectedTargetIds}
-              allShots={allShots}
-            />
+          {/* Two-column layout for Attacker/Resolution and Target */}
+          <Box 
+            sx={{ 
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+              gap: 0.5,
+              p: 0.5,
+              backgroundColor: "action.hover"
+            }}
+          >
+            {/* Left Column: Attacker and Resolution */}
+            <Box sx={{ minWidth: 0 }}>
+              <AttackerCombatFields
+                formState={formState}
+                dispatchForm={dispatchForm}
+                attacker={attacker}
+                attackerWeapons={attackerWeapons}
+                selectedTargetIds={selectedTargetIds}
+                allShots={allShots}
+              />
+              
+              {/* Resolution Section - below Attacker */}
+              <Box sx={{ mt: 1 }}>
+                {/* Show different UI for mook attackers */}
+                {attacker && CS.isMook(attacker) ? (
+                  <MookAttackSection
+                    attacker={attacker}
+                    allShots={allShots}
+                    selectedTargetIds={selectedTargetIds}
+                    mookRolls={mookRolls}
+                    showMookRolls={showMookRolls}
+                    totalAttackingMooks={totalAttackingMooks}
+                    finalDamage={finalDamage}
+                    shotCost={shotCost}
+                    attackValue={attackValue}
+                    isProcessing={isProcessing}
+                    updateField={updateField}
+                    handleRollMookAttacks={handleRollMookAttacks}
+                    handleApplyDamage={handleApplyDamage}
+                  />
+                ) : (
+                  <CombatResolution
+                    attacker={attacker}
+                    allShots={allShots}
+                    selectedTargetIds={selectedTargetIds}
+                    swerve={swerve}
+                    smackdown={smackdown}
+                    finalDamage={finalDamage}
+                    shotCost={shotCost}
+                    showMultiTargetResults={showMultiTargetResults}
+                    multiTargetResults={multiTargetResults}
+                    isProcessing={isProcessing}
+                    updateField={updateField}
+                    handleApplyDamage={handleApplyDamage}
+                  />
+                )}
+              </Box>
+            </Box>
 
-            {/* Target Section */}
-            <TargetSection
-              allShots={allShots}
-              sortedTargetShots={sortedTargetShots}
-              formState={formState}
-              dispatchForm={dispatchForm}
-              attacker={attacker}
-              attackerShotId={attackerShotId}
-              updateField={updateField}
-              updateFields={updateFields}
-              updateDefenseAndToughness={updateDefenseAndToughness}
-              distributeMooks={distributeMooks}
-              calculateTargetDefense={calculateTargetDefense}
+            {/* Right Column: Target */}
+            <Box sx={{ minWidth: 0 }}>
+              <TargetSection
+                allShots={allShots}
+                sortedTargetShots={sortedTargetShots}
+                formState={formState}
+                dispatchForm={dispatchForm}
+                attacker={attacker}
+                attackerShotId={attackerShotId}
+                updateField={updateField}
+                updateFields={updateFields}
+                updateDefenseAndToughness={updateDefenseAndToughness}
+                distributeMooks={distributeMooks}
+                calculateTargetDefense={calculateTargetDefense}
               encounter={encounter}
             />
+            </Box>
           </Box>
 
-          {/* Bottom Section - Combat Resolution */}
+          {/* Bottom Section - Attack Results */}
           <Box
-            sx={{ p: { xs: 2, sm: 3 }, backgroundColor: "background.default" }}
+            sx={{ p: 0.5, backgroundColor: "background.default" }}
           >
-            {/* Show different UI for mook attackers */}
-            {attacker && CS.isMook(attacker) ? (
-              <MookAttackSection
-                attacker={attacker}
-                allShots={allShots}
-                selectedTargetIds={selectedTargetIds}
-                mookRolls={mookRolls}
-                showMookRolls={showMookRolls}
-                totalAttackingMooks={totalAttackingMooks}
-                finalDamage={finalDamage}
-                shotCost={shotCost}
-                attackValue={attackValue}
-                isProcessing={isProcessing}
-                updateField={updateField}
-                handleRollMookAttacks={handleRollMookAttacks}
-                handleApplyDamage={handleApplyDamage}
-              />
-            ) : (
-              <CombatResolution
-                attacker={attacker}
-                allShots={allShots}
-                selectedTargetIds={selectedTargetIds}
-                swerve={swerve}
-                smackdown={smackdown}
-                finalDamage={finalDamage}
-                shotCost={shotCost}
-                showMultiTargetResults={showMultiTargetResults}
-                multiTargetResults={multiTargetResults}
-                isProcessing={isProcessing}
-                updateField={updateField}
-                handleApplyDamage={handleApplyDamage}
-              />
-            )}
 
             {/* Attack Results for Non-Mook Attackers (single or multiple targets) */}
             {showMultiTargetResults && (
