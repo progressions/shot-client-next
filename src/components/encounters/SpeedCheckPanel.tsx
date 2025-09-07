@@ -1,14 +1,7 @@
 "use client"
 
 import React, { useState, useMemo } from "react"
-import {
-  Box,
-  Paper,
-  Typography,
-  Button,
-  Alert,
-  Divider,
-} from "@mui/material"
+import { Box, Paper, Typography, Button, Alert, Divider } from "@mui/material"
 import { FaPersonRunning, FaDice } from "react-icons/fa6"
 import { useEncounter, useToast, useClient } from "@/contexts"
 import { CS } from "@/services"
@@ -38,13 +31,15 @@ export default function SpeedCheckPanel({
   const [swerve, setSwerve] = useState<number>(0)
   const [fortuneBonus, setFortuneBonus] = useState<string>("0")
   const [usingFortune, setUsingFortune] = useState(false)
-  
+
   // The selected character from the encounter is the preventer
   const selectedPreventer = selectedCharacter
-  
+
   // Check if preventer is a PC and get available Fortune
   const isPreventerPC = selectedPreventer && CS.isPC(selectedPreventer)
-  const availableFortune = isPreventerPC ? (CS.fortune(selectedPreventer) || 0) : 0
+  const availableFortune = isPreventerPC
+    ? CS.fortune(selectedPreventer) || 0
+    : 0
 
   // Get all shots for the CharacterSelector
   const allShots = useMemo(() => {
@@ -69,20 +64,22 @@ export default function SpeedCheckPanel({
   // Get the selected target character
   const selectedTarget = useMemo(() => {
     if (!selectedTargetShotId) return null
-    const shot = allShots.find(s => s.character?.shot_id === selectedTargetShotId)
+    const shot = allShots.find(
+      s => s.character?.shot_id === selectedTargetShotId
+    )
     return shot?.character || null
   }, [selectedTargetShotId, allShots])
-  
+
   // Calculate the Speed Check result dynamically
   const speedCheckResult = useMemo(() => {
     if (!selectedPreventer || !selectedTarget) return null
-    
+
     const preventerSpeed = CS.speed(selectedPreventer) || 0
     const targetSpeed = CS.speed(selectedTarget) || 5
     const fortuneBonusValue = parseInt(fortuneBonus) || 0
     const totalRoll = swerve + preventerSpeed + fortuneBonusValue
     const success = totalRoll >= targetSpeed
-    
+
     return {
       preventerSpeed,
       targetSpeed,
@@ -126,8 +123,7 @@ export default function SpeedCheckPanel({
   }, [encounter?.shots, selectedTarget])
 
   const handlePreventEscape = async () => {
-    if (!selectedPreventer || !selectedTarget || !encounter)
-      return
+    if (!selectedPreventer || !selectedTarget || !encounter) return
 
     setSubmitting(true)
     try {
@@ -143,7 +139,7 @@ export default function SpeedCheckPanel({
       const success = totalRoll >= escapeeDifficulty
 
       const characterUpdates = []
-      
+
       // If using Fortune, deduct it from the preventer (PC only)
       if (fortuneBonusValue > 0 && isPreventerPC) {
         const currentFortune = CS.fortune(selectedPreventer)
@@ -277,7 +273,9 @@ export default function SpeedCheckPanel({
             borderColor="warning.main"
             disabled={submitting}
             showShotNumbers={true}
-            filterFunction={(character) => !!character.status?.includes("cheesing_it")}
+            filterFunction={character =>
+              !!character.status?.includes("cheesing_it")
+            }
           />
           {selectedTarget && (
             <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}>
@@ -297,7 +295,10 @@ export default function SpeedCheckPanel({
           <Box sx={{ flex: 1 }}>
             <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}>
               <Box>
-                <Typography variant="caption" sx={{ display: "block", mb: 0.5, color: "text.secondary" }}>
+                <Typography
+                  variant="caption"
+                  sx={{ display: "block", mb: 0.5, color: "text.secondary" }}
+                >
                   Swerve
                 </Typography>
                 <NumberField
@@ -310,7 +311,10 @@ export default function SpeedCheckPanel({
               </Box>
               {isPreventerPC && (
                 <Box>
-                  <Typography variant="caption" sx={{ display: "block", mb: 0.5, color: "text.secondary" }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ display: "block", mb: 0.5, color: "text.secondary" }}
+                  >
                     Fortune +
                   </Typography>
                   <NumberField
@@ -332,11 +336,22 @@ export default function SpeedCheckPanel({
                     size="small"
                     sx={{
                       "& .MuiOutlinedInput-root": {
-                        backgroundColor: fortuneBonus !== "0" ? "warning.light" : "background.paper",
+                        backgroundColor:
+                          fortuneBonus !== "0"
+                            ? "warning.light"
+                            : "background.paper",
                       },
                     }}
                   />
-                  <Typography variant="caption" sx={{ display: "block", textAlign: "center", mt: 0.5, color: "text.secondary" }}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: "block",
+                      textAlign: "center",
+                      mt: 0.5,
+                      color: "text.secondary",
+                    }}
+                  >
                     {availableFortune} avail
                   </Typography>
                 </Box>
@@ -353,24 +368,35 @@ export default function SpeedCheckPanel({
               <>
                 <Divider sx={{ my: 2 }} />
                 <Box sx={{ mb: 2 }}>
-                  <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                  <Typography
+                    variant="subtitle2"
+                    color="text.secondary"
+                    sx={{ mb: 1 }}
+                  >
                     Resolution
                   </Typography>
-                  <Alert severity={speedCheckResult.success ? "success" : "warning"}>
+                  <Alert
+                    severity={speedCheckResult.success ? "success" : "warning"}
+                  >
                     <Typography variant="body2">
-                      <strong>{speedCheckResult.success ? "Success!" : "Miss!"}</strong>{" "}
-                      Swerve {swerve >= 0 ? "" : ""}{swerve} + Speed {speedCheckResult.preventerSpeed}
+                      <strong>
+                        {speedCheckResult.success ? "Success!" : "Miss!"}
+                      </strong>{" "}
+                      Swerve {swerve >= 0 ? "" : ""}
+                      {swerve} + Speed {speedCheckResult.preventerSpeed}
                       {speedCheckResult.fortuneBonusValue > 0 && (
                         <> + Fortune {speedCheckResult.fortuneBonusValue}</>
-                      )}
-                      {" "}= Result {speedCheckResult.totalRoll}.{" "}
-                      Result {speedCheckResult.totalRoll} vs Target {speedCheckResult.targetSpeed} = {speedCheckResult.success ? "Success" : "Miss"}.
+                      )}{" "}
+                      = Result {speedCheckResult.totalRoll}. Result{" "}
+                      {speedCheckResult.totalRoll} vs Target{" "}
+                      {speedCheckResult.targetSpeed} ={" "}
+                      {speedCheckResult.success ? "Success" : "Miss"}.
                     </Typography>
                   </Alert>
                 </Box>
               </>
             )}
-            
+
             <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
               <Button
                 variant="contained"

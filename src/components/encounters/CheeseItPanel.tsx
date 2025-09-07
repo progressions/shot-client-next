@@ -1,13 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import {
-  Box,
-  Paper,
-  Typography,
-  Button,
-  Alert,
-} from "@mui/material"
+import { Box, Paper, Typography, Button, Alert } from "@mui/material"
 import { FaPersonRunning } from "react-icons/fa6"
 import { useEncounter, useToast, useClient } from "@/contexts"
 import { CS } from "@/services"
@@ -31,14 +25,14 @@ export default function CheeseItPanel({
   const { toastSuccess, toastError } = useToast()
   const { client } = useClient()
   const [submitting, setSubmitting] = useState(false)
-  
+
   // Calculate default shot cost based on character type
   const characterType = preselectedCharacter.action_values?.["Type"]
   const isBoss = characterType === "Boss" || characterType === "Uber-Boss"
   const defaultShotCost = isBoss ? 2 : 3
-  
+
   const [shotCost, setShotCost] = useState(defaultShotCost.toString())
-  
+
   // Reset shot cost when character changes
   useEffect(() => {
     const newDefault = isBoss ? 2 : 3
@@ -131,7 +125,7 @@ export default function CheeseItPanel({
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
           <Avatar character={preselectedCharacter} hideVehicle size={64} />
         </Box>
-        
+
         {/* Shot Cost Input */}
         <Box sx={{ mb: 2 }}>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
@@ -140,8 +134,8 @@ export default function CheeseItPanel({
           <NumberField
             name="shotCost"
             value={parseInt(shotCost) || 0}
-            onChange={(e) => setShotCost(e.target.value)}
-            onBlur={(e) => setShotCost(e.target.value)}
+            onChange={e => setShotCost(e.target.value)}
+            onBlur={e => setShotCost(e.target.value)}
             size="small"
             error={false}
           />

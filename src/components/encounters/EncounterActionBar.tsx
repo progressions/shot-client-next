@@ -185,8 +185,8 @@ export default function EncounterActionBar({
                 !selectedCharacter
                   ? "Select a character first"
                   : escapingCount > 0
-                  ? `${escapingCount} character${escapingCount > 1 ? "s" : ""} attempting escape`
-                  : "No characters attempting escape"
+                    ? `${escapingCount} character${escapingCount > 1 ? "s" : ""} attempting escape`
+                    : "No characters attempting escape"
               }
               isActive={activePanel === "speedcheck"}
             >

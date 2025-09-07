@@ -1,7 +1,15 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardContent, Box, Alert, Typography, Chip, Stack } from "@mui/material"
+import {
+  Card,
+  CardContent,
+  Box,
+  Alert,
+  Typography,
+  Chip,
+  Stack,
+} from "@mui/material"
 import type { Character } from "@/types"
 import { CharacterDescription } from "@/components/characters"
 import { useCampaign, useClient } from "@/contexts"
