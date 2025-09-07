@@ -149,8 +149,9 @@ export async function handleNonMookMultipleTargets(
 
     if (effectiveWounds === 0) continue // Skip targets with no wounds
 
-    // For PCs, wounds are in action_values. For NPCs/Mooks, wounds are in shot.count
-    const currentWounds = CS.isPC(targetChar) 
+    // For PCs and Allies, wounds are in action_values. For NPCs/Mooks, wounds are in shot.count
+    const isAlly = CS.type(targetChar) === "Ally"
+    const currentWounds = CS.isPC(targetChar) || isAlly
       ? CS.wounds(targetChar)
       : (targetShot as any).count || 0
     const newWounds = CS.isMook(targetChar)
