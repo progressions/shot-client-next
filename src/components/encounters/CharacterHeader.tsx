@@ -45,6 +45,64 @@ export default function CharacterHeader({
           }}
         >
           <CharacterLink character={character} />
+          {character.status?.includes("up_check_required") && (
+            <Chip
+              size="small"
+              label="UP CHECK"
+              color="warning"
+              sx={{
+                height: "20px",
+                fontSize: "0.7rem",
+                ml: 0.5,
+                fontWeight: "bold",
+              }}
+            />
+          )}
+          {character.status?.includes("out_of_fight") && (
+            <Chip
+              size="small"
+              label="OUT"
+              color="error"
+              sx={{
+                height: "20px",
+                fontSize: "0.7rem",
+                ml: 0.5,
+                fontWeight: "bold",
+              }}
+            />
+          )}
+          {character.status?.includes("cheesing_it") && (
+            <Chip
+              size="small"
+              label="ESCAPING"
+              color="warning"
+              sx={{
+                height: "20px",
+                fontSize: "0.7rem",
+                ml: 0.5,
+                fontWeight: "bold",
+                animation: "pulse 1s infinite",
+                "@keyframes pulse": {
+                  "0%": { opacity: 1 },
+                  "50%": { opacity: 0.6 },
+                  "100%": { opacity: 1 },
+                },
+              }}
+            />
+          )}
+          {character.status?.includes("cheesed_it") && (
+            <Chip
+              size="small"
+              label="ESCAPED"
+              color="success"
+              sx={{
+                height: "20px",
+                fontSize: "0.7rem",
+                ml: 0.5,
+                fontWeight: "bold",
+              }}
+            />
+          )}
           {onLocationClick && location && (
             <Chip
               size="small"

@@ -286,6 +286,7 @@ export interface Person extends BaseEntity {
   location?: string
   image_url: string
   task: boolean
+  status?: string[]
   notion_page_id: string | null
   driving?: Vehicle
   wealth: string

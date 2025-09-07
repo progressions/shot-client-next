@@ -31,3 +31,6 @@ export { default as EndFightDialog } from "@/components/encounters/EndFightDialo
 export { default as EncounterActionBar } from "@/components/encounters/EncounterActionBar"
 export { default as HealPanel } from "@/components/encounters/HealPanel"
 export { default as TargetDisplay } from "@/components/encounters/TargetDisplay"
+export { default as UpCheckPanel } from "@/components/encounters/UpCheckPanel"
+export { default as CheeseItPanel } from "@/components/encounters/CheeseItPanel"
+export { default as SpeedCheckPanel } from "@/components/encounters/SpeedCheckPanel"

@@ -1,7 +1,15 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardContent, Box, Alert, Typography } from "@mui/material"
+import {
+  Card,
+  CardContent,
+  Box,
+  Alert,
+  Typography,
+  Chip,
+  Stack,
+} from "@mui/material"
 import type { Character } from "@/types"
 import { CharacterDescription } from "@/components/characters"
 import { useCampaign, useClient } from "@/contexts"
@@ -88,9 +96,53 @@ export default function CharacterDetail({
             alignItems: "center",
           }}
         >
-          <Typography variant="h6" sx={{ color: "#ffffff" }}>
-            <CharacterLink character={character} disablePopup={true} />
-          </Typography>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Typography variant="h6" sx={{ color: "#ffffff" }}>
+              <CharacterLink character={character} disablePopup={true} />
+            </Typography>
+            {character.status?.includes("up_check_required") && (
+              <Chip
+                size="small"
+                label="UP CHECK"
+                color="warning"
+                sx={{ height: "20px", fontSize: "0.7rem", fontWeight: "bold" }}
+              />
+            )}
+            {character.status?.includes("out_of_fight") && (
+              <Chip
+                size="small"
+                label="OUT"
+                color="error"
+                sx={{ height: "20px", fontSize: "0.7rem", fontWeight: "bold" }}
+              />
+            )}
+            {character.status?.includes("cheesing_it") && (
+              <Chip
+                size="small"
+                label="ESCAPING"
+                color="warning"
+                sx={{
+                  height: "20px",
+                  fontSize: "0.7rem",
+                  fontWeight: "bold",
+                  animation: "pulse 1s infinite",
+                  "@keyframes pulse": {
+                    "0%": { opacity: 1 },
+                    "50%": { opacity: 0.6 },
+                    "100%": { opacity: 1 },
+                  },
+                }}
+              />
+            )}
+            {character.status?.includes("cheesed_it") && (
+              <Chip
+                size="small"
+                label="ESCAPED"
+                color="success"
+                sx={{ height: "20px", fontSize: "0.7rem", fontWeight: "bold" }}
+              />
+            )}
+          </Stack>
           <DetailButtons
             name="Character"
             onEdit={handleEdit}
