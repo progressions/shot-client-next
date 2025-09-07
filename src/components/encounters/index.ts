@@ -32,3 +32,4 @@ export { default as EncounterActionBar } from "@/components/encounters/Encounter
 export { default as HealPanel } from "@/components/encounters/HealPanel"
 export { default as TargetDisplay } from "@/components/encounters/TargetDisplay"
 export { default as UpCheckPanel } from "@/components/encounters/UpCheckPanel"
+export { default as CheeseItPanel } from "@/components/encounters/CheeseItPanel"
