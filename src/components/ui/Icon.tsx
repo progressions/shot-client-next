@@ -4,11 +4,18 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd"
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar"
 import { Box } from "@mui/material"
 import { IoIosClock } from "react-icons/io"
-import { GiMagicGate } from "react-icons/gi"
+import { GiMagicGate, GiSwordsPower } from "react-icons/gi"
 import BoltIcon from "@mui/icons-material/Bolt"
 import { FaBolt } from "react-icons/fa"
 import { VscGithubAction } from "react-icons/vsc"
-import { FaGun } from "react-icons/fa6"
+import {
+  FaGun,
+  FaCar,
+  FaHeartPulse,
+  FaHandFist,
+  FaPersonRunning,
+  FaDice,
+} from "react-icons/fa6"
 import AutoStoriesIcon from "@mui/icons-material/AutoStories"
 import { GiClothes } from "react-icons/gi"
 import { GiDramaMasks } from "react-icons/gi"
@@ -51,6 +58,12 @@ type Keyword =
   | "Add Character"
   | "Add Vehicle"
   | "Administration"
+  | "Attack"
+  | "Chase"
+  | "Heal"
+  | "Boost"
+  | "Cheese It"
+  | "Speed Check"
 
 // Map keywords to categories
 const categoryMap: Record<Keyword, Category> = {
@@ -59,6 +72,12 @@ const categoryMap: Record<Keyword, Category> = {
   Schtick: "Combat",
   "Action Value": "Combat",
   Weapon: "Combat",
+  Attack: "Combat",
+  Chase: "Combat",
+  Heal: "Combat",
+  Boost: "Combat",
+  "Cheese It": "Combat",
+  "Speed Check": "Combat",
   Site: "Affiliations",
   "Feng Shui Site": "Affiliations",
   Character: "Characters",
@@ -116,6 +135,12 @@ const iconMap: Record<Keyword, React.ReactElement> = {
     </Box>
   ),
   Administration: <AdminPanelSettingsIcon />,
+  Attack: <GiSwordsPower />,
+  Chase: <FaCar />,
+  Heal: <FaHeartPulse />,
+  Boost: <FaHandFist />,
+  "Cheese It": <FaPersonRunning />,
+  "Speed Check": <FaDice />,
 }
 
 interface IconProps extends SvgIconProps {

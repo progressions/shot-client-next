@@ -22,7 +22,6 @@ interface ChaseResolutionProps {
   }) => void
   attacker: Vehicle | null
   target: Vehicle | null
-  onClose: () => void
   onComplete?: () => void
 }
 
@@ -31,7 +30,6 @@ export default function ChaseResolution({
   dispatchForm,
   attacker,
   target,
-  onClose,
   onComplete,
 }: ChaseResolutionProps) {
   const [isProcessing, setIsProcessing] = useState(false)
@@ -316,7 +314,6 @@ export default function ChaseResolution({
       }
 
       if (onComplete) onComplete()
-      onClose()
     } catch (error) {
       toastError("Failed to process chase action")
       console.error(error)

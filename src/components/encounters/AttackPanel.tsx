@@ -1,11 +1,13 @@
 "use client"
 
 import { useMemo, useEffect, useState } from "react"
-import { Box, Typography } from "@mui/material"
+import { Box } from "@mui/material"
+import { GiSwordsPower } from "react-icons/gi"
 import { useEncounter, useToast } from "@/contexts"
 import { CS, DS, CES } from "@/services"
 import type { Character, Weapon, AttackFormData } from "@/types"
 import { useClient } from "@/contexts/AppContext"
+import BasePanel from "./BasePanel"
 import AttackerCombatFields from "./attacks/AttackerCombatFields"
 import TargetSection from "./attacks/TargetSection"
 import WoundsSummary from "./attacks/WoundsSummary"
@@ -29,17 +31,15 @@ import {
   handleSingleTargetAttack,
 } from "./attacks/attackHandlers"
 
-interface ExtendedAttackPanelProps {
-  onClose?: () => void
+interface AttackPanelProps {
   onComplete?: () => void
   preselectedAttacker: Character
 }
 
 export default function AttackPanel({
-  onClose,
   onComplete,
   preselectedAttacker,
-}: ExtendedAttackPanelProps) {
+}: AttackPanelProps) {
   const [isReady, setIsReady] = useState(false)
   const { encounter, weapons: encounterWeapons } = useEncounter()
   const { toastSuccess, toastError, toastInfo } = useToast()
@@ -149,7 +149,7 @@ export default function AttackPanel({
   )
 
   // Sort attacker shots by: shot position (higher first), character type priority, then speed
-  const sortedAttackerShots = useMemo(
+  const _sortedAttackerShots = useMemo(
     () => sortAttackerShots(allShots, encounter),
     [allShots, encounter]
   )
@@ -854,7 +854,6 @@ export default function AttackPanel({
         })
 
         if (onComplete) onComplete()
-        if (onClose) onClose()
         return
       }
 
@@ -896,7 +895,6 @@ export default function AttackPanel({
         })
 
         if (onComplete) onComplete()
-        if (onClose) onClose()
         return
       }
 
@@ -943,7 +941,6 @@ export default function AttackPanel({
         })
 
         if (onComplete) onComplete()
-        if (onClose) onClose()
         return
       }
     } catch (error) {
@@ -955,22 +952,7 @@ export default function AttackPanel({
   }
 
   return (
-    <Box sx={{ overflow: "hidden", minHeight: isReady ? "auto" : "100px" }}>
-      {/* Panel Heading */}
-      <Typography
-        variant="h6"
-        sx={{
-          p: 0.75,
-          fontWeight: "bold",
-          backgroundColor: "background.paper",
-          borderBottom: "2px solid",
-          borderBottomColor: "divider",
-          fontSize: "1.1rem",
-        }}
-      >
-        Attack
-      </Typography>
-
+    <BasePanel title="Attack" icon={<GiSwordsPower />} borderColor="error.main">
       {/* Main Content - Two Column Grid */}
       {isReady ? (
         <>
@@ -1092,6 +1074,6 @@ export default function AttackPanel({
           </Box>
         </>
       ) : null}
-    </Box>
+    </BasePanel>
   )
 }

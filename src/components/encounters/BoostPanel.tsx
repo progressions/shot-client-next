@@ -9,16 +9,14 @@ import {
   Alert,
   CircularProgress,
 } from "@mui/material"
+import { FaHandFist } from "react-icons/fa6"
 import { useEncounter, useToast, useClient } from "@/contexts"
 import { CS } from "@/services"
 import CharacterSelector from "./CharacterSelector"
 import { TargetDisplay } from "@/components/encounters"
+import BasePanel from "./BasePanel"
 import type { Character } from "@/types"
 import { getAllVisibleShots } from "./attacks/shotSorting"
-
-interface BoostPanelProps {
-  onClose?: () => void
-}
 
 interface BoostFormData {
   boosterShotId: string
@@ -28,17 +26,15 @@ interface BoostFormData {
   isProcessing: boolean
 }
 
-interface ExtendedBoostPanelProps {
-  onClose?: () => void
+interface BoostPanelProps {
   onComplete?: () => void
   preselectedBooster?: Character
 }
 
 export default function BoostPanel({
-  onClose,
   onComplete,
   preselectedBooster,
-}: ExtendedBoostPanelProps) {
+}: BoostPanelProps) {
   const [isReady, setIsReady] = useState(false)
   const { encounter } = useEncounter()
   const { toastSuccess, toastError } = useToast()
@@ -233,7 +229,6 @@ export default function BoostPanel({
       })
 
       if (onComplete) onComplete()
-      if (onClose) onClose()
     } catch (error) {
       console.error("Failed to apply boost:", error)
       toastError("Failed to apply boost")
@@ -246,21 +241,7 @@ export default function BoostPanel({
     formData.boosterShotId && formData.targetShotId && formData.boostType
 
   return (
-    <Box sx={{ overflow: "hidden", minHeight: isReady ? "auto" : "100px" }}>
-      {/* Panel Heading */}
-      <Typography
-        variant="h6"
-        sx={{
-          p: 1,
-          fontWeight: "bold",
-          backgroundColor: "background.paper",
-          borderBottom: "2px solid",
-          borderBottomColor: "divider",
-        }}
-      >
-        Boost
-      </Typography>
-
+    <BasePanel title="Boost" icon={<FaHandFist />} borderColor="primary.main">
       {/* Main Content - Attacker then Target */}
       {isReady ? (
         <>
@@ -486,6 +467,6 @@ export default function BoostPanel({
           <CircularProgress />
         </Box>
       )}
-    </Box>
+    </BasePanel>
   )
 }

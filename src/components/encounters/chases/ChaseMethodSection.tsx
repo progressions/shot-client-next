@@ -87,24 +87,15 @@ export default function ChaseMethodSection({
     <Box
       sx={{
         p: { xs: 2, sm: 3 },
-        borderBottom: "2px solid",
-        borderBottomColor: "divider",
-        backgroundColor: "action.hover",
       }}
     >
-      <Stack
-        direction="row"
-        spacing={2}
-        alignItems="flex-start"
-        justifyContent="space-between"
-      >
-        {/* Left group: Driving, Squeal, Fortune, Role, Chase Action, Position */}
-        <Stack
-          direction="row"
-          spacing={2}
-          alignItems="flex-start"
-          sx={{ flex: 1 }}
-        >
+      <Typography variant="h6" sx={{ mb: 2, color: "primary.main" }}>
+        🏁 Attacker
+      </Typography>
+
+      <Stack spacing={2}>
+        {/* First row: Driving, Squeal, Fortune, Shot Cost */}
+        <Stack direction="row" spacing={2} alignItems="flex-start">
           {/* Driving Skill Field - Always visible */}
           <FormControl sx={{ minWidth: 100 }}>
             <InputLabel
@@ -230,10 +221,52 @@ export default function ChaseMethodSection({
             </FormControl>
           )}
 
+          {/* Shot Cost Field - moved to first row */}
+          <FormControl sx={{ minWidth: 100 }}>
+            <InputLabel
+              shrink
+              sx={{
+                backgroundColor: "#262626",
+                px: 0.5,
+                ml: -0.5,
+              }}
+            >
+              Shot Cost
+            </InputLabel>
+            <NumberField
+              name="shotCost"
+              value={formState.data.shotCost || 3}
+              size="medium"
+              width="80px"
+              error={false}
+              onChange={e => {
+                const value = parseInt(e.target.value)
+                if (!isNaN(value)) {
+                  updateField("shotCost", value)
+                }
+              }}
+              onBlur={e => {
+                const value = parseInt(e.target.value) || 0
+                if (value <= 0) {
+                  // Reset to default based on character type
+                  const defaultCost =
+                    attacker && (CS.isBoss(attacker) || CS.isUberBoss(attacker))
+                      ? 2
+                      : 3
+                  updateField("shotCost", defaultCost)
+                }
+              }}
+              sx={{ fontSize: "1.5rem" }}
+            />
+          </FormControl>
+        </Stack>
+
+        {/* Second row: Role, Position */}
+        <Stack direction="row" spacing={2} alignItems="flex-start">
           {/* Role Selection */}
           <FormControl
             sx={{
-              flex: 1,
+              minWidth: 200,
               "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
                 {
                   borderColor: "primary.main",
@@ -268,10 +301,51 @@ export default function ChaseMethodSection({
             </Select>
           </FormControl>
 
+          {/* Position Selection */}
+          <FormControl
+            sx={{
+              minWidth: 200,
+              "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                {
+                  borderColor: "primary.main",
+                },
+            }}
+            disabled={!hasTarget}
+          >
+            <InputLabel>Position</InputLabel>
+            <Select
+              disabled={!hasTarget}
+              value={formState.data.position || "far"}
+              onChange={e => {
+                const newPosition = e.target.value as "near" | "far"
+                updateField("position", newPosition)
+
+                // Update method based on role and new position
+                const role = formState.data.attackerRole || "pursuer"
+                let defaultMethod = "EVADE"
+                if (role === "pursuer") {
+                  defaultMethod =
+                    newPosition === "near" ? "RAM_SIDESWIPE" : "NARROW_THE_GAP"
+                } else {
+                  defaultMethod =
+                    newPosition === "near" ? "WIDEN_THE_GAP" : "EVADE"
+                }
+                updateField("method", defaultMethod)
+              }}
+              label="Position"
+            >
+              <MenuItem value="near">Near</MenuItem>
+              <MenuItem value="far">Far</MenuItem>
+            </Select>
+          </FormControl>
+        </Stack>
+
+        {/* Third row: Chase Action */}
+        <Stack direction="row" spacing={2} alignItems="flex-start">
           {/* Chase Action Selection */}
           <FormControl
             sx={{
-              flex: 1,
+              minWidth: 300,
               "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
                 {
                   borderColor: "primary.main",
@@ -350,84 +424,7 @@ export default function ChaseMethodSection({
                     ]}
             </Select>
           </FormControl>
-
-          {/* Position Selection */}
-          <FormControl
-            sx={{
-              flex: 1,
-              "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
-                {
-                  borderColor: "primary.main",
-                },
-            }}
-            disabled={!hasTarget}
-          >
-            <InputLabel>Position</InputLabel>
-            <Select
-              disabled={!hasTarget}
-              value={formState.data.position || "far"}
-              onChange={e => {
-                const newPosition = e.target.value as "near" | "far"
-                updateField("position", newPosition)
-
-                // Update method based on role and new position
-                const role = formState.data.attackerRole || "pursuer"
-                let defaultMethod = "EVADE"
-                if (role === "pursuer") {
-                  defaultMethod =
-                    newPosition === "near" ? "RAM_SIDESWIPE" : "NARROW_THE_GAP"
-                } else {
-                  defaultMethod =
-                    newPosition === "near" ? "WIDEN_THE_GAP" : "EVADE"
-                }
-                updateField("method", defaultMethod)
-              }}
-              label="Position"
-            >
-              <MenuItem value="near">Near</MenuItem>
-              <MenuItem value="far">Far</MenuItem>
-            </Select>
-          </FormControl>
         </Stack>
-
-        {/* Shot Cost Field - separate on the right */}
-        <FormControl sx={{ minWidth: 100, flexShrink: 0 }}>
-          <InputLabel
-            shrink
-            sx={{
-              backgroundColor: "#262626",
-              px: 0.5,
-              ml: -0.5,
-            }}
-          >
-            Shot Cost
-          </InputLabel>
-          <NumberField
-            name="shotCost"
-            value={formState.data.shotCost || 3}
-            size="medium"
-            width="80px"
-            error={false}
-            onChange={e => {
-              const value = parseInt(e.target.value)
-              if (!isNaN(value)) {
-                updateField("shotCost", value)
-              }
-            }}
-            onBlur={e => {
-              const value = parseInt(e.target.value) || 0
-              if (value <= 0) {
-                // Reset to default based on character type
-                const defaultCost =
-                  attacker && (CS.isBoss(attacker) || CS.isUberBoss(attacker))
-                    ? 2
-                    : 3
-                updateField("shotCost", defaultCost)
-              }
-            }}
-            sx={{ fontSize: "1.5rem" }}
-          />
-        </FormControl>
       </Stack>
     </Box>
   )
