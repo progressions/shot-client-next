@@ -247,6 +247,7 @@ export default function SpeedCheckPanel({
               label="Swerve"
               value={swerve}
               onChange={e => setSwerve(parseInt(e.target.value) || 0)}
+              onBlur={e => setSwerve(parseInt(e.target.value) || 0)}
               width="80px"
             />
             <Typography variant="body2">

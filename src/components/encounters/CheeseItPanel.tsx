@@ -132,6 +132,7 @@ export default function CheeseItPanel({
             label="Shots to Spend"
             value={parseInt(shotCost) || 0}
             onChange={(e) => setShotCost(e.target.value)}
+            onBlur={(e) => setShotCost(e.target.value)}
             width="100px"
           />
           <Typography variant="body2" color="text.secondary">
