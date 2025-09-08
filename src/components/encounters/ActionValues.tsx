@@ -62,44 +62,32 @@ export default function ActionValues({ character }: ActionValuesProps) {
         flexWrap: "wrap",
       }}
     >
-      {gunsData.value > 0 && (
-        <AV
-          label="Guns"
-          value={gunsData.value}
-          change={gunsData.change}
-        />
-      )}
-      {martialArtsData.value > 0 && (
-        <AV
-          label="Martial Arts"
-          value={martialArtsData.value}
-          change={martialArtsData.change}
-        />
-      )}
-      {defenseData.value > 0 && (
-        <AV
-          label="Defense"
-          value={defenseData.value}
-          change={defenseData.change}
-        />
-      )}
-      {toughnessData.value > 0 && (
-        <AV
-          label="Toughness"
-          value={toughnessData.value}
-          change={toughnessData.change}
-        />
-      )}
-      {speedData.value > 0 && (
-        <AV label="Speed" value={speedData.value} change={speedData.change} />
-      )}
-      {damageData.value > 0 && (
-        <AV
-          label="Damage"
-          value={damageData.value}
-          change={damageData.change}
-        />
-      )}
+      <AV
+        label="Guns"
+        value={gunsData.value}
+        change={gunsData.change}
+      />
+      <AV
+        label="Martial Arts"
+        value={martialArtsData.value}
+        change={martialArtsData.change}
+      />
+      <AV
+        label="Defense"
+        value={defenseData.value}
+        change={defenseData.change}
+      />
+      <AV
+        label="Toughness"
+        value={toughnessData.value}
+        change={toughnessData.change}
+      />
+      <AV label="Speed" value={speedData.value} change={speedData.change} />
+      <AV
+        label="Damage"
+        value={damageData.value}
+        change={damageData.change}
+      />
       {CS.isPC(character) && (
         <AV
           label={CS.fortuneType(character)}

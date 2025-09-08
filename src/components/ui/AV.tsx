@@ -30,6 +30,12 @@ export function AV({ label, value, maxValue, change }: AVProps) {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
   if (value === null || value === undefined) return null
+  
+  // Don't show values less than 7 (except for Fortune which can be 0)
+  const numValue = typeof value === 'string' ? parseInt(value) : value
+  if (label !== "Fortune" && label !== "Chi" && label !== "Magic" && !isNaN(numValue) && numValue < 7) {
+    return null
+  }
 
   const getChangeColor = () => {
     if (!change || change === 0) return "inherit"
