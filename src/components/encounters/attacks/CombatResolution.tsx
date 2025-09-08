@@ -45,7 +45,7 @@ export default function CombatResolution({
         <Box sx={{ flex: 1 }}>
           <NumberField
             name="swerve"
-            label="Swerve Roll"
+            label="Swerve"
             labelBackgroundColor="#904340"
             value={swerve}
             size="small"
