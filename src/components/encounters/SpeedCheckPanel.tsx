@@ -352,7 +352,7 @@ export default function SpeedCheckPanel({
               <Box>
                 <NumberField
                   name="shotCost"
-                  label="Shot Cost"
+                  label="Shots"
                   value={shotCost}
                   onChange={e => setShotCost(parseInt(e.target.value) || 0)}
                   onBlur={e => setShotCost(parseInt(e.target.value) || 0)}

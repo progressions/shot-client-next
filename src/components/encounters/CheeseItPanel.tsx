@@ -106,7 +106,7 @@ export default function CheeseItPanel({
           <Box>
             <NumberField
               name="shotCost"
-              label="Shot Cost"
+              label="Shots"
               value={parseInt(shotCost) || 0}
               onChange={e => setShotCost(e.target.value)}
               onBlur={e => setShotCost(e.target.value)}

@@ -250,7 +250,7 @@ export default function HealPanel({
                       </Box>
                       <Box sx={{ width: 100 }}>
                         <NumberField
-                          label="Shot Cost"
+                          label="Shots"
                           value={shotsSpent}
                           onChange={e => setShotsSpent(e.target.value)}
                           onBlur={() => {

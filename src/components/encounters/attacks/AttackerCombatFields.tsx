@@ -327,7 +327,7 @@ export default function AttackerCombatFields({
           <Box>
             <NumberField
               name="shotCost"
-              label="Shot Cost"
+              label="Shots"
               value={parseInt(shotCost) || 0}
               size="small"
               error={false}
