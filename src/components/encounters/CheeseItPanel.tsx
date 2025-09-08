@@ -101,57 +101,58 @@ export default function CheeseItPanel({
           <Avatar character={preselectedCharacter} hideVehicle size={64} />
         </Box>
 
-        {/* Shot Cost Input */}
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-            Shot Cost
-          </Typography>
-          <NumberField
-            name="shotCost"
-            value={parseInt(shotCost) || 0}
-            onChange={e => setShotCost(e.target.value)}
-            onBlur={e => setShotCost(e.target.value)}
-            size="small"
-            error={false}
-          />
+        <Box sx={{ display: "flex", alignItems: "flex-end", gap: 2, mb: 2 }}>
+          {/* Shot Cost Input */}
+          <Box>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              Shot Cost
+            </Typography>
+            <NumberField
+              name="shotCost"
+              value={parseInt(shotCost) || 0}
+              onChange={e => setShotCost(e.target.value)}
+              onBlur={e => setShotCost(e.target.value)}
+              size="small"
+              error={false}
+            />
+          </Box>
+
+          {/* Alerts */}
+          <Box sx={{ flex: 1 }}>
+            {isAlreadyCheesing ? (
+              <Alert severity="warning">
+                {preselectedCharacter.name} is already attempting to escape!
+              </Alert>
+            ) : hasEscaped ? (
+              <Alert severity="success">
+                {preselectedCharacter.name} has successfully escaped!
+              </Alert>
+            ) : (
+              <Alert severity="info">
+                <Typography variant="body2">
+                  <strong>Cheese It:</strong> Spend shots to attempt escape.
+                </Typography>
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  Characters acting after you can attempt to prevent your escape
+                  with a Speed check.
+                </Typography>
+              </Alert>
+            )}
+          </Box>
         </Box>
 
-        {isAlreadyCheesing && (
-          <Alert severity="warning" sx={{ mb: 2 }}>
-            {preselectedCharacter.name} is already attempting to escape!
-          </Alert>
-        )}
-
-        {hasEscaped && (
-          <Alert severity="success" sx={{ mb: 2 }}>
-            {preselectedCharacter.name} has successfully escaped!
-          </Alert>
-        )}
-
         {!isAlreadyCheesing && !hasEscaped && (
-          <>
-            <Alert severity="info" sx={{ mb: 2 }}>
-              <Typography variant="body2">
-                <strong>Cheese It:</strong> Spend shots to attempt escape.
-              </Typography>
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                Characters acting after you can attempt to prevent your escape
-                with a Speed check.
-              </Typography>
-            </Alert>
-
-            <Box sx={{ display: "flex", gap: 2 }}>
-              <Button
-                variant="contained"
-                color="warning"
-                onClick={handleCheeseIt}
-                disabled={submitting || !shotCost || parseInt(shotCost) <= 0}
-                startIcon={<Icon keyword="Cheese It" />}
-              >
-                {submitting ? "Running..." : "Cheese It!"}
-              </Button>
-            </Box>
-          </>
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button
+              variant="contained"
+              color="warning"
+              onClick={handleCheeseIt}
+              disabled={submitting || !shotCost || parseInt(shotCost) <= 0}
+              startIcon={<Icon keyword="Cheese It" />}
+            >
+              {submitting ? "Running..." : "Cheese It!"}
+            </Button>
+          </Box>
         )}
       </Box>
     </BasePanel>
