@@ -151,6 +151,7 @@ export default function AttackerCombatFields({
             <NumberField
               name="attackValue"
               label="Attack Value"
+              labelBackgroundColor="#873230"
               value={parseInt(attackValue) || 0}
               size="small"
               error={false}
@@ -198,6 +199,7 @@ export default function AttackerCombatFields({
             <NumberField
               name="weaponDamage"
               label="Damage"
+              labelBackgroundColor="#873230"
               value={parseInt(weaponDamage) || 0}
               size="small"
               error={false}
@@ -278,6 +280,7 @@ export default function AttackerCombatFields({
               <NumberField
                 name="fortuneBonus"
                 label="Fortune +"
+                labelBackgroundColor="#873230"
                 value={fortuneBonus}
                 size="small"
                 error={false}
@@ -328,6 +331,7 @@ export default function AttackerCombatFields({
             <NumberField
               name="shotCost"
               label="Shots"
+              labelBackgroundColor="#873230"
               value={parseInt(shotCost) || 0}
               size="small"
               error={false}

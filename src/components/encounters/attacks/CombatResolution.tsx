@@ -46,6 +46,7 @@ export default function CombatResolution({
           <NumberField
             name="swerve"
             label="Swerve Roll"
+            labelBackgroundColor="#873230"
             value={swerve}
             size="small"
             width="100px"
