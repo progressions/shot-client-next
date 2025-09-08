@@ -189,14 +189,8 @@ export default function UpCheckPanel({
 
                       {/* Die Roll Input */}
                       <Box sx={{ width: 120 }}>
-                        <Typography
-                          variant="caption"
-                          sx={{ mb: 0.5, display: "block" }}
-                        >
-                          Die Roll (1-6)
-                        </Typography>
                         <NumberField
-                          label=""
+                          label="Die Roll (1-6)"
                           value={bossDieRoll}
                           onChange={e => setBossDieRoll(e.target.value)}
                           onBlur={() => {}}
@@ -243,14 +237,8 @@ export default function UpCheckPanel({
                     >
                       {/* Swerve Input */}
                       <Box sx={{ width: 120 }}>
-                        <Typography
-                          variant="caption"
-                          sx={{ mb: 0.5, display: "block" }}
-                        >
-                          Swerve Roll
-                        </Typography>
                         <NumberField
-                          label=""
+                          label="Swerve Roll"
                           value={swerve}
                           onChange={e => setSwerve(e.target.value)}
                           onBlur={() => {}}
@@ -280,14 +268,8 @@ export default function UpCheckPanel({
                             />
                             {useFortune && (
                               <Box sx={{ width: 120 }}>
-                                <Typography
-                                  variant="caption"
-                                  sx={{ mb: 0.5, display: "block" }}
-                                >
-                                  Fortune Die
-                                </Typography>
                                 <NumberField
-                                  label=""
+                                  label="Fortune Die"
                                   value={fortuneDie}
                                   onChange={e => setFortuneDie(e.target.value)}
                                   onBlur={() => {}}

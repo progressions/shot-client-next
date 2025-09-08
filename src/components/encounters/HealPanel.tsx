@@ -233,14 +233,8 @@ export default function HealPanel({
                       sx={{ display: "flex", gap: 2, mt: 2, flexWrap: "wrap" }}
                     >
                       <Box sx={{ width: 100 }}>
-                        <Typography
-                          variant="caption"
-                          sx={{ mb: 0.5, display: "block" }}
-                        >
-                          Medicine Skill
-                        </Typography>
                         <NumberField
-                          label=""
+                          label="Medicine Skill"
                           value={medicineValue}
                           onChange={e => setMedicineValue(e.target.value)}
                           onBlur={() => {
@@ -255,14 +249,8 @@ export default function HealPanel({
                         />
                       </Box>
                       <Box sx={{ width: 100 }}>
-                        <Typography
-                          variant="caption"
-                          sx={{ mb: 0.5, display: "block" }}
-                        >
-                          Shot Cost
-                        </Typography>
                         <NumberField
-                          label=""
+                          label="Shot Cost"
                           value={shotsSpent}
                           onChange={e => setShotsSpent(e.target.value)}
                           onBlur={() => {
@@ -344,14 +332,8 @@ export default function HealPanel({
                 >
                   {/* Swerve Input */}
                   <Box sx={{ width: 100, flexShrink: 0 }}>
-                    <Typography
-                      variant="caption"
-                      sx={{ mb: 0.5, display: "block" }}
-                    >
-                      Swerve
-                    </Typography>
                     <NumberField
-                      label=""
+                      label="Swerve"
                       value={swerve}
                       onChange={e => setSwerve(e.target.value)}
                       onBlur={() => {}}

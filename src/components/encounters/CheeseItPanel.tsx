@@ -104,11 +104,9 @@ export default function CheeseItPanel({
         <Box sx={{ display: "flex", alignItems: "flex-end", gap: 2, mb: 2 }}>
           {/* Shot Cost Input */}
           <Box>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-              Shot Cost
-            </Typography>
             <NumberField
               name="shotCost"
+              label="Shot Cost"
               value={parseInt(shotCost) || 0}
               onChange={e => setShotCost(e.target.value)}
               onBlur={e => setShotCost(e.target.value)}
