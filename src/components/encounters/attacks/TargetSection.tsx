@@ -374,6 +374,7 @@ export default function TargetSection({
                         <NumberField
                           name={`defense-${targetId}`}
                           label="Defense"
+                          labelBackgroundColor="#730F10"
                           value={
                             manualDefensePerTarget[targetId] ??
                             CS.defense(target)
@@ -408,6 +409,7 @@ export default function TargetSection({
                         <NumberField
                           name={`toughness-${targetId}`}
                           label="Toughness"
+                          labelBackgroundColor="#730F10"
                           value={
                             manualToughnessPerTarget[targetId] ??
                             CS.toughness(target)
@@ -585,6 +587,7 @@ export default function TargetSection({
                                 <NumberField
                                   name={`fortuneDie-${targetId}`}
                                   label="Fortune"
+                                  labelBackgroundColor="#730F10"
                                   value={
                                     parseInt(
                                       fortuneDiePerTarget[targetId] || "0"
@@ -734,6 +737,7 @@ export default function TargetSection({
               <NumberField
                 name="defenseValue"
                 label="Defense"
+                labelBackgroundColor="#730F10"
                 value={parseInt(defenseValue || "0") || 0}
                 size="small"
                 width="80px"
