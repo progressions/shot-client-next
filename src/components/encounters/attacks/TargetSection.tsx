@@ -371,14 +371,9 @@ export default function TargetSection({
                       }}
                     >
                       <Box>
-                        <Typography
-                          variant="caption"
-                          sx={{ fontSize: "0.7rem", color: "text.secondary" }}
-                        >
-                          Defense
-                        </Typography>
                         <NumberField
                           name={`defense-${targetId}`}
+                          label="Defense"
                           value={
                             manualDefensePerTarget[targetId] ??
                             CS.defense(target)
@@ -410,14 +405,9 @@ export default function TargetSection({
                         />
                       </Box>
                       <Box>
-                        <Typography
-                          variant="caption"
-                          sx={{ fontSize: "0.7rem", color: "text.secondary" }}
-                        >
-                          Toughness
-                        </Typography>
                         <NumberField
                           name={`toughness-${targetId}`}
+                          label="Toughness"
                           value={
                             manualToughnessPerTarget[targetId] ??
                             CS.toughness(target)
@@ -585,15 +575,6 @@ export default function TargetSection({
                                 gap: 0.5,
                               }}
                             >
-                              <Typography
-                                variant="caption"
-                                sx={{
-                                  fontSize: "0.7rem",
-                                  color: "text.secondary",
-                                }}
-                              >
-                                Fortune
-                              </Typography>
                               <Box
                                 sx={{
                                   display: "flex",
@@ -603,6 +584,7 @@ export default function TargetSection({
                               >
                                 <NumberField
                                   name={`fortuneDie-${targetId}`}
+                                  label="Fortune"
                                   value={
                                     parseInt(
                                       fortuneDiePerTarget[targetId] || "0"
@@ -749,14 +731,9 @@ export default function TargetSection({
           {/* Defense Value - show for multiple targets when non-mook attacker (except for single mook group) */}
           {selectedTargetIds.length > 1 && attacker && !CS.isMook(attacker) && (
             <Box>
-              <Typography
-                variant="caption"
-                sx={{ fontSize: "0.7rem", color: "text.secondary" }}
-              >
-                Defense
-              </Typography>
               <NumberField
                 name="defenseValue"
+                label="Defense"
                 value={parseInt(defenseValue || "0") || 0}
                 size="small"
                 width="80px"
