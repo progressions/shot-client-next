@@ -77,11 +77,9 @@ export default function ChaseAttackerInfo({
 
         {/* Editable Driving Skill */}
         <Box>
-          <Typography variant="caption" sx={{ mb: 0.5, display: "block" }}>
-            Driving Skill
-          </Typography>
           <NumberField
             name="actionValue"
+            label="Driving Skill"
             value={formState.data.actionValue || 7}
             size="small"
             width="80px"
