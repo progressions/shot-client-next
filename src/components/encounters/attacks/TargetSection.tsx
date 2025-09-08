@@ -366,7 +366,7 @@ export default function TargetSection({
                       sx={{
                         display: "flex",
                         gap: 2,
-                        mt: 1,
+                        mt: 2,
                         mb: 1,
                         alignItems: "flex-start",
                       }}
