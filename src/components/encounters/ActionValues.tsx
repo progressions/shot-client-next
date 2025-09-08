@@ -71,31 +71,31 @@ export default function ActionValues({ character }: ActionValuesProps) {
       )}
       {martialArtsData.value >= 7 && (
         <AV
-          label="MA"
+          label="Martial Arts"
           value={martialArtsData.value}
           change={martialArtsData.change}
         />
       )}
       {defenseData.value >= 7 && (
         <AV
-          label="Def"
+          label="Defense"
           value={defenseData.value}
           change={defenseData.change}
         />
       )}
       {toughnessData.value >= 7 && (
         <AV
-          label="Tough"
+          label="Toughness"
           value={toughnessData.value}
           change={toughnessData.change}
         />
       )}
       {speedData.value >= 7 && (
-        <AV label="Spd" value={speedData.value} change={speedData.change} />
+        <AV label="Speed" value={speedData.value} change={speedData.change} />
       )}
       {damageData.value >= 7 && (
         <AV
-          label="Dmg"
+          label="Damage"
           value={damageData.value}
           change={damageData.change}
         />
