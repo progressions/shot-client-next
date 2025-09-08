@@ -9,7 +9,7 @@ import { CharacterLink } from "@/components/ui/links"
 import { Avatar } from "@/components/avatars"
 import { NumberField } from "@/components/ui"
 import { getAllVisibleShots } from "./attacks/shotSorting"
-import CharacterSelector from "./CharacterSelector"
+import TargetSelector from "./TargetSelector"
 import BasePanel from "./BasePanel"
 import type { Character } from "@/types"
 
@@ -270,28 +270,31 @@ export default function SpeedCheckPanel({
           <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
             Select Escaping Character to Target:
           </Typography>
-          <CharacterSelector
-            shots={allShots}
-            selectedShotId={selectedTargetShotId}
-            onSelect={setSelectedTargetShotId}
+          <TargetSelector
+            allShots={allShots}
+            selectedIds={selectedTargetShotId}
+            onSelectionChange={setSelectedTargetShotId}
             borderColor="warning.main"
             disabled={submitting}
             showShotNumbers={true}
             filterFunction={character =>
               !!character.status?.includes("cheesing_it")
             }
-          />
-          {selectedTarget && (
-            <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}>
-              <Avatar character={selectedTarget} hideVehicle size={48} />
-              <Box>
-                <CharacterLink character={selectedTarget} />
-                <Typography variant="body2" color="text.secondary">
-                  Speed: {CS.speed(selectedTarget)} (Difficulty)
-                </Typography>
-              </Box>
-            </Box>
-          )}
+          >
+            {([selectedTarget]) =>
+              selectedTarget ? (
+                <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}>
+                  <Avatar character={selectedTarget} hideVehicle size={48} />
+                  <Box>
+                    <CharacterLink character={selectedTarget} />
+                    <Typography variant="body2" color="text.secondary">
+                      Speed: {CS.speed(selectedTarget as Character)} (Difficulty)
+                    </Typography>
+                  </Box>
+                </Box>
+              ) : null
+            }
+          </TargetSelector>
         </Box>
 
         {/* Right column - Speed Check Resolution */}

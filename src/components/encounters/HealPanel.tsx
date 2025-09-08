@@ -14,7 +14,7 @@ import { FaHeartPulse } from "react-icons/fa6"
 import { useEncounter, useToast, useClient } from "@/contexts"
 import { CS } from "@/services"
 import { NumberField } from "@/components/ui"
-import CharacterSelector from "./CharacterSelector"
+import TargetSelector from "./TargetSelector"
 import { TargetDisplay } from "@/components/encounters"
 import BasePanel from "./BasePanel"
 import { getAllVisibleShots } from "./attacks/shotSorting"
@@ -306,21 +306,23 @@ export default function HealPanel({
                 <Typography variant="h6" sx={{ mb: 1, color: "error.main" }}>
                   🎯 Healing Target
                 </Typography>
-                <CharacterSelector
-                  shots={allShots}
-                  selectedShotId={targetShotId}
-                  onSelect={setTargetShotId}
+                <TargetSelector
+                  allShots={allShots}
+                  selectedIds={targetShotId}
+                  onSelectionChange={selected => setTargetShotId(selected as string)}
                   borderColor="error.main"
                   disabled={isProcessing}
                   showShotNumbers={false}
                   characterTypes={["Ally", "PC"]}
-                  showAllCheckbox={true}
-                />
-                {target && (
-                  <Box sx={{ mt: 1 }}>
-                    <TargetDisplay character={target} />
-                  </Box>
-                )}
+                >
+                  {([selectedTarget]) =>
+                    selectedTarget ? (
+                      <Box sx={{ mt: 1 }}>
+                        <TargetDisplay character={selectedTarget as Character} />
+                      </Box>
+                    ) : null
+                  }
+                </TargetSelector>
               </Box>
             </Box>
           </Box>

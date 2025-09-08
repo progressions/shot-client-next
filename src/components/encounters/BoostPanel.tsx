@@ -13,6 +13,7 @@ import { FaHandFist } from "react-icons/fa6"
 import { useEncounter, useToast, useClient } from "@/contexts"
 import { CS } from "@/services"
 import CharacterSelector from "./CharacterSelector"
+import TargetSelector from "./TargetSelector"
 import { TargetDisplay } from "@/components/encounters"
 import BasePanel from "./BasePanel"
 import type { Character } from "@/types"
@@ -92,36 +93,23 @@ export default function BoostPanel({
   )
   const booster = boosterShot?.character || boosterShot?.vehicle
 
-  // Get valid targets - show all when no booster, filter when booster selected
-  const validTargetShots = useMemo(() => {
-    if (!booster) {
-      // Show all shots when no booster selected (matching AttackPanel behavior)
-      return allShots
-    }
+  const targetFilter = (shot, actor) => {
+    if (!actor) return true // Show all if no booster selected
 
-    // If booster is selected, filter based on booster type
-    const boosterType = CS.type(booster as Character)
+    const target = shot.character || shot.vehicle
+    if (!target) return false
+
+    const boosterType = CS.type(actor as Character)
     const isBoosterGoodGuy = boosterType === "PC" || boosterType === "Ally"
 
-    return allShots.filter(shot => {
-      const target = shot.character || shot.vehicle
-      if (!target) return false
-
-      // Can't boost yourself
-      if (target.shot_id === formData.boosterShotId) return false
-
-      // Apply targeting rules similar to AttackPanel
-      if (isBoosterGoodGuy) {
-        // Good guys typically boost other good guys
-        const targetType = CS.type(target as Character)
-        return targetType === "PC" || targetType === "Ally"
-      } else {
-        // Bad guys can boost other bad guys
-        const targetType = CS.type(target as Character)
-        return !(targetType === "PC" || targetType === "Ally")
-      }
-    })
-  }, [allShots, booster, formData.boosterShotId])
+    if (isBoosterGoodGuy) {
+      const targetType = CS.type(target as Character)
+      return targetType === "PC" || targetType === "Ally"
+    } else {
+      const targetType = CS.type(target as Character)
+      return !(targetType === "PC" || targetType === "Ally")
+    }
+  }
 
   // Get selected target
   const targetShot = allShots.find(
@@ -279,20 +267,25 @@ export default function BoostPanel({
               <Typography variant="h6" sx={{ mb: 1, color: "error.main" }}>
                 🎯 Target
               </Typography>
-              <CharacterSelector
-                shots={validTargetShots}
-                selectedShotId={formData.targetShotId}
-                onSelect={handleTargetSelect}
+              <TargetSelector
+                allShots={allShots}
+                actor={booster}
+                selectedIds={formData.targetShotId}
+                onSelectionChange={handleTargetSelect}
+                filterFunction={targetFilter}
+                excludeShotId={formData.boosterShotId}
                 borderColor="error.main"
                 disabled={formData.isProcessing}
-                excludeShotId={formData.boosterShotId}
                 showShotNumbers={false}
-              />
-              {target && (
-                <Box sx={{ mt: 1 }}>
-                  <TargetDisplay character={target as Character} />
-                </Box>
-              )}
+              >
+                {([selectedTarget]) =>
+                  selectedTarget ? (
+                    <Box sx={{ mt: 1 }}>
+                      <TargetDisplay character={selectedTarget as Character} />
+                    </Box>
+                  ) : null
+                }
+              </TargetSelector>
             </Box>
           </Box>
 
