@@ -40,6 +40,12 @@ export default function EncounterActionBar({
     }).length
   }, [encounter?.shots])
 
+  // Check if selected character requires an Up Check
+  const selectedCharacterNeedsUpCheck = useMemo(() => {
+    if (!selectedCharacter) return false
+    return selectedCharacter.status?.includes("up_check_required") || false
+  }, [selectedCharacter])
+
   // Count characters attempting to escape
   const escapingCount = useMemo(() => {
     if (!encounter?.shots) return 0
@@ -125,7 +131,7 @@ export default function EncounterActionBar({
           <MenuButton
             onClick={() => handleAction("attack")}
             disabled={!selectedCharacter || !hasAttackSkills}
-            title={!selectedCharacter ? "Select a character first" : "Attack"}
+            title="Attack"
             isActive={activePanel === "attack"}
           >
             <FaGun size={20} />
@@ -133,15 +139,7 @@ export default function EncounterActionBar({
 
           <MenuButton
             onClick={() => handleAction("chase")}
-            title={
-              !selectedCharacter
-                ? "Select a character first"
-                : !isDriving
-                  ? "Character is not driving a vehicle"
-                  : isVehicleDefeated
-                    ? "Vehicle has been defeated"
-                    : "Chase"
-            }
+            title="Chase"
             disabled={!selectedCharacter || !isDriving || isVehicleDefeated}
             isActive={activePanel === "chase"}
           >
@@ -151,7 +149,7 @@ export default function EncounterActionBar({
           <MenuButton
             onClick={() => handleAction("boost")}
             disabled={!selectedCharacter}
-            title={!selectedCharacter ? "Select a character first" : "Boost"}
+            title="Boost"
             isActive={activePanel === "boost"}
           >
             <FaRocket size={20} />
@@ -160,7 +158,7 @@ export default function EncounterActionBar({
           <MenuButton
             onClick={() => handleAction("heal")}
             disabled={!selectedCharacter}
-            title={!selectedCharacter ? "Select a character first" : "Heal"}
+            title="Heal"
             isActive={activePanel === "heal"}
           >
             <HealIcon />
@@ -169,9 +167,7 @@ export default function EncounterActionBar({
           <MenuButton
             onClick={() => handleAction("cheese")}
             disabled={!selectedCharacter}
-            title={
-              !selectedCharacter ? "Select a character first" : "Cheese It"
-            }
+            title="Cheese It"
             isActive={activePanel === "cheese"}
           >
             <FaPersonRunning size={20} />
@@ -181,13 +177,7 @@ export default function EncounterActionBar({
             <MenuButton
               onClick={() => handleAction("speedcheck")}
               disabled={escapingCount === 0 || !selectedCharacter}
-              title={
-                !selectedCharacter
-                  ? "Select a character first"
-                  : escapingCount > 0
-                    ? `${escapingCount} character${escapingCount > 1 ? "s" : ""} attempting escape`
-                    : "No characters attempting escape"
-              }
+              title="Speed Check"
               isActive={activePanel === "speedcheck"}
             >
               <FaHand size={20} />
@@ -197,12 +187,8 @@ export default function EncounterActionBar({
           <Badge badgeContent={upCheckCount} color="warning">
             <MenuButton
               onClick={() => handleAction("upcheck")}
-              disabled={upCheckCount === 0}
-              title={
-                upCheckCount > 0
-                  ? `${upCheckCount} character${upCheckCount > 1 ? "s" : ""} need Up Check`
-                  : "No characters require Up Check"
-              }
+              disabled={!selectedCharacterNeedsUpCheck}
+              title="Perform Up Check"
               isActive={activePanel === "upcheck"}
             >
               <FaDice size={20} />
