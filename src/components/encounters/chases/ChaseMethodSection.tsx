@@ -97,83 +97,54 @@ export default function ChaseMethodSection({
         {/* First row: Driving, Squeal, Fortune, Shot Cost */}
         <Stack direction="row" spacing={2} alignItems="flex-start">
           {/* Driving Skill Field - Always visible */}
-          <FormControl sx={{ minWidth: 100 }}>
-            <InputLabel
-              shrink
-              sx={{
-                backgroundColor: "#262626",
-                px: 0.5,
-                ml: -0.5,
-              }}
-            >
-              Driving
-            </InputLabel>
-            <NumberField
-              name="actionValue"
-              value={formState.data.actionValue || 7}
-              size="medium"
-              width="80px"
-              error={false}
-              onChange={e =>
-                updateField("actionValue", parseInt(e.target.value) || 7)
+          <NumberField
+            name="actionValue"
+            label="Driving"
+            labelBackgroundColor="#873230"
+            value={formState.data.actionValue || 7}
+            size="medium"
+            width="80px"
+            error={false}
+            onChange={e =>
+              updateField("actionValue", parseInt(e.target.value) || 7)
+            }
+            onBlur={e => {
+              const value = parseInt(e.target.value) || 0
+              if (value < 1) {
+                updateField("actionValue", 7)
               }
-              onBlur={e => {
-                const value = parseInt(e.target.value) || 0
-                if (value < 1) {
-                  updateField("actionValue", 7)
-                }
-              }}
-              sx={{ fontSize: "1.5rem" }}
-            />
-          </FormControl>
+            }}
+            sx={{ fontSize: "1.5rem" }}
+          />
 
           {/* Squeal Field - Always visible */}
-          <FormControl sx={{ minWidth: 100 }}>
-            <InputLabel
-              shrink
-              sx={{
-                backgroundColor: "#262626",
-                px: 0.5,
-                ml: -0.5,
-              }}
-            >
-              Squeal
-            </InputLabel>
-            <NumberField
-              name="squeal"
-              value={formState.data.squeal || 0}
-              size="medium"
-              width="80px"
-              error={false}
-              onChange={e =>
-                updateField("squeal", parseInt(e.target.value) || 0)
+          <NumberField
+            name="squeal"
+            label="Squeal"
+            labelBackgroundColor="#873230"
+            value={formState.data.squeal || 0}
+            size="medium"
+            width="80px"
+            error={false}
+            onChange={e =>
+              updateField("squeal", parseInt(e.target.value) || 0)
+            }
+            onBlur={e => {
+              const value = parseInt(e.target.value) || 0
+              if (value < 0) {
+                updateField("squeal", 0)
               }
-              onBlur={e => {
-                const value = parseInt(e.target.value) || 0
-                if (value < 0) {
-                  updateField("squeal", 0)
-                }
-              }}
-              sx={{ fontSize: "1.5rem" }}
-            />
-          </FormControl>
+            }}
+            sx={{ fontSize: "1.5rem" }}
+          />
 
           {/* Fortune bonus field for PCs */}
           {isPC && availableFortune > 0 && (
-            <FormControl sx={{ minWidth: 100 }}>
-              <InputLabel
-                shrink
-                sx={{
-                  backgroundColor: "#262626",
-                  px: 0.5,
-                  ml: -0.5,
-                  color: usingFortune ? "warning.main" : "text.primary",
-                }}
-              >
-                Fortune +
-              </InputLabel>
+            <Box>
               <NumberField
                 name="fortuneBonus"
+                label="Fortune +"
+                labelBackgroundColor="#873230"
                 value={fortuneBonus}
                 size="medium"
                 width="80px"
@@ -218,47 +189,37 @@ export default function ChaseMethodSection({
                   ? `Cost: 1 (${availableFortune - 1} left)`
                   : `Available: ${availableFortune}`}
               </Typography>
-            </FormControl>
+            </Box>
           )}
 
           {/* Shot Cost Field - moved to first row */}
-          <FormControl sx={{ minWidth: 100 }}>
-            <InputLabel
-              shrink
-              sx={{
-                backgroundColor: "#262626",
-                px: 0.5,
-                ml: -0.5,
-              }}
-            >
-              Shot Cost
-            </InputLabel>
-            <NumberField
-              name="shotCost"
-              value={formState.data.shotCost || 3}
-              size="medium"
-              width="80px"
-              error={false}
-              onChange={e => {
-                const value = parseInt(e.target.value)
-                if (!isNaN(value)) {
-                  updateField("shotCost", value)
-                }
-              }}
-              onBlur={e => {
-                const value = parseInt(e.target.value) || 0
-                if (value <= 0) {
-                  // Reset to default based on character type
-                  const defaultCost =
-                    attacker && (CS.isBoss(attacker) || CS.isUberBoss(attacker))
-                      ? 2
-                      : 3
-                  updateField("shotCost", defaultCost)
-                }
-              }}
-              sx={{ fontSize: "1.5rem" }}
-            />
-          </FormControl>
+          <NumberField
+            name="shotCost"
+            label="Shots"
+            labelBackgroundColor="#873230"
+            value={formState.data.shotCost || 3}
+            size="medium"
+            width="80px"
+            error={false}
+            onChange={e => {
+              const value = parseInt(e.target.value)
+              if (!isNaN(value)) {
+                updateField("shotCost", value)
+              }
+            }}
+            onBlur={e => {
+              const value = parseInt(e.target.value) || 0
+              if (value <= 0) {
+                // Reset to default based on character type
+                const defaultCost =
+                  attacker && (CS.isBoss(attacker) || CS.isUberBoss(attacker))
+                    ? 2
+                    : 3
+                updateField("shotCost", defaultCost)
+              }
+            }}
+            sx={{ fontSize: "1.5rem" }}
+          />
         </Stack>
 
         {/* Second row: Role, Position */}
@@ -266,7 +227,7 @@ export default function ChaseMethodSection({
           {/* Role Selection */}
           <FormControl
             sx={{
-              minWidth: 200,
+              minWidth: 120,
               "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
                 {
                   borderColor: "primary.main",
@@ -304,7 +265,7 @@ export default function ChaseMethodSection({
           {/* Position Selection */}
           <FormControl
             sx={{
-              minWidth: 200,
+              minWidth: 120,
               "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
                 {
                   borderColor: "primary.main",

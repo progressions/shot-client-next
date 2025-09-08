@@ -21,7 +21,7 @@ export default function VehicleStatsDisplay({
       <Avatar entity={vehicle} sx={{ width: 64, height: 64 }} />
       <Box sx={{ flex: 1 }}>
         <Stack direction="row" spacing={1} alignItems="center">
-          <Typography variant="h6" fontWeight="bold">
+          <Typography variant="subtitle1" fontWeight="bold">
             {showLink ? (
               <VehicleLink vehicle={vehicle}>{vehicle.name}</VehicleLink>
             ) : (
@@ -30,18 +30,18 @@ export default function VehicleStatsDisplay({
           </Typography>
         </Stack>
 
-        {/* Vehicle Stats Row 1 */}
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-          <strong>Acceleration</strong> {VS.acceleration(vehicle)} •{" "}
-          <strong>Handling</strong> {VS.handling(vehicle)} •{" "}
-          <strong>Squeal</strong> {VS.squeal(vehicle)}
-        </Typography>
-
-        {/* Vehicle Stats Row 2 */}
-        <Typography variant="body2" color="text.secondary">
-          <strong>Frame</strong> {VS.frame(vehicle)} • <strong>Crunch</strong>{" "}
-          {VS.crunch(vehicle)}
-        </Typography>
+        {/* Vehicle Stats */}
+        <Box>
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+            <strong>Acceleration</strong> {VS.acceleration(vehicle)} •{" "}
+            <strong>Handling</strong> {VS.handling(vehicle)}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+            <strong>Squeal</strong> {VS.squeal(vehicle)} •{" "}
+            <strong>Frame</strong> {VS.frame(vehicle)} • <strong>Crunch</strong>{" "}
+            {VS.crunch(vehicle)}
+          </Typography>
+        </Box>
 
         {/* Chase and Condition Points */}
         <Box sx={{ mt: 1 }}>
