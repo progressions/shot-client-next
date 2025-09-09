@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { Box, Stack, IconButton } from "@mui/material"
+import { Box, Stack, IconButton, FormControl, InputLabel } from "@mui/material"
 import { TextField } from "./TextField"
 import AddIcon from "@mui/icons-material/Add"
 import RemoveIcon from "@mui/icons-material/Remove"
@@ -16,6 +16,8 @@ type NumberFieldProps = {
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   onBlur: (event: React.FocusEvent<HTMLInputElement>) => void
   sx?: SystemStyleObject<Theme>
+  label?: string
+  labelBackgroundColor?: string
 }
 
 export function NumberField({
@@ -27,6 +29,8 @@ export function NumberField({
   onChange,
   onBlur,
   sx = {},
+  label,
+  labelBackgroundColor,
 }: NumberFieldProps) {
   const theme = useTheme()
   const [isFocused, setIsFocused] = useState<boolean>(false)
@@ -75,94 +79,109 @@ export function NumberField({
   if (!onBlur) throw "WTF"
 
   return (
-    <Box
-      sx={{
-        border: `1px solid ${theme.palette.divider}`,
-        "&:hover": { border: `1px solid ${theme.palette.primary.main}` },
-        borderRadius: 1,
-        position: "relative",
-        width: width || widthMap[size],
-        overflow: "hidden",
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <TextField
-        name={name}
-        value={value?.toString() ?? ""}
-        onChange={onChange}
-        onBlur={event => {
-          setIsFocused(false)
-          onBlur(event)
-        }}
-        onFocus={() => setIsFocused(true)}
-        error={error}
-        type="text"
-        InputProps={{
-          sx: {
-            width: width || widthMap[size],
-            fontSize: fontSizeMap[size],
-            borderRadius: 1,
-            fontWeight: 600,
-            px: 1,
-            "& input": {
-              textAlign: "center",
-              paddingRight: `${paddingMap[size]}`,
-            },
-            "& .MuiOutlinedInput-notchedOutline": {
-              border: "none", // Remove default border
-            },
-            "&:hover .MuiOutlinedInput-notchedOutline": {
-              border: "none", // Remove hover border
-            },
-            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-              border: "none", // Remove focused border
-            },
-            ...sx,
-          },
-        }}
-      />
-      <Stack
-        direction="column"
+    <FormControl sx={{ minWidth: width || widthMap[size] }}>
+      {label && (
+        <InputLabel
+          shrink
+          sx={{
+            opacity: 1,
+            backgroundColor: labelBackgroundColor || "#262626",
+            px: 0.5,
+            ml: -0.5,
+          }}
+        >
+          {label}
+        </InputLabel>
+      )}
+      <Box
         sx={{
-          position: "absolute",
-          top: "0",
-          bottom: "0",
-          right: isFocused || isHovered ? "0" : "-30px",
-          gap: 0,
-          justifyContent: "space-between",
-          transition: "right 0.3s ease-in-out",
-          opacity: isFocused || isHovered ? 1 : 0,
-          pointerEvents: isFocused || isHovered ? "auto" : "none",
+          border: `1px solid ${theme.palette.divider}`,
+          "&:hover": { border: `1px solid ${theme.palette.primary.main}` },
+          borderRadius: 1,
+          position: "relative",
+          width: width || widthMap[size],
+          overflow: "hidden",
         }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
-        <IconButton
-          onClick={handleIncrement}
+        <TextField
+          name={name}
+          value={value?.toString() ?? ""}
+          onChange={onChange}
+          onBlur={event => {
+            setIsFocused(false)
+            onBlur(event)
+          }}
+          onFocus={() => setIsFocused(true)}
+          error={error}
+          type="text"
+          InputProps={{
+            sx: {
+              width: width || widthMap[size],
+              fontSize: fontSizeMap[size],
+              borderRadius: 1,
+              fontWeight: 600,
+              px: 1,
+              "& input": {
+                textAlign: "center",
+                paddingRight: `${paddingMap[size]}`,
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                border: "none", // Remove default border
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                border: "none", // Remove hover border
+              },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                border: "none", // Remove focused border
+              },
+              ...sx,
+            },
+          }}
+        />
+        <Stack
+          direction="column"
           sx={{
-            padding: "0",
-            color: theme.palette.text.primary,
-            backgroundColor: theme.palette.background.paper,
-            borderRadius: "0px 6px 0px 0px",
-            height: "50%",
-            "&:hover": { backgroundColor: theme.palette.action.hover },
+            position: "absolute",
+            top: "0",
+            bottom: "0",
+            right: isFocused || isHovered ? "0" : "-30px",
+            gap: 0,
+            justifyContent: "space-between",
+            transition: "right 0.3s ease-in-out",
+            opacity: isFocused || isHovered ? 1 : 0,
+            pointerEvents: isFocused || isHovered ? "auto" : "none",
           }}
         >
-          <AddIcon sx={{ fontSize: "0.75rem" }} />
-        </IconButton>
-        <IconButton
-          onClick={handleDecrement}
-          sx={{
-            padding: "0",
-            color: theme.palette.text.primary,
-            backgroundColor: theme.palette.background.paper,
-            borderRadius: "0px 0px 6px 0px",
-            height: "50%",
-            "&:hover": { backgroundColor: theme.palette.action.hover },
-          }}
-        >
-          <RemoveIcon sx={{ fontSize: "0.75rem" }} />
-        </IconButton>
-      </Stack>
-    </Box>
+          <IconButton
+            onClick={handleIncrement}
+            sx={{
+              padding: "0",
+              color: theme.palette.text.primary,
+              backgroundColor: theme.palette.background.paper,
+              borderRadius: "0px 6px 0px 0px",
+              height: "50%",
+              "&:hover": { backgroundColor: theme.palette.action.hover },
+            }}
+          >
+            <AddIcon sx={{ fontSize: "0.75rem" }} />
+          </IconButton>
+          <IconButton
+            onClick={handleDecrement}
+            sx={{
+              padding: "0",
+              color: theme.palette.text.primary,
+              backgroundColor: theme.palette.background.paper,
+              borderRadius: "0px 0px 6px 0px",
+              height: "50%",
+              "&:hover": { backgroundColor: theme.palette.action.hover },
+            }}
+          >
+            <RemoveIcon sx={{ fontSize: "0.75rem" }} />
+          </IconButton>
+        </Stack>
+      </Box>
+    </FormControl>
   )
 }

@@ -31,6 +31,12 @@ export function AV({ label, value, maxValue, change }: AVProps) {
 
   if (value === null || value === undefined) return null
 
+  // Don't show values that are 0 or less
+  const numValue = typeof value === "string" ? parseInt(value) : value
+  if (!isNaN(numValue) && numValue <= 0) {
+    return null
+  }
+
   const getChangeColor = () => {
     if (!change || change === 0) return "inherit"
     return change > 0 ? "success.main" : "error.main"

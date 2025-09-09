@@ -29,18 +29,15 @@ export default function ActionValues({ character }: ActionValuesProps) {
     return { value: adjustedValue, change }
   }
 
-  const mainAttackData = getAdjustedValue(
-    CS.mainAttack(character),
-    CS.rawActionValue(character, CS.mainAttack(character))
+  const gunsData = getAdjustedValue(
+    "Guns",
+    CS.rawActionValue(character, "Guns")
   )
 
-  const secondaryAttackName = CS.secondaryAttack(character)
-  const secondaryAttackData = secondaryAttackName
-    ? getAdjustedValue(
-        secondaryAttackName,
-        CS.rawActionValue(character, secondaryAttackName)
-      )
-    : null
+  const martialArtsData = getAdjustedValue(
+    "Martial Arts",
+    CS.rawActionValue(character, "Martial Arts")
+  )
 
   const defenseData = getAdjustedValue(
     "Defense",
@@ -57,65 +54,39 @@ export default function ActionValues({ character }: ActionValuesProps) {
   return (
     <Stack
       component="span"
-      direction="column"
+      direction="row"
       sx={{
         fontSize: { xs: "0.7rem", sm: "0.75rem", md: "0.75rem" },
         width: "100%",
         gap: 0.5,
+        flexWrap: "wrap",
       }}
     >
-      {/* First row: Attack skills, Defense, and Fortune */}
-      <Stack
-        component="span"
-        direction="row"
-        sx={{
-          gap: { xs: 0.75, sm: 0.5 },
-        }}
-      >
-        <AV
-          label={CS.mainAttack(character)}
-          value={mainAttackData.value}
-          change={mainAttackData.change}
-        />
-        {secondaryAttackData && (
-          <AV
-            label={secondaryAttackName}
-            value={secondaryAttackData.value}
-            change={secondaryAttackData.change}
-          />
-        )}
-        <AV
-          label="Defense"
-          value={defenseData.value}
-          change={defenseData.change}
-        />
+      <AV label="Guns" value={gunsData.value} change={gunsData.change} />
+      <AV
+        label="Martial Arts"
+        value={martialArtsData.value}
+        change={martialArtsData.change}
+      />
+      <AV
+        label="Defense"
+        value={defenseData.value}
+        change={defenseData.change}
+      />
+      <AV
+        label="Toughness"
+        value={toughnessData.value}
+        change={toughnessData.change}
+      />
+      <AV label="Speed" value={speedData.value} change={speedData.change} />
+      <AV label="Damage" value={damageData.value} change={damageData.change} />
+      {CS.isPC(character) && (
         <AV
           label={CS.fortuneType(character)}
           value={CS.fortune(character)}
           maxValue={CS.maxFortune(character)}
         />
-      </Stack>
-
-      {/* Second row: Toughness, Speed, and Damage */}
-      <Stack
-        component="span"
-        direction="row"
-        sx={{
-          gap: { xs: 0.75, sm: 0.5 },
-        }}
-      >
-        <AV
-          label="Toughness"
-          value={toughnessData.value}
-          change={toughnessData.change}
-        />
-        <AV label="Speed" value={speedData.value} change={speedData.change} />
-        <AV
-          label="Damage"
-          value={damageData.value}
-          change={damageData.change}
-        />
-      </Stack>
+      )}
     </Stack>
   )
 }

@@ -9,12 +9,12 @@ import {
   CircularProgress,
   FormControlLabel,
   Checkbox,
-  Chip,
 } from "@mui/material"
 import { useEncounter, useToast, useClient } from "@/contexts"
 import { CS } from "@/services"
-import { NumberField } from "@/components/ui"
+import { NumberField, Icon } from "@/components/ui"
 import { getAllVisibleShots } from "./attacks/shotSorting"
+import BasePanel from "./BasePanel"
 
 interface UpCheckPanelProps {
   onClose?: () => void
@@ -26,12 +26,11 @@ export default function UpCheckPanel({
   onComplete,
 }: UpCheckPanelProps) {
   const [isReady, setIsReady] = useState(false)
-  const { encounter } = useEncounter()
+  const { encounter, selectedActorId } = useEncounter()
   const { toastSuccess, toastError } = useToast()
   const { client } = useClient()
 
   // Form state
-  const [selectedCharacterId, setSelectedCharacterId] = useState("")
   const [swerve, setSwerve] = useState("0")
   const [fortuneDie, setFortuneDie] = useState("0")
   const [useFortune, setUseFortune] = useState(false)
@@ -44,26 +43,15 @@ export default function UpCheckPanel({
     return () => clearTimeout(timer)
   }, [])
 
-  // Get all characters that require Up Checks (PCs, Allies, Bosses, Uber-Bosses)
-  const charactersRequiringUpCheck = useMemo(() => {
-    if (!encounter?.shots) return []
+  // Get selected character from encounter context
+  const selectedCharacter = useMemo(() => {
+    if (!selectedActorId || !encounter?.shots) return null
 
-    return getAllVisibleShots(encounter.shots)
-      .filter(shot => {
-        const character = shot.character
-        if (!character) return false
+    const allShots = getAllVisibleShots(encounter.shots)
+    const shot = allShots.find(s => s.character?.shot_id === selectedActorId)
 
-        // Check if character has up_check_required status
-        const status = character.status || []
-        return status.includes("up_check_required")
-      })
-      .map(shot => shot.character!)
-  }, [encounter?.shots])
-
-  // Get selected character
-  const selectedCharacter = charactersRequiringUpCheck.find(
-    c => c.id === selectedCharacterId
-  )
+    return shot?.character || null
+  }, [selectedActorId, encounter?.shots])
 
   // Check if selected character is Boss or Uber-Boss
   const isBossType = useMemo(() => {
@@ -156,7 +144,6 @@ export default function UpCheckPanel({
       }
 
       // Reset form
-      setSelectedCharacterId("")
       setSwerve("0")
       setFortuneDie("0")
       setUseFortune(false)
@@ -173,130 +160,15 @@ export default function UpCheckPanel({
   }
 
   return (
-    <Box sx={{ overflow: "hidden", minHeight: isReady ? "auto" : "100px" }}>
-      <Typography
-        variant="h6"
-        sx={{
-          p: 1,
-          fontWeight: "bold",
-          backgroundColor: "background.paper",
-          borderBottom: "2px solid",
-          borderBottomColor: "divider",
-        }}
-      >
-        🎲 Up Check
-      </Typography>
-
+    <BasePanel
+      title="Up Check"
+      icon={<Icon keyword="Speed Check" />}
+      borderColor="warning.main"
+    >
       {isReady ? (
         <>
-          {/* Character Selection Section */}
-          <Box sx={{ backgroundColor: "action.hover" }}>
-            <Box
-              sx={{
-                p: { xs: 1, sm: 1.5 },
-                borderBottom: "2px solid",
-                borderBottomColor: "divider",
-              }}
-            >
-              <Typography variant="h6" sx={{ mb: 2, color: "warning.main" }}>
-                💀 Characters Requiring Up Check
-              </Typography>
-
-              {charactersRequiringUpCheck.length > 0 ? (
-                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                  {charactersRequiringUpCheck.map(character => (
-                    <Chip
-                      key={character.id}
-                      label={
-                        <Box
-                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                        >
-                          <Typography>{character.name}</Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            ({CS.wounds(character)} wounds)
-                          </Typography>
-                        </Box>
-                      }
-                      onClick={() => setSelectedCharacterId(character.id)}
-                      color={
-                        selectedCharacterId === character.id
-                          ? "warning"
-                          : "default"
-                      }
-                      variant={
-                        selectedCharacterId === character.id
-                          ? "filled"
-                          : "outlined"
-                      }
-                      disabled={isProcessing}
-                      sx={{ cursor: "pointer" }}
-                    />
-                  ))}
-                </Box>
-              ) : (
-                <Alert severity="info">
-                  No characters currently require Up Checks
-                </Alert>
-              )}
-
-              {selectedCharacter && (
-                <Box
-                  sx={{
-                    mt: 2,
-                    p: 2,
-                    backgroundColor: "background.paper",
-                    borderRadius: 1,
-                  }}
-                >
-                  <Typography variant="h6" gutterBottom>
-                    {selectedCharacter.name}
-                  </Typography>
-                  <Box sx={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
-                    <Box>
-                      <Typography variant="caption" color="text.secondary">
-                        Wounds
-                      </Typography>
-                      <Typography variant="h6" color="error.main">
-                        {CS.wounds(selectedCharacter)}
-                      </Typography>
-                    </Box>
-                    <Box>
-                      <Typography variant="caption" color="text.secondary">
-                        Toughness
-                      </Typography>
-                      <Typography variant="h6">
-                        {selectedCharacter.action_values?.["Toughness"] || 0}
-                      </Typography>
-                    </Box>
-                    <Box>
-                      <Typography variant="caption" color="text.secondary">
-                        Marks of Death
-                      </Typography>
-                      <Typography variant="h6" color="warning.main">
-                        {selectedCharacter.action_values?.["Marks of Death"] ||
-                          0}
-                      </Typography>
-                    </Box>
-                    {CS.isPC(selectedCharacter) && (
-                      <Box>
-                        <Typography variant="caption" color="text.secondary">
-                          Fortune
-                        </Typography>
-                        <Typography variant="h6" color="primary.main">
-                          {CS.fortune(selectedCharacter)}
-                        </Typography>
-                      </Box>
-                    )}
-                  </Box>
-                </Box>
-              )}
-            </Box>
-          </Box>
-
           {/* Up Check Resolution Section */}
-          <Box
-            sx={{ p: { xs: 2, sm: 3 }, backgroundColor: "background.default" }}
-          >
+          <Box>
             {selectedCharacter ? (
               <>
                 {isBossType ? (
@@ -317,14 +189,8 @@ export default function UpCheckPanel({
 
                       {/* Die Roll Input */}
                       <Box sx={{ width: 120 }}>
-                        <Typography
-                          variant="caption"
-                          sx={{ mb: 0.5, display: "block" }}
-                        >
-                          Die Roll (1-6)
-                        </Typography>
                         <NumberField
-                          label=""
+                          label="Die Roll (1-6)"
                           value={bossDieRoll}
                           onChange={e => setBossDieRoll(e.target.value)}
                           onBlur={() => {}}
@@ -371,14 +237,8 @@ export default function UpCheckPanel({
                     >
                       {/* Swerve Input */}
                       <Box sx={{ width: 120 }}>
-                        <Typography
-                          variant="caption"
-                          sx={{ mb: 0.5, display: "block" }}
-                        >
-                          Swerve Roll
-                        </Typography>
                         <NumberField
-                          label=""
+                          label="Swerve Roll"
                           value={swerve}
                           onChange={e => setSwerve(e.target.value)}
                           onBlur={() => {}}
@@ -408,14 +268,8 @@ export default function UpCheckPanel({
                             />
                             {useFortune && (
                               <Box sx={{ width: 120 }}>
-                                <Typography
-                                  variant="caption"
-                                  sx={{ mb: 0.5, display: "block" }}
-                                >
-                                  Fortune Die
-                                </Typography>
                                 <NumberField
-                                  label=""
+                                  label="Fortune Die"
                                   value={fortuneDie}
                                   onChange={e => setFortuneDie(e.target.value)}
                                   onBlur={() => {}}
@@ -521,6 +375,6 @@ export default function UpCheckPanel({
           <CircularProgress />
         </Box>
       )}
-    </Box>
+    </BasePanel>
   )
 }

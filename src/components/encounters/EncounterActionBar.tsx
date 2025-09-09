@@ -40,6 +40,12 @@ export default function EncounterActionBar({
     }).length
   }, [encounter?.shots])
 
+  // Check if selected character requires an Up Check
+  const selectedCharacterNeedsUpCheck = useMemo(() => {
+    if (!selectedCharacter) return false
+    return selectedCharacter.status?.includes("up_check_required") || false
+  }, [selectedCharacter])
+
   // Count characters attempting to escape
   const escapingCount = useMemo(() => {
     if (!encounter?.shots) return 0
@@ -131,22 +137,16 @@ export default function EncounterActionBar({
             <FaGun size={20} />
           </MenuButton>
 
-          <MenuButton
-            onClick={() => handleAction("chase")}
-            title={
-              !selectedCharacter
-                ? "Select a character first"
-                : !isDriving
-                  ? "Character is not driving a vehicle"
-                  : isVehicleDefeated
-                    ? "Vehicle has been defeated"
-                    : "Chase"
-            }
-            disabled={!selectedCharacter || !isDriving || isVehicleDefeated}
-            isActive={activePanel === "chase"}
-          >
-            <FaCar size={20} />
-          </MenuButton>
+          {isDriving && !isVehicleDefeated && (
+            <MenuButton
+              onClick={() => handleAction("chase")}
+              title="Chase"
+              disabled={!selectedCharacter}
+              isActive={activePanel === "chase"}
+            >
+              <FaCar size={20} />
+            </MenuButton>
+          )}
 
           <MenuButton
             onClick={() => handleAction("boost")}
@@ -182,11 +182,7 @@ export default function EncounterActionBar({
               onClick={() => handleAction("speedcheck")}
               disabled={escapingCount === 0 || !selectedCharacter}
               title={
-                !selectedCharacter
-                  ? "Select a character first"
-                  : escapingCount > 0
-                    ? `${escapingCount} character${escapingCount > 1 ? "s" : ""} attempting escape`
-                    : "No characters attempting escape"
+                !selectedCharacter ? "Select a character first" : "Speed Check"
               }
               isActive={activePanel === "speedcheck"}
             >
@@ -197,11 +193,11 @@ export default function EncounterActionBar({
           <Badge badgeContent={upCheckCount} color="warning">
             <MenuButton
               onClick={() => handleAction("upcheck")}
-              disabled={upCheckCount === 0}
+              disabled={!selectedCharacterNeedsUpCheck}
               title={
-                upCheckCount > 0
-                  ? `${upCheckCount} character${upCheckCount > 1 ? "s" : ""} need Up Check`
-                  : "No characters require Up Check"
+                !selectedCharacter
+                  ? "Select a character first"
+                  : "Perform Up Check"
               }
               isActive={activePanel === "upcheck"}
             >

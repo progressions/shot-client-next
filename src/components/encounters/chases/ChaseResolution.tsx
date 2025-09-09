@@ -347,14 +347,9 @@ export default function ChaseResolution({
             minWidth: { xs: "80px", sm: "auto" },
           }}
         >
-          <Typography
-            variant="caption"
-            sx={{ mb: 0.5, fontSize: { xs: "0.7rem", sm: "0.75rem" } }}
-          >
-            Swerve
-          </Typography>
           <NumberField
             name="swerve"
+            label="Swerve"
             value={typedSwerve || ""}
             size="large"
             width="120px"

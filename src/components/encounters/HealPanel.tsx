@@ -14,7 +14,7 @@ import { FaHeartPulse } from "react-icons/fa6"
 import { useEncounter, useToast, useClient } from "@/contexts"
 import { CS } from "@/services"
 import { NumberField } from "@/components/ui"
-import CharacterSelector from "./CharacterSelector"
+import TargetSelector from "./TargetSelector"
 import { TargetDisplay } from "@/components/encounters"
 import BasePanel from "./BasePanel"
 import { getAllVisibleShots } from "./attacks/shotSorting"
@@ -233,14 +233,8 @@ export default function HealPanel({
                       sx={{ display: "flex", gap: 2, mt: 2, flexWrap: "wrap" }}
                     >
                       <Box sx={{ width: 100 }}>
-                        <Typography
-                          variant="caption"
-                          sx={{ mb: 0.5, display: "block" }}
-                        >
-                          Medicine Skill
-                        </Typography>
                         <NumberField
-                          label=""
+                          label="Medicine Skill"
                           value={medicineValue}
                           onChange={e => setMedicineValue(e.target.value)}
                           onBlur={() => {
@@ -255,14 +249,8 @@ export default function HealPanel({
                         />
                       </Box>
                       <Box sx={{ width: 100 }}>
-                        <Typography
-                          variant="caption"
-                          sx={{ mb: 0.5, display: "block" }}
-                        >
-                          Shot Cost
-                        </Typography>
                         <NumberField
-                          label=""
+                          label="Shots"
                           value={shotsSpent}
                           onChange={e => setShotsSpent(e.target.value)}
                           onBlur={() => {
@@ -306,21 +294,27 @@ export default function HealPanel({
                 <Typography variant="h6" sx={{ mb: 1, color: "error.main" }}>
                   🎯 Healing Target
                 </Typography>
-                <CharacterSelector
-                  shots={allShots}
-                  selectedShotId={targetShotId}
-                  onSelect={setTargetShotId}
+                <TargetSelector
+                  allShots={allShots}
+                  selectedIds={targetShotId}
+                  onSelectionChange={selected =>
+                    setTargetShotId(selected as string)
+                  }
                   borderColor="error.main"
                   disabled={isProcessing}
                   showShotNumbers={false}
                   characterTypes={["Ally", "PC"]}
-                  showAllCheckbox={true}
-                />
-                {target && (
-                  <Box sx={{ mt: 1 }}>
-                    <TargetDisplay character={target} />
-                  </Box>
-                )}
+                >
+                  {([selectedTarget]) =>
+                    selectedTarget ? (
+                      <Box sx={{ mt: 1 }}>
+                        <TargetDisplay
+                          character={selectedTarget as Character}
+                        />
+                      </Box>
+                    ) : null
+                  }
+                </TargetSelector>
               </Box>
             </Box>
           </Box>
@@ -342,14 +336,8 @@ export default function HealPanel({
                 >
                   {/* Swerve Input */}
                   <Box sx={{ width: 100, flexShrink: 0 }}>
-                    <Typography
-                      variant="caption"
-                      sx={{ mb: 0.5, display: "block" }}
-                    >
-                      Swerve
-                    </Typography>
                     <NumberField
-                      label=""
+                      label="Swerve"
                       value={swerve}
                       onChange={e => setSwerve(e.target.value)}
                       onBlur={() => {}}

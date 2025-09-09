@@ -147,15 +147,11 @@ export default function AttackerCombatFields({
       <Box>
         {/* Attack Value - full width */}
         <Box sx={{ mb: 1 }}>
-          <Typography
-            variant="caption"
-            sx={{ color: "text.secondary", fontSize: "0.7rem" }}
-          >
-            Attack Value
-          </Typography>
           <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5 }}>
             <NumberField
               name="attackValue"
+              label="Attack Value"
+              labelBackgroundColor="#873230"
               value={parseInt(attackValue) || 0}
               size="small"
               error={false}
@@ -199,15 +195,11 @@ export default function AttackerCombatFields({
 
         {/* Damage - full width */}
         <Box sx={{ mb: 1 }}>
-          <Typography
-            variant="caption"
-            sx={{ color: "text.secondary", fontSize: "0.7rem" }}
-          >
-            Damage
-          </Typography>
           <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5 }}>
             <NumberField
               name="weaponDamage"
+              label="Damage"
+              labelBackgroundColor="#873230"
               value={parseInt(weaponDamage) || 0}
               size="small"
               error={false}
@@ -285,14 +277,10 @@ export default function AttackerCombatFields({
           {/* Fortune field for PCs */}
           {isPC && availableFortune > 0 && (
             <Box>
-              <Typography
-                variant="caption"
-                sx={{ color: "text.secondary", fontSize: "0.7rem" }}
-              >
-                Fortune +
-              </Typography>
               <NumberField
                 name="fortuneBonus"
+                label="Fortune +"
+                labelBackgroundColor="#873230"
                 value={fortuneBonus}
                 size="small"
                 error={false}
@@ -340,14 +328,10 @@ export default function AttackerCombatFields({
 
           {/* Shot Cost */}
           <Box>
-            <Typography
-              variant="caption"
-              sx={{ color: "text.secondary", fontSize: "0.7rem" }}
-            >
-              Shot Cost
-            </Typography>
             <NumberField
               name="shotCost"
+              label="Shots"
+              labelBackgroundColor="#873230"
               value={parseInt(shotCost) || 0}
               size="small"
               error={false}

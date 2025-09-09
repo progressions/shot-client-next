@@ -234,104 +234,79 @@ export default function ChaseTargetSection({
           <Box
             sx={{ p: 2, bgcolor: "background.paper", borderRadius: 1, mb: 2 }}
           >
-            <Stack direction="row" spacing={3}>
+            <Stack direction="column" spacing={2}>
               {/* Vehicle Stats Display */}
               <Box sx={{ flex: 1 }}>
                 <VehicleStatsDisplay vehicle={selectedVehicle} />
               </Box>
 
-              {/* Editable Defense Values */}
-              <Stack direction="row" spacing={2} alignItems="flex-start">
-                {/* Driving Value */}
-                <Box>
-                  <Typography
-                    variant="body2"
-                    sx={{ mb: 1, fontWeight: "medium" }}
-                  >
-                    Driving
-                  </Typography>
-                  <NumberField
-                    name="defense"
-                    value={
-                      parseInt(formState.data.defense?.toString() || "0") || 0
-                    }
-                    size="small"
-                    width="80px"
-                    error={false}
-                    onChange={e => updateField("defense", e.target.value)}
-                    onBlur={e => updateField("defense", e.target.value)}
-                  />
-                </Box>
-
-                {/* Handling Value */}
-                <Box>
-                  <Typography
-                    variant="body2"
-                    sx={{ mb: 1, fontWeight: "medium" }}
-                  >
-                    Handling
-                  </Typography>
-                  <NumberField
-                    name="handling"
-                    value={
-                      parseInt(formState.data.handling?.toString() || "0") || 0
-                    }
-                    size="small"
-                    width="80px"
-                    error={false}
-                    onChange={e => updateField("handling", e.target.value)}
-                    onBlur={e => updateField("handling", e.target.value)}
-                  />
-                </Box>
-
-                {/* Frame Value (editable) */}
-                <Box>
-                  <Typography
-                    variant="body2"
-                    sx={{ mb: 1, fontWeight: "medium" }}
-                  >
-                    Frame
-                  </Typography>
-                  <NumberField
-                    name="frame"
-                    value={
-                      parseInt(formState.data.frame?.toString() || "0") || 0
-                    }
-                    size="small"
-                    width="80px"
-                    error={false}
-                    onChange={e => updateField("frame", e.target.value)}
-                    onBlur={e => updateField("frame", e.target.value)}
-                  />
-                </Box>
-
-                {/* Crunch Value (editable) */}
-                <Box>
-                  <Typography
-                    variant="body2"
-                    sx={{ mb: 1, fontWeight: "medium" }}
-                  >
-                    Crunch
-                  </Typography>
-                  <NumberField
-                    name="targetCrunch"
-                    value={
-                      parseInt(
-                        (
-                          formState.data as ChaseFormData & {
-                            targetCrunch?: string
-                          }
-                        ).targetCrunch?.toString() || "0"
-                      ) || 0
-                    }
-                    size="small"
-                    width="80px"
-                    error={false}
-                    onChange={e => updateField("targetCrunch", e.target.value)}
-                    onBlur={e => updateField("targetCrunch", e.target.value)}
-                  />
-                </Box>
-              </Stack>
+              {/* Editable Defense Values - 2x2 Grid */}
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  columnGap: 1,
+                  rowGap: 2,
+                  maxWidth: "200px",
+                }}
+              >
+                <NumberField
+                  name="defense"
+                  label="Driving"
+                  labelBackgroundColor="#730F10"
+                  value={
+                    parseInt(formState.data.defense?.toString() || "0") || 0
+                  }
+                  size="small"
+                  width="80px"
+                  error={false}
+                  onChange={e => updateField("defense", e.target.value)}
+                  onBlur={e => updateField("defense", e.target.value)}
+                />
+                <NumberField
+                  name="handling"
+                  label="Handling"
+                  labelBackgroundColor="#730F10"
+                  value={
+                    parseInt(formState.data.handling?.toString() || "0") || 0
+                  }
+                  size="small"
+                  width="80px"
+                  error={false}
+                  onChange={e => updateField("handling", e.target.value)}
+                  onBlur={e => updateField("handling", e.target.value)}
+                />
+                <NumberField
+                  name="frame"
+                  label="Frame"
+                  labelBackgroundColor="#730F10"
+                  value={parseInt(formState.data.frame?.toString() || "0") || 0}
+                  size="small"
+                  width="80px"
+                  error={false}
+                  onChange={e => updateField("frame", e.target.value)}
+                  onBlur={e => updateField("frame", e.target.value)}
+                />
+                <NumberField
+                  name="targetCrunch"
+                  label="Crunch"
+                  labelBackgroundColor="#730F10"
+                  value={
+                    parseInt(
+                      (
+                        formState.data as ChaseFormData & {
+                          targetCrunch?: string
+                        }
+                      ).targetCrunch?.toString() || "0"
+                    ) || 0
+                  }
+                  size="small"
+                  width="80px"
+                  error={false}
+                  onChange={e => updateField("targetCrunch", e.target.value)}
+                  onBlur={e => updateField("targetCrunch", e.target.value)}
+                />
+              </Box>
             </Stack>
           </Box>
 

@@ -43,14 +43,10 @@ export default function CombatResolution({
       >
         {/* Dice Roll */}
         <Box sx={{ flex: 1 }}>
-          <Typography
-            variant="caption"
-            sx={{ fontSize: "0.7rem", color: "text.secondary" }}
-          >
-            Swerve Roll
-          </Typography>
           <NumberField
             name="swerve"
+            label="Swerve"
+            labelBackgroundColor="#904340"
             value={swerve}
             size="small"
             width="100px"
