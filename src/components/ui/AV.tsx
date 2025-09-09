@@ -30,9 +30,9 @@ export function AV({ label, value, maxValue, change }: AVProps) {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
   if (value === null || value === undefined) return null
-  
+
   // Don't show values that are 0 or less
-  const numValue = typeof value === 'string' ? parseInt(value) : value
+  const numValue = typeof value === "string" ? parseInt(value) : value
   if (!isNaN(numValue) && numValue <= 0) {
     return null
   }

@@ -7,7 +7,6 @@ import {
   Stack,
   FormControlLabel,
   Checkbox,
-  Grid,
 } from "@mui/material"
 import { VS, CS } from "@/services"
 import type { ChaseFormData, Shot, Vehicle, Character } from "@/types"
@@ -242,7 +241,15 @@ export default function ChaseTargetSection({
               </Box>
 
               {/* Editable Defense Values - 2x2 Grid */}
-              <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: 1, rowGap: 2, maxWidth: "200px" }}>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  columnGap: 1,
+                  rowGap: 2,
+                  maxWidth: "200px",
+                }}
+              >
                 <NumberField
                   name="defense"
                   label="Driving"
@@ -273,9 +280,7 @@ export default function ChaseTargetSection({
                   name="frame"
                   label="Frame"
                   labelBackgroundColor="#730F10"
-                  value={
-                    parseInt(formState.data.frame?.toString() || "0") || 0
-                  }
+                  value={parseInt(formState.data.frame?.toString() || "0") || 0}
                   size="small"
                   width="80px"
                   error={false}

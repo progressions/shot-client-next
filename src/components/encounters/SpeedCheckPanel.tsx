@@ -283,12 +283,15 @@ export default function SpeedCheckPanel({
           >
             {([selectedTarget]) =>
               selectedTarget ? (
-                <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}>
+                <Box
+                  sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}
+                >
                   <Avatar character={selectedTarget} hideVehicle size={48} />
                   <Box>
                     <CharacterLink character={selectedTarget} />
                     <Typography variant="body2" color="text.secondary">
-                      Speed: {CS.speed(selectedTarget as Character)} (Difficulty)
+                      Speed: {CS.speed(selectedTarget as Character)}{" "}
+                      (Difficulty)
                     </Typography>
                   </Box>
                 </Box>

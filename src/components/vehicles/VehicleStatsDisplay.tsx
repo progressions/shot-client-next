@@ -32,11 +32,19 @@ export default function VehicleStatsDisplay({
 
         {/* Vehicle Stats */}
         <Box>
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ mt: 0.5, display: "block" }}
+          >
             <strong>Acceleration</strong> {VS.acceleration(vehicle)} •{" "}
             <strong>Handling</strong> {VS.handling(vehicle)}
           </Typography>
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: "block" }}
+          >
             <strong>Squeal</strong> {VS.squeal(vehicle)} •{" "}
             <strong>Frame</strong> {VS.frame(vehicle)} • <strong>Crunch</strong>{" "}
             {VS.crunch(vehicle)}

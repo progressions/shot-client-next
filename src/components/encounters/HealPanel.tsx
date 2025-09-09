@@ -297,7 +297,9 @@ export default function HealPanel({
                 <TargetSelector
                   allShots={allShots}
                   selectedIds={targetShotId}
-                  onSelectionChange={selected => setTargetShotId(selected as string)}
+                  onSelectionChange={selected =>
+                    setTargetShotId(selected as string)
+                  }
                   borderColor="error.main"
                   disabled={isProcessing}
                   showShotNumbers={false}
@@ -306,7 +308,9 @@ export default function HealPanel({
                   {([selectedTarget]) =>
                     selectedTarget ? (
                       <Box sx={{ mt: 1 }}>
-                        <TargetDisplay character={selectedTarget as Character} />
+                        <TargetDisplay
+                          character={selectedTarget as Character}
+                        />
                       </Box>
                     ) : null
                   }

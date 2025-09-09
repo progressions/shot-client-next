@@ -131,25 +131,27 @@ export default function EncounterActionBar({
           <MenuButton
             onClick={() => handleAction("attack")}
             disabled={!selectedCharacter || !hasAttackSkills}
-            title="Attack"
+            title={!selectedCharacter ? "Select a character first" : "Attack"}
             isActive={activePanel === "attack"}
           >
             <FaGun size={20} />
           </MenuButton>
 
-          <MenuButton
-            onClick={() => handleAction("chase")}
-            title="Chase"
-            disabled={!selectedCharacter || !isDriving || isVehicleDefeated}
-            isActive={activePanel === "chase"}
-          >
-            <FaCar size={20} />
-          </MenuButton>
+          {isDriving && !isVehicleDefeated && (
+            <MenuButton
+              onClick={() => handleAction("chase")}
+              title="Chase"
+              disabled={!selectedCharacter}
+              isActive={activePanel === "chase"}
+            >
+              <FaCar size={20} />
+            </MenuButton>
+          )}
 
           <MenuButton
             onClick={() => handleAction("boost")}
             disabled={!selectedCharacter}
-            title="Boost"
+            title={!selectedCharacter ? "Select a character first" : "Boost"}
             isActive={activePanel === "boost"}
           >
             <FaRocket size={20} />
@@ -158,7 +160,7 @@ export default function EncounterActionBar({
           <MenuButton
             onClick={() => handleAction("heal")}
             disabled={!selectedCharacter}
-            title="Heal"
+            title={!selectedCharacter ? "Select a character first" : "Heal"}
             isActive={activePanel === "heal"}
           >
             <HealIcon />
@@ -167,7 +169,7 @@ export default function EncounterActionBar({
           <MenuButton
             onClick={() => handleAction("cheese")}
             disabled={!selectedCharacter}
-            title="Cheese It"
+            title={!selectedCharacter ? "Select a character first" : "Cheese It"}
             isActive={activePanel === "cheese"}
           >
             <FaPersonRunning size={20} />
@@ -177,7 +179,7 @@ export default function EncounterActionBar({
             <MenuButton
               onClick={() => handleAction("speedcheck")}
               disabled={escapingCount === 0 || !selectedCharacter}
-              title="Speed Check"
+              title={!selectedCharacter ? "Select a character first" : "Speed Check"}
               isActive={activePanel === "speedcheck"}
             >
               <FaHand size={20} />
@@ -188,7 +190,7 @@ export default function EncounterActionBar({
             <MenuButton
               onClick={() => handleAction("upcheck")}
               disabled={!selectedCharacterNeedsUpCheck}
-              title="Perform Up Check"
+              title={!selectedCharacter ? "Select a character first" : "Perform Up Check"}
               isActive={activePanel === "upcheck"}
             >
               <FaDice size={20} />

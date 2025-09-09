@@ -126,9 +126,7 @@ export default function ChaseMethodSection({
             size="medium"
             width="80px"
             error={false}
-            onChange={e =>
-              updateField("squeal", parseInt(e.target.value) || 0)
-            }
+            onChange={e => updateField("squeal", parseInt(e.target.value) || 0)}
             onBlur={e => {
               const value = parseInt(e.target.value) || 0
               if (value < 0) {

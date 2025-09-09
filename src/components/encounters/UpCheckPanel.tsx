@@ -46,10 +46,10 @@ export default function UpCheckPanel({
   // Get selected character from encounter context
   const selectedCharacter = useMemo(() => {
     if (!selectedActorId || !encounter?.shots) return null
-    
+
     const allShots = getAllVisibleShots(encounter.shots)
     const shot = allShots.find(s => s.character?.shot_id === selectedActorId)
-    
+
     return shot?.character || null
   }, [selectedActorId, encounter?.shots])
 

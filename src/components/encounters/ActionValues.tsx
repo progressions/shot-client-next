@@ -62,11 +62,7 @@ export default function ActionValues({ character }: ActionValuesProps) {
         flexWrap: "wrap",
       }}
     >
-      <AV
-        label="Guns"
-        value={gunsData.value}
-        change={gunsData.change}
-      />
+      <AV label="Guns" value={gunsData.value} change={gunsData.change} />
       <AV
         label="Martial Arts"
         value={martialArtsData.value}
@@ -83,11 +79,7 @@ export default function ActionValues({ character }: ActionValuesProps) {
         change={toughnessData.change}
       />
       <AV label="Speed" value={speedData.value} change={speedData.change} />
-      <AV
-        label="Damage"
-        value={damageData.value}
-        change={damageData.change}
-      />
+      <AV label="Damage" value={damageData.value} change={damageData.change} />
       {CS.isPC(character) && (
         <AV
           label={CS.fortuneType(character)}
