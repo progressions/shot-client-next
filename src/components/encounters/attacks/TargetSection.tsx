@@ -406,41 +406,103 @@ export default function TargetSection({
                           }}
                         />
                       </Box>
-                      <Box>
-                        <NumberField
-                          name={`toughness-${targetId}`}
-                          label="Toughness"
-                          labelBackgroundColor="#730F10"
-                          value={
-                            manualToughnessPerTarget[targetId] ??
-                            CS.toughness(target)
-                          }
-                          size="small"
-                          width="80px"
-                          error={false}
-                          onChange={e => {
-                            const newVal = parseInt(e.target.value) || 0
-                            updateField("manualToughnessPerTarget", {
-                              ...manualToughnessPerTarget,
-                              [targetId]: newVal,
-                            })
-                          }}
-                          onBlur={e => {
-                            const newVal = parseInt(e.target.value) || 0
-                            updateField("manualToughnessPerTarget", {
-                              ...manualToughnessPerTarget,
-                              [targetId]: newVal,
-                            })
-                          }}
-                          sx={{
-                            "& .MuiOutlinedInput-root": {
-                              height: 40,
-                              "& input": { padding: "8px 12px" },
-                              backgroundColor: "background.paper",
-                            },
-                          }}
-                        />
-                      </Box>
+                      {/* Show Count field for mooks, Toughness for others */}
+                      {CS.isMook(target) ? (
+                        <Box>
+                          <NumberField
+                            name={`count-${targetId}`}
+                            label="Count"
+                            labelBackgroundColor="#730F10"
+                            value={targetMookCountPerTarget[targetId] || 1}
+                            size="small"
+                            width="80px"
+                            error={false}
+                            onChange={e => {
+                              const count = Math.max(
+                                1,
+                                parseInt(e.target.value) || 1
+                              )
+                              // Update the per-target mook count
+                              updateField("targetMookCountPerTarget", {
+                                ...targetMookCountPerTarget,
+                                [targetId]: count,
+                              })
+
+                              // Recalculate defense with new count
+                              updateDefenseAndToughness(
+                                selectedTargetIds,
+                                stunt,
+                                defenseChoicePerTarget,
+                                fortuneDiePerTarget,
+                                manualDefensePerTarget
+                              )
+                            }}
+                            onBlur={e => {
+                              const count = Math.max(
+                                1,
+                                parseInt(e.target.value) || 1
+                              )
+                              // Update the per-target mook count
+                              updateField("targetMookCountPerTarget", {
+                                ...targetMookCountPerTarget,
+                                [targetId]: count,
+                              })
+
+                              // Recalculate defense with new count
+                              updateDefenseAndToughness(
+                                selectedTargetIds,
+                                stunt,
+                                defenseChoicePerTarget,
+                                fortuneDiePerTarget,
+                                manualDefensePerTarget
+                              )
+                            }}
+                            sx={{
+                              "& .MuiOutlinedInput-root": {
+                                height: 40,
+                                "& input": { padding: "8px 12px" },
+                                backgroundColor: "background.paper",
+                              },
+                            }}
+                          />
+                        </Box>
+                      ) : (
+                        <Box>
+                          <NumberField
+                            name={`toughness-${targetId}`}
+                            label="Toughness"
+                            labelBackgroundColor="#730F10"
+                            value={
+                              manualToughnessPerTarget[targetId] ??
+                              CS.toughness(target)
+                            }
+                            size="small"
+                            width="80px"
+                            error={false}
+                            onChange={e => {
+                              const newVal = parseInt(e.target.value) || 0
+                              updateField("manualToughnessPerTarget", {
+                                ...manualToughnessPerTarget,
+                                [targetId]: newVal,
+                              })
+                            }}
+                            onBlur={e => {
+                              const newVal = parseInt(e.target.value) || 0
+                              updateField("manualToughnessPerTarget", {
+                                ...manualToughnessPerTarget,
+                                [targetId]: newVal,
+                              })
+                            }}
+                            sx={{
+                              "& .MuiOutlinedInput-root": {
+                                height: 40,
+                                "& input": { padding: "8px 12px" },
+                                backgroundColor: "background.paper",
+                              },
+                            }}
+                          />
+                        </Box>
+                      )}
 
                       {/* Dodge buttons - now inline with Defense/Toughness */}
                       {!CS.isMook(target) && (

@@ -8,7 +8,7 @@ import type { Character, Faction } from "@/types"
 import { useCallback, useEffect } from "react"
 
 type FormStateData = {
-  filters: Record<string, string | boolean | null>
+  filters: Record<string, string | boolean | null | Faction | Character>
   characters: Character[]
   factions: Faction[]
   archetypes: string[]
@@ -45,7 +45,9 @@ export default function CharacterFilter({
       character_type: null,
       archetype: null,
       faction_id: null,
+      faction: null,
       character_id: null,
+      character: null,
       search: "",
     },
     characters: [],
@@ -86,7 +88,7 @@ export default function CharacterFilter({
       console.error("Error fetching characters:", error)
       return []
     }
-  }, [client, formState.data.filters, formState.data, dispatchForm]) // Only depend on filters
+  }, [client, formState.data, dispatchForm]) // Only depend on filters
 
   useEffect(() => {
     fetchCharacters().catch(error => {
