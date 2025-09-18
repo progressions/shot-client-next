@@ -175,7 +175,7 @@ export function GenericFilter({
         <ModelAutocomplete
           key={field.name}
           model={entityName}
-          value={filters?.[field.name] as AutocompleteOption | null}
+          value={filters?.[field.name + "_id"] as string | null}
           onChange={newValue =>
             changeFilter(field.name + "_id", newValue, true)
           }

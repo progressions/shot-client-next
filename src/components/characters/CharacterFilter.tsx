@@ -8,7 +8,7 @@ import type { Character, Faction } from "@/types"
 import { useCallback, useEffect } from "react"
 
 type FormStateData = {
-  filters: Record<string, string | boolean | null>
+  filters: Record<string, any>
   characters: Character[]
   factions: Faction[]
   archetypes: string[]
@@ -45,7 +45,9 @@ export default function CharacterFilter({
       character_type: null,
       archetype: null,
       faction_id: null,
+      faction: null,
       character_id: null,
+      character: null,
       search: "",
     },
     characters: [],
