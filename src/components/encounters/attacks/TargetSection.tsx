@@ -377,25 +377,60 @@ export default function TargetSection({
                           label="Defense"
                           labelBackgroundColor="#730F10"
                           value={
-                            manualDefensePerTarget[targetId] ??
-                            CS.defense(target)
+                            targetId in manualDefensePerTarget
+                              ? manualDefensePerTarget[targetId]
+                              : calculateTargetDefense(
+                                  target,
+                                  targetId,
+                                  manualDefensePerTarget,
+                                  defenseChoicePerTarget,
+                                  fortuneDiePerTarget,
+                                  stunt,
+                                  attacker,
+                                  CS.isMook(target)
+                                    ? targetMookCountPerTarget[targetId] || 1
+                                    : 1,
+                                  encounter
+                                )
                           }
                           size="small"
                           width="80px"
                           error={false}
                           onChange={e => {
                             const newVal = parseInt(e.target.value) || 0
-                            updateField("manualDefensePerTarget", {
+                            const newManualDefense = {
                               ...manualDefensePerTarget,
                               [targetId]: newVal,
-                            })
+                            }
+                            updateField(
+                              "manualDefensePerTarget",
+                              newManualDefense
+                            )
+                            updateDefenseAndToughness(
+                              selectedTargetIds,
+                              stunt,
+                              defenseChoicePerTarget,
+                              fortuneDiePerTarget,
+                              newManualDefense
+                            )
                           }}
                           onBlur={e => {
                             const newVal = parseInt(e.target.value) || 0
-                            updateField("manualDefensePerTarget", {
+                            const newManualDefense = {
                               ...manualDefensePerTarget,
                               [targetId]: newVal,
-                            })
+                            }
+                            updateField(
+                              "manualDefensePerTarget",
+                              newManualDefense
+                            )
+                            updateDefenseAndToughness(
+                              selectedTargetIds,
+                              stunt,
+                              defenseChoicePerTarget,
+                              fortuneDiePerTarget,
+                              newManualDefense
+                            )
                           }}
                           sx={{
                             "& .MuiOutlinedInput-root": {
@@ -422,19 +457,30 @@ export default function TargetSection({
                                 1,
                                 parseInt(e.target.value) || 1
                               )
-                              // Update the per-target mook count
-                              updateField("targetMookCountPerTarget", {
-                                ...targetMookCountPerTarget,
-                                [targetId]: count,
+
+                              // Clear manual defense override when count changes
+                              // This allows the defense to auto-update with the new count
+                              const newManualDefense = {
+                                ...manualDefensePerTarget,
+                              }
+                              delete newManualDefense[targetId]
+
+                              // Update both fields together to ensure proper re-render
+                              updateFields({
+                                targetMookCountPerTarget: {
+                                  ...targetMookCountPerTarget,
+                                  [targetId]: count,
+                                },
+                                manualDefensePerTarget: newManualDefense,
                               })
 
-                              // Recalculate defense with new count
+                              // Recalculate defense immediately with updated counts
                               updateDefenseAndToughness(
                                 selectedTargetIds,
                                 stunt,
                                 defenseChoicePerTarget,
                                 fortuneDiePerTarget,
-                                manualDefensePerTarget
+                                newManualDefense
                               )
                             }}
                             onBlur={e => {
@@ -442,19 +488,30 @@ export default function TargetSection({
                                 1,
                                 parseInt(e.target.value) || 1
                               )
-                              // Update the per-target mook count
-                              updateField("targetMookCountPerTarget", {
-                                ...targetMookCountPerTarget,
-                                [targetId]: count,
+
+                              // Clear manual defense override when count changes
+                              // This allows the defense to auto-update with the new count
+                              const newManualDefense = {
+                                ...manualDefensePerTarget,
+                              }
+                              delete newManualDefense[targetId]
+
+                              // Update both fields together to ensure proper re-render
+                              updateFields({
+                                targetMookCountPerTarget: {
+                                  ...targetMookCountPerTarget,
+                                  [targetId]: count,
+                                },
+                                manualDefensePerTarget: newManualDefense,
                               })
 
-                              // Recalculate defense with new count
+                              // Recalculate defense immediately with updated counts
                               updateDefenseAndToughness(
                                 selectedTargetIds,
                                 stunt,
                                 defenseChoicePerTarget,
                                 fortuneDiePerTarget,
-                                manualDefensePerTarget
+                                newManualDefense
                               )
                             }}
                             sx={{

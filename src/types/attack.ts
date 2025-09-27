@@ -1,4 +1,4 @@
-import type { Character, Shot, Weapon } from "./index"
+import type { Character, Shot, Weapon, Encounter } from "./index"
 import type { FormStateType, FormStateAction } from "@/reducers"
 
 /**
@@ -46,6 +46,18 @@ export interface AttackFormData {
   fortuneSpent?: boolean
   [key: string]: unknown
 }
+
+export type CalculateTargetDefenseFn = (
+  target: Character,
+  targetId: string,
+  manualDefense?: { [targetId: string]: string },
+  defenseChoices?: { [targetId: string]: DefenseChoice },
+  fortuneDice?: { [targetId: string]: string },
+  includeStunt?: boolean,
+  attacker?: Character,
+  targetMookCount?: number,
+  encounter?: Encounter | null
+) => number
 
 /**
  * Result of attacking multiple targets
@@ -116,10 +128,13 @@ export interface TargetSectionProps {
   updateFields: (updates: Partial<AttackFormData>) => void
   updateDefenseAndToughness: (
     targetIds: string[],
-    includeStunt: boolean
+    includeStunt: boolean,
+    defenseChoices?: { [targetId: string]: DefenseChoice },
+    fortuneDice?: { [targetId: string]: string },
+    manualDefense?: { [targetId: string]: string }
   ) => void
   distributeMooks: (targetIds: string[]) => void
-  calculateTargetDefense: (target: Character, targetId: string) => number
+  calculateTargetDefense: CalculateTargetDefenseFn
 }
 
 /**
@@ -137,12 +152,15 @@ export interface TargetDefenseDisplayProps {
   manualDefensePerTarget: { [targetId: string]: string }
   manualToughnessPerTarget: { [targetId: string]: string }
   selectedTargetIds: string[]
-  calculateTargetDefense: (target: Character, targetId: string) => number
+  calculateTargetDefense: CalculateTargetDefenseFn
   updateField: (name: string, value: unknown) => void
   updateFields: (updates: Partial<AttackFormData>) => void
   updateDefenseAndToughness: (
     targetIds: string[],
-    includeStunt: boolean
+    includeStunt: boolean,
+    defenseChoices?: { [targetId: string]: DefenseChoice },
+    fortuneDice?: { [targetId: string]: string },
+    manualDefense?: { [targetId: string]: string }
   ) => void
 }
 
@@ -204,7 +222,7 @@ export interface AttackResultsProps {
     weapons: Weapon[],
     allShots: Shot[]
   ) => number
-  calculateTargetDefense: (target: Character, targetId: string) => number
+  calculateTargetDefense: CalculateTargetDefenseFn
 }
 
 /**
