@@ -545,18 +545,36 @@ export default function AttackPanel({
   // Helper function to calculate effective defense for a target based on their defense choice
   const calculateTargetDefense = (
     target: Character,
-    targetId: string
+    targetId: string,
+    manualDefenseOverrides = manualDefensePerTarget,
+    defenseChoiceOverrides = defenseChoicePerTarget,
+    fortuneDieOverrides = fortuneDiePerTarget,
+    includeStunt = stunt,
+    attackingCharacter = attacker,
+    explicitMookCount?: number,
+    encounterContext = encounter
   ): number => {
+    let resolvedMookCount = explicitMookCount
+
+    if (CS.isMook(target)) {
+      const perTargetCount =
+        resolvedMookCount ?? targetMookCountPerTarget[targetId]
+      const fallbackCount = targetMookCount || 1
+      resolvedMookCount = Math.max(1, perTargetCount ?? fallbackCount ?? 1)
+    } else {
+      resolvedMookCount = 1
+    }
+
     return calcTargetDefense(
       target,
       targetId,
-      manualDefensePerTarget,
-      defenseChoicePerTarget,
-      fortuneDiePerTarget,
-      stunt,
-      attacker,
-      targetMookCount,
-      encounter
+      manualDefenseOverrides,
+      defenseChoiceOverrides,
+      fortuneDieOverrides,
+      includeStunt,
+      attackingCharacter,
+      resolvedMookCount,
+      encounterContext
     )
   }
 
@@ -630,6 +648,31 @@ export default function AttackPanel({
       }
     }
   }, [targetMookCountPerTarget, selectedTargetIds, formState.data.stunt])
+
+  // Recalculate defense when single mook target count changes
+  useEffect(() => {
+    if (selectedTargetIds.length === 1 && attacker && !CS.isMook(attacker)) {
+      const targetId = selectedTargetIds[0]
+      const target = allShots.find(
+        s => s.character?.shot_id === targetId
+      )?.character
+
+      if (target && CS.isMook(target) && targetMookCountPerTarget[targetId]) {
+        updateDefenseAndToughness(
+          selectedTargetIds,
+          formState.data.stunt,
+          defenseChoicePerTarget,
+          fortuneDiePerTarget,
+          manualDefensePerTarget
+        )
+      }
+    }
+  }, [
+    targetMookCountPerTarget,
+    selectedTargetIds,
+    formState.data.stunt,
+    attacker,
+  ])
 
   // Clear attack results when targets change
   useEffect(() => {
