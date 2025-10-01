@@ -75,6 +75,11 @@ export function ListManager({
 
   useEffect(() => {
     const fetchChildEntities = async () => {
+      if (!childIds || childIds.length === 0) {
+        setChildEntities([])
+        return
+      }
+
       try {
         const funcName = `get${pluralChildEntityName}`
         const getFunc = client[funcName as keyof typeof client]
