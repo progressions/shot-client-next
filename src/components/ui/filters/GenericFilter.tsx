@@ -4,8 +4,9 @@ import { AddButton } from "../AddButton"
 import { ModelAutocomplete } from "../ModelAutocomplete"
 import { StringAutocomplete } from "../StringAutocomplete"
 import { SearchInput } from "../SearchInput"
-import { useCallback } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { filterConfigs } from "@/lib/filterConfigs"
+import { debounce } from "lodash"
 
 interface AutocompleteOption {
   id: number
@@ -45,6 +46,34 @@ export function GenericFilter({
 }: GenericFilterProps) {
   const config = filterConfigs[entity]
   const { filters, ...data } = formState.data
+  const primaryField = config.fields.find(
+    f => f.name.toLowerCase() === entity.toLowerCase()
+  )
+
+  const primaryFieldId = primaryField ? `${primaryField.name}_id` : null
+
+  const debouncedSearchUpdate = useMemo(() => {
+    if (!onFiltersUpdate || !primaryField || primaryField.type !== "entity") {
+      return null
+    }
+
+    return debounce((value: string) => {
+      onFiltersUpdate({
+        ...filters,
+        ...(primaryFieldId
+          ? { [primaryFieldId]: null, [primaryField.name]: null }
+          : {}),
+        search: value,
+        page: 1,
+      })
+    }, 300)
+  }, [filters, onFiltersUpdate, primaryField, primaryFieldId])
+
+  useEffect(() => {
+    return () => {
+      debouncedSearchUpdate?.cancel()
+    }
+  }, [debouncedSearchUpdate])
 
   const changeFilter = (
     name: string,
@@ -66,9 +95,6 @@ export function GenericFilter({
   }
 
   const handleAdd = useCallback(() => {
-    const primaryField = config.fields.find(
-      f => f.name.toLowerCase() === entity.toLowerCase()
-    )
     if (!primaryField || primaryField.type !== "entity") {
       console.error(
         `handleAdd: Invalid primary field for entity=${entity}`,
@@ -96,7 +122,7 @@ export function GenericFilter({
       [primaryFieldId]: null,
       [primaryField.name]: null,
     })
-  }, [filters, data, config, entity, onChange, onFiltersUpdate])
+  }, [filters, data, entity, onChange, onFiltersUpdate, primaryField])
 
   const renderField = (field: FilterFieldConfig) => {
     if (omit.includes(field.name)) return null
@@ -179,6 +205,14 @@ export function GenericFilter({
           onChange={newValue =>
             changeFilter(field.name + "_id", newValue, true)
           }
+          onInputChange={
+            debouncedSearchUpdate &&
+            primaryField?.type === "entity" &&
+            field.name === primaryField.name
+              ? (_event, newValue) =>
+                  debouncedSearchUpdate(newValue ?? "")
+              : undefined
+          }
           filters={{}}
           records={data[responseKey] || []}
           allowNone={field.allowNone ?? true}
@@ -201,11 +235,6 @@ export function GenericFilter({
 
     return null
   }
-
-  const primaryField = config.fields.find(
-    f => f.name.toLowerCase() === entity.toLowerCase()
-  )
-  const primaryFieldId = primaryField ? `${primaryField.name}_id` : null
 
   return (
     <Stack direction="row" spacing={1} alignItems="center">
