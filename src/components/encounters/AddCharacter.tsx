@@ -41,7 +41,7 @@ export default function AddCharacter({
       await client.addCharacter(encounter, character)
       toastSuccess(`Added ${character.name} to the fight`)
       setSelectedCharacter(null)
-      onClose()
+      // Keep panel open to allow adding more characters
     } catch (error) {
       console.error("Error adding character to fight:", error)
       toastError(`Failed to add ${character.name} to the fight`)
