@@ -209,8 +209,7 @@ export function GenericFilter({
             debouncedSearchUpdate &&
             primaryField?.type === "entity" &&
             field.name === primaryField.name
-              ? (_event, newValue) =>
-                  debouncedSearchUpdate(newValue ?? "")
+              ? (_event, newValue) => debouncedSearchUpdate(newValue ?? "")
               : undefined
           }
           filters={{}}
