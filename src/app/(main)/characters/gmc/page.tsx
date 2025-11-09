@@ -303,7 +303,7 @@ export default function GMCTemplatesPage() {
 
   useEffect(() => {
     const loadTemplates = async () => {
-      if (!campaign) return
+      if (!campaign?.id) return
 
       setLoading(true)
       try {
@@ -329,7 +329,8 @@ export default function GMCTemplatesPage() {
     }
 
     loadTemplates()
-  }, [campaign, client, toastError])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [campaign?.id])
 
   const handleSelectTemplate = async (template: Character) => {
     if (creatingFrom) return // Prevent double-clicking
