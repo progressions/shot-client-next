@@ -79,8 +79,6 @@ export default function TargetSection({
   calculateTargetDefense,
   encounter,
 }: TargetSectionProps & { encounter: Encounter }) {
-  const theme = useTheme()
-
   // Extract needed values from formState
   const {
     selectedTargetIds,
