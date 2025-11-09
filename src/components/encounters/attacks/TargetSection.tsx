@@ -8,7 +8,6 @@ import {
   Checkbox,
   Button,
 } from "@mui/material"
-import { useTheme } from "@mui/material/styles"
 import { CS } from "@/services"
 import type { TargetSectionProps, Encounter } from "@/types"
 import { NumberField } from "@/components/ui"
