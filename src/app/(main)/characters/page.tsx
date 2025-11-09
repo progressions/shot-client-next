@@ -28,7 +28,7 @@ export default async function CharactersPage({
     <ResourcePage
       resourceName="characters"
       fetchData={async (client, params) => client.getCharacters(params)}
-      validSorts={["name", "created_at", "updated_at"]}
+      validSorts={["name", "archetype", "faction", "juncture", "created_at", "updated_at"]}
       getInitialFormData={(
         data: CharactersResponse,
         page,

@@ -50,7 +50,7 @@ const columns: GridColDef<Character>[] = [
     renderCell: params => CS.type(params.row),
   },
   {
-    field: "archtype",
+    field: "archetype",
     headerName: "Archetype",
     width: 140,
     editable: false,
