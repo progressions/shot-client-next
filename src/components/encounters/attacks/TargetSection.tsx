@@ -246,7 +246,7 @@ export default function TargetSection({
                       name={`mookDist-${id}`}
                       value={mookDistribution[id] || 0}
                       size="small"
-                      width="60px"
+                      width="80px"
                       error={false}
                       onChange={e => {
                         updateMookDistribution(
@@ -849,7 +849,7 @@ export default function TargetSection({
       )}
 
       {/* Defense and Modifiers Section */}
-      <Box sx={{ mb: 1, mt: 1 }}>
+      <Box sx={{ mb: 1, mt: 2 }}>
         <Stack direction="row" spacing={{ xs: 1, sm: 2 }} alignItems="center">
           {/* Defense Value - show for multiple targets when non-mook attacker (except for single mook group) */}
           {selectedTargetIds.length > 1 && attacker && !CS.isMook(attacker) && (
@@ -857,7 +857,7 @@ export default function TargetSection({
               <NumberField
                 name="defenseValue"
                 label="Defense"
-                labelBackgroundColor="#730F10"
+                labelBackgroundColor="#873230"
                 value={parseInt(defenseValue || "0") || 0}
                 size="small"
                 width="80px"
