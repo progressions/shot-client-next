@@ -33,10 +33,8 @@ export function BaseDataGrid<T>({
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    if (!ready) {
-      setReady(true)
-    }
-  }, [ready])
+    setReady(true)
+  }, [])
 
   const onSortChange = (model: GridSortModel) => {
     const sortField = model[0]?.field || ""
