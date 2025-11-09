@@ -89,7 +89,14 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
       <SortControls
         route="/characters"
         isMobile={viewMode === "mobile"}
-        validSorts={["name", "archetype", "faction", "juncture", "created_at", "updated_at"]}
+        validSorts={[
+          "name",
+          "archetype",
+          "faction",
+          "juncture",
+          "created_at",
+          "updated_at",
+        ]}
         dispatchForm={dispatchForm}
         formState={formState}
       >
