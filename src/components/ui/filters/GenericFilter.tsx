@@ -57,17 +57,23 @@ export function GenericFilter({
       return null
     }
 
-    return debounce((value: string) => {
-      onFiltersUpdate({
-        ...filters,
-        ...(primaryFieldId
-          ? { [primaryFieldId]: null, [primaryField.name]: null }
-          : {}),
-        search: value,
-        page: 1,
-      })
-    }, 300)
-  }, [filters, onFiltersUpdate, primaryField, primaryFieldId])
+    return debounce(
+      (
+        value: string,
+        currentFilters: Record<string, string | boolean | null>
+      ) => {
+        onFiltersUpdate({
+          ...currentFilters,
+          ...(primaryFieldId
+            ? { [primaryFieldId]: null, [primaryField.name]: null }
+            : {}),
+          search: value,
+          page: 1,
+        })
+      },
+      300
+    )
+  }, [onFiltersUpdate, primaryField, primaryFieldId])
 
   useEffect(() => {
     return () => {
@@ -122,7 +128,7 @@ export function GenericFilter({
       [primaryFieldId]: null,
       [primaryField.name]: null,
     })
-  }, [filters, data, entity, onChange, onFiltersUpdate, primaryField])
+  }, [filters, data, entity, onChange, onFiltersUpdate, primaryField, config])
 
   const renderField = (field: FilterFieldConfig) => {
     if (omit.includes(field.name)) return null
@@ -206,10 +212,9 @@ export function GenericFilter({
             changeFilter(field.name + "_id", newValue, true)
           }
           onInputChange={
-            debouncedSearchUpdate &&
-            primaryField?.type === "entity" &&
-            field.name === primaryField.name
-              ? (_event, newValue) => debouncedSearchUpdate(newValue ?? "")
+            debouncedSearchUpdate && field.name === primaryField.name
+              ? (_event, newValue) =>
+                  debouncedSearchUpdate(newValue ?? "", filters)
               : undefined
           }
           filters={{}}
