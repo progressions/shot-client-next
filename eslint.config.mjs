@@ -2,14 +2,9 @@ import globals from "globals"
 import pluginJs from "@eslint/js"
 import tseslint from "typescript-eslint"
 import pluginReact from "eslint-plugin-react"
-import { FlatCompat } from "@eslint/eslintrc"
+import pluginReactHooks from "eslint-plugin-react-hooks"
 import unusedImports from "eslint-plugin-unused-imports"
 import eslintPluginImport from "eslint-plugin-import"
-
-const compat = new FlatCompat({
-  // import.meta.dirname is available after Node.js v20.11.0
-  baseDirectory: import.meta.dirname,
-})
 
 /** @type {import("eslint").Linter.Config[]} */
 const config = [
@@ -19,22 +14,18 @@ const config = [
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
-  ...compat.config({
-    extends: ["next"],
+  {
     settings: {
-      next: {
-        rootDir: ".",
+      react: {
+        version: "detect",
       },
     },
-  }),
-  ...compat.config({
-    extends: ["plugin:drizzle/all"],
-  }),
+  },
   {
     plugins: {
       import: eslintPluginImport,
       "unused-imports": unusedImports,
-      "eslint-plugin-import": eslintPluginImport,
+      "react-hooks": pluginReactHooks,
     },
   },
   {
@@ -42,6 +33,8 @@ const config = [
       "no-undef": 0,
       "no-console": "off",
       "react/react-in-jsx-scope": "off",
+      "react/prop-types": "off",
+      "react/no-unknown-property": ["error", { ignore: ["jsx", "global"] }],
       "no-prototype-builtins": "off",
       "drizzle/enforce-delete-with-where": "off",
       "no-unused-vars": "off",
@@ -55,7 +48,9 @@ const config = [
           args: "after-used",
           argsIgnorePattern: "^_",
         },
-      ]
+      ],
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
     },
   },
   {
