@@ -1,5 +1,4 @@
 import { Box, AppBar, Toolbar, Typography } from "@mui/material"
-import Link from "next/link"
 import { Button } from "../Button"
 import { ConditionalMenu } from "./ConditionalMenu"
 import { UserMenu } from "./UserMenu"
@@ -18,7 +17,7 @@ export async function Navbar({ user }) {
           <ConditionalMenu />
           <Typography
             variant="h6"
-            component={Link}
+            component="a"
             href="/"
             sx={{
               color: "#ffffff",
@@ -38,7 +37,6 @@ export async function Navbar({ user }) {
             <Button
               variant="contained"
               color="primary"
-              component={Link}
               href="/login"
               sx={{ color: "#ffffff" }}
             >

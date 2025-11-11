@@ -1,7 +1,7 @@
-// middleware.ts
+// proxy.ts - Next.js 16 proxy configuration (replaces middleware.ts)
 import { NextRequest, NextResponse } from "next/server"
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const token = request.cookies.get("jwtToken")?.value
   const { pathname } = request.nextUrl
 
