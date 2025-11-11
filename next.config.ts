@@ -1,4 +1,5 @@
 import type { NextConfig } from "next"
+import path from "path"
 
 const nextConfig: NextConfig = {
   output: 'standalone',
@@ -19,7 +20,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   turbopack: {
-    root: '/Users/isaacpriestley/tech/isaacpriestley/chi-war/shot-client-next',
+    root: path.resolve(__dirname),
   },
 }
 
