@@ -18,10 +18,8 @@ const nextConfig: NextConfig = {
     // !! WARN !!
     ignoreBuildErrors: true,
   },
-  eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
-    ignoreDuringBuilds: true,
+  turbopack: {
+    root: '/Users/isaacpriestley/tech/isaacpriestley/chi-war/shot-client-next',
   },
 }
 
