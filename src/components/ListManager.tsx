@@ -3,7 +3,7 @@ import { Skeleton, Stack, Box } from "@mui/material"
 import { GenericFilter, BadgeList } from "@/components/ui"
 import { useClient } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import { paginateArray } from "@/lib"
 import { filterConfigs } from "@/lib/filterConfigs"
 import type { Fight } from "@/types"
@@ -33,14 +33,65 @@ export function ListManager({
   manage = true,
 }: ListManagerProps) {
   const childIdsKey = `${childEntityName.toLowerCase()}_ids`
-  const childIds = parentEntity[childIdsKey]
+  const childIds = useMemo(() => {
+    if (childEntityName === "Character" && Array.isArray(parentEntity.shots)) {
+      const idsFromShots = parentEntity.shots
+        .map(shot => shot.character_id)
+        .filter(Boolean)
+        .filter((id, index, self) => self.indexOf(id) === index)
+      if (idsFromShots.length > 0) return idsFromShots
+    }
+    if (childEntityName === "Vehicle" && Array.isArray(parentEntity.shots)) {
+      const idsFromShots = parentEntity.shots
+        .map(shot => shot.vehicle_id)
+        .filter(Boolean)
+        .filter((id, index, self) => self.indexOf(id) === index)
+      if (idsFromShots.length > 0) return idsFromShots
+    }
+
+    const ids = parentEntity[childIdsKey]
+    if (Array.isArray(ids) && ids.length > 0) {
+      return ids
+    }
+    return []
+  }, [childEntityName, childIdsKey, parentEntity])
   const stableExcludeIds = excludeIds
   const collection = collectionNames[childEntityName]
   const pluralChildEntityName = pluralize(childEntityName)
-  const [childEntities, setChildEntities] = useState(
-    parentEntity[collection] || []
-  )
+  const defaultEntities = useMemo(() => {
+    if (
+      Array.isArray(parentEntity[collection]) &&
+      parentEntity[collection].length
+    ) {
+      return parentEntity[collection]
+    }
+    if (childEntityName === "Character" && Array.isArray(parentEntity.shots)) {
+      return parentEntity.shots
+        .map(shot => shot.character)
+        .filter(Boolean)
+        .map(character => ({
+          ...character,
+          entity_class: character.entity_class || "Character",
+        }))
+    }
+    if (childEntityName === "Vehicle" && Array.isArray(parentEntity.shots)) {
+      return parentEntity.shots
+        .map(shot => shot.vehicle)
+        .filter(Boolean)
+        .map(vehicle => ({
+          ...vehicle,
+          entity_class: vehicle.entity_class || "Vehicle",
+        }))
+    }
+    return []
+  }, [childEntityName, collection, parentEntity])
+
+  const [childEntities, setChildEntities] = useState(defaultEntities)
+  const optimisticUpdateRef = useRef(false)
   const { client } = useClient()
+  // Don't use fight_id filter for autocomplete - we want to show ALL characters
+  // for selection, not just ones already in the fight
+  const contextualFilters: Record<string, string> = {}
   const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(true)
 
@@ -64,6 +115,7 @@ export function ListManager({
     archetypes: [],
     types: [],
     filters: {
+      ...contextualFilters,
       per_page: 200,
       sort: "name",
       order: "asc",
@@ -75,6 +127,12 @@ export function ListManager({
 
   useEffect(() => {
     const fetchChildEntities = async () => {
+      // Skip fetch if we just did an optimistic update
+      if (optimisticUpdateRef.current) {
+        optimisticUpdateRef.current = false
+        return
+      }
+
       if (!childIds || childIds.length === 0) {
         setChildEntities([])
         return
@@ -123,9 +181,14 @@ export function ListManager({
     dispatchForm({
       type: FormActions.UPDATE,
       name: "filters",
-      value: { sort: "name", order: "asc", per_page: 200 },
+      value: {
+        ...contextualFilters,
+        sort: "name",
+        order: "asc",
+        per_page: 200,
+      },
     })
-  }, [dispatchForm])
+  }, [contextualFilters, dispatchForm])
 
   const fetchChildrenForAutocomplete = useCallback(
     async (localFilters: Record<string, string | boolean | null>) => {
@@ -143,7 +206,7 @@ export function ListManager({
             params: Record<string, unknown>,
             cache?: Record<string, unknown>
           ) => Promise<{ data: Record<string, unknown> }>
-        )(localFilters)
+        )({ ...contextualFilters, ...localFilters })
         for (const [key, value] of Object.entries(response.data)) {
           dispatchForm({
             type: FormActions.UPDATE,
@@ -156,7 +219,7 @@ export function ListManager({
       }
       setLoading(false)
     },
-    [client, dispatchForm, pluralChildEntityName]
+    [client, contextualFilters, dispatchForm, pluralChildEntityName]
   )
 
   useEffect(() => {
@@ -169,20 +232,29 @@ export function ListManager({
         type: FormActions.UPDATE,
         name: "filters",
         value: {
+          ...contextualFilters,
           ...formState.data.filters,
           ...filters,
         },
       })
     },
-    [dispatchForm, formState.data.filters]
+    [contextualFilters, dispatchForm, formState.data.filters]
   )
 
   const handleAdd = useCallback(
     async (child: AutocompleteOption | string | null) => {
-      if (child && typeof child !== "string" && !childIds.includes(child.id)) {
+      if (
+        child &&
+        typeof child !== "string" &&
+        !(childIds as (number | string)[]).includes(child.id)
+      ) {
+        // Mark that we're doing an optimistic update
+        optimisticUpdateRef.current = true
         // Locally update childEntities
-        setChildEntities(prev => [...prev, child])
-        const newChildIds = [...childIds, child.id]
+        const updatedEntities = [...childEntities, child]
+        setChildEntities(updatedEntities)
+        // Use the updated entities list to build the new IDs array
+        const newChildIds = updatedEntities.map(entity => entity.id)
         try {
           await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
           setCurrentPage(1)
@@ -192,22 +264,34 @@ export function ListManager({
             error
           )
           // Revert local update on error
+          optimisticUpdateRef.current = false
           setChildEntities(prev =>
             prev.filter(entity => entity.id !== child.id)
           )
         }
       }
     },
-    [childIds, onListUpdate, parentEntity, childIdsKey, childEntityName]
+    [
+      childIds,
+      childEntities,
+      onListUpdate,
+      parentEntity,
+      childIdsKey,
+      childEntityName,
+    ]
   )
 
   const handleDelete = useCallback(
     async (item: AutocompleteOption) => {
+      // Mark that we're doing an optimistic update
+      optimisticUpdateRef.current = true
       // Locally update childEntities
-      setChildEntities(prev => prev.filter(entity => entity.id !== item.id))
-      const newChildIds = childIds.filter(
-        (childId: number) => childId !== item.id
+      const updatedEntities = childEntities.filter(
+        entity => entity.id !== item.id
       )
+      setChildEntities(updatedEntities)
+      // Use the updated entities list to build the new IDs array
+      const newChildIds = updatedEntities.map(entity => entity.id)
       try {
         await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
       } catch (error) {
@@ -216,20 +300,14 @@ export function ListManager({
           error
         )
         // Revert local update on error
+        optimisticUpdateRef.current = false
         setChildEntities(prev => [
           ...prev,
           childEntities.find(entity => entity.id === item.id) || item,
         ])
       }
     },
-    [
-      childIds,
-      onListUpdate,
-      parentEntity,
-      childIdsKey,
-      childEntityName,
-      childEntities,
-    ]
+    [childEntities, onListUpdate, parentEntity, childIdsKey, childEntityName]
   )
 
   const handlePageChange = (

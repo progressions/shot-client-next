@@ -45,26 +45,44 @@ export function createFightClient(deps: ClientDependencies) {
     fight: Fight | string,
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<Fight>> {
-    return get(apiV2.fights(fight), {}, cacheOptions)
+    const response = await get<{ fight?: Fight }>(
+      apiV2.fights(fight),
+      {},
+      cacheOptions
+    )
+    return normalizeFightResponse(response)
   }
 
   async function createFight(
     formData: FormData
   ): Promise<AxiosResponse<Fight>> {
-    return requestFormData("POST", `${apiV2.fights()}`, formData)
+    const response = await requestFormData<{ fight?: Fight }>(
+      "POST",
+      `${apiV2.fights()}`,
+      formData
+    )
+    return normalizeFightResponse(response)
   }
 
   async function updateFight(
     id: string,
     formData: FormData
   ): Promise<AxiosResponse<Fight>> {
-    return requestFormData("PATCH", `${apiV2.fights({ id })}`, formData)
+    const response = await requestFormData<{ fight?: Fight }>(
+      "PATCH",
+      `${apiV2.fights({ id })}`,
+      formData
+    )
+    return normalizeFightResponse(response)
   }
 
   async function touchFight(
     fight: Fight | string
   ): Promise<AxiosResponse<Fight>> {
-    return patch(`${apiV2.fights(fight)}/touch`)
+    const response = await patch<{ fight?: Fight }>(
+      `${apiV2.fights(fight)}/touch`
+    )
+    return normalizeFightResponse(response)
   }
 
   async function deleteFight(
@@ -193,10 +211,20 @@ export function createFightClient(deps: ClientDependencies) {
     notes?: string
   ): Promise<AxiosResponse<Fight>> {
     const fightId = typeof fight === "string" ? fight : fight.id
-    return patch(
+    const response = await patch<{ fight?: Fight }>(
       `${apiV2.fights({ id: fightId })}/end_fight`,
       notes ? { notes } : {}
     )
+    return normalizeFightResponse(response)
+  }
+
+  function normalizeFightResponse(
+    response: AxiosResponse<{ fight?: Fight }>
+  ): AxiosResponse<Fight> {
+    const fightData =
+      response.data?.fight ?? (response.data as unknown as Fight)
+    ;(response as AxiosResponse<Fight>).data = fightData
+    return response as AxiosResponse<Fight>
   }
 
   return {

@@ -61,7 +61,9 @@ const Avatar = ({
 
   const initials = entity.name
     ? (() => {
-        const words = entity.name.trim().split(/\s+/)
+        // Remove parentheses and their contents before splitting
+        const cleanedName = entity.name.replace(/\s*\([^)]*\)/g, "").trim()
+        const words = cleanedName.split(/\s+/)
         if (words.length === 0) return ""
         if (words.length === 1) return words[0].charAt(0).toUpperCase()
 

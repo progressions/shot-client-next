@@ -92,6 +92,19 @@ function handleAuthConflictResolution(
   window.location.href = "/login"
 }
 
+function normalizeStoredCampaign(storedValue: unknown): Campaign | null {
+  if (!storedValue || typeof storedValue !== "object") {
+    return null
+  }
+
+  if ("campaign" in storedValue) {
+    const { campaign } = storedValue as { campaign?: Campaign | null }
+    return campaign ?? null
+  }
+
+  return storedValue as Campaign
+}
+
 interface AppContextType {
   client: Client
   jwt: string
@@ -243,8 +256,17 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
             )
             if (cachedCampaign) {
               const parsedCampaign = JSON.parse(cachedCampaign)
-              if (parsedCampaign && parsedCampaign.id !== defaultCampaign.id) {
-                setCampaign(parsedCampaign)
+              const normalizedCampaign = normalizeStoredCampaign(parsedCampaign)
+              if (
+                normalizedCampaign &&
+                normalizedCampaign.id &&
+                normalizedCampaign.id !== defaultCampaign.id
+              ) {
+                setCampaign(normalizedCampaign)
+                localStorage.setItem(
+                  `currentCampaign-${parsedUser.id}`,
+                  JSON.stringify(normalizedCampaign)
+                )
                 setLoading(false)
                 return
               }
@@ -297,8 +319,17 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         )
         if (cachedCampaign) {
           const parsedCampaign = JSON.parse(cachedCampaign)
-          if (parsedCampaign && parsedCampaign.id !== defaultCampaign.id) {
-            setCampaign(parsedCampaign)
+          const normalizedCampaign = normalizeStoredCampaign(parsedCampaign)
+          if (
+            normalizedCampaign &&
+            normalizedCampaign.id &&
+            normalizedCampaign.id !== defaultCampaign.id
+          ) {
+            setCampaign(normalizedCampaign)
+            localStorage.setItem(
+              `currentCampaign-${userData.id}`,
+              JSON.stringify(normalizedCampaign)
+            )
             setLoading(false)
             return
           }

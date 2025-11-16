@@ -53,11 +53,15 @@ export async function getServerClient() {
 
           // Handle 400 errors from API endpoints (invalid/expired JWT)
           // This happens when the JWT exists but is invalid for the current environment
+          const isCurrentUserRequest =
+            error?.config?.url?.includes("/api/v2/users/current") ||
+            error?.config?.url?.includes("/api/v2/users/profile")
+          const isCampaignRequest =
+            error?.config?.url?.includes("/api/v2/campaigns")
+
           if (
             error?.response?.status === 400 &&
-            (error?.config?.url?.includes("/api/v2/users/current") ||
-              error?.config?.url?.includes("/api/v2/campaigns") ||
-              error?.config?.url?.includes("/api/v2/"))
+            (isCurrentUserRequest || isCampaignRequest)
           ) {
             console.log(
               "🔥 400 error from API - invalid JWT, redirecting to login"

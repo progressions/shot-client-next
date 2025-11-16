@@ -16,6 +16,56 @@ interface ClientDependencies {
   queryParams: typeof import("@/lib").queryParams
 }
 
+type CampaignPayload =
+  | Campaign
+  | { campaign?: Campaign | null }
+  | { campaign?: Campaign | null; user?: unknown }
+  | null
+
+function hasCampaignWrapper(payload: unknown): payload is {
+  campaign?: Campaign | null
+} {
+  return (
+    typeof payload === "object" &&
+    payload !== null &&
+    Object.prototype.toString.call(payload) === "[object Object]" &&
+    "campaign" in payload
+  )
+}
+
+function extractCampaign(payload: CampaignPayload): Campaign | null {
+  if (!payload) {
+    return null
+  }
+
+  if (hasCampaignWrapper(payload)) {
+    return payload.campaign ?? null
+  }
+
+  return payload as Campaign
+}
+
+function normalizeCampaignResponse(
+  response: AxiosResponse<CampaignPayload>
+): AxiosResponse<Campaign | null> {
+  const normalized = extractCampaign(response.data)
+  ;(response as AxiosResponse<Campaign | null>).data = normalized
+  return response as AxiosResponse<Campaign | null>
+}
+
+function normalizeRequiredCampaignResponse(
+  response: AxiosResponse<CampaignPayload>
+): AxiosResponse<Campaign> {
+  const normalized = extractCampaign(response.data)
+
+  if (!normalized) {
+    throw new Error("Campaign data missing from response")
+  }
+
+  ;(response as AxiosResponse<Campaign>).data = normalized
+  return response as AxiosResponse<Campaign>
+}
+
 export function createCampaignClient(deps: ClientDependencies) {
   const { api, apiV2, queryParams } = deps
   const {
@@ -98,14 +148,24 @@ export function createCampaignClient(deps: ClientDependencies) {
   async function createCampaign(
     formData: FormData
   ): Promise<AxiosResponse<Campaign>> {
-    return requestFormData("POST", `${apiV2.campaigns()}`, formData)
+    const response = await requestFormData<CampaignPayload>(
+      "POST",
+      `${apiV2.campaigns()}`,
+      formData
+    )
+    return normalizeRequiredCampaignResponse(response)
   }
 
   async function updateCampaign(
     id: string,
     formData: FormData
   ): Promise<AxiosResponse<Campaign>> {
-    return requestFormData("PATCH", `${apiV2.campaigns({ id })}`, formData)
+    const response = await requestFormData<CampaignPayload>(
+      "PATCH",
+      `${apiV2.campaigns({ id })}`,
+      formData
+    )
+    return normalizeRequiredCampaignResponse(response)
   }
 
   async function getCampaigns(
@@ -120,7 +180,12 @@ export function createCampaignClient(deps: ClientDependencies) {
     campaign: Campaign | string,
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<Campaign>> {
-    return get(apiV2.campaigns(campaign), {}, cacheOptions)
+    const response = await get<CampaignPayload>(
+      apiV2.campaigns(campaign),
+      {},
+      cacheOptions
+    )
+    return normalizeRequiredCampaignResponse(response)
   }
 
   async function deleteCampaign(
@@ -134,15 +199,28 @@ export function createCampaignClient(deps: ClientDependencies) {
     campaign: Campaign | null
   ): Promise<AxiosResponse<Campaign | null>> {
     if (campaign === null) {
-      return patch(`${apiV2.campaigns()}/set`, { id: null })
+      const response = await patch<CampaignPayload>(
+        `${apiV2.campaigns()}/set`,
+        { id: null }
+      )
+      return normalizeCampaignResponse(response)
     }
-    return patch(`${apiV2.campaigns(campaign)}/set`, { id: campaign.id })
+    const response = await patch<CampaignPayload>(
+      `${apiV2.campaigns(campaign)}/set`,
+      { id: campaign.id }
+    )
+    return normalizeCampaignResponse(response)
   }
 
   async function getCurrentCampaign(
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<Campaign | null>> {
-    return get(apiV2.currentCampaign(), {}, cacheOptions)
+    const response = await get<CampaignPayload>(
+      apiV2.currentCampaign(),
+      {},
+      cacheOptions
+    )
+    return normalizeCampaignResponse(response)
   }
 
   async function getCurrentFight(
