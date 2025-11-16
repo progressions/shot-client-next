@@ -34,21 +34,24 @@ export function ListManager({
 }: ListManagerProps) {
   const childIdsKey = `${childEntityName.toLowerCase()}_ids`
   const childIds = useMemo(() => {
-    const ids = parentEntity[childIdsKey]
-    if (Array.isArray(ids) && ids.length > 0) {
-      return ids
-    }
     if (childEntityName === "Character" && Array.isArray(parentEntity.shots)) {
-      return parentEntity.shots
+      const idsFromShots = parentEntity.shots
         .map(shot => shot.character_id)
         .filter(Boolean)
         .filter((id, index, self) => self.indexOf(id) === index)
+      if (idsFromShots.length > 0) return idsFromShots
     }
     if (childEntityName === "Vehicle" && Array.isArray(parentEntity.shots)) {
-      return parentEntity.shots
+      const idsFromShots = parentEntity.shots
         .map(shot => shot.vehicle_id)
         .filter(Boolean)
         .filter((id, index, self) => self.indexOf(id) === index)
+      if (idsFromShots.length > 0) return idsFromShots
+    }
+
+    const ids = parentEntity[childIdsKey]
+    if (Array.isArray(ids) && ids.length > 0) {
+      return ids
     }
     return []
   }, [childEntityName, childIdsKey, parentEntity])
@@ -56,7 +59,10 @@ export function ListManager({
   const collection = collectionNames[childEntityName]
   const pluralChildEntityName = pluralize(childEntityName)
   const defaultEntities = useMemo(() => {
-    if (Array.isArray(parentEntity[collection]) && parentEntity[collection].length) {
+    if (
+      Array.isArray(parentEntity[collection]) &&
+      parentEntity[collection].length
+    ) {
       return parentEntity[collection]
     }
     if (childEntityName === "Character" && Array.isArray(parentEntity.shots)) {
@@ -172,7 +178,12 @@ export function ListManager({
     dispatchForm({
       type: FormActions.UPDATE,
       name: "filters",
-      value: { ...contextualFilters, sort: "name", order: "asc", per_page: 200 },
+      value: {
+        ...contextualFilters,
+        sort: "name",
+        order: "asc",
+        per_page: 200,
+      },
     })
   }, [contextualFilters, dispatchForm])
 
@@ -229,11 +240,11 @@ export function ListManager({
 
   const handleAdd = useCallback(
     async (child: AutocompleteOption | string | null) => {
-  if (
-    child &&
-    typeof child !== "string" &&
-    !(childIds as (number | string)[]).includes(child.id)
-  ) {
+      if (
+        child &&
+        typeof child !== "string" &&
+        !(childIds as (number | string)[]).includes(child.id)
+      ) {
         // Locally update childEntities
         setChildEntities(prev => [...prev, child])
         const newChildIds = [...childIds, child.id]

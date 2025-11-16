@@ -57,6 +57,7 @@ export default function Show({ fight: initialFight }: ShowProperties) {
   })
   const { errors, status, data } = formState
   const fight = data.entity
+  console.log("fight", fight)
   const { updateEntity, deleteEntity, handleChangeAndSave } = useEntity(
     fight,
     dispatchForm
