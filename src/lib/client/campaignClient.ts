@@ -26,7 +26,10 @@ function hasCampaignWrapper(payload: unknown): payload is {
   campaign?: Campaign | null
 } {
   return (
-    typeof payload === "object" && payload !== null && "campaign" in payload
+    typeof payload === "object" &&
+    payload !== null &&
+    Object.prototype.toString.call(payload) === "[object Object]" &&
+    "campaign" in payload
   )
 }
 
