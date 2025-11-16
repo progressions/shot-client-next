@@ -245,8 +245,10 @@ export function ListManager({
         !(childIds as (number | string)[]).includes(child.id)
       ) {
         // Locally update childEntities
-        setChildEntities(prev => [...prev, child])
-        const newChildIds = [...childIds, child.id]
+        const updatedEntities = [...childEntities, child]
+        setChildEntities(updatedEntities)
+        // Use the updated entities list to build the new IDs array
+        const newChildIds = updatedEntities.map(entity => entity.id)
         try {
           await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
           setCurrentPage(1)
@@ -262,16 +264,16 @@ export function ListManager({
         }
       }
     },
-    [childIds, onListUpdate, parentEntity, childIdsKey, childEntityName]
+    [childIds, childEntities, onListUpdate, parentEntity, childIdsKey, childEntityName]
   )
 
   const handleDelete = useCallback(
     async (item: AutocompleteOption) => {
       // Locally update childEntities
-      setChildEntities(prev => prev.filter(entity => entity.id !== item.id))
-      const newChildIds = childIds.filter(
-        (childId: string | number) => childId !== item.id
-      )
+      const updatedEntities = childEntities.filter(entity => entity.id !== item.id)
+      setChildEntities(updatedEntities)
+      // Use the updated entities list to build the new IDs array
+      const newChildIds = updatedEntities.map(entity => entity.id)
       try {
         await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
       } catch (error) {
@@ -287,12 +289,11 @@ export function ListManager({
       }
     },
     [
-      childIds,
+      childEntities,
       onListUpdate,
       parentEntity,
       childIdsKey,
       childEntityName,
-      childEntities,
     ]
   )
 
