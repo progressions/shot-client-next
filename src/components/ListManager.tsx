@@ -33,13 +33,54 @@ export function ListManager({
   manage = true,
 }: ListManagerProps) {
   const childIdsKey = `${childEntityName.toLowerCase()}_ids`
-  const childIds = parentEntity[childIdsKey] || []
+  const childIds = useMemo(() => {
+    const ids = parentEntity[childIdsKey]
+    if (Array.isArray(ids) && ids.length > 0) {
+      return ids
+    }
+    if (childEntityName === "Character" && Array.isArray(parentEntity.shots)) {
+      return parentEntity.shots
+        .map(shot => shot.character_id)
+        .filter(Boolean)
+        .filter((id, index, self) => self.indexOf(id) === index)
+    }
+    if (childEntityName === "Vehicle" && Array.isArray(parentEntity.shots)) {
+      return parentEntity.shots
+        .map(shot => shot.vehicle_id)
+        .filter(Boolean)
+        .filter((id, index, self) => self.indexOf(id) === index)
+    }
+    return []
+  }, [childEntityName, childIdsKey, parentEntity])
   const stableExcludeIds = excludeIds
   const collection = collectionNames[childEntityName]
   const pluralChildEntityName = pluralize(childEntityName)
-  const [childEntities, setChildEntities] = useState(
-    parentEntity[collection] || []
-  )
+  const defaultEntities = useMemo(() => {
+    if (Array.isArray(parentEntity[collection]) && parentEntity[collection].length) {
+      return parentEntity[collection]
+    }
+    if (childEntityName === "Character" && Array.isArray(parentEntity.shots)) {
+      return parentEntity.shots
+        .map(shot => shot.character)
+        .filter(Boolean)
+        .map(character => ({
+          ...character,
+          entity_class: character.entity_class || "Character",
+        }))
+    }
+    if (childEntityName === "Vehicle" && Array.isArray(parentEntity.shots)) {
+      return parentEntity.shots
+        .map(shot => shot.vehicle)
+        .filter(Boolean)
+        .map(vehicle => ({
+          ...vehicle,
+          entity_class: vehicle.entity_class || "Vehicle",
+        }))
+    }
+    return []
+  }, [childEntityName, collection, parentEntity])
+
+  const [childEntities, setChildEntities] = useState(defaultEntities)
   const { client } = useClient()
   const contextualFilters = useMemo(() => {
     const filters: Record<string, string> = {}
@@ -188,7 +229,11 @@ export function ListManager({
 
   const handleAdd = useCallback(
     async (child: AutocompleteOption | string | null) => {
-      if (child && typeof child !== "string" && !childIds.includes(child.id)) {
+  if (
+    child &&
+    typeof child !== "string" &&
+    !(childIds as (number | string)[]).includes(child.id)
+  ) {
         // Locally update childEntities
         setChildEntities(prev => [...prev, child])
         const newChildIds = [...childIds, child.id]
@@ -215,7 +260,7 @@ export function ListManager({
       // Locally update childEntities
       setChildEntities(prev => prev.filter(entity => entity.id !== item.id))
       const newChildIds = childIds.filter(
-        (childId: number) => childId !== item.id
+        (childId: string | number) => childId !== item.id
       )
       try {
         await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
