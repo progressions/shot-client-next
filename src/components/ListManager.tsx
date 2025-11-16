@@ -33,7 +33,7 @@ export function ListManager({
   manage = true,
 }: ListManagerProps) {
   const childIdsKey = `${childEntityName.toLowerCase()}_ids`
-  const childIds = parentEntity[childIdsKey]
+  const childIds = parentEntity[childIdsKey] || []
   const stableExcludeIds = excludeIds
   const collection = collectionNames[childEntityName]
   const pluralChildEntityName = pluralize(childEntityName)
