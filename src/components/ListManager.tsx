@@ -3,7 +3,7 @@ import { Skeleton, Stack, Box } from "@mui/material"
 import { GenericFilter, BadgeList } from "@/components/ui"
 import { useClient } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { paginateArray } from "@/lib"
 import { filterConfigs } from "@/lib/filterConfigs"
 import type { Fight } from "@/types"
@@ -41,6 +41,13 @@ export function ListManager({
     parentEntity[collection] || []
   )
   const { client } = useClient()
+  const contextualFilters = useMemo(() => {
+    const filters: Record<string, string> = {}
+    if (childEntityName === "Character" && parentEntity?.id) {
+      filters.fight_id = parentEntity.id
+    }
+    return filters
+  }, [childEntityName, parentEntity?.id])
   const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(true)
 
@@ -64,6 +71,7 @@ export function ListManager({
     archetypes: [],
     types: [],
     filters: {
+      ...contextualFilters,
       per_page: 200,
       sort: "name",
       order: "asc",
@@ -123,9 +131,9 @@ export function ListManager({
     dispatchForm({
       type: FormActions.UPDATE,
       name: "filters",
-      value: { sort: "name", order: "asc", per_page: 200 },
+      value: { ...contextualFilters, sort: "name", order: "asc", per_page: 200 },
     })
-  }, [dispatchForm])
+  }, [contextualFilters, dispatchForm])
 
   const fetchChildrenForAutocomplete = useCallback(
     async (localFilters: Record<string, string | boolean | null>) => {
@@ -143,7 +151,7 @@ export function ListManager({
             params: Record<string, unknown>,
             cache?: Record<string, unknown>
           ) => Promise<{ data: Record<string, unknown> }>
-        )(localFilters)
+        )({ ...contextualFilters, ...localFilters })
         for (const [key, value] of Object.entries(response.data)) {
           dispatchForm({
             type: FormActions.UPDATE,
@@ -156,7 +164,7 @@ export function ListManager({
       }
       setLoading(false)
     },
-    [client, dispatchForm, pluralChildEntityName]
+    [client, contextualFilters, dispatchForm, pluralChildEntityName]
   )
 
   useEffect(() => {
@@ -169,12 +177,13 @@ export function ListManager({
         type: FormActions.UPDATE,
         name: "filters",
         value: {
+          ...contextualFilters,
           ...formState.data.filters,
           ...filters,
         },
       })
     },
-    [dispatchForm, formState.data.filters]
+    [contextualFilters, dispatchForm, formState.data.filters]
   )
 
   const handleAdd = useCallback(
