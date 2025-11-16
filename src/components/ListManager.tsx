@@ -275,7 +275,14 @@ export function ListManager({
         }
       }
     },
-    [childIds, childEntities, onListUpdate, parentEntity, childIdsKey, childEntityName]
+    [
+      childIds,
+      childEntities,
+      onListUpdate,
+      parentEntity,
+      childIdsKey,
+      childEntityName,
+    ]
   )
 
   const handleDelete = useCallback(
@@ -283,7 +290,9 @@ export function ListManager({
       // Mark that we're doing an optimistic update
       optimisticUpdateRef.current = true
       // Locally update childEntities
-      const updatedEntities = childEntities.filter(entity => entity.id !== item.id)
+      const updatedEntities = childEntities.filter(
+        entity => entity.id !== item.id
+      )
       setChildEntities(updatedEntities)
       // Use the updated entities list to build the new IDs array
       const newChildIds = updatedEntities.map(entity => entity.id)
@@ -302,13 +311,7 @@ export function ListManager({
         ])
       }
     },
-    [
-      childEntities,
-      onListUpdate,
-      parentEntity,
-      childIdsKey,
-      childEntityName,
-    ]
+    [childEntities, onListUpdate, parentEntity, childIdsKey, childEntityName]
   )
 
   const handlePageChange = (
