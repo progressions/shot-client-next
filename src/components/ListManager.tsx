@@ -88,13 +88,12 @@ export function ListManager({
 
   const [childEntities, setChildEntities] = useState(defaultEntities)
   const { client } = useClient()
+  // Don't use fight_id filter for autocomplete - we want to show ALL characters
+  // for selection, not just ones already in the fight
   const contextualFilters = useMemo(() => {
     const filters: Record<string, string> = {}
-    if (childEntityName === "Character" && parentEntity?.id) {
-      filters.fight_id = parentEntity.id
-    }
     return filters
-  }, [childEntityName, parentEntity?.id])
+  }, [])
   const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(true)
 
