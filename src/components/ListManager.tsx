@@ -3,7 +3,7 @@ import { Skeleton, Stack, Box } from "@mui/material"
 import { GenericFilter, BadgeList } from "@/components/ui"
 import { useClient } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
-import { useState, useEffect, useCallback, useMemo } from "react"
+import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import { paginateArray } from "@/lib"
 import { filterConfigs } from "@/lib/filterConfigs"
 import type { Fight } from "@/types"
@@ -87,6 +87,7 @@ export function ListManager({
   }, [childEntityName, collection, parentEntity])
 
   const [childEntities, setChildEntities] = useState(defaultEntities)
+  const optimisticUpdateRef = useRef(false)
   const { client } = useClient()
   // Don't use fight_id filter for autocomplete - we want to show ALL characters
   // for selection, not just ones already in the fight
@@ -129,6 +130,13 @@ export function ListManager({
 
   useEffect(() => {
     const fetchChildEntities = async () => {
+      // Skip fetch if we just did an optimistic update
+      if (optimisticUpdateRef.current) {
+        console.log("Skipping fetch - optimistic update in progress")
+        optimisticUpdateRef.current = false
+        return
+      }
+
       if (!childIds || childIds.length === 0) {
         setChildEntities([])
         return
@@ -244,6 +252,8 @@ export function ListManager({
         typeof child !== "string" &&
         !(childIds as (number | string)[]).includes(child.id)
       ) {
+        // Mark that we're doing an optimistic update
+        optimisticUpdateRef.current = true
         // Locally update childEntities
         const updatedEntities = [...childEntities, child]
         setChildEntities(updatedEntities)
@@ -258,6 +268,7 @@ export function ListManager({
             error
           )
           // Revert local update on error
+          optimisticUpdateRef.current = false
           setChildEntities(prev =>
             prev.filter(entity => entity.id !== child.id)
           )
@@ -269,6 +280,8 @@ export function ListManager({
 
   const handleDelete = useCallback(
     async (item: AutocompleteOption) => {
+      // Mark that we're doing an optimistic update
+      optimisticUpdateRef.current = true
       // Locally update childEntities
       const updatedEntities = childEntities.filter(entity => entity.id !== item.id)
       setChildEntities(updatedEntities)
@@ -282,6 +295,7 @@ export function ListManager({
           error
         )
         // Revert local update on error
+        optimisticUpdateRef.current = false
         setChildEntities(prev => [
           ...prev,
           childEntities.find(entity => entity.id === item.id) || item,
