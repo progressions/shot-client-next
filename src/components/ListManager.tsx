@@ -129,7 +129,6 @@ export function ListManager({
     const fetchChildEntities = async () => {
       // Skip fetch if we just did an optimistic update
       if (optimisticUpdateRef.current) {
-        console.log("Skipping fetch - optimistic update in progress")
         optimisticUpdateRef.current = false
         return
       }
