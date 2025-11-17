@@ -54,7 +54,8 @@ export default async function SchticksPage({
           search,
           category: additionalParams?.category || defaults.category || "",
           path: additionalParams?.path || defaults.path || "",
-          show_hidden: additionalParams?.show_hidden || defaults.show_hidden || false,
+          show_hidden:
+            additionalParams?.show_hidden || defaults.show_hidden || false,
         },
         drawerOpen: false,
       })}

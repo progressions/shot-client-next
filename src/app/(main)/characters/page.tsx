@@ -60,11 +60,16 @@ export default async function CharactersPage({
           order,
           page,
           search,
-          character_type: additionalParams?.character_type || defaults.character_type || "",
+          character_type:
+            additionalParams?.character_type || defaults.character_type || "",
           archetype: additionalParams?.archetype || defaults.archetype || "",
           faction_id: additionalParams?.faction_id || defaults.faction_id || "",
-          show_hidden: additionalParams?.show_hidden || defaults.show_hidden || false,
-          template_filter: additionalParams?.template_filter || defaults.template_filter || "non-templates",
+          show_hidden:
+            additionalParams?.show_hidden || defaults.show_hidden || false,
+          template_filter:
+            additionalParams?.template_filter ||
+            defaults.template_filter ||
+            "non-templates",
         },
       })}
       ListComponent={List}

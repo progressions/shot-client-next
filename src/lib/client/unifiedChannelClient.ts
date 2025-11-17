@@ -8,10 +8,10 @@
  * This allows the frontend to support both backends without code changes.
  */
 
-import { createConsumer, Consumer, Subscription } from "@rails/actioncable"
+import { createConsumer, Consumer } from "@rails/actioncable"
 import { Socket, Channel } from "phoenix"
 
-export type ChannelCallback = (data: any) => void
+export type ChannelCallback = (data: unknown) => void
 
 export interface UnifiedChannel {
   disconnect: () => void
@@ -26,7 +26,7 @@ export interface ChannelOptions {
 export interface UnifiedChannelClient {
   subscribe: (
     channelName: string,
-    params: Record<string, any>,
+    params: Record<string, unknown>,
     options: ChannelOptions
   ) => UnifiedChannel
   disconnect: () => void
@@ -44,7 +44,7 @@ class ActionCableClient implements UnifiedChannelClient {
 
   subscribe(
     channelName: string,
-    params: Record<string, any>,
+    params: Record<string, unknown>,
     options: ChannelOptions
   ): UnifiedChannel {
     const subscription = this.consumer.subscriptions.create(
@@ -80,7 +80,7 @@ class PhoenixChannelClient implements UnifiedChannelClient {
     this.token = token
 
     this.socket = new Socket(websocketUrl, {
-      params: () => ({ token: this.token })
+      params: () => ({ token: this.token }),
     })
 
     this.socket.connect()
@@ -88,7 +88,7 @@ class PhoenixChannelClient implements UnifiedChannelClient {
 
   subscribe(
     channelName: string,
-    params: Record<string, any>,
+    params: Record<string, unknown>,
     options: ChannelOptions
   ): UnifiedChannel {
     // Convert Rails channel name to Phoenix topic format
@@ -99,8 +99,8 @@ class PhoenixChannelClient implements UnifiedChannelClient {
 
     // Phoenix uses event-based messages, ActionCable uses single 'received'
     // Listen for both ActionCable compatibility events and Phoenix-specific events
-    channel.on("message", options.received)  // ActionCable compatibility
-    channel.on("update", options.received)   // Phoenix Channels convention
+    channel.on("message", options.received) // ActionCable compatibility
+    channel.on("update", options.received) // Phoenix Channels convention
     channel.on("broadcast", options.received)
     channel.on("change", options.received)
 
@@ -123,7 +123,7 @@ class PhoenixChannelClient implements UnifiedChannelClient {
       .receive("ok", () => {
         if (options.connected) options.connected()
       })
-      .receive("error", (error: any) => {
+      .receive("error", (error: unknown) => {
         console.error(`[Phoenix] Failed to join channel ${topic}:`, error)
       })
 
@@ -145,7 +145,7 @@ class PhoenixChannelClient implements UnifiedChannelClient {
 
   private convertToPhoenixTopic(
     channelName: string,
-    params: Record<string, any>
+    params: Record<string, unknown>
   ): string {
     // Convert "CampaignChannel" -> "campaign"
     const baseName = channelName.replace("Channel", "").toLowerCase()

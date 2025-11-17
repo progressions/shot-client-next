@@ -23,17 +23,26 @@ interface ClientDependencies {
  */
 class ConsumerAdapter {
   private unifiedClient: UnifiedChannelClient
-  subscriptions: any
+  subscriptions: {
+    create: (
+      params: Record<string, unknown> & { channel: string },
+      callbacks: {
+        connected?: () => void
+        disconnected?: () => void
+        received: (data: unknown) => void
+      }
+    ) => { disconnect: () => void }
+  }
 
   constructor(unifiedClient: UnifiedChannelClient) {
     this.unifiedClient = unifiedClient
     this.subscriptions = {
       create: (
-        params: any,
+        params: Record<string, unknown> & { channel: string },
         callbacks: {
           connected?: () => void
           disconnected?: () => void
-          received: (data: any) => void
+          received: (data: unknown) => void
         }
       ) => {
         const { channel, ...rest } = params
@@ -56,10 +65,10 @@ export function consumer({ jwt, api }: ClientDependencies): Consumer | any {
     return {
       subscriptions: {
         create: () => ({
-          unsubscribe: () => {}
-        })
+          unsubscribe: () => {},
+        }),
       },
-      disconnect: () => {}
+      disconnect: () => {},
     }
   }
 
@@ -71,11 +80,7 @@ export function consumer({ jwt, api }: ClientDependencies): Consumer | any {
       ? `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/socket`
       : "ws://localhost:4002/socket"
 
-    const unifiedClient = createUnifiedChannelClient(
-      phoenixUrl,
-      jwt,
-      "phoenix"
-    )
+    const unifiedClient = createUnifiedChannelClient(phoenixUrl, jwt, "phoenix")
     return new ConsumerAdapter(unifiedClient)
   }
 

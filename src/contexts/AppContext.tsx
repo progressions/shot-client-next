@@ -452,7 +452,12 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
 
       // Only trigger callbacks for actual entity objects, not reload signals
       // Reload signals are strings like "reload", entity updates are objects
-      if (callbacks && callbacks.size > 0 && typeof value === "object" && value !== null) {
+      if (
+        callbacks &&
+        callbacks.size > 0 &&
+        typeof value === "object" &&
+        value !== null
+      ) {
         callbacks.forEach(callback => {
           try {
             console.log(

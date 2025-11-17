@@ -1,7 +1,7 @@
 // app/users/page.tsx
 import { List } from "@/components/users"
 import ResourcePage from "@/components/ResourcePage"
-import { applyFilterDefaults, getFilterDefaults } from "@/lib"
+import { applyFilterDefaults } from "@/lib"
 import type { UsersResponse } from "@/types"
 
 export const metadata = {

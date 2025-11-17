@@ -51,8 +51,7 @@ export function applyFilterDefaults(
   // Preserve boolean false and string "false" for show_hidden
   return Object.fromEntries(
     Object.entries(withDefaults).filter(
-      ([_, value]) =>
-        value !== "" && value !== null && value !== undefined
+      ([_, value]) => value !== "" && value !== null && value !== undefined
     )
   )
 }

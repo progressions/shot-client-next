@@ -1,7 +1,7 @@
 // app/campaigns/page.tsx
 import { List } from "@/components/campaigns"
 import ResourcePage from "@/components/ResourcePage"
-import { applyFilterDefaults, getFilterDefaults } from "@/lib"
+import { applyFilterDefaults } from "@/lib"
 import type { CampaignsResponse } from "@/types"
 
 export const metadata = {

@@ -54,7 +54,8 @@ export default async function WeaponsPage({
           search,
           category: additionalParams?.category || defaults.category || "",
           juncture: additionalParams?.juncture || defaults.juncture || "",
-          show_hidden: additionalParams?.show_hidden || defaults.show_hidden || false,
+          show_hidden:
+            additionalParams?.show_hidden || defaults.show_hidden || false,
         },
       })}
       ListComponent={List}

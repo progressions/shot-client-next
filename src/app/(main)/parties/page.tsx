@@ -52,7 +52,8 @@ export default async function PartiesPage({
           page,
           search,
           faction_id: additionalParams?.faction_id || defaults.faction_id || "",
-          show_hidden: additionalParams?.show_hidden || defaults.show_hidden || false,
+          show_hidden:
+            additionalParams?.show_hidden || defaults.show_hidden || false,
         },
       })}
       ListComponent={List}

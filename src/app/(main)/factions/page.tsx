@@ -50,7 +50,8 @@ export default async function FactionsPage({
           order,
           page,
           search,
-          show_hidden: additionalParams?.show_hidden || defaults.show_hidden || false,
+          show_hidden:
+            additionalParams?.show_hidden || defaults.show_hidden || false,
         },
         drawerOpen: false,
       })}

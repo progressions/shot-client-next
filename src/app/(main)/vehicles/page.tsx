@@ -52,10 +52,12 @@ export default async function VehiclesPage({
           order,
           page,
           search,
-          vehicle_type: additionalParams?.vehicle_type || defaults.vehicle_type || "",
+          vehicle_type:
+            additionalParams?.vehicle_type || defaults.vehicle_type || "",
           archetype: additionalParams?.archetype || defaults.archetype || "",
           faction_id: additionalParams?.faction_id || defaults.faction_id || "",
-          show_hidden: additionalParams?.show_hidden || defaults.show_hidden || false,
+          show_hidden:
+            additionalParams?.show_hidden || defaults.show_hidden || false,
         },
         drawerOpen: false,
       })}
