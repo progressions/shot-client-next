@@ -53,6 +53,7 @@ class ConsumerAdapter {
 export function consumer({ jwt, api }: ClientDependencies): Consumer | any {
   const backendType = detectBackendType()
   console.log("[WebSocket] Detected backend type:", backendType)
+  console.log("[WebSocket] JWT provided:", jwt ? `${jwt.substring(0, 20)}...` : "NONE")
   console.log("[WebSocket] NEXT_PUBLIC_SERVER_URL:", process.env.NEXT_PUBLIC_SERVER_URL)
   console.log("[WebSocket] NEXT_PUBLIC_WEBSOCKET_URL:", process.env.NEXT_PUBLIC_WEBSOCKET_URL)
 
@@ -63,6 +64,7 @@ export function consumer({ jwt, api }: ClientDependencies): Consumer | any {
       : "ws://localhost:4002/socket"
 
     console.log("[WebSocket] Using Phoenix Channels at:", phoenixUrl)
+    console.log("[WebSocket] Creating Phoenix client with JWT:", jwt ? "present" : "MISSING")
 
     const unifiedClient = createUnifiedChannelClient(
       phoenixUrl,

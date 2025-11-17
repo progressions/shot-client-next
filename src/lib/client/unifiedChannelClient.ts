@@ -74,10 +74,17 @@ class PhoenixChannelClient implements UnifiedChannelClient {
   private channels: Map<string, Channel> = new Map()
 
   constructor(websocketUrl: string, token: string) {
+    console.log("[PhoenixChannelClient] Constructor called with:")
+    console.log("  - websocketUrl:", websocketUrl)
+    console.log("  - token:", token ? `${token.substring(0, 20)}...` : "EMPTY OR UNDEFINED")
+    console.log("  - Bearer token:", `Bearer ${token}`)
+
     this.socket = new Socket(websocketUrl, {
       params: { token: `Bearer ${token}` },
     })
     this.socket.connect()
+
+    console.log("[PhoenixChannelClient] Socket created and connecting...")
   }
 
   subscribe(
