@@ -25,10 +25,10 @@ export function getFilterDefaults(
 }
 
 /**
- * Applies default filter values to params object
+ * Applies default filter values to params object and removes empty string values
  * @param params - The current params object
  * @param entityName - The name of the entity (e.g., "Fight", "Character")
- * @returns Params with defaults applied for any missing values
+ * @returns Params with defaults applied and empty strings removed
  */
 export function applyFilterDefaults(
   params: Record<string, unknown>,
@@ -36,7 +36,8 @@ export function applyFilterDefaults(
 ): Record<string, unknown> {
   const defaults = getFilterDefaults(entityName)
 
-  return {
+  // First apply defaults for fields with defined defaultValue
+  const withDefaults = {
     ...params,
     ...Object.fromEntries(
       Object.entries(defaults).map(([key, value]) => [
@@ -45,4 +46,9 @@ export function applyFilterDefaults(
       ])
     ),
   }
+
+  // Remove empty string values to prevent backend casting errors
+  return Object.fromEntries(
+    Object.entries(withDefaults).filter(([_, value]) => value !== "")
+  )
 }
