@@ -48,7 +48,11 @@ export function applyFilterDefaults(
   }
 
   // Remove empty string values to prevent backend casting errors
+  // Preserve boolean false and string "false" for show_hidden
   return Object.fromEntries(
-    Object.entries(withDefaults).filter(([_, value]) => value !== "")
+    Object.entries(withDefaults).filter(
+      ([_, value]) =>
+        value !== "" && value !== null && value !== undefined
+    )
   )
 }
