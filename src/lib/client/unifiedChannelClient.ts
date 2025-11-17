@@ -91,12 +91,25 @@ class PhoenixChannelClient implements UnifiedChannelClient {
         console.log("[PhoenixChannelClient] params callback invoked")
         console.log("  - this.token length:", this.token?.length)
         console.log("  - this.token value:", this.token ? `${this.token.substring(0, 20)}...` : "EMPTY")
-        return { token: this.token }
+        const params = { token: this.token }
+        console.log("  - returning params:", params)
+        return params
       }
     })
 
+    // Log the endpoint URL that will be used
+    console.log("[PhoenixChannelClient] Socket endPoint:", (this.socket as any).endPoint)
+    console.log("[PhoenixChannelClient] Socket params:", typeof (this.socket as any).params)
+
     console.log("[PhoenixChannelClient] Socket created, connecting...")
     this.socket.connect()
+
+    // After connect, check the actual connection URL
+    setTimeout(() => {
+      const conn = (this.socket as any).conn
+      console.log("[PhoenixChannelClient] WebSocket URL:", conn?.url)
+    }, 100)
+
     console.log("[PhoenixChannelClient] Connect called")
   }
 
