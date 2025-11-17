@@ -450,14 +450,9 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         `🔄 AppContext: Entity '${key}' - value: ${value}, callbacks: ${callbacks?.size || 0}`
       )
 
-      // Only trigger callbacks for actual entity objects, not reload signals
+      // Trigger callbacks for both entity objects and reload signals
       // Reload signals are strings like "reload", entity updates are objects
-      if (
-        callbacks &&
-        callbacks.size > 0 &&
-        typeof value === "object" &&
-        value !== null
-      ) {
+      if (callbacks && callbacks.size > 0) {
         callbacks.forEach(callback => {
           try {
             console.log(
@@ -469,8 +464,6 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
             console.error(`Error in ${key} callback:`, error)
           }
         })
-      } else if (typeof value === "string") {
-        console.log(`🔄 AppContext: Ignoring reload signal for '${key}'`)
       }
     })
 
