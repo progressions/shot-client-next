@@ -2,7 +2,7 @@ import Cookies from "js-cookie"
 import Api from "@/lib/Api"
 import ApiV2 from "@/lib/ApiV2"
 import { queryParams } from "@/lib/queryParams"
-import { createConsumer } from "@rails/actioncable"
+import { consumer as createUnifiedConsumer } from "@/lib/client/websocketClient"
 import * as auth from "@/lib/client/authClient"
 import * as character from "@/lib/client/characterClient"
 import * as vehicle from "@/lib/client/vehicleClient"
@@ -33,8 +33,10 @@ export default function createClient(parameters: ClientParameters = {}) {
   }
   const api = new Api()
   const apiV2 = new ApiV2()
-  const websocketUrl = api.cable(jwt)
-  const consumerInstance = createConsumer(websocketUrl)
+  const consumerInstance = createUnifiedConsumer({ jwt, api })
+
+  console.log("[Client] Created unified consumer for JWT:", jwt?.substring(0, 20) + "...")
+  console.log("[Client] Consumer instance:", consumerInstance)
 
   return {
     jwt,
