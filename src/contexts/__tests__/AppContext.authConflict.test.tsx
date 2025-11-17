@@ -48,6 +48,7 @@ describe("AppContext - Authentication Conflict Detection", () => {
         subscriptions: {
           create: jest.fn(() => ({
             unsubscribe: jest.fn(),
+            disconnect: jest.fn(),
           })),
         },
       })),

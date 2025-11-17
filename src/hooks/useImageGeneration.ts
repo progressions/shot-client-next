@@ -24,7 +24,7 @@ export function useImageGeneration({
   useEffect(() => {
     return () => {
       if (subscription) {
-        subscription.unsubscribe()
+        subscription.disconnect()
       }
     }
   }, [subscription])
@@ -52,7 +52,7 @@ export function useImageGeneration({
                   payload: "Images generated successfully",
                 })
                 setPending(false)
-                sub.unsubscribe()
+                sub.disconnect()
               } catch (parseError) {
                 console.error("Failed to parse image URLs JSON:", parseError)
                 handleError(
@@ -60,13 +60,13 @@ export function useImageGeneration({
                   dispatchForm
                 )
                 setPending(false)
-                sub.unsubscribe()
+                sub.disconnect()
               }
             } else if (data.status === "error" && data.error) {
               console.error("WebSocket error:", data.error)
               handleError(new Error(data.error), dispatchForm)
               setPending(false)
-              sub.unsubscribe()
+              sub.disconnect()
             }
           },
         }
