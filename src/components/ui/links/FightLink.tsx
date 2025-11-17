@@ -1,4 +1,6 @@
 "use client"
+import { useState, useEffect } from "react"
+import { useApp } from "@/contexts"
 import EntityLink from "./EntityLink"
 import dynamic from "next/dynamic"
 
@@ -15,12 +17,32 @@ type FightLinkProperties = {
 }
 
 export default function FightLink({
-  fight,
+  fight: initialFight,
   data,
   disablePopup = false,
   children,
   sx,
 }: FightLinkProperties) {
+  const { subscribeToEntity } = useApp()
+  const [fight, setFight] = useState(initialFight)
+
+  // Subscribe to fight updates via WebSocket
+  useEffect(() => {
+    const unsubscribe = subscribeToEntity("fight", updatedFight => {
+      // Only update if this is the same fight
+      if (updatedFight && updatedFight.id === initialFight.id) {
+        setFight(updatedFight)
+      }
+    })
+
+    return unsubscribe
+  }, [subscribeToEntity, initialFight.id])
+
+  // Update when prop changes
+  useEffect(() => {
+    setFight(initialFight)
+  }, [initialFight])
+
   return (
     <EntityLink
       entity={fight}

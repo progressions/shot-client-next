@@ -1,4 +1,6 @@
 "use client"
+import { useState, useEffect } from "react"
+import { useApp } from "@/contexts"
 import EntityLink from "./EntityLink"
 import dynamic from "next/dynamic"
 
@@ -15,12 +17,30 @@ type PartyLinkProperties = {
 }
 
 export default function PartyLink({
-  party,
+  party: initialParty,
   data,
   disablePopup = false,
   children,
   sx,
 }: PartyLinkProperties) {
+  const { subscribeToEntity } = useApp()
+  const [party, setParty] = useState(initialParty)
+
+  // Subscribe to party updates via WebSocket
+  useEffect(() => {
+    const unsubscribe = subscribeToEntity("party", updatedParty => {
+      if (updatedParty && updatedParty.id === initialParty.id) {
+        setParty(updatedParty)
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, initialParty.id])
+
+  // Update when prop changes
+  useEffect(() => {
+    setParty(initialParty)
+  }, [initialParty])
+
   return (
     <EntityLink
       entity={party}
