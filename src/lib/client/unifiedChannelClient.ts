@@ -175,7 +175,14 @@ export function createUnifiedChannelClient(
   token: string,
   backendType: "rails" | "phoenix" = "rails"
 ): UnifiedChannelClient {
+  console.log("[createUnifiedChannelClient] Called with:")
+  console.log("  - websocketUrl:", websocketUrl)
+  console.log("  - token:", token ? `${token.substring(0, 20)}...` : "EMPTY OR UNDEFINED")
+  console.log("  - token length:", token?.length)
+  console.log("  - backendType:", backendType)
+
   if (backendType === "phoenix") {
+    console.log("[createUnifiedChannelClient] Creating PhoenixChannelClient")
     return new PhoenixChannelClient(websocketUrl, token)
   }
 
