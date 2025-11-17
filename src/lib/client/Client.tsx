@@ -35,9 +35,6 @@ export default function createClient(parameters: ClientParameters = {}) {
   const apiV2 = new ApiV2()
   const consumerInstance = createUnifiedConsumer({ jwt, api })
 
-  console.log("[Client] Created unified consumer for JWT:", jwt?.substring(0, 20) + "...")
-  console.log("[Client] Consumer instance:", consumerInstance)
-
   return {
     jwt,
     api,

@@ -76,41 +76,14 @@ class PhoenixChannelClient implements UnifiedChannelClient {
   private token: string
 
   constructor(websocketUrl: string, token: string) {
-    console.log("[PhoenixChannelClient] Constructor called with:")
-    console.log("  - websocketUrl:", websocketUrl)
-    console.log("  - token:", token ? `${token.substring(0, 20)}...` : "EMPTY OR UNDEFINED")
-    console.log("  - token length:", token?.length)
-    console.log("  - token typeof:", typeof token)
-
     // Store token as instance variable to ensure it's available in params callback
     this.token = token
-    console.log("  - Stored token length:", this.token?.length)
 
     this.socket = new Socket(websocketUrl, {
-      params: () => {
-        console.log("[PhoenixChannelClient] params callback invoked")
-        console.log("  - this.token length:", this.token?.length)
-        console.log("  - this.token value:", this.token ? `${this.token.substring(0, 20)}...` : "EMPTY")
-        const params = { token: this.token }
-        console.log("  - returning params:", params)
-        return params
-      }
+      params: () => ({ token: this.token })
     })
 
-    // Log the endpoint URL that will be used
-    console.log("[PhoenixChannelClient] Socket endPoint:", (this.socket as any).endPoint)
-    console.log("[PhoenixChannelClient] Socket params:", typeof (this.socket as any).params)
-
-    console.log("[PhoenixChannelClient] Socket created, connecting...")
     this.socket.connect()
-
-    // After connect, check the actual connection URL
-    setTimeout(() => {
-      const conn = (this.socket as any).conn
-      console.log("[PhoenixChannelClient] WebSocket URL:", conn?.url)
-    }, 100)
-
-    console.log("[PhoenixChannelClient] Connect called")
   }
 
   subscribe(
@@ -122,20 +95,12 @@ class PhoenixChannelClient implements UnifiedChannelClient {
     // "CampaignChannel" with {id: "123"} -> "campaign:123"
     const topic = this.convertToPhoenixTopic(channelName, params)
 
-    console.log(`[PhoenixChannelClient] Subscribing to topic: ${topic}`)
-
     const channel = this.socket.channel(topic, params)
 
     // Phoenix uses event-based messages, ActionCable uses single 'received'
     // Listen for both ActionCable compatibility events and Phoenix-specific events
-    channel.on("message", (payload) => {
-      console.log(`[PhoenixChannelClient] Received 'message' on ${topic}:`, payload)
-      options.received(payload)
-    })
-    channel.on("update", (payload) => {
-      console.log(`[PhoenixChannelClient] Received 'update' on ${topic}:`, payload)
-      options.received(payload)
-    })
+    channel.on("message", options.received)  // ActionCable compatibility
+    channel.on("update", options.received)   // Phoenix Channels convention
     channel.on("broadcast", options.received)
     channel.on("change", options.received)
 
@@ -202,14 +167,7 @@ export function createUnifiedChannelClient(
   token: string,
   backendType: "rails" | "phoenix" = "rails"
 ): UnifiedChannelClient {
-  console.log("[createUnifiedChannelClient] Called with:")
-  console.log("  - websocketUrl:", websocketUrl)
-  console.log("  - token:", token ? `${token.substring(0, 20)}...` : "EMPTY OR UNDEFINED")
-  console.log("  - token length:", token?.length)
-  console.log("  - backendType:", backendType)
-
   if (backendType === "phoenix") {
-    console.log("[createUnifiedChannelClient] Creating PhoenixChannelClient")
     return new PhoenixChannelClient(websocketUrl, token)
   }
 
