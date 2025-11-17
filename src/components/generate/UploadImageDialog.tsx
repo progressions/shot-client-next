@@ -169,8 +169,6 @@ export function UploadImageDialog({
             entity.id,
             formData
           )
-          console.log("Upload response:", response.data)
-          console.log("Image URL from response:", response.data.image_url)
           setEntity?.(response.data)
           const imageUrl = response.data.image_url
           dispatchForm({
