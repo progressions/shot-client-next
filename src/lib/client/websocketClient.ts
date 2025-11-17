@@ -52,12 +52,20 @@ class ConsumerAdapter {
  */
 export function consumer({ jwt, api }: ClientDependencies): Consumer | any {
   const backendType = detectBackendType()
-  const websocketUrl = api.cable(jwt)
+  console.log("[WebSocket] Detected backend type:", backendType)
+  console.log("[WebSocket] NEXT_PUBLIC_SERVER_URL:", process.env.NEXT_PUBLIC_SERVER_URL)
+  console.log("[WebSocket] NEXT_PUBLIC_WEBSOCKET_URL:", process.env.NEXT_PUBLIC_WEBSOCKET_URL)
 
   if (backendType === "phoenix") {
     // Use unified client with Phoenix Channels
+    const phoenixUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL
+      ? `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/socket`
+      : "ws://localhost:4002/socket"
+
+    console.log("[WebSocket] Using Phoenix Channels at:", phoenixUrl)
+
     const unifiedClient = createUnifiedChannelClient(
-      process.env.NEXT_PUBLIC_WEBSOCKET_URL || "ws://localhost:4002/socket",
+      phoenixUrl,
       jwt || "",
       "phoenix"
     )
@@ -65,5 +73,7 @@ export function consumer({ jwt, api }: ClientDependencies): Consumer | any {
   }
 
   // Use native ActionCable for Rails backend
+  const websocketUrl = api.cable(jwt)
+  console.log("[WebSocket] Using ActionCable at:", websocketUrl)
   return createConsumer(websocketUrl)
 }
