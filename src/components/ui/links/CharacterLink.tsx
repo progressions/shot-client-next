@@ -35,7 +35,7 @@ export default function CharacterLink({
   useEffect(() => {
     const unsubscribe = subscribeToEntity("character", updatedCharacter => {
       // Only update if this is the same character
-      if (updatedCharacter.id === initialCharacter.id) {
+      if (updatedCharacter && updatedCharacter.id === initialCharacter.id) {
         setCharacter(updatedCharacter)
       }
     })
