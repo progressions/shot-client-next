@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
-import { useAppContext } from "@/contexts"
+import { useApp } from "@/contexts"
 import EntityLink from "./EntityLink"
 import dynamic from "next/dynamic"
 
@@ -28,7 +28,7 @@ export default function CharacterLink({
   sx,
   noUnderline = false,
 }: CharacterLinkProperties) {
-  const { subscribeToEntity } = useAppContext()
+  const { subscribeToEntity } = useApp()
   const [character, setCharacter] = useState(initialCharacter)
 
   // Subscribe to character updates via WebSocket
