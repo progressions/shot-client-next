@@ -32,7 +32,10 @@ export default function SiteLink({
     const unsubscribe = subscribeToEntity("site", updatedSite => {
       // Only update if this is the same site
       if (updatedSite && updatedSite.id === initialSite.id) {
-        console.log(`🔄 SiteLink: Updating site ${initialSite.id} with new data:`, updatedSite)
+        console.log(
+          `🔄 SiteLink: Updating site ${initialSite.id} with new data:`,
+          updatedSite
+        )
         setSite(updatedSite)
       }
     })
