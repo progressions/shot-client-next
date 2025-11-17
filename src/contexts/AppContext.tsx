@@ -412,7 +412,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
     )
     setSubscription(sub)
     return () => {
-      sub.unsubscribe()
+      sub.disconnect()
     }
   }, [state.user.id, campaign?.id, client])
 
@@ -435,7 +435,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
     )
 
     return () => {
-      userSub.unsubscribe()
+      userSub.disconnect()
     }
   }, [state.user.id, client])
 

@@ -66,6 +66,7 @@ export function ImageBox({
     <Box
       ref={imgRef}
       component="img"
+      key={entity.image_url} // Force remount when URL changes
       src={entity.image_url}
       alt={entity.name}
       onClick={handleClick}

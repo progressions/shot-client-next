@@ -38,6 +38,7 @@ const mockGetCurrentCampaign = jest.fn()
 
 const mockSubscription = {
   unsubscribe: jest.fn(),
+  disconnect: jest.fn(),
 }
 
 const mockConsumerInstance = {

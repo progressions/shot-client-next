@@ -21,6 +21,7 @@ interface GenerateImageDialogProps {
   onClose: () => void
   title: string
   entity: Entity
+  setEntity?: (entity: Entity) => void
 }
 
 type FormStateData = {
@@ -32,6 +33,7 @@ export function GenerateImageDialog({
   onClose,
   title,
   entity,
+  setEntity,
 }: GenerateImageDialogProps) {
   const { client } = useClient()
   const { campaign } = useCampaign()
@@ -64,16 +66,21 @@ export function GenerateImageDialog({
 
   const handleSelect = async (imageUrl: string) => {
     try {
-      await client.attachImage({
+      const response = await client.attachImage({
         entity,
         imageUrl,
       })
+
+      // Update local entity state with the response data which includes the new image_url
+      if (setEntity && response.data?.entity) {
+        setEntity(response.data.entity)
+      }
+
       toastSuccess("Image attached successfully")
       handleConfirmClose()
     } catch (error) {
       console.error("Error attaching image:", error)
       toastError("Failed to attach image")
-      // Handle error appropriately, e.g., show a toast notification
     }
   }
 

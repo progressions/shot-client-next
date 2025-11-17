@@ -330,6 +330,7 @@ export function PositionableImage({
         onConfirm={handleGenerateDialogConfirm}
         title="Generate Image"
         entity={entity}
+        setEntity={setEntity}
       />
       <UploadImageDialog
         open={isUploadDialogOpen}
