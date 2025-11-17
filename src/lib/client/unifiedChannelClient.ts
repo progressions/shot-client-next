@@ -78,22 +78,14 @@ class PhoenixChannelClient implements UnifiedChannelClient {
     console.log("  - websocketUrl:", websocketUrl)
     console.log("  - token:", token ? `${token.substring(0, 20)}...` : "EMPTY OR UNDEFINED")
     console.log("  - token length:", token?.length)
-    const bearerToken = `Bearer ${token}`
-    console.log("  - Bearer token:", bearerToken.substring(0, 50) + "...")
-    console.log("  - Bearer token length:", bearerToken.length)
 
-    // Store token in closure to ensure it's captured
-    const getParams = () => {
-      const params = { token: bearerToken }
-      console.log("[PhoenixChannelClient] getParams() called, returning:", {
-        token: params.token.substring(0, 50) + "...",
-        length: params.token.length
-      })
-      return params
-    }
+    // Send just the JWT token without "Bearer " prefix
+    // The UserSocket extract_bearer function can handle tokens with or without "Bearer "
+    // But sending "Bearer eyJ..." in URL params gets truncated
+    console.log("  - Sending token without Bearer prefix")
 
     this.socket = new Socket(websocketUrl, {
-      params: getParams,
+      params: { token: token },
     })
     this.socket.connect()
 
