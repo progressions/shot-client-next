@@ -77,11 +77,23 @@ class PhoenixChannelClient implements UnifiedChannelClient {
     console.log("[PhoenixChannelClient] Constructor called with:")
     console.log("  - websocketUrl:", websocketUrl)
     console.log("  - token:", token ? `${token.substring(0, 20)}...` : "EMPTY OR UNDEFINED")
+    console.log("  - token length:", token?.length)
     const bearerToken = `Bearer ${token}`
-    console.log("  - Bearer token:", bearerToken)
+    console.log("  - Bearer token:", bearerToken.substring(0, 50) + "...")
+    console.log("  - Bearer token length:", bearerToken.length)
+
+    // Store token in closure to ensure it's captured
+    const getParams = () => {
+      const params = { token: bearerToken }
+      console.log("[PhoenixChannelClient] getParams() called, returning:", {
+        token: params.token.substring(0, 50) + "...",
+        length: params.token.length
+      })
+      return params
+    }
 
     this.socket = new Socket(websocketUrl, {
-      params: () => ({ token: bearerToken }),
+      params: getParams,
     })
     this.socket.connect()
 
