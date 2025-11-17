@@ -122,13 +122,27 @@ class PhoenixChannelClient implements UnifiedChannelClient {
     // "CampaignChannel" with {id: "123"} -> "campaign:123"
     const topic = this.convertToPhoenixTopic(channelName, params)
 
+    console.log(`[PhoenixChannelClient] Subscribing to topic: ${topic}`)
+
     const channel = this.socket.channel(topic, params)
 
     // Phoenix uses event-based messages, ActionCable uses single 'received'
-    // We listen for common Phoenix events and forward to received callback
-    channel.on("update", options.received)
+    // Listen for both ActionCable compatibility events and Phoenix-specific events
+    channel.on("message", (payload) => {
+      console.log(`[PhoenixChannelClient] Received 'message' on ${topic}:`, payload)
+      options.received(payload)
+    })
+    channel.on("update", (payload) => {
+      console.log(`[PhoenixChannelClient] Received 'update' on ${topic}:`, payload)
+      options.received(payload)
+    })
     channel.on("broadcast", options.received)
     channel.on("change", options.received)
+
+    // Also listen for specific event types that might be broadcast
+    channel.on("reload", options.received)
+    channel.on("character_update", options.received)
+    channel.on("fight_update", options.received)
 
     // Handle Phoenix lifecycle events
     channel.on("phx_error", () => {
