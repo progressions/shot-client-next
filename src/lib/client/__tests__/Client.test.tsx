@@ -275,7 +275,7 @@ describe("createClient", () => {
 
       expect(mockConsumerFunction).toHaveBeenCalledWith({
         jwt: undefined,
-        api: mockApi
+        api: mockApi,
       })
     })
 
