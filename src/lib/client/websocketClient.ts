@@ -59,7 +59,7 @@ class ConsumerAdapter {
 /**
  * Creates a consumer that works with either Rails or Phoenix backend
  */
-export function consumer({ jwt, api }: ClientDependencies): Consumer | any {
+export function consumer({ jwt, api }: ClientDependencies): Consumer | ConsumerAdapter {
   // Don't create consumer without a JWT - prevents failed connection loops
   if (!jwt) {
     return {
