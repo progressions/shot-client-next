@@ -121,7 +121,7 @@ export function createCharacterClient(deps: ClientDependencies) {
     character: Character | string,
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<Person>> {
-    return get(api.characters(null, character), {}, cacheOptions)
+    return get(apiV2.characters(character), {}, cacheOptions)
   }
 
   async function getCharacterPdf(

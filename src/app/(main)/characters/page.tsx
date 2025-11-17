@@ -1,7 +1,7 @@
 // app/characters/page.tsx
 import { List } from "@/components/characters"
 import ResourcePage from "@/components/ResourcePage"
-import { requireCampaign } from "@/lib"
+import { requireCampaign, applyFilterDefaults, getFilterDefaults } from "@/lib"
 import type { CharactersResponse } from "@/types"
 
 export const metadata = {
@@ -24,10 +24,17 @@ export default async function CharactersPage({
   // Server-side campaign check - will redirect if no campaign
   await requireCampaign()
 
+  // Get default filter values for Character entity
+  const defaults = getFilterDefaults("Character")
+
   return (
     <ResourcePage
       resourceName="characters"
-      fetchData={async (client, params) => client.getCharacters(params)}
+      fetchData={async (client, params) => {
+        // Apply default filters to params before API call
+        const paramsWithDefaults = applyFilterDefaults(params, "Character")
+        return client.getCharacters(paramsWithDefaults)
+      }}
       validSorts={[
         "name",
         "archetype",
@@ -53,11 +60,16 @@ export default async function CharactersPage({
           order,
           page,
           search,
-          character_type: "",
-          archetype: "",
-          faction_id: "",
-          show_hidden: additionalParams?.show_hidden || false,
-          template_filter: additionalParams?.template_filter || "non-templates",
+          character_type:
+            additionalParams?.character_type || defaults.character_type || "",
+          archetype: additionalParams?.archetype || defaults.archetype || "",
+          faction_id: additionalParams?.faction_id || defaults.faction_id || "",
+          show_hidden:
+            additionalParams?.show_hidden || defaults.show_hidden || false,
+          template_filter:
+            additionalParams?.template_filter ||
+            defaults.template_filter ||
+            "non-templates",
         },
       })}
       ListComponent={List}

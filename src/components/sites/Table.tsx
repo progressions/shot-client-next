@@ -43,7 +43,8 @@ const columns: GridColDef<Site>[] = [
     width: 200,
     editable: false,
     sortable: false,
-    renderCell: params => <FactionLink faction={params.row.faction} />,
+    renderCell: params =>
+      params.row.faction && <FactionLink faction={params.row.faction} />,
   },
   {
     field: "members",

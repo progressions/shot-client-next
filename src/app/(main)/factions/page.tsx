@@ -1,7 +1,7 @@
 // app/factions/page.tsx
 import { List } from "@/components/factions"
 import ResourcePage from "@/components/ResourcePage"
-import { requireCampaign } from "@/lib"
+import { requireCampaign, applyFilterDefaults, getFilterDefaults } from "@/lib"
 import type { FactionsResponse } from "@/types"
 
 export const metadata = {
@@ -23,10 +23,17 @@ export default async function FactionsPage({
   // Server-side campaign check - will redirect if no campaign
   await requireCampaign()
 
+  // Get default filter values for Faction entity
+  const defaults = getFilterDefaults("Faction")
+
   return (
     <ResourcePage
       resourceName="factions"
-      fetchData={async (client, params) => client.getFactions(params)}
+      fetchData={async (client, params) => {
+        // Apply default filters to params before API call
+        const paramsWithDefaults = applyFilterDefaults(params, "Faction")
+        return client.getFactions(paramsWithDefaults)
+      }}
       validSorts={["name", "created_at", "updated_at"]}
       getInitialFormData={(
         data: FactionsResponse,
@@ -43,7 +50,8 @@ export default async function FactionsPage({
           order,
           page,
           search,
-          show_hidden: additionalParams?.show_hidden || false,
+          show_hidden:
+            additionalParams?.show_hidden || defaults.show_hidden || false,
         },
         drawerOpen: false,
       })}
