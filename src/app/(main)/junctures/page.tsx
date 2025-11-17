@@ -1,7 +1,7 @@
 // app/junctures/page.tsx
 import { List } from "@/components/junctures"
 import ResourcePage from "@/components/ResourcePage"
-import { requireCampaign } from "@/lib"
+import { requireCampaign, applyFilterDefaults, getFilterDefaults } from "@/lib"
 import type { JuncturesResponse } from "@/types"
 
 export const metadata = {
@@ -21,17 +21,25 @@ export default async function JuncturesPage({
   // Server-side campaign check - will redirect if no campaign
   await requireCampaign()
 
+  // Get default filter values for Juncture entity
+  const defaults = getFilterDefaults("Juncture")
+
   return (
     <ResourcePage
       resourceName="junctures"
-      fetchData={async (client, params) => client.getJunctures(params)}
+      fetchData={async (client, params) => {
+        // Apply default filters to params before API call
+        const paramsWithDefaults = applyFilterDefaults(params, "Juncture")
+        return client.getJunctures(paramsWithDefaults)
+      }}
       validSorts={["name", "created_at", "updated_at"]}
       getInitialFormData={(
         data: JuncturesResponse,
         page,
         sort,
         order,
-        search
+        search,
+        additionalParams
       ) => ({
         junctures: data.junctures,
         factions: data.factions,
@@ -41,7 +49,7 @@ export default async function JuncturesPage({
           order,
           page,
           search,
-          faction_id: "",
+          faction_id: additionalParams?.faction_id || defaults.faction_id || "",
         },
       })}
       ListComponent={List}

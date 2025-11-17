@@ -91,7 +91,7 @@ export function ListManager({
   const { client } = useClient()
   // Don't use fight_id filter for autocomplete - we want to show ALL characters
   // for selection, not just ones already in the fight
-  const contextualFilters: Record<string, string> = {}
+  const contextualFilters: Record<string, string> = useMemo(() => ({}), [])
   const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(true)
 

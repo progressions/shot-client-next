@@ -1,7 +1,7 @@
 // app/schticks/page.tsx
 import { List } from "@/components/schticks"
 import ResourcePage from "@/components/ResourcePage"
-import { requireCampaign } from "@/lib"
+import { requireCampaign, applyFilterDefaults, getFilterDefaults } from "@/lib"
 import type { SchticksResponse } from "@/types"
 
 export const metadata = {
@@ -23,10 +23,17 @@ export default async function SchticksPage({
   // Server-side campaign check - will redirect if no campaign
   await requireCampaign()
 
+  // Get default filter values for Schtick entity
+  const defaults = getFilterDefaults("Schtick")
+
   return (
     <ResourcePage
       resourceName="schticks"
-      fetchData={async (client, params) => client.getSchticks(params)}
+      fetchData={async (client, params) => {
+        // Apply default filters to params before API call
+        const paramsWithDefaults = applyFilterDefaults(params, "Schtick")
+        return client.getSchticks(paramsWithDefaults)
+      }}
       validSorts={["name", "created_at", "updated_at"]}
       getInitialFormData={(
         data: SchticksResponse,
@@ -45,9 +52,10 @@ export default async function SchticksPage({
           order,
           page,
           search,
-          category: "",
-          path: "",
-          show_hidden: additionalParams?.show_hidden || false,
+          category: additionalParams?.category || defaults.category || "",
+          path: additionalParams?.path || defaults.path || "",
+          show_hidden:
+            additionalParams?.show_hidden || defaults.show_hidden || false,
         },
         drawerOpen: false,
       })}

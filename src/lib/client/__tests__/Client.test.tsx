@@ -8,11 +8,13 @@ jest.mock("@/lib/Api")
 jest.mock("@/lib/ApiV2")
 jest.mock("@/lib/queryParams")
 jest.mock("@rails/actioncable")
+jest.mock("@/lib/client/websocketClient")
 
 // Import mocked functions after mocking
 import Api from "@/lib/Api"
 import ApiV2 from "@/lib/ApiV2"
 import { queryParams } from "@/lib/queryParams"
+import { consumer } from "@/lib/client/websocketClient"
 
 // Mock all client modules
 jest.mock("@/lib/client/authClient")
@@ -32,6 +34,7 @@ const mockCookies = Cookies as jest.Mocked<typeof Cookies>
 const mockCreateConsumer = createConsumer as jest.MockedFunction<
   typeof createConsumer
 >
+const mockConsumerFunction = consumer as jest.MockedFunction<typeof consumer>
 
 describe("createClient", () => {
   // Mock API instances
@@ -41,7 +44,7 @@ describe("createClient", () => {
 
   const mockApiV2 = {}
 
-  const mockConsumer = {
+  const mockConsumerInstance = {
     subscriptions: {
       create: jest.fn(),
     },
@@ -134,7 +137,8 @@ describe("createClient", () => {
     ).mockImplementation(params => params)
 
     // Mock createConsumer
-    mockCreateConsumer.mockReturnValue(mockConsumer as unknown)
+    mockCreateConsumer.mockReturnValue(mockConsumerInstance as unknown)
+    mockConsumerFunction.mockReturnValue(mockConsumerInstance as unknown)
 
     // Mock all client creation functions
     const authModule = require("@/lib/client/authClient")
@@ -257,33 +261,29 @@ describe("createClient", () => {
   })
 
   describe("WebSocket consumer creation", () => {
-    it("creates WebSocket consumer with correct URL", () => {
+    it("creates WebSocket consumer with JWT", () => {
       const jwt = "websocket-jwt-token"
-      const websocketUrl = "ws://localhost:3000/cable?token=websocket-jwt-token"
-      mockApi.cable.mockReturnValue(websocketUrl)
 
       const client = createClient({ jwt })
 
-      expect(mockApi.cable).toHaveBeenCalledWith(jwt)
-      expect(mockCreateConsumer).toHaveBeenCalledWith(websocketUrl)
-      expect(client.consumer()).toBe(mockConsumer)
+      expect(mockConsumerFunction).toHaveBeenCalledWith({ jwt, api: mockApi })
+      expect(client.consumer()).toBe(mockConsumerInstance)
     })
 
     it("creates consumer with no JWT", () => {
-      const websocketUrl = "ws://localhost:3000/cable"
-      mockApi.cable.mockReturnValue(websocketUrl)
-
       const client = createClient()
 
-      expect(mockApi.cable).toHaveBeenCalledWith(undefined)
-      expect(mockCreateConsumer).toHaveBeenCalledWith(websocketUrl)
+      expect(mockConsumerFunction).toHaveBeenCalledWith({
+        jwt: undefined,
+        api: mockApi,
+      })
     })
 
     it("returns consumer as function", () => {
       const client = createClient()
 
       expect(typeof client.consumer).toBe("function")
-      expect(client.consumer()).toBe(mockConsumer)
+      expect(client.consumer()).toBe(mockConsumerInstance)
     })
   })
 
