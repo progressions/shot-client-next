@@ -51,6 +51,18 @@ class ConsumerAdapter {
  * Creates a consumer that works with either Rails or Phoenix backend
  */
 export function consumer({ jwt, api }: ClientDependencies): Consumer | any {
+  // Don't create consumer without a JWT - prevents failed connection loops
+  if (!jwt) {
+    return {
+      subscriptions: {
+        create: () => ({
+          unsubscribe: () => {}
+        })
+      },
+      disconnect: () => {}
+    }
+  }
+
   const backendType = detectBackendType()
 
   if (backendType === "phoenix") {
@@ -61,7 +73,7 @@ export function consumer({ jwt, api }: ClientDependencies): Consumer | any {
 
     const unifiedClient = createUnifiedChannelClient(
       phoenixUrl,
-      jwt || "",
+      jwt,
       "phoenix"
     )
     return new ConsumerAdapter(unifiedClient)
