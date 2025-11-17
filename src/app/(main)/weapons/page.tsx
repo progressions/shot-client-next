@@ -1,7 +1,7 @@
 // app/weapons/page.tsx
 import { List } from "@/components/weapons"
 import ResourcePage from "@/components/ResourcePage"
-import { requireCampaign } from "@/lib"
+import { requireCampaign, applyFilterDefaults, getFilterDefaults } from "@/lib"
 import type { WeaponsResponse } from "@/types"
 
 export const metadata = {
@@ -23,10 +23,17 @@ export default async function WeaponsPage({
   // Server-side campaign check - will redirect if no campaign
   await requireCampaign()
 
+  // Get default filter values for Weapon entity
+  const defaults = getFilterDefaults("Weapon")
+
   return (
     <ResourcePage
       resourceName="weapons"
-      fetchData={async (client, params) => client.getWeapons(params)}
+      fetchData={async (client, params) => {
+        // Apply default filters to params before API call
+        const paramsWithDefaults = applyFilterDefaults(params, "Weapon")
+        return client.getWeapons(paramsWithDefaults)
+      }}
       validSorts={["name", "created_at", "updated_at"]}
       getInitialFormData={(
         data: WeaponsResponse,
@@ -45,9 +52,9 @@ export default async function WeaponsPage({
           order,
           page,
           search,
-          category: "",
-          juncture: "",
-          show_hidden: additionalParams?.show_hidden || false,
+          category: additionalParams?.category || defaults.category || "",
+          juncture: additionalParams?.juncture || defaults.juncture || "",
+          show_hidden: additionalParams?.show_hidden || defaults.show_hidden || false,
         },
       })}
       ListComponent={List}

@@ -1,7 +1,7 @@
 // app/sites/page.tsx
 import { List } from "@/components/sites"
 import ResourcePage from "@/components/ResourcePage"
-import { requireCampaign } from "@/lib"
+import { requireCampaign, applyFilterDefaults, getFilterDefaults } from "@/lib"
 import type { SitesResponse } from "@/types"
 
 export const metadata = {
@@ -23,10 +23,17 @@ export default async function SitesPage({
   // Server-side campaign check - will redirect if no campaign
   await requireCampaign()
 
+  // Get default filter values for Site entity
+  const defaults = getFilterDefaults("Site")
+
   return (
     <ResourcePage
       resourceName="sites"
-      fetchData={async (client, params) => client.getSites(params)}
+      fetchData={async (client, params) => {
+        // Apply default filters to params before API call
+        const paramsWithDefaults = applyFilterDefaults(params, "Site")
+        return client.getSites(paramsWithDefaults)
+      }}
       validSorts={["name", "created_at", "updated_at"]}
       getInitialFormData={(
         data: SitesResponse,
@@ -44,8 +51,8 @@ export default async function SitesPage({
           order,
           page,
           search,
-          faction_id: "",
-          show_hidden: additionalParams?.show_hidden || false,
+          faction_id: additionalParams?.faction_id || defaults.faction_id || "",
+          show_hidden: additionalParams?.show_hidden || defaults.show_hidden || false,
         },
       })}
       ListComponent={List}

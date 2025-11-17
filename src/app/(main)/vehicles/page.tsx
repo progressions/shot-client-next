@@ -1,7 +1,7 @@
 // app/vehicles/page.tsx
 import { List } from "@/components/vehicles"
 import ResourcePage from "@/components/ResourcePage"
-import { requireCampaign } from "@/lib"
+import { requireCampaign, applyFilterDefaults, getFilterDefaults } from "@/lib"
 import type { VehiclesResponse } from "@/types"
 
 export const metadata = {
@@ -23,10 +23,17 @@ export default async function VehiclesPage({
   // Server-side campaign check - will redirect if no campaign
   await requireCampaign()
 
+  // Get default filter values for Vehicle entity
+  const defaults = getFilterDefaults("Vehicle")
+
   return (
     <ResourcePage
       resourceName="vehicles"
-      fetchData={async (client, params) => client.getVehicles(params)}
+      fetchData={async (client, params) => {
+        // Apply default filters to params before API call
+        const paramsWithDefaults = applyFilterDefaults(params, "Vehicle")
+        return client.getVehicles(paramsWithDefaults)
+      }}
       validSorts={["name", "created_at", "updated_at"]}
       getInitialFormData={(
         data: VehiclesResponse,
@@ -45,10 +52,10 @@ export default async function VehiclesPage({
           order,
           page,
           search,
-          vehicle_type: "",
-          archetype: "",
-          faction_id: "",
-          show_hidden: additionalParams?.show_hidden || false,
+          vehicle_type: additionalParams?.vehicle_type || defaults.vehicle_type || "",
+          archetype: additionalParams?.archetype || defaults.archetype || "",
+          faction_id: additionalParams?.faction_id || defaults.faction_id || "",
+          show_hidden: additionalParams?.show_hidden || defaults.show_hidden || false,
         },
         drawerOpen: false,
       })}

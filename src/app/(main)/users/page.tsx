@@ -1,6 +1,7 @@
 // app/users/page.tsx
 import { List } from "@/components/users"
 import ResourcePage from "@/components/ResourcePage"
+import { applyFilterDefaults, getFilterDefaults } from "@/lib"
 import type { UsersResponse } from "@/types"
 
 export const metadata = {
@@ -20,7 +21,11 @@ export default async function UsersPage({
   return (
     <ResourcePage
       resourceName="users"
-      fetchData={async (client, params) => client.getUsers(params)}
+      fetchData={async (client, params) => {
+        // Apply default filters to params before API call
+        const paramsWithDefaults = applyFilterDefaults(params, "User")
+        return client.getUsers(paramsWithDefaults)
+      }}
       validSorts={["name", "created_at", "updated_at"]}
       getInitialFormData={(data: UsersResponse, page, sort, order, search) => ({
         users: data.users,

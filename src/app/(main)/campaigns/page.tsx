@@ -1,6 +1,7 @@
 // app/campaigns/page.tsx
 import { List } from "@/components/campaigns"
 import ResourcePage from "@/components/ResourcePage"
+import { applyFilterDefaults, getFilterDefaults } from "@/lib"
 import type { CampaignsResponse } from "@/types"
 
 export const metadata = {
@@ -20,7 +21,11 @@ export default async function CampaignsPage({
   return (
     <ResourcePage
       resourceName="campaigns"
-      fetchData={async (client, params) => client.getCampaigns(params)}
+      fetchData={async (client, params) => {
+        // Apply default filters to params before API call
+        const paramsWithDefaults = applyFilterDefaults(params, "Campaign")
+        return client.getCampaigns(paramsWithDefaults)
+      }}
       validSorts={["name", "created_at", "updated_at"]}
       getInitialFormData={(
         data: CampaignsResponse,

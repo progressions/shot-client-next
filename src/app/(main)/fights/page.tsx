@@ -1,7 +1,7 @@
 // app/fights/page.tsx
 import { List } from "@/components/fights"
 import ResourcePage from "@/components/ResourcePage"
-import { requireCampaign, filterConfigs } from "@/lib"
+import { requireCampaign, applyFilterDefaults, getFilterDefaults } from "@/lib"
 import type { FightsResponse } from "@/types"
 
 export const metadata = {
@@ -23,10 +23,17 @@ export default async function FightsPage({
   // Server-side campaign check - will redirect if no campaign
   await requireCampaign()
 
+  // Get default filter values for Fight entity
+  const defaults = getFilterDefaults("Fight")
+
   return (
     <ResourcePage
       resourceName="fights"
-      fetchData={async (client, params) => client.getFights(params)}
+      fetchData={async (client, params) => {
+        // Apply default filters to params before API call
+        const paramsWithDefaults = applyFilterDefaults(params, "Fight")
+        return client.getFights(paramsWithDefaults)
+      }}
       validSorts={["name", "created_at", "updated_at"]}
       getInitialFormData={(
         data: FightsResponse,
@@ -36,12 +43,6 @@ export default async function FightsPage({
         search,
         additionalParams
       ) => {
-        // Get the status field config to access defaultValue
-        const statusField = filterConfigs.Fight.fields.find(
-          f => f.name === "status"
-        )
-        const defaultStatus = statusField?.defaultValue || ""
-
         return {
           fights: data.fights,
           seasons: data.seasons || [],
@@ -52,7 +53,7 @@ export default async function FightsPage({
             page,
             search: search || "",
             season: additionalParams?.season || "",
-            status: additionalParams?.status || defaultStatus,
+            status: additionalParams?.status || defaults.status || "",
             show_hidden: additionalParams?.show_hidden || false,
           },
           drawerOpen: false,
