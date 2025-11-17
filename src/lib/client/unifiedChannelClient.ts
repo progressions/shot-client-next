@@ -79,11 +79,26 @@ class PhoenixChannelClient implements UnifiedChannelClient {
     // Store token as instance variable to ensure it's available in params callback
     this.token = token
 
+    console.log(`[PhoenixChannelClient] Creating Socket connection to ${websocketUrl}`)
+
     this.socket = new Socket(websocketUrl, {
       params: () => ({ token: this.token }),
     })
 
+    this.socket.onOpen(() => {
+      console.log(`[PhoenixChannelClient] Socket connection opened`)
+    })
+
+    this.socket.onError((error: unknown) => {
+      console.error(`[PhoenixChannelClient] Socket error:`, error)
+    })
+
+    this.socket.onClose(() => {
+      console.log(`[PhoenixChannelClient] Socket connection closed`)
+    })
+
     this.socket.connect()
+    console.log(`[PhoenixChannelClient] Socket connect() called`)
   }
 
   subscribe(
@@ -99,10 +114,22 @@ class PhoenixChannelClient implements UnifiedChannelClient {
 
     // Phoenix uses event-based messages, ActionCable uses single 'received'
     // Listen for both ActionCable compatibility events and Phoenix-specific events
-    channel.on("message", options.received) // ActionCable compatibility
-    channel.on("update", options.received) // Phoenix Channels convention
-    channel.on("broadcast", options.received)
-    channel.on("change", options.received)
+    channel.on("message", (payload: unknown) => {
+      console.log(`[PhoenixChannelClient] Received "message" event on ${topic}:`, payload)
+      options.received(payload)
+    }) // ActionCable compatibility
+    channel.on("update", (payload: unknown) => {
+      console.log(`[PhoenixChannelClient] Received "update" event on ${topic}:`, payload)
+      options.received(payload)
+    }) // Phoenix Channels convention
+    channel.on("broadcast", (payload: unknown) => {
+      console.log(`[PhoenixChannelClient] Received "broadcast" event on ${topic}:`, payload)
+      options.received(payload)
+    })
+    channel.on("change", (payload: unknown) => {
+      console.log(`[PhoenixChannelClient] Received "change" event on ${topic}:`, payload)
+      options.received(payload)
+    })
 
     // Also listen for specific event types that might be broadcast
     channel.on("reload", options.received)
@@ -120,11 +147,12 @@ class PhoenixChannelClient implements UnifiedChannelClient {
 
     channel
       .join()
-      .receive("ok", () => {
+      .receive("ok", (response: unknown) => {
+        console.log(`[PhoenixChannelClient] Successfully joined channel ${topic}`, response)
         if (options.connected) options.connected()
       })
       .receive("error", (error: unknown) => {
-        console.error(`[Phoenix] Failed to join channel ${topic}:`, error)
+        console.error(`[PhoenixChannelClient] Failed to join channel ${topic}:`, error)
       })
 
     this.channels.set(topic, channel)
