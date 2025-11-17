@@ -13,6 +13,7 @@ const mockDispatchForm = jest.fn()
 
 const mockSubscription = {
   unsubscribe: jest.fn(),
+  disconnect: jest.fn(),
   send: jest.fn(),
 }
 
@@ -198,7 +199,7 @@ describe("useImageGeneration", () => {
         payload: "Images generated successfully",
       })
 
-      expect(mockSubscription.unsubscribe).toHaveBeenCalled()
+      expect(mockSubscription.disconnect).toHaveBeenCalled()
     })
 
     it("handles empty image URLs array", async () => {
@@ -242,7 +243,7 @@ describe("useImageGeneration", () => {
         mockDispatchForm
       )
       expect(result.current.pending).toBe(false)
-      expect(mockSubscription.unsubscribe).toHaveBeenCalled()
+      expect(mockSubscription.disconnect).toHaveBeenCalled()
     })
 
     it("handles malformed JSON in preview_ready message", async () => {
@@ -299,7 +300,7 @@ describe("useImageGeneration", () => {
 
       unmount()
 
-      expect(mockSubscription.unsubscribe).toHaveBeenCalled()
+      expect(mockSubscription.disconnect).toHaveBeenCalled()
     })
 
     it("handles multiple subscription cleanup calls safely", async () => {
