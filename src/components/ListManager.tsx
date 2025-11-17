@@ -122,8 +122,8 @@ export function ListManager({
     },
   })
   const { filters } = formState.data
-  console.log("parentEntity", parentEntity)
-  console.log("childIds", childEntityName, childIds)
+  // console.log("parentEntity", parentEntity)
+  // console.log("childIds", childEntityName, childIds)
 
   useEffect(() => {
     const fetchChildEntities = async () => {
