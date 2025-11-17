@@ -73,30 +73,31 @@ class PhoenixChannelClient implements UnifiedChannelClient {
   private socket: Socket
   private channels: Map<string, Channel> = new Map()
 
+  private token: string
+
   constructor(websocketUrl: string, token: string) {
     console.log("[PhoenixChannelClient] Constructor called with:")
     console.log("  - websocketUrl:", websocketUrl)
     console.log("  - token:", token ? `${token.substring(0, 20)}...` : "EMPTY OR UNDEFINED")
     console.log("  - token length:", token?.length)
+    console.log("  - token typeof:", typeof token)
 
-    // Send just the JWT token without "Bearer " prefix
-    // The UserSocket extract_bearer function can handle tokens with or without "Bearer "
-    console.log("  - Sending token without Bearer prefix")
-
-    // params must be a function that returns the params object
-    // This ensures the token is captured in the closure
-    const paramsFunction = () => {
-      const params = { token: token }
-      console.log("[PhoenixChannelClient] paramsFunction() returning token length:", token.length)
-      return params
-    }
+    // Store token as instance variable to ensure it's available in params callback
+    this.token = token
+    console.log("  - Stored token length:", this.token?.length)
 
     this.socket = new Socket(websocketUrl, {
-      params: paramsFunction,
+      params: () => {
+        console.log("[PhoenixChannelClient] params callback invoked")
+        console.log("  - this.token length:", this.token?.length)
+        console.log("  - this.token value:", this.token ? `${this.token.substring(0, 20)}...` : "EMPTY")
+        return { token: this.token }
+      }
     })
-    this.socket.connect()
 
-    console.log("[PhoenixChannelClient] Socket created and connecting...")
+    console.log("[PhoenixChannelClient] Socket created, connecting...")
+    this.socket.connect()
+    console.log("[PhoenixChannelClient] Connect called")
   }
 
   subscribe(
