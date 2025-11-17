@@ -42,6 +42,8 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
   const { filters } = formState.data
 
+  console.log("formState", formState?.data?.sites)
+
   const fetchSites = useCallback(
     async filters => {
       try {
