@@ -546,10 +546,14 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
               const value = data[key]
               // Only include objects (entities), not string signals like "reload"
               if (typeof value === "object" && value !== null) {
-                console.log(`🔄 [AppContext] Including ${key} entity update in campaignData`)
+                console.log(
+                  `🔄 [AppContext] Including ${key} entity update in campaignData`
+                )
                 filteredData[key] = value
               } else {
-                console.log(`🔄 [AppContext] Skipping ${key}="${value}" signal (not an entity object)`)
+                console.log(
+                  `🔄 [AppContext] Skipping ${key}="${value}" signal (not an entity object)`
+                )
               }
             })
 
@@ -564,7 +568,9 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
                 return newData
               })
             } else {
-              console.log("🔄 [AppContext] No entity updates to merge, skipping campaignData update")
+              console.log(
+                "🔄 [AppContext] No entity updates to merge, skipping campaignData update"
+              )
             }
           }
         },
