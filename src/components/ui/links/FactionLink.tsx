@@ -28,12 +28,25 @@ export default function FactionLink({
 
   // Subscribe to faction updates via WebSocket
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("faction", updatedFaction => {
+    // Subscribe to individual faction updates
+    const unsubscribeFaction = subscribeToEntity("faction", updatedFaction => {
       if (updatedFaction && updatedFaction.id === initialFaction.id) {
+        console.log("🔄 [FactionLink] Received faction update:", updatedFaction)
         setFaction(updatedFaction)
       }
     })
-    return unsubscribe
+
+    // Subscribe to factions reload signal
+    const unsubscribeFactions = subscribeToEntity("factions", reloadSignal => {
+      if (reloadSignal === "reload") {
+        console.log("🔄 [FactionLink] Received factions reload signal, keeping current data for now")
+      }
+    })
+
+    return () => {
+      unsubscribeFaction()
+      unsubscribeFactions()
+    }
   }, [subscribeToEntity, initialFaction.id])
 
   // Update when prop changes

@@ -377,44 +377,125 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
   }, [jwt, client, state.user.id, campaign])
 
   useEffect(() => {
-    if (!state.user.id || !campaign?.id || campaign.id === defaultCampaign.id)
+    const currentPath = typeof window !== "undefined" ? window.location.pathname : "unknown"
+    console.log("🔌 [AppContext] WebSocket subscription check on page:", currentPath, {
+      userId: state.user.id,
+      campaignId: campaign?.id,
+      isDefaultCampaign: campaign?.id === defaultCampaign.id,
+      shouldSubscribe: !!(state.user.id && campaign?.id && campaign.id !== defaultCampaign.id)
+    })
+
+    if (!state.user.id || !campaign?.id || campaign.id === defaultCampaign.id) {
+      console.log("❌ [AppContext] Not subscribing to WebSocket - missing requirements on page:", currentPath)
       return
+    }
+
+    console.log("✅ [AppContext] Creating WebSocket subscription to campaign:", campaign.id)
+    console.log("✅ [AppContext] Subscription identifier will be:", JSON.stringify({ channel: "CampaignChannel", id: campaign.id }))
+
+    // Track connection state and setup reconnection logic
+    let isConnected = false
+    let connectionCheckInterval: NodeJS.Timeout | null = null
+    let lastDataReceived = Date.now()
+
+    console.log("🔧 [AppContext] Creating WebSocket subscription on page:", currentPath, "campaign:", campaign.id)
+
+    const subscriptionId = `${campaign.id}-${currentPath.replace(/\//g, '-')}`
+    console.log("🔧 [AppContext] Subscription ID:", subscriptionId)
 
     const sub = client.consumer().subscriptions.create(
-      { channel: "CampaignChannel", id: campaign.id },
+      { channel: "CampaignChannel", id: campaign.id, client_id: subscriptionId },
       {
-        connected: () => {}, // Connected to CampaignChannel
-        disconnected: () => {}, // Disconnected from CampaignChannel
-        received: (data: CampaignCableData) => {
+        connected: function() {
+          console.log("🔗 [AppContext] WebSocket CONNECTED to CampaignChannel on page:", currentPath, "campaign:", campaign.id)
+          console.log("🔗 [AppContext] Subscription created:", !!sub, "with callbacks:", {
+            connected: typeof this.connected,
+            disconnected: typeof this.disconnected,
+            received: typeof this.received
+          })
+          console.log("🔧 [AppContext] Sub object:", sub)
+          isConnected = true
+          lastDataReceived = Date.now()
+        },
+        disconnected: function() {
+          console.log("❌ [AppContext] WebSocket DISCONNECTED from CampaignChannel:", campaign.id)
+          isConnected = false
+          if (connectionCheckInterval) {
+            clearInterval(connectionCheckInterval)
+            connectionCheckInterval = null
+          }
+        },
+        received: function(data: CampaignCableData) {
+          console.log("🚀 [AppContext] RECEIVED FUNCTION CALLED on page:", window.location.pathname)
+
+          const timestamp = Date.now()
+          lastDataReceived = timestamp
+          isConnected = true // Mark connection as active when receiving data
+
           console.log(
-            "[AppContext] WebSocket data received on CampaignChannel:",
-            data
+            "📡 [AppContext] WebSocket data received on CampaignChannel:",
+            data,
+            "at",
+            new Date(timestamp).toLocaleTimeString(),
+            "on page:",
+            window.location.pathname
           )
+
+          // Log all possible entity types
           if (data && data.fight) {
-            console.log("[AppContext] Fight update received:", {
+            console.log("🥊 [AppContext] Fight update received:", {
               id: data.fight?.id,
               name: data.fight?.name,
+              active: data.fight?.active,
             })
           }
+          if (data && data.fights === "reload") {
+            console.log("🔄 [AppContext] Fights reload signal received - should trigger list refresh")
+          }
           if (data && data.encounter) {
-            console.log("[AppContext] Encounter update received:", {
+            console.log("⚔️ [AppContext] Encounter update received:", {
               id: data.encounter?.id,
               firstShot: data.encounter?.shots?.[0],
               actionId: data.encounter?.action_id,
             })
           }
+          if (data && data.character) {
+            console.log("👤 [AppContext] Character update received:", {
+              id: data.character?.id,
+              name: data.character?.name,
+            })
+          }
+          if (data && data.characters === "reload") {
+            console.log("🔄 [AppContext] Characters reload signal received - should trigger list refresh")
+          }
+
+          // Log any other entity types
+          Object.keys(data || {}).forEach(key => {
+            if (!['fight', 'fights', 'encounter', 'character', 'characters'].includes(key)) {
+              console.log(`🔧 [AppContext] ${key} update received:`, data[key])
+            }
+          })
+
           if (data) {
+            console.log("🔄 [AppContext] Merging WebSocket data into campaignData state")
+            console.log("🔄 [AppContext] Previous campaignData keys:", Object.keys(campaignData || {}))
+
             // Merge new data with existing to prevent overwrites
-            setCampaignData(prev => ({ ...prev, ...data }))
+            setCampaignData(prev => {
+              const newData = { ...prev, ...data }
+              console.log("🔄 [AppContext] New campaignData keys:", Object.keys(newData))
+              return newData
+            })
           }
         },
       }
     )
     setSubscription(sub)
     return () => {
+      if (connectionCheckInterval) clearInterval(connectionCheckInterval)
       sub.disconnect()
     }
-  }, [state.user.id, campaign?.id, client])
+  }, [state.user.id, campaign?.id])
 
   // Subscribe to user-specific channel for campaign list updates
   useEffect(() => {

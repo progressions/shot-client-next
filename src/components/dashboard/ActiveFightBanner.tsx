@@ -25,7 +25,7 @@ export default function ActiveFightBanner({
   campaignId,
 }: ActiveFightBannerProps) {
   const router = useRouter()
-  const { subscription } = useApp()
+  const { subscription, subscribeToEntity } = useApp()
   const { client } = useClient()
   const [currentFight, setCurrentFight] = useState<Fight | null>(null)
   const [loading, setLoading] = useState(true)
@@ -80,28 +80,37 @@ export default function ActiveFightBanner({
     fetchCurrentFight()
   }, [fetchCurrentFight])
 
-  // Subscribe to WebSocket events for fight updates
+  // Subscribe to fight updates via subscribeToEntity instead of overwriting main subscription
   useEffect(() => {
-    if (!subscription) return
+    if (!subscribeToEntity) return
 
-    const handleFightUpdate = (data: { type: string; fight_id?: string }) => {
-      if (data.type === "fight_ended" && data.fight_id === currentFight?.id) {
-        // Fight has ended, clear the banner
-        setCurrentFight(null)
-      } else if (data.type === "fight_started") {
-        // New fight started, fetch it
-        fetchCurrentFight()
+    const unsubscribeFights = subscribeToEntity("fight", (updatedFight: any) => {
+      if (updatedFight && currentFight && updatedFight.id === currentFight.id) {
+        // Update current fight data
+        setCurrentFight(updatedFight)
       }
-    }
+    })
 
-    subscription.received = handleFightUpdate
+    const unsubscribeFightEvents = subscribeToEntity("fights", (eventData: any) => {
+      if (eventData === "reload") {
+        // Fights reloaded, refresh current fight
+        fetchCurrentFight()
+      } else if (eventData && typeof eventData === 'object') {
+        if (eventData.type === "fight_ended" && eventData.fight_id === currentFight?.id) {
+          // Fight has ended, clear the banner
+          setCurrentFight(null)
+        } else if (eventData.type === "fight_started") {
+          // New fight started, fetch it
+          fetchCurrentFight()
+        }
+      }
+    })
 
     return () => {
-      if (subscription) {
-        subscription.received = () => {}
-      }
+      unsubscribeFights()
+      unsubscribeFightEvents()
     }
-  }, [subscription, currentFight?.id, fetchCurrentFight])
+  }, [subscribeToEntity, currentFight?.id, fetchCurrentFight])
 
   const handleJoinFight = () => {
     if (currentFight) {
