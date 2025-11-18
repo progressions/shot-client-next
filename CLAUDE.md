@@ -11,9 +11,43 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Format & Lint**: `npm run fl` (runs both format and lint in sequence)
 - **Code generation**: `npm run generate:component` or `npm run generate:index` (uses Plop)
 
+## Environment Configuration
+
+The application supports switching between two backend APIs via `.env.local`:
+
+```bash
+# Copy example file and configure
+cp .env.example .env.local
+```
+
+### Phoenix API (Recommended)
+```bash
+NEXT_PUBLIC_SERVER_URL=http://localhost:4002
+NEXT_PUBLIC_WEBSOCKET_URL=ws://localhost:4002
+NEXT_PUBLIC_BACKEND_TYPE=phoenix
+```
+
+### Rails API (Legacy)
+```bash
+NEXT_PUBLIC_SERVER_URL=http://localhost:3000
+NEXT_PUBLIC_WEBSOCKET_URL=ws://localhost:3000
+NEXT_PUBLIC_BACKEND_TYPE=rails
+```
+
+Both backends provide:
+- Identical RESTful `/api/v2/` endpoints
+- JWT authentication
+- ActionCable WebSocket support for real-time updates
+- Image upload via ActiveStorage/ImageKit integration
+
 ## Project Architecture
 
-This is a **Next.js 15** frontend for a Feng Shui 2 RPG game manager that connects to a Ruby on Rails backend (`@progressions/shot-server`). The app uses TypeScript, Material-UI, and follows a modular component architecture.
+This is a **Next.js 15** frontend for a Feng Shui 2 RPG game manager that supports **dual API backends**:
+
+- **Phoenix/Elixir API** (recommended): Port 4002 - Modern Elixir implementation with full feature parity
+- **Ruby on Rails API** (legacy): Port 3000 - Original Rails backend for backward compatibility
+
+Both APIs provide identical `/api/v2/` endpoints and functionality. The backend selection is controlled via environment variables.
 
 ### Key Architectural Patterns
 
