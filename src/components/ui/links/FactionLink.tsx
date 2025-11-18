@@ -39,7 +39,9 @@ export default function FactionLink({
     // Subscribe to factions reload signal
     const unsubscribeFactions = subscribeToEntity("factions", reloadSignal => {
       if (reloadSignal === "reload") {
-        console.log("🔄 [FactionLink] Received factions reload signal, keeping current data for now")
+        console.log(
+          "🔄 [FactionLink] Received factions reload signal, keeping current data for now"
+        )
       }
     })
 

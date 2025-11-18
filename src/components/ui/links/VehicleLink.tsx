@@ -39,7 +39,9 @@ export default function VehicleLink({
     // Subscribe to vehicles reload signal
     const unsubscribeVehicles = subscribeToEntity("vehicles", reloadSignal => {
       if (reloadSignal === "reload") {
-        console.log("🔄 [VehicleLink] Received vehicles reload signal, keeping current data for now")
+        console.log(
+          "🔄 [VehicleLink] Received vehicles reload signal, keeping current data for now"
+        )
       }
     })
 

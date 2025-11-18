@@ -41,7 +41,9 @@ export default function FightLink({
     const unsubscribeFights = subscribeToEntity("fights", reloadSignal => {
       // For reload signals, we need to refetch the fight data
       if (reloadSignal === "reload") {
-        console.log("🔄 [FightLink] Received fights reload signal, keeping current data for now")
+        console.log(
+          "🔄 [FightLink] Received fights reload signal, keeping current data for now"
+        )
         // Note: We could refetch here, but for now we'll rely on the individual fight updates
       }
     })

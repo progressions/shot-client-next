@@ -39,7 +39,9 @@ export default function PartyLink({
     // Subscribe to parties reload signal
     const unsubscribeParties = subscribeToEntity("parties", reloadSignal => {
       if (reloadSignal === "reload") {
-        console.log("🔄 [PartyLink] Received parties reload signal, keeping current data for now")
+        console.log(
+          "🔄 [PartyLink] Received parties reload signal, keeping current data for now"
+        )
       }
     })
 

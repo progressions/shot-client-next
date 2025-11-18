@@ -41,7 +41,9 @@ export default function SiteLink({
     // Subscribe to sites reload signal
     const unsubscribeSites = subscribeToEntity("sites", reloadSignal => {
       if (reloadSignal === "reload") {
-        console.log("🔄 [SiteLink] Received sites reload signal, keeping current data for now")
+        console.log(
+          "🔄 [SiteLink] Received sites reload signal, keeping current data for now"
+        )
       }
     })
 
