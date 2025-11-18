@@ -533,22 +533,39 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
 
           if (data) {
             console.log(
-              "🔄 [AppContext] Merging WebSocket data into campaignData state"
+              "🔄 [AppContext] Processing WebSocket data for campaignData state"
             )
             console.log(
               "🔄 [AppContext] Previous campaignData keys:",
               Object.keys(campaignData || {})
             )
 
-            // Merge new data with existing to prevent overwrites
-            setCampaignData(prev => {
-              const newData = { ...prev, ...data }
-              console.log(
-                "🔄 [AppContext] New campaignData keys:",
-                Object.keys(newData)
-              )
-              return newData
+            // Filter data to only include actual entity objects, not "reload" signals
+            const filteredData: Record<string, unknown> = {}
+            Object.keys(data).forEach(key => {
+              const value = data[key]
+              // Only include objects (entities), not string signals like "reload"
+              if (typeof value === "object" && value !== null) {
+                console.log(`🔄 [AppContext] Including ${key} entity update in campaignData`)
+                filteredData[key] = value
+              } else {
+                console.log(`🔄 [AppContext] Skipping ${key}="${value}" signal (not an entity object)`)
+              }
             })
+
+            // Only merge if we have actual entity data to merge
+            if (Object.keys(filteredData).length > 0) {
+              setCampaignData(prev => {
+                const newData = { ...prev, ...filteredData }
+                console.log(
+                  "🔄 [AppContext] New campaignData keys:",
+                  Object.keys(newData)
+                )
+                return newData
+              })
+            } else {
+              console.log("🔄 [AppContext] No entity updates to merge, skipping campaignData update")
+            }
           }
         },
       }
