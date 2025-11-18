@@ -44,8 +44,8 @@ Both backends provide:
 
 This is a **Next.js 15** frontend for a Feng Shui 2 RPG game manager that supports **dual API backends**:
 
-- **Phoenix/Elixir API** (recommended): Port 4002 - Modern Elixir implementation with full feature parity
-- **Ruby on Rails API** (legacy): Port 3000 - Original Rails backend for backward compatibility
+- **Phoenix/Elixir API** : Port 4002 - Modern Elixir implementation with full feature parity
+- **Ruby on Rails API** : Port 3000 - Original Rails backend for backward compatibility
 
 Both APIs provide identical `/api/v2/` endpoints and functionality. The backend selection is controlled via environment variables.
 
