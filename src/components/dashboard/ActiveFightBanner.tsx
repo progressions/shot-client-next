@@ -25,7 +25,7 @@ export default function ActiveFightBanner({
   campaignId,
 }: ActiveFightBannerProps) {
   const router = useRouter()
-  const { subscription, subscribeToEntity } = useApp()
+  const { subscribeToEntity } = useApp()
   const { client } = useClient()
   const [currentFight, setCurrentFight] = useState<Fight | null>(null)
   const [loading, setLoading] = useState(true)
@@ -84,33 +84,47 @@ export default function ActiveFightBanner({
   useEffect(() => {
     if (!subscribeToEntity) return
 
-    const unsubscribeFights = subscribeToEntity("fight", (updatedFight: any) => {
-      if (updatedFight && currentFight && updatedFight.id === currentFight.id) {
-        // Update current fight data
-        setCurrentFight(updatedFight)
-      }
-    })
-
-    const unsubscribeFightEvents = subscribeToEntity("fights", (eventData: any) => {
-      if (eventData === "reload") {
-        // Fights reloaded, refresh current fight
-        fetchCurrentFight()
-      } else if (eventData && typeof eventData === 'object') {
-        if (eventData.type === "fight_ended" && eventData.fight_id === currentFight?.id) {
-          // Fight has ended, clear the banner
-          setCurrentFight(null)
-        } else if (eventData.type === "fight_started") {
-          // New fight started, fetch it
-          fetchCurrentFight()
+    const unsubscribeFights = subscribeToEntity(
+      "fight",
+      (updatedFight: Fight) => {
+        if (
+          updatedFight &&
+          currentFight &&
+          updatedFight.id === currentFight.id
+        ) {
+          // Update current fight data
+          setCurrentFight(updatedFight)
         }
       }
-    })
+    )
+
+    const unsubscribeFightEvents = subscribeToEntity(
+      "fights",
+      (eventData: unknown) => {
+        if (eventData === "reload") {
+          // Fights reloaded, refresh current fight
+          fetchCurrentFight()
+        } else if (eventData && typeof eventData === "object") {
+          const eventObj = eventData as { type?: string; fight_id?: string }
+          if (
+            eventObj.type === "fight_ended" &&
+            eventObj.fight_id === currentFight?.id
+          ) {
+            // Fight has ended, clear the banner
+            setCurrentFight(null)
+          } else if (eventObj.type === "fight_started") {
+            // New fight started, fetch it
+            fetchCurrentFight()
+          }
+        }
+      }
+    )
 
     return () => {
       unsubscribeFights()
       unsubscribeFightEvents()
     }
-  }, [subscribeToEntity, currentFight?.id, fetchCurrentFight])
+  }, [subscribeToEntity, currentFight?.id, fetchCurrentFight, currentFight])
 
   const handleJoinFight = () => {
     if (currentFight) {
