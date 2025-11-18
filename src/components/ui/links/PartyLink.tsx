@@ -28,12 +28,27 @@ export default function PartyLink({
 
   // Subscribe to party updates via WebSocket
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("party", updatedParty => {
+    // Subscribe to individual party updates
+    const unsubscribeParty = subscribeToEntity("party", updatedParty => {
       if (updatedParty && updatedParty.id === initialParty.id) {
+        console.log("🔄 [PartyLink] Received party update:", updatedParty)
         setParty(updatedParty)
       }
     })
-    return unsubscribe
+
+    // Subscribe to parties reload signal
+    const unsubscribeParties = subscribeToEntity("parties", reloadSignal => {
+      if (reloadSignal === "reload") {
+        console.log(
+          "🔄 [PartyLink] Received parties reload signal, keeping current data for now"
+        )
+      }
+    })
+
+    return () => {
+      unsubscribeParty()
+      unsubscribeParties()
+    }
   }, [subscribeToEntity, initialParty.id])
 
   // Update when prop changes

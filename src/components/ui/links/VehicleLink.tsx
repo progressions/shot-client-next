@@ -28,12 +28,27 @@ export default function VehicleLink({
 
   // Subscribe to vehicle updates via WebSocket
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("vehicle", updatedVehicle => {
+    // Subscribe to individual vehicle updates
+    const unsubscribeVehicle = subscribeToEntity("vehicle", updatedVehicle => {
       if (updatedVehicle && updatedVehicle.id === initialVehicle.id) {
+        console.log("🔄 [VehicleLink] Received vehicle update:", updatedVehicle)
         setVehicle(updatedVehicle)
       }
     })
-    return unsubscribe
+
+    // Subscribe to vehicles reload signal
+    const unsubscribeVehicles = subscribeToEntity("vehicles", reloadSignal => {
+      if (reloadSignal === "reload") {
+        console.log(
+          "🔄 [VehicleLink] Received vehicles reload signal, keeping current data for now"
+        )
+      }
+    })
+
+    return () => {
+      unsubscribeVehicle()
+      unsubscribeVehicles()
+    }
   }, [subscribeToEntity, initialVehicle.id])
 
   // Update when prop changes

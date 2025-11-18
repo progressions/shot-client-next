@@ -31,16 +31,53 @@ export default function CharacterLink({
   const { subscribeToEntity } = useApp()
   const [character, setCharacter] = useState(initialCharacter)
 
-  // Subscribe to character updates via WebSocket
+  // Subscribe to character updates via WebSocket with fallback polling
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("character", updatedCharacter => {
-      // Only update if this is the same character
-      if (updatedCharacter && updatedCharacter.id === initialCharacter.id) {
-        setCharacter(updatedCharacter)
-      }
-    })
+    console.log(
+      "🔗 [CharacterLink] Setting up WebSocket subscription for character:",
+      initialCharacter.name,
+      initialCharacter.id
+    )
 
-    return unsubscribe
+    let lastUpdateTime = Date.now()
+
+    // Subscribe to individual character updates
+    const unsubscribeCharacter = subscribeToEntity(
+      "character",
+      updatedCharacter => {
+        // Only update if this is the same character
+        if (updatedCharacter && updatedCharacter.id === initialCharacter.id) {
+          console.log(
+            "🔄 [CharacterLink] Received character update:",
+            updatedCharacter
+          )
+          lastUpdateTime = Date.now()
+          setCharacter(updatedCharacter)
+        }
+      }
+    )
+
+    // Subscribe to characters reload signal
+    const unsubscribeCharacters = subscribeToEntity(
+      "characters",
+      reloadSignal => {
+        // For reload signals, we need to refetch the character data
+        if (reloadSignal === "reload") {
+          console.log(
+            "🔄 [CharacterLink] Received characters reload signal, refreshing page in 1 second"
+          )
+          // As a fallback, refresh the page if WebSocket isn't working properly
+          setTimeout(() => {
+            window.location.reload()
+          }, 1000)
+        }
+      }
+    )
+
+    return () => {
+      unsubscribeCharacter()
+      unsubscribeCharacters()
+    }
   }, [subscribeToEntity, initialCharacter.id])
 
   // Update when prop changes

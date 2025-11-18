@@ -29,7 +29,8 @@ export default function SiteLink({
 
   // Subscribe to site updates via WebSocket
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("site", updatedSite => {
+    // Subscribe to individual site updates
+    const unsubscribeSite = subscribeToEntity("site", updatedSite => {
       // Only update if this is the same site
       if (updatedSite && updatedSite.id === initialSite.id) {
         console.log(
@@ -40,7 +41,19 @@ export default function SiteLink({
       }
     })
 
-    return unsubscribe
+    // Subscribe to sites reload signal
+    const unsubscribeSites = subscribeToEntity("sites", reloadSignal => {
+      if (reloadSignal === "reload") {
+        console.log(
+          "🔄 [SiteLink] Received sites reload signal, keeping current data for now"
+        )
+      }
+    })
+
+    return () => {
+      unsubscribeSite()
+      unsubscribeSites()
+    }
   }, [subscribeToEntity, initialSite.id])
 
   // Update when prop changes

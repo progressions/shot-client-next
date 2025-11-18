@@ -28,14 +28,30 @@ export default function FightLink({
 
   // Subscribe to fight updates via WebSocket
   useEffect(() => {
-    const unsubscribe = subscribeToEntity("fight", updatedFight => {
+    // Subscribe to individual fight updates
+    const unsubscribeFight = subscribeToEntity("fight", updatedFight => {
       // Only update if this is the same fight
       if (updatedFight && updatedFight.id === initialFight.id) {
+        console.log("🔄 [FightLink] Received fight update:", updatedFight)
         setFight(updatedFight)
       }
     })
 
-    return unsubscribe
+    // Subscribe to fights reload signal
+    const unsubscribeFights = subscribeToEntity("fights", reloadSignal => {
+      // For reload signals, we need to refetch the fight data
+      if (reloadSignal === "reload") {
+        console.log(
+          "🔄 [FightLink] Received fights reload signal, keeping current data for now"
+        )
+        // Note: We could refetch here, but for now we'll rely on the individual fight updates
+      }
+    })
+
+    return () => {
+      unsubscribeFight()
+      unsubscribeFights()
+    }
   }, [subscribeToEntity, initialFight.id])
 
   // Update when prop changes
