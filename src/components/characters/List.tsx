@@ -62,11 +62,6 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
         })
         dispatchForm({
           type: FormActions.UPDATE,
-          name: "types",
-          value: response.data.types,
-        })
-        dispatchForm({
-          type: FormActions.UPDATE,
           name: "archetypes",
           value: response.data.archetypes,
         })
