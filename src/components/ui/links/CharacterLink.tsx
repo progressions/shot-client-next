@@ -33,12 +33,6 @@ export default function CharacterLink({
 
   // Subscribe to character updates via WebSocket with fallback polling
   useEffect(() => {
-    console.log(
-      "🔗 [CharacterLink] Setting up WebSocket subscription for character:",
-      initialCharacter.name,
-      initialCharacter.id
-    )
-
     let lastUpdateTime = Date.now()
 
     // Subscribe to individual character updates
