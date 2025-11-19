@@ -622,10 +622,6 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
       if (callbacks && callbacks.size > 0) {
         callbacks.forEach(callback => {
           try {
-            console.log(
-              `🔄 AppContext: Calling callback for '${key}' with value:`,
-              value
-            )
             callback(value)
           } catch (error) {
             console.error(`Error in ${key} callback:`, error)
