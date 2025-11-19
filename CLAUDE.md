@@ -23,6 +23,7 @@ cp .env.example .env.local
 ### Phoenix API (Recommended)
 ```bash
 NEXT_PUBLIC_SERVER_URL=http://localhost:4002
+NEXT_PUBLIC_API_BASE_URL=http://localhost:4002
 NEXT_PUBLIC_WEBSOCKET_URL=ws://localhost:4002
 NEXT_PUBLIC_BACKEND_TYPE=phoenix
 ```
@@ -30,6 +31,7 @@ NEXT_PUBLIC_BACKEND_TYPE=phoenix
 ### Rails API (Legacy)
 ```bash
 NEXT_PUBLIC_SERVER_URL=http://localhost:3000
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
 NEXT_PUBLIC_WEBSOCKET_URL=ws://localhost:3000
 NEXT_PUBLIC_BACKEND_TYPE=rails
 ```
