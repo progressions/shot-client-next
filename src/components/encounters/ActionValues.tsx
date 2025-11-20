@@ -29,15 +29,12 @@ export default function ActionValues({ character }: ActionValuesProps) {
     return { value: adjustedValue, change }
   }
 
-  const gunsData = getAdjustedValue(
-    "Guns",
-    CS.rawActionValue(character, "Guns")
-  )
-
-  const martialArtsData = getAdjustedValue(
-    "Martial Arts",
-    CS.rawActionValue(character, "Martial Arts")
-  )
+  // Get the character's attack values (MainAttack and SecondaryAttack if exists)
+  const attackTypes = CS.attackValues(character)
+  const attackValuesData = attackTypes.map(attackType => ({
+    label: attackType,
+    ...getAdjustedValue(attackType, CS.rawActionValue(character, attackType))
+  }))
 
   const defenseData = getAdjustedValue(
     "Defense",
@@ -62,12 +59,14 @@ export default function ActionValues({ character }: ActionValuesProps) {
         flexWrap: "wrap",
       }}
     >
-      <AV label="Guns" value={gunsData.value} change={gunsData.change} />
-      <AV
-        label="Martial Arts"
-        value={martialArtsData.value}
-        change={martialArtsData.change}
-      />
+      {attackValuesData.map(attackData => (
+        <AV
+          key={attackData.label}
+          label={attackData.label}
+          value={attackData.value}
+          change={attackData.change}
+        />
+      ))}
       <AV
         label="Defense"
         value={defenseData.value}
