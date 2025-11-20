@@ -33,7 +33,7 @@ export default function ActionValues({ character }: ActionValuesProps) {
   const attackTypes = CS.attackValues(character)
   const attackValuesData = attackTypes.map(attackType => ({
     label: attackType,
-    ...getAdjustedValue(attackType, CS.rawActionValue(character, attackType))
+    ...getAdjustedValue(attackType, CS.rawActionValue(character, attackType)),
   }))
 
   const defenseData = getAdjustedValue(
