@@ -77,6 +77,16 @@ export function consumer({
 
   const backendType = detectBackendType()
 
+  console.log("[websocketClient] Backend type detected:", backendType)
+  console.log(
+    "[websocketClient] NEXT_PUBLIC_BACKEND_TYPE:",
+    process.env.NEXT_PUBLIC_BACKEND_TYPE
+  )
+  console.log(
+    "[websocketClient] NEXT_PUBLIC_WEBSOCKET_URL:",
+    process.env.NEXT_PUBLIC_WEBSOCKET_URL
+  )
+
   if (backendType === "phoenix") {
     // Use unified client with Phoenix Channels
     const phoenixUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL
