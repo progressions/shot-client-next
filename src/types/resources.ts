@@ -297,6 +297,14 @@ export interface Person extends BaseEntity {
   effects?: CharacterEffect[]
 }
 
+export interface Advancement {
+  id: string
+  character_id: string
+  description: string
+  created_at: string
+  updated_at: string
+}
+
 // Entity union type - all entity types that can be displayed with avatars
 export type Entity =
   | Campaign

@@ -150,7 +150,7 @@ export function CallToAction() {
           {/* Quick Features */}
           <Grid container spacing={3} justifyContent="center">
             {quickFeatures.map((feature, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
                 <FeatureHighlight elevation={0}>
                   <Stack spacing={2} alignItems="center">
                     <Box sx={{ color: "white" }}>{feature.icon}</Box>

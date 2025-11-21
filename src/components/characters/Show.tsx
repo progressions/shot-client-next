@@ -27,6 +27,7 @@ import {
   EditJuncture,
   EditWealth,
   SkillsManager,
+  AdvancementsManager,
 } from "@/components/characters"
 import { EditFaction } from "@/components/factions"
 import { EntityActiveToggle } from "@/components/common"
@@ -193,6 +194,10 @@ export default function Show({
         character={memoizedCharacter}
         updateCharacter={updateCharacter}
       />
+
+      {memoizedCharacter.action_values?.Type === "PC" && (
+        <AdvancementsManager character={memoizedCharacter} />
+      )}
 
       <Weapons
         character={memoizedCharacter}

@@ -151,7 +151,7 @@ export default function ProfileForm({ user, onSave }: ProfileFormProps) {
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <Box display="flex" flexDirection="column" alignItems="center">
             <Avatar
               src={data.imagePreview || user.image_url}
@@ -176,10 +176,10 @@ export default function ProfileForm({ user, onSave }: ProfileFormProps) {
           </Box>
         </Grid>
 
-        <Grid item xs={12} md={9}>
+        <Grid size={{ xs: 12, md: 9 }}>
           <Box component="form" noValidate sx={{ mt: 1 }}>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth error={!!errors.first_name}>
                   <TextField
                     fullWidth
@@ -201,7 +201,7 @@ export default function ProfileForm({ user, onSave }: ProfileFormProps) {
                   )}
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth error={!!errors.last_name}>
                   <TextField
                     fullWidth
@@ -223,7 +223,7 @@ export default function ProfileForm({ user, onSave }: ProfileFormProps) {
                   )}
                 </FormControl>
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <FormControl fullWidth error={!!errors.email}>
                   <TextField
                     fullWidth

@@ -38,6 +38,7 @@ export { default as EditJuncture } from "@/components/characters/edit/EditJunctu
 export { default as EditWealth } from "@/components/characters/edit/EditWealth"
 export { default as EditOwner } from "@/components/characters/edit/EditOwner"
 export { default as SkillsManager } from "@/components/characters/edit/SkillsManager"
+export { default as AdvancementsManager } from "@/components/characters/edit/AdvancementsManager"
 export { default as DescriptionValue } from "@/components/characters/edit/DescriptionValue"
 export { default as NotFound } from "@/components/characters/NotFound"
 export { default as Table } from "@/components/characters/Table"

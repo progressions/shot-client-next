@@ -246,18 +246,37 @@ export function createCharacterClient(deps: ClientDependencies) {
     })
   }
 
+  async function getAdvancements(
+    characterId: string,
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<Advancement[]>> {
+    return get(apiV2.advancements({ id: characterId }), {}, cacheOptions)
+  }
+
   async function createAdvancement(
-    character: Character,
-    advancement: Advancement
+    characterId: string,
+    data: { description: string }
   ): Promise<AxiosResponse<Advancement>> {
-    return post(api.advancements(character), { advancement: advancement })
+    return post(apiV2.advancements({ id: characterId }), {
+      advancement: data,
+    })
+  }
+
+  async function updateAdvancement(
+    characterId: string,
+    advancementId: string,
+    data: { description: string }
+  ): Promise<AxiosResponse<Advancement>> {
+    return patch(apiV2.advancements({ id: characterId }, advancementId), {
+      advancement: data,
+    })
   }
 
   async function deleteAdvancement(
-    character: Character,
-    advancement: Advancement
+    characterId: string,
+    advancementId: string
   ): Promise<AxiosResponse<void>> {
-    return delete_(api.advancements(character, advancement))
+    return delete_(apiV2.advancements({ id: characterId }, advancementId))
   }
 
   async function getAllCharacters(
@@ -337,7 +356,9 @@ export function createCharacterClient(deps: ClientDependencies) {
     removeCharacterFromFight,
     showCharacter,
     addCharacter,
+    getAdvancements,
     createAdvancement,
+    updateAdvancement,
     deleteAdvancement,
     getAllCharacters,
     updateShotLocation,

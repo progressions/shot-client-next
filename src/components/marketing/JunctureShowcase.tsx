@@ -129,7 +129,7 @@ export function JunctureShowcase() {
 
           <Grid container spacing={4}>
             {junctures.map((juncture, index) => (
-              <Grid item xs={12} md={6} key={index}>
+              <Grid size={{ xs: 12, md: 6 }} key={index}>
                 <JunctureCard>
                   <Box position="relative" sx={{ aspectRatio: "16/9" }}>
                     <Image
