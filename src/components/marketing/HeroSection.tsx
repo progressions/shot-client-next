@@ -1,10 +1,17 @@
 "use client"
 
-import { Box, Button, Container, Typography, Stack } from "@mui/material"
-import { styled } from "@mui/material/styles"
+import {
+  Box,
+  Button,
+  Typography,
+  Stack,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material"
+import { styled, alpha } from "@mui/material/styles"
 import Link from "next/link"
 import Image from "next/image"
-import { RocketLaunch, Login } from "@mui/icons-material"
+import { Login, ArrowForward } from "@mui/icons-material"
 import { MARKETING_IMAGES } from "@/lib/marketingImages"
 
 const HeroContainer = styled(Box)(() => ({
@@ -12,23 +19,40 @@ const HeroContainer = styled(Box)(() => ({
   minHeight: "100vh",
   display: "flex",
   alignItems: "center",
+  justifyContent: "center",
   position: "relative",
   overflow: "hidden",
 }))
 
-const HeroContent = styled(Container)(({ theme }) => ({
+const GlassCard = styled(Box)(({ theme }) => ({
   position: "relative",
   zIndex: 2,
+  padding: theme.spacing(6, 8),
+  maxWidth: "1000px",
+  width: "90%",
+  // Fully transparent - no glass effect
+  background: "transparent",
+  backdropFilter: "none",
+  borderRadius: theme.spacing(4),
+  border: "none",
+  boxShadow: "none",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
   textAlign: "center",
-  [theme.breakpoints.up("md")]: {
-    textAlign: "left",
+  [theme.breakpoints.down("md")]: {
+    padding: theme.spacing(4),
+    width: "95%",
   },
 }))
 
 const HeroTitle = styled(Typography)(({ theme }) => ({
-  fontWeight: "bold",
+  fontWeight: 800,
+  letterSpacing: "-0.02em",
   marginBottom: theme.spacing(2),
-  textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
+  color: "#fff",
+  // Stronger text shadow for contrast against raw image
+  textShadow: "0 4px 12px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.6)",
   [theme.breakpoints.down("md")]: {
     fontSize: "2.5rem",
   },
@@ -36,47 +60,54 @@ const HeroTitle = styled(Typography)(({ theme }) => ({
 
 const HeroSubtitle = styled(Typography)(({ theme }) => ({
   marginBottom: theme.spacing(4),
-  opacity: 0.9,
-  textShadow: "1px 1px 2px rgba(0, 0, 0, 0.5)",
+  color: "#fff",
+  fontSize: "1.25rem",
+  lineHeight: 1.6,
+  maxWidth: "700px",
+  // Strong text shadow
+  textShadow: "0 2px 8px rgba(0,0,0,0.9)",
   [theme.breakpoints.down("md")]: {
     fontSize: "1.1rem",
   },
 }))
 
-const CTAButton = styled(Button)(({ theme }) => ({
-  margin: theme.spacing(1),
-  padding: theme.spacing(2, 4),
-  fontSize: "1.2rem",
-  fontWeight: "bold",
+const ActionButton = styled(Button)(({ theme }) => ({
+  padding: theme.spacing(1.8, 4),
+  fontSize: "1.1rem",
+  fontWeight: 600,
+  borderRadius: "50px",
   textTransform: "none",
-  borderRadius: theme.spacing(1),
-  boxShadow: "0 6px 20px rgba(0, 0, 0, 0.3)",
-  transition: "all 0.3s ease",
+  boxShadow: "0 4px 14px 0 rgba(0,0,0,0.3)",
+  transition: "all 0.2s ease-in-out",
   "&:hover": {
-    transform: "translateY(-3px)",
-    boxShadow: "0 8px 25px rgba(0, 0, 0, 0.4)",
+    transform: "translateY(-2px)",
+    boxShadow: "0 6px 20px rgba(0,0,0,0.4)",
   },
 }))
 
-const PrimaryCTA = styled(CTAButton)(({ theme }) => ({
-  backgroundColor: theme.palette.secondary.main,
+const PrimaryCTA = styled(ActionButton)(({ theme }) => ({
+  background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
   color: theme.palette.secondary.contrastText,
+  border: "1px solid rgba(255,255,255,0.2)",
   "&:hover": {
-    backgroundColor: theme.palette.secondary.dark,
+    background: `linear-gradient(135deg, ${theme.palette.secondary.light} 0%, ${theme.palette.secondary.main} 100%)`,
   },
 }))
 
-const SecondaryCTA = styled(CTAButton)(({ theme }) => ({
-  backgroundColor: "transparent",
+const SecondaryCTA = styled(ActionButton)(({ theme }) => ({
+  background: "rgba(0,0,0,0.6)", // Darker background for contrast
   color: "white",
-  border: "2px solid white",
+  border: `2px solid ${alpha("#fff", 0.5)}`,
   "&:hover": {
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-    borderColor: theme.palette.secondary.main,
+    background: alpha("#000", 0.8),
+    border: `2px solid ${theme.palette.secondary.main}`,
   },
 }))
 
 export function HeroSection() {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
+
   return (
     <HeroContainer>
       {/* Background Image */}
@@ -87,69 +118,79 @@ export function HeroSection() {
         style={{ objectFit: "cover" }}
         priority
         quality={90}
-        unoptimized // Using external CDN
+        unoptimized
       />
 
-      {/* Dark Overlay */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background:
-            "linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7))",
-          zIndex: 1,
-        }}
-      />
-      <HeroContent maxWidth="lg">
-        <Stack spacing={4} alignItems={{ xs: "center", md: "flex-start" }}>
-          <HeroTitle variant="h1" component="h1">
-            Master Epic Cinematic Adventures
-          </HeroTitle>
+      <GlassCard>
+        <HeroTitle variant="h1" component="h1">
+          Master Epic Cinematic Adventures
+        </HeroTitle>
 
-          <HeroSubtitle variant="h5" component="h2">
-            The ultimate Feng Shui 2 campaign management platform.
-            <br />
-            Real-time combat, AI character generation, and cross-juncture
-            storytelling await.
-          </HeroSubtitle>
+        <HeroSubtitle variant="h5" component="h2">
+          The ultimate Feng Shui 2 campaign management platform. Real-time
+          combat, AI character generation, and cross-juncture storytelling
+          await.
+        </HeroSubtitle>
 
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={2}
-            alignItems="center"
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          alignItems="center"
+          justifyContent="center"
+          width="100%"
+        >
+          <Link
+            href="/register"
+            passHref
+            style={{
+              textDecoration: "none",
+              width: isMobile ? "100%" : "auto",
+            }}
           >
-            <Link href="/register" passHref>
-              <PrimaryCTA
-                variant="contained"
-                size="large"
-                startIcon={<RocketLaunch />}
-                fullWidth={{ xs: true, sm: false }}
-              >
-                Start Your Legendary Campaign
-              </PrimaryCTA>
-            </Link>
+            <PrimaryCTA
+              variant="contained"
+              size="large"
+              endIcon={<ArrowForward />}
+              fullWidth={isMobile}
+            >
+              Start Your Legendary Campaign
+            </PrimaryCTA>
+          </Link>
 
-            <Link href="/login" passHref>
-              <SecondaryCTA
-                variant="outlined"
-                size="large"
-                startIcon={<Login />}
-                fullWidth={{ xs: true, sm: false }}
-              >
-                Already a Hero? Login
-              </SecondaryCTA>
-            </Link>
-          </Stack>
-
-          <Typography variant="body1" sx={{ opacity: 0.8, maxWidth: 600 }}>
-            Join gamemasters and players worldwide in creating unforgettable
-            action movie adventures across the four junctures of time.
-          </Typography>
+          <Link
+            href="/login"
+            passHref
+            style={{
+              textDecoration: "none",
+              width: isMobile ? "100%" : "auto",
+            }}
+          >
+            <SecondaryCTA
+              variant="outlined"
+              size="large"
+              startIcon={<Login />}
+              fullWidth={isMobile}
+            >
+              Already a Hero? Login
+            </SecondaryCTA>
+          </Link>
         </Stack>
-      </HeroContent>
+
+        <Typography
+          variant="body2"
+          sx={{
+            mt: 4,
+            opacity: 1,
+            maxWidth: 500,
+            fontSize: "0.875rem",
+            color: "#fff",
+            textShadow: "0 2px 4px rgba(0,0,0,0.9)",
+          }}
+        >
+          Join gamemasters and players worldwide in creating unforgettable
+          action movie adventures across the four junctures of time.
+        </Typography>
+      </GlassCard>
     </HeroContainer>
   )
 }
