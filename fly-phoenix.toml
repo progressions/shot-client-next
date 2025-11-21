@@ -1,0 +1,35 @@
+# fly.toml app configuration file generated for shot-client-phoenix
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "shot-client-phoenix"
+primary_region = "dfw"
+
+[build]
+  [build.args]
+    NEXT_PUBLIC_API_BASE_URL = "https://shot-elixir.fly.dev"
+    NEXT_PUBLIC_SERVER_URL = "https://shot-elixir.fly.dev"
+    NEXT_PUBLIC_WEBSOCKET_URL = "wss://shot-elixir.fly.dev"
+    NEXT_PUBLIC_BACKEND_TYPE = "phoenix"
+
+[env]
+  PORT = "3000"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+  [http_service.concurrency]
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1
