@@ -2,95 +2,110 @@
 
 import {
   Box,
-  Container,
   Typography,
   Button,
   Stack,
   Grid,
   Paper,
+  Divider,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material"
-import { styled } from "@mui/material/styles"
+import { styled, alpha } from "@mui/material/styles"
 import Link from "next/link"
 import Image from "next/image"
-import { RocketLaunch, Login, MenuBook } from "@mui/icons-material"
+import {
+  RocketLaunch,
+  Login,
+  MenuBook,
+  ArrowForward,
+} from "@mui/icons-material"
 import { MARKETING_IMAGES } from "@/lib/marketingImages"
 
-const CTASection = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(10, 0),
-  color: "white",
+const SectionWrapper = styled(Box)(({ theme }) => ({
   position: "relative",
-  overflow: "hidden",
-  minHeight: "600px",
+  minHeight: "850px",
   display: "flex",
   alignItems: "center",
+  justifyContent: "center",
+  overflow: "hidden",
+  padding: theme.spacing(4),
+  [theme.breakpoints.down("sm")]: {
+    padding: theme.spacing(2),
+    minHeight: "auto",
+  },
 }))
 
-const CTAContent = styled(Container)(() => ({
+const GlassCard = styled(Paper)(({ theme }) => ({
   position: "relative",
   zIndex: 2,
-  textAlign: "center",
+  padding: theme.spacing(6, 8),
+  maxWidth: "900px",
+  width: "100%",
+  // Fully transparent - no glass effect
+  background: "transparent",
+  backdropFilter: "none",
+  borderRadius: theme.spacing(3),
+  border: "none",
+  boxShadow: "none",
+  color: "white",
+  [theme.breakpoints.down("md")]: {
+    padding: theme.spacing(4),
+  },
 }))
 
-const CTAButton = styled(Button)(({ theme }) => ({
-  margin: theme.spacing(1),
-  padding: theme.spacing(2, 4),
-  fontSize: "1.2rem",
-  fontWeight: "bold",
+const ActionButton = styled(Button)(({ theme }) => ({
+  padding: theme.spacing(1.5, 4),
+  fontSize: "1.1rem",
+  fontWeight: 600,
+  borderRadius: "50px", // Pill shape
   textTransform: "none",
-  borderRadius: theme.spacing(1),
-  boxShadow: "0 6px 20px rgba(0, 0, 0, 0.3)",
-  transition: "all 0.3s ease",
+  boxShadow: "0 4px 14px 0 rgba(0,0,0,0.3)",
+  transition: "all 0.2s ease-in-out",
   "&:hover": {
-    transform: "translateY(-3px)",
-    boxShadow: "0 8px 25px rgba(0, 0, 0, 0.4)",
+    transform: "translateY(-2px)",
+    boxShadow: "0 6px 20px rgba(0,0,0,0.4)",
   },
 }))
 
-const PrimaryCTA = styled(CTAButton)(({ theme }) => ({
-  backgroundColor: theme.palette.secondary.main,
+const PrimaryButton = styled(ActionButton)(({ theme }) => ({
+  background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
   color: theme.palette.secondary.contrastText,
+  border: "1px solid rgba(255,255,255,0.2)",
   "&:hover": {
-    backgroundColor: theme.palette.secondary.dark,
+    background: `linear-gradient(135deg, ${theme.palette.secondary.light} 0%, ${theme.palette.secondary.main} 100%)`,
   },
 }))
 
-const SecondaryCTA = styled(CTAButton)(({ theme }) => ({
-  backgroundColor: "transparent",
+const SecondaryButton = styled(ActionButton)(({ theme }) => ({
+  background: "rgba(0,0,0,0.6)",
   color: "white",
-  border: "2px solid white",
+  border: `2px solid ${alpha("#fff", 0.5)}`,
   "&:hover": {
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-    borderColor: theme.palette.secondary.main,
+    background: alpha("#000", 0.8),
+    border: `2px solid ${theme.palette.secondary.main}`,
   },
-}))
-
-const FeatureHighlight = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  backgroundColor: "rgba(255, 255, 255, 0.1)",
-  backdropFilter: "blur(10px)",
-  border: "1px solid rgba(255, 255, 255, 0.2)",
-  borderRadius: theme.spacing(2),
-  color: "white",
-  textAlign: "center",
-  height: "100%",
 }))
 
 const quickFeatures = [
   {
-    icon: <RocketLaunch sx={{ fontSize: 40 }} />,
+    icon: <RocketLaunch sx={{ fontSize: 32, color: "secondary.main" }} />,
     title: "Quick Setup",
     description: "Create your first campaign in under 5 minutes",
   },
   {
-    icon: <MenuBook sx={{ fontSize: 40 }} />,
+    icon: <MenuBook sx={{ fontSize: 32, color: "secondary.main" }} />,
     title: "Learn Fast",
     description: "Comprehensive documentation and tutorials",
   },
 ]
 
 export function CallToAction() {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
+
   return (
-    <CTASection>
+    <SectionWrapper>
       {/* Background Image */}
       <Image
         src={MARKETING_IMAGES.assets.eatersOfTheLotus}
@@ -98,47 +113,38 @@ export function CallToAction() {
         fill
         style={{ objectFit: "cover" }}
         quality={90}
+        priority
         unoptimized // Using external CDN
       />
 
-      {/* Dark Overlay */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background:
-            "linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7))",
-          zIndex: 1,
-        }}
-      />
-
-      <CTAContent maxWidth="lg">
-        <Stack spacing={6}>
+      <GlassCard elevation={0}>
+        <Stack spacing={5} alignItems="center" textAlign="center">
+          {/* Header Section */}
           <Box>
             <Typography
-              variant="h2"
+              variant={isMobile ? "h4" : "h2"}
               component="h2"
-              gutterBottom
               sx={{
-                fontWeight: "bold",
-                textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
-                mb: 3,
+                fontWeight: 800,
+                letterSpacing: "-0.02em",
+                mb: 2,
+                color: "#fff",
+                textShadow:
+                  "0 4px 12px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.6)",
               }}
             >
               Your Epic Adventure Awaits
             </Typography>
 
             <Typography
-              variant="h5"
+              variant="h6"
               sx={{
-                opacity: 0.9,
-                textShadow: "1px 1px 2px rgba(0, 0, 0, 0.5)",
-                maxWidth: 800,
+                color: "#fff",
+                maxWidth: 600,
                 mx: "auto",
-                mb: 4,
+                lineHeight: 1.6,
+                fontWeight: 400,
+                textShadow: "0 2px 8px rgba(0,0,0,0.9)",
               }}
             >
               The ultimate Feng Shui 2 campaign management platform. Real-time
@@ -147,112 +153,174 @@ export function CallToAction() {
             </Typography>
           </Box>
 
-          {/* Quick Features */}
-          <Grid container spacing={3} justifyContent="center">
+          <Divider flexItem sx={{ borderColor: "rgba(255,255,255,0.2)" }} />
+
+          {/* Features - Now inline/cleaner */}
+          <Grid container spacing={4} justifyContent="center">
             {quickFeatures.map((feature, index) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
-                <FeatureHighlight elevation={0}>
-                  <Stack spacing={2} alignItems="center">
-                    <Box sx={{ color: "white" }}>{feature.icon}</Box>
-                    <Typography variant="h6" fontWeight="bold">
+              <Grid size={{ xs: 12, sm: 6 }} key={index}>
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  alignItems="center"
+                  justifyContent={{ xs: "flex-start", sm: "center" }}
+                  sx={{
+                    p: 1,
+                    textAlign: "left",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      p: 1.5,
+                      borderRadius: "12px",
+                      background: alpha(theme.palette.secondary.main, 0.2), // Increased visibility
+                      display: "flex",
+                      border: `1px solid ${alpha(theme.palette.secondary.main, 0.4)}`,
+                      boxShadow: "0 4px 8px rgba(0,0,0,0.5)",
+                    }}
+                  >
+                    {feature.icon}
+                  </Box>
+                  <Box>
+                    <Typography
+                      variant="h6"
+                      fontWeight="bold"
+                      sx={{
+                        mb: 0.5,
+                        color: "#fff",
+                        textShadow: "0 2px 4px rgba(0,0,0,0.9)",
+                      }}
+                    >
                       {feature.title}
                     </Typography>
-                    <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "rgba(255,255,255,0.95)",
+                        textShadow: "0 1px 3px rgba(0,0,0,0.9)",
+                      }}
+                    >
                       {feature.description}
                     </Typography>
-                  </Stack>
-                </FeatureHighlight>
+                  </Box>
+                </Stack>
               </Grid>
             ))}
           </Grid>
 
-          {/* Main CTAs */}
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={3}
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Link href="/register" passHref>
-              <PrimaryCTA
-                variant="contained"
-                size="large"
-                startIcon={<RocketLaunch />}
-                fullWidth={{ xs: true, sm: false }}
-              >
-                Start Your Legendary Campaign
-              </PrimaryCTA>
-            </Link>
-
-            <Link href="/login" passHref>
-              <SecondaryCTA
-                variant="outlined"
-                size="large"
-                startIcon={<Login />}
-                fullWidth={{ xs: true, sm: false }}
-              >
-                Already a Hero? Login
-              </SecondaryCTA>
-            </Link>
-          </Stack>
-
-          {/* Secondary Actions */}
+          {/* Main Actions */}
           <Stack
             direction={{ xs: "column", sm: "row" }}
             spacing={2}
+            width="100%"
             justifyContent="center"
-            alignItems="center"
+            sx={{ pt: 2 }}
           >
-            <Link href="/documentation" passHref>
-              <Button
-                color="inherit"
-                sx={{ color: "white", textDecoration: "underline" }}
+            <Link href="/register" passHref style={{ textDecoration: "none" }}>
+              <PrimaryButton
+                variant="contained"
+                size="large"
+                endIcon={<ArrowForward />}
+                fullWidth={isMobile}
               >
-                Explore Documentation
-              </Button>
+                Start Your Legendary Campaign
+              </PrimaryButton>
             </Link>
 
-            <Typography variant="body2" sx={{ opacity: 0.7 }}>
-              •
-            </Typography>
-
-            <Link href="/support" passHref>
-              <Button
-                color="inherit"
-                sx={{ color: "white", textDecoration: "underline" }}
+            <Link href="/login" passHref style={{ textDecoration: "none" }}>
+              <SecondaryButton
+                variant="outlined"
+                size="large"
+                startIcon={<Login />}
+                fullWidth={isMobile}
               >
-                Get Support
-              </Button>
-            </Link>
-
-            <Typography variant="body2" sx={{ opacity: 0.7 }}>
-              •
-            </Typography>
-
-            <Link href="/about" passHref>
-              <Button
-                color="inherit"
-                sx={{ color: "white", textDecoration: "underline" }}
-              >
-                Learn About Chi War
-              </Button>
+                Already a Hero? Login
+              </SecondaryButton>
             </Link>
           </Stack>
 
-          <Box>
+          {/* Footer Links */}
+          <Stack
+            spacing={2}
+            alignItems="center"
+            sx={{
+              pt: 2,
+              borderTop: "1px solid rgba(255,255,255,0.2)",
+              width: "100%",
+            }}
+          >
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={{ xs: 1, sm: 3 }}
+              alignItems="center"
+            >
+              <Link href="/documentation" passHref>
+                <Button
+                  size="small"
+                  sx={{
+                    color: "#fff",
+                    textShadow: "0 1px 3px rgba(0,0,0,0.9)",
+                    "&:hover": { color: "white", textDecoration: "underline" },
+                  }}
+                >
+                  Explore Documentation
+                </Button>
+              </Link>
+
+              {!isMobile && (
+                <Typography sx={{ color: "rgba(255,255,255,0.6)" }}>
+                  •
+                </Typography>
+              )}
+
+              <Link href="/support" passHref>
+                <Button
+                  size="small"
+                  sx={{
+                    color: "#fff",
+                    textShadow: "0 1px 3px rgba(0,0,0,0.9)",
+                    "&:hover": { color: "white", textDecoration: "underline" },
+                  }}
+                >
+                  Get Support
+                </Button>
+              </Link>
+
+              {!isMobile && (
+                <Typography sx={{ color: "rgba(255,255,255,0.6)" }}>
+                  •
+                </Typography>
+              )}
+
+              <Link href="/about" passHref>
+                <Button
+                  size="small"
+                  sx={{
+                    color: "#fff",
+                    textShadow: "0 1px 3px rgba(0,0,0,0.9)",
+                    "&:hover": { color: "white", textDecoration: "underline" },
+                  }}
+                >
+                  Learn About Chi War
+                </Button>
+              </Link>
+            </Stack>
+
             <Typography
-              variant="body1"
+              variant="body2"
               sx={{
-                opacity: 0.8,
+                color: "rgba(255,255,255,0.9)",
                 fontStyle: "italic",
+                fontSize: "0.85rem",
+                textShadow: "0 1px 3px rgba(0,0,0,0.9)",
               }}
             >
               &ldquo;Master the Art of Cinematic Combat. Forge Legends Across
               Time.&rdquo;
             </Typography>
-          </Box>
+          </Stack>
         </Stack>
-      </CTAContent>
-    </CTASection>
+      </GlassCard>
+    </SectionWrapper>
   )
 }

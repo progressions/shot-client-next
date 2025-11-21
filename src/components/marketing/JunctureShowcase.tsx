@@ -1,40 +1,34 @@
 "use client"
 
-import {
-  Box,
-  Container,
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  Stack,
-  Chip,
-} from "@mui/material"
-import { styled } from "@mui/material/styles"
+import { Box, Container, Typography, Grid, Stack, Chip } from "@mui/material"
+import { styled, alpha } from "@mui/material/styles"
 import Image from "next/image"
 import { MARKETING_IMAGES } from "@/lib/marketingImages"
 
 const JunctureSection = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(8, 0),
-  background: `linear-gradient(180deg, 
-    ${theme.palette.background.default} 0%, 
-    ${theme.palette.primary.main}08 50%, 
-    ${theme.palette.background.default} 100%)`,
+  padding: theme.spacing(12, 0),
+  background: "#0f172a", // Dark slate
+  position: "relative",
 }))
 
-const JunctureCard = styled(Card)(({ theme }) => ({
+const GlassJunctureCard = styled(Box)(({ theme }) => ({
   height: "100%",
   position: "relative",
   overflow: "hidden",
+  borderRadius: theme.spacing(3),
+  background: alpha("#1e293b", 0.4),
+  backdropFilter: "blur(10px)",
+  border: `1px solid ${alpha("#fff", 0.05)}`,
   transition: "transform 0.3s ease, box-shadow 0.3s ease",
   "&:hover": {
     transform: "translateY(-8px)",
-    boxShadow: theme.shadows[12],
+    boxShadow: `0 20px 40px -5px ${alpha("#000", 0.4)}`,
+    border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
   },
 }))
 
-const JunctureContent = styled(CardContent)(({ theme }) => ({
-  padding: theme.spacing(3),
+const JunctureContent = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(4),
 }))
 
 const junctures = [
@@ -107,20 +101,29 @@ export function JunctureShowcase() {
   return (
     <JunctureSection>
       <Container maxWidth="lg">
-        <Stack spacing={6}>
+        <Stack spacing={8}>
           <Box textAlign="center">
             <Typography
               variant="h2"
               component="h2"
               gutterBottom
-              sx={{ fontWeight: "bold", color: "primary.main" }}
+              sx={{
+                fontWeight: 800,
+                background: "linear-gradient(to right, #fff, #94a3b8)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
             >
               Adventure Across Time
             </Typography>
             <Typography
-              variant="h5"
-              color="text.secondary"
-              sx={{ maxWidth: 800, mx: "auto" }}
+              variant="h6"
+              sx={{
+                maxWidth: 800,
+                mx: "auto",
+                color: "rgba(255,255,255,0.7)",
+                fontWeight: 400,
+              }}
             >
               Experience epic storytelling across four distinct time periods,
               each with its own flavor, challenges, and cinematic possibilities.
@@ -130,7 +133,7 @@ export function JunctureShowcase() {
           <Grid container spacing={4}>
             {junctures.map((juncture, index) => (
               <Grid size={{ xs: 12, md: 6 }} key={index}>
-                <JunctureCard>
+                <GlassJunctureCard>
                   <Box position="relative" sx={{ aspectRatio: "16/9" }}>
                     <Image
                       src={juncture.imageUrl}
@@ -143,12 +146,9 @@ export function JunctureShowcase() {
                     <Box
                       sx={{
                         position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
+                        inset: 0,
                         background:
-                          "linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6))",
+                          "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(15,23,42,0.9))",
                         display: "flex",
                         alignItems: "flex-end",
                         p: 3,
@@ -158,8 +158,10 @@ export function JunctureShowcase() {
                         variant="h4"
                         component="h3"
                         fontWeight="bold"
-                        color="white"
-                        sx={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}
+                        sx={{
+                          color: "#fff",
+                          textShadow: "0 4px 12px rgba(0,0,0,0.5)",
+                        }}
                       >
                         {juncture.era}
                       </Typography>
@@ -172,12 +174,15 @@ export function JunctureShowcase() {
                         variant="h5"
                         component="h3"
                         fontWeight="bold"
-                        color="primary.main"
+                        sx={{ color: "#fff" }}
                       >
                         {juncture.title}
                       </Typography>
 
-                      <Typography variant="body1" color="text.secondary">
+                      <Typography
+                        variant="body1"
+                        sx={{ color: "rgba(255,255,255,0.6)" }}
+                      >
                         {juncture.description}
                       </Typography>
 
@@ -185,7 +190,7 @@ export function JunctureShowcase() {
                         <Typography
                           variant="body2"
                           fontStyle="italic"
-                          color="text.secondary"
+                          sx={{ color: "rgba(255,255,255,0.4)" }}
                           gutterBottom
                         >
                           Atmosphere: {juncture.atmosphere}
@@ -203,23 +208,27 @@ export function JunctureShowcase() {
                             key={featureIndex}
                             label={feature}
                             size="small"
-                            variant="outlined"
-                            color="primary"
+                            sx={{
+                              background: alpha("#fff", 0.1),
+                              color: "rgba(255,255,255,0.8)",
+                              border: `1px solid ${alpha("#fff", 0.1)}`,
+                              "&:hover": { background: alpha("#fff", 0.2) },
+                            }}
                           />
                         ))}
                       </Stack>
                     </Stack>
                   </JunctureContent>
-                </JunctureCard>
+                </GlassJunctureCard>
               </Grid>
             ))}
           </Grid>
 
           <Box textAlign="center" sx={{ mt: 4 }}>
-            <Typography variant="h6" color="primary.main" gutterBottom>
+            <Typography variant="h6" sx={{ color: "#fff", mb: 1 }}>
               Seamless Time-Hopping Adventures
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body1" sx={{ color: "rgba(255,255,255,0.5)" }}>
               Characters can travel between junctures, bringing ancient wisdom
               to future battles or modern technology to historical conflicts.
               The possibilities are endless.
