@@ -8,10 +8,9 @@ primary_region = "dfw"
 
 [build]
   [build.args]
-    NEXT_PUBLIC_API_BASE_URL = "https://shot-elixir.fly.dev"
-    NEXT_PUBLIC_SERVER_URL = "https://shot-elixir.fly.dev"
-    NEXT_PUBLIC_WEBSOCKET_URL = "wss://shot-elixir.fly.dev"
-    NEXT_PUBLIC_BACKEND_TYPE = "phoenix"
+    NEXT_PUBLIC_API_BASE_URL = "https://shot-counter.fly.dev"
+    NEXT_PUBLIC_SERVER_URL = "https://shot-counter.fly.dev"
+    NEXT_PUBLIC_WEBSOCKET_URL = "wss://shot-counter.fly.dev"
 
 [env]
   PORT = "3000"
