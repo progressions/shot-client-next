@@ -151,8 +151,9 @@ class PhoenixChannelClient implements UnifiedChannelClient {
     channel.on("fight_update", options.received)
 
     // Handle Phoenix lifecycle events
-    channel.on("phx_error", () => {
-      console.error(`[Phoenix] Error on channel ${topic}`)
+    channel.on("phx_error", (error: unknown) => {
+      console.error(`[Phoenix] Error on channel ${topic}:`, error)
+      console.error(`[Phoenix] Error details:`, JSON.stringify(error, null, 2))
     })
 
     channel.on("phx_close", () => {

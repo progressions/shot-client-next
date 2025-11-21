@@ -168,6 +168,14 @@ class ApiV2 {
   invitationRegister(invitation: Invitation | ID): string {
     return `${this.invitations(invitation)}/register`
   }
+
+  advancements(character: Character | ID, advancementId?: string): string {
+    const characterUrl = this.characters(character)
+    if (advancementId) {
+      return `${characterUrl}/advancements/${advancementId}`
+    }
+    return `${characterUrl}/advancements`
+  }
 }
 
 export default ApiV2
