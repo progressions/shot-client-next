@@ -141,8 +141,8 @@ export default function AdvancementsManager({
         icon={<Icon keyword="Advancements" size="24" />}
         actions={actionButton}
       >
-        Track your character's progression and experience gains throughout the
-        campaign.
+        Track your character&apos;s progression and experience gains throughout
+        the campaign.
       </SectionHeader>
 
       {open && (
@@ -170,8 +170,8 @@ export default function AdvancementsManager({
       {advancements.length === 0 ? (
         <Box sx={{ p: 2, textAlign: "center" }}>
           <Typography variant="body2" color="text.secondary">
-            No advancements yet. Track your character's growth and progression
-            here.
+            No advancements yet. Track your character&apos;s growth and
+            progression here.
           </Typography>
         </Box>
       ) : (
