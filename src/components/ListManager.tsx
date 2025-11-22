@@ -127,13 +127,8 @@ export function ListManager({
 
   useEffect(() => {
     const fetchChildEntities = async () => {
-      // Skip fetch if we just did an optimistic update
+      // Skip fetch if we just did an optimistic update to prevent overwriting local changes
       if (optimisticUpdateRef.current) {
-        // Reset the flag after a delay to allow the server state to catch up
-        // This prevents the immediate re-render with stale data from overwriting our optimistic update
-        setTimeout(() => {
-          optimisticUpdateRef.current = false
-        }, 2000)
         return
       }
 
@@ -261,6 +256,8 @@ export function ListManager({
         const newChildIds = updatedEntities.map(entity => entity.id)
         try {
           await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
+          // Reset flag after successful update so future fetches can proceed
+          optimisticUpdateRef.current = false
           setCurrentPage(1)
         } catch (error) {
           console.error(
@@ -298,6 +295,8 @@ export function ListManager({
       const newChildIds = updatedEntities.map(entity => entity.id)
       try {
         await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
+        // Reset flag after successful update so future fetches can proceed
+        optimisticUpdateRef.current = false
       } catch (error) {
         console.error(
           `Failed to delete ${childEntityName.toLowerCase()}:`,
