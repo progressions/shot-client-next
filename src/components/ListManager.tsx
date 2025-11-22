@@ -150,15 +150,39 @@ export function ListManager({
         return
       }
 
-      // If incoming childIds are a subset of what we have (i.e., stale broadcast),
+      // If incoming childIds are a subset of what we have (stale broadcast from before ADD),
+      // OR if our current IDs are a subset of incoming (stale broadcast from before DELETE),
       // skip the fetch to preserve our optimistic update
       const childIdsSet = new Set(childIds)
       const lastFetchedSet = new Set(lastFetchedIdsRef.current)
-      const isSubset = [...childIdsSet].every(id => lastFetchedSet.has(id))
 
-      if (isSubset && childIds.length < lastFetchedIdsRef.current.length) {
+      const incomingIsSubset = [...childIdsSet].every(id =>
+        lastFetchedSet.has(id)
+      )
+      const currentIsSubset = [...lastFetchedSet].every(id =>
+        childIdsSet.has(id)
+      )
+
+      // Case 1: Incoming has fewer IDs and is a subset (stale broadcast after ADD)
+      if (
+        incomingIsSubset &&
+        childIds.length < lastFetchedIdsRef.current.length
+      ) {
         console.log(
-          "⚠️ Skipping fetch - incoming IDs are a subset (stale broadcast)"
+          "⚠️ Skipping fetch - incoming IDs are a subset (stale broadcast after ADD)"
+        )
+        console.log("   Incoming:", childIds.length, "IDs")
+        console.log("   Current:", lastFetchedIdsRef.current.length, "IDs")
+        return
+      }
+
+      // Case 2: Current has fewer IDs and is a subset (stale broadcast after DELETE)
+      if (
+        currentIsSubset &&
+        lastFetchedIdsRef.current.length < childIds.length
+      ) {
+        console.log(
+          "⚠️ Skipping fetch - current IDs are a subset (stale broadcast after DELETE)"
         )
         console.log("   Incoming:", childIds.length, "IDs")
         console.log("   Current:", lastFetchedIdsRef.current.length, "IDs")
