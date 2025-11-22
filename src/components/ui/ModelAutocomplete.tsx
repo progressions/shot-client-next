@@ -43,6 +43,11 @@ export function ModelAutocomplete({
 
   const noneOption: AutocompleteOption = { id: NONE_VALUE, name: "None" }
 
+  // Extract stable values for dependency array
+  const hasRecords = records?.length > 0
+  const hasFilters = filters && Object.keys(filters).length > 0
+  const filtersString = JSON.stringify(filters)
+
   const fetchRecords = useCallback(async () => {
     if (disabled || !model) {
       return
@@ -50,7 +55,7 @@ export function ModelAutocomplete({
 
     // If records are provided and filters are empty, just use the provided records
     // This handles the common case where GenericFilter pre-fetches data
-    if (records?.length && (!filters || Object.keys(filters).length === 0)) {
+    if (hasRecords && !hasFilters) {
       setOptions(
         allowNone
           ? [noneOption, ...(records as AutocompleteOption[])]
@@ -76,9 +81,9 @@ export function ModelAutocomplete({
     try {
       console.log("about to call apiMethod", apiMethod)
       // Call the appropriate API method
-      const response = await apiMethod(client, filters)
+      const response = await apiMethod(client, JSON.parse(filtersString))
 
-      console.log("Just fetched", model, filters, response.data)
+      console.log("Just fetched", model, filtersString, response.data)
 
       // Model comes in as capitalized plural (e.g., "Weapons", "Parties")
       // Data is always at response.data.[lowercase plural]
@@ -116,7 +121,15 @@ export function ModelAutocomplete({
     } finally {
       setLoading(false)
     }
-  }, [client, model, filters, records, allowNone, disabled])
+  }, [
+    client,
+    model,
+    filtersString,
+    hasRecords,
+    hasFilters,
+    allowNone,
+    disabled,
+  ])
 
   const debouncedFetch = useMemo(
     () => debounce(fetchRecords, 100),
