@@ -540,38 +540,29 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
               Object.keys(campaignData || {})
             )
 
-            // Filter data to only include actual entity objects, not "reload" signals
-            const filteredData: Record<string, unknown> = {}
+            // Process all data, including both entity objects and reload signals
             Object.keys(data).forEach(key => {
               const value = data[key]
-              // Only include objects (entities), not string signals like "reload"
               if (typeof value === "object" && value !== null) {
                 console.log(
                   `🔄 [AppContext] Including ${key} entity update in campaignData`
                 )
-                filteredData[key] = value
               } else {
                 console.log(
-                  `🔄 [AppContext] Skipping ${key}="${value}" signal (not an entity object)`
+                  `🔄 [AppContext] Including ${key}="${value}" reload signal in campaignData`
                 )
               }
             })
 
-            // Only merge if we have actual entity data to merge
-            if (Object.keys(filteredData).length > 0) {
-              setCampaignData(prev => {
-                const newData = { ...prev, ...filteredData }
-                console.log(
-                  "🔄 [AppContext] New campaignData keys:",
-                  Object.keys(newData)
-                )
-                return newData
-              })
-            } else {
+            // Update campaignData with all data (entities and reload signals)
+            setCampaignData(prev => {
+              const newData = { ...prev, ...data }
               console.log(
-                "🔄 [AppContext] No entity updates to merge, skipping campaignData update"
+                "🔄 [AppContext] New campaignData keys:",
+                Object.keys(newData)
               )
-            }
+              return newData
+            })
           }
         },
       }
