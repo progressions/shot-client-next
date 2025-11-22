@@ -41,7 +41,20 @@ export function ModelAutocomplete({
   )
   const [loading, setLoading] = useState(false)
 
-  const noneOption: AutocompleteOption = { id: NONE_VALUE, name: "None" }
+  // Memoize noneOption to prevent recreation on every render
+  const noneOption = useMemo<AutocompleteOption>(
+    () => ({ id: NONE_VALUE, name: "None" }),
+    []
+  )
+
+  // Memoize records array based on content, not reference
+  // This creates a stable reference that only changes when the actual data changes
+  const memoizedRecords = useMemo(() => {
+    return records as AutocompleteOption[]
+  }, [JSON.stringify(records)])
+
+  // Memoize filters to create stable reference
+  const memoizedFilters = useMemo(() => filters, [JSON.stringify(filters)])
 
   const fetchRecords = useCallback(async () => {
     if (disabled || !model) {
@@ -50,12 +63,11 @@ export function ModelAutocomplete({
 
     // If records are provided and filters are empty, just use the provided records
     // This handles the common case where GenericFilter pre-fetches data
-    if (records?.length && (!filters || Object.keys(filters).length === 0)) {
-      setOptions(
-        allowNone
-          ? [noneOption, ...(records as AutocompleteOption[])]
-          : (records as AutocompleteOption[])
-      )
+    if (
+      memoizedRecords?.length &&
+      (!memoizedFilters || Object.keys(memoizedFilters).length === 0)
+    ) {
+      setOptions(allowNone ? [noneOption, ...memoizedRecords] : memoizedRecords)
       return
     }
 
@@ -64,11 +76,7 @@ export function ModelAutocomplete({
     if (!apiMethod) {
       // No API method found, fall back to provided records
       console.warn(`No API method found for model: ${model}`)
-      setOptions(
-        allowNone
-          ? [noneOption, ...(records as AutocompleteOption[])]
-          : (records as AutocompleteOption[])
-      )
+      setOptions(allowNone ? [noneOption, ...memoizedRecords] : memoizedRecords)
       return
     }
 
@@ -76,9 +84,9 @@ export function ModelAutocomplete({
     try {
       console.log("about to call apiMethod", apiMethod)
       // Call the appropriate API method
-      const response = await apiMethod(client, filters)
+      const response = await apiMethod(client, memoizedFilters)
 
-      console.log("Just fetched", model, filters, response.data)
+      console.log("Just fetched", model, memoizedFilters, response.data)
 
       // Model comes in as capitalized plural (e.g., "Weapons", "Parties")
       // Data is always at response.data.[lowercase plural]
@@ -100,23 +108,25 @@ export function ModelAutocomplete({
       } else {
         // No data returned
         setOptions(
-          allowNone
-            ? [noneOption, ...(records as AutocompleteOption[])]
-            : (records as AutocompleteOption[])
+          allowNone ? [noneOption, ...memoizedRecords] : memoizedRecords
         )
       }
     } catch (error) {
       console.error(`Error fetching ${model} records:`, error)
       // On error, fall back to provided records
-      setOptions(
-        allowNone
-          ? [noneOption, ...(records as AutocompleteOption[])]
-          : (records as AutocompleteOption[])
-      )
+      setOptions(allowNone ? [noneOption, ...memoizedRecords] : memoizedRecords)
     } finally {
       setLoading(false)
     }
-  }, [client, model, filters, records, allowNone, disabled])
+  }, [
+    client,
+    model,
+    memoizedFilters,
+    memoizedRecords,
+    allowNone,
+    disabled,
+    noneOption,
+  ])
 
   const debouncedFetch = useMemo(
     () => debounce(fetchRecords, 100),
