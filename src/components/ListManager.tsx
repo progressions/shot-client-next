@@ -146,7 +146,22 @@ export function ListManager({
       console.log("   lastFetched:", sortedLastFetched)
 
       if (sortedChildIds === sortedLastFetched) {
-        console.log("✅ Skipping fetch - IDs match")
+        console.log("✅ Skipping fetch - IDs match exactly")
+        return
+      }
+
+      // If incoming childIds are a subset of what we have (i.e., stale broadcast),
+      // skip the fetch to preserve our optimistic update
+      const childIdsSet = new Set(childIds)
+      const lastFetchedSet = new Set(lastFetchedIdsRef.current)
+      const isSubset = [...childIdsSet].every(id => lastFetchedSet.has(id))
+
+      if (isSubset && childIds.length < lastFetchedIdsRef.current.length) {
+        console.log(
+          "⚠️ Skipping fetch - incoming IDs are a subset (stale broadcast)"
+        )
+        console.log("   Incoming:", childIds.length, "IDs")
+        console.log("   Current:", lastFetchedIdsRef.current.length, "IDs")
         return
       }
 
