@@ -272,6 +272,8 @@ export function ListManager({
           await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
           // Reset flag after successful update so future fetches can proceed
           optimisticUpdateRef.current = false
+          // Update lastFetchedIds to match our optimistic state to prevent stale fetches
+          lastFetchedIdsRef.current = newChildIds
           setCurrentPage(1)
         } catch (error) {
           console.error(
@@ -311,6 +313,8 @@ export function ListManager({
         await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
         // Reset flag after successful update so future fetches can proceed
         optimisticUpdateRef.current = false
+        // Update lastFetchedIds to match our optimistic state to prevent stale fetches
+        lastFetchedIdsRef.current = newChildIds
       } catch (error) {
         console.error(
           `Failed to delete ${childEntityName.toLowerCase()}:`,
