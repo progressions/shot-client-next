@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import { useApp } from "@/contexts"
+import { usePathname } from "next/navigation"
 import EntityLink from "./EntityLink"
 import dynamic from "next/dynamic"
 
@@ -29,6 +30,7 @@ export default function CharacterLink({
   noUnderline = false,
 }: CharacterLinkProperties) {
   const { subscribeToEntity } = useApp()
+  const pathname = usePathname()
   const [character, setCharacter] = useState(initialCharacter)
 
   // Subscribe to character updates via WebSocket with fallback polling
@@ -55,15 +57,23 @@ export default function CharacterLink({
     const unsubscribeCharacters = subscribeToEntity(
       "characters",
       reloadSignal => {
-        // For reload signals, we need to refetch the character data
+        // For reload signals, only refresh on characters list page
         if (reloadSignal === "reload") {
-          console.log(
-            "🔄 [CharacterLink] Received characters reload signal, refreshing page in 1 second"
-          )
-          // As a fallback, refresh the page if WebSocket isn't working properly
-          setTimeout(() => {
-            window.location.reload()
-          }, 1000)
+          // Only reload the page if we're on the characters list page
+          // On other pages (like encounters), the individual character updates handle the refresh
+          if (pathname === "/characters") {
+            console.log(
+              "🔄 [CharacterLink] Received characters reload signal on characters list, refreshing page"
+            )
+            setTimeout(() => {
+              window.location.reload()
+            }, 1000)
+          } else {
+            console.log(
+              "🔄 [CharacterLink] Received characters reload signal, ignoring on non-list page:",
+              pathname
+            )
+          }
         }
       }
     )
@@ -72,7 +82,7 @@ export default function CharacterLink({
       unsubscribeCharacter()
       unsubscribeCharacters()
     }
-  }, [subscribeToEntity, initialCharacter.id])
+  }, [subscribeToEntity, initialCharacter.id, pathname])
 
   // Update when prop changes
   useEffect(() => {
