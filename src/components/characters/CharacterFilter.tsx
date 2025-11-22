@@ -56,15 +56,20 @@ export default function CharacterFilter({
     selectedChild: null,
   })
 
+  // Extract filter values to stable references
+  const factionId = formState.data.filters.faction_id as string
+  const characterType = formState.data.filters.character_type as string
+  const archetype = formState.data.filters.archetype as string
+  const search = formState.data.filters.search as string
+
   const fetchCharacters = useCallback(async () => {
     try {
-      const { filters } = formState.data
       const response = await client.getCharacters({
         autocomplete: true,
-        faction_id: filters.faction_id as string,
-        character_type: filters.character_type as string,
-        archetype: filters.archetype as string,
-        search: filters.search as string,
+        faction_id: factionId,
+        character_type: characterType,
+        archetype,
+        search,
         per_page: 100,
         sort: "name",
         order: "asc",
@@ -88,7 +93,7 @@ export default function CharacterFilter({
       console.error("Error fetching characters:", error)
       return []
     }
-  }, [client, formState.data, dispatchForm]) // Only depend on filters
+  }, [client, factionId, characterType, archetype, search, dispatchForm])
 
   useEffect(() => {
     fetchCharacters().catch(error => {

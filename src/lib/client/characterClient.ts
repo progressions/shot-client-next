@@ -241,9 +241,21 @@ export function createCharacterClient(deps: ClientDependencies) {
     fight: Fight,
     character: Character | string
   ): Promise<AxiosResponse<Character>> {
-    return post(api.addCharacter(fight, character), {
-      character: { current_shot: null },
+    // V2 API: Add character by updating fight's character_ids array
+    const characterId = typeof character === "string" ? character : character.id
+    const currentCharacterIds = fight.character_ids || []
+    const updatedCharacterIds = [...currentCharacterIds, characterId]
+
+    // Update the fight with new character_ids using v2 endpoint
+    await patch(apiV2.fights(fight), {
+      fight: {
+        character_ids: updatedCharacterIds,
+      },
     })
+
+    // Return a response with the character data
+    // The character will be in the updated fight's shots
+    return { data: character } as AxiosResponse<Character>
   }
 
   async function getAdvancements(
