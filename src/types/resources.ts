@@ -122,6 +122,8 @@ export interface Fight extends BaseEntity {
   effects: Effect[]
   characters?: Character[]
   vehicles?: Vehicle[]
+  character_ids?: string[]
+  vehicle_ids?: string[]
   character_effects: CharacterEffects
   vehicle_effects: CharacterEffects
   created_at: string

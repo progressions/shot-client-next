@@ -16,6 +16,8 @@ export type Encounter = BaseEntity & {
   sequence: number
   description: string | null
   shots: Shot[]
+  character_ids?: string[]
+  vehicle_ids?: string[]
   started_at: string | null
   ended_at: string | null
   image_url: string | null
