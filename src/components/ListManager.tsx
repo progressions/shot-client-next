@@ -129,7 +129,11 @@ export function ListManager({
     const fetchChildEntities = async () => {
       // Skip fetch if we just did an optimistic update
       if (optimisticUpdateRef.current) {
-        optimisticUpdateRef.current = false
+        // Reset the flag after a delay to allow the server state to catch up
+        // This prevents the immediate re-render with stale data from overwriting our optimistic update
+        setTimeout(() => {
+          optimisticUpdateRef.current = false
+        }, 2000)
         return
       }
 
