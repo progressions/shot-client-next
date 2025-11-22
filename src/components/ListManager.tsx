@@ -87,7 +87,6 @@ export function ListManager({
   }, [childEntityName, collection, parentEntity])
 
   const [childEntities, setChildEntities] = useState(defaultEntities)
-  const optimisticUpdateRef = useRef(false)
   const lastFetchedIdsRef = useRef<(number | string)[]>([])
   const { client } = useClient()
   // Don't use fight_id filter for autocomplete - we want to show ALL characters
@@ -128,25 +127,18 @@ export function ListManager({
 
   useEffect(() => {
     const fetchChildEntities = async () => {
-      // Skip fetch if we just did an optimistic update to prevent overwriting local changes
-      if (optimisticUpdateRef.current) {
-        return
-      }
-
       if (!childIds || childIds.length === 0) {
         setChildEntities([])
         lastFetchedIdsRef.current = []
         return
       }
 
-      // Check if we already fetched these exact IDs - if so, skip fetch to prevent loops
+      // Check if we already have these exact IDs - skip fetch if so
       const sortedChildIds = [...childIds].sort().join(",")
       const sortedLastFetched = [...lastFetchedIdsRef.current].sort().join(",")
+
       if (sortedChildIds === sortedLastFetched) {
-        console.log(
-          "Skipping fetch - already fetched these IDs",
-          sortedChildIds
-        )
+        console.log("Skipping fetch - already have these IDs", sortedChildIds)
         return
       }
 
@@ -261,19 +253,17 @@ export function ListManager({
         typeof child !== "string" &&
         !(childIds as (number | string)[]).includes(child.id)
       ) {
-        // Mark that we're doing an optimistic update
-        optimisticUpdateRef.current = true
-        // Locally update childEntities
+        // Locally update childEntities immediately
         const updatedEntities = [...childEntities, child]
         setChildEntities(updatedEntities)
         // Use the updated entities list to build the new IDs array
         const newChildIds = updatedEntities.map(entity => entity.id)
+
+        // Update lastFetchedIds immediately to prevent broadcasts from overwriting
+        lastFetchedIdsRef.current = newChildIds
+
         try {
           await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
-          // Reset flag after successful update so future fetches can proceed
-          optimisticUpdateRef.current = false
-          // Update lastFetchedIds to match our optimistic state to prevent stale fetches
-          lastFetchedIdsRef.current = newChildIds
           setCurrentPage(1)
         } catch (error) {
           console.error(
@@ -281,10 +271,11 @@ export function ListManager({
             error
           )
           // Revert local update on error
-          optimisticUpdateRef.current = false
           setChildEntities(prev =>
             prev.filter(entity => entity.id !== child.id)
           )
+          // Revert lastFetchedIds
+          lastFetchedIdsRef.current = childIds
         }
       }
     },
@@ -300,35 +291,41 @@ export function ListManager({
 
   const handleDelete = useCallback(
     async (item: AutocompleteOption) => {
-      // Mark that we're doing an optimistic update
-      optimisticUpdateRef.current = true
-      // Locally update childEntities
+      // Locally update childEntities immediately
       const updatedEntities = childEntities.filter(
         entity => entity.id !== item.id
       )
       setChildEntities(updatedEntities)
       // Use the updated entities list to build the new IDs array
       const newChildIds = updatedEntities.map(entity => entity.id)
+
+      // Update lastFetchedIds immediately to prevent broadcasts from overwriting
+      lastFetchedIdsRef.current = newChildIds
+
       try {
         await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
-        // Reset flag after successful update so future fetches can proceed
-        optimisticUpdateRef.current = false
-        // Update lastFetchedIds to match our optimistic state to prevent stale fetches
-        lastFetchedIdsRef.current = newChildIds
       } catch (error) {
         console.error(
           `Failed to delete ${childEntityName.toLowerCase()}:`,
           error
         )
         // Revert local update on error
-        optimisticUpdateRef.current = false
         setChildEntities(prev => [
           ...prev,
           childEntities.find(entity => entity.id === item.id) || item,
         ])
+        // Revert lastFetchedIds
+        lastFetchedIdsRef.current = childIds
       }
     },
-    [childEntities, onListUpdate, parentEntity, childIdsKey, childEntityName]
+    [
+      childIds,
+      childEntities,
+      onListUpdate,
+      parentEntity,
+      childIdsKey,
+      childEntityName,
+    ]
   )
 
   const handlePageChange = (
