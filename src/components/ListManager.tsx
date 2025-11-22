@@ -88,6 +88,7 @@ export function ListManager({
 
   const [childEntities, setChildEntities] = useState(defaultEntities)
   const optimisticUpdateRef = useRef(false)
+  const lastFetchedIdsRef = useRef<(number | string)[]>([])
   const { client } = useClient()
   // Don't use fight_id filter for autocomplete - we want to show ALL characters
   // for selection, not just ones already in the fight
@@ -134,6 +135,18 @@ export function ListManager({
 
       if (!childIds || childIds.length === 0) {
         setChildEntities([])
+        lastFetchedIdsRef.current = []
+        return
+      }
+
+      // Check if we already fetched these exact IDs - if so, skip fetch to prevent loops
+      const sortedChildIds = [...childIds].sort().join(",")
+      const sortedLastFetched = [...lastFetchedIdsRef.current].sort().join(",")
+      if (sortedChildIds === sortedLastFetched) {
+        console.log(
+          "Skipping fetch - already fetched these IDs",
+          sortedChildIds
+        )
         return
       }
 
@@ -162,6 +175,7 @@ export function ListManager({
 
         console.log("Just fetched", childIds, response)
         setChildEntities(response.data[collection] || [])
+        lastFetchedIdsRef.current = childIds
       } catch (error) {
         console.error(`Fetch ${childEntityName} error:`, error)
       }
