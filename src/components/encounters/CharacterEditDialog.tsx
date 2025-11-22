@@ -380,17 +380,16 @@ export default function CharacterEditDialog({
 
       // Fetch the updated encounter to refresh the display
       const updatedEncounterResponse = await client.getEncounter(encounter)
-      if (updatedEncounterResponse.data) {
-        updateEncounter(updatedEncounterResponse.data)
-      }
 
       toastSuccess(`Updated ${name}`)
-      // Close dialog before updating encounter to prevent flicker
       onClose()
+
       // Update encounter after dialog closes
-      setTimeout(() => {
-        updateEncounter(updatedEncounterResponse.data)
-      }, 100)
+      if (updatedEncounterResponse.data) {
+        setTimeout(() => {
+          updateEncounter(updatedEncounterResponse.data)
+        }, 100)
+      }
     } catch (error) {
       console.error("Error updating character:", error)
       toastError(`Failed to update ${character.name}`)

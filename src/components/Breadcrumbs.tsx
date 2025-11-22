@@ -154,9 +154,11 @@ export default async function Breadcrumbs({ client }) {
 
   return (
     <MuiBreadcrumbs
-      separator={<NavigateNextIcon fontSize="small" sx={{ color: "#fff" }} />}
+      separator={
+        <NavigateNextIcon fontSize="small" style={{ color: "#fff" }} />
+      }
       aria-label="breadcrumb"
-      sx={{ mb: 2 }}
+      style={{ marginBottom: "16px" }}
     >
       {breadcrumbs.map((item, index) => {
         const isLast = index === breadcrumbs.length - 1
@@ -169,17 +171,16 @@ export default async function Breadcrumbs({ client }) {
             key={item.path}
             href={item.path}
             passHref
-            style={{ textDecoration: "none" }}
+            style={{
+              textDecoration: "none",
+              color: "#fff",
+            }}
           >
             <Typography
               component="span"
               color="#fff"
-              sx={{
+              style={{
                 textDecoration: "none",
-                "&:hover": {
-                  textDecoration: "underline",
-                  textDecorationColor: "#fff",
-                },
               }}
             >
               {item.label}
