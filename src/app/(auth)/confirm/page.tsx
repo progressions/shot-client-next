@@ -42,11 +42,6 @@ export default function ConfirmPage() {
 
       if (res.status === 200) {
         setResponse(data)
-
-        // Redirect to login page after 3 seconds
-        setTimeout(() => {
-          router.push("/login")
-        }, 3000)
       } else {
         setError(data.error || "Failed to confirm account")
         setResponse(data)
@@ -165,25 +160,15 @@ export default function ConfirmPage() {
               <Typography variant="body1" textAlign="center">
                 Welcome to the Chi War! Your account has been successfully
                 confirmed.
-                {response?.token &&
-                  " You'll be redirected to your dashboard in a few seconds..."}
               </Typography>
 
-              {response?.user && (
-                <Alert severity="success" sx={{ width: "100%" }}>
-                  Logged in as {response.user.email}
-                </Alert>
-              )}
-
-              {!response?.token && (
-                <Button
-                  variant="contained"
-                  onClick={() => router.push("/login")}
-                  fullWidth
-                >
-                  Go to Login
-                </Button>
-              )}
+              <Button
+                variant="contained"
+                onClick={() => router.push("/login")}
+                fullWidth
+              >
+                Go to Login
+              </Button>
             </>
           )}
         </Stack>
