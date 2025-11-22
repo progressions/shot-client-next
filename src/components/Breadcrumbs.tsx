@@ -169,16 +169,17 @@ export default async function Breadcrumbs({ client }) {
             key={item.path}
             href={item.path}
             passHref
-            style={{ textDecoration: "none" }}
+            style={{
+              textDecoration: "none",
+              color: "#fff",
+            }}
           >
             <Typography
               component="span"
-              color="#fff"
               sx={{
-                textDecoration: "none",
+                color: "#fff",
                 "&:hover": {
                   textDecoration: "underline",
-                  textDecorationColor: "#fff",
                 },
               }}
             >

@@ -22,6 +22,7 @@ import {
 import { NumberField, TextField } from "@/components/ui"
 import { useClient, useToast, useEncounter } from "@/contexts"
 import { CS } from "@/services"
+import { FormActions } from "@/reducers"
 import type { Character, Vehicle } from "@/types"
 
 interface CharacterEditDialogProps {
@@ -37,7 +38,7 @@ export default function CharacterEditDialog({
 }: CharacterEditDialogProps) {
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
-  const { encounter, updateEncounter } = useEncounter()
+  const { encounter, dispatchEncounter } = useEncounter()
 
   // Form state
   const [name, setName] = useState(character.name)
@@ -380,17 +381,20 @@ export default function CharacterEditDialog({
 
       // Fetch the updated encounter to refresh the display
       const updatedEncounterResponse = await client.getEncounter(encounter)
-      if (updatedEncounterResponse.data) {
-        updateEncounter(updatedEncounterResponse.data)
-      }
 
       toastSuccess(`Updated ${name}`)
-      // Close dialog before updating encounter to prevent flicker
       onClose()
-      // Update encounter after dialog closes
-      setTimeout(() => {
-        updateEncounter(updatedEncounterResponse.data)
-      }, 100)
+
+      // Update local encounter state with fresh data (without making another API call)
+      if (updatedEncounterResponse.data) {
+        setTimeout(() => {
+          dispatchEncounter({
+            type: FormActions.UPDATE,
+            name: "encounter",
+            value: updatedEncounterResponse.data,
+          })
+        }, 100)
+      }
     } catch (error) {
       console.error("Error updating character:", error)
       toastError(`Failed to update ${character.name}`)
