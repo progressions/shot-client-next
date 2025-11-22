@@ -87,7 +87,7 @@ export function ListManager({
   }, [childEntityName, collection, parentEntity])
 
   const [childEntities, setChildEntities] = useState(defaultEntities)
-  const optimisticUpdateRef = useRef(false)
+  const lastFetchedIdsRef = useRef<(number | string)[]>([])
   const { client } = useClient()
   // Don't use fight_id filter for autocomplete - we want to show ALL characters
   // for selection, not just ones already in the fight
@@ -127,22 +127,52 @@ export function ListManager({
 
   useEffect(() => {
     const fetchChildEntities = async () => {
-      // Skip fetch if we just did an optimistic update
-      if (optimisticUpdateRef.current) {
-        optimisticUpdateRef.current = false
+      if (!childIds || childIds.length === 0) {
+        setChildEntities([])
+        lastFetchedIdsRef.current = []
         return
       }
 
-      if (!childIds || childIds.length === 0) {
-        setChildEntities([])
+      // Check if we already have these exact IDs - skip fetch if so
+      const sortedChildIds = [...childIds].sort().join(",")
+      const sortedLastFetched = [...lastFetchedIdsRef.current].sort().join(",")
+
+      if (sortedChildIds === sortedLastFetched) {
+        return
+      }
+
+      // If incoming childIds are a subset of what we have (stale broadcast from before ADD),
+      // OR if our current IDs are a subset of incoming (stale broadcast from before DELETE),
+      // skip the fetch to preserve our optimistic update
+      const childIdsSet = new Set(childIds)
+      const lastFetchedSet = new Set(lastFetchedIdsRef.current)
+
+      const incomingIsSubset = [...childIdsSet].every(id =>
+        lastFetchedSet.has(id)
+      )
+      const currentIsSubset = [...lastFetchedSet].every(id =>
+        childIdsSet.has(id)
+      )
+
+      // Case 1: Incoming has fewer IDs and is a subset (stale broadcast after ADD)
+      if (
+        incomingIsSubset &&
+        childIds.length < lastFetchedIdsRef.current.length
+      ) {
+        return
+      }
+
+      // Case 2: Current has fewer IDs and is a subset (stale broadcast after DELETE)
+      if (
+        currentIsSubset &&
+        lastFetchedIdsRef.current.length < childIds.length
+      ) {
         return
       }
 
       try {
         const funcName = `get${pluralChildEntityName}`
         const getFunc = client[funcName as keyof typeof client]
-
-        console.log("About to call", funcName, "with childIds", childIds)
 
         if (typeof getFunc !== "function") {
           console.error(`Function ${funcName} does not exist on client`)
@@ -161,8 +191,8 @@ export function ListManager({
           per_page: 200,
         })
 
-        console.log("Just fetched", childIds, response)
         setChildEntities(response.data[collection] || [])
+        lastFetchedIdsRef.current = childIds
       } catch (error) {
         console.error(`Fetch ${childEntityName} error:`, error)
       }
@@ -248,13 +278,15 @@ export function ListManager({
         typeof child !== "string" &&
         !(childIds as (number | string)[]).includes(child.id)
       ) {
-        // Mark that we're doing an optimistic update
-        optimisticUpdateRef.current = true
-        // Locally update childEntities
+        // Locally update childEntities immediately
         const updatedEntities = [...childEntities, child]
         setChildEntities(updatedEntities)
         // Use the updated entities list to build the new IDs array
         const newChildIds = updatedEntities.map(entity => entity.id)
+
+        // Update lastFetchedIds immediately to prevent broadcasts from overwriting
+        lastFetchedIdsRef.current = newChildIds
+
         try {
           await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
           setCurrentPage(1)
@@ -264,10 +296,11 @@ export function ListManager({
             error
           )
           // Revert local update on error
-          optimisticUpdateRef.current = false
           setChildEntities(prev =>
             prev.filter(entity => entity.id !== child.id)
           )
+          // Revert lastFetchedIds
+          lastFetchedIdsRef.current = childIds
         }
       }
     },
@@ -283,15 +316,17 @@ export function ListManager({
 
   const handleDelete = useCallback(
     async (item: AutocompleteOption) => {
-      // Mark that we're doing an optimistic update
-      optimisticUpdateRef.current = true
-      // Locally update childEntities
+      // Locally update childEntities immediately
       const updatedEntities = childEntities.filter(
         entity => entity.id !== item.id
       )
       setChildEntities(updatedEntities)
       // Use the updated entities list to build the new IDs array
       const newChildIds = updatedEntities.map(entity => entity.id)
+
+      // Update lastFetchedIds immediately to prevent broadcasts from overwriting
+      lastFetchedIdsRef.current = newChildIds
+
       try {
         await onListUpdate?.({ ...parentEntity, [childIdsKey]: newChildIds })
       } catch (error) {
@@ -300,14 +335,22 @@ export function ListManager({
           error
         )
         // Revert local update on error
-        optimisticUpdateRef.current = false
         setChildEntities(prev => [
           ...prev,
           childEntities.find(entity => entity.id === item.id) || item,
         ])
+        // Revert lastFetchedIds
+        lastFetchedIdsRef.current = childIds
       }
     },
-    [childEntities, onListUpdate, parentEntity, childIdsKey, childEntityName]
+    [
+      childIds,
+      childEntities,
+      onListUpdate,
+      parentEntity,
+      childIdsKey,
+      childEntityName,
+    ]
   )
 
   const handlePageChange = (
