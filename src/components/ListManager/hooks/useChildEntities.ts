@@ -21,8 +21,7 @@ export function useChildEntities(
 
   // Extract specific properties to stabilize dependencies
   const shots = parentEntity.shots
-  // @ts-ignore - Dynamic access based on collection name
-  const parentCollection = parentEntity[collection]
+  const parentCollection = parentEntity[collection as keyof Fight] as any[]
 
   const defaultEntities = useMemo(() => {
     if (Array.isArray(parentCollection) && parentCollection.length) {

@@ -6,10 +6,9 @@ export function useChildIds(
   parentEntity: Fight,
   childEntityName: keyof typeof filterConfigs
 ) {
-  const childIdsKey = `${childEntityName.toLowerCase()}_ids`
+  const childIdsKey = `${childEntityName.toLowerCase()}_ids` as keyof Fight
   const shots = parentEntity.shots
-  // @ts-ignore - Dynamic access to parentEntity based on childIdsKey
-  const directIds = parentEntity[childIdsKey]
+  const directIds = parentEntity[childIdsKey] as (string | number)[]
 
   const childIds = useMemo(() => {
     if (childEntityName === "Character" && Array.isArray(shots)) {
