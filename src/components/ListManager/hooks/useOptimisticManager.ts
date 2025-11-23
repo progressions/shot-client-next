@@ -8,8 +8,8 @@ interface AutocompleteOption {
 }
 
 interface UseOptimisticManagerProps {
-  childEntities: any[]
-  setChildEntities: (entities: any[]) => void
+  childEntities: AutocompleteOption[]
+  setChildEntities: (entities: AutocompleteOption[]) => void
   optimisticUpdateRef: React.MutableRefObject<boolean>
   childIds: (string | number)[]
   onListUpdate?: (updatedEntity: Fight) => Promise<void>

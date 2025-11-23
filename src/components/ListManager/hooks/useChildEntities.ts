@@ -4,24 +4,30 @@ import { collectionNames } from "@/lib/maps"
 import type { Fight } from "@/types"
 import { filterConfigs } from "@/lib/filterConfigs"
 
+interface Client {
+  [key: string]: (params: any) => Promise<{ data: any }>
+}
+
 export function useChildEntities(
   childEntityName: keyof typeof filterConfigs,
   childIds: (string | number)[],
   parentEntity: Fight,
-  client: any
+  client: Client
 ) {
   const collection = collectionNames[childEntityName]
   const pluralChildEntityName = pluralize(childEntityName)
 
+  // Extract specific properties to stabilize dependencies
+  const shots = parentEntity.shots
+  // @ts-ignore - Dynamic access based on collection name
+  const parentCollection = parentEntity[collection]
+
   const defaultEntities = useMemo(() => {
-    if (
-      Array.isArray(parentEntity[collection]) &&
-      parentEntity[collection].length
-    ) {
-      return parentEntity[collection]
+    if (Array.isArray(parentCollection) && parentCollection.length) {
+      return parentCollection
     }
-    if (childEntityName === "Character" && Array.isArray(parentEntity.shots)) {
-      return parentEntity.shots
+    if (childEntityName === "Character" && Array.isArray(shots)) {
+      return shots
         .map(shot => shot.character)
         .filter(Boolean)
         .map(character => ({
@@ -29,8 +35,8 @@ export function useChildEntities(
           entity_class: character.entity_class || "Character",
         }))
     }
-    if (childEntityName === "Vehicle" && Array.isArray(parentEntity.shots)) {
-      return parentEntity.shots
+    if (childEntityName === "Vehicle" && Array.isArray(shots)) {
+      return shots
         .map(shot => shot.vehicle)
         .filter(Boolean)
         .map(vehicle => ({
@@ -39,18 +45,20 @@ export function useChildEntities(
         }))
     }
     return []
-  }, [childEntityName, collection, parentEntity])
+  }, [childEntityName, collection, parentCollection, shots])
 
   const [childEntities, setChildEntities] = useState(defaultEntities)
   const optimisticUpdateRef = useRef(false)
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+
     const fetchChildEntities = async () => {
       // Skip fetch if we just did an optimistic update
       if (optimisticUpdateRef.current) {
         // Reset the flag after a delay to allow the server state to catch up
         // This prevents the immediate re-render with stale data from overwriting our optimistic update
-        setTimeout(() => {
+        timeoutId = setTimeout(() => {
           optimisticUpdateRef.current = false
         }, 2000)
         return
@@ -83,6 +91,10 @@ export function useChildEntities(
       }
     }
     fetchChildEntities()
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId)
+    }
   }, [childIds, childEntityName, client, collection, pluralChildEntityName])
 
   return {

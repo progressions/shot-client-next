@@ -6,6 +6,7 @@ import { useState } from "react"
 import { paginateArray } from "@/lib"
 import { filterConfigs } from "@/lib/filterConfigs"
 import type { Fight } from "@/types"
+import pluralize from "pluralize"
 import {
   useChildIds,
   useChildEntities,
@@ -107,5 +108,3 @@ export function ListManager({
     </Box>
   )
 }
-
-import pluralize from "pluralize"

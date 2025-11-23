@@ -1,9 +1,13 @@
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { FormActions, useForm } from "@/reducers"
 
+interface Client {
+  [key: string]: (params: any) => Promise<{ data: Record<string, unknown> }>
+}
+
 export function useAutocompleteFilters(
   pluralChildEntityName: string,
-  client: any
+  client: Client
 ) {
   const [loading, setLoading] = useState(true)
   const contextualFilters: Record<string, string> = useMemo(() => ({}), [])

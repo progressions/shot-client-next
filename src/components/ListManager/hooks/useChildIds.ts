@@ -7,29 +7,31 @@ export function useChildIds(
   childEntityName: keyof typeof filterConfigs
 ) {
   const childIdsKey = `${childEntityName.toLowerCase()}_ids`
+  const shots = parentEntity.shots
+  // @ts-ignore - Dynamic access to parentEntity based on childIdsKey
+  const directIds = parentEntity[childIdsKey]
 
   const childIds = useMemo(() => {
-    if (childEntityName === "Character" && Array.isArray(parentEntity.shots)) {
-      const idsFromShots = parentEntity.shots
+    if (childEntityName === "Character" && Array.isArray(shots)) {
+      const idsFromShots = shots
         .map(shot => shot.character_id)
         .filter(Boolean)
         .filter((id, index, self) => self.indexOf(id) === index)
       if (idsFromShots.length > 0) return idsFromShots
     }
-    if (childEntityName === "Vehicle" && Array.isArray(parentEntity.shots)) {
-      const idsFromShots = parentEntity.shots
+    if (childEntityName === "Vehicle" && Array.isArray(shots)) {
+      const idsFromShots = shots
         .map(shot => shot.vehicle_id)
         .filter(Boolean)
         .filter((id, index, self) => self.indexOf(id) === index)
       if (idsFromShots.length > 0) return idsFromShots
     }
 
-    const ids = parentEntity[childIdsKey]
-    if (Array.isArray(ids) && ids.length > 0) {
-      return ids
+    if (Array.isArray(directIds) && directIds.length > 0) {
+      return directIds
     }
     return []
-  }, [childEntityName, childIdsKey, parentEntity])
+  }, [childEntityName, shots, directIds])
 
   return { childIds, childIdsKey }
 }
