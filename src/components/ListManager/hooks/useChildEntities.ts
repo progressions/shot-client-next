@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react"
+import { useState, useEffect, useRef } from "react"
 import pluralize from "pluralize"
 import { collectionNames } from "@/lib/maps"
 import type { Fight } from "@/types"
@@ -21,7 +21,9 @@ export function useChildEntities(
 
   const [childEntities, setChildEntities] = useState(() => {
     const shots = parentEntity.shots
-    const parentCollection = parentEntity[collection as keyof Fight] as any[]
+    const parentCollection = parentEntity[
+      collection as keyof Fight
+    ] as unknown[]
 
     if (Array.isArray(parentCollection) && parentCollection.length) {
       return parentCollection
