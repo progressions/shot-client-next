@@ -2,7 +2,9 @@ import { useState, useEffect, useCallback, useMemo } from "react"
 import { FormActions, useForm } from "@/reducers"
 
 interface Client {
-  [key: string]: (params: any) => Promise<{ data: Record<string, unknown> }>
+  [key: string]: (
+    params: Record<string, unknown>
+  ) => Promise<{ data: Record<string, unknown> }>
 }
 
 export function useAutocompleteFilters(

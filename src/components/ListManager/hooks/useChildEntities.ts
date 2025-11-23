@@ -5,7 +5,9 @@ import type { Fight } from "@/types"
 import { filterConfigs } from "@/lib/filterConfigs"
 
 interface Client {
-  [key: string]: (params: any) => Promise<{ data: any }>
+  [key: string]: (
+    params: Record<string, unknown>
+  ) => Promise<{ data: Record<string, unknown> }>
 }
 
 export function useChildEntities(
