@@ -19,11 +19,10 @@ export function useChildEntities(
   const collection = collectionNames[childEntityName]
   const pluralChildEntityName = pluralize(childEntityName)
 
-  // Extract specific properties to stabilize dependencies
-  const shots = parentEntity.shots
-  const parentCollection = parentEntity[collection as keyof Fight] as any[]
+  const [childEntities, setChildEntities] = useState(() => {
+    const shots = parentEntity.shots
+    const parentCollection = parentEntity[collection as keyof Fight] as any[]
 
-  const defaultEntities = useMemo(() => {
     if (Array.isArray(parentCollection) && parentCollection.length) {
       return parentCollection
     }
@@ -46,9 +45,7 @@ export function useChildEntities(
         }))
     }
     return []
-  }, [childEntityName, collection, parentCollection, shots])
-
-  const [childEntities, setChildEntities] = useState(defaultEntities)
+  })
   const optimisticUpdateRef = useRef(false)
 
   useEffect(() => {
