@@ -1,4 +1,4 @@
-import { AxiosResponse } from "axios"
+import axios, { AxiosResponse } from "axios"
 import { createBaseClient } from "@/lib/client/baseClient"
 import type {
   Character,

@@ -144,7 +144,7 @@ const SharedService = {
     character: Character | Vehicle,
     key: keyof VehicleDescriptionValues
   ): string {
-    return character.description[key] || ""
+    return character.description?.[key] || ""
   },
 
   faction: function (character: Character | Vehicle): Faction | null {
