@@ -16,6 +16,7 @@ import {
 import {
   CharacterSpeedDial,
   EditOwner,
+  EditNotionLink,
   ActionValuesEdit,
   Weapons,
   Description,
@@ -133,10 +134,16 @@ export default function Show({
         setEntity={setCharacter}
         updateEntity={updateCharacter}
       />
-      <EditOwner
-        character={memoizedCharacter}
-        updateCharacter={updateCharacter}
-      />
+      <Stack direction="row" spacing={2} alignItems="center" sx={{ my: 1 }}>
+        <EditOwner
+          character={memoizedCharacter}
+          updateCharacter={updateCharacter}
+        />
+        <EditNotionLink
+          character={memoizedCharacter}
+          updateCharacter={updateCharacter}
+        />
+      </Stack>
       <SectionHeader
         title="Action Values"
         icon={<Icon keyword="Action Values" />}

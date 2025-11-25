@@ -64,7 +64,7 @@ export function createCharacterClient(deps: ClientDependencies) {
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<NotionPage[]>> {
     const query = queryParams(parameters)
-    return get(`${api.notionCharacters()}?${query}`, {}, cacheOptions)
+    return get(`${apiV2.notionCharacters()}?${query}`, {}, cacheOptions)
   }
 
   async function getLocationForCharacter(

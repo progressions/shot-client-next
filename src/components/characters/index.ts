@@ -37,6 +37,7 @@ export { default as EditArchetype } from "@/components/characters/edit/EditArche
 export { default as EditJuncture } from "@/components/characters/edit/EditJuncture"
 export { default as EditWealth } from "@/components/characters/edit/EditWealth"
 export { default as EditOwner } from "@/components/characters/edit/EditOwner"
+export { default as EditNotionLink } from "@/components/characters/edit/EditNotionLink"
 export { default as SkillsManager } from "@/components/characters/edit/SkillsManager"
 export { default as AdvancementsManager } from "@/components/characters/edit/AdvancementsManager"
 export { default as DescriptionValue } from "@/components/characters/edit/DescriptionValue"

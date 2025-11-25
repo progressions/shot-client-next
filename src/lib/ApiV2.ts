@@ -176,6 +176,10 @@ class ApiV2 {
     }
     return `${characterUrl}/advancements`
   }
+
+  notionCharacters(): string {
+    return `${this.api()}/notion/characters`
+  }
 }
 
 export default ApiV2
