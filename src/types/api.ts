@@ -108,6 +108,13 @@ export interface SessionData {
 
 export interface NotionPage {
   id: string
+  properties?: {
+    Name?: {
+      title?: Array<{
+        plain_text?: string
+      }>
+    }
+  }
 }
 
 /**
