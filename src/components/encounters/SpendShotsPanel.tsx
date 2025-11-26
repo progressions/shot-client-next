@@ -53,8 +53,8 @@ export default function SpendShotsPanel({
           label="Shots to Spend"
           value={shots}
           onChange={(e: React.ChangeEvent<HTMLInputElement> | number) => {
-            const val = typeof e === "number" ? e : parseInt(e.target.value)
-            setShots(val || 0)
+            const val = typeof e === "number" ? e : parseInt(e.target.value, 10)
+            setShots(Number.isNaN(val) ? 0 : val)
           }}
           sx={{ mb: 2, width: "100%" }}
         />

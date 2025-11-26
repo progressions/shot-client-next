@@ -16,9 +16,15 @@ export default function PlayerStatus({ character }: PlayerStatusProps) {
   const deathMarks = CS.marksOfDeath(character)
   const upCheck = (character.status || []).includes("up_check_required")
 
-  // Safe cast for current_shot which might be merged in from the shot record
-  const currentShot =
-    (character as unknown as { current_shot?: number }).current_shot || 0
+  // Type guard for current_shot property merged from shot record
+  const hasCurrentShot = (
+    obj: unknown
+  ): obj is { current_shot: number | undefined } =>
+    typeof obj === "object" && obj !== null && "current_shot" in obj
+
+  const currentShot = hasCurrentShot(character)
+    ? (character.current_shot ?? 0)
+    : 0
 
   return (
     <Fragment>

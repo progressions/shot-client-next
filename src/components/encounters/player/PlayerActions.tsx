@@ -152,13 +152,14 @@ export default function PlayerActions({ character }: PlayerActionsProps) {
   }
 
   // Determine which actions are available
+  // Action values default to 7 if not set
   const hasAttackSkills = useMemo(() => {
     if (!character || !character.action_values) return false
     return (
-      (character.action_values["Martial Arts"] as number) > 0 ||
-      (character.action_values["Guns"] as number) > 0 ||
-      (character.action_values["Sorcery"] as number) > 0 ||
-      (character.action_values["Creature"] as number) > 0
+      (character.action_values["Martial Arts"] ?? 7) > 0 ||
+      (character.action_values["Guns"] ?? 7) > 0 ||
+      (character.action_values["Sorcery"] ?? 7) > 0 ||
+      (character.action_values["Creature"] ?? 7) > 0
     )
   }, [character])
 

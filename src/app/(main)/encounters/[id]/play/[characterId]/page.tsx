@@ -1,10 +1,9 @@
-import { CircularProgress, Typography } from "@mui/material"
+import { Typography } from "@mui/material"
 import { EncounterProvider } from "@/contexts"
 import { getServerClient, getCurrentUser, requireCampaign } from "@/lib"
 import type { Encounter } from "@/types"
 import { NotFound } from "@/components/encounters"
 import PlayerEncounterView from "@/components/encounters/player/PlayerEncounterView"
-import { Suspense } from "react"
 
 type PlayerEncounterPageProperties = {
   params: Promise<{ id: string; characterId: string }>
@@ -26,11 +25,9 @@ export default async function PlayerEncounterPage({
     const encounter: Encounter = response.data
 
     return (
-      <Suspense fallback={<CircularProgress />}>
-        <EncounterProvider encounter={encounter}>
-          <PlayerEncounterView characterId={characterId} />
-        </EncounterProvider>
-      </Suspense>
+      <EncounterProvider encounter={encounter}>
+        <PlayerEncounterView characterId={characterId} />
+      </EncounterProvider>
     )
   } catch (error) {
     console.error(error)

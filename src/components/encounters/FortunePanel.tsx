@@ -50,8 +50,7 @@ export default function FortunePanel({
         toastSuccess(`Recovered 1 ${fortuneType}`)
       }
 
-      // We don't strictly need to close, allowing multiple spends, but user might expect it.
-      // Let's keep it open for rapid spending/adjustment unless user clicks away.
+      // Panel remains open to allow multiple fortune adjustments without reopening.
     } catch (error) {
       console.error("Failed to update fortune", error)
       toastError(`Failed to update ${fortuneType}`)
