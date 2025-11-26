@@ -120,8 +120,14 @@ export function useAttackPanelController({
   } = formState.data
 
   // Create form update helpers
-  const updateField = createFieldUpdater<AttackFormData>(dispatchForm)
-  const updateFields = createFieldsUpdater<AttackFormData>(dispatchForm)
+  const updateField = useMemo(
+    () => createFieldUpdater<AttackFormData>(dispatchForm),
+    [dispatchForm]
+  )
+  const updateFields = useMemo(
+    () => createFieldsUpdater<AttackFormData>(dispatchForm),
+    [dispatchForm]
+  )
 
   const calculateEffectiveAttackValue = useCallback(
     (
