@@ -10,6 +10,7 @@ import { GiPerson } from "react-icons/gi"
 import PlayerStatus from "./PlayerStatus"
 import PlayerActions from "./PlayerActions"
 import PlayerInfo from "./PlayerInfo"
+import PlayerEffects from "./PlayerEffects"
 
 interface PlayerEncounterViewProps {
   characterId: string
@@ -105,9 +106,10 @@ export default function PlayerEncounterView({
             p: { xs: 0.5, sm: 1 },
           }}
         >
-          <PlayerStatus
+          <PlayerStatus character={character} />
+          <PlayerEffects
             character={character}
-            activeEffects={encounter?.character_effects?.[character.id] || []}
+            effects={encounter?.character_effects?.[character.id] || []}
           />
           <PlayerInfo character={character} />
           <PlayerActions character={character} />

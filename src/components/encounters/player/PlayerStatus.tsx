@@ -2,7 +2,7 @@
 
 import { Box, Typography, Chip, Stack } from "@mui/material"
 import { CS } from "@/services"
-import type { Character, CharacterEffect } from "@/types"
+import type { Character } from "@/types"
 import { LocalPharmacy, Biotech } from "@mui/icons-material"
 import { EntityAvatar } from "@/components/avatars"
 import { Wounds } from "@/components/encounters"
@@ -10,13 +10,9 @@ import { Fragment } from "react"
 
 interface PlayerStatusProps {
   character: Character
-  activeEffects?: CharacterEffect[]
 }
 
-export default function PlayerStatus({
-  character,
-  activeEffects = [],
-}: PlayerStatusProps) {
+export default function PlayerStatus({ character }: PlayerStatusProps) {
   const deathMarks = CS.marksOfDeath(character)
   const upCheck = (character.status || []).includes("up_check_required")
 
@@ -133,49 +129,6 @@ export default function PlayerStatus({
             </Box>
           </Box>
         </Box>
-
-        {/* Active Effects */}
-        {activeEffects.length > 0 && (
-          <Box
-            sx={{
-              mt: 1,
-              p: 1,
-              backgroundColor: "background.paper",
-              borderRadius: 1,
-              border: "1px solid",
-              borderColor: "divider",
-            }}
-          >
-            <Typography
-              variant="caption"
-              sx={{
-                fontWeight: "bold",
-                color: "text.secondary",
-                display: "block",
-                mb: 0.5,
-                fontSize: "0.65rem",
-              }}
-            >
-              ACTIVE EFFECTS
-            </Typography>
-            <Stack direction="row" spacing={0.5} flexWrap="wrap" gap={0.5}>
-              {activeEffects.map(effect => (
-                <Chip
-                  key={effect.id}
-                  label={`${effect.name} (${effect.severity})`}
-                  size="small"
-                  color="info"
-                  sx={{
-                    height: 20,
-                    bgcolor: "info.light",
-                    color: "info.contrastText",
-                    "& .MuiChip-label": { px: 0.5, fontSize: "0.65rem" },
-                  }}
-                />
-              ))}
-            </Stack>
-          </Box>
-        )}
       </Box>
     </Fragment>
   )
