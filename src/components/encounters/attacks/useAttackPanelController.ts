@@ -1,21 +1,30 @@
 import { useState, useEffect, useMemo, useCallback } from "react"
 import { useEncounter, useToast } from "@/contexts"
-import { CS, CES } from "@/services"
+import { CS } from "@/services"
 import type { Character, Weapon, AttackFormData } from "@/types"
 import { useClient } from "@/contexts/AppContext"
 import { useForm } from "@/reducers"
 import {
   calculateTargetDefense as calcTargetDefense,
   distributeMooksAmongTargets,
+  getDefenseAndToughnessValues,
+  calculateNonMookDamageOutcome,
+  initializeAttackerProperties,
+  recalculateMookDefense, // Add this import
 } from "./attackCalculations"
 import { sortTargetShots, getAllVisibleShots } from "./shotSorting"
 import { createFieldUpdater, createFieldsUpdater } from "./formHelpers"
-import {
-  handleNonMookMultipleTargets,
-  handleMookAttack,
-  handleSingleTargetAttack,
-} from "./attackHandlers"
+
 import { calculateMookRolls } from "./mookAttackRolls"
+import {
+  resetAttackPanelForm,
+  resetOnAttackerChange,
+  resetAttackRelatedFields,
+} from "./formResets" // Add resetOnAttackerChange
+import {
+  handleMookApplication,
+  handleSingleTargetApplication,
+} from "./damageApplicationHelpers"
 
 interface UseAttackPanelControllerProps {
   preselectedAttacker: Character
@@ -97,8 +106,6 @@ export function useAttackPanelController({
     weaponDamage,
     swerve,
     stunt,
-    finalDamage,
-    shotCost,
     mookRolls,
     mookDistribution,
     totalAttackingMooks,
@@ -169,62 +176,11 @@ export function useAttackPanelController({
   // Calculate suggested values when selections change
   useEffect(() => {
     if (attacker && "action_values" in attacker) {
-      const mainAttack = CS.mainAttack(attacker)
-      const [, av] = CES.adjustedActionValue(
+      const updates = initializeAttackerProperties({
         attacker,
-        mainAttack,
+        encounterWeapons,
         encounter,
-        false
-      )
-      const [effectsOnlyChange] = CES.adjustedActionValue(
-        attacker,
-        mainAttack,
-        encounter,
-        true
-      )
-
-      const weaponIds = attacker.weapon_ids || []
-      const charWeapons = weaponIds
-        .map(id => encounterWeapons[id])
-        .filter((weapon): weapon is Weapon => weapon !== undefined)
-
-      const updates: Partial<AttackFormData> = {
-        attackSkill: mainAttack,
-        attackValueChange: effectsOnlyChange,
-      }
-
-      if (charWeapons.length > 0) {
-        const firstWeapon = charWeapons[0]
-        updates.selectedWeaponId = firstWeapon.id?.toString() || ""
-        const [damageChange] = CES.adjustedActionValue(
-          attacker,
-          "Damage",
-          encounter,
-          true
-        )
-        updates.weaponDamage = (firstWeapon.damage + damageChange).toString()
-        updates.damageChange = damageChange
-      } else {
-        updates.selectedWeaponId = "unarmed"
-        const baseDamage = CS.damage(attacker) || 7
-        const [damageChange] = CES.adjustedActionValue(
-          attacker,
-          "Damage",
-          encounter,
-          true
-        )
-        updates.weaponDamage = (baseDamage + damageChange).toString()
-        updates.damageChange = damageChange
-      }
-
-      updates.attackValue = av.toString()
-      updates.shotCost =
-        CS.isBoss(attacker) || CS.isUberBoss(attacker) ? "2" : "3"
-
-      if (CS.isMook(attacker)) {
-        updates.mookDistribution = {}
-      }
-
+      })
       updateFields(updates)
     }
   }, [attacker, encounterWeapons, targetShotId, encounter, updateFields])
@@ -279,69 +235,42 @@ export function useAttackPanelController({
 
   // Calculate damage when swerve is entered
   useEffect(() => {
-    if (attacker && !CS.isMook(attacker)) {
-      if (swerve && attackValue && defenseValue) {
-        const av = calculateEffectiveAttackValue()
-        const dv = parseInt(defenseValue) || 0
-        const sw = parseInt(swerve) || 0
-        const weaponDmg = parseInt(weaponDamage) || 0
-        const fortuneVal = parseInt(fortuneBonus || "0") || 0
-
-        const outcome = av - dv + sw + fortuneVal
-
-        if (selectedTargetIds.length > 0) {
-          const results = selectedTargetIds
-            .map(targetId => {
-              const targetShot = allShots.find(
-                s => s.character?.shot_id === targetId
-              )
-              const targetChar = targetShot?.character
-              if (!targetChar) return null
-
-              const targetDefense = CS.defense(targetChar)
-              const targetToughness = CS.toughness(targetChar)
-              let wounds = 0
-
-              if (CS.isMook(targetChar) && !CS.isMook(attacker)) {
-                if (outcome >= 0) {
-                  wounds =
-                    targetMookCountPerTarget[targetId] || targetMookCount || 1
-                }
-              } else {
-                if (outcome >= 0) {
-                  const smackdown = outcome + weaponDmg
-                  wounds = Math.max(0, smackdown - targetToughness)
-                }
-              }
-
-              return {
-                targetId,
-                targetName: targetChar.name,
-                defense: targetDefense,
-                toughness: targetToughness,
-                wounds,
-              }
-            })
-            .filter(r => r !== null) as typeof multiTargetResults
-
-          const calculatedSmackdown = outcome >= 0 ? outcome + weaponDmg : 0
-          const totalWounds = results.reduce((sum, r) => sum + r.wounds, 0)
-
-          updateFields({
-            multiTargetResults: results,
-            showMultiTargetResults: true,
-            smackdown: calculatedSmackdown.toString(),
-            finalDamage: totalWounds.toString(),
-          })
-        } else {
-          updateFields({
-            multiTargetResults: [],
-            showMultiTargetResults: false,
-            finalDamage: "0",
-          })
-        }
-      }
+    if (
+      !attacker ||
+      CS.isMook(attacker) ||
+      !swerve ||
+      !attackValue ||
+      !defenseValue
+    ) {
+      updateFields({
+        multiTargetResults: [],
+        showMultiTargetResults: false,
+        smackdown: "",
+        finalDamage: "0",
+      })
+      return
     }
+
+    const result = calculateNonMookDamageOutcome({
+      attacker,
+      swerve,
+      attackValue,
+      defenseValue,
+      weaponDamage,
+      fortuneBonus,
+      selectedTargetIds,
+      allShots,
+      targetMookCount,
+      targetMookCountPerTarget,
+      calculateEffectiveAttackValue,
+    })
+
+    updateFields({
+      multiTargetResults: result.multiTargetResults,
+      showMultiTargetResults: result.showMultiTargetResults,
+      smackdown: result.smackdown,
+      finalDamage: result.finalDamage,
+    })
   }, [
     swerve,
     attackValue,
@@ -375,12 +304,6 @@ export function useAttackPanelController({
       overrideFortuneDice?: { [key: string]: string },
       overrideManualDefense?: { [key: string]: string }
     ) => {
-      const currentDefenseChoices =
-        overrideDefenseChoices || defenseChoicePerTarget
-      const currentFortuneDice = overrideFortuneDice || fortuneDiePerTarget
-      const currentManualDefense =
-        overrideManualDefense || manualDefensePerTarget
-
       if (targetIds.length === 0) {
         updateFields({
           defenseValue: "0",
@@ -390,112 +313,24 @@ export function useAttackPanelController({
         return
       }
 
-      const targets = targetIds
-        .map(id => allShots.find(s => s.character?.shot_id === id)?.character)
-        .filter((char): char is Character => char !== undefined)
+      const { defenseValue, toughnessValue } = getDefenseAndToughnessValues({
+        targetIds,
+        allShots,
+        attacker,
+        stunt: includeStunt,
+        defenseChoicePerTarget:
+          overrideDefenseChoices || defenseChoicePerTarget,
+        fortuneDiePerTarget: overrideFortuneDice || fortuneDiePerTarget,
+        manualDefensePerTarget: overrideManualDefense || manualDefensePerTarget,
+        targetMookCount,
+        targetMookCountPerTarget,
+        encounter,
+      })
 
-      if (targetIds.length === 1) {
-        const target = targets[0]
-        const targetId = targetIds[0]
-        if (target) {
-          const finalDefense = calculateTargetDefense(
-            target,
-            targetId,
-            currentManualDefense,
-            currentDefenseChoices,
-            currentFortuneDice,
-            includeStunt,
-            attacker,
-            CS.isMook(target)
-              ? targetMookCountPerTarget[targetId] || targetMookCount || 1
-              : 1,
-            encounter
-          )
-
-          const [_toughnessChange, toughness] = CES.adjustedActionValue(
-            target,
-            "Toughness",
-            encounter,
-            true
-          )
-
-          updateFields({
-            defenseValue: finalDefense.toString(),
-            toughnessValue: toughness.toString(),
-          })
-        }
-      } else {
-        if (attacker && CS.isMook(attacker)) {
-          const defenses = targetIds.map((id, index) => {
-            const target = targets[index]
-            if (!target) return 0
-            return calculateTargetDefense(
-              target,
-              id,
-              currentManualDefense,
-              currentDefenseChoices,
-              currentFortuneDice,
-              includeStunt,
-              attacker,
-              targetMookCount,
-              encounter
-            )
-          })
-          const highestDefense = Math.max(...defenses)
-          updateFields({
-            defenseValue: highestDefense.toString(),
-            toughnessValue: "0",
-          })
-        } else {
-          const allTargetsAreMooks = targets.every(t => CS.isMook(t))
-          if (allTargetsAreMooks) {
-            const defenses = targetIds.map((id, index) => {
-              const target = targets[index]
-              if (!target) return 0
-              const mookCount = targetMookCountPerTarget[id] || 1
-              return calculateTargetDefense(
-                target,
-                id,
-                currentManualDefense,
-                currentDefenseChoices,
-                currentFortuneDice,
-                includeStunt,
-                attacker,
-                mookCount,
-                encounter
-              )
-            })
-            const highestDefense = Math.max(...defenses)
-            const combinedDefense = highestDefense + targetIds.length
-            updateFields({
-              defenseValue: combinedDefense.toString(),
-              toughnessValue: "0",
-            })
-          } else {
-            const defenses = targetIds.map((id, index) => {
-              const target = targets[index]
-              if (!target) return 0
-              return calculateTargetDefense(
-                target,
-                id,
-                currentManualDefense,
-                currentDefenseChoices,
-                currentFortuneDice,
-                includeStunt,
-                attacker,
-                targetMookCount,
-                encounter
-              )
-            })
-            const highestDefense = Math.max(...defenses)
-            const combinedDefense = highestDefense + targetIds.length
-            updateFields({
-              defenseValue: combinedDefense.toString(),
-              toughnessValue: "0",
-            })
-          }
-        }
-      }
+      updateFields({
+        defenseValue,
+        toughnessValue,
+      })
     },
     [
       allShots,
@@ -507,7 +342,6 @@ export function useAttackPanelController({
       targetMookCount,
       targetMookCountPerTarget,
       updateFields,
-      calculateTargetDefense,
     ]
   )
 
@@ -536,67 +370,24 @@ export function useAttackPanelController({
 
   // Reset when attacker changes
   useEffect(() => {
-    const currentAttacker = allShots.find(
-      s => s.character?.shot_id === attackerShotId
-    )?.character
-    const totalMooks =
-      currentAttacker && CS.isMook(currentAttacker)
-        ? currentAttacker.count || 0
-        : 0
-
-    updateFields({
-      mookRolls: [],
-      showMookRolls: false,
-      selectedTargetIds: [],
-      mookDistribution: {},
-      defenseValue: "0",
-      toughnessValue: "0",
-      swerve: "",
-      finalDamage: "",
-      defenseChoicePerTarget: {},
-      fortuneDiePerTarget: {},
-      defenseAppliedPerTarget: {},
-      manualDefensePerTarget: {},
-      manualToughnessPerTarget: {},
-      totalAttackingMooks: totalMooks,
-      multiTargetResults: [],
-      showMultiTargetResults: false,
-    })
+    resetOnAttackerChange(updateFields, allShots, attackerShotId, CS)
   }, [attackerShotId, allShots, updateFields])
 
-  // Recalculate defense when mook counts change (multi-target)
   useEffect(() => {
-    if (selectedTargetIds.length > 1 && attacker && !CS.isMook(attacker)) {
-      const targets = selectedTargetIds
-        .map(id => allShots.find(s => s.character?.shot_id === id)?.character)
-        .filter((char): char is Character => char !== undefined)
+    const newDefenseValue = recalculateMookDefense({
+      selectedTargetIds,
+      attacker,
+      allShots,
+      targetMookCountPerTarget,
+      stunt,
+      manualDefensePerTarget,
+      defenseChoicePerTarget,
+      fortuneDiePerTarget,
+      encounter,
+    })
 
-      const allTargetsAreMooks = targets.every(t => CS.isMook(t))
-
-      if (
-        allTargetsAreMooks &&
-        Object.keys(targetMookCountPerTarget).length > 0
-      ) {
-        const defenses = selectedTargetIds.map((id, index) => {
-          const target = targets[index]
-          if (!target) return 0
-          const mookCount = targetMookCountPerTarget[id] || 1
-          return calculateTargetDefense(
-            target,
-            id,
-            manualDefensePerTarget,
-            defenseChoicePerTarget,
-            fortuneDiePerTarget,
-            stunt,
-            attacker,
-            mookCount,
-            encounter
-          )
-        })
-        const highestDefense = Math.max(...defenses)
-        const combinedDefense = highestDefense + selectedTargetIds.length
-        updateField("defenseValue", combinedDefense.toString())
-      }
+    if (newDefenseValue !== undefined) {
+      updateField("defenseValue", newDefenseValue)
     }
   }, [
     targetMookCountPerTarget,
@@ -609,53 +400,11 @@ export function useAttackPanelController({
     fortuneDiePerTarget,
     encounter,
     updateField,
-    calculateTargetDefense,
-  ])
-
-  // Recalculate defense when single mook target count changes
-  useEffect(() => {
-    if (
-      selectedTargetIds.length === 1 &&
-      attacker &&
-      !CS.isMook(attacker) &&
-      targetMookCountPerTarget[selectedTargetIds[0]]
-    ) {
-      const target = allShots.find(
-        s => s.character?.shot_id === selectedTargetIds[0]
-      )?.character
-
-      if (target && CS.isMook(target)) {
-        updateDefenseAndToughness(
-          selectedTargetIds,
-          stunt,
-          defenseChoicePerTarget,
-          fortuneDiePerTarget,
-          manualDefensePerTarget
-        )
-      }
-    }
-  }, [
-    targetMookCountPerTarget,
-    selectedTargetIds,
-    stunt,
-    attacker,
-    allShots,
-    defenseChoicePerTarget,
-    fortuneDiePerTarget,
-    manualDefensePerTarget,
-    updateDefenseAndToughness,
   ])
 
   // Clear attack results when targets change
   useEffect(() => {
-    updateFields({
-      swerve: "",
-      finalDamage: "",
-      mookRolls: [],
-      showMookRolls: false,
-      multiTargetResults: [],
-      showMultiTargetResults: false,
-    })
+    resetAttackRelatedFields(updateFields)
 
     if (selectedTargetIds.length > 0) {
       updateDefenseAndToughness(selectedTargetIds, stunt)
@@ -721,132 +470,38 @@ export function useAttackPanelController({
 
   const handleApplyDamage = async () => {
     updateField("isProcessing", true)
+    let attackApplied = false
+
     try {
-      if (
-        !CS.isMook(attacker!) &&
-        selectedTargetIds.length > 0 &&
-        multiTargetResults.length > 0
-      ) {
-        await handleNonMookMultipleTargets(
-          client,
-          encounter,
-          attackerShot!,
-          attacker!,
-          allShots,
-          multiTargetResults,
-          parseInt(shotCost),
-          weaponDamage,
-          attackValue,
-          swerve,
-          defenseValue,
-          stunt,
-          selectedTargetIds,
-          defenseChoicePerTarget,
-          fortuneDiePerTarget,
-          targetMookCount,
-          calculateTargetDefense,
-          calculateEffectiveAttackValue,
-          attackerWeapons,
-          toastSuccess,
-          toastInfo,
-          toastError,
-          { data: formState.data }
-        )
-        updateFields({
-          selectedTargetIds: [],
-          multiTargetResults: [],
-          showMultiTargetResults: false,
-          swerve: "",
-          finalDamage: "",
-          stunt: false,
-          kachunkActive: false,
-          defenseChoicePerTarget: {},
-          fortuneDiePerTarget: {},
-          defenseAppliedPerTarget: {},
-          manualDefensePerTarget: {},
-          manualToughnessPerTarget: {},
-          targetMookCount: 1,
-        })
-        if (onComplete) onComplete()
-        return
+      const commonParams = {
+        client,
+        encounter,
+        attackerShot: attackerShot!,
+        attacker: attacker!,
+        allShots,
+        formStateData: formState.data,
+        selectedTargetIds,
+        multiTargetResults,
+        mookRolls,
+        target,
+        calculateTargetDefense,
+        calculateEffectiveAttackValue,
+        attackerWeapons,
+        toastSuccess,
+        toastInfo,
+        toastError,
       }
 
-      if (
-        CS.isMook(attacker!) &&
-        selectedTargetIds.length >= 1 &&
-        mookRolls.length > 0
-      ) {
-        await handleMookAttack(
-          client,
-          encounter,
-          attackerShot!,
-          attacker!,
-          allShots,
-          mookRolls,
-          parseInt(shotCost),
-          weaponDamage,
-          calculateEffectiveAttackValue,
-          attackerWeapons,
-          toastSuccess
-        )
-        updateFields({
-          selectedTargetIds: [],
-          mookDistribution: {},
-          totalAttackingMooks: 0,
-          mookRolls: [],
-          showMookRolls: false,
-          swerve: "",
-          finalDamage: "",
-          stunt: false,
-          kachunkActive: false,
-          defenseChoicePerTarget: {},
-          fortuneDiePerTarget: {},
-          defenseAppliedPerTarget: {},
-        })
-        if (onComplete) onComplete()
-        return
-      }
+      attackApplied =
+        (await handleNonMookMultiTargetApplication(commonParams)) ||
+        (await handleMookApplication(commonParams)) ||
+        (await handleSingleTargetApplication(commonParams))
 
-      if (
-        !CS.isMook(attacker!) &&
-        selectedTargetIds.length === 1 &&
-        finalDamage &&
-        target
-      ) {
-        await handleSingleTargetAttack(
-          client,
-          encounter,
-          attackerShot!,
-          attacker!,
-          target,
-          finalDamage,
-          toughnessValue,
-          parseInt(shotCost),
-          attackValue,
-          defenseValue,
-          swerve,
-          weaponDamage,
-          stunt,
-          toastSuccess,
-          toastError,
-          { data: formState.data }
-        )
-        updateFields({
-          targetShotId: "",
-          selectedTargetIds: [],
-          swerve: "",
-          finalDamage: "",
-          stunt: false,
-          mookRolls: [],
-          showMookRolls: false,
-          mookDistribution: {},
-          totalAttackingMooks: 0,
-          defenseChoicePerTarget: {},
-          fortuneDiePerTarget: {},
-          defenseAppliedPerTarget: {},
-        })
+      if (attackApplied) {
+        resetAttackPanelForm(updateFields)
         if (onComplete) onComplete()
-        return
+      } else {
+        toastError("No valid attack scenario found to apply damage.")
       }
     } catch (error) {
       toastError("Failed to apply damage")

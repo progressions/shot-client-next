@@ -1,7 +1,7 @@
 import { CS, DS } from "@/services"
 import type { Character, Shot, Weapon } from "@/types"
 
-interface MookRollResult {
+export interface MookRollResult {
   mookNumber: number
   swerve: number
   actionResult: number
