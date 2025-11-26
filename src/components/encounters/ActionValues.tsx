@@ -51,41 +51,47 @@ export default function ActionValues({ character }: ActionValuesProps) {
   return (
     <Stack
       component="span"
-      direction="row"
       sx={{
         fontSize: { xs: "0.7rem", sm: "0.75rem", md: "0.75rem" },
         width: "100%",
         gap: 0.5,
-        flexWrap: "wrap",
       }}
     >
-      {attackValuesData.map(attackData => (
+      <Stack direction="row" flexWrap="wrap" gap={0.5}>
+        {attackValuesData.map(attackData => (
+          <AV
+            key={attackData.label}
+            label={attackData.label}
+            value={attackData.value}
+            change={attackData.change}
+          />
+        ))}
         <AV
-          key={attackData.label}
-          label={attackData.label}
-          value={attackData.value}
-          change={attackData.change}
+          label="Defense"
+          value={defenseData.value}
+          change={defenseData.change}
         />
-      ))}
-      <AV
-        label="Defense"
-        value={defenseData.value}
-        change={defenseData.change}
-      />
-      <AV
-        label="Toughness"
-        value={toughnessData.value}
-        change={toughnessData.change}
-      />
-      <AV label="Speed" value={speedData.value} change={speedData.change} />
-      <AV label="Damage" value={damageData.value} change={damageData.change} />
-      {CS.isPC(character) && (
         <AV
-          label={CS.fortuneType(character)}
-          value={CS.fortune(character)}
-          maxValue={CS.maxFortune(character)}
+          label="Toughness"
+          value={toughnessData.value}
+          change={toughnessData.change}
         />
-      )}
+      </Stack>
+      <Stack direction="row" flexWrap="wrap" gap={0.5}>
+        <AV label="Speed" value={speedData.value} change={speedData.change} />
+        <AV
+          label="Damage"
+          value={damageData.value}
+          change={damageData.change}
+        />
+        {CS.isPC(character) && (
+          <AV
+            label={CS.fortuneType(character)}
+            value={CS.fortune(character)}
+            maxValue={CS.maxFortune(character)}
+          />
+        )}
+      </Stack>
     </Stack>
   )
 }
