@@ -53,34 +53,8 @@ export default function CharacterLink({
       }
     )
 
-    // Subscribe to characters reload signal
-    const unsubscribeCharacters = subscribeToEntity(
-      "characters",
-      reloadSignal => {
-        // For reload signals, only refresh on characters list page
-        if (reloadSignal === "reload") {
-          // Only reload the page if we're on the characters list page
-          // On other pages (like encounters), the individual character updates handle the refresh
-          if (pathname === "/characters") {
-            console.log(
-              "🔄 [CharacterLink] Received characters reload signal on characters list, refreshing page"
-            )
-            setTimeout(() => {
-              window.location.reload()
-            }, 1000)
-          } else {
-            console.log(
-              "🔄 [CharacterLink] Received characters reload signal, ignoring on non-list page:",
-              pathname
-            )
-          }
-        }
-      }
-    )
-
     return () => {
       unsubscribeCharacter()
-      unsubscribeCharacters()
     }
   }, [subscribeToEntity, initialCharacter.id, pathname])
 
