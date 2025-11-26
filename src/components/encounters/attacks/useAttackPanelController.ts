@@ -22,6 +22,7 @@ import {
   resetAttackRelatedFields,
 } from "./formResets" // Add resetOnAttackerChange
 import {
+  handleNonMookMultiTargetApplication, // Add this import
   handleMookApplication,
   handleSingleTargetApplication,
 } from "./damageApplicationHelpers"
