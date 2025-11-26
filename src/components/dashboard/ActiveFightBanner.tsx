@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import {
   Paper,
@@ -11,7 +11,7 @@ import {
   Skeleton,
 } from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
-import { FaFire, FaUsers, FaPlay } from "react-icons/fa6"
+import { FaFire, FaUsers, FaPlay, FaUser } from "react-icons/fa6"
 import { useApp, useClient } from "@/contexts"
 import type { Fight } from "@/types"
 
@@ -23,6 +23,7 @@ interface ActiveFightBannerProps {
 
 export default function ActiveFightBanner({
   campaignId,
+  userId,
 }: ActiveFightBannerProps) {
   const router = useRouter()
   const { subscribeToEntity } = useApp()
@@ -30,6 +31,12 @@ export default function ActiveFightBanner({
   const [currentFight, setCurrentFight] = useState<Fight | null>(null)
   const [loading, setLoading] = useState(true)
   const [participantCount, setParticipantCount] = useState(0)
+
+  // Find user's character in the fight (if any)
+  const userCharacter = useMemo(() => {
+    if (!currentFight?.characters || !userId) return null
+    return currentFight.characters.find(char => char.user_id === userId) || null
+  }, [currentFight?.characters, userId])
 
   const fetchCurrentFight = useCallback(async () => {
     if (!client) {
@@ -132,6 +139,12 @@ export default function ActiveFightBanner({
     }
   }
 
+  const handlePlayAsCharacter = () => {
+    if (currentFight && userCharacter) {
+      router.push(`/encounters/${currentFight.id}/play/${userCharacter.id}`)
+    }
+  }
+
   // Don't render anything if no fight is active
   if (!loading && !currentFight) {
     return null
@@ -215,23 +228,48 @@ export default function ActiveFightBanner({
                     </Stack>
                   </Box>
 
-                  <Button
-                    variant="contained"
-                    size="large"
-                    onClick={handleJoinFight}
-                    startIcon={<FaPlay />}
-                    sx={{
-                      bgcolor: "white",
-                      color: "#ff6b6b",
-                      fontWeight: "bold",
-                      "&:hover": {
-                        bgcolor: "rgba(255, 255, 255, 0.9)",
-                      },
-                      minWidth: 150,
-                    }}
-                  >
-                    Join Fight
-                  </Button>
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+                    {userCharacter && (
+                      <Button
+                        variant="contained"
+                        size="large"
+                        onClick={handlePlayAsCharacter}
+                        startIcon={<FaUser />}
+                        sx={{
+                          bgcolor: "white",
+                          color: "#ff6b6b",
+                          fontWeight: "bold",
+                          "&:hover": {
+                            bgcolor: "rgba(255, 255, 255, 0.9)",
+                          },
+                          minWidth: 150,
+                        }}
+                      >
+                        Play as {userCharacter.name}
+                      </Button>
+                    )}
+                    <Button
+                      variant="contained"
+                      size="large"
+                      onClick={handleJoinFight}
+                      startIcon={<FaPlay />}
+                      sx={{
+                        bgcolor: userCharacter
+                          ? "rgba(255, 255, 255, 0.2)"
+                          : "white",
+                        color: userCharacter ? "white" : "#ff6b6b",
+                        fontWeight: "bold",
+                        "&:hover": {
+                          bgcolor: userCharacter
+                            ? "rgba(255, 255, 255, 0.3)"
+                            : "rgba(255, 255, 255, 0.9)",
+                        },
+                        minWidth: 150,
+                      }}
+                    >
+                      {userCharacter ? "Manage Fight" : "Join Fight"}
+                    </Button>
+                  </Stack>
                 </Stack>
               )}
             </Box>
