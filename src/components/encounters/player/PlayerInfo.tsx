@@ -38,13 +38,6 @@ export default function PlayerInfo({ character }: PlayerInfoProps) {
 
   return (
     <Box sx={{ p: 1, mb: 0.5 }}>
-      <Typography
-        variant="subtitle2"
-        sx={{ mb: 1, fontWeight: "bold", color: "text.secondary" }}
-      >
-        CHARACTER
-      </Typography>
-
       {/* Character Type, Archetype, Faction */}
       <Box
         sx={{

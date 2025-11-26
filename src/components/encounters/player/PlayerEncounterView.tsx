@@ -7,6 +7,7 @@ import { getAllVisibleShots } from "@/components/encounters/attacks/shotSorting"
 import Link from "next/link"
 import { ArrowBack } from "@mui/icons-material"
 import { GiPerson } from "react-icons/gi"
+import { CharacterName } from "@/components/characters"
 import PlayerStatus from "./PlayerStatus"
 import PlayerActions from "./PlayerActions"
 import PlayerInfo from "./PlayerInfo"
@@ -19,7 +20,7 @@ interface PlayerEncounterViewProps {
 export default function PlayerEncounterView({
   characterId,
 }: PlayerEncounterViewProps) {
-  const { encounter } = useEncounter()
+  const { encounter, currentShot } = useEncounter()
 
   // Find the character in the encounter
   // The characterId passed in the URL is the database ID (character.id), not the shot ID
@@ -67,6 +68,33 @@ export default function PlayerEncounterView({
         p: { xs: 1, sm: 2 },
       }}
     >
+      {/* Current Shot Banner */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 1,
+          py: 1,
+          px: 2,
+          mb: 1,
+          backgroundColor: "primary.main",
+          borderRadius: 1,
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            color: "primary.contrastText",
+            fontWeight: "bold",
+            textTransform: "uppercase",
+            letterSpacing: 1,
+          }}
+        >
+          Current Shot: {currentShot ?? "—"}
+        </Typography>
+      </Box>
+
       {/* Main Panel - BasePanel style */}
       <Paper
         sx={{
@@ -95,7 +123,7 @@ export default function PlayerEncounterView({
           </Link>
           <GiPerson size={24} />
           <Typography variant="h6" component="h2" noWrap>
-            {character.name}
+            <CharacterName character={character} />
           </Typography>
         </Box>
 
@@ -107,11 +135,11 @@ export default function PlayerEncounterView({
           }}
         >
           <PlayerStatus character={character} />
+          <PlayerInfo character={character} />
           <PlayerEffects
             character={character}
             effects={encounter?.character_effects?.[character.id] || []}
           />
-          <PlayerInfo character={character} />
           <PlayerActions character={character} />
         </Box>
       </Paper>

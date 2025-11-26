@@ -169,13 +169,6 @@ export default function PlayerActions({ character }: PlayerActionsProps) {
 
   return (
     <Box sx={{ p: 1 }}>
-      <Typography
-        variant="subtitle2"
-        sx={{ mb: 1, fontWeight: "bold", color: "text.secondary" }}
-      >
-        ACTIONS
-      </Typography>
-
       {/* Action Buttons Grid */}
       <Box
         data-testid="player-action-bar"
