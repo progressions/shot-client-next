@@ -123,10 +123,16 @@ export function useAttackPanelController({
   const updateField = createFieldUpdater<AttackFormData>(dispatchForm)
   const updateFields = createFieldsUpdater<AttackFormData>(dispatchForm)
 
-  // Helper function to calculate effective attack value
-  const calculateEffectiveAttackValue = useCallback((): number => {
-    return parseInt(attackValue) || 0
-  }, [attackValue])
+  const calculateEffectiveAttackValue = useCallback(
+    (
+      _attacker?: Character,
+      _weapons?: Weapon[],
+      _allShots?: Shot[]
+    ): number => {
+      return parseInt(attackValue) || 0
+    },
+    [attackValue]
+  )
 
   // Get all characters in the fight
   const allShots = useMemo(
