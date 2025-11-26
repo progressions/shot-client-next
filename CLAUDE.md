@@ -2,6 +2,20 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git Workflow
+
+**Never commit directly to main/master.** Always create a feature branch and make a pull request. Wait for CI to pass before merging.
+
+## Production Stack
+
+The application is deployed on Fly.io:
+
+| App                     | URL                         | Purpose                    |
+| ----------------------- | --------------------------- | -------------------------- |
+| **shot-client-phoenix** | https://chiwar.net          | Next.js frontend (primary) |
+| **shot-elixir**         | https://shot-elixir.fly.dev | Phoenix/Elixir API backend |
+| **shot-counter-db**     | (internal)                  | PostgreSQL database        |
+
 ## Development Commands
 
 - **Development server**: `npm run dev` (runs on port 3001 with Turbopack)
@@ -13,14 +27,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Environment Configuration
 
-The application supports switching between two backend APIs via `.env.local`:
+The application connects to the Phoenix/Elixir backend. Configure via `.env.local`:
 
 ```bash
 # Copy example file and configure
 cp .env.example .env.local
 ```
 
-### Phoenix API (Recommended)
+### Phoenix API (Production Backend)
+
 ```bash
 NEXT_PUBLIC_SERVER_URL=http://localhost:4002
 NEXT_PUBLIC_API_BASE_URL=http://localhost:4002
@@ -28,42 +43,44 @@ NEXT_PUBLIC_WEBSOCKET_URL=ws://localhost:4002
 NEXT_PUBLIC_BACKEND_TYPE=phoenix
 ```
 
-### Rails API (Legacy)
+### Production Environment
+
 ```bash
-NEXT_PUBLIC_SERVER_URL=http://localhost:3000
-NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
-NEXT_PUBLIC_WEBSOCKET_URL=ws://localhost:3000
-NEXT_PUBLIC_BACKEND_TYPE=rails
+NEXT_PUBLIC_SERVER_URL=https://shot-elixir.fly.dev
+NEXT_PUBLIC_API_BASE_URL=https://shot-elixir.fly.dev
+NEXT_PUBLIC_WEBSOCKET_URL=wss://shot-elixir.fly.dev
+NEXT_PUBLIC_BACKEND_TYPE=phoenix
 ```
 
-Both backends provide:
-- Identical RESTful `/api/v2/` endpoints
-- JWT authentication
-- ActionCable WebSocket support for real-time updates
-- Image upload via ActiveStorage/ImageKit integration
+The backend provides:
+
+- RESTful `/api/v2/` endpoints
+- Guardian JWT authentication
+- Phoenix Channels WebSocket support for real-time updates
+- Image upload via ImageKit integration
 
 ## Project Architecture
 
-This is a **Next.js 15** frontend for a Feng Shui 2 RPG game manager that supports **dual API backends**:
+This is a **Next.js 15** frontend for a Feng Shui 2 RPG game manager.
 
-- **Phoenix/Elixir API** : Port 4002 - Modern Elixir implementation with full feature parity
-- **Ruby on Rails API** : Port 3000 - Original Rails backend for backward compatibility
-
-Both APIs provide identical `/api/v2/` endpoints and functionality. The backend selection is controlled via environment variables.
+**Backend**: Phoenix/Elixir API (shot-elixir) - Port 4002 locally, https://shot-elixir.fly.dev in production
 
 ### Key Architectural Patterns
 
 **API Client Architecture**: Uses a layered client system in `src/lib/client/`:
+
 - `baseClient.ts` - Core HTTP methods with JWT authentication
 - Individual clients (e.g., `characterClient.ts`, `campaignClient.ts`) - Model-specific API operations
 - Main `Client.ts` - Aggregates all clients and provides unified interface
 
-**Context-Based State Management**: 
+**Context-Based State Management**:
+
 - `AppContext.tsx` - Global app state, user authentication, campaign management
-- `EncounterContext.tsx` - Real-time encounter/fight state via ActionCable WebSocket
+- `EncounterContext.tsx` - Real-time encounter/fight state via Phoenix Channels WebSocket
 - `ToastContext.tsx` - Global notification system
 
 **Resource-Based Component Organization**: Each game resource (characters, campaigns, factions, etc.) has a dedicated component directory with:
+
 - List/table views with filtering and sorting
 - Detail views for individual resources
 - Forms for create/edit operations
@@ -71,6 +88,7 @@ Both APIs provide identical `/api/v2/` endpoints and functionality. The backend 
 - Autocomplete components for relationships
 
 **Autocomplete System**: Extensive reusable autocomplete infrastructure:
+
 - `ModelAutocomplete` - Generic autocomplete component using TypeScript generics
 - Model-specific wrappers (e.g., `CharacterAutocomplete`, `FactionAutocomplete`)
 - Complex filtering components (e.g., `CharacterFilter`) that coordinate multiple autocompletes
@@ -78,7 +96,8 @@ Both APIs provide identical `/api/v2/` endpoints and functionality. The backend 
 
 ### Real-Time Features
 
-The app uses Rails ActionCable for real-time updates:
+The app uses Phoenix Channels for real-time updates:
+
 - `websocketClient.ts` manages WebSocket connections
 - `CampaignChannel` subscription in `AppContext.tsx` for live campaign data
 - Real-time encounter/fight updates for gameplay sessions
@@ -86,6 +105,7 @@ The app uses Rails ActionCable for real-time updates:
 ### Code Generation
 
 Uses Plop.js for component scaffolding:
+
 - `npm run generate:index` - Creates complete CRUD component sets
 - Templates in `plop-templates/` directory
 - Generates List, Filter, Form, Table components and index files
@@ -131,3 +151,24 @@ Uses Plop.js for component scaffolding:
 - Junctures
 - Users
 - Campaigns
+
+## Deployment
+
+Deployed to Fly.io as `shot-client-phoenix`:
+
+```bash
+# Deploy to production
+fly deploy -a shot-client-phoenix
+
+# View logs
+fly logs -a shot-client-phoenix
+
+# SSH into container
+fly ssh console -a shot-client-phoenix
+```
+
+The app connects to:
+
+- **API**: https://shot-elixir.fly.dev
+- **WebSocket**: wss://shot-elixir.fly.dev/socket
+- **Domain**: https://chiwar.net
