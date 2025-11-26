@@ -17,7 +17,7 @@ export function createCharacterEffectClient(deps: ClientDependencies) {
     encounter: Encounter,
     effect: Partial<CharacterEffect>
   ): Promise<AxiosResponse<CharacterEffect>> {
-    return post(`${api.fights(encounter)}/character_effects`, {
+    return post(`${apiV2.fights(encounter)}/character_effects`, {
       character_effect: effect,
     })
   }
@@ -26,7 +26,7 @@ export function createCharacterEffectClient(deps: ClientDependencies) {
     encounter: Encounter,
     effect: CharacterEffect
   ): Promise<AxiosResponse<CharacterEffect>> {
-    return patch(`${api.fights(encounter)}/character_effects/${effect.id}`, {
+    return patch(`${apiV2.fights(encounter)}/character_effects/${effect.id}`, {
       character_effect: effect,
     })
   }
@@ -35,13 +35,13 @@ export function createCharacterEffectClient(deps: ClientDependencies) {
     encounter: Encounter,
     effect: CharacterEffect
   ): Promise<AxiosResponse<void>> {
-    return delete_(`${api.fights(encounter)}/character_effects/${effect.id}`)
+    return delete_(`${apiV2.fights(encounter)}/character_effects/${effect.id}`)
   }
 
   async function getCharacterEffects(
     encounter: Encounter
   ): Promise<AxiosResponse<CharacterEffect[]>> {
-    return get(`${api.fights(encounter)}/character_effects`)
+    return get(`${apiV2.fights(encounter)}/character_effects`)
   }
 
   return {
