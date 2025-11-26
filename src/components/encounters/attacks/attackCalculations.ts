@@ -93,6 +93,319 @@ export const calculateTargetDefense = (
 }
 
 /**
+ * Calculates defense and toughness values based on selected targets and current state.
+ */
+interface GetDefenseAndToughnessValuesParams {
+  targetIds: string[]
+  allShots: Shot[]
+  attacker: Character | undefined
+  stunt: boolean
+  defenseChoicePerTarget: { [key: string]: "none" | "dodge" | "fortune" }
+  fortuneDiePerTarget: { [key: string]: string }
+  manualDefensePerTarget: { [key: string]: string }
+  targetMookCount: number
+  targetMookCountPerTarget: { [key: string]: number }
+  encounter: Encounter
+}
+
+interface GetDefenseAndToughnessValuesResult {
+  defenseValue: string
+  toughnessValue: string
+}
+
+export function getDefenseAndToughnessValues({
+  targetIds,
+  allShots,
+  attacker,
+  stunt,
+  defenseChoicePerTarget,
+  fortuneDiePerTarget,
+  manualDefensePerTarget,
+  targetMookCount,
+  targetMookCountPerTarget,
+  encounter,
+}: GetDefenseAndToughnessValuesParams): GetDefenseAndToughnessValuesResult {
+  let defenseValue = "0"
+  let toughnessValue = "0"
+
+  if (targetIds.length === 0) {
+    return { defenseValue, toughnessValue }
+  }
+
+  const targets = targetIds
+    .map(id => allShots.find(s => s.character?.shot_id === id)?.character)
+    .filter((char): char is Character => char !== undefined)
+
+  if (targetIds.length === 1) {
+    const target = targets[0]
+    const targetId = targetIds[0]
+    if (target) {
+      const finalDefense = calculateTargetDefense(
+        target,
+        targetId,
+        manualDefensePerTarget,
+        defenseChoicePerTarget,
+        fortuneDiePerTarget,
+        stunt,
+        attacker,
+        CS.isMook(target)
+          ? targetMookCountPerTarget[targetId] || targetMookCount || 1
+          : 1,
+        encounter
+      )
+
+      const [_toughnessChange, toughness] = CES.adjustedActionValue(
+        target,
+        "Toughness",
+        encounter,
+        true
+      )
+      defenseValue = finalDefense.toString()
+      toughnessValue = toughness.toString()
+    }
+  } else {
+    if (attacker && CS.isMook(attacker)) {
+      const defenses = targetIds.map((id, index) => {
+        const target = targets[index]
+        if (!target) return 0
+        return calculateTargetDefense(
+          target,
+          id,
+          manualDefensePerTarget,
+          defenseChoicePerTarget,
+          fortuneDiePerTarget,
+          stunt,
+          attacker,
+          targetMookCount,
+          encounter
+        )
+      })
+      defenseValue = Math.max(...defenses).toString()
+      toughnessValue = "0"
+    } else {
+      const allTargetsAreMooks = targets.every(t => CS.isMook(t))
+      if (allTargetsAreMooks) {
+        const defenses = targetIds.map((id, index) => {
+          const target = targets[index]
+          if (!target) return 0
+          const mookCount = targetMookCountPerTarget[id] || 1
+          return calculateTargetDefense(
+            target,
+            id,
+            manualDefensePerTarget,
+            defenseChoicePerTarget,
+            fortuneDiePerTarget,
+            stunt,
+            attacker,
+            mookCount,
+            encounter
+          )
+        })
+        const highestDefense = Math.max(...defenses)
+        defenseValue = (highestDefense + targetIds.length).toString()
+        toughnessValue = "0"
+      } else {
+        const defenses = targetIds.map((id, index) => {
+          const target = targets[index]
+          if (!target) return 0
+          return calculateTargetDefense(
+            target,
+            id,
+            manualDefensePerTarget,
+            defenseChoicePerTarget,
+            fortuneDiePerTarget,
+            stunt,
+            attacker,
+            targetMookCount,
+            encounter
+          )
+        })
+        const highestDefense = Math.max(...defenses)
+        defenseValue = (highestDefense + targetIds.length).toString()
+        toughnessValue = "0"
+      }
+    }
+  }
+
+  return { defenseValue, toughnessValue }
+}
+
+interface MultiTargetResult {
+  targetId: string
+  targetName: string
+  defense: number
+  toughness: number
+  wounds: number
+}
+
+interface CalculateNonMookDamageOutcomeParams {
+  attacker: Character
+  swerve: string
+  attackValue: string
+  defenseValue: string
+  weaponDamage: string
+  fortuneBonus: string
+  selectedTargetIds: string[]
+  allShots: Shot[]
+  targetMookCount: number
+  targetMookCountPerTarget: { [key: string]: number }
+  calculateEffectiveAttackValue: () => number
+}
+
+interface CalculateNonMookDamageOutcomeResult {
+  multiTargetResults: MultiTargetResult[]
+  showMultiTargetResults: boolean
+  smackdown: string
+  finalDamage: string
+}
+
+export function calculateNonMookDamageOutcome({
+  attacker,
+  swerve,
+  attackValue,
+  defenseValue,
+  weaponDamage,
+  fortuneBonus,
+  selectedTargetIds,
+  allShots,
+  targetMookCount,
+  targetMookCountPerTarget,
+  calculateEffectiveAttackValue,
+}: CalculateNonMookDamageOutcomeParams): CalculateNonMookDamageOutcomeResult {
+  let multiTargetResults: MultiTargetResult[] = []
+  let showMultiTargetResults = false
+  let smackdown = ""
+  let finalDamage = "0"
+
+  if (!attacker || CS.isMook(attacker)) {
+    return {
+      multiTargetResults,
+      showMultiTargetResults,
+      smackdown,
+      finalDamage,
+    }
+  }
+
+  if (swerve && attackValue && defenseValue) {
+    const av = calculateEffectiveAttackValue()
+    const dv = parseInt(defenseValue) || 0
+    const sw = parseInt(swerve) || 0
+    const weaponDmg = parseInt(weaponDamage) || 0
+    const fortuneVal = parseInt(fortuneBonus || "0") || 0
+
+    const outcome = av - dv + sw + fortuneVal
+
+    if (selectedTargetIds.length > 0) {
+      multiTargetResults = selectedTargetIds
+        .map(targetId => {
+          const targetShot = allShots.find(
+            s => s.character?.shot_id === targetId
+          )
+          const targetChar = targetShot?.character
+          if (!targetChar) return null
+
+          const targetDefense = CS.defense(targetChar)
+          const targetToughness = CS.toughness(targetChar)
+          let wounds = 0
+
+          if (CS.isMook(targetChar) && !CS.isMook(attacker)) {
+            if (outcome >= 0) {
+              wounds =
+                targetMookCountPerTarget[targetId] || targetMookCount || 1
+            }
+          } else {
+            if (outcome >= 0) {
+              const calculatedSmackdown = outcome + weaponDmg
+              wounds = Math.max(0, calculatedSmackdown - targetToughness)
+            }
+          }
+
+          return {
+            targetId,
+            targetName: targetChar.name,
+            defense: targetDefense,
+            toughness: targetToughness,
+            wounds,
+          }
+        })
+        .filter(r => r !== null) as MultiTargetResult[]
+
+      smackdown = (outcome >= 0 ? outcome + weaponDmg : 0).toString()
+      finalDamage = multiTargetResults
+        .reduce((sum, r) => sum + r.wounds, 0)
+        .toString()
+      showMultiTargetResults = true
+    }
+  }
+
+  return { multiTargetResults, showMultiTargetResults, smackdown, finalDamage }
+}
+
+interface InitializeAttackerPropertiesParams {
+  attacker: Character
+  encounterWeapons: Record<string, Weapon>
+  encounter: Encounter
+}
+
+export function initializeAttackerProperties({
+  attacker,
+  encounterWeapons,
+  encounter,
+}: InitializeAttackerPropertiesParams): Partial<AttackFormData> {
+  const mainAttack = CS.mainAttack(attacker)
+  const [, av] = CES.adjustedActionValue(attacker, mainAttack, encounter, false)
+  const [effectsOnlyChange] = CES.adjustedActionValue(
+    attacker,
+    mainAttack,
+    encounter,
+    true
+  )
+
+  const weaponIds = attacker.weapon_ids || []
+  const charWeapons = weaponIds
+    .map(id => encounterWeapons[id])
+    .filter((weapon): weapon is Weapon => weapon !== undefined)
+
+  const updates: Partial<AttackFormData> = {
+    attackSkill: mainAttack,
+    attackValueChange: effectsOnlyChange,
+  }
+
+  if (charWeapons.length > 0) {
+    const firstWeapon = charWeapons[0]
+    updates.selectedWeaponId = firstWeapon.id?.toString() || ""
+    const [damageChange] = CES.adjustedActionValue(
+      attacker,
+      "Damage",
+      encounter,
+      true
+    )
+    updates.weaponDamage = (firstWeapon.damage + damageChange).toString()
+    updates.damageChange = damageChange
+  } else {
+    updates.selectedWeaponId = "unarmed"
+    const baseDamage = CS.damage(attacker) || 7
+    const [damageChange] = CES.adjustedActionValue(
+      attacker,
+      "Damage",
+      encounter,
+      true
+    )
+    updates.weaponDamage = (baseDamage + damageChange).toString()
+    updates.damageChange = damageChange
+  }
+
+  updates.attackValue = av.toString()
+  updates.shotCost = CS.isBoss(attacker) || CS.isUberBoss(attacker) ? "2" : "3"
+
+  if (CS.isMook(attacker)) {
+    updates.mookDistribution = {}
+  }
+
+  return updates
+}
+
+/**
  * Calculate attack value with impairments
  */
 export const calculateAttackWithImpairments = (
@@ -212,6 +525,85 @@ export const calculateCombinedDefense = (
       return highestDefense + targetIds.length
     }
   }
+}
+
+interface RecalculateMookDefenseParams {
+  selectedTargetIds: string[]
+  attacker: Character | undefined
+  allShots: Shot[]
+  targetMookCountPerTarget: { [key: string]: number }
+  stunt: boolean
+  manualDefensePerTarget: { [key: string]: string }
+  defenseChoicePerTarget: { [key: string]: "none" | "dodge" | "fortune" }
+  fortuneDiePerTarget: { [key: string]: string }
+  encounter: Encounter
+}
+
+export function recalculateMookDefense({
+  selectedTargetIds,
+  attacker,
+  allShots,
+  targetMookCountPerTarget,
+  stunt,
+  manualDefensePerTarget,
+  defenseChoicePerTarget,
+  fortuneDiePerTarget,
+  encounter,
+}: RecalculateMookDefenseParams): string | undefined {
+  if (!attacker || CS.isMook(attacker)) {
+    return undefined
+  }
+
+  const targets = selectedTargetIds
+    .map(id => allShots.find(s => s.character?.shot_id === id)?.character)
+    .filter((char): char is Character => char !== undefined)
+
+  if (selectedTargetIds.length > 1) {
+    const allTargetsAreMooks = targets.every(t => CS.isMook(t))
+    if (
+      allTargetsAreMooks &&
+      Object.keys(targetMookCountPerTarget).length > 0
+    ) {
+      const defenses = selectedTargetIds.map((id, index) => {
+        const target = targets[index]
+        if (!target) return 0
+        const mookCount = targetMookCountPerTarget[id] || 1
+        return calculateTargetDefense(
+          target,
+          id,
+          manualDefensePerTarget,
+          defenseChoicePerTarget,
+          fortuneDiePerTarget,
+          stunt,
+          attacker,
+          mookCount,
+          encounter
+        )
+      })
+      const highestDefense = Math.max(...defenses)
+      return (highestDefense + selectedTargetIds.length).toString()
+    }
+  } else if (selectedTargetIds.length === 1) {
+    const targetId = selectedTargetIds[0]
+    const target = allShots.find(
+      s => s.character?.shot_id === targetId
+    )?.character
+    if (target && CS.isMook(target) && targetMookCountPerTarget[targetId]) {
+      const finalDefense = calculateTargetDefense(
+        target,
+        targetId,
+        manualDefensePerTarget,
+        defenseChoicePerTarget,
+        fortuneDiePerTarget,
+        stunt,
+        attacker,
+        targetMookCountPerTarget[targetId],
+        encounter
+      )
+      return finalDefense.toString()
+    }
+  }
+  return undefined
 }
 
 /**
