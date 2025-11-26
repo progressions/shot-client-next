@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "tidewave-phoenix": {
+      "type": "http",
+      "url": "http://localhost:4002/tidewave/mcp"
+    },
+    "tidewave-nextjs": {
+      "command": "npx",
+      "args": ["tidewave", "mcp"]
+    }
+  }
+}
