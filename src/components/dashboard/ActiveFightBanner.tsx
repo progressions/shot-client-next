@@ -9,9 +9,10 @@ import {
   Chip,
   Stack,
   Skeleton,
+  Avatar,
 } from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
-import { FaFire, FaUsers, FaPlay, FaUser } from "react-icons/fa6"
+import { FaFire, FaUsers, FaPlay } from "react-icons/fa6"
 import { useApp, useClient } from "@/contexts"
 import type { Fight } from "@/types"
 
@@ -215,28 +216,51 @@ export default function ActiveFightBanner({
                     </Stack>
                   </Box>
 
-                  <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+                  <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    spacing={1}
+                    alignItems="center"
+                  >
                     {userCharacter && currentFight && (
-                      <Button
-                        component={Link}
+                      <Link
                         href={`/encounters/${currentFight.id}/play/${userCharacter.id}`}
                         target="_blank"
-                        variant="contained"
-                        size="large"
-                        startIcon={<FaUser />}
-                        sx={{
-                          bgcolor: "white",
-                          color: "#ff6b6b",
-                          fontWeight: "bold",
-                          textDecoration: "none",
-                          "&:hover": {
-                            bgcolor: "rgba(255, 255, 255, 0.9)",
-                          },
-                          minWidth: 150,
-                        }}
+                        style={{ textDecoration: "none" }}
                       >
-                        Play as {userCharacter.name}
-                      </Button>
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          alignItems="center"
+                          sx={{
+                            bgcolor: "white",
+                            borderRadius: 2,
+                            px: 2,
+                            py: 1,
+                            transition: "all 0.2s ease",
+                            "&:hover": {
+                              bgcolor: "rgba(255, 255, 255, 0.9)",
+                              transform: "scale(1.02)",
+                            },
+                          }}
+                        >
+                          <Avatar
+                            src={userCharacter.image_url || ""}
+                            alt={userCharacter.name}
+                            sx={{ width: 40, height: 40 }}
+                          >
+                            {userCharacter.name?.charAt(0) || "?"}
+                          </Avatar>
+                          <Typography
+                            sx={{
+                              color: "#ff6b6b",
+                              fontWeight: "bold",
+                              fontSize: "0.95rem",
+                            }}
+                          >
+                            Play as {userCharacter.name}
+                          </Typography>
+                        </Stack>
+                      </Link>
                     )}
                     {currentFight && (
                       <Button
