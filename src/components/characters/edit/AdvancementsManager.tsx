@@ -2,7 +2,14 @@
 
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
-import { Stack, Box, IconButton, Typography, Button } from "@mui/material"
+import {
+  Stack,
+  Box,
+  IconButton,
+  Typography,
+  Button,
+  CircularProgress,
+} from "@mui/material"
 import { useState, useEffect } from "react"
 import {
   SaveButton,
@@ -31,15 +38,19 @@ export default function AdvancementsManager({
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingDescription, setEditingDescription] = useState("")
   const [loading, setLoading] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(true)
 
   // Fetch advancements when component mounts or character changes
   useEffect(() => {
     const fetchAdvancements = async () => {
+      setInitialLoading(true)
       try {
         const response = await client.getAdvancements(character.id)
         setAdvancements(response.data)
       } catch (error) {
         console.error("Error fetching advancements:", error)
+      } finally {
+        setInitialLoading(false)
       }
     }
 
@@ -167,7 +178,11 @@ export default function AdvancementsManager({
         </Box>
       )}
 
-      {advancements.length === 0 ? (
+      {initialLoading ? (
+        <Box sx={{ p: 2, textAlign: "center" }}>
+          <CircularProgress size={24} />
+        </Box>
+      ) : advancements.length === 0 ? (
         <Box sx={{ p: 2, textAlign: "center" }}>
           <Typography variant="body2" color="text.secondary">
             No advancements yet. Track your character&apos;s growth and
