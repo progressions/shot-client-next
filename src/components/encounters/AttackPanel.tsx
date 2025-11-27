@@ -1,16 +1,26 @@
 "use client"
 
-import { Box } from "@mui/material"
+/**
+ * AttackPanel - Attack Panel with improved UX flow
+ *
+ * Key features:
+ * 1. Top-to-bottom workflow that matches natural reading order
+ * 2. Prominent "Action Zone" at the bottom for Swerve/Apply - the final step
+ * 3. Compact attacker bar at top (expandable for details)
+ * 4. Clear visual hierarchy: Attacker → Targets → Resolve
+ * 5. Attack resolution is visually prominent and unmissable
+ */
+
+import { Box, Typography } from "@mui/material"
 import { GiSwordsPower } from "react-icons/gi"
 import { useEncounter } from "@/contexts"
 import { CS } from "@/services"
 import type { Character } from "@/types"
 import BasePanel from "./BasePanel"
-import AttackerCombatFields from "./attacks/AttackerCombatFields"
+import AttackerBar from "./attacks/AttackerBar"
 import TargetSection from "./attacks/TargetSection"
-import WoundsSummary from "./attacks/WoundsSummary"
 import MookAttackSection from "./attacks/MookAttackSection"
-import CombatResolution from "./attacks/CombatResolution"
+import ActionZone from "./attacks/ActionZone"
 import AttackResults from "./attacks/AttackResults"
 import { useAttackPanelController } from "./attacks/useAttackPanelController"
 
@@ -65,72 +75,71 @@ export default function AttackPanel({
     fortuneBonus,
   } = formState.data
 
+  const isMookAttacker = attacker && CS.isMook(attacker)
+
   return (
     <BasePanel title="Attack" icon={<GiSwordsPower />} borderColor="error.main">
-      {/* Main Content - Two Column Grid */}
       {isReady ? (
-        <>
-          {/* Two-column layout for Attacker/Resolution and Target */}
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-              gap: 0.5,
-              p: 0.5,
-              backgroundColor: "action.hover",
-            }}
-          >
-            {/* Left Column: Attacker and Resolution */}
-            <Box sx={{ minWidth: 0 }}>
-              <AttackerCombatFields
-                formState={formState}
-                dispatchForm={dispatchForm}
-                attacker={attacker}
-                attackerWeapons={attackerWeapons}
-                selectedTargetIds={selectedTargetIds}
-                allShots={allShots}
-              />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 1.5,
+            p: 1,
+          }}
+        >
+          {/* STEP 1: Attacker Stats (Compact Bar) */}
+          <Box>
+            <Typography
+              variant="caption"
+              sx={{
+                display: "block",
+                mb: 0.5,
+                color: "text.secondary",
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                fontSize: "0.65rem",
+              }}
+            >
+              Step 1: Attacker
+            </Typography>
+            <AttackerBar
+              formState={formState}
+              dispatchForm={dispatchForm}
+              attacker={attacker}
+              attackerWeapons={attackerWeapons}
+              selectedTargetIds={selectedTargetIds}
+              allShots={allShots}
+            />
+          </Box>
 
-              {/* Resolution Section - below Attacker */}
-              <Box sx={{ mt: 1 }}>
-                {/* Show different UI for mook attackers */}
-                {attacker && CS.isMook(attacker) ? (
-                  <MookAttackSection
-                    attacker={attacker}
-                    allShots={allShots}
-                    selectedTargetIds={selectedTargetIds}
-                    mookRolls={mookRolls}
-                    showMookRolls={showMookRolls}
-                    totalAttackingMooks={totalAttackingMooks}
-                    finalDamage={finalDamage}
-                    shotCost={shotCost}
-                    attackValue={attackValue}
-                    isProcessing={isProcessing}
-                    updateField={updateField}
-                    handleRollMookAttacks={handleRollMookAttacks}
-                    handleApplyDamage={handleApplyDamage}
-                  />
-                ) : (
-                  <CombatResolution
-                    attacker={attacker}
-                    allShots={allShots}
-                    selectedTargetIds={selectedTargetIds}
-                    swerve={swerve}
-                    smackdown={smackdown}
-                    finalDamage={finalDamage}
-                    shotCost={shotCost}
-                    showMultiTargetResults={showMultiTargetResults}
-                    multiTargetResults={multiTargetResults}
-                    isProcessing={isProcessing}
-                    updateField={updateField}
-                    handleApplyDamage={handleApplyDamage}
-                  />
-                )}
-              </Box>
-            </Box>
-
-            {/* Right Column: Target */}
-            <Box sx={{ minWidth: 0 }}>
+          {/* STEP 2: Target Selection */}
+          <Box>
+            <Typography
+              variant="caption"
+              sx={{
+                display: "block",
+                mb: 0.5,
+                color: "text.secondary",
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                fontSize: "0.65rem",
+              }}
+            >
+              Step 2: Select Target{selectedTargetIds.length > 1 ? "s" : ""}
+            </Typography>
+            <Box
+              sx={{
+                backgroundColor: "background.paper",
+                borderRadius: 1,
+                border: "1px solid",
+                borderColor:
+                  selectedTargetIds.length > 0 ? "warning.main" : "divider",
+                transition: "border-color 0.2s ease",
+              }}
+            >
               <TargetSection
                 allShots={allShots}
                 sortedTargetShots={sortedTargetShots}
@@ -148,10 +157,99 @@ export default function AttackPanel({
             </Box>
           </Box>
 
-          {/* Bottom Section - Attack Results */}
-          <Box sx={{ p: 0.5, backgroundColor: "background.default" }}>
-            {/* Attack Results for Non-Mook Attackers (single or multiple targets) */}
-            {showMultiTargetResults && (
+          {/* STEP 3: Resolve Attack - THE PROMINENT ACTION ZONE */}
+          <Box>
+            <Typography
+              variant="caption"
+              sx={{
+                display: "block",
+                mb: 0.5,
+                color:
+                  selectedTargetIds.length > 0
+                    ? "error.main"
+                    : "text.secondary",
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                fontSize: "0.65rem",
+                transition: "color 0.2s ease",
+              }}
+            >
+              Step 3: Resolve Attack
+            </Typography>
+
+            {/* For Mook Attackers - use existing MookAttackSection */}
+            {isMookAttacker ? (
+              <Box
+                sx={{
+                  backgroundColor: "background.paper",
+                  borderRadius: 1,
+                  border: "2px solid",
+                  borderColor: "error.main",
+                  p: 1,
+                }}
+              >
+                <MookAttackSection
+                  attacker={attacker}
+                  allShots={allShots}
+                  selectedTargetIds={selectedTargetIds}
+                  mookRolls={mookRolls}
+                  showMookRolls={showMookRolls}
+                  totalAttackingMooks={totalAttackingMooks}
+                  finalDamage={finalDamage}
+                  shotCost={shotCost}
+                  attackValue={attackValue}
+                  isProcessing={isProcessing}
+                  updateField={updateField}
+                  handleRollMookAttacks={handleRollMookAttacks}
+                  handleApplyDamage={handleApplyDamage}
+                />
+              </Box>
+            ) : (
+              /* For Non-Mook Attackers - use new ActionZone */
+              <ActionZone
+                attackValue={attackValue}
+                swerve={swerve}
+                smackdown={smackdown}
+                finalDamage={finalDamage}
+                shotCost={shotCost}
+                defenseValue={defenseValue}
+                weaponDamage={weaponDamage}
+                selectedTargetIds={selectedTargetIds}
+                allShots={allShots}
+                attacker={attacker}
+                showMultiTargetResults={showMultiTargetResults}
+                multiTargetResults={multiTargetResults}
+                isProcessing={isProcessing}
+                updateField={updateField}
+                handleApplyDamage={handleApplyDamage}
+              />
+            )}
+          </Box>
+
+          {/* Attack Results Detail (expandable, less prominent) */}
+          {showMultiTargetResults && multiTargetResults.length > 1 && (
+            <Box
+              sx={{
+                backgroundColor: "action.hover",
+                borderRadius: 1,
+                p: 1,
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{
+                  display: "block",
+                  mb: 1,
+                  color: "text.secondary",
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  fontSize: "0.65rem",
+                }}
+              >
+                Attack Breakdown
+              </Typography>
               <AttackResults
                 attacker={attacker}
                 attackerWeapons={attackerWeapons}
@@ -168,25 +266,9 @@ export default function AttackPanel({
                 calculateEffectiveAttackValue={calculateEffectiveAttackValue}
                 calculateTargetDefense={calculateTargetDefense}
               />
-            )}
-
-            {/* Summary of wounds to apply */}
-            {showMultiTargetResults && multiTargetResults.length > 0 && (
-              <WoundsSummary
-                multiTargetResults={multiTargetResults}
-                allShots={allShots}
-                calculateTargetDefense={calculateTargetDefense}
-                defenseChoicePerTarget={defenseChoicePerTarget}
-                selectedTargetIds={selectedTargetIds}
-                attackValue={attackValue}
-                swerve={swerve}
-                weaponDamage={weaponDamage}
-                targetMookCount={targetMookCount}
-                finalDamage={finalDamage}
-              />
-            )}
-          </Box>
-        </>
+            </Box>
+          )}
+        </Box>
       ) : null}
     </BasePanel>
   )
