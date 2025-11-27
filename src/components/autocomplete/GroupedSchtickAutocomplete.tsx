@@ -75,7 +75,7 @@ export function GroupedSchtickAutocomplete({
     <Autocomplete
       options={options}
       getOptionLabel={option => option.name}
-      getOptionKey={option => option.id}
+      getOptionKey={option => String(option.id)}
       groupBy={option => option.group}
       renderGroup={params => (
         <li key={params.key}>
