@@ -79,20 +79,25 @@ export default function PlayerEncounterView({
           py: 1,
           px: 2,
           mb: 1,
-          backgroundColor: "primary.main",
+          backgroundColor: currentShot === 0 ? "warning.main" : "primary.main",
           borderRadius: 1,
         }}
       >
         <Typography
           variant="h6"
           sx={{
-            color: "primary.contrastText",
+            color:
+              currentShot === 0
+                ? "warning.contrastText"
+                : "primary.contrastText",
             fontWeight: "bold",
             textTransform: "uppercase",
             letterSpacing: 1,
           }}
         >
-          Current Shot: {currentShot ?? "—"}
+          {currentShot === 0
+            ? `Waiting for Sequence ${(encounter?.sequence ?? 0) + 1}`
+            : `Current Shot: ${currentShot ?? "—"}`}
         </Typography>
       </Box>
 
