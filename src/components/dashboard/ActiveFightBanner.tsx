@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 import {
   Paper,
   Box,
@@ -25,7 +25,6 @@ export default function ActiveFightBanner({
   campaignId,
   userId,
 }: ActiveFightBannerProps) {
-  const router = useRouter()
   const { subscribeToEntity } = useApp()
   const { client } = useClient()
   const [currentFight, setCurrentFight] = useState<Fight | null>(null)
@@ -133,18 +132,6 @@ export default function ActiveFightBanner({
     }
   }, [subscribeToEntity, currentFight?.id, fetchCurrentFight, currentFight])
 
-  const handleJoinFight = () => {
-    if (currentFight) {
-      router.push(`/encounters/${currentFight.id}`)
-    }
-  }
-
-  const handlePlayAsCharacter = () => {
-    if (currentFight && userCharacter) {
-      router.push(`/encounters/${currentFight.id}/play/${userCharacter.id}`)
-    }
-  }
-
   // Don't render anything if no fight is active
   if (!loading && !currentFight) {
     return null
@@ -229,16 +216,19 @@ export default function ActiveFightBanner({
                   </Box>
 
                   <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
-                    {userCharacter && (
+                    {userCharacter && currentFight && (
                       <Button
+                        component={Link}
+                        href={`/encounters/${currentFight.id}/play/${userCharacter.id}`}
+                        target="_blank"
                         variant="contained"
                         size="large"
-                        onClick={handlePlayAsCharacter}
                         startIcon={<FaUser />}
                         sx={{
                           bgcolor: "white",
                           color: "#ff6b6b",
                           fontWeight: "bold",
+                          textDecoration: "none",
                           "&:hover": {
                             bgcolor: "rgba(255, 255, 255, 0.9)",
                           },
@@ -248,27 +238,28 @@ export default function ActiveFightBanner({
                         Play as {userCharacter.name}
                       </Button>
                     )}
-                    <Button
-                      variant="contained"
-                      size="large"
-                      onClick={handleJoinFight}
-                      startIcon={<FaPlay />}
-                      sx={{
-                        bgcolor: userCharacter
-                          ? "rgba(255, 255, 255, 0.2)"
-                          : "white",
-                        color: userCharacter ? "white" : "#ff6b6b",
-                        fontWeight: "bold",
-                        "&:hover": {
-                          bgcolor: userCharacter
-                            ? "rgba(255, 255, 255, 0.3)"
-                            : "rgba(255, 255, 255, 0.9)",
-                        },
-                        minWidth: 150,
-                      }}
-                    >
-                      {userCharacter ? "Manage Fight" : "Join Fight"}
-                    </Button>
+                    {currentFight && (
+                      <Button
+                        component={Link}
+                        href={`/encounters/${currentFight.id}`}
+                        target="_blank"
+                        variant="contained"
+                        size="large"
+                        startIcon={<FaPlay />}
+                        sx={{
+                          bgcolor: "white",
+                          color: "#ff6b6b",
+                          fontWeight: "bold",
+                          textDecoration: "none",
+                          "&:hover": {
+                            bgcolor: "rgba(255, 255, 255, 0.9)",
+                          },
+                          minWidth: 150,
+                        }}
+                      >
+                        {userCharacter ? "Manage Fight" : "Join Fight"}
+                      </Button>
+                    )}
                   </Stack>
                 </Stack>
               )}
