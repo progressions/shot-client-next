@@ -301,16 +301,17 @@ export default function ShotCarousel({
         }}
         disableRestoreFocus
         disableScrollLock
-        sx={{ pointerEvents: "none" }}
-        PaperProps={{
-          sx: { maxWidth: "90vw", maxHeight: "50vh", overflow: "auto" },
+        disableAutoFocus
+        disableEnforceFocus
+        slotProps={{
+          paper: {
+            sx: { maxWidth: "90vw", maxHeight: "50vh", overflow: "auto" },
+            onMouseEnter: handlePopupMouseEnter,
+            onMouseLeave: handlePopupMouseLeave,
+          },
         }}
       >
-        <Box
-          sx={{ px: 2, maxWidth: 400, pointerEvents: "auto" }}
-          onMouseEnter={handlePopupMouseEnter}
-          onMouseLeave={handlePopupMouseLeave}
-        >
+        <Box sx={{ px: 2, maxWidth: 400 }}>
           {popupCharacterId && <CharacterPopup id={popupCharacterId} />}
         </Box>
       </Popover>
