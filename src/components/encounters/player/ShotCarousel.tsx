@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useRef, useState, useCallback } from "react"
+import React, { useRef, useState, useCallback, useEffect } from "react"
 import { Box, IconButton, Popover } from "@mui/material"
 import { ChevronLeft, ChevronRight } from "@mui/icons-material"
 import { EntityAvatar } from "@/components/avatars"
@@ -57,6 +57,11 @@ export default function ShotCarousel({
     setCanScrollLeft(scrollLeft > 0)
     setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1)
   }, [])
+
+  // Check scroll position on mount to accurately determine if scrolling is needed
+  useEffect(() => {
+    checkScrollPosition()
+  }, [checkScrollPosition])
 
   // Scroll handlers
   const scrollLeft = useCallback(() => {
