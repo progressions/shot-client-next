@@ -125,6 +125,33 @@ export const sortTargetShots = (
 }
 
 /**
+ * Find a character by ID in all shots (including hidden ones)
+ * Used for player view where the player should see their own character even if hidden
+ */
+export const findCharacterInAllShots = (
+  encounterShots: unknown[],
+  characterId: string
+): Character | null => {
+  if (!encounterShots || !Array.isArray(encounterShots)) {
+    return null
+  }
+
+  for (const shotGroupUnknown of encounterShots) {
+    const shotGroup = shotGroupUnknown as Record<string, unknown>
+    if (shotGroup.characters && Array.isArray(shotGroup.characters)) {
+      const found = shotGroup.characters.find(
+        (char: Character) => char.id === characterId
+      )
+      if (found) {
+        return found
+      }
+    }
+  }
+
+  return null
+}
+
+/**
  * Get all visible shots from encounter
  */
 export const getAllVisibleShots = (encounterShots: unknown[]): Shot[] => {
