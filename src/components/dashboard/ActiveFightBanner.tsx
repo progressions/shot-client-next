@@ -5,7 +5,6 @@ import {
   Paper,
   Box,
   Typography,
-  Button,
   Chip,
   Stack,
   Skeleton,
@@ -15,6 +14,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import { FaFire, FaUsers, FaPlay } from "react-icons/fa6"
 import { useApp, useClient } from "@/contexts"
 import type { Fight } from "@/types"
+import { PlayAsCharacterPopup } from "@/components/popups"
+import EntityLink from "@/components/ui/links/EntityLink"
 
 interface ActiveFightBannerProps {
   campaignId: string
@@ -31,11 +32,10 @@ export default function ActiveFightBanner({
   const [currentFight, setCurrentFight] = useState<Fight | null>(null)
   const [loading, setLoading] = useState(true)
   const [participantCount, setParticipantCount] = useState(0)
-
-  // Find user's character in the fight (if any)
-  const userCharacter = useMemo(() => {
-    if (!currentFight?.characters || !userId) return null
-    return currentFight.characters.find(char => char.user_id === userId) || null
+  // Find all user's characters in the fight
+  const userCharacters = useMemo(() => {
+    if (!currentFight?.characters || !userId) return []
+    return currentFight.characters.filter(char => char.user_id === userId)
   }, [currentFight?.characters, userId])
 
   const fetchCurrentFight = useCallback(async () => {
@@ -221,9 +221,43 @@ export default function ActiveFightBanner({
                     spacing={1}
                     alignItems="center"
                   >
-                    {userCharacter && currentFight && (
+                    {userCharacters.length > 0 && currentFight && (
+                      <Stack direction="row" spacing={1}>
+                        {userCharacters.map(character => (
+                          <EntityLink
+                            key={character.id}
+                            entity={{
+                              id: character.id,
+                              name: character.name,
+                              entity_class: "Character",
+                            }}
+                            href={`/encounters/${currentFight.id}/play/${character.id}`}
+                            popupOverride={PlayAsCharacterPopup}
+                            noUnderline
+                          >
+                            <Avatar
+                              src={character.image_url || ""}
+                              alt={character.name}
+                              sx={{
+                                width: 48,
+                                height: 48,
+                                border: "3px solid white",
+                                transition: "all 0.2s ease",
+                                "&:hover": {
+                                  transform: "scale(1.1)",
+                                  boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                                },
+                              }}
+                            >
+                              {character.name?.charAt(0) || "?"}
+                            </Avatar>
+                          </EntityLink>
+                        ))}
+                      </Stack>
+                    )}
+                    {currentFight && (
                       <Link
-                        href={`/encounters/${currentFight.id}/play/${userCharacter.id}`}
+                        href={`/encounters/${currentFight.id}`}
                         target="_blank"
                         style={{ textDecoration: "none" }}
                       >
@@ -243,13 +277,7 @@ export default function ActiveFightBanner({
                             },
                           }}
                         >
-                          <Avatar
-                            src={userCharacter.image_url || ""}
-                            alt={userCharacter.name}
-                            sx={{ width: 40, height: 40 }}
-                          >
-                            {userCharacter.name?.charAt(0) || "?"}
-                          </Avatar>
+                          <FaPlay color="#ff6b6b" />
                           <Typography
                             sx={{
                               color: "#ff6b6b",
@@ -257,33 +285,12 @@ export default function ActiveFightBanner({
                               fontSize: "0.95rem",
                             }}
                           >
-                            Play as {userCharacter.name}
+                            {userCharacters.length > 0
+                              ? "Manage Fight"
+                              : "Join Fight"}
                           </Typography>
                         </Stack>
                       </Link>
-                    )}
-                    {currentFight && (
-                      <Button
-                        component={Link}
-                        href={`/encounters/${currentFight.id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        variant="contained"
-                        size="large"
-                        startIcon={<FaPlay />}
-                        sx={{
-                          bgcolor: "white",
-                          color: "#ff6b6b",
-                          fontWeight: "bold",
-                          textDecoration: "none",
-                          "&:hover": {
-                            bgcolor: "rgba(255, 255, 255, 0.9)",
-                          },
-                          minWidth: 150,
-                        }}
-                      >
-                        {userCharacter ? "Manage Fight" : "Join Fight"}
-                      </Button>
                     )}
                   </Stack>
                 </Stack>
