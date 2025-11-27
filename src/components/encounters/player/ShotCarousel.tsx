@@ -27,6 +27,17 @@ export default function ShotCarousel({
   const popupTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+  // Cleanup timeouts on unmount to prevent memory leaks
+  React.useEffect(() => {
+    return () => {
+      if (popupTimeoutRef.current) {
+        clearTimeout(popupTimeoutRef.current)
+      }
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current)
+      }
+    }
+  }, [])
   // Get visible shots and group by shot number
   const visibleShots = getAllVisibleShots(shots)
 
