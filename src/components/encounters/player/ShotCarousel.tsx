@@ -73,7 +73,10 @@ export default function ShotCarousel({
 
   // Popup handlers
   const handleMouseEnter = useCallback(
-    (event: React.MouseEvent<HTMLElement>, characterId: string) => {
+    (
+      event: React.MouseEvent<HTMLElement> | React.FocusEvent<HTMLElement>,
+      characterId: string
+    ) => {
       // Clear any pending close timeout
       if (closeTimeoutRef.current) {
         clearTimeout(closeTimeoutRef.current)
@@ -223,6 +226,11 @@ export default function ShotCarousel({
                   key={character.shot_id || character.id}
                   onMouseEnter={e => handleMouseEnter(e, character.id)}
                   onMouseLeave={handleMouseLeave}
+                  onFocus={e => handleMouseEnter(e, character.id)}
+                  onBlur={handleMouseLeave}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`View ${character.name || "character"} details`}
                   sx={{
                     display: "flex",
                     alignItems: "center",
