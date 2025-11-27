@@ -12,6 +12,7 @@ import PlayerStatus from "./PlayerStatus"
 import PlayerActions from "./PlayerActions"
 import PlayerInfo from "./PlayerInfo"
 import PlayerEffects from "./PlayerEffects"
+import ShotCarousel from "./ShotCarousel"
 
 interface PlayerEncounterViewProps {
   characterId: string
@@ -94,6 +95,11 @@ export default function PlayerEncounterView({
           Current Shot: {currentShot ?? "—"}
         </Typography>
       </Box>
+
+      {/* Shot Carousel - shows all characters in shot order */}
+      {encounter?.shots && (
+        <ShotCarousel shots={encounter.shots} currentShot={currentShot} />
+      )}
 
       {/* Main Panel - BasePanel style */}
       <Paper
