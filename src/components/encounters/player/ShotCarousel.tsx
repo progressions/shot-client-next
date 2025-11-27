@@ -157,6 +157,7 @@ export default function ShotCarousel({
       {canScrollLeft && (
         <IconButton
           onClick={scrollLeft}
+          aria-label="Scroll left"
           sx={{
             position: "absolute",
             left: 0,
@@ -268,6 +269,7 @@ export default function ShotCarousel({
       {canScrollRight && (
         <IconButton
           onClick={scrollRight}
+          aria-label="Scroll right"
           sx={{
             position: "absolute",
             right: 0,
