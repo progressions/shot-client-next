@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 import {
   Paper,
   Box,
@@ -9,9 +9,10 @@ import {
   Chip,
   Stack,
   Skeleton,
+  Avatar,
 } from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
-import { FaFire, FaUsers, FaPlay, FaUser } from "react-icons/fa6"
+import { FaFire, FaUsers, FaPlay } from "react-icons/fa6"
 import { useApp, useClient } from "@/contexts"
 import type { Fight } from "@/types"
 
@@ -25,7 +26,6 @@ export default function ActiveFightBanner({
   campaignId,
   userId,
 }: ActiveFightBannerProps) {
-  const router = useRouter()
   const { subscribeToEntity } = useApp()
   const { client } = useClient()
   const [currentFight, setCurrentFight] = useState<Fight | null>(null)
@@ -133,18 +133,6 @@ export default function ActiveFightBanner({
     }
   }, [subscribeToEntity, currentFight?.id, fetchCurrentFight, currentFight])
 
-  const handleJoinFight = () => {
-    if (currentFight) {
-      router.push(`/encounters/${currentFight.id}`)
-    }
-  }
-
-  const handlePlayAsCharacter = () => {
-    if (currentFight && userCharacter) {
-      router.push(`/encounters/${currentFight.id}/play/${userCharacter.id}`)
-    }
-  }
-
   // Don't render anything if no fight is active
   if (!loading && !currentFight) {
     return null
@@ -228,47 +216,75 @@ export default function ActiveFightBanner({
                     </Stack>
                   </Box>
 
-                  <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
-                    {userCharacter && (
+                  <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    spacing={1}
+                    alignItems="center"
+                  >
+                    {userCharacter && currentFight && (
+                      <Link
+                        href={`/encounters/${currentFight.id}/play/${userCharacter.id}`}
+                        target="_blank"
+                        style={{ textDecoration: "none" }}
+                      >
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          alignItems="center"
+                          sx={{
+                            bgcolor: "white",
+                            borderRadius: 2,
+                            px: 2,
+                            py: 1,
+                            transition: "all 0.2s ease",
+                            "&:hover": {
+                              bgcolor: "rgba(255, 255, 255, 0.9)",
+                              transform: "scale(1.02)",
+                            },
+                          }}
+                        >
+                          <Avatar
+                            src={userCharacter.image_url || ""}
+                            alt={userCharacter.name}
+                            sx={{ width: 40, height: 40 }}
+                          >
+                            {userCharacter.name?.charAt(0) || "?"}
+                          </Avatar>
+                          <Typography
+                            sx={{
+                              color: "#ff6b6b",
+                              fontWeight: "bold",
+                              fontSize: "0.95rem",
+                            }}
+                          >
+                            Play as {userCharacter.name}
+                          </Typography>
+                        </Stack>
+                      </Link>
+                    )}
+                    {currentFight && (
                       <Button
+                        component={Link}
+                        href={`/encounters/${currentFight.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         variant="contained"
                         size="large"
-                        onClick={handlePlayAsCharacter}
-                        startIcon={<FaUser />}
+                        startIcon={<FaPlay />}
                         sx={{
                           bgcolor: "white",
                           color: "#ff6b6b",
                           fontWeight: "bold",
+                          textDecoration: "none",
                           "&:hover": {
                             bgcolor: "rgba(255, 255, 255, 0.9)",
                           },
                           minWidth: 150,
                         }}
                       >
-                        Play as {userCharacter.name}
+                        {userCharacter ? "Manage Fight" : "Join Fight"}
                       </Button>
                     )}
-                    <Button
-                      variant="contained"
-                      size="large"
-                      onClick={handleJoinFight}
-                      startIcon={<FaPlay />}
-                      sx={{
-                        bgcolor: userCharacter
-                          ? "rgba(255, 255, 255, 0.2)"
-                          : "white",
-                        color: userCharacter ? "white" : "#ff6b6b",
-                        fontWeight: "bold",
-                        "&:hover": {
-                          bgcolor: userCharacter
-                            ? "rgba(255, 255, 255, 0.3)"
-                            : "rgba(255, 255, 255, 0.9)",
-                        },
-                        minWidth: 150,
-                      }}
-                    >
-                      {userCharacter ? "Manage Fight" : "Join Fight"}
-                    </Button>
                   </Stack>
                 </Stack>
               )}
