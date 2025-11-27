@@ -9,11 +9,13 @@ import {
   Stack,
   Skeleton,
   Avatar,
+  Popover,
 } from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
 import { FaFire, FaUsers, FaPlay } from "react-icons/fa6"
 import { useApp, useClient } from "@/contexts"
-import type { Fight } from "@/types"
+import type { Fight, Character } from "@/types"
+import { PlayAsCharacterPopup } from "@/components/popups"
 
 interface ActiveFightBannerProps {
   campaignId: string
@@ -30,6 +32,10 @@ export default function ActiveFightBanner({
   const [currentFight, setCurrentFight] = useState<Fight | null>(null)
   const [loading, setLoading] = useState(true)
   const [participantCount, setParticipantCount] = useState(0)
+  const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null)
+  const [hoveredCharacter, setHoveredCharacter] = useState<Character | null>(
+    null
+  )
 
   // Find all user's characters in the fight
   const userCharacters = useMemo(() => {
@@ -227,7 +233,14 @@ export default function ActiveFightBanner({
                             key={character.id}
                             href={`/encounters/${currentFight.id}/play/${character.id}`}
                             target="_blank"
-                            title={`Play as ${character.name}`}
+                            onMouseEnter={e => {
+                              setPopoverAnchor(e.currentTarget)
+                              setHoveredCharacter(character as Character)
+                            }}
+                            onMouseLeave={() => {
+                              setPopoverAnchor(null)
+                              setHoveredCharacter(null)
+                            }}
                           >
                             <Avatar
                               src={character.image_url || ""}
@@ -249,6 +262,33 @@ export default function ActiveFightBanner({
                         ))}
                       </Stack>
                     )}
+                    <Popover
+                      open={Boolean(popoverAnchor && hoveredCharacter)}
+                      anchorEl={popoverAnchor}
+                      onClose={() => {
+                        setPopoverAnchor(null)
+                        setHoveredCharacter(null)
+                      }}
+                      anchorOrigin={{
+                        vertical: "bottom",
+                        horizontal: "center",
+                      }}
+                      transformOrigin={{
+                        vertical: "top",
+                        horizontal: "center",
+                      }}
+                      disableRestoreFocus
+                      sx={{ pointerEvents: "none" }}
+                      PaperProps={{
+                        sx: { pointerEvents: "auto" },
+                      }}
+                    >
+                      {hoveredCharacter && (
+                        <Box sx={{ px: 2 }}>
+                          <PlayAsCharacterPopup character={hoveredCharacter} />
+                        </Box>
+                      )}
+                    </Popover>
                     {currentFight && (
                       <Link
                         href={`/encounters/${currentFight.id}`}
