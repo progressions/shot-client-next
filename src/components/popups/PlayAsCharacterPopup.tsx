@@ -8,6 +8,10 @@ import { useClient } from "@/contexts/AppContext"
 
 interface PlayAsCharacterPopupProps {
   id: string
+  keyword?: string
+  handleClose: () => void
+  anchorEl: HTMLElement | null
+  open: boolean
   keyword: string
   handleClose: () => void
   anchorEl: HTMLElement | null
