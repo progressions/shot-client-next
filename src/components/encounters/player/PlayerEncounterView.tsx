@@ -3,7 +3,7 @@
 import { useMemo, useEffect } from "react"
 import { Box, Typography, Paper, IconButton } from "@mui/material"
 import { useEncounter } from "@/contexts"
-import { getAllVisibleShots } from "@/components/encounters/attacks/shotSorting"
+import { findCharacterInAllShots } from "@/components/encounters/attacks/shotSorting"
 import Link from "next/link"
 import { ArrowBack } from "@mui/icons-material"
 import { GiPerson } from "react-icons/gi"
@@ -24,15 +24,10 @@ export default function PlayerEncounterView({
 
   // Find the character in the encounter
   // The characterId passed in the URL is the database ID (character.id), not the shot ID
+  // Use findCharacterInAllShots to include hidden characters - players should see their own character even if hidden
   const character = useMemo(() => {
     if (!encounter?.shots) return null
-
-    const allShots = getAllVisibleShots(encounter.shots)
-
-    // Search through all shots to find the matching character
-    const foundShot = allShots.find(s => s.character?.id === characterId)
-
-    return foundShot?.character || null
+    return findCharacterInAllShots(encounter.shots, characterId)
   }, [encounter?.shots, characterId])
 
   useEffect(() => {
