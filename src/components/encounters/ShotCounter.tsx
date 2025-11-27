@@ -8,7 +8,7 @@ import {
   CharacterSelector,
   EncounterActionBar,
   CharacterDetail,
-  AttackPanelV2 as AttackPanel,
+  AttackPanel,
   BoostPanel,
   ChasePanel,
   HealPanel,

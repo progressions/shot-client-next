@@ -22,7 +22,7 @@ import {
 } from "@mui/icons-material"
 import type { Character } from "@/types"
 import {
-  AttackPanelV2 as AttackPanel,
+  AttackPanel,
   BoostPanel,
   CheeseItPanel,
   HealPanel,
