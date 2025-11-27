@@ -83,14 +83,18 @@ export function createSchtickClient(deps: ClientDependencies) {
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<SchticksResponse>> {
     const query = queryParams(parameters)
-    return get(`${api.characterSchticks(character)}?${query}`, {}, cacheOptions)
+    return get(
+      `${apiV2.characterSchticks(character)}?${query}`,
+      {},
+      cacheOptions
+    )
   }
 
   async function addSchtick(
     character: Character | string,
     schtick: Schtick
   ): Promise<AxiosResponse<Character>> {
-    return post(api.characterSchticks(character), { schtick: schtick })
+    return post(apiV2.characterSchticks(character), { schtick: schtick })
   }
 
   async function uploadSchticks(content: string): Promise<AxiosResponse<void>> {
@@ -101,7 +105,7 @@ export function createSchtickClient(deps: ClientDependencies) {
     character: Character | string,
     schtick: Schtick | string
   ): Promise<AxiosResponse<void>> {
-    return delete_(api.characterSchticks(character, schtick))
+    return delete_(apiV2.characterSchticks(character, schtick))
   }
 
   return {
