@@ -243,6 +243,7 @@ export default function ActiveFightBanner({
                         component={Link}
                         href={`/encounters/${currentFight.id}`}
                         target="_blank"
+                        rel="noopener noreferrer"
                         variant="contained"
                         size="large"
                         startIcon={<FaPlay />}
