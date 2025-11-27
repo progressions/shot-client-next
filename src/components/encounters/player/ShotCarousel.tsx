@@ -226,8 +226,8 @@ export default function ShotCarousel({
 
             {/* Characters at this shot */}
             {shotsInGroup.map(shot => {
+              if (!shot.character) return null
               const character = shot.character as Character
-              if (!character) return null
 
               return (
                 <Box
