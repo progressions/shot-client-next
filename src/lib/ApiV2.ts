@@ -81,6 +81,11 @@ class ApiV2 {
       : `${this.api()}/parties`
   }
 
+  partyMembers(party: Party | ID, memberId?: string): string {
+    const partyUrl = this.parties(party)
+    return memberId ? `${partyUrl}/members/${memberId}` : `${partyUrl}/members`
+  }
+
   weapons(weapon?: Weapon | ID): string {
     return weapon?.id
       ? `${this.api()}/weapons/${weapon.id}`
@@ -175,6 +180,20 @@ class ApiV2 {
       return `${characterUrl}/advancements/${advancementId}`
     }
     return `${characterUrl}/advancements`
+  }
+
+  characterWeapons(character: Character | ID, weapon?: Weapon | ID): string {
+    const characterUrl = this.characters(character)
+    return weapon?.id
+      ? `${characterUrl}/weapons/${weapon.id}`
+      : `${characterUrl}/weapons`
+  }
+
+  characterSchticks(character: Character | ID, schtick?: Schtick | ID): string {
+    const characterUrl = this.characters(character)
+    return schtick?.id
+      ? `${characterUrl}/schticks/${schtick.id}`
+      : `${characterUrl}/schticks`
   }
 
   notionCharacters(): string {

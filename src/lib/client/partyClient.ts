@@ -6,6 +6,8 @@ import type {
   CacheOptions,
   Parameters_,
   Fight,
+  Character,
+  Vehicle,
 } from "@/types"
 
 interface ClientDependencies {
@@ -23,28 +25,36 @@ export function createPartyClient(deps: ClientDependencies) {
     party: Party | string,
     character: Character | string
   ): Promise<AxiosResponse<Party>> {
-    return post(api.memberships(party), { character_id: character.id })
+    const partyId = typeof party === "string" ? party : party.id
+    const characterId = typeof character === "string" ? character : character.id
+    return post(apiV2.partyMembers({ id: partyId }), {
+      character_id: characterId,
+    })
   }
 
   async function addVehicleToParty(
     party: Party | string,
     vehicle: Vehicle | string
   ): Promise<AxiosResponse<Party>> {
-    return post(api.memberships(party), { vehicle_id: vehicle.id })
+    const partyId = typeof party === "string" ? party : party.id
+    const vehicleId = typeof vehicle === "string" ? vehicle : vehicle.id
+    return post(apiV2.partyMembers({ id: partyId }), { vehicle_id: vehicleId })
   }
 
   async function removeCharacterFromParty(
     party: Party | string,
-    character: Character | string
-  ): Promise<AxiosResponse<Party>> {
-    return delete_(`${api.memberships(party, character)}/character`)
+    membershipId: string
+  ): Promise<AxiosResponse<void>> {
+    const partyId = typeof party === "string" ? party : party.id
+    return delete_(apiV2.partyMembers({ id: partyId }, membershipId))
   }
 
   async function removeVehicleFromParty(
     party: Party | string,
-    vehicle: Vehicle | string
-  ): Promise<AxiosResponse<Party>> {
-    return delete_(`${api.memberships(party, vehicle)}/vehicle`)
+    membershipId: string
+  ): Promise<AxiosResponse<void>> {
+    const partyId = typeof party === "string" ? party : party.id
+    return delete_(apiV2.partyMembers({ id: partyId }, membershipId))
   }
 
   async function getParties(

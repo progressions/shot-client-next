@@ -87,7 +87,7 @@ export function createWeaponClient(deps: ClientDependencies) {
     character: Character | string,
     weapon: Weapon
   ): Promise<AxiosResponse<Character>> {
-    return post(api.characterWeapons(character), { weapon: weapon })
+    return post(apiV2.characterWeapons(character), { weapon: weapon })
   }
 
   async function uploadWeapons(content: string): Promise<AxiosResponse<void>> {
@@ -98,7 +98,7 @@ export function createWeaponClient(deps: ClientDependencies) {
     character: Character | string,
     weapon: Weapon | string
   ): Promise<AxiosResponse<Weapon>> {
-    return delete_(api.characterWeapons(character, weapon))
+    return delete_(apiV2.characterWeapons(character, weapon))
   }
 
   async function getCharacterWeapons(
@@ -107,7 +107,11 @@ export function createWeaponClient(deps: ClientDependencies) {
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<WeaponsResponse>> {
     const query = queryParams(parameters)
-    return get(`${api.characterWeapons(character)}?${query}`, {}, cacheOptions)
+    return get(
+      `${apiV2.characterWeapons(character)}?${query}`,
+      {},
+      cacheOptions
+    )
   }
 
   return {
