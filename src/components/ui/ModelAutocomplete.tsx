@@ -144,6 +144,7 @@ export function ModelAutocomplete({
     <Autocomplete
       options={options}
       getOptionLabel={option => option.name}
+      getOptionKey={option => String(option.id)}
       value={options.find(option => option.id === value) || null}
       onChange={(event, newValue) => onChange(newValue)}
       onInputChange={onInputChange}

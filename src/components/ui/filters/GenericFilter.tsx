@@ -7,6 +7,8 @@ import { SearchInput } from "../SearchInput"
 import { useCallback, useEffect, useMemo } from "react"
 import { filterConfigs } from "@/lib/filterConfigs"
 import { debounce } from "lodash"
+import { GroupedSchtickAutocomplete } from "@/components/autocomplete/GroupedSchtickAutocomplete"
+import type { Schtick } from "@/types"
 
 interface AutocompleteOption {
   id: number
@@ -199,6 +201,24 @@ export function GenericFilter({
             records={userOptions}
             allowNone={field.allowNone ?? true}
             sx={{ width: 300 }}
+          />
+        )
+      }
+
+      // Special handling for Schticks with grouped dropdown
+      if (responseKey === "schticks") {
+        const records = (data[responseKey] || []) as Schtick[]
+
+        return (
+          <GroupedSchtickAutocomplete
+            key={field.name}
+            schticks={records}
+            value={filters?.[field.name + "_id"] as string | null}
+            onChange={newValue =>
+              changeFilter(field.name + "_id", newValue, true)
+            }
+            allowNone={field.allowNone ?? true}
+            sx={{ width: 350 }}
           />
         )
       }
