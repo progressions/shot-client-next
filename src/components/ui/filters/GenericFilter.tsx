@@ -233,8 +233,12 @@ export function GenericFilter({
           }
           onInputChange={
             debouncedSearchUpdate && field.name === primaryField.name
-              ? (_event, newValue) =>
-                  debouncedSearchUpdate(newValue ?? "", filters)
+              ? (_event, newValue, reason) => {
+                  // Only trigger search on user input, not on selection or reset
+                  if (reason === "input") {
+                    debouncedSearchUpdate(newValue ?? "", filters)
+                  }
+                }
               : undefined
           }
           filters={{}}
