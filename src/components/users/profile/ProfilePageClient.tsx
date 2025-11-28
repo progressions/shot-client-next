@@ -17,7 +17,10 @@ import {
   HeroImage,
   EmailChangeConfirmation,
 } from "@/components/ui"
-import { CampaignsList } from "@/components/users/profile"
+import {
+  CampaignsList,
+  OnboardingMilestonesForm,
+} from "@/components/users/profile"
 import { useClient, useToast } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
 
@@ -302,6 +305,8 @@ export default function ProfilePageClient({
           </Box>
         </Stack>
       </Box>
+
+      <OnboardingMilestonesForm />
 
       <CampaignsList user={user} onUserUpdate={setUser} />
 
