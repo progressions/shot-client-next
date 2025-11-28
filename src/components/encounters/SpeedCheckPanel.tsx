@@ -174,6 +174,7 @@ export default function SpeedCheckPanel({
 
         // Then update the target's status
         characterUpdates.push({
+          shot_id: targetEscaper.shot_id,
           character_id: targetEscaper.id,
           remove_status: ["cheesing_it"],
           event: {
@@ -215,6 +216,7 @@ export default function SpeedCheckPanel({
 
         // Then update the target's status
         characterUpdates.push({
+          shot_id: targetEscaper.shot_id,
           character_id: targetEscaper.id,
           remove_status: ["cheesing_it"],
           add_status: ["cheesed_it"],
