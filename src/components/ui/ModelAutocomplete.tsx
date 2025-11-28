@@ -16,7 +16,11 @@ type ModelAutocompleteProps = {
   model: string
   value: AutocompleteOption | string | null
   onChange: (value: AutocompleteOption | string | null) => void
-  onInputChange?: (event: React.SyntheticEvent, value: string) => void
+  onInputChange?: (
+    event: React.SyntheticEvent,
+    value: string,
+    reason: "input" | "reset" | "clear"
+  ) => void
   filters: Record<string, string | boolean>
   records: AutocompleteOption[] | string[]
   allowNone: boolean
