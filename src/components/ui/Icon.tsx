@@ -31,6 +31,7 @@ import FlagIcon from "@mui/icons-material/Flag"
 import DescriptionIcon from "@mui/icons-material/Description"
 import BuildIcon from "@mui/icons-material/Build"
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings"
+import RocketLaunchIcon from "@mui/icons-material/RocketLaunch"
 import { iconColorMap, type Category } from "@/components/ui/iconColors"
 
 // Define the keyword type
@@ -64,6 +65,7 @@ type Keyword =
   | "Boost"
   | "Cheese It"
   | "Speed Check"
+  | "Onboarding"
 
 // Map keywords to categories
 const categoryMap: Record<Keyword, Category> = {
@@ -96,6 +98,7 @@ const categoryMap: Record<Keyword, Category> = {
   "Add Character": "Utility",
   "Add Vehicle": "Utility",
   Administration: "Interface",
+  Onboarding: "Interface",
 }
 
 // Map keywords to JSX icon elements
@@ -141,6 +144,7 @@ const iconMap: Record<Keyword, React.ReactElement> = {
   Boost: <FaHandFist />,
   "Cheese It": <FaPersonRunning />,
   "Speed Check": <FaDice />,
+  Onboarding: <RocketLaunchIcon />,
 }
 
 interface IconProps extends SvgIconProps {
