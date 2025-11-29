@@ -242,7 +242,6 @@ export default function ChasePanel({
     }
 
     fetchExistingRelationship()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- we want to trigger when vehicle IDs change
   }, [
     attackerVehicle?.id,
     targetVehicle?.id,
