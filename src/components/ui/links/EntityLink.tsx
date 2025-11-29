@@ -1,6 +1,6 @@
 "use client"
 import { Box, Popover, Link } from "@mui/material"
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useEffect, useCallback } from "react"
 import type { Entity } from "@/types"
 import pluralize from "pluralize"
 
@@ -43,57 +43,60 @@ export default function EntityLink({
   const [anchorEl, setAnchorEl] = useState<HTMLAnchorElement | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const target = useRef<HTMLAnchorElement>(null)
-  let openTimeoutId: NodeJS.Timeout | null = null
-  let closeTimeoutId: NodeJS.Timeout | null = null
+  const openTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  const handleMouseEnterLink = (event: MouseEvent<HTMLAnchorElement>) => {
-    if (!disablePopup) {
-      target.current = event.currentTarget as HTMLAnchorElement
-      openTimeoutId = setTimeout(() => {
-        if (closeTimeoutId) {
-          clearTimeout(closeTimeoutId)
-          closeTimeoutId = null
-        }
-        setAnchorEl(target.current)
-        setIsOpen(true)
-      }, 500)
-    }
-  }
+  const handleMouseEnterLink = useCallback(
+    (event: MouseEvent<HTMLAnchorElement>) => {
+      if (!disablePopup) {
+        target.current = event.currentTarget as HTMLAnchorElement
+        openTimeoutRef.current = setTimeout(() => {
+          if (closeTimeoutRef.current) {
+            clearTimeout(closeTimeoutRef.current)
+            closeTimeoutRef.current = null
+          }
+          setAnchorEl(target.current)
+          setIsOpen(true)
+        }, 500)
+      }
+    },
+    [disablePopup]
+  )
 
-  const handleMouseEnterPopover = () => {
-    if (closeTimeoutId) {
-      clearTimeout(closeTimeoutId)
-      closeTimeoutId = null
+  const handleMouseEnterPopover = useCallback(() => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current)
+      closeTimeoutRef.current = null
     }
-    if (openTimeoutId) {
-      clearTimeout(openTimeoutId)
-      openTimeoutId = null
+    if (openTimeoutRef.current) {
+      clearTimeout(openTimeoutRef.current)
+      openTimeoutRef.current = null
     }
-  }
+  }, [])
 
-  const handleMouseLeave = () => {
-    if (openTimeoutId) {
-      clearTimeout(openTimeoutId)
-      openTimeoutId = null
+  const handleMouseLeave = useCallback(() => {
+    if (openTimeoutRef.current) {
+      clearTimeout(openTimeoutRef.current)
+      openTimeoutRef.current = null
     }
-    closeTimeoutId = setTimeout(() => {
+    closeTimeoutRef.current = setTimeout(() => {
       setAnchorEl(null)
       setIsOpen(false)
     }, 200)
-  }
+  }, [])
 
-  const handleClose = () => {
-    if (openTimeoutId) {
-      clearTimeout(openTimeoutId)
-      openTimeoutId = null
+  const handleClose = useCallback(() => {
+    if (openTimeoutRef.current) {
+      clearTimeout(openTimeoutRef.current)
+      openTimeoutRef.current = null
     }
-    if (closeTimeoutId) {
-      clearTimeout(closeTimeoutId)
-      closeTimeoutId = null
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current)
+      closeTimeoutRef.current = null
     }
     setAnchorEl(null)
     setIsOpen(false)
-  }
+  }, [])
 
   // Update anchorEl on scroll with debouncing to prevent excessive updates
   useEffect(() => {
@@ -111,8 +114,8 @@ export default function EntityLink({
     window.addEventListener("scroll", handleScroll)
     return () => {
       window.removeEventListener("scroll", handleScroll)
-      if (openTimeoutId) clearTimeout(openTimeoutId)
-      if (closeTimeoutId) clearTimeout(closeTimeoutId)
+      if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current)
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current)
       if (scrollTimeoutId) clearTimeout(scrollTimeoutId)
     }
   }, [isOpen, entity?.id, entity?.entity_class])
