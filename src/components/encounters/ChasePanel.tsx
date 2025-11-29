@@ -102,28 +102,22 @@ export default function ChasePanel({
   useEffect(() => {
     async function fetchExistingRelationship() {
       console.log("Checking vehicles - attacker:", attacker, "target:", target)
-
-      // Get the actual vehicle IDs from the form state
-      const attackerVehicle = (
-        formState.data as ChaseFormData & { vehicle?: Vehicle }
-      ).vehicle
-      const targetVehicle = (
-        formState.data as ChaseFormData & { targetVehicle?: Vehicle }
-      ).targetVehicle
-
-      console.log("Form state vehicles:", {
-        attackerVehicle,
-        targetVehicle,
-        hasAttackerId: attackerVehicle?.id,
-        hasTargetId: targetVehicle?.id,
-      })
+      console.log(
+        "Fetching relationship for vehicles:",
+        attackerVehicle?.id,
+        targetVehicle?.id
+      )
 
       if (!attackerVehicle?.id || !targetVehicle?.id || !encounter?.id) {
-        console.log("Missing vehicle or encounter data:", {
-          attackerVehicle,
-          targetVehicle,
-          encounter: encounter?.id,
-        })
+        console.log(
+          "Missing vehicle or encounter data for relationship fetch:",
+          {
+            attackerVehicleId: attackerVehicle?.id,
+            targetVehicleId: targetVehicle?.id,
+            targetVehicle,
+            encounter: encounter?.id,
+          }
+        )
         return
       }
 
@@ -248,7 +242,14 @@ export default function ChasePanel({
     }
 
     fetchExistingRelationship()
-  }, [attacker?.id, target?.id, encounter?.id, client, dispatchForm])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- we want to trigger when vehicle IDs change
+  }, [
+    attackerVehicle?.id,
+    targetVehicle?.id,
+    encounter?.id,
+    client,
+    dispatchForm,
+  ])
 
   return (
     <BasePanel title="Chase" icon={<FaCar />} borderColor="secondary.main">
