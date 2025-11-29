@@ -76,7 +76,8 @@ export default function VehicleFilter({
     } catch (error) {
       console.error("Error fetching vehicles:", error)
     }
-  }, [client, dispatchForm, formState.data.filters]) // Only depend on filters
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-fetch when filters change
+  }, [client, dispatchForm, formState.data.filters])
 
   useEffect(() => {
     fetchVehicles().catch(error => {

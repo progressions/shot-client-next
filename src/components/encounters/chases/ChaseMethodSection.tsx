@@ -35,7 +35,6 @@ export default function ChaseMethodSection({
   vehicle,
 }: ChaseMethodSectionProps) {
   // Fortune spending state
-  const [usingFortune, setUsingFortune] = useState(false)
   const [fortuneBonus, setFortuneBonus] = useState("0")
 
   // Helper to update a field
@@ -66,6 +65,7 @@ export default function ChaseMethodSection({
       const initialValue = Math.max(7, drivingSkill)
       updateField("actionValue", initialValue)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-initialize when attacker changes
   }, [attacker?.id])
 
   useEffect(() => {
@@ -73,6 +73,7 @@ export default function ChaseMethodSection({
       const squealValue = VS.squeal(vehicle)
       updateField("squeal", squealValue)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-initialize when vehicle changes
   }, [vehicle?.id])
 
   // Set shot cost based on driver type (Boss/Uber Boss = 2, others = 3)
@@ -81,6 +82,7 @@ export default function ChaseMethodSection({
       const shotCost = CS.isBoss(attacker) || CS.isUberBoss(attacker) ? 2 : 3
       updateField("shotCost", shotCost)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-initialize when attacker changes
   }, [attacker?.id])
 
   return (
@@ -151,14 +153,12 @@ export default function ChaseMethodSection({
                   const value = e.target.value
                   setFortuneBonus(value)
                   updateField("fortuneBonus", value)
-                  setUsingFortune(value !== "" && value !== "0")
                 }}
                 onBlur={e => {
                   const value = parseInt(e.target.value) || 0
                   const finalValue = value < 0 ? "0" : value.toString()
                   setFortuneBonus(finalValue)
                   updateField("fortuneBonus", finalValue)
-                  setUsingFortune(finalValue !== "0")
                 }}
                 sx={{
                   fontSize: "1.5rem",

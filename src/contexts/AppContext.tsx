@@ -412,9 +412,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
     )
 
     // Track connection state and setup reconnection logic
-    let isConnected = false
     let connectionCheckInterval: NodeJS.Timeout | null = null
-    let lastDataReceived = Date.now()
 
     console.log(
       "🔧 [AppContext] Creating WebSocket subscription on page:",
@@ -451,15 +449,12 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
             }
           )
           console.log("🔧 [AppContext] Sub object:", sub)
-          isConnected = true
-          lastDataReceived = Date.now()
         },
         disconnected: function () {
           console.log(
             "❌ [AppContext] WebSocket DISCONNECTED from CampaignChannel:",
             campaign.id
           )
-          isConnected = false
           if (connectionCheckInterval) {
             clearInterval(connectionCheckInterval)
             connectionCheckInterval = null
@@ -471,15 +466,11 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
             window.location.pathname
           )
 
-          const timestamp = Date.now()
-          lastDataReceived = timestamp
-          isConnected = true // Mark connection as active when receiving data
-
           console.log(
             "📡 [AppContext] WebSocket data received on CampaignChannel:",
             data,
             "at",
-            new Date(timestamp).toLocaleTimeString(),
+            new Date().toLocaleTimeString(),
             "on page:",
             window.location.pathname
           )
@@ -572,6 +563,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
       if (connectionCheckInterval) clearInterval(connectionCheckInterval)
       sub.disconnect()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- campaignData and client intentionally omitted to prevent reconnection loops
   }, [state.user.id, campaign?.id])
 
   // Subscribe to user-specific channel for campaign list updates

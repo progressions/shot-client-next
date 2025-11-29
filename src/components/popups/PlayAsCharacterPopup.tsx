@@ -12,18 +12,10 @@ interface PlayAsCharacterPopupProps {
   handleClose: () => void
   anchorEl: HTMLElement | null
   open: boolean
-  keyword: string
-  handleClose: () => void
-  anchorEl: HTMLElement | null
-  open: boolean
 }
 
 export default function PlayAsCharacterPopup({
   id,
-  keyword,
-  handleClose,
-  anchorEl,
-  open,
 }: PlayAsCharacterPopupProps) {
   const { user, client } = useClient()
   const [character, setCharacter] = useState<Character>(defaultCharacter)

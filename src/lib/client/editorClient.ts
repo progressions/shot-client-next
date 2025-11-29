@@ -10,8 +10,8 @@ interface ClientDependencies {
 }
 
 export function createEditorClient(deps: ClientDependencies) {
-  const { api, apiV2, queryParams } = deps
-  const { get, post, patch, delete: delete_ } = createBaseClient(deps)
+  const { api, queryParams } = deps
+  const { get } = createBaseClient(deps)
 
   async function getSuggestions(
     parameters: Parameters_ = {},

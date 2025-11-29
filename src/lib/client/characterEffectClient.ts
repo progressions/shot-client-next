@@ -10,7 +10,7 @@ interface ClientDependencies {
 }
 
 export function createCharacterEffectClient(deps: ClientDependencies) {
-  const { api, apiV2, queryParams } = deps
+  const { apiV2 } = deps
   const { get, post, patch, delete: delete_ } = createBaseClient(deps)
 
   async function createCharacterEffect(

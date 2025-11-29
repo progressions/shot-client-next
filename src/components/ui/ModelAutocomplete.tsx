@@ -53,12 +53,16 @@ export function ModelAutocomplete({
 
   // Memoize records array based on content, not reference
   // This creates a stable reference that only changes when the actual data changes
+  const recordsKey = JSON.stringify(records)
   const memoizedRecords = useMemo(() => {
     return records as AutocompleteOption[]
-  }, [JSON.stringify(records)])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- using recordsKey to detect content changes
+  }, [recordsKey])
 
   // Memoize filters to create stable reference
-  const memoizedFilters = useMemo(() => filters, [JSON.stringify(filters)])
+  const filtersKey = JSON.stringify(filters)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- using filtersKey to detect content changes
+  const memoizedFilters = useMemo(() => filters, [filtersKey])
 
   const fetchRecords = useCallback(async () => {
     if (disabled || !model) {
