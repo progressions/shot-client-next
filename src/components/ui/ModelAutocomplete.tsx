@@ -51,18 +51,8 @@ export function ModelAutocomplete({
     []
   )
 
-  // Memoize records array based on content, not reference
-  // This creates a stable reference that only changes when the actual data changes
-  const recordsKey = JSON.stringify(records)
-  const memoizedRecords = useMemo(() => {
-    return records as AutocompleteOption[]
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- using recordsKey to detect content changes
-  }, [recordsKey])
-
-  // Memoize filters to create stable reference
-  const filtersKey = JSON.stringify(filters)
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- using filtersKey to detect content changes
-  const memoizedFilters = useMemo(() => filters, [filtersKey])
+  // Use JSON.stringify directly in dependency arrays to detect content changes
+  // This is simpler and more honest than attempting complex memoization patterns
 
   const fetchRecords = useCallback(async () => {
     if (disabled || !model) {
@@ -71,11 +61,12 @@ export function ModelAutocomplete({
 
     // If records are provided and filters are empty, just use the provided records
     // This handles the common case where GenericFilter pre-fetches data
-    if (
-      memoizedRecords?.length &&
-      (!memoizedFilters || Object.keys(memoizedFilters).length === 0)
-    ) {
-      setOptions(allowNone ? [noneOption, ...memoizedRecords] : memoizedRecords)
+    if (records?.length && (!filters || Object.keys(filters).length === 0)) {
+      setOptions(
+        allowNone
+          ? [noneOption, ...(records as AutocompleteOption[])]
+          : (records as AutocompleteOption[])
+      )
       return
     }
 
@@ -84,7 +75,11 @@ export function ModelAutocomplete({
     if (!apiMethod) {
       // No API method found, fall back to provided records
       console.warn(`No API method found for model: ${model}`)
-      setOptions(allowNone ? [noneOption, ...memoizedRecords] : memoizedRecords)
+      setOptions(
+        allowNone
+          ? [noneOption, ...(records as AutocompleteOption[])]
+          : (records as AutocompleteOption[])
+      )
       return
     }
 
@@ -92,9 +87,9 @@ export function ModelAutocomplete({
     try {
       console.log("about to call apiMethod", apiMethod)
       // Call the appropriate API method
-      const response = await apiMethod(client, memoizedFilters)
+      const response = await apiMethod(client, filters)
 
-      console.log("Just fetched", model, memoizedFilters, response.data)
+      console.log("Just fetched", model, filters, response.data)
 
       // Model comes in as capitalized plural (e.g., "Weapons", "Parties")
       // Data is always at response.data.[lowercase plural]
@@ -116,21 +111,28 @@ export function ModelAutocomplete({
       } else {
         // No data returned
         setOptions(
-          allowNone ? [noneOption, ...memoizedRecords] : memoizedRecords
+          allowNone
+            ? [noneOption, ...(records as AutocompleteOption[])]
+            : (records as AutocompleteOption[])
         )
       }
     } catch (error) {
       console.error(`Error fetching ${model} records:`, error)
       // On error, fall back to provided records
-      setOptions(allowNone ? [noneOption, ...memoizedRecords] : memoizedRecords)
+      setOptions(
+        allowNone
+          ? [noneOption, ...(records as AutocompleteOption[])]
+          : (records as AutocompleteOption[])
+      )
     } finally {
       setLoading(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- use JSON.stringify for content-based comparison
   }, [
     client,
     model,
-    memoizedFilters,
-    memoizedRecords,
+    JSON.stringify(filters),
+    JSON.stringify(records),
     allowNone,
     disabled,
     noneOption,

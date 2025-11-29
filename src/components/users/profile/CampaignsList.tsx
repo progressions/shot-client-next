@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useMemo } from "react"
+import { useState, useCallback } from "react"
 import {
   Box,
   Stack,
@@ -35,10 +35,7 @@ export default function CampaignsList({
   const [isLeaving, setIsLeaving] = useState(false)
 
   const campaigns = user.campaigns || []
-  const playerCampaigns = useMemo(
-    () => user.player_campaigns || [],
-    [user.player_campaigns]
-  )
+  const playerCampaigns = user.player_campaigns || []
 
   const handleLeaveCampaign = useCallback(
     async (campaign: Campaign) => {
