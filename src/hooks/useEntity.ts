@@ -9,25 +9,33 @@ import { useRouter } from "next/navigation"
 import { handleEntityDeletion } from "@/lib/deletionHandler"
 import { AxiosError } from "axios"
 
-/*********
- * expects a formState with the following structure:
+/**
+ * Hook for CRUD operations on any entity type (Character, Campaign, Fight, etc.).
+ * Provides standardized create, read, update, delete operations with toast notifications.
  *
- * {
- *   data: {
- *     entity: Entity,
- *     ...
- *   },
- *   loading: boolean,
- *   errors: Record<string, string>,
- *   status: {
- *     severity: "error" | "success",
- *     message: string
- *   }
- *    ...
- *  }
+ * @param entity - The entity instance to operate on (must have entity_class property)
+ * @param dispatchForm - Dispatch function from useForm reducer for state updates
  *
- *********/
-
+ * @returns Object with entity operations:
+ * - `getEntities(params?)` - Fetch list of entities
+ * - `createEntity(entity, image)` - Create new entity with optional image
+ * - `updateEntity(entity)` - Update existing entity
+ * - `deleteEntity()` - Delete the entity and redirect to list
+ * - `handleChangeAndSave(event)` - Handle input change and auto-save
+ * - `handleFormErrors(error)` - Process API validation errors into form state
+ *
+ * @example
+ * ```tsx
+ * const { formState, dispatchForm } = useForm({ entity: character })
+ * const { updateEntity, deleteEntity } = useEntity(character, dispatchForm)
+ *
+ * // Update character
+ * await updateEntity({ ...character, name: "New Name" })
+ *
+ * // Delete character (redirects to /characters)
+ * await deleteEntity()
+ * ```
+ */
 export function useEntity(
   entity: Entity,
   dispatchForm: React.Dispatch<FormActions>
