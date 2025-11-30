@@ -12,6 +12,32 @@ interface UseImageGenerationProps {
   dispatchForm: (action: FormStateAction<{ image_urls: string[] }>) => void
 }
 
+/**
+ * Hook for generating AI images for an entity via WebSocket.
+ * Triggers image generation and listens for results on the campaign channel.
+ *
+ * @param props - Configuration object
+ * @param props.campaignId - Campaign ID for WebSocket subscription
+ * @param props.entity - Entity to generate images for (character, etc.)
+ * @param props.dispatchForm - Form dispatch to update image_urls state
+ *
+ * @returns Object with:
+ * - `pending` - True while waiting for image generation
+ * - `generateImages()` - Trigger image generation
+ *
+ * @example
+ * ```tsx
+ * const { pending, generateImages } = useImageGeneration({
+ *   campaignId: campaign.id,
+ *   entity: character,
+ *   dispatchForm,
+ * })
+ *
+ * <Button onClick={generateImages} disabled={pending}>
+ *   {pending ? "Generating..." : "Generate Images"}
+ * </Button>
+ * ```
+ */
 export function useImageGeneration({
   campaignId,
   entity,
