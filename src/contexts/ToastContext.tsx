@@ -9,12 +9,22 @@ interface ToastProviderProps {
   children: React.ReactNode
 }
 
+/**
+ * Context type for toast notification functionality.
+ * Provides methods to display success, error, info, and warning messages.
+ */
 interface ToastContextType {
+  /** Current toast state including open status, message, and severity */
   toast: Toast
+  /** Closes the currently displayed toast */
   closeToast: () => void
+  /** Displays a success toast with a green indicator */
   toastSuccess: (message: string) => void
+  /** Displays an error toast with a red indicator. Defaults to "There was an error." */
   toastError: (message?: string) => void
+  /** Displays an info toast with a blue indicator */
   toastInfo: (message: string) => void
+  /** Displays a warning toast with an orange indicator */
   toastWarning: (message: string) => void
 }
 
@@ -70,6 +80,23 @@ export function ToastProvider({ children }: ToastProviderProps) {
   )
 }
 
+/**
+ * Hook to access toast notification functions.
+ * Must be used within a ToastProvider.
+ *
+ * @returns Toast context with methods: toastSuccess, toastError, toastInfo, toastWarning, closeToast
+ *
+ * @example
+ * ```tsx
+ * const { toastSuccess, toastError } = useToast()
+ *
+ * // After successful API call
+ * toastSuccess("Character saved successfully")
+ *
+ * // After failed API call
+ * toastError("Failed to save character")
+ * ```
+ */
 export function useToast(): ToastContextType {
   return useContext(ToastContext)
 }

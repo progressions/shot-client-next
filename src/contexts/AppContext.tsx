@@ -105,23 +105,41 @@ function normalizeStoredCampaign(storedValue: unknown): Campaign | null {
   return storedValue as Campaign
 }
 
+/**
+ * Main application context type providing global state and services.
+ * Includes authentication, campaign management, and real-time subscriptions.
+ */
 interface AppContextType {
+  /** API client instance for making backend requests */
   client: Client
+  /** Current JWT token for authentication */
   jwt: string
+  /** Current authenticated user */
   user: User
+  /** Currently active campaign (null if none selected) */
   campaign: Campaign | null
+  /** WebSocket subscription for real-time campaign updates */
   subscription: Subscription | null
+  /** Latest data received from campaign WebSocket channel */
   campaignData: CampaignCableData | null
+  /** User reducer state for advanced state management */
   currentUserState: UserStateType
+  /** Dispatch function for user state updates */
   dispatchCurrentUser: ActionDispatch<[action: UserStateAction]>
+  /** Switch to a different campaign, persists to localStorage */
   setCurrentCampaign: (camp: Campaign | null) => Promise<Campaign | null>
+  /** Subscribe to real-time updates for an entity type */
   subscribeToEntity: (
     entityType: string,
     callback: EntityUpdateCallback
   ) => () => void
+  /** Re-fetch current user data from backend */
   refreshUser: () => Promise<void>
+  /** True while initial user data is loading */
   loading: boolean
+  /** Error message if user loading failed */
   error: string | null
+  /** True if user has an active campaign */
   hasCampaign: boolean
 }
 
@@ -672,16 +690,58 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
   )
 }
 
+/**
+ * Hook to access the full application context.
+ * Provides user, campaign, client, and all app-level state.
+ *
+ * @returns Full AppContextType with all properties
+ *
+ * @example
+ * ```tsx
+ * const { user, campaign, refreshUser, hasCampaign } = useApp()
+ * ```
+ */
 export function useApp(): AppContextType {
   return useContext(AppContext)
 }
 
+/**
+ * Hook to access the API client and authentication state.
+ * Use when you need to make API calls or check user authentication.
+ *
+ * @returns Object with client, jwt, user, and user state management
+ *
+ * @example
+ * ```tsx
+ * const { client, user } = useClient()
+ * const characters = await client.getCharacters()
+ * ```
+ */
 export function useClient() {
   const { client, jwt, user, currentUserState, dispatchCurrentUser } =
     useContext(AppContext)
   return { client, jwt, user, currentUserState, dispatchCurrentUser }
 }
 
+/**
+ * Hook to access campaign state and real-time subscriptions.
+ * Use for campaign-scoped operations and WebSocket updates.
+ *
+ * @returns Object with campaign, subscription, campaignData, and management functions
+ *
+ * @example
+ * ```tsx
+ * const { campaign, setCurrentCampaign, campaignData } = useCampaign()
+ *
+ * // Switch campaigns
+ * await setCurrentCampaign(newCampaign)
+ *
+ * // Access real-time updates
+ * if (campaignData?.character) {
+ *   // Handle character update from WebSocket
+ * }
+ * ```
+ */
 export function useCampaign() {
   const {
     campaign,

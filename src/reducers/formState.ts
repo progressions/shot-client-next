@@ -149,6 +149,34 @@ export function formReducer<T extends Record<string, unknown>>(
   }
 }
 
+/**
+ * Hook for managing form state with loading, saving, errors, and validation.
+ * Provides a reducer-based state management pattern for forms.
+ *
+ * @param initialData - Initial data object for the form
+ *
+ * @returns Object with:
+ * - `formState` - Current form state (data, loading, saving, errors, status)
+ * - `dispatchForm` - Dispatch function for form actions
+ * - `initialFormState` - Reference to the initial state
+ *
+ * @example
+ * ```tsx
+ * const { formState, dispatchForm } = useForm({ entity: character })
+ *
+ * // Update a field
+ * dispatchForm({ type: FormActions.EDIT, name: "name", value: "New Name" })
+ *
+ * // Submit form
+ * dispatchForm({ type: FormActions.SUBMIT })
+ *
+ * // Handle success
+ * dispatchForm({ type: FormActions.SUCCESS, payload: "Saved!" })
+ *
+ * // Handle errors
+ * dispatchForm({ type: FormActions.ERRORS, payload: { name: "Required" } })
+ * ```
+ */
 export function useForm<T extends Record<string, unknown>>(initialData: T) {
   const initialFormState = initializeFormState<T>(initialData)
   const [formState, dispatchForm] = useReducer(formReducer<T>, initialFormState)

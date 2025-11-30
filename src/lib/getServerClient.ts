@@ -4,6 +4,27 @@ import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/client"
 
+/**
+ * Server-side function to get an authenticated API client.
+ * Reads JWT from cookies and wraps the client to handle auth errors.
+ *
+ * Use this in Server Components and Server Actions to make authenticated API calls.
+ * Automatically redirects to login on 401/400 auth errors.
+ *
+ * @returns Proxied client that handles auth errors, or null if no JWT token
+ *
+ * @example
+ * ```tsx
+ * // In a Server Component
+ * export default async function CharacterPage({ params }) {
+ *   const client = await getServerClient()
+ *   if (!client) redirect("/login")
+ *
+ *   const { data } = await client.getCharacter(params.id)
+ *   return <CharacterView character={data} />
+ * }
+ * ```
+ */
 export async function getServerClient() {
   const cookieStore = await cookies()
   const token = cookieStore.get("jwtToken")?.value

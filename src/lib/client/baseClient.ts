@@ -11,6 +11,28 @@ interface CacheOptions {
 
 type Parameters_ = Record<string, unknown>
 
+/**
+ * Factory to create low-level HTTP client with JWT authentication.
+ * Provides get, post, patch, delete methods that automatically include auth headers.
+ *
+ * @param dependencies - Configuration object
+ * @param dependencies.jwt - JWT token for Authorization header
+ *
+ * @returns Object with HTTP methods:
+ * - `get(url, params?, cacheOptions?)` - GET request with query params
+ * - `getPublic(url, params?, cacheOptions?)` - GET without auth (public endpoints)
+ * - `post(url, data?, cacheOptions?)` - POST with JSON body
+ * - `patch(url, data?, cacheOptions?)` - PATCH with JSON body
+ * - `delete(url, params?)` - DELETE request
+ * - `request(method, url, data?, cacheOptions?)` - Generic request
+ * - `requestFormData(method, url, formData)` - Multipart form upload
+ *
+ * @example
+ * ```tsx
+ * const base = createBaseClient({ jwt: token })
+ * const response = await base.get("/api/v2/characters", { active: true })
+ * ```
+ */
 export function createBaseClient({ jwt }: ClientDependencies) {
   async function get<T>(
     url: string,

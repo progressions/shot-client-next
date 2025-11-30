@@ -22,6 +22,33 @@ interface ClientParameters {
   jwt?: string
 }
 
+/**
+ * Factory function to create the main API client with all entity operations.
+ * Aggregates all domain-specific clients (characters, campaigns, fights, etc.)
+ * into a single unified client interface.
+ *
+ * @param parameters - Optional configuration with JWT token
+ * @param parameters.jwt - JWT token for authentication (falls back to localStorage/cookies)
+ *
+ * @returns Unified client object with methods for all API operations:
+ * - Authentication: signIn, signOut, register
+ * - Characters: getCharacters, getCharacter, createCharacter, updateCharacter, deleteCharacter
+ * - Campaigns: getCampaigns, getCampaign, activateCampaign, etc.
+ * - Fights, Parties, Sites, Factions, Weapons, Schticks, Vehicles, etc.
+ * - AI: generateAiCharacter, generateAiImages
+ * - WebSocket: consumer() for real-time subscriptions
+ *
+ * @example
+ * ```tsx
+ * // Client-side with auto-detected JWT
+ * const client = createClient()
+ * const characters = await client.getCharacters()
+ *
+ * // Server-side with explicit JWT
+ * const client = createClient({ jwt: token })
+ * const campaign = await client.getCampaign(id)
+ * ```
+ */
 export default function createClient(parameters: ClientParameters = {}) {
   // Check for JWT token: parameters > localStorage > cookies
   let jwt = parameters.jwt

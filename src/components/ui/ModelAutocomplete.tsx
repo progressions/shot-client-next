@@ -12,22 +12,50 @@ interface AutocompleteOption {
 
 const NONE_VALUE = "__NONE__"
 
+/**
+ * Props for ModelAutocomplete component.
+ */
 type ModelAutocompleteProps = {
+  /** Model name for API calls (e.g., "Characters", "Weapons") */
   model: string
+  /** Currently selected value */
   value: AutocompleteOption | string | null
+  /** Callback when selection changes */
   onChange: (value: AutocompleteOption | string | null) => void
+  /** Optional callback for input text changes */
   onInputChange?: (
     event: React.SyntheticEvent,
     value: string,
     reason: "input" | "reset" | "clear"
   ) => void
+  /** Filter parameters to pass to API */
   filters: Record<string, string | boolean>
+  /** Pre-fetched records to display as options */
   records: AutocompleteOption[] | string[]
+  /** Whether to include "None" as an option */
   allowNone: boolean
+  /** Disable the autocomplete */
   disabled?: boolean
+  /** MUI sx prop for styling */
   sx?: Record<string, unknown>
 }
 
+/**
+ * Generic autocomplete component for selecting any model type.
+ * Automatically fetches options from the API based on model name and filters.
+ *
+ * @example
+ * ```tsx
+ * <ModelAutocomplete
+ *   model="Characters"
+ *   value={selectedCharacter}
+ *   onChange={setSelectedCharacter}
+ *   filters={{ active: true }}
+ *   records={[]}
+ *   allowNone={true}
+ * />
+ * ```
+ */
 export function ModelAutocomplete({
   model,
   value,

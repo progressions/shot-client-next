@@ -40,6 +40,34 @@ export function formatConstraintMessage(
   return `${items.join(", ")}, and ${lastItem}`
 }
 
+/**
+ * Handles entity deletion with confirmation dialogs and constraint handling.
+ * Shows initial confirmation, handles association errors, and offers force deletion.
+ *
+ * @param entity - Entity to delete (must have id, optionally name)
+ * @param deleteFunction - API function to call for deletion
+ * @param options - Configuration options
+ * @param options.entityName - Display name for messages (e.g., "character")
+ * @param options.onSuccess - Callback after successful deletion
+ * @param options.onError - Callback with error message on failure
+ * @param options.confirmMessage - Optional custom confirmation message
+ *
+ * @example
+ * ```tsx
+ * await handleEntityDeletion(
+ *   character,
+ *   (entity, params) => client.deleteCharacter(entity.id, params),
+ *   {
+ *     entityName: "character",
+ *     onSuccess: () => {
+ *       router.push("/characters")
+ *       toastSuccess("Character deleted")
+ *     },
+ *     onError: (msg) => toastError(msg),
+ *   }
+ * )
+ * ```
+ */
 export async function handleEntityDeletion<
   T extends { id: string; name?: string },
 >(
