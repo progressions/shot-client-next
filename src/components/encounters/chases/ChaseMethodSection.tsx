@@ -96,7 +96,7 @@ export default function ChaseMethodSection({
       </Typography>
 
       <Stack spacing={2}>
-        {/* First row: Driving, Squeal, Fortune, Shot Cost */}
+        {/* First row: Driving, Squeal, Fortune */}
         <Stack direction="row" spacing={2} alignItems="flex-start">
           {/* Driving Skill Field - Always visible */}
           <NumberField
@@ -189,43 +189,14 @@ export default function ChaseMethodSection({
               </Typography>
             </Box>
           )}
-
-          {/* Shot Cost Field - moved to first row */}
-          <NumberField
-            name="shotCost"
-            label="Shots"
-            labelBackgroundColor="#873230"
-            value={formState.data.shotCost || 3}
-            size="medium"
-            width="80px"
-            error={false}
-            onChange={e => {
-              const value = parseInt(e.target.value)
-              if (!isNaN(value)) {
-                updateField("shotCost", value)
-              }
-            }}
-            onBlur={e => {
-              const value = parseInt(e.target.value) || 0
-              if (value <= 0) {
-                // Reset to default based on character type
-                const defaultCost =
-                  attacker && (CS.isBoss(attacker) || CS.isUberBoss(attacker))
-                    ? 2
-                    : 3
-                updateField("shotCost", defaultCost)
-              }
-            }}
-            sx={{ fontSize: "1.5rem" }}
-          />
         </Stack>
 
-        {/* Second row: Role, Position */}
-        <Stack direction="row" spacing={2} alignItems="flex-start">
+        {/* Second row: Role, Position, Shots */}
+        <Stack direction="row" spacing={2} alignItems="center">
           {/* Role Selection */}
           <FormControl
             sx={{
-              minWidth: 120,
+              minWidth: 100,
               "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
                 {
                   borderColor: "primary.main",
@@ -263,7 +234,7 @@ export default function ChaseMethodSection({
           {/* Position Selection */}
           <FormControl
             sx={{
-              minWidth: 120,
+              minWidth: 100,
               "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
                 {
                   borderColor: "primary.main",
@@ -297,14 +268,44 @@ export default function ChaseMethodSection({
               <MenuItem value="far">Far</MenuItem>
             </Select>
           </FormControl>
+
+          {/* Shot Cost Field */}
+          <NumberField
+            name="shotCost"
+            label="Shots"
+            labelBackgroundColor="#873230"
+            value={formState.data.shotCost || 3}
+            size="small"
+            width="70px"
+            error={false}
+            onChange={e => {
+              const value = parseInt(e.target.value)
+              if (!isNaN(value)) {
+                updateField("shotCost", value)
+              }
+            }}
+            onBlur={e => {
+              const value = parseInt(e.target.value) || 0
+              if (value <= 0) {
+                // Reset to default based on character type
+                const defaultCost =
+                  attacker && (CS.isBoss(attacker) || CS.isUberBoss(attacker))
+                    ? 2
+                    : 3
+                updateField("shotCost", defaultCost)
+              }
+            }}
+            sx={{ height: "56px", "& input": { height: "56px" } }}
+          />
         </Stack>
 
         {/* Third row: Chase Action */}
-        <Stack direction="row" spacing={2} alignItems="flex-start">
+        <Box>
           {/* Chase Action Selection */}
           <FormControl
             sx={{
-              minWidth: 300,
+              width: "100%",
+              maxWidth: { xs: "100%", sm: 300 },
               "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
                 {
                   borderColor: "primary.main",
@@ -383,7 +384,7 @@ export default function ChaseMethodSection({
                     ]}
             </Select>
           </FormControl>
-        </Stack>
+        </Box>
       </Stack>
     </Box>
   )
