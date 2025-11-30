@@ -13,23 +13,23 @@ import {
 } from "@mui/material"
 import {
   Close,
+  DirectionsCar,
   DirectionsRun,
   Favorite,
   FlashOn,
   SportsMartialArts,
   AccessTime,
-  AutoAwesome,
 } from "@mui/icons-material"
-import type { Character } from "@/types"
+import type { Character, Vehicle } from "@/types"
 import {
   AttackPanel,
   BoostPanel,
+  ChasePanel,
   CheeseItPanel,
   HealPanel,
   SpendShotsPanel,
-  FortunePanel,
 } from "@/components/encounters"
-import { CS } from "@/services"
+import { VS } from "@/services"
 
 interface PlayerActionsProps {
   character: Character
@@ -37,11 +37,11 @@ interface PlayerActionsProps {
 
 type ActionType =
   | "attack"
+  | "chase"
   | "boost"
   | "cheese"
   | "heal"
   | "wait"
-  | "fortune"
   | null
 
 interface ActionButtonProps {
@@ -122,6 +122,13 @@ export default function PlayerActions({ character }: PlayerActionsProps) {
             onComplete={handleClose}
           />
         )
+      case "chase":
+        return (
+          <ChasePanel
+            preselectedCharacter={character}
+            onComplete={handleClose}
+          />
+        )
       case "boost":
         return (
           <BoostPanel preselectedBooster={character} onComplete={handleClose} />
@@ -144,8 +151,6 @@ export default function PlayerActions({ character }: PlayerActionsProps) {
         return (
           <SpendShotsPanel character={character} onComplete={handleClose} />
         )
-      case "fortune":
-        return <FortunePanel character={character} onComplete={handleClose} />
       default:
         return null
     }
@@ -163,10 +168,13 @@ export default function PlayerActions({ character }: PlayerActionsProps) {
     )
   }, [character])
 
-  const canUseFortune = useMemo(() => {
-    if (!character) return false
-    return CS.isPC(character) && CS.fortune(character) > 0
-  }, [character])
+  // Check if character is driving a vehicle and can chase
+  const drivingVehicle = (character as Character & { driving?: Vehicle })
+    .driving
+  const canChase = useMemo(() => {
+    if (!character || !drivingVehicle) return false
+    return !VS.isDefeated(drivingVehicle)
+  }, [character, drivingVehicle])
 
   return (
     <Box sx={{ p: 1 }}>
@@ -192,6 +200,14 @@ export default function PlayerActions({ character }: PlayerActionsProps) {
         />
 
         <ActionButton
+          onClick={() => handleAction("chase")}
+          disabled={!character || !canChase}
+          isActive={activeAction === "chase"}
+          icon={<DirectionsCar sx={{ fontSize: 20 }} />}
+          label="Chase"
+        />
+
+        <ActionButton
           onClick={() => handleAction("wait")}
           disabled={!character}
           isActive={activeAction === "wait"}
@@ -205,14 +221,6 @@ export default function PlayerActions({ character }: PlayerActionsProps) {
           isActive={activeAction === "boost"}
           icon={<FlashOn sx={{ fontSize: 20 }} />}
           label="Boost"
-        />
-
-        <ActionButton
-          onClick={() => handleAction("fortune")}
-          disabled={!character || !canUseFortune}
-          isActive={activeAction === "fortune"}
-          icon={<AutoAwesome sx={{ fontSize: 20 }} />}
-          label="Fortune"
         />
 
         <ActionButton

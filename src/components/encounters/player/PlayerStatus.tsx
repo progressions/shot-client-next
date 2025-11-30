@@ -1,24 +1,62 @@
 "use client"
 
-import { Box, Typography, Chip, Stack } from "@mui/material"
+import { useState } from "react"
+import {
+  Box,
+  Typography,
+  Chip,
+  Stack,
+  Button,
+  Dialog,
+  DialogContent,
+  IconButton,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material"
 import { CS, VS } from "@/services"
 import type { Character, Vehicle } from "@/types"
-import { LocalPharmacy, Biotech, DirectionsCar } from "@mui/icons-material"
+import {
+  LocalPharmacy,
+  Biotech,
+  DirectionsCar,
+  AutoAwesome,
+  Close,
+} from "@mui/icons-material"
 import { EntityAvatar } from "@/components/avatars"
-import { Wounds, ChaseConditionPoints } from "@/components/encounters"
-import { Fragment } from "react"
+import {
+  Wounds,
+  ChaseConditionPoints,
+  FortunePanel,
+} from "@/components/encounters"
 
 interface PlayerStatusProps {
   character: Character
 }
 
+type StatusActionType = "fortune" | null
+
 export default function PlayerStatus({ character }: PlayerStatusProps) {
+  const [activeAction, setActiveAction] = useState<StatusActionType>(null)
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"))
+
   const deathMarks = CS.marksOfDeath(character)
   const upCheck = (character.status || []).includes("up_check_required")
 
   // Check if character is driving a vehicle
   const drivingVehicle = (character as Character & { driving?: Vehicle })
     .driving
+
+  // Check if character can use fortune
+  const canUseFortune = CS.isPC(character) && CS.fortune(character) > 0
+
+  // Check vehicle defeat status for display
+  const isVehicleDefeated = drivingVehicle && VS.isDefeated(drivingVehicle)
+  const vehicleDefeatType = drivingVehicle
+    ? VS.getDefeatType(drivingVehicle)
+    : null
+
+  const handleClose = () => setActiveAction(null)
 
   // Type guard for current_shot property merged from shot record
   const hasCurrentShot = (
@@ -30,8 +68,17 @@ export default function PlayerStatus({ character }: PlayerStatusProps) {
     ? (character.current_shot ?? 0)
     : 0
 
+  const renderActivePanel = () => {
+    switch (activeAction) {
+      case "fortune":
+        return <FortunePanel character={character} onComplete={handleClose} />
+      default:
+        return null
+    }
+  }
+
   return (
-    <Fragment>
+    <>
       {/* STATUS Section */}
       <Box sx={{ p: 1, mb: 0.5 }}>
         {/* Current Shot and Avatar/Wounds in a row */}
@@ -130,6 +177,38 @@ export default function PlayerStatus({ character }: PlayerStatusProps) {
                 </Stack>
               )}
             </Box>
+
+            {/* Fortune Action Button */}
+            {canUseFortune && (
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => setActiveAction("fortune")}
+                sx={{
+                  minWidth: 0,
+                  px: 1,
+                  py: 0.5,
+                  fontSize: "0.65rem",
+                  flexDirection: "column",
+                  gap: 0.25,
+                  borderColor: "warning.main",
+                  color: "warning.main",
+                  "&:hover": {
+                    borderColor: "warning.dark",
+                    backgroundColor: "warning.dark",
+                    color: "warning.contrastText",
+                  },
+                }}
+              >
+                <AutoAwesome sx={{ fontSize: 16 }} />
+                <Typography
+                  variant="caption"
+                  sx={{ fontSize: "0.55rem", lineHeight: 1 }}
+                >
+                  Fortune ({CS.fortune(character)})
+                </Typography>
+              </Button>
+            )}
           </Box>
         </Box>
 
@@ -148,13 +227,34 @@ export default function PlayerStatus({ character }: PlayerStatusProps) {
             <Stack direction="row" spacing={1.5} alignItems="center">
               <EntityAvatar entity={drivingVehicle} size={48} />
               <Box sx={{ flex: 1 }}>
-                <Stack direction="row" spacing={0.5} alignItems="center">
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  alignItems="center"
+                  flexWrap="wrap"
+                >
                   <DirectionsCar
                     sx={{ fontSize: 16, color: "text.secondary" }}
                   />
                   <Typography variant="subtitle2" fontWeight="bold">
                     {drivingVehicle.name}
                   </Typography>
+                  {isVehicleDefeated && vehicleDefeatType && (
+                    <Chip
+                      label={
+                        vehicleDefeatType === "crashed" ? "CRASHED" : "BOXED IN"
+                      }
+                      color={
+                        vehicleDefeatType === "crashed" ? "error" : "warning"
+                      }
+                      size="small"
+                      sx={{
+                        height: 18,
+                        fontSize: "0.6rem",
+                        fontWeight: "bold",
+                      }}
+                    />
+                  )}
                 </Stack>
 
                 {/* Vehicle Stats Row 1 */}
@@ -188,6 +288,26 @@ export default function PlayerStatus({ character }: PlayerStatusProps) {
           </Box>
         )}
       </Box>
-    </Fragment>
+
+      {/* Action Dialog */}
+      <Dialog
+        open={!!activeAction}
+        onClose={handleClose}
+        fullScreen={fullScreen}
+        maxWidth="md"
+        fullWidth
+      >
+        {fullScreen && (
+          <Box sx={{ display: "flex", justifyContent: "flex-end", p: 1 }}>
+            <IconButton onClick={handleClose}>
+              <Close />
+            </IconButton>
+          </Box>
+        )}
+        <DialogContent sx={{ p: fullScreen ? 1 : 2 }}>
+          {renderActivePanel()}
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
