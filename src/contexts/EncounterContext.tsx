@@ -252,6 +252,29 @@ export function EncounterProvider({
   )
 }
 
+/**
+ * Hook to access encounter/fight state and actions.
+ * Must be used within an EncounterProvider (typically on encounter play pages).
+ *
+ * @returns Encounter context with:
+ * - `encounter` - Current encounter data with shots, characters, vehicles
+ * - `weapons` - Map of weapon IDs to weapon data
+ * - `schticks` - Map of schtick IDs to schtick data
+ * - `currentShot` - The current shot number in the initiative order
+ * - `ec.spendShots(entity, cost)` - Spend shots for a character/vehicle action
+ * - `updateEncounter` / `deleteEncounter` - CRUD operations
+ * - `selectedActorId` / `setSelectedActor` - Track selected character/vehicle
+ *
+ * @throws Error if used outside of EncounterProvider
+ *
+ * @example
+ * ```tsx
+ * const { encounter, ec, currentShot } = useEncounter()
+ *
+ * // Spend 3 shots for an attack
+ * await ec.spendShots(character, 3)
+ * ```
+ */
 export function useEncounter(): EncounterContextType {
   const context = useContext(EncounterContext)
   if (!context) {
