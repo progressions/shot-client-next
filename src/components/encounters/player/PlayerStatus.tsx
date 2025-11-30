@@ -1,11 +1,11 @@
 "use client"
 
 import { Box, Typography, Chip, Stack } from "@mui/material"
-import { CS } from "@/services"
-import type { Character } from "@/types"
-import { LocalPharmacy, Biotech } from "@mui/icons-material"
+import { CS, VS } from "@/services"
+import type { Character, Vehicle } from "@/types"
+import { LocalPharmacy, Biotech, DirectionsCar } from "@mui/icons-material"
 import { EntityAvatar } from "@/components/avatars"
-import { Wounds } from "@/components/encounters"
+import { Wounds, ChaseConditionPoints } from "@/components/encounters"
 import { Fragment } from "react"
 
 interface PlayerStatusProps {
@@ -15,6 +15,10 @@ interface PlayerStatusProps {
 export default function PlayerStatus({ character }: PlayerStatusProps) {
   const deathMarks = CS.marksOfDeath(character)
   const upCheck = (character.status || []).includes("up_check_required")
+
+  // Check if character is driving a vehicle
+  const drivingVehicle = (character as Character & { driving?: Vehicle })
+    .driving
 
   // Type guard for current_shot property merged from shot record
   const hasCurrentShot = (
@@ -128,6 +132,61 @@ export default function PlayerStatus({ character }: PlayerStatusProps) {
             </Box>
           </Box>
         </Box>
+
+        {/* Vehicle Stats - shown when character is driving */}
+        {drivingVehicle && (
+          <Box
+            sx={{
+              mt: 1,
+              p: 1,
+              backgroundColor: "background.paper",
+              borderRadius: 1,
+              border: "1px solid",
+              borderColor: "divider",
+            }}
+          >
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <EntityAvatar entity={drivingVehicle} size={48} />
+              <Box sx={{ flex: 1 }}>
+                <Stack direction="row" spacing={0.5} alignItems="center">
+                  <DirectionsCar
+                    sx={{ fontSize: 16, color: "text.secondary" }}
+                  />
+                  <Typography variant="subtitle2" fontWeight="bold">
+                    {drivingVehicle.name}
+                  </Typography>
+                </Stack>
+
+                {/* Vehicle Stats Row 1 */}
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "block", mt: 0.25 }}
+                >
+                  <strong>Accel</strong> {VS.acceleration(drivingVehicle)} •{" "}
+                  <strong>Hand</strong> {VS.handling(drivingVehicle)} •{" "}
+                  <strong>Squeal</strong> {VS.squeal(drivingVehicle)}
+                </Typography>
+
+                {/* Vehicle Stats Row 2 */}
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "block" }}
+                >
+                  <strong>Frame</strong> {VS.frame(drivingVehicle)} •{" "}
+                  <strong>Crunch</strong> {VS.crunch(drivingVehicle)}
+                </Typography>
+              </Box>
+
+              {/* Chase and Condition Points */}
+              <ChaseConditionPoints
+                vehicle={drivingVehicle}
+                driver={character}
+              />
+            </Stack>
+          </Box>
+        )}
       </Box>
     </Fragment>
   )
