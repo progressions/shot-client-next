@@ -124,36 +124,21 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/sign_in`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user: { email, password } }),
-        }
-      )
+      const client = createClient()
+      const result = await client.signIn({ email, password })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-
-        if (errorData.error_type === "unconfirmed_account") {
+      if (!result.success) {
+        if (result.error.error_type === "unconfirmed_account") {
           setIsUnconfirmed(true)
-          setUnconfirmedEmail(errorData.email)
+          setUnconfirmedEmail(result.error.email || email)
           setError(null)
           return
         } else {
-          throw new Error(errorData.message || "Login failed")
+          throw new Error(result.error.message || "Login failed")
         }
       }
 
-      const authHeader = response.headers.get("Authorization")
-      const token = authHeader?.split(" ")?.[1] || ""
-
-      if (!token) {
-        throw new Error("No authentication token received from server")
-      }
-
-      await handleLoginSuccess(token)
+      await handleLoginSuccess(result.token)
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : "An error occurred")
       setIsUnconfirmed(false)
@@ -218,22 +203,9 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/confirmation/resend`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: unconfirmedEmail }),
-        }
-      )
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setResendMessage(data.message)
-      } else {
-        setError(data.error || "Failed to resend confirmation email")
-      }
+      const client = createClient()
+      const response = await client.resendConfirmation(unconfirmedEmail)
+      setResendMessage(response.data.message)
     } catch (error_) {
       setError("Failed to resend confirmation email. Please try again.")
       console.error("Resend confirmation error:", error_)

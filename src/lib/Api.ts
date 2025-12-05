@@ -220,6 +220,10 @@ class Api {
     return `${this.base()}/users/confirmation`
   }
 
+  resendConfirmation(): string {
+    return `${this.base()}/users/confirmation/resend`
+  }
+
   resetUserPassword(): string {
     return `${this.base()}/users/password`
   }

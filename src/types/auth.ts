@@ -56,3 +56,24 @@ export interface OtpVerifyResponse {
 export interface OtpErrorResponse {
   error: string
 }
+
+// Sign In Types
+export interface SignInCredentials {
+  email: string
+  password: string
+}
+
+export interface SignInErrorResponse {
+  message?: string
+  error_type?: "unconfirmed_account"
+  email?: string
+}
+
+// Resend Confirmation Types
+export interface ResendConfirmationResponse {
+  message: string
+}
+
+export interface ResendConfirmationErrorResponse {
+  error: string
+}
