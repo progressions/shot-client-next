@@ -8,7 +8,14 @@ import type {
   Parameters_,
   ConfirmationResponse,
 } from "@/types"
-import type { RegistrationData, RegistrationResponse } from "@/types/auth"
+import type {
+  RegistrationData,
+  RegistrationResponse,
+  OtpRequestResponse,
+  OtpVerifyResponse,
+  SignInCredentials,
+  ResendConfirmationResponse,
+} from "@/types/auth"
 
 interface ClientDependencies {
   jwt?: string
@@ -23,6 +30,7 @@ export function createAuthClient(deps: ClientDependencies) {
     get,
     getPublic,
     post,
+    postPublic,
     patch,
     delete: delete_,
     requestFormData,
@@ -157,6 +165,77 @@ export function createAuthClient(deps: ClientDependencies) {
     return delete_(`${api.base()}/logout`)
   }
 
+  // Sign In Method
+  interface SignInResponse {
+    token: string
+  }
+
+  interface SignInError {
+    message?: string
+    error_type?: "unconfirmed_account"
+    email?: string
+  }
+
+  async function signIn(
+    credentials: SignInCredentials
+  ): Promise<
+    { success: true; token: string } | { success: false; error: SignInError }
+  > {
+    try {
+      const response = await postPublic<void>(api.signIn(), {
+        user: credentials,
+      })
+
+      const authHeader = response.headers["authorization"]
+      const token = authHeader?.split(" ")?.[1] || ""
+
+      if (!token) {
+        return {
+          success: false,
+          error: { message: "No authentication token received from server" },
+        }
+      }
+
+      return { success: true, token }
+    } catch (error) {
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as { response?: { data?: SignInError } }
+        return {
+          success: false,
+          error: axiosError.response?.data || { message: "Login failed" },
+        }
+      }
+      return { success: false, error: { message: "Login failed" } }
+    }
+  }
+
+  // Resend Confirmation Email
+  async function resendConfirmation(
+    email: string
+  ): Promise<AxiosResponse<ResendConfirmationResponse>> {
+    return postPublic(api.resendConfirmation(), { email })
+  }
+
+  // OTP Passwordless Login Methods
+  async function requestOtp(
+    email: string
+  ): Promise<AxiosResponse<OtpRequestResponse>> {
+    return postPublic(api.otpRequest(), { email })
+  }
+
+  async function verifyOtp(
+    email: string,
+    code: string
+  ): Promise<AxiosResponse<OtpVerifyResponse>> {
+    return postPublic(api.otpVerify(), { email, code })
+  }
+
+  async function verifyMagicLink(
+    token: string
+  ): Promise<AxiosResponse<OtpVerifyResponse>> {
+    return getPublic(api.otpMagicLink(token))
+  }
+
   return {
     createUser,
     registerUser,
@@ -176,5 +255,12 @@ export function createAuthClient(deps: ClientDependencies) {
     dismissCongratulations,
     updateOnboardingProgress,
     logout,
+    // Authentication
+    signIn,
+    resendConfirmation,
+    // OTP Passwordless Login
+    requestOtp,
+    verifyOtp,
+    verifyMagicLink,
   }
 }

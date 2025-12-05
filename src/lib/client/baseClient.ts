@@ -89,6 +89,23 @@ export function createBaseClient({ jwt }: ClientDependencies) {
     return await axios(config)
   }
 
+  async function postPublic<T>(
+    url: string,
+    data: Parameters_ = {}
+  ): Promise<AxiosResponse<T>> {
+    const config: AxiosRequestConfig = {
+      url: url,
+      method: "POST",
+      data: data,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      proxy: false,
+    }
+    return await axios(config)
+  }
+
   async function post<T>(
     url: string,
     parameters: Parameters_ = {},
@@ -178,6 +195,7 @@ export function createBaseClient({ jwt }: ClientDependencies) {
     get,
     getPublic,
     post,
+    postPublic,
     patch,
     delete: delete_,
     request,
