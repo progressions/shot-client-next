@@ -26,6 +26,7 @@ import {
   FaEye,
   FaHeart,
   FaExclamationTriangle,
+  FaUser,
 } from "react-icons/fa"
 import { MdEdit } from "react-icons/md"
 import { FaCar } from "react-icons/fa6"
@@ -43,6 +44,7 @@ import {
 import { VehicleAvatar } from "@/components/avatars"
 import CharacterEffectsDisplay from "./effects/CharacterEffectsDisplay"
 import { VehicleLink } from "@/components/ui/links"
+import Link from "next/link"
 import { encounterTransition } from "@/contexts/EncounterContext"
 import { useEncounter, useClient, useToast } from "@/contexts"
 import { VS } from "@/services"
@@ -434,6 +436,27 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
               <FaTimes size={16} />
             </IconButton>
           </Tooltip>
+          {character.user_id && (
+            <Tooltip title="View as player">
+              <IconButton
+                aria-label="player view"
+                component={Link}
+                href={`/encounters/${encounter.id}/play/${character.id}`}
+                target="_blank"
+                size="small"
+                sx={{
+                  p: { xs: 0.5, sm: 1 },
+                  color: "text.secondary",
+                  "&:hover": {
+                    color: "info.main",
+                    backgroundColor: "action.hover",
+                  },
+                }}
+              >
+                <FaUser size={16} />
+              </IconButton>
+            </Tooltip>
+          )}
           <Actions entity={character} />
         </Box>
       </ListItem>

@@ -14,14 +14,17 @@ export default function EditOwner({
   character,
   updateCharacter,
 }: EditOwnerProps) {
-  const [ownerId, setOwnerId] = useState(character.user?.id || "")
+  // Use user.id if user object is loaded, otherwise fall back to user_id
+  const [ownerId, setOwnerId] = useState(
+    character.user?.id || character.user_id || ""
+  )
   const { user } = useClient()
   const { campaign } = useCampaign()
 
   // Sync local state when character prop changes
   useEffect(() => {
-    setOwnerId(character.user?.id || "")
-  }, [character])
+    setOwnerId(character.user?.id || character.user_id || "")
+  }, [character.user?.id, character.user_id])
 
   // Check if current user can edit ownership
   const canEditOwner = () => {
