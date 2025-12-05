@@ -6,8 +6,8 @@ import { useEncounter } from "@/contexts"
 import { findCharacterInAllShots } from "@/components/encounters/attacks/shotSorting"
 import Link from "next/link"
 import { ArrowBack } from "@mui/icons-material"
-import { GiPerson } from "react-icons/gi"
 import { CharacterName } from "@/components/characters"
+import { EntityAvatar } from "@/components/avatars"
 import PlayerStatus from "./PlayerStatus"
 import PlayerActions from "./PlayerActions"
 import PlayerInfo from "./PlayerInfo"
@@ -60,7 +60,7 @@ export default function PlayerEncounterView({
         display: "flex",
         flexDirection: "column",
         minHeight: "calc(100vh - 64px)",
-        bgcolor: "background.default",
+        bgcolor: "#0a0a0a",
         p: { xs: 1, sm: 2 },
       }}
     >
@@ -71,23 +71,36 @@ export default function PlayerEncounterView({
           alignItems: "center",
           justifyContent: "center",
           gap: 1,
-          py: 1,
+          py: 1.5,
           px: 2,
-          mb: 1,
-          backgroundColor: currentShot === 0 ? "warning.main" : "primary.main",
-          borderRadius: 1,
+          mb: 1.5,
+          background:
+            currentShot === 0
+              ? "linear-gradient(135deg, #78350f 0%, #451a03 100%)"
+              : "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+          borderRadius: 2,
+          boxShadow:
+            currentShot === 0
+              ? "0 4px 20px rgba(120, 53, 15, 0.4)"
+              : "0 4px 20px rgba(245, 158, 11, 0.3)",
+          border: "1px solid",
+          borderColor:
+            currentShot === 0
+              ? "rgba(251, 191, 36, 0.2)"
+              : "rgba(255, 255, 255, 0.1)",
         }}
       >
         <Typography
           variant="h6"
           sx={{
-            color:
-              currentShot === 0
-                ? "warning.contrastText"
-                : "primary.contrastText",
-            fontWeight: "bold",
+            color: currentShot === 0 ? "#fbbf24" : "#0a0a0a",
+            fontWeight: 700,
             textTransform: "uppercase",
-            letterSpacing: 1,
+            letterSpacing: 2,
+            textShadow:
+              currentShot === 0
+                ? "0 2px 4px rgba(0,0,0,0.5)"
+                : "0 1px 2px rgba(255,255,255,0.2)",
           }}
         >
           {currentShot === 0
@@ -101,14 +114,17 @@ export default function PlayerEncounterView({
         <ShotCarousel shots={encounter.shots} currentShot={currentShot} />
       )}
 
-      {/* Main Panel - BasePanel style */}
+      {/* Main Panel */}
       <Paper
+        elevation={0}
         sx={{
           position: "relative",
-          border: "2px solid",
-          borderColor: "primary.main",
-          backgroundColor: "background.paper",
+          border: "1px solid",
+          borderColor: "rgba(245, 158, 11, 0.3)",
+          backgroundColor: "#111111",
           overflow: "hidden",
+          borderRadius: 2,
+          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.6)",
         }}
       >
         {/* Panel Header */}
@@ -116,28 +132,47 @@ export default function PlayerEncounterView({
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: 1,
-            p: 1.5,
-            borderBottom: "1px solid",
-            borderColor: "divider",
+            gap: 1.5,
+            p: 2,
+            background: "linear-gradient(180deg, #1a1a1a 0%, #111111 100%)",
+            borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
           }}
         >
           <Link href={`/encounters/${encounter?.id}`} passHref>
-            <IconButton size="small" sx={{ color: "text.primary", mr: 0.5 }}>
+            <IconButton
+              size="small"
+              sx={{
+                color: "#a1a1aa",
+                mr: 0.5,
+                "&:hover": {
+                  color: "#f59e0b",
+                  backgroundColor: "rgba(245, 158, 11, 0.1)",
+                },
+              }}
+            >
               <ArrowBack />
             </IconButton>
           </Link>
-          <GiPerson size={24} />
-          <Typography variant="h6" component="h2" noWrap>
+          <EntityAvatar entity={character} size={32} />
+          <Typography
+            variant="h6"
+            component="h2"
+            noWrap
+            sx={{
+              fontWeight: 600,
+              color: "#fafafa",
+              letterSpacing: 0.5,
+            }}
+          >
             <CharacterName character={character} />
           </Typography>
         </Box>
 
-        {/* Main Content - Dark background container */}
+        {/* Main Content */}
         <Box
           sx={{
-            backgroundColor: "action.hover",
-            p: { xs: 0.5, sm: 1 },
+            backgroundColor: "#0d0d0d",
+            p: { xs: 1, sm: 1.5 },
           }}
         >
           <PlayerStatus character={character} />

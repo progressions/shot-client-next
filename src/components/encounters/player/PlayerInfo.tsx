@@ -41,12 +41,12 @@ export default function PlayerInfo({ character }: PlayerInfoProps) {
       {/* Character Type, Archetype, Faction */}
       <Box
         sx={{
-          p: 1,
-          backgroundColor: "background.paper",
-          borderRadius: 1,
-          border: "1px solid",
-          borderColor: "divider",
+          p: 1.5,
+          background: "linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%)",
+          borderRadius: 2,
+          border: "1px solid rgba(255, 255, 255, 0.06)",
           mb: 1,
+          boxShadow: "inset 0 2px 4px rgba(0,0,0,0.3)",
         }}
       >
         <Typography
@@ -80,7 +80,7 @@ export default function PlayerInfo({ character }: PlayerInfoProps) {
         </Typography>
 
         {/* Action Values Section */}
-        <Box sx={{ mt: 1 }}>
+        <Box sx={{ mt: 1.5 }}>
           <ActionValues character={character} />
         </Box>
       </Box>
@@ -89,36 +89,44 @@ export default function PlayerInfo({ character }: PlayerInfoProps) {
       {characterWeapons.length > 0 && (
         <Box
           sx={{
-            p: 1,
-            backgroundColor: "background.paper",
-            borderRadius: 1,
-            border: "1px solid",
-            borderColor: "divider",
+            p: 1.5,
+            background: "linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%)",
+            borderRadius: 2,
+            border: "1px solid rgba(255, 255, 255, 0.06)",
             mb: 1,
+            boxShadow: "inset 0 2px 4px rgba(0,0,0,0.3)",
           }}
         >
           <Typography
             variant="caption"
             sx={{
-              fontWeight: "bold",
-              color: "text.secondary",
+              fontWeight: 600,
+              color: "#71717a",
               display: "block",
-              mb: 0.5,
+              mb: 0.75,
               fontSize: "0.65rem",
+              letterSpacing: 1,
+              textTransform: "uppercase",
             }}
           >
             WEAPONS
           </Typography>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
             {characterWeapons.map(weapon => (
               <Chip
                 key={weapon.id}
                 label={`${weapon.name} (${weapon.damage})`}
                 size="small"
-                variant="outlined"
                 sx={{
-                  height: 24,
-                  "& .MuiChip-label": { px: 1, fontSize: "0.75rem" },
+                  height: 26,
+                  backgroundColor: "rgba(245, 158, 11, 0.1)",
+                  border: "1px solid rgba(245, 158, 11, 0.3)",
+                  color: "#fafafa",
+                  "& .MuiChip-label": {
+                    px: 1.25,
+                    fontSize: "0.75rem",
+                    fontWeight: 500,
+                  },
                 }}
               />
             ))}
@@ -130,35 +138,43 @@ export default function PlayerInfo({ character }: PlayerInfoProps) {
       {characterSchticks.length > 0 && (
         <Box
           sx={{
-            p: 1,
-            backgroundColor: "background.paper",
-            borderRadius: 1,
-            border: "1px solid",
-            borderColor: "divider",
+            p: 1.5,
+            background: "linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%)",
+            borderRadius: 2,
+            border: "1px solid rgba(255, 255, 255, 0.06)",
+            boxShadow: "inset 0 2px 4px rgba(0,0,0,0.3)",
           }}
         >
           <Typography
             variant="caption"
             sx={{
-              fontWeight: "bold",
-              color: "text.secondary",
+              fontWeight: 600,
+              color: "#71717a",
               display: "block",
-              mb: 0.5,
+              mb: 0.75,
               fontSize: "0.65rem",
+              letterSpacing: 1,
+              textTransform: "uppercase",
             }}
           >
             SCHTICKS
           </Typography>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
             {characterSchticks.map(schtick => (
               <Chip
                 key={schtick.id}
                 label={schtick.name}
                 size="small"
                 sx={{
-                  height: 24,
-                  bgcolor: "action.selected",
-                  "& .MuiChip-label": { px: 1, fontSize: "0.75rem" },
+                  height: 26,
+                  backgroundColor: "rgba(161, 161, 170, 0.1)",
+                  border: "1px solid rgba(161, 161, 170, 0.2)",
+                  color: "#d4d4d8",
+                  "& .MuiChip-label": {
+                    px: 1.25,
+                    fontSize: "0.75rem",
+                    fontWeight: 500,
+                  },
                 }}
               />
             ))}

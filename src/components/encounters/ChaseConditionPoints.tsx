@@ -11,11 +11,13 @@ import { CharacterTypes } from "@/types"
 interface ChaseConditionPointsProps {
   vehicle: Vehicle
   driver?: Character
+  variant?: "responsive" | "full"
 }
 
 export default function ChaseConditionPoints({
   vehicle,
   driver,
+  variant = "responsive",
 }: ChaseConditionPointsProps) {
   const theme = useTheme()
   const chasePoints = VS.chasePoints(vehicle)
@@ -35,6 +37,8 @@ export default function ChaseConditionPoints({
   const chaseExceedsThreshold = chasePoints >= woundThreshold
   const conditionExceedsThreshold = conditionPoints >= woundThreshold
 
+  const isFull = variant === "full"
+
   return (
     <Box
       component="span"
@@ -52,21 +56,25 @@ export default function ChaseConditionPoints({
           backgroundColor: chaseExceedsThreshold
             ? theme.palette.error.dark
             : theme.palette.divider,
-          width: { xs: "2.25rem", sm: "3rem", md: "3.5rem" },
-          height: { xs: "2.25rem", sm: "3rem", md: "auto" },
-          borderRadius: { xs: "50%", sm: "50%", md: "8px" },
+          width: isFull
+            ? "3.5rem"
+            : { xs: "2.25rem", sm: "3rem", md: "3.5rem" },
+          height: isFull ? "auto" : { xs: "2.25rem", sm: "3rem", md: "auto" },
+          borderRadius: isFull ? "8px" : { xs: "50%", sm: "50%", md: "8px" },
           display: "inline-flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           textAlign: "center",
-          py: { xs: 0, md: 0.75 },
+          py: isFull ? 0.75 : { xs: 0, md: 0.75 },
         }}
       >
         <Box
           component="span"
           sx={{
-            fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
+            fontSize: isFull
+              ? "1.5rem"
+              : { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
             fontWeight: 800,
             lineHeight: 1,
             display: "block",
@@ -80,9 +88,11 @@ export default function ChaseConditionPoints({
         <Box
           component="span"
           sx={{
-            fontSize: { xs: "0.4rem", sm: "0.5rem", md: "0.65rem" },
+            fontSize: isFull
+              ? "0.65rem"
+              : { xs: "0.4rem", sm: "0.5rem", md: "0.65rem" },
             lineHeight: 1,
-            mt: { xs: 0, md: 0.25 },
+            mt: isFull ? 0.25 : { xs: 0, md: 0.25 },
             display: "block",
             color: chaseExceedsThreshold
               ? theme.palette.error.contrastText
@@ -98,21 +108,25 @@ export default function ChaseConditionPoints({
           backgroundColor: conditionExceedsThreshold
             ? theme.palette.error.dark
             : theme.palette.divider,
-          width: { xs: "2.25rem", sm: "3rem", md: "3.5rem" },
-          height: { xs: "2.25rem", sm: "3rem", md: "auto" },
-          borderRadius: { xs: "50%", sm: "50%", md: "8px" },
+          width: isFull
+            ? "3.5rem"
+            : { xs: "2.25rem", sm: "3rem", md: "3.5rem" },
+          height: isFull ? "auto" : { xs: "2.25rem", sm: "3rem", md: "auto" },
+          borderRadius: isFull ? "8px" : { xs: "50%", sm: "50%", md: "8px" },
           display: "inline-flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           textAlign: "center",
-          py: { xs: 0, md: 0.75 },
+          py: isFull ? 0.75 : { xs: 0, md: 0.75 },
         }}
       >
         <Box
           component="span"
           sx={{
-            fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
+            fontSize: isFull
+              ? "1.5rem"
+              : { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
             fontWeight: 800,
             lineHeight: 1,
             display: "block",
@@ -126,9 +140,11 @@ export default function ChaseConditionPoints({
         <Box
           component="span"
           sx={{
-            fontSize: { xs: "0.4rem", sm: "0.5rem", md: "0.65rem" },
+            fontSize: isFull
+              ? "0.65rem"
+              : { xs: "0.4rem", sm: "0.5rem", md: "0.65rem" },
             lineHeight: 1,
-            mt: { xs: 0, md: 0.25 },
+            mt: isFull ? 0.25 : { xs: 0, md: 0.25 },
             display: "block",
             color: conditionExceedsThreshold
               ? theme.palette.error.contrastText
