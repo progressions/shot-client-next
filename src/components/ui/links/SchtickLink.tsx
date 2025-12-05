@@ -21,9 +21,15 @@ export default function SchtickLink({
   children,
   sx,
 }: SchtickLinkProperties) {
+  // Ensure entity_class is set for EntityLink
+  const schtickWithClass = {
+    ...schtick,
+    entity_class: schtick.entity_class || "Schtick",
+  }
+
   return (
     <EntityLink
-      entity={schtick}
+      entity={schtickWithClass}
       data={data}
       disablePopup={disablePopup}
       popupOverride={SchtickPopup}
