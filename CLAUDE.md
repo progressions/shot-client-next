@@ -117,6 +117,34 @@ Uses Plop.js for component scaffolding:
 - **Responsive design** with mobile-specific components
 - Custom UI components in `src/components/ui/`
 
+**Theme Colors**: Always use theme values instead of hardcoded colors. Access via the `sx` prop callback:
+
+```tsx
+// CORRECT - use theme values
+sx={theme => ({
+  background: theme.palette.custom?.panel?.gradient,
+  border: `1px solid ${theme.palette.custom?.panel?.border}`,
+  color: theme.palette.text.primary,
+})}
+
+// WRONG - hardcoded colors
+sx={{
+  background: "linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%)",
+  border: "1px solid rgba(255, 255, 255, 0.06)",
+  color: "#fafafa",
+}}
+```
+
+Custom theme colors are defined in `customThemeOptions.ts`:
+
+- `theme.palette.custom?.amber` - Primary amber accent colors (main, light, dark, glow, border, hover, bg)
+- `theme.palette.custom?.panel` - Panel styling (gradient, border, shadow, bg)
+- `theme.palette.custom?.disabled` - Disabled state colors (bg, border, text)
+- `theme.palette.custom?.neutral` - Neutral text colors (text, textLight)
+- `theme.palette.custom?.grey` - Grey backgrounds
+- `theme.palette.custom?.gold` - Gold accent colors
+- `theme.palette.custom?.purple` - Purple accent colors
+
 ### Authentication and Data Flow
 
 1. JWT tokens stored in cookies via `js-cookie`
