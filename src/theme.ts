@@ -34,9 +34,6 @@ export const themeOptions: ThemeOptions = {
   shape: {
     borderRadius: 8,
   },
-  typography: {
-    fontFamily: '"Inter", "system-ui", -apple-system, sans-serif',
-  },
 }
 
 // Merge custom and base theme options
