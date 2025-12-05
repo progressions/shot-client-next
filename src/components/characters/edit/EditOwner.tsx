@@ -24,7 +24,7 @@ export default function EditOwner({
   // Sync local state when character prop changes
   useEffect(() => {
     setOwnerId(character.user?.id || character.user_id || "")
-  }, [character])
+  }, [character.user?.id, character.user_id])
 
   // Check if current user can edit ownership
   const canEditOwner = () => {
