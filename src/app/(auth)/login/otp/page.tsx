@@ -36,19 +36,12 @@ function MagicLinkHandler() {
       }
 
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/otp/magic/${token}`,
-          {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-          }
-        )
+        const client = createClient()
+        const response = await client.verifyMagicLink(token)
 
-        const data = await response.json()
-
-        if (response.ok && data.token) {
+        if (response.data.token) {
           // Store JWT
-          Cookies.set("jwtToken", data.token, {
+          Cookies.set("jwtToken", response.data.token, {
             expires: 1,
             secure: process.env.NODE_ENV === "production",
             sameSite: "Lax",
@@ -57,7 +50,7 @@ function MagicLinkHandler() {
           })
 
           // Get current user
-          const temporaryClient = createClient({ jwt: data.token })
+          const temporaryClient = createClient({ jwt: response.data.token })
           const userResponse = await temporaryClient.getCurrentUser()
 
           // Store user ID
@@ -83,7 +76,7 @@ function MagicLinkHandler() {
           }, 1500)
         } else {
           setStatus("error")
-          setErrorMessage(data.error || "Invalid or expired link")
+          setErrorMessage("Invalid or expired link")
         }
       } catch (error) {
         console.error("Magic link verification error:", error)

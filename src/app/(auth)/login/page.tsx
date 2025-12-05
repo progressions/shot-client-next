@@ -83,31 +83,39 @@ export default function LoginPage() {
   }, [authError])
 
   const handleLoginSuccess = async (token: string) => {
-    Cookies.set("jwtToken", token, {
-      expires: 1,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax",
-      httpOnly: false,
-      path: "/",
-    })
+    try {
+      Cookies.set("jwtToken", token, {
+        expires: 1,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Lax",
+        httpOnly: false,
+        path: "/",
+      })
 
-    const temporaryClient = createClient({ jwt: token })
-    const temporaryResponse = await temporaryClient.getCurrentUser()
+      const temporaryClient = createClient({ jwt: token })
+      const temporaryResponse = await temporaryClient.getCurrentUser()
 
-    Cookies.set("userId", temporaryResponse.data.id, {
-      expires: 1,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax",
-      httpOnly: false,
-      path: "/",
-    })
+      Cookies.set("userId", temporaryResponse.data.id, {
+        expires: 1,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Lax",
+        httpOnly: false,
+        path: "/",
+      })
 
-    dispatchCurrentUser({
-      type: UserActions.USER,
-      payload: temporaryResponse.data,
-    })
+      dispatchCurrentUser({
+        type: UserActions.USER,
+        payload: temporaryResponse.data,
+      })
 
-    router.push(redirectTo)
+      router.push(redirectTo)
+    } catch (error) {
+      // Clean up cookies to avoid inconsistent state
+      Cookies.remove("jwtToken")
+      Cookies.remove("userId")
+      console.error("Login success handler error:", error)
+      throw error
+    }
   }
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
@@ -162,24 +170,16 @@ export default function LoginPage() {
     setSuccessMessage(null)
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/otp/request`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: otpEmail }),
-        }
+      const client = createClient()
+      const response = await client.requestOtp(otpEmail)
+
+      setOtpSent(true)
+      setSuccessMessage(
+        response.data.message || "Check your email for a login code"
       )
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setOtpSent(true)
-        setSuccessMessage(data.message || "Check your email for a login code")
-      } else {
-        throw new Error(data.error || "Failed to send login code")
-      }
     } catch (error_) {
+      // The API always returns success to prevent email enumeration,
+      // so errors here are network/server errors
       setError(error_ instanceof Error ? error_.message : "An error occurred")
       console.error("OTP request error:", error_)
     } finally {
@@ -194,21 +194,13 @@ export default function LoginPage() {
     setSuccessMessage(null)
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/otp/verify`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: otpEmail, code: otpCode }),
-        }
-      )
+      const client = createClient()
+      const response = await client.verifyOtp(otpEmail, otpCode)
 
-      const data = await response.json()
-
-      if (response.ok && data.token) {
-        await handleLoginSuccess(data.token)
+      if (response.data.token) {
+        await handleLoginSuccess(response.data.token)
       } else {
-        throw new Error(data.error || "Invalid code")
+        throw new Error("Invalid code")
       }
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : "An error occurred")
@@ -416,7 +408,10 @@ export default function LoginPage() {
               name="code"
               label="Login Code"
               value={otpCode}
-              onChange={e => setOtpCode(e.target.value)}
+              onChange={e => {
+                const value = e.target.value.replace(/\D/g, "")
+                setOtpCode(value)
+              }}
               autoFocus
               inputProps={{
                 maxLength: 6,
