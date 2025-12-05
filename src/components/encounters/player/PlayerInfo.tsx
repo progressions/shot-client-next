@@ -5,6 +5,8 @@ import { ActionValues } from "@/components/encounters"
 import type { Character, Weapon, Schtick } from "@/types"
 import { useEncounter } from "@/contexts"
 import { CS } from "@/services"
+import { WeaponLink } from "@/components/ui/links"
+import { SchtickLink } from "@/components/ui/links"
 
 interface PlayerInfoProps {
   character: Character
@@ -115,19 +117,28 @@ export default function PlayerInfo({ character }: PlayerInfoProps) {
             {characterWeapons.map(weapon => (
               <Chip
                 key={weapon.id}
-                label={`${weapon.name} (${weapon.damage})`}
+                label={
+                  <WeaponLink weapon={weapon}>
+                    {weapon.name} ({weapon.damage})
+                  </WeaponLink>
+                }
                 size="small"
-                sx={{
+                clickable
+                sx={theme => ({
                   height: 26,
-                  backgroundColor: "rgba(245, 158, 11, 0.1)",
-                  border: "1px solid rgba(245, 158, 11, 0.3)",
-                  color: "#fafafa",
+                  backgroundColor: theme.palette.custom?.amber?.bg,
+                  border: `1px solid ${theme.palette.custom?.amber?.glow}`,
+                  color: theme.palette.text.primary,
                   "& .MuiChip-label": {
                     px: 1.25,
                     fontSize: "0.75rem",
                     fontWeight: 500,
                   },
-                }}
+                  "& a": {
+                    color: "inherit",
+                    textDecoration: "none",
+                  },
+                })}
               />
             ))}
           </Box>
@@ -163,19 +174,26 @@ export default function PlayerInfo({ character }: PlayerInfoProps) {
             {characterSchticks.map(schtick => (
               <Chip
                 key={schtick.id}
-                label={schtick.name}
+                label={
+                  <SchtickLink schtick={schtick}>{schtick.name}</SchtickLink>
+                }
                 size="small"
-                sx={{
+                clickable
+                sx={theme => ({
                   height: 26,
                   backgroundColor: "rgba(161, 161, 170, 0.1)",
                   border: "1px solid rgba(161, 161, 170, 0.2)",
-                  color: "#d4d4d8",
+                  color: theme.palette.custom?.neutral?.text,
                   "& .MuiChip-label": {
                     px: 1.25,
                     fontSize: "0.75rem",
                     fontWeight: 500,
                   },
-                }}
+                  "& a": {
+                    color: "inherit",
+                    textDecoration: "none",
+                  },
+                })}
               />
             ))}
           </Box>
