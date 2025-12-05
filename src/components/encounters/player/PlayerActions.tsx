@@ -64,7 +64,7 @@ function ActionButton({
       onClick={onClick}
       disabled={disabled}
       variant={isActive ? "contained" : "outlined"}
-      sx={{
+      sx={theme => ({
         flex: 1,
         minWidth: 0,
         flexDirection: "column",
@@ -72,19 +72,23 @@ function ActionButton({
         px: 0.5,
         gap: 0.5,
         borderRadius: 2,
-        borderColor: isActive ? "#f59e0b" : "rgba(255, 255, 255, 0.1)",
+        borderColor: isActive
+          ? theme.palette.custom?.amber?.main
+          : "rgba(255, 255, 255, 0.1)",
         backgroundColor: isActive
           ? "rgba(245, 158, 11, 0.9)"
           : "rgba(26, 26, 26, 0.8)",
-        color: isActive ? "#0a0a0a" : "#d4d4d8",
+        color: isActive ? theme.palette.background.default : "#d4d4d8",
         boxShadow: isActive
-          ? "0 4px 12px rgba(245, 158, 11, 0.3)"
+          ? `0 4px 12px ${theme.palette.custom?.amber?.glow}`
           : "inset 0 1px 2px rgba(0,0,0,0.2)",
         transition: "all 0.2s ease",
         "&:hover": {
-          backgroundColor: isActive ? "#f59e0b" : "rgba(245, 158, 11, 0.15)",
-          borderColor: "#f59e0b",
-          color: isActive ? "#0a0a0a" : "#fafafa",
+          backgroundColor: isActive
+            ? theme.palette.custom?.amber?.main
+            : "rgba(245, 158, 11, 0.15)",
+          borderColor: theme.palette.custom?.amber?.main,
+          color: isActive ? theme.palette.background.default : "#fafafa",
           transform: "translateY(-1px)",
         },
         "&:disabled": {
@@ -93,7 +97,7 @@ function ActionButton({
           color: "#52525b",
           boxShadow: "none",
         },
-      }}
+      })}
     >
       {icon}
       <Typography
@@ -193,15 +197,15 @@ export default function PlayerActions({ character }: PlayerActionsProps) {
       {/* Action Buttons Grid */}
       <Box
         data-testid="player-action-bar"
-        sx={{
+        sx={theme => ({
           p: 1.5,
-          background: "linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%)",
+          background: theme.palette.custom?.panel?.gradient,
           borderRadius: 2,
-          border: "1px solid rgba(255, 255, 255, 0.06)",
+          border: `1px solid ${theme.palette.custom?.panel?.border}`,
           display: "flex",
           gap: 0.75,
-          boxShadow: "inset 0 2px 4px rgba(0,0,0,0.3)",
-        }}
+          boxShadow: theme.palette.custom?.panel?.shadow,
+        })}
       >
         <ActionButton
           onClick={() => handleAction("attack")}
