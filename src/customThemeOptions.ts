@@ -22,14 +22,24 @@ export const customThemeOptions: ThemeOptions = {
         light: "#fbbf24", // Lighter amber for highlights
         dark: "#d97706", // Darker amber
         glow: "rgba(245, 158, 11, 0.3)", // For shadows/glows
-        border: "rgba(245, 158, 11, 0.2)", // For borders
-        hover: "rgba(251, 191, 36, 0.2)", // For hover states
-        bg: "rgba(245, 158, 11, 0.1)", // For backgrounds
+        border: "rgba(245, 255, 255, 0.1)", // For borders
+        hover: "rgba(245, 158, 11, 0.15)", // For hover states
+        bg: "rgba(245, 158, 11, 0.9)", // For active backgrounds
       },
       panel: {
         gradient: "linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%)",
         border: "rgba(255, 255, 255, 0.06)",
         shadow: "inset 0 2px 4px rgba(0,0,0,0.3)",
+        bg: "rgba(26, 26, 26, 0.8)", // Button inactive background
+      },
+      disabled: {
+        bg: "rgba(15, 15, 15, 0.8)",
+        border: "rgba(255, 255, 255, 0.05)",
+        text: "#52525b",
+      },
+      neutral: {
+        text: "#d4d4d8", // Inactive text
+        textLight: "#fafafa", // Hover/active text
       },
     },
   },

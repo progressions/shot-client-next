@@ -74,11 +74,13 @@ function ActionButton({
         borderRadius: 2,
         borderColor: isActive
           ? theme.palette.custom?.amber?.main
-          : "rgba(255, 255, 255, 0.1)",
+          : theme.palette.custom?.amber?.border,
         backgroundColor: isActive
-          ? "rgba(245, 158, 11, 0.9)"
-          : "rgba(26, 26, 26, 0.8)",
-        color: isActive ? theme.palette.background.default : "#d4d4d8",
+          ? theme.palette.custom?.amber?.bg
+          : theme.palette.custom?.panel?.bg,
+        color: isActive
+          ? theme.palette.background.default
+          : theme.palette.custom?.neutral?.text,
         boxShadow: isActive
           ? `0 4px 12px ${theme.palette.custom?.amber?.glow}`
           : "inset 0 1px 2px rgba(0,0,0,0.2)",
@@ -86,15 +88,17 @@ function ActionButton({
         "&:hover": {
           backgroundColor: isActive
             ? theme.palette.custom?.amber?.main
-            : "rgba(245, 158, 11, 0.15)",
+            : theme.palette.custom?.amber?.hover,
           borderColor: theme.palette.custom?.amber?.main,
-          color: isActive ? theme.palette.background.default : "#fafafa",
+          color: isActive
+            ? theme.palette.background.default
+            : theme.palette.custom?.neutral?.textLight,
           transform: "translateY(-1px)",
         },
         "&:disabled": {
-          backgroundColor: "rgba(15, 15, 15, 0.8)",
-          borderColor: "rgba(255, 255, 255, 0.05)",
-          color: "#52525b",
+          backgroundColor: theme.palette.custom?.disabled?.bg,
+          borderColor: theme.palette.custom?.disabled?.border,
+          color: theme.palette.custom?.disabled?.text,
           boxShadow: "none",
         },
       })}
