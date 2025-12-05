@@ -41,14 +41,14 @@ export default function PlayerInfo({ character }: PlayerInfoProps) {
     <Box sx={{ p: 1, mb: 0.5 }}>
       {/* Character Type, Archetype, Faction */}
       <Box
-        sx={{
+        sx={theme => ({
           p: 1.5,
-          background: "linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%)",
+          background: theme.palette.custom?.panel?.gradient,
           borderRadius: 2,
-          border: "1px solid rgba(255, 255, 255, 0.06)",
+          border: `1px solid ${theme.palette.custom?.panel?.border}`,
           mb: 1,
-          boxShadow: "inset 0 2px 4px rgba(0,0,0,0.3)",
-        }}
+          boxShadow: theme.palette.custom?.panel?.shadow,
+        })}
       >
         <Typography
           variant="caption"
@@ -89,20 +89,20 @@ export default function PlayerInfo({ character }: PlayerInfoProps) {
       {/* Weapons */}
       {characterWeapons.length > 0 && (
         <Box
-          sx={{
+          sx={theme => ({
             p: 1.5,
-            background: "linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%)",
+            background: theme.palette.custom?.panel?.gradient,
             borderRadius: 2,
-            border: "1px solid rgba(255, 255, 255, 0.06)",
+            border: `1px solid ${theme.palette.custom?.panel?.border}`,
             mb: 1,
-            boxShadow: "inset 0 2px 4px rgba(0,0,0,0.3)",
-          }}
+            boxShadow: theme.palette.custom?.panel?.shadow,
+          })}
         >
           <Typography
             variant="caption"
             sx={{
               fontWeight: 600,
-              color: "#71717a",
+              color: "text.secondary",
               display: "block",
               mb: 0.75,
               fontSize: "0.65rem",
@@ -147,19 +147,19 @@ export default function PlayerInfo({ character }: PlayerInfoProps) {
       {/* Schticks */}
       {characterSchticks.length > 0 && (
         <Box
-          sx={{
+          sx={theme => ({
             p: 1.5,
-            background: "linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%)",
+            background: theme.palette.custom?.panel?.gradient,
             borderRadius: 2,
-            border: "1px solid rgba(255, 255, 255, 0.06)",
-            boxShadow: "inset 0 2px 4px rgba(0,0,0,0.3)",
-          }}
+            border: `1px solid ${theme.palette.custom?.panel?.border}`,
+            boxShadow: theme.palette.custom?.panel?.shadow,
+          })}
         >
           <Typography
             variant="caption"
             sx={{
               fontWeight: 600,
-              color: "#71717a",
+              color: "text.secondary",
               display: "block",
               mb: 0.75,
               fontSize: "0.65rem",
@@ -180,8 +180,8 @@ export default function PlayerInfo({ character }: PlayerInfoProps) {
                 clickable
                 sx={theme => ({
                   height: 26,
-                  backgroundColor: "rgba(161, 161, 170, 0.1)",
-                  border: "1px solid rgba(161, 161, 170, 0.2)",
+                  backgroundColor: theme.palette.action.hover,
+                  border: `1px solid ${theme.palette.divider}`,
                   color: theme.palette.custom?.neutral?.text,
                   "& .MuiChip-label": {
                     px: 1.25,
