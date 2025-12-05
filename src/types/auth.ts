@@ -32,3 +32,27 @@ export interface RegistrationError {
     [field: string]: string[]
   }
 }
+
+// OTP Passwordless Login Types
+export interface OtpRequestResponse {
+  message: string
+}
+
+export interface OtpVerifyResponse {
+  user: {
+    id: string
+    email: string
+    first_name: string
+    last_name: string
+    name: string
+    admin: boolean
+    gamemaster: boolean
+    current_campaign_id: string | null
+    active: boolean
+  }
+  token: string
+}
+
+export interface OtpErrorResponse {
+  error: string
+}

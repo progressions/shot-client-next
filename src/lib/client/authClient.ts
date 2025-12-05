@@ -8,7 +8,12 @@ import type {
   Parameters_,
   ConfirmationResponse,
 } from "@/types"
-import type { RegistrationData, RegistrationResponse } from "@/types/auth"
+import type {
+  RegistrationData,
+  RegistrationResponse,
+  OtpRequestResponse,
+  OtpVerifyResponse,
+} from "@/types/auth"
 
 interface ClientDependencies {
   jwt?: string
@@ -157,6 +162,26 @@ export function createAuthClient(deps: ClientDependencies) {
     return delete_(`${api.base()}/logout`)
   }
 
+  // OTP Passwordless Login Methods
+  async function requestOtp(
+    email: string
+  ): Promise<AxiosResponse<OtpRequestResponse>> {
+    return post(api.otpRequest(), { email })
+  }
+
+  async function verifyOtp(
+    email: string,
+    code: string
+  ): Promise<AxiosResponse<OtpVerifyResponse>> {
+    return post(api.otpVerify(), { email, code })
+  }
+
+  async function verifyMagicLink(
+    token: string
+  ): Promise<AxiosResponse<OtpVerifyResponse>> {
+    return getPublic(api.otpMagicLink(token))
+  }
+
   return {
     createUser,
     registerUser,
@@ -176,5 +201,9 @@ export function createAuthClient(deps: ClientDependencies) {
     dismissCongratulations,
     updateOnboardingProgress,
     logout,
+    // OTP Passwordless Login
+    requestOtp,
+    verifyOtp,
+    verifyMagicLink,
   }
 }

@@ -224,6 +224,19 @@ class Api {
     return `${this.base()}/users/password`
   }
 
+  // OTP Passwordless Login
+  otpRequest(): string {
+    return `${this.base()}/users/otp/request`
+  }
+
+  otpVerify(): string {
+    return `${this.base()}/users/otp/verify`
+  }
+
+  otpMagicLink(token: string): string {
+    return `${this.base()}/users/otp/magic/${token}`
+  }
+
   signIn(): string {
     return `${this.base()}/users/sign_in`
   }

@@ -2,7 +2,15 @@
 
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Stack, Box, Typography, Alert, Container } from "@mui/material"
+import {
+  Stack,
+  Box,
+  Typography,
+  Alert,
+  Container,
+  Tabs,
+  Tab,
+} from "@mui/material"
 import Link from "next/link"
 import { Button, TextField } from "@/components/ui"
 import Cookies from "js-cookie"
@@ -10,10 +18,18 @@ import { useClient } from "@/contexts"
 import { createClient } from "@/lib/client"
 import { UserActions } from "@/reducers"
 
+type LoginMethod = "password" | "otp"
+
 export default function LoginPage() {
+  const [loginMethod, setLoginMethod] = useState<LoginMethod>("password")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [otpCode, setOtpCode] = useState("")
+  const [otpSent, setOtpSent] = useState(false)
+  const [otpEmail, setOtpEmail] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [isUnconfirmed, setIsUnconfirmed] = useState(false)
   const [unconfirmedEmail, setUnconfirmedEmail] = useState("")
   const [isResending, setIsResending] = useState(false)
@@ -25,14 +41,14 @@ export default function LoginPage() {
   const redirectTo = searchParams.get("redirect") || "/"
   const authError = searchParams.get("error")
 
-  // Clear cookies when there&rsquo;s an auth error from server component
+  // Clear cookies when there's an auth error from server component
   useEffect(() => {
     if (
       authError === "invalid_token" ||
       authError === "unauthorized" ||
       authError === "auth_failed"
     ) {
-      console.log("🔄 Clearing invalid authentication data due to:", authError)
+      console.log("Clearing invalid authentication data due to:", authError)
 
       // Clear cookies
       Cookies.remove("jwtToken")
@@ -66,8 +82,39 @@ export default function LoginPage() {
     }
   }, [authError])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLoginSuccess = async (token: string) => {
+    Cookies.set("jwtToken", token, {
+      expires: 1,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
+      httpOnly: false,
+      path: "/",
+    })
+
+    const temporaryClient = createClient({ jwt: token })
+    const temporaryResponse = await temporaryClient.getCurrentUser()
+
+    Cookies.set("userId", temporaryResponse.data.id, {
+      expires: 1,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
+      httpOnly: false,
+      path: "/",
+    })
+
+    dispatchCurrentUser({
+      type: UserActions.USER,
+      payload: temporaryResponse.data,
+    })
+
+    router.push(redirectTo)
+  }
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsSubmitting(true)
+    setError(null)
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/sign_in`,
@@ -79,10 +126,8 @@ export default function LoginPage() {
       )
 
       if (!response.ok) {
-        // Parse error response
         const errorData = await response.json()
 
-        // Check if it&rsquo;s an unconfirmed account error
         if (errorData.error_type === "unconfirmed_account") {
           setIsUnconfirmed(true)
           setUnconfirmedEmail(errorData.email)
@@ -94,46 +139,82 @@ export default function LoginPage() {
       }
 
       const authHeader = response.headers.get("Authorization")
-
       const token = authHeader?.split(" ")?.[1] || ""
 
       if (!token) {
         throw new Error("No authentication token received from server")
       }
 
-      Cookies.set("jwtToken", token, {
-        expires: 1,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Lax",
-        httpOnly: false,
-        path: "/",
-      })
-
-      // Verify the cookie was set
-      const _setCookie = Cookies.get("jwtToken")
-
-      const temporaryClient = createClient({ jwt: token })
-      const temporaryResponse = await temporaryClient.getCurrentUser()
-
-      // NEW: Store user ID alongside JWT for cache validation
-      Cookies.set("userId", temporaryResponse.data.id, {
-        expires: 1,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Lax",
-        httpOnly: false,
-        path: "/",
-      })
-
-      dispatchCurrentUser({
-        type: UserActions.USER,
-        payload: temporaryResponse.data,
-      })
-
-      router.push(redirectTo)
+      await handleLoginSuccess(token)
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : "An error occurred")
       setIsUnconfirmed(false)
       console.error("Login error:", error_)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleOtpRequest = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setError(null)
+    setSuccessMessage(null)
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/otp/request`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: otpEmail }),
+        }
+      )
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setOtpSent(true)
+        setSuccessMessage(data.message || "Check your email for a login code")
+      } else {
+        throw new Error(data.error || "Failed to send login code")
+      }
+    } catch (error_) {
+      setError(error_ instanceof Error ? error_.message : "An error occurred")
+      console.error("OTP request error:", error_)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleOtpVerify = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setError(null)
+    setSuccessMessage(null)
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/otp/verify`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: otpEmail, code: otpCode }),
+        }
+      )
+
+      const data = await response.json()
+
+      if (response.ok && data.token) {
+        await handleLoginSuccess(data.token)
+      } else {
+        throw new Error(data.error || "Invalid code")
+      }
+    } catch (error_) {
+      setError(error_ instanceof Error ? error_.message : "An error occurred")
+      console.error("OTP verify error:", error_)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -169,6 +250,22 @@ export default function LoginPage() {
     }
   }
 
+  const handleTabChange = (_: React.SyntheticEvent, newValue: LoginMethod) => {
+    setLoginMethod(newValue)
+    setError(null)
+    setSuccessMessage(null)
+    setIsUnconfirmed(false)
+    setOtpSent(false)
+    setOtpCode("")
+  }
+
+  const handleBackToEmailEntry = () => {
+    setOtpSent(false)
+    setOtpCode("")
+    setError(null)
+    setSuccessMessage(null)
+  }
+
   return (
     <Container maxWidth="sm">
       <Box
@@ -187,93 +284,180 @@ export default function LoginPage() {
         >
           Login to Chi War
         </Typography>
-        <Stack
-          direction="column"
-          component="form"
-          onSubmit={handleSubmit}
-          sx={{ mt: 1, width: "100%" }}
+
+        <Tabs
+          value={loginMethod}
+          onChange={handleTabChange}
+          sx={{ mb: 3, width: "100%" }}
+          centered
         >
-          <TextField
-            margin="normal"
-            required
-            name="email"
-            label="Email Address"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            autoFocus
-          />
-          <TextField
-            margin="normal"
-            required
-            name="password"
-            label="Password"
-            type="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
-          <Box sx={{ textAlign: "right", mt: 1 }}>
-            <Link
-              href="/forgot-password"
-              style={{
-                color: "inherit",
-                textDecoration: "none",
-              }}
-            >
-              <Typography
-                variant="body2"
-                component="span"
-                sx={{
-                  color: "primary.main",
+          <Tab value="password" label="Password" />
+          <Tab value="otp" label="Email Code" />
+        </Tabs>
+
+        {loginMethod === "password" && (
+          <Stack
+            direction="column"
+            component="form"
+            onSubmit={handlePasswordSubmit}
+            sx={{ mt: 1, width: "100%" }}
+          >
+            <TextField
+              margin="normal"
+              required
+              name="email"
+              label="Email Address"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              autoFocus
+            />
+            <TextField
+              margin="normal"
+              required
+              name="password"
+              label="Password"
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+            <Box sx={{ textAlign: "right", mt: 1 }}>
+              <Link
+                href="/forgot-password"
+                style={{
+                  color: "inherit",
                   textDecoration: "none",
-                  "&:hover": {
-                    textDecoration: "underline",
-                  },
                 }}
               >
-                Forgot Password?
-              </Typography>
-            </Link>
-          </Box>
-          <Button type="submit" sx={{ mt: 2, mb: 2 }}>
-            Sign In
-          </Button>
+                <Typography
+                  variant="body2"
+                  component="span"
+                  sx={{
+                    color: "primary.main",
+                    textDecoration: "none",
+                    "&:hover": {
+                      textDecoration: "underline",
+                    },
+                  }}
+                >
+                  Forgot Password?
+                </Typography>
+              </Link>
+            </Box>
+            <Button type="submit" disabled={isSubmitting} sx={{ mt: 2, mb: 2 }}>
+              {isSubmitting ? "Signing in..." : "Sign In"}
+            </Button>
 
-          {/* Unconfirmed account message */}
-          {isUnconfirmed && (
-            <Alert severity="warning" sx={{ mt: 2 }}>
-              <Typography variant="body2" sx={{ mb: 2 }}>
-                Please confirm your email address before logging in.
-              </Typography>
+            {/* Unconfirmed account message */}
+            {isUnconfirmed && (
+              <Alert severity="warning" sx={{ mt: 2 }}>
+                <Typography variant="body2" sx={{ mb: 2 }}>
+                  Please confirm your email address before logging in.
+                </Typography>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={handleResendConfirmation}
+                  disabled={isResending}
+                  sx={{ mt: 1 }}
+                >
+                  {isResending ? "Sending..." : "Resend Confirmation Email"}
+                </Button>
+              </Alert>
+            )}
+
+            {/* Resend success message */}
+            {resendMessage && (
+              <Alert severity="success" sx={{ mt: 2 }}>
+                {resendMessage}
+              </Alert>
+            )}
+          </Stack>
+        )}
+
+        {loginMethod === "otp" && !otpSent && (
+          <Stack
+            direction="column"
+            component="form"
+            onSubmit={handleOtpRequest}
+            sx={{ mt: 1, width: "100%" }}
+          >
+            <Typography variant="body2" sx={{ color: "#cccccc", mb: 2 }}>
+              Enter your email address and we&apos;ll send you a login code.
+            </Typography>
+            <TextField
+              margin="normal"
+              required
+              name="email"
+              label="Email Address"
+              type="email"
+              value={otpEmail}
+              onChange={e => setOtpEmail(e.target.value)}
+              autoFocus
+            />
+            <Button type="submit" disabled={isSubmitting} sx={{ mt: 2, mb: 2 }}>
+              {isSubmitting ? "Sending..." : "Send Login Code"}
+            </Button>
+          </Stack>
+        )}
+
+        {loginMethod === "otp" && otpSent && (
+          <Stack
+            direction="column"
+            component="form"
+            onSubmit={handleOtpVerify}
+            sx={{ mt: 1, width: "100%" }}
+          >
+            <Typography variant="body2" sx={{ color: "#cccccc", mb: 2 }}>
+              Enter the 6-digit code sent to {otpEmail}
+            </Typography>
+            <TextField
+              margin="normal"
+              required
+              name="code"
+              label="Login Code"
+              value={otpCode}
+              onChange={e => setOtpCode(e.target.value)}
+              autoFocus
+              inputProps={{
+                maxLength: 6,
+                inputMode: "numeric",
+                pattern: "[0-9]*",
+                style: { letterSpacing: "0.5em", textAlign: "center" },
+              }}
+            />
+            <Button type="submit" disabled={isSubmitting} sx={{ mt: 2, mb: 2 }}>
+              {isSubmitting ? "Verifying..." : "Verify Code"}
+            </Button>
+            <Box sx={{ textAlign: "center" }}>
               <Button
-                variant="outlined"
+                variant="text"
                 size="small"
-                onClick={handleResendConfirmation}
-                disabled={isResending}
-                sx={{ mt: 1 }}
+                onClick={handleBackToEmailEntry}
+                sx={{ color: "primary.main" }}
               >
-                {isResending ? "Sending..." : "Resend Confirmation Email"}
+                Use a different email
               </Button>
-            </Alert>
-          )}
+            </Box>
+          </Stack>
+        )}
 
-          {/* Resend success message */}
-          {resendMessage && (
-            <Alert severity="success" sx={{ mt: 2 }}>
-              {resendMessage}
-            </Alert>
-          )}
+        {/* Success message */}
+        {successMessage && (
+          <Alert severity="success" sx={{ mt: 2, width: "100%" }}>
+            {successMessage}
+          </Alert>
+        )}
 
-          {/* General error message */}
-          {error && (
-            <Alert severity="error" sx={{ mt: 2 }}>
-              {error}
-            </Alert>
-          )}
-        </Stack>
+        {/* General error message */}
+        {error && (
+          <Alert severity="error" sx={{ mt: 2, width: "100%" }}>
+            {error}
+          </Alert>
+        )}
 
         <Box sx={{ mt: 3, textAlign: "center" }}>
           <Typography variant="body2" sx={{ color: "#cccccc" }}>
-            Don&rsquo;t have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               href="/register"
               style={{
