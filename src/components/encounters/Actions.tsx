@@ -97,8 +97,15 @@ export default function Actions({ entity }: ActionsProps) {
         <DialogContent>
           <Box sx={{ pt: 1 }}>
             {currentShot !== null && shotCost > 0 && (
-              <Typography variant="body2" sx={{ mb: 1.5, textAlign: "center" }}>
-                <Box component="span" sx={{ fontWeight: 600 }}>
+              <Typography
+                variant="body2"
+                component="div"
+                sx={{ mb: 1.5, textAlign: "center" }}
+              >
+                <Box
+                  component="span"
+                  sx={{ fontWeight: 600, display: "block" }}
+                >
                   {entity.name}
                 </Box>
                 <Box sx={{ mt: 0.5 }}>
