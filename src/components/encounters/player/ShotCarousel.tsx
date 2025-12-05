@@ -154,11 +154,11 @@ export default function ShotCarousel({
     <Box
       sx={{
         position: "relative",
-        backgroundColor: "background.paper",
-        borderRadius: 1,
-        border: "1px solid",
-        borderColor: "divider",
-        mb: 1,
+        background: "linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%)",
+        borderRadius: 2,
+        border: "1px solid rgba(255, 255, 255, 0.06)",
+        mb: 1.5,
+        boxShadow: "inset 0 2px 4px rgba(0,0,0,0.3)",
       }}
     >
       {/* Left scroll button */}
@@ -168,14 +168,17 @@ export default function ShotCarousel({
           aria-label="Scroll left"
           sx={{
             position: "absolute",
-            left: 0,
+            left: 4,
             top: "50%",
             transform: "translateY(-50%)",
             zIndex: 2,
-            backgroundColor: "background.paper",
-            boxShadow: 2,
+            backgroundColor: "#1a1a1a",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
+            color: "#a1a1aa",
             "&:hover": {
-              backgroundColor: "action.hover",
+              backgroundColor: "#262626",
+              color: "#f59e0b",
             },
           }}
           size="small"
@@ -191,11 +194,11 @@ export default function ShotCarousel({
         sx={{
           display: "flex",
           flexDirection: "row",
-          gap: 0.5,
+          gap: 0.75,
           overflowX: "auto",
           overflowY: "hidden",
-          py: 1,
-          px: { xs: 1, sm: 2 },
+          py: 1.5,
+          px: { xs: 1.5, sm: 2.5 },
           scrollBehavior: "smooth",
           WebkitOverflowScrolling: "touch",
           // Hide scrollbar but keep functionality
@@ -213,21 +216,23 @@ export default function ShotCarousel({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                minWidth: 32,
-                px: 0.5,
-                height: 48,
+                minWidth: 36,
+                px: 0.75,
+                height: 52,
                 flexShrink: 0,
-                fontWeight: "bold",
-                color:
-                  currentShot === shotNumber
-                    ? "primary.main"
-                    : "text.secondary",
-                fontSize: "0.875rem",
-                borderRadius: 1,
+                fontWeight: 700,
+                fontSize: "0.9rem",
+                borderRadius: 1.5,
+                color: currentShot === shotNumber ? "#f59e0b" : "#71717a",
                 backgroundColor:
                   currentShot === shotNumber
-                    ? "action.selected"
+                    ? "rgba(245, 158, 11, 0.15)"
                     : "transparent",
+                border:
+                  currentShot === shotNumber
+                    ? "1px solid rgba(245, 158, 11, 0.3)"
+                    : "1px solid transparent",
+                transition: "all 0.2s ease",
               }}
             >
               {shotNumber}
@@ -252,14 +257,21 @@ export default function ShotCarousel({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    width: 48,
-                    height: 48,
+                    width: 52,
+                    height: 52,
                     flexShrink: 0,
-                    borderRadius: 1,
+                    borderRadius: "50%",
                     cursor: "pointer",
-                    transition: "transform 0.2s",
+                    transition: "all 0.2s ease",
+                    border: "2px solid transparent",
                     "&:hover": {
                       transform: "scale(1.1)",
+                      borderColor: "rgba(245, 158, 11, 0.5)",
+                      boxShadow: "0 0 12px rgba(245, 158, 11, 0.3)",
+                    },
+                    "&:focus": {
+                      outline: "none",
+                      borderColor: "#f59e0b",
                     },
                   }}
                 >
@@ -267,8 +279,8 @@ export default function ShotCarousel({
                     entity={character}
                     disablePopup={true}
                     sx={{
-                      width: 40,
-                      height: 40,
+                      width: 44,
+                      height: 44,
                     }}
                   />
                 </Box>
@@ -285,14 +297,17 @@ export default function ShotCarousel({
           aria-label="Scroll right"
           sx={{
             position: "absolute",
-            right: 0,
+            right: 4,
             top: "50%",
             transform: "translateY(-50%)",
             zIndex: 2,
-            backgroundColor: "background.paper",
-            boxShadow: 2,
+            backgroundColor: "#1a1a1a",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
+            color: "#a1a1aa",
             "&:hover": {
-              backgroundColor: "action.hover",
+              backgroundColor: "#262626",
+              color: "#f59e0b",
             },
           }}
           size="small"

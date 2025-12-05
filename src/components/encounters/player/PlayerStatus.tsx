@@ -92,32 +92,40 @@ export default function PlayerStatus({ character }: PlayerStatusProps) {
           {/* Current Shot */}
           <Box
             sx={{
-              p: 1,
-              backgroundColor: "background.paper",
-              borderRadius: 1,
-              border: "1px solid",
-              borderColor: "divider",
+              p: 1.5,
+              background: "linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%)",
+              borderRadius: 2,
+              border: "1px solid rgba(245, 158, 11, 0.2)",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              minWidth: 70,
+              minWidth: 80,
+              boxShadow: "inset 0 2px 4px rgba(0,0,0,0.3)",
             }}
           >
             <Typography
               variant="caption"
               sx={{
-                fontWeight: "bold",
-                color: "text.secondary",
+                fontWeight: 600,
+                color: "#71717a",
                 fontSize: "0.65rem",
+                letterSpacing: 1,
+                textTransform: "uppercase",
               }}
             >
               SHOT
             </Typography>
             <Typography
-              variant="h4"
-              color="primary"
-              sx={{ fontWeight: "bold", lineHeight: 1 }}
+              variant="h3"
+              sx={{
+                fontWeight: 700,
+                lineHeight: 1,
+                background: "linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                textShadow: "0 0 30px rgba(245, 158, 11, 0.3)",
+              }}
             >
               {currentShot}
             </Typography>
@@ -127,38 +135,44 @@ export default function PlayerStatus({ character }: PlayerStatusProps) {
           <Box
             sx={{
               flex: 1,
-              p: 1,
-              backgroundColor: "background.paper",
-              borderRadius: 1,
-              border: "1px solid",
-              borderColor: "divider",
+              p: 1.5,
+              background: "linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%)",
+              borderRadius: 2,
+              border: "1px solid rgba(255, 255, 255, 0.06)",
               display: "flex",
               alignItems: "center",
               gap: 1.5,
+              boxShadow: "inset 0 2px 4px rgba(0,0,0,0.3)",
             }}
           >
-            <EntityAvatar entity={character} size={60} />
             <Box sx={{ flex: 1 }}>
-              <Wounds character={character} />
+              <Wounds character={character} variant="full" />
 
               {/* Critical Status Indicators */}
               {(deathMarks > 0 || upCheck) && (
                 <Stack
                   direction="row"
                   spacing={0.5}
-                  sx={{ mt: 0.5 }}
+                  sx={{ mt: 0.75 }}
                   flexWrap="wrap"
                 >
                   {deathMarks > 0 && (
                     <Chip
                       icon={<Biotech sx={{ fontSize: 14 }} />}
                       label={`Death: ${deathMarks}`}
-                      color="error"
                       size="small"
-                      variant="outlined"
                       sx={{
-                        height: 20,
-                        "& .MuiChip-label": { px: 0.5, fontSize: "0.65rem" },
+                        height: 22,
+                        backgroundColor: "rgba(239, 68, 68, 0.15)",
+                        borderColor: "#ef4444",
+                        color: "#ef4444",
+                        border: "1px solid",
+                        "& .MuiChip-icon": { color: "#ef4444" },
+                        "& .MuiChip-label": {
+                          px: 0.75,
+                          fontSize: "0.7rem",
+                          fontWeight: 600,
+                        },
                       }}
                     />
                   )}
@@ -166,11 +180,19 @@ export default function PlayerStatus({ character }: PlayerStatusProps) {
                     <Chip
                       icon={<LocalPharmacy sx={{ fontSize: 14 }} />}
                       label="Up Check"
-                      color="warning"
                       size="small"
                       sx={{
-                        height: 20,
-                        "& .MuiChip-label": { px: 0.5, fontSize: "0.65rem" },
+                        height: 22,
+                        backgroundColor: "rgba(245, 158, 11, 0.15)",
+                        borderColor: "#f59e0b",
+                        color: "#f59e0b",
+                        border: "1px solid",
+                        "& .MuiChip-icon": { color: "#f59e0b" },
+                        "& .MuiChip-label": {
+                          px: 0.75,
+                          fontSize: "0.7rem",
+                          fontWeight: 600,
+                        },
                       }}
                     />
                   )}
@@ -186,24 +208,26 @@ export default function PlayerStatus({ character }: PlayerStatusProps) {
                 onClick={() => setActiveAction("fortune")}
                 sx={{
                   minWidth: 0,
-                  px: 1,
-                  py: 0.5,
+                  px: 1.5,
+                  py: 1,
                   fontSize: "0.65rem",
                   flexDirection: "column",
-                  gap: 0.25,
-                  borderColor: "warning.main",
-                  color: "warning.main",
+                  gap: 0.5,
+                  borderColor: "#fbbf24",
+                  color: "#fbbf24",
+                  background: "rgba(251, 191, 36, 0.08)",
+                  borderRadius: 2,
                   "&:hover": {
-                    borderColor: "warning.dark",
-                    backgroundColor: "warning.dark",
-                    color: "warning.contrastText",
+                    borderColor: "#fbbf24",
+                    backgroundColor: "rgba(251, 191, 36, 0.2)",
+                    color: "#fbbf24",
                   },
                 }}
               >
-                <AutoAwesome sx={{ fontSize: 16 }} />
+                <AutoAwesome sx={{ fontSize: 18 }} />
                 <Typography
                   variant="caption"
-                  sx={{ fontSize: "0.55rem", lineHeight: 1 }}
+                  sx={{ fontSize: "0.6rem", lineHeight: 1, fontWeight: 600 }}
                 >
                   Fortune ({CS.fortune(character)})
                 </Typography>
@@ -217,15 +241,23 @@ export default function PlayerStatus({ character }: PlayerStatusProps) {
           <Box
             sx={{
               mt: 1,
-              p: 1,
-              backgroundColor: "background.paper",
-              borderRadius: 1,
-              border: "1px solid",
-              borderColor: "divider",
+              p: 1.5,
+              background: "linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%)",
+              borderRadius: 2,
+              border: "1px solid rgba(255, 255, 255, 0.06)",
+              boxShadow: "inset 0 2px 4px rgba(0,0,0,0.3)",
             }}
           >
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <EntityAvatar entity={drivingVehicle} size={48} />
+              <Box
+                sx={{
+                  borderRadius: 1.5,
+                  border: "1px solid rgba(245, 158, 11, 0.2)",
+                  p: 0.25,
+                }}
+              >
+                <EntityAvatar entity={drivingVehicle} size={48} />
+              </Box>
               <Box sx={{ flex: 1 }}>
                 <Stack
                   direction="row"
@@ -233,10 +265,12 @@ export default function PlayerStatus({ character }: PlayerStatusProps) {
                   alignItems="center"
                   flexWrap="wrap"
                 >
-                  <DirectionsCar
-                    sx={{ fontSize: 16, color: "text.secondary" }}
-                  />
-                  <Typography variant="subtitle2" fontWeight="bold">
+                  <DirectionsCar sx={{ fontSize: 16, color: "#f59e0b" }} />
+                  <Typography
+                    variant="subtitle2"
+                    fontWeight="bold"
+                    sx={{ color: "#fafafa" }}
+                  >
                     {drivingVehicle.name}
                   </Typography>
                   {isVehicleDefeated && vehicleDefeatType && (
@@ -244,14 +278,25 @@ export default function PlayerStatus({ character }: PlayerStatusProps) {
                       label={
                         vehicleDefeatType === "crashed" ? "CRASHED" : "BOXED IN"
                       }
-                      color={
-                        vehicleDefeatType === "crashed" ? "error" : "warning"
-                      }
                       size="small"
                       sx={{
-                        height: 18,
-                        fontSize: "0.6rem",
-                        fontWeight: "bold",
+                        height: 20,
+                        fontSize: "0.65rem",
+                        fontWeight: 700,
+                        letterSpacing: 0.5,
+                        backgroundColor:
+                          vehicleDefeatType === "crashed"
+                            ? "rgba(239, 68, 68, 0.2)"
+                            : "rgba(245, 158, 11, 0.2)",
+                        color:
+                          vehicleDefeatType === "crashed"
+                            ? "#ef4444"
+                            : "#f59e0b",
+                        border: "1px solid",
+                        borderColor:
+                          vehicleDefeatType === "crashed"
+                            ? "#ef4444"
+                            : "#f59e0b",
                       }}
                     />
                   )}
@@ -260,31 +305,62 @@ export default function PlayerStatus({ character }: PlayerStatusProps) {
                 {/* Vehicle Stats Row 1 */}
                 <Typography
                   variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block", mt: 0.25 }}
+                  sx={{ display: "block", mt: 0.5, color: "#a1a1aa" }}
                 >
-                  <strong>Accel</strong> {VS.acceleration(drivingVehicle)} •{" "}
-                  <strong>Hand</strong> {VS.handling(drivingVehicle)} •{" "}
-                  <strong>Squeal</strong> {VS.squeal(drivingVehicle)}
+                  <Box
+                    component="span"
+                    sx={{ color: "#f59e0b", fontWeight: 600 }}
+                  >
+                    Accel
+                  </Box>{" "}
+                  {VS.acceleration(drivingVehicle)} •{" "}
+                  <Box
+                    component="span"
+                    sx={{ color: "#f59e0b", fontWeight: 600 }}
+                  >
+                    Hand
+                  </Box>{" "}
+                  {VS.handling(drivingVehicle)} •{" "}
+                  <Box
+                    component="span"
+                    sx={{ color: "#f59e0b", fontWeight: 600 }}
+                  >
+                    Squeal
+                  </Box>{" "}
+                  {VS.squeal(drivingVehicle)}
                 </Typography>
 
                 {/* Vehicle Stats Row 2 */}
                 <Typography
                   variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block" }}
+                  sx={{ display: "block", color: "#a1a1aa" }}
                 >
-                  <strong>Frame</strong> {VS.frame(drivingVehicle)} •{" "}
-                  <strong>Crunch</strong> {VS.crunch(drivingVehicle)}
+                  <Box
+                    component="span"
+                    sx={{ color: "#f59e0b", fontWeight: 600 }}
+                  >
+                    Frame
+                  </Box>{" "}
+                  {VS.frame(drivingVehicle)} •{" "}
+                  <Box
+                    component="span"
+                    sx={{ color: "#f59e0b", fontWeight: 600 }}
+                  >
+                    Crunch
+                  </Box>{" "}
+                  {VS.crunch(drivingVehicle)}
                 </Typography>
               </Box>
+            </Stack>
 
-              {/* Chase and Condition Points */}
+            {/* Chase and Condition Points */}
+            <Box sx={{ mt: 1, display: "flex", justifyContent: "flex-start" }}>
               <ChaseConditionPoints
                 vehicle={drivingVehicle}
                 driver={character}
+                variant="full"
               />
-            </Stack>
+            </Box>
           </Box>
         )}
       </Box>

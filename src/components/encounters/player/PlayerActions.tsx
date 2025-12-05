@@ -64,34 +64,54 @@ function ActionButton({
       onClick={onClick}
       disabled={disabled}
       variant={isActive ? "contained" : "outlined"}
-      sx={{
+      sx={theme => ({
         flex: 1,
         minWidth: 0,
         flexDirection: "column",
-        py: 1,
+        py: 1.25,
         px: 0.5,
-        gap: 0.25,
-        borderColor: isActive ? "primary.main" : "divider",
-        backgroundColor: isActive ? "primary.main" : "background.paper",
-        color: isActive ? "primary.contrastText" : "text.primary",
+        gap: 0.5,
+        borderRadius: 2,
+        borderColor: isActive
+          ? theme.palette.custom?.amber?.main
+          : theme.palette.custom?.amber?.border,
+        backgroundColor: isActive
+          ? theme.palette.custom?.amber?.bg
+          : theme.palette.custom?.panel?.bg,
+        color: isActive
+          ? theme.palette.background.default
+          : theme.palette.custom?.neutral?.text,
+        boxShadow: isActive
+          ? `0 4px 12px ${theme.palette.custom?.amber?.glow}`
+          : "inset 0 1px 2px rgba(0,0,0,0.2)",
+        transition: "all 0.2s ease",
         "&:hover": {
-          backgroundColor: isActive ? "primary.dark" : "action.hover",
-          borderColor: "primary.main",
+          backgroundColor: isActive
+            ? theme.palette.custom?.amber?.main
+            : theme.palette.custom?.amber?.hover,
+          borderColor: theme.palette.custom?.amber?.main,
+          color: isActive
+            ? theme.palette.background.default
+            : theme.palette.custom?.neutral?.textLight,
+          transform: "translateY(-1px)",
         },
         "&:disabled": {
-          backgroundColor: "action.disabledBackground",
-          borderColor: "divider",
-          color: "text.disabled",
+          backgroundColor: theme.palette.custom?.disabled?.bg,
+          borderColor: theme.palette.custom?.disabled?.border,
+          color: theme.palette.custom?.disabled?.text,
+          boxShadow: "none",
         },
-      }}
+      })}
     >
       {icon}
       <Typography
         variant="caption"
         sx={{
-          fontSize: "0.6rem",
+          fontSize: "0.65rem",
           lineHeight: 1,
           textTransform: "none",
+          fontWeight: 600,
+          letterSpacing: 0.3,
         }}
       >
         {label}
@@ -181,15 +201,15 @@ export default function PlayerActions({ character }: PlayerActionsProps) {
       {/* Action Buttons Grid */}
       <Box
         data-testid="player-action-bar"
-        sx={{
-          p: 1,
-          backgroundColor: "background.paper",
-          borderRadius: 1,
-          border: "1px solid",
-          borderColor: "divider",
+        sx={theme => ({
+          p: 1.5,
+          background: theme.palette.custom?.panel?.gradient,
+          borderRadius: 2,
+          border: `1px solid ${theme.palette.custom?.panel?.border}`,
           display: "flex",
-          gap: 0.5,
-        }}
+          gap: 0.75,
+          boxShadow: theme.palette.custom?.panel?.shadow,
+        })}
       >
         <ActionButton
           onClick={() => handleAction("attack")}
