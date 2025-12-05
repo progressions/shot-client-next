@@ -5,8 +5,7 @@ import { ActionValues } from "@/components/encounters"
 import type { Character, Weapon, Schtick } from "@/types"
 import { useEncounter } from "@/contexts"
 import { CS } from "@/services"
-import { WeaponLink } from "@/components/ui/links"
-import { SchtickLink } from "@/components/ui/links"
+import { WeaponLink, SchtickLink } from "@/components/ui/links"
 
 interface PlayerInfoProps {
   character: Character
