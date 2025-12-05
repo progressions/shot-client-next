@@ -6,7 +6,7 @@ import { useEncounter } from "@/contexts"
 import { findCharacterInAllShots } from "@/components/encounters/attacks/shotSorting"
 import Link from "next/link"
 import { ArrowBack } from "@mui/icons-material"
-import { CharacterName } from "@/components/characters"
+import { CharacterLink } from "@/components/ui/links"
 import { EntityAvatar } from "@/components/avatars"
 import PlayerStatus from "./PlayerStatus"
 import PlayerActions from "./PlayerActions"
@@ -164,7 +164,9 @@ export default function PlayerEncounterView({
               letterSpacing: 0.5,
             }}
           >
-            <CharacterName character={character} />
+            <CharacterLink character={character}>
+              {character.name}
+            </CharacterLink>
           </Typography>
         </Box>
 
@@ -175,13 +177,13 @@ export default function PlayerEncounterView({
             p: { xs: 1, sm: 1.5 },
           }}
         >
+          <PlayerActions character={character} />
           <PlayerStatus character={character} />
           <PlayerInfo character={character} />
           <PlayerEffects
             character={character}
             effects={encounter?.character_effects?.[character.id] || []}
           />
-          <PlayerActions character={character} />
         </Box>
       </Paper>
     </Box>
