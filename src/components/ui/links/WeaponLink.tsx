@@ -23,15 +23,9 @@ export default function WeaponLink({
   children,
   sx,
 }: WeaponLinkProperties) {
-  // Ensure entity_class is set for EntityLink
-  const weaponWithClass = {
-    ...weapon,
-    entity_class: weapon.entity_class || "Weapon",
-  }
-
   return (
     <EntityLink
-      entity={weaponWithClass}
+      entity={weapon}
       data={data}
       disablePopup={disablePopup}
       popupOverride={WeaponPopup}
