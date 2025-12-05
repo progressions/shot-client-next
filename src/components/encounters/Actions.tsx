@@ -102,12 +102,7 @@ export default function Actions({ entity }: ActionsProps) {
                 component="div"
                 sx={{ mb: 1.5, textAlign: "center" }}
               >
-                <Box
-                  component="span"
-                  sx={{ fontWeight: 600, display: "block" }}
-                >
-                  {entity.name}
-                </Box>
+                <Box sx={{ fontWeight: 600 }}>{entity.name}</Box>
                 <Box sx={{ mt: 0.5 }}>
                   Shot&nbsp;{currentShot} → Shot&nbsp;{newShot}
                 </Box>
