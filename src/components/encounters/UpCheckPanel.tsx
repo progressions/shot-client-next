@@ -103,13 +103,12 @@ export default function UpCheckPanel({
         const dieValue = parseInt(bossDieRoll, 10) || 0
         const passed = dieValue >= 1 && dieValue <= 3
 
-        // For Boss types, send 1 for pass, 0 for fail as the swerve value
-        // Backend will interpret this as pass/fail
         await client.applyUpCheck(
           encounter,
           selectedCharacter.id,
-          passed ? 1 : 0, // 1 = passed, 0 = failed
-          0
+          dieValue,
+          0,
+          passed
         )
 
         if (passed) {
@@ -129,7 +128,8 @@ export default function UpCheckPanel({
           encounter,
           selectedCharacter.id,
           parseInt(swerve, 10) || 0,
-          fortuneValue
+          fortuneValue,
+          upCheckResult.willPass
         )
 
         if (upCheckResult.willPass) {
