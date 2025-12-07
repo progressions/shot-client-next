@@ -57,10 +57,22 @@ export function useAutocompleteFilters(
           return
         }
 
-        const response = await getFunc({
+        // Filter out object values (like faction: {...}) that shouldn't be sent to API
+        // Only send primitive values (strings, numbers, booleans, null)
+        const cleanedFilters = Object.fromEntries(
+          Object.entries(localFilters).filter(([, value]) => {
+            if (value === null || value === undefined) return true
+            if (typeof value === "object") return false
+            return true
+          })
+        )
+
+        const apiParams = {
           ...contextualFilters,
-          ...localFilters,
-        })
+          ...cleanedFilters,
+        }
+
+        const response = await getFunc(apiParams)
 
         for (const [key, value] of Object.entries(response.data)) {
           dispatchForm({
@@ -83,14 +95,15 @@ export function useAutocompleteFilters(
 
   const updateFilters = useCallback(
     (filters: Record<string, string | boolean | null>) => {
+      const mergedFilters = {
+        ...contextualFilters,
+        ...formState.data.filters,
+        ...filters,
+      }
       dispatchForm({
         type: FormActions.UPDATE,
         name: "filters",
-        value: {
-          ...contextualFilters,
-          ...formState.data.filters,
-          ...filters,
-        },
+        value: mergedFilters,
       })
     },
     [contextualFilters, dispatchForm, formState.data.filters]

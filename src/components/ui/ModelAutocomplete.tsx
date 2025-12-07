@@ -87,9 +87,9 @@ export function ModelAutocomplete({
       return
     }
 
-    // If records are provided and filters are empty, just use the provided records
+    // If filters is empty, don't make API calls - parent is responsible for data
     // This handles the common case where GenericFilter pre-fetches data
-    if (records?.length && (!filters || Object.keys(filters).length === 0)) {
+    if (!filters || Object.keys(filters).length === 0) {
       setOptions(
         allowNone
           ? [noneOption, ...(records as AutocompleteOption[])]
