@@ -115,35 +115,40 @@ export default function Show({ fight: initialFight }: ShowProperties) {
   }
 
   // Fetch parties for AddParty component
-  const fetchParties = useCallback(async () => {
-    try {
-      const response = await client.getParties({ autocomplete: true })
-      setPartyFormState(prev => ({
-        ...prev,
-        data: {
-          filters: prev.data.filters,
-          parties: response.data.parties || [],
-          factions: response.data.factions || [],
-        },
-      }))
-    } catch (error) {
-      console.error("Failed to fetch parties:", error)
-    }
-  }, [client])
+  const fetchParties = useCallback(
+    async (filters: Record<string, unknown> = {}) => {
+      try {
+        // Build API parameters from filters
+        const params: Record<string, unknown> = { autocomplete: true }
 
-  // Handle party filter updates
+        // Add faction_id filter if a faction is selected
+        // GenericFilter sets faction_id directly when a faction is selected
+        if (filters.faction_id) {
+          params.faction_id = filters.faction_id
+        }
+
+        const response = await client.getParties(params)
+        setPartyFormState(prev => ({
+          ...prev,
+          data: {
+            filters,
+            parties: response.data.parties || [],
+            factions: response.data.factions || [],
+          },
+        }))
+      } catch (error) {
+        console.error("Failed to fetch parties:", error)
+      }
+    },
+    [client]
+  )
+
+  // Handle party filter updates - re-fetch parties with new filters
   const handlePartyFiltersUpdate = useCallback(
     (filters: Record<string, unknown>) => {
-      setPartyFormState(prev => ({
-        ...prev,
-        data: {
-          filters,
-          parties: prev.data.parties,
-          factions: prev.data.factions,
-        },
-      }))
+      fetchParties(filters)
     },
-    []
+    [fetchParties]
   )
 
   // Handle adding party to fight
@@ -178,7 +183,7 @@ export default function Show({ fight: initialFight }: ShowProperties) {
 
   // Fetch parties on component mount
   useEffect(() => {
-    fetchParties()
+    fetchParties({})
   }, [fetchParties])
 
   return (
