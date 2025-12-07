@@ -126,6 +126,14 @@ class ApiV2 {
       : `${this.api()}/fights`
   }
 
+  fightEvents(fight: Fight | ID | string): string {
+    const fightId = typeof fight === "string" ? fight : fight?.id
+    if (!fightId) {
+      throw new Error("fightEvents requires a valid fight ID")
+    }
+    return `${this.api()}/fights/${fightId}/fight_events`
+  }
+
   currentCampaign() {
     return `${this.campaigns()}/current`
   }
