@@ -288,6 +288,7 @@ export default function MenuBar({
               },
             }}
             title="Fight Events"
+            aria-label="Fight Events"
           >
             <FaHistory size={18} />
           </IconButton>

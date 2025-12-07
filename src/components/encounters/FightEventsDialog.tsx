@@ -83,6 +83,14 @@ export default function FightEventsDialog({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Reset events when dialog closes to avoid showing stale data
+  useEffect(() => {
+    if (!open) {
+      setEvents([])
+      setError(null)
+    }
+  }, [open])
+
   useEffect(() => {
     const fetchEvents = async () => {
       if (!open || !encounter?.id) return
@@ -102,7 +110,8 @@ export default function FightEventsDialog({
     }
 
     fetchEvents()
-  }, [open, encounter?.id, client])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, encounter?.id])
 
   const getEventIcon = (eventType: string) => {
     return eventTypeIcons[eventType] || <FaCrosshairs />
@@ -113,8 +122,14 @@ export default function FightEventsDialog({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Fight Events</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      aria-labelledby="fight-events-dialog-title"
+    >
+      <DialogTitle id="fight-events-dialog-title">Fight Events</DialogTitle>
       <DialogContent>
         <Box sx={{ pt: 1 }}>
           {loading ? (
