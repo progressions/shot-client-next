@@ -122,9 +122,9 @@ export default function Show({ fight: initialFight }: ShowProperties) {
         const params: Record<string, unknown> = { autocomplete: true }
 
         // Add faction_id filter if a faction is selected
-        const factionFilter = filters.faction as { id?: string } | undefined
-        if (factionFilter?.id) {
-          params.faction_id = factionFilter.id
+        // GenericFilter sets faction_id directly when a faction is selected
+        if (filters.faction_id) {
+          params.faction_id = filters.faction_id
         }
 
         const response = await client.getParties(params)
