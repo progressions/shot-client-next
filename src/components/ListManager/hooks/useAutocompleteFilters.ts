@@ -62,6 +62,7 @@ export function useAutocompleteFilters(
         const cleanedFilters = Object.fromEntries(
           Object.entries(localFilters).filter(([, value]) => {
             if (value === null || value === undefined) return true
+            if (Array.isArray(value)) return true
             if (typeof value === "object") return false
             return true
           })
