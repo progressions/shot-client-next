@@ -12,13 +12,12 @@ import type {
 
 interface ClientDependencies {
   jwt?: string
-  api: import("@/lib").Api
   apiV2: import("@/lib").ApiV2
   queryParams: typeof import("@/lib").queryParams
 }
 
 export function createFightClient(deps: ClientDependencies) {
-  const { api, apiV2, queryParams } = deps
+  const { apiV2, queryParams } = deps
   const {
     get,
     post,
@@ -96,14 +95,23 @@ export function createFightClient(deps: ClientDependencies) {
     fight: Fight | string,
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<FightEvent[]>> {
-    return get(api.fightEvents(fight), {}, cacheOptions)
+    const response = await get<{ fight_events: FightEvent[] }>(
+      apiV2.fightEvents(fight),
+      {},
+      cacheOptions
+    )
+    // Normalize response to return array directly
+    return {
+      ...response,
+      data: response.data?.fight_events ?? [],
+    } as AxiosResponse<FightEvent[]>
   }
 
   async function createFightEvent(
     fight: Fight | string,
     fightEvent: FightEvent
   ): Promise<AxiosResponse<FightEvent>> {
-    return post(api.fightEvents(fight), { fight_event: fightEvent })
+    return post(apiV2.fightEvents(fight), { fight_event: fightEvent })
   }
 
   async function spendShots(

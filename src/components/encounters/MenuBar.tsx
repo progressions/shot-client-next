@@ -23,9 +23,15 @@ import {
   InitiativeDialog,
   LocationsDialog,
   EndFightDialog,
+  FightEventsDialog,
 } from "@/components/encounters"
 import { FaPlay, FaPlus, FaMinus, FaStop } from "react-icons/fa6"
-import { FaMapMarkerAlt, FaCaretRight, FaCaretDown } from "react-icons/fa"
+import {
+  FaMapMarkerAlt,
+  FaCaretRight,
+  FaCaretDown,
+  FaHistory,
+} from "react-icons/fa"
 import { MdAdminPanelSettings } from "react-icons/md"
 import { useEncounter, useClient, useToast } from "@/contexts"
 import FightService from "@/services/FightService"
@@ -50,6 +56,7 @@ export default function MenuBar({
   const [initiativeDialogOpen, setInitiativeDialogOpen] = useState(false)
   const [locationsDialogOpen, setLocationsDialogOpen] = useState(false)
   const [endFightDialogOpen, setEndFightDialogOpen] = useState(false)
+  const [fightEventsDialogOpen, setFightEventsDialogOpen] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
   const toggleBox = (type: "character" | "vehicle" | "admin") => {
@@ -265,6 +272,26 @@ export default function MenuBar({
           >
             <FaMapMarkerAlt size={18} />
           </IconButton>
+          <IconButton
+            onClick={() => setFightEventsDialogOpen(true)}
+            sx={{
+              color: "white",
+              px: { xs: 0.5, sm: 1 },
+              backgroundColor: fightEventsDialogOpen
+                ? "rgba(255, 255, 255, 0.2)"
+                : "transparent",
+              borderRadius: 1,
+              "&:hover": {
+                backgroundColor: fightEventsDialogOpen
+                  ? "rgba(255, 255, 255, 0.3)"
+                  : "rgba(255, 255, 255, 0.1)",
+              },
+            }}
+            title="Fight Events"
+            aria-label="Fight Events"
+          >
+            <FaHistory size={18} />
+          </IconButton>
         </Toolbar>
       </AppBar>
 
@@ -462,6 +489,10 @@ export default function MenuBar({
         onClose={() => setEndFightDialogOpen(false)}
         onConfirm={handleEndFight}
         fightName={encounter.name || ""}
+      />
+      <FightEventsDialog
+        open={fightEventsDialogOpen}
+        onClose={() => setFightEventsDialogOpen(false)}
       />
     </>
   )
