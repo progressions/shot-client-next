@@ -207,6 +207,31 @@ class ApiV2 {
   notionCharacters(): string {
     return `${this.api()}/notion/characters`
   }
+
+  // WebAuthn/Passkey endpoints
+  webauthnRegisterOptions(): string {
+    return `${this.api()}/webauthn/register/options`
+  }
+
+  webauthnRegisterVerify(): string {
+    return `${this.api()}/webauthn/register/verify`
+  }
+
+  webauthnAuthenticateOptions(): string {
+    return `${this.api()}/webauthn/authenticate/options`
+  }
+
+  webauthnAuthenticateVerify(): string {
+    return `${this.api()}/webauthn/authenticate/verify`
+  }
+
+  webauthnCredentials(): string {
+    return `${this.api()}/webauthn/credentials`
+  }
+
+  webauthnCredential(credentialId: string): string {
+    return `${this.api()}/webauthn/credentials/${credentialId}`
+  }
 }
 
 export default ApiV2

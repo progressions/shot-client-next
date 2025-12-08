@@ -13,12 +13,14 @@ import {
 } from "@mui/material"
 import Link from "next/link"
 import { Button, TextField } from "@/components/ui"
+import { PasskeyLogin } from "@/components/auth"
 import Cookies from "js-cookie"
 import { useClient } from "@/contexts"
 import { createClient } from "@/lib/client"
 import { UserActions } from "@/reducers"
+import KeyIcon from "@mui/icons-material/Key"
 
-type LoginMethod = "password" | "otp"
+type LoginMethod = "password" | "otp" | "passkey"
 
 export default function LoginPage() {
   const [loginMethod, setLoginMethod] = useState<LoginMethod>("password")
@@ -257,6 +259,13 @@ export default function LoginPage() {
         >
           <Tab value="password" label="Password" />
           <Tab value="otp" label="Email Code" />
+          <Tab
+            value="passkey"
+            label="Passkey"
+            icon={<KeyIcon sx={{ fontSize: 18 }} />}
+            iconPosition="start"
+            aria-label="Sign in with Passkey"
+          />
         </Tabs>
 
         {loginMethod === "password" && (
@@ -406,6 +415,12 @@ export default function LoginPage() {
               </Button>
             </Box>
           </Stack>
+        )}
+
+        {loginMethod === "passkey" && (
+          <Box sx={{ mt: 1, width: "100%" }}>
+            <PasskeyLogin onSuccess={handleLoginSuccess} />
+          </Box>
         )}
 
         {/* Success message */}
