@@ -33,6 +33,20 @@ interface PasskeyRegistrationProps {
 
 type RegistrationStep = "idle" | "naming" | "registering"
 
+/**
+ * PasskeyRegistration allows users to register a new WebAuthn passkey.
+ *
+ * Renders a button that opens a dialog for naming and registering a passkey.
+ * Uses the browser's WebAuthn API to create the credential, then stores it
+ * on the server.
+ *
+ * @param props.onSuccess - Optional callback invoked after successful registration
+ * @param props.buttonVariant - MUI Button variant (default: "outlined")
+ * @param props.buttonSize - MUI Button size (default: "medium")
+ *
+ * @example
+ * <PasskeyRegistration onSuccess={() => refetchPasskeys()} />
+ */
 export function PasskeyRegistration({
   onSuccess,
   buttonVariant = "outlined",

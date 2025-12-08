@@ -20,6 +20,18 @@ interface PasskeyLoginProps {
 
 type PasskeyLoginStep = "email" | "authenticating"
 
+/**
+ * PasskeyLogin allows users to sign in using WebAuthn passkey authentication.
+ *
+ * Displays an email input form, then initiates passkey authentication using
+ * the browser's WebAuthn API. On success, calls the onSuccess callback with
+ * the JWT token.
+ *
+ * @param props.onSuccess - Callback invoked with the JWT token after successful login
+ *
+ * @example
+ * <PasskeyLogin onSuccess={async (token) => { await handleLogin(token) }} />
+ */
 export function PasskeyLogin({ onSuccess }: PasskeyLoginProps) {
   const [step, setStep] = useState<PasskeyLoginStep>("email")
   const [email, setEmail] = useState("")

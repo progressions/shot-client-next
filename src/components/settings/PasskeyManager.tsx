@@ -30,6 +30,17 @@ import { browserSupportsWebAuthn } from "@simplewebauthn/browser"
 import type { WebAuthnCredential } from "@/types/auth"
 import { formatDistanceToNow } from "date-fns"
 
+/**
+ * PasskeyManager displays and manages the user's registered WebAuthn passkeys.
+ *
+ * Shows a list of passkeys with creation/last-used timestamps, and provides
+ * functionality to add, rename, and delete passkeys. Includes browser support
+ * detection with graceful fallback messaging.
+ *
+ * @example
+ * // In profile/settings page
+ * <PasskeyManager />
+ */
 export function PasskeyManager() {
   const [credentials, setCredentials] = useState<WebAuthnCredential[]>([])
   const [isLoading, setIsLoading] = useState(true)
