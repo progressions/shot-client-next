@@ -160,7 +160,7 @@ export function PasskeyLogin({ onSuccess }: PasskeyLoginProps) {
           spacing={2}
           sx={{ width: "100%" }}
         >
-          <Typography variant="body2" sx={{ color: "#cccccc" }}>
+          <Typography variant="body2" color="text.secondary">
             Enter your email address to sign in with your passkey.
           </Typography>
 
@@ -196,10 +196,10 @@ export function PasskeyLogin({ onSuccess }: PasskeyLoginProps) {
           }}
         >
           <CircularProgress sx={{ mb: 2 }} />
-          <Typography variant="body1" sx={{ color: "#cccccc" }}>
+          <Typography variant="body1" color="text.secondary">
             Waiting for passkey authentication...
           </Typography>
-          <Typography variant="body2" sx={{ color: "#999999", mt: 1 }}>
+          <Typography variant="body2" color="text.disabled" sx={{ mt: 1 }}>
             Please use your fingerprint, face, or security key
           </Typography>
         </Box>

@@ -264,6 +264,7 @@ export default function LoginPage() {
             label="Passkey"
             icon={<KeyIcon sx={{ fontSize: 18 }} />}
             iconPosition="start"
+            aria-label="Sign in with Passkey"
           />
         </Tabs>
 

@@ -83,7 +83,7 @@ export interface ResendConfirmationErrorResponse {
 export interface WebAuthnCredentialDescriptor {
   id: string
   type: "public-key"
-  transports?: ("usb" | "ble" | "nfc" | "internal")[]
+  transports?: ("usb" | "ble" | "nfc" | "internal" | "hybrid")[]
 }
 
 export interface WebAuthnRegistrationOptions {
