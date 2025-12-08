@@ -15,6 +15,12 @@ import type {
   OtpVerifyResponse,
   SignInCredentials,
   ResendConfirmationResponse,
+  WebAuthnRegistrationOptions,
+  WebAuthnRegistrationResponse,
+  WebAuthnAuthenticationOptions,
+  WebAuthnAuthenticationResponse,
+  WebAuthnCredentialsResponse,
+  WebAuthnCredential,
 } from "@/types/auth"
 
 interface ClientDependencies {
@@ -236,6 +242,79 @@ export function createAuthClient(deps: ClientDependencies) {
     return getPublic(api.otpMagicLink(token))
   }
 
+  // WebAuthn/Passkey Methods
+
+  /**
+   * Get registration options for registering a new passkey (requires authentication)
+   */
+  async function getPasskeyRegistrationOptions(): Promise<
+    AxiosResponse<WebAuthnRegistrationOptions>
+  > {
+    return post(apiV2.webauthnRegisterOptions())
+  }
+
+  /**
+   * Verify passkey registration and store the credential (requires authentication)
+   */
+  async function verifyPasskeyRegistration(params: {
+    attestationObject: string
+    clientDataJSON: string
+    challengeId: string
+    name: string
+  }): Promise<AxiosResponse<WebAuthnRegistrationResponse>> {
+    return post(apiV2.webauthnRegisterVerify(), params)
+  }
+
+  /**
+   * Get authentication options for signing in with a passkey (public)
+   */
+  async function getPasskeyAuthenticationOptions(
+    email: string
+  ): Promise<AxiosResponse<WebAuthnAuthenticationOptions>> {
+    return postPublic(apiV2.webauthnAuthenticateOptions(), { email })
+  }
+
+  /**
+   * Verify passkey authentication and get JWT token (public)
+   */
+  async function verifyPasskeyAuthentication(params: {
+    credentialId: string
+    authenticatorData: string
+    signature: string
+    clientDataJSON: string
+    challengeId: string
+  }): Promise<AxiosResponse<WebAuthnAuthenticationResponse>> {
+    return postPublic(apiV2.webauthnAuthenticateVerify(), params)
+  }
+
+  /**
+   * List all passkeys for the current user (requires authentication)
+   */
+  async function listPasskeys(): Promise<
+    AxiosResponse<WebAuthnCredentialsResponse>
+  > {
+    return get(apiV2.webauthnCredentials())
+  }
+
+  /**
+   * Delete a passkey (requires authentication)
+   */
+  async function deletePasskey(
+    credentialId: string
+  ): Promise<AxiosResponse<void>> {
+    return delete_(apiV2.webauthnCredential(credentialId))
+  }
+
+  /**
+   * Rename a passkey (requires authentication)
+   */
+  async function renamePasskey(
+    credentialId: string,
+    name: string
+  ): Promise<AxiosResponse<WebAuthnCredential>> {
+    return patch(apiV2.webauthnCredential(credentialId), { name })
+  }
+
   return {
     createUser,
     registerUser,
@@ -262,5 +341,13 @@ export function createAuthClient(deps: ClientDependencies) {
     requestOtp,
     verifyOtp,
     verifyMagicLink,
+    // WebAuthn/Passkey
+    getPasskeyRegistrationOptions,
+    verifyPasskeyRegistration,
+    getPasskeyAuthenticationOptions,
+    verifyPasskeyAuthentication,
+    listPasskeys,
+    deletePasskey,
+    renamePasskey,
   }
 }

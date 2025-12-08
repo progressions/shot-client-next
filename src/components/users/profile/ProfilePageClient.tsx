@@ -21,6 +21,7 @@ import {
   CampaignsList,
   OnboardingMilestonesForm,
 } from "@/components/users/profile"
+import { PasskeyManager } from "@/components/settings"
 import { useClient, useToast } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
 
@@ -279,7 +280,7 @@ export default function ProfilePageClient({
       <Box sx={{ mb: 4 }}>
         <SectionHeader
           title="Account Information"
-          icon={<Icon keyword="Settings" />}
+          icon={<Icon keyword="Account" />}
           sx={{ mb: 2 }}
         >
           Your account status and role information.
@@ -307,6 +308,17 @@ export default function ProfilePageClient({
       </Box>
 
       <OnboardingMilestonesForm />
+
+      <Box sx={{ mb: 4 }}>
+        <SectionHeader
+          title="Security"
+          icon={<Icon keyword="Security" />}
+          sx={{ mb: 2 }}
+        >
+          Manage your authentication methods and security settings.
+        </SectionHeader>
+        <PasskeyManager />
+      </Box>
 
       <CampaignsList user={user} onUserUpdate={setUser} />
 
