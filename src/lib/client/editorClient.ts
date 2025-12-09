@@ -10,7 +10,7 @@ interface ClientDependencies {
 }
 
 export function createEditorClient(deps: ClientDependencies) {
-  const { api, queryParams } = deps
+  const { apiV2, queryParams } = deps
   const { get } = createBaseClient(deps)
 
   async function getSuggestions(
@@ -18,7 +18,7 @@ export function createEditorClient(deps: ClientDependencies) {
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<SuggestionsResponse>> {
     const query = queryParams(parameters)
-    return get(`${api.suggestions()}?${query}`, {}, cacheOptions)
+    return get(`${apiV2.suggestions()}?${query}`, {}, cacheOptions)
   }
 
   return {

@@ -208,6 +208,10 @@ class ApiV2 {
     return `${this.api()}/notion/characters`
   }
 
+  suggestions(): string {
+    return `${this.api()}/suggestions`
+  }
+
   // WebAuthn/Passkey endpoints
   webauthnRegisterOptions(): string {
     return `${this.api()}/webauthn/register/options`
