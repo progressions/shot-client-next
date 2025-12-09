@@ -34,8 +34,8 @@ export interface Option {
  * @property onChange - Callback when selection changes (receives value string or null)
  * @property value - Currently selected value (ID string or null)
  * @property exclude - Array of values to exclude from options
- * @property allowNone - Whether to show "None" option (default: true)
- * @property freeSolo - Allow arbitrary text input (default: false)
+ * @property allowNone - Whether to show "None" option (defaults to true)
+ * @property freeSolo - Allow arbitrary text input (defaults to false)
  */
 interface AutocompleteProperties
   extends Partial<MuiAutocompleteProps<Option, false, false, boolean>> {

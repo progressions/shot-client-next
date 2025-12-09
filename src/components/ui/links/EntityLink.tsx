@@ -21,12 +21,12 @@ const keywordMap: Record<string, (id: string) => string | undefined> = {
  *
  * @property entity - The entity object to link to (must have id and entity_class)
  * @property data - Additional data to store in data-mention-data attribute
- * @property disablePopup - Disable hover popup (default: false)
+ * @property disablePopup - Disable hover popup (defaults to false)
  * @property children - Custom link text (defaults to entity.name)
  * @property sx - Custom styles for the link
  * @property popupOverride - Custom popup component to show on hover
  * @property href - Override the auto-generated URL
- * @property noUnderline - Remove underline from link (default: false)
+ * @property noUnderline - Remove underline from link (defaults to false)
  */
 type EntityLinkProperties = {
   entity: Entity

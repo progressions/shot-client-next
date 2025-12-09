@@ -1,6 +1,14 @@
 "use client"
 
-// @/reducers/index.tsx
+/**
+ * Form State Reducer
+ *
+ * Provides a reducer-based state management pattern for forms throughout the application.
+ * Handles common form states: loading, saving, errors, validation, and success messages.
+ *
+ * @module reducers/formState
+ */
+
 import { useReducer, useMemo } from "react"
 import { FormActions, FormStateType, FormStateAction } from "@/types"
 
@@ -8,6 +16,29 @@ import { FormActions, FormStateType, FormStateAction } from "@/types"
 export { FormActions } from "@/types"
 export type { FormStateType, FormStateAction } from "@/types"
 
+/**
+ * Creates an initial form state object with default values.
+ *
+ * Initial state:
+ * - `edited: false` - Form has not been modified
+ * - `loading: true` - Form is loading data
+ * - `saving: false` - Form is not currently saving
+ * - `disabled: true` - Form inputs are disabled during load
+ * - `open: false` - Modal/dialog is closed
+ * - `errors: {}` - No validation errors
+ * - `status: null` - No status message
+ * - `success: null` - No success message
+ *
+ * @template T - The shape of the form data object
+ * @param data - Optional initial data to populate the form
+ * @returns Initialized form state with the provided data
+ *
+ * @example
+ * ```tsx
+ * const initial = initializeFormState({ name: "", email: "" })
+ * // { edited: false, loading: true, saving: false, disabled: true, ... }
+ * ```
+ */
 export function initializeFormState<T extends Record<string, unknown>>(
   data: T | null = null
 ): FormStateType<T> {
@@ -24,6 +55,42 @@ export function initializeFormState<T extends Record<string, unknown>>(
   }
 }
 
+/**
+ * Reducer function for form state management.
+ *
+ * Handles the following action types:
+ *
+ * | Action | Effect |
+ * |--------|--------|
+ * | `EDIT` | Updates a single field, marks form as edited |
+ * | `UPDATE` | Updates a field, enables form, clears saving state |
+ * | `OPEN` | Toggles modal/dialog open state |
+ * | `DISABLE` | Toggles disabled state |
+ * | `LOADING` | Toggles loading state |
+ * | `ERROR` | Sets a single field error, disables form |
+ * | `ERRORS` | Sets multiple errors at once, disables form |
+ * | `STATUS` | Sets a status message with severity |
+ * | `SUCCESS` | Clears errors, sets success message, enables form |
+ * | `SUBMIT` | Clears errors/success, sets saving state |
+ * | `RESET` | Resets to initial state with optional new data |
+ *
+ * @template T - The shape of the form data object
+ * @param state - Current form state
+ * @param action - Action to dispatch
+ * @returns Updated form state
+ *
+ * @example
+ * ```tsx
+ * // Used internally by useForm hook
+ * const [state, dispatch] = useReducer(formReducer, initialState)
+ *
+ * // Edit a field
+ * dispatch({ type: FormActions.EDIT, name: "email", value: "user@example.com" })
+ *
+ * // Set validation errors
+ * dispatch({ type: FormActions.ERRORS, payload: { email: "Invalid email" } })
+ * ```
+ */
 export function formReducer<T extends Record<string, unknown>>(
   state: FormStateType<T>,
   action: FormStateAction<T>

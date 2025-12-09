@@ -173,7 +173,7 @@ const iconMap: Record<Keyword, React.ReactElement> = {
  * Props for the Icon component.
  *
  * @property keyword - Entity type or action name to determine which icon to display
- * @property size - Icon size in pixels (default: 24)
+ * @property size - Icon size in pixels (defaults to 24)
  * @property color - Override the default category-based color
  * @property hoverColor - Override the default category-based hover color
  */
@@ -185,7 +185,7 @@ interface IconProps extends SvgIconProps {
 }
 
 /**
- * Dynamic icon component that renders context-appropriate icons based on entity type.
+ * Dynamic icon component that renders icons based on keyword strings.
  *
  * Icons are organized by category (Combat, Affiliations, Characters, Details, Utility, Interface)
  * with each category having consistent color theming. The component automatically handles

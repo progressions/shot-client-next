@@ -44,7 +44,7 @@ interface BaseDataGridProps<T> {
  * - Loading skeleton during initial render
  * - Integration with useForm reducer pattern
  *
- * @typeParam T - The type of row data
+ * @template T - The type of row data
  *
  * @example
  * ```tsx

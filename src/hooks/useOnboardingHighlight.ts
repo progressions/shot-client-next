@@ -8,7 +8,7 @@ import { OnboardingMilestone, isRelevantPage } from "@/lib/onboarding"
  * Props for the useOnboardingHighlight hook.
  *
  * @property currentMilestone - The current onboarding milestone to highlight for
- * @property shouldHighlight - Whether highlighting is enabled (default: true)
+ * @property shouldHighlight - Whether highlighting is enabled (defaults to true)
  */
 export interface UseOnboardingHighlightProps {
   currentMilestone: OnboardingMilestone | null
