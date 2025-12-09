@@ -1,5 +1,17 @@
 "use client"
 
+/**
+ * useEntity Hook
+ *
+ * Provides standardized CRUD operations for any entity type in the application.
+ * Handles API calls, form state updates, toast notifications, and error handling.
+ *
+ * Works with the entity_class property to dynamically call the correct API methods.
+ * Integrates with the form reducer pattern for state management.
+ *
+ * @module hooks/useEntity
+ */
+
 import { useToast } from "@/contexts/ToastContext"
 import { useClient, useApp } from "@/contexts/AppContext"
 import type { Entity } from "@/types"

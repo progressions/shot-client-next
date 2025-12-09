@@ -1,3 +1,16 @@
+/**
+ * useEntityFilters Hook
+ *
+ * Manages URL-synchronized filter state for entity list pages.
+ * Provides a consistent pattern for filtering entities with:
+ * - Automatic URL query parameter synchronization
+ * - Support for checkbox (boolean) and dropdown (string) filters
+ * - Active filter counting for UI badges
+ * - Reset to defaults functionality
+ *
+ * @module hooks/useEntityFilters
+ */
+
 import { useCallback, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { queryParams } from "@/lib"

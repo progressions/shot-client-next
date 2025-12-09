@@ -1,4 +1,21 @@
 "use client"
+
+/**
+ * EncounterContext - Real-Time Combat/Fight State Management
+ *
+ * Provides state management for active combat encounters (fights) including:
+ * - Current encounter data with shots, characters, and vehicles
+ * - Weapons and schticks lookup maps for quick access
+ * - Real-time WebSocket updates for multiplayer combat
+ * - Shot spending and initiative tracking
+ * - Selected actor state for combat UI
+ *
+ * Must be wrapped around encounter/fight pages via EncounterProvider.
+ * Uses Phoenix Channels for real-time synchronization between players.
+ *
+ * @module contexts/EncounterContext
+ */
+
 import { createContext, useContext, useEffect, useState } from "react"
 import { v4 as uuidv4 } from "uuid"
 import type { Entity, Encounter, Weapon, Schtick } from "@/types"
@@ -6,6 +23,9 @@ import { FormStateType, FormActions, useForm } from "@/reducers"
 import { useCampaign, useClient } from "@/contexts/AppContext"
 import { useEntity } from "@/hooks"
 
+/**
+ * Animation transition settings for encounter UI changes.
+ */
 export const encounterTransition = {
   duration: 1,
   ease: "easeInOut",

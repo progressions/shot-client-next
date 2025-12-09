@@ -1,4 +1,15 @@
 "use client"
+
+/**
+ * useImageGeneration Hook
+ *
+ * Handles AI image generation for entities (characters, etc.) using WebSocket
+ * for real-time progress updates. Triggers the generation API and listens
+ * for completion via Phoenix Channels.
+ *
+ * @module hooks/useImageGeneration
+ */
+
 import { useState, useEffect } from "react"
 import type { Entity, CableData } from "@/types"
 import { Subscription } from "@rails/actioncable"
@@ -6,6 +17,13 @@ import { FormActions, type FormStateAction } from "@/reducers"
 import { useClient } from "@/contexts"
 import { handleError } from "@/lib"
 
+/**
+ * Props for the useImageGeneration hook.
+ *
+ * @property campaignId - Campaign ID for WebSocket channel subscription
+ * @property entity - The entity to generate images for
+ * @property dispatchForm - Form dispatch to update image_urls state
+ */
 interface UseImageGenerationProps {
   campaignId: string | number
   entity: Entity
