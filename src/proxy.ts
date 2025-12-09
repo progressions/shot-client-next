@@ -2,8 +2,14 @@
 import { NextRequest, NextResponse } from "next/server"
 
 export function proxy(request: NextRequest) {
-  const token = request.cookies.get("jwtToken")?.value
   const { pathname } = request.nextUrl
+
+  // Tidewave MCP proxy - rewrite /tidewave requests to API handler
+  if (pathname.startsWith("/tidewave")) {
+    return NextResponse.rewrite(new URL("/api/tidewave", request.url))
+  }
+
+  const token = request.cookies.get("jwtToken")?.value
 
   // Set x-pathname header
   const requestHeaders = new Headers(request.headers)
