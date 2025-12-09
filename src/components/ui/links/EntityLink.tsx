@@ -4,7 +4,10 @@ import { useRef, useState, useEffect, useCallback } from "react"
 import type { Entity } from "@/types"
 import pluralize from "pluralize"
 
-// Map entity_class to keyword generation function
+/**
+ * Maps entity_class to keyword generation function for popup components.
+ * Used to pass context-specific keywords to popup components.
+ */
 const keywordMap: Record<string, (id: string) => string | undefined> = {
   Archetype: id => `Archetype: ${id}`,
   Type: id => `Type: ${id}`,
@@ -13,6 +16,18 @@ const keywordMap: Record<string, (id: string) => string | undefined> = {
   Info: id => id,
 }
 
+/**
+ * Props for the EntityLink component.
+ *
+ * @property entity - The entity object to link to (must have id and entity_class)
+ * @property data - Additional data to store in data-mention-data attribute
+ * @property disablePopup - Disable hover popup (default: false)
+ * @property children - Custom link text (defaults to entity.name)
+ * @property sx - Custom styles for the link
+ * @property popupOverride - Custom popup component to show on hover
+ * @property href - Override the auto-generated URL
+ * @property noUnderline - Remove underline from link (default: false)
+ */
 type EntityLinkProperties = {
   entity: Entity
   data?: string | object
@@ -30,6 +45,34 @@ type EntityLinkProperties = {
   noUnderline?: boolean
 }
 
+/**
+ * Polymorphic link component for any entity type with optional hover popup.
+ *
+ * Automatically generates URLs based on entity_class (e.g., Character → /characters/{id}).
+ * Supports hover-triggered popups that show entity details without navigating away.
+ * Used extensively in rich text content for @mentions.
+ *
+ * Features:
+ * - Auto-generates href from entity_class (pluralized, lowercase)
+ * - Opens in new tab by default
+ * - Hover popup with 500ms delay (cancelable)
+ * - Popup stays open when hovering over it
+ * - Data attributes for mention parsing
+ *
+ * @example
+ * ```tsx
+ * // Basic usage - auto-generates URL
+ * <EntityLink entity={character} />
+ *
+ * // With custom popup
+ * <EntityLink entity={character} popupOverride={CharacterPopup} />
+ *
+ * // Custom text and no popup
+ * <EntityLink entity={faction} disablePopup>
+ *   View {faction.name}'s details
+ * </EntityLink>
+ * ```
+ */
 export default function EntityLink({
   entity,
   data,

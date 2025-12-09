@@ -11,6 +11,14 @@ import {
 } from "@mui/material"
 import { FormActions, useForm } from "@/reducers"
 
+/**
+ * Option structure for the Autocomplete component.
+ *
+ * @property label - Display text shown in the dropdown
+ * @property value - Unique identifier value (usually entity ID)
+ * @property group - Optional group name for grouped options
+ * @property isDivider - If true, renders as a divider instead of selectable option
+ */
 export interface Option {
   label: string
   value: string
@@ -18,6 +26,17 @@ export interface Option {
   isDivider?: boolean
 }
 
+/**
+ * Props for the Autocomplete component.
+ *
+ * @property label - Label text for the input field
+ * @property fetchOptions - Async function to fetch options based on search query
+ * @property onChange - Callback when selection changes (receives value string or null)
+ * @property value - Currently selected value (ID string or null)
+ * @property exclude - Array of values to exclude from options
+ * @property allowNone - Whether to show "None" option (default: true)
+ * @property freeSolo - Allow arbitrary text input (default: false)
+ */
 interface AutocompleteProperties
   extends Partial<MuiAutocompleteProps<Option, false, false, boolean>> {
   label: string
@@ -65,6 +84,31 @@ type FormStateData = {
 
 const NONE_VALUE = "__NONE__"
 
+/**
+ * Generic async autocomplete component with search-as-you-type functionality.
+ *
+ * Features:
+ * - Async option fetching with loading indicator
+ * - Optional "None" selection
+ * - Option exclusion (hide already-selected items)
+ * - Free-form text input mode (freeSolo)
+ * - Grouped options with dividers
+ * - Themed styling matching app design
+ *
+ * @example
+ * ```tsx
+ * <Autocomplete
+ *   label="Select Character"
+ *   value={characterId}
+ *   onChange={setCharacterId}
+ *   fetchOptions={async (query) => {
+ *     const { data } = await client.getCharacters({ search: query })
+ *     return data.map(c => ({ label: c.name, value: c.id }))
+ *   }}
+ *   exclude={existingCharacterIds}
+ * />
+ * ```
+ */
 export function Autocomplete({
   label,
   fetchOptions,

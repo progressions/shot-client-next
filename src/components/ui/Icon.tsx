@@ -38,7 +38,10 @@ import SecurityIcon from "@mui/icons-material/Security"
 import BadgeIcon from "@mui/icons-material/Badge"
 import { iconColorMap, type Category } from "@/components/ui/iconColors"
 
-// Define the keyword type
+/**
+ * Valid keyword strings for the Icon component.
+ * Each keyword maps to a specific icon and color category.
+ */
 type Keyword =
   | "Fight"
   | "Fighter"
@@ -166,6 +169,14 @@ const iconMap: Record<Keyword, React.ReactElement> = {
   Account: <BadgeIcon />,
 }
 
+/**
+ * Props for the Icon component.
+ *
+ * @property keyword - Entity type or action name to determine which icon to display
+ * @property size - Icon size in pixels (default: 24)
+ * @property color - Override the default category-based color
+ * @property hoverColor - Override the default category-based hover color
+ */
 interface IconProps extends SvgIconProps {
   keyword: Keyword
   size?: number
@@ -173,7 +184,28 @@ interface IconProps extends SvgIconProps {
   hoverColor?: string
 }
 
-// Reusable Icon component that renders the icon with category-based colors
+/**
+ * Dynamic icon component that renders context-appropriate icons based on entity type.
+ *
+ * Icons are organized by category (Combat, Affiliations, Characters, Details, Utility, Interface)
+ * with each category having consistent color theming. The component automatically handles
+ * pluralization (e.g., "Characters" → "Character") to find the correct icon.
+ *
+ * @param props - Icon configuration including keyword, size, and color overrides
+ * @returns The appropriate icon element with category-based styling, or null if keyword not found
+ *
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <Icon keyword="Character" />
+ *
+ * // With custom size
+ * <Icon keyword="Fight" size={32} />
+ *
+ * // With color override
+ * <Icon keyword="Weapon" color="#ff0000" />
+ * ```
+ */
 export const Icon: React.FC<IconProps> = ({
   size,
   keyword,
