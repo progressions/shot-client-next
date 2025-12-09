@@ -1,4 +1,22 @@
 "use client"
+
+/**
+ * AppContext - Global Application State Management
+ *
+ * Provides centralized state management for the entire application including:
+ * - User authentication and JWT token management
+ * - Current campaign selection and persistence
+ * - Real-time WebSocket subscriptions via Phoenix Channels
+ * - API client access
+ *
+ * Exports three specialized hooks for different use cases:
+ * - `useApp()` - Full context access (user, campaign, client, loading state)
+ * - `useClient()` - API client and authentication state
+ * - `useCampaign()` - Campaign state and WebSocket subscriptions
+ *
+ * @module contexts/AppContext
+ */
+
 import {
   type ActionDispatch,
   useCallback,

@@ -1,5 +1,19 @@
 "use client"
 
+/**
+ * ToastContext - Global Notification System
+ *
+ * Provides a centralized toast notification system for displaying
+ * success, error, info, and warning messages throughout the application.
+ *
+ * Features:
+ * - Four severity levels: success, error, info, warning
+ * - Auto-close functionality
+ * - Single toast at a time (new toasts replace existing)
+ *
+ * @module contexts/ToastContext
+ */
+
 import { createContext, useContext, useState } from "react"
 
 import type { Toast } from "@/types"
