@@ -1,4 +1,21 @@
 "use client"
+
+/**
+ * ListManager Component
+ *
+ * Manages parent-child entity relationships with optimistic updates.
+ * Provides a unified interface for adding/removing child entities from a parent
+ * (e.g., adding Characters or Vehicles to a Fight).
+ *
+ * Features:
+ * - Optimistic UI updates with automatic rollback on error
+ * - Filterable autocomplete for adding new entities
+ * - Paginated badge list display
+ * - Support for Characters and Vehicles derived from shots
+ *
+ * @module components/ListManager
+ */
+
 import { Skeleton, Stack, Box } from "@mui/material"
 import { GenericFilter, BadgeList } from "@/components/ui"
 import { useClient } from "@/contexts"
@@ -14,6 +31,16 @@ import {
   useAutocompleteFilters,
 } from "./ListManager/hooks"
 
+/**
+ * Props for the ListManager component.
+ *
+ * @property open - Whether the manager UI is expanded/visible
+ * @property parentEntity - The parent Fight entity containing child relationships
+ * @property childEntityName - Type of child entity to manage (e.g., "Character", "Vehicle")
+ * @property onListUpdate - Callback fired when the child list is modified
+ * @property excludeIds - IDs to exclude from the autocomplete options (defaults to [])
+ * @property manage - Whether to show add/remove controls (defaults to true)
+ */
 type ListManagerProps = {
   open: boolean
   parentEntity: Fight
@@ -23,6 +50,27 @@ type ListManagerProps = {
   manage?: boolean
 }
 
+/**
+ * Component for managing parent-child entity relationships with optimistic updates.
+ *
+ * Combines filtering, autocomplete selection, and paginated display to provide
+ * a complete interface for managing entity relationships. Uses optimistic updates
+ * for responsive UI with automatic rollback on server errors.
+ *
+ * @param props - Component props
+ * @returns Rendered list manager with filter and badge list
+ *
+ * @example
+ * ```tsx
+ * <ListManager
+ *   open={isExpanded}
+ *   parentEntity={fight}
+ *   childEntityName="Character"
+ *   onListUpdate={handleFightUpdate}
+ *   excludeIds={alreadySelectedIds}
+ * />
+ * ```
+ */
 export function ListManager({
   open,
   parentEntity,

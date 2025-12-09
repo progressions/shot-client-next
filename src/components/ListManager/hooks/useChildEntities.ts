@@ -1,3 +1,13 @@
+/**
+ * useChildEntities Hook
+ *
+ * Fetches and manages the full entity objects for child entities.
+ * Provides optimistic update support with a ref flag to prevent
+ * stale data from overwriting optimistic changes.
+ *
+ * @module components/ListManager/hooks/useChildEntities
+ */
+
 import { useState, useEffect, useRef } from "react"
 import pluralize from "pluralize"
 import { collectionNames } from "@/lib/maps"
@@ -10,6 +20,25 @@ interface Client {
   ) => Promise<{ data: Record<string, unknown> }>
 }
 
+/**
+ * Hook to fetch and manage child entity data from API.
+ *
+ * Initializes state from parent entity data (shots or direct collections),
+ * then fetches full entity data from the API. Includes optimistic update
+ * support via a ref that temporarily blocks API refetches.
+ *
+ * @param childEntityName - Type of child entity (e.g., "Character", "Vehicle")
+ * @param childIds - Array of child entity IDs to fetch
+ * @param parentEntity - Parent Fight entity for initial data extraction
+ * @param client - API client with dynamic get methods
+ * @returns Object with childEntities state, setter, optimisticUpdateRef, and collection name
+ *
+ * @example
+ * ```tsx
+ * const { childEntities, setChildEntities, optimisticUpdateRef } =
+ *   useChildEntities("Character", [1, 2, 3], fight, client)
+ * ```
+ */
 export function useChildEntities(
   childEntityName: keyof typeof filterConfigs,
   childIds: (string | number)[],

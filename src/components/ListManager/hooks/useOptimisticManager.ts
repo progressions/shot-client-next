@@ -1,3 +1,13 @@
+/**
+ * useOptimisticManager Hook
+ *
+ * Provides optimistic add/delete handlers for child entity management.
+ * Updates local state immediately, then syncs with server. Automatically
+ * reverts on error.
+ *
+ * @module components/ListManager/hooks/useOptimisticManager
+ */
+
 import { useCallback } from "react"
 import type { Fight } from "@/types"
 import { filterConfigs } from "@/lib/filterConfigs"
@@ -7,6 +17,19 @@ interface AutocompleteOption {
   name: string
 }
 
+/**
+ * Props for the useOptimisticManager hook.
+ *
+ * @property childEntities - Current array of child entities
+ * @property setChildEntities - State setter for child entities
+ * @property optimisticUpdateRef - Ref to flag optimistic updates in progress
+ * @property childIds - Current array of child entity IDs
+ * @property onListUpdate - Callback to persist changes to parent entity
+ * @property parentEntity - The parent Fight entity
+ * @property childIdsKey - Property name for child IDs on parent (e.g., "character_ids")
+ * @property childEntityName - Type of child entity
+ * @property setCurrentPage - Pagination state setter
+ */
 interface UseOptimisticManagerProps {
   childEntities: AutocompleteOption[]
   setChildEntities: (entities: AutocompleteOption[]) => void
@@ -19,6 +42,38 @@ interface UseOptimisticManagerProps {
   setCurrentPage: (page: number) => void
 }
 
+/**
+ * Hook providing optimistic add/delete handlers for child entities.
+ *
+ * Implements the optimistic update pattern:
+ * 1. Update local state immediately for responsive UI
+ * 2. Call server to persist changes
+ * 3. Revert local state if server call fails
+ *
+ * @param props - Configuration props including entities, callbacks, and refs
+ * @returns Object with handleAdd and handleDelete callbacks
+ *
+ * @example
+ * ```tsx
+ * const { handleAdd, handleDelete } = useOptimisticManager({
+ *   childEntities,
+ *   setChildEntities,
+ *   optimisticUpdateRef,
+ *   childIds,
+ *   onListUpdate: updateFight,
+ *   parentEntity: fight,
+ *   childIdsKey: "character_ids",
+ *   childEntityName: "Character",
+ *   setCurrentPage,
+ * })
+ *
+ * // Add a character
+ * await handleAdd(selectedCharacter)
+ *
+ * // Remove a character
+ * await handleDelete(characterToRemove)
+ * ```
+ */
 export function useOptimisticManager({
   childEntities,
   setChildEntities,
