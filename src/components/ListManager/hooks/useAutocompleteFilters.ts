@@ -1,3 +1,13 @@
+/**
+ * useAutocompleteFilters Hook
+ *
+ * Manages filter state and data fetching for autocomplete dropdowns.
+ * Integrates with the form reducer system to track filter changes and
+ * fetch matching entities from the API.
+ *
+ * @module components/ListManager/hooks/useAutocompleteFilters
+ */
+
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { FormActions, useForm } from "@/reducers"
 
@@ -7,6 +17,31 @@ interface Client {
   ) => Promise<{ data: Record<string, unknown> }>
 }
 
+/**
+ * Hook for managing autocomplete filter state and data fetching.
+ *
+ * Creates a form state for tracking filter values and automatically
+ * fetches entities when filters change. Cleans filter values before
+ * sending to API (removes object values, keeps primitives).
+ *
+ * @param pluralChildEntityName - Pluralized entity name for API method lookup
+ * @param client - API client with dynamic get methods
+ * @returns Object with formState, updateFilters callback, and loading state
+ *
+ * @example
+ * ```tsx
+ * const { formState, updateFilters, loading } = useAutocompleteFilters(
+ *   "Characters",
+ *   client
+ * )
+ *
+ * // Update filters
+ * updateFilters({ faction_id: 5, archetype: "Martial Artist" })
+ *
+ * // Access fetched data
+ * const characters = formState.data.characters
+ * ```
+ */
 export function useAutocompleteFilters(
   pluralChildEntityName: string,
   client: Client

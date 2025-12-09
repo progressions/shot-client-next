@@ -1,5 +1,14 @@
 import { Stack, Box, Typography } from "@mui/material"
 
+/**
+ * Props for the SectionHeader component.
+ *
+ * @property title - Section title text (required)
+ * @property icon - Optional icon to display before the title
+ * @property actions - Optional action buttons/elements aligned to the right
+ * @property sx - Custom styles to apply to the container
+ * @property children - Optional subtitle content displayed below the header
+ */
 type SectionHeader = {
   icon?: React.ReactNode
   actions?: React.ReactNode
@@ -8,6 +17,26 @@ type SectionHeader = {
   children?: React.ReactNode
 }
 
+/**
+ * Section header component with icon, title, actions, and optional subtitle.
+ *
+ * Renders a consistent section header with:
+ * - Optional leading icon
+ * - Title with underline decoration
+ * - Right-aligned action buttons
+ * - Optional subtitle/description below
+ *
+ * @example
+ * ```tsx
+ * <SectionHeader
+ *   icon={<Icon keyword="Character" />}
+ *   title="Characters"
+ *   actions={<Button onClick={handleAdd}>Add Character</Button>}
+ * >
+ *   Manage your campaign characters
+ * </SectionHeader>
+ * ```
+ */
 export function SectionHeader({
   icon,
   actions,

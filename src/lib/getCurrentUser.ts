@@ -2,6 +2,28 @@
 
 import { getServerClient } from "@/lib/getServerClient"
 
+/**
+ * Server action to fetch the currently authenticated user.
+ *
+ * Used for SSR (Server-Side Rendering) to get user data during page load.
+ * Handles authentication errors gracefully by returning null instead of throwing,
+ * allowing pages to render in an unauthenticated state.
+ *
+ * @returns The authenticated User object, or null if:
+ *   - No JWT token is present in cookies
+ *   - Token is invalid or expired (401/400 response)
+ *   - API returns no user data
+ *   - Any unexpected error occurs
+ *
+ * @example
+ * ```tsx
+ * // In a Server Component or page
+ * const user = await getCurrentUser()
+ * if (!user) {
+ *   redirect('/login')
+ * }
+ * ```
+ */
 export async function getCurrentUser() {
   "use server"
   const client = await getServerClient()

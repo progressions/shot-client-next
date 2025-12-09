@@ -2,6 +2,14 @@ import { useCallback, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { queryParams } from "@/lib"
 
+/**
+ * Configuration for a single entity filter.
+ *
+ * @property name - The URL parameter name and filter key
+ * @property label - Human-readable label for the filter UI
+ * @property defaultValue - Default value when filter is not set (defaults to false for checkboxes, "" for dropdowns)
+ * @property type - Filter type: "checkbox" for boolean toggles, "dropdown" for select menus
+ */
 export interface EntityFilterConfig {
   name: string
   label: string
@@ -9,6 +17,14 @@ export interface EntityFilterConfig {
   type?: "checkbox" | "dropdown"
 }
 
+/**
+ * Options for configuring the useEntityFilters hook.
+ *
+ * @property filterConfigs - Array of filter configurations
+ * @property basePath - Base URL path for navigation (e.g., "/characters")
+ * @property otherFilters - Additional filters to merge (e.g., sort, search)
+ * @property onFiltersChange - Callback when filters change
+ */
 interface UseEntityFiltersOptions {
   filterConfigs: EntityFilterConfig[]
   basePath: string
@@ -16,6 +32,39 @@ interface UseEntityFiltersOptions {
   onFiltersChange?: (filters: Record<string, unknown>) => void
 }
 
+/**
+ * Hook for managing URL-synchronized entity filters.
+ *
+ * Provides filter state management with automatic URL synchronization,
+ * supporting both checkbox (boolean) and dropdown (string) filter types.
+ * Filter values are persisted in URL query parameters for shareable,
+ * bookmarkable filtered views.
+ *
+ * @param options - Configuration options for the filters
+ * @returns Object containing filter state and control functions
+ *
+ * @example
+ * ```tsx
+ * const { filters, updateFilters, resetFilters, activeFilterCount } = useEntityFilters({
+ *   filterConfigs: [
+ *     { name: "active", label: "Active Only", defaultValue: true, type: "checkbox" },
+ *     { name: "character_type", label: "Type", type: "dropdown" }
+ *   ],
+ *   basePath: "/characters",
+ *   otherFilters: { sort: sortValue },
+ *   onFiltersChange: handleFiltersChange
+ * })
+ *
+ * // Update a single filter
+ * updateFilters({ active: false })
+ *
+ * // Reset all filters to defaults
+ * resetFilters()
+ *
+ * // Show active filter badge
+ * {activeFilterCount > 0 && <Badge>{activeFilterCount}</Badge>}
+ * ```
+ */
 export function useEntityFilters({
   filterConfigs,
   basePath,
