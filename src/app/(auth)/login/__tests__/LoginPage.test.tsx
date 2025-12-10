@@ -470,6 +470,14 @@ describe("LoginPage", () => {
       )
     }
 
+    // Helper function to fill OTP inputs by pasting the code
+    const fillOtpInputs = async (code: string) => {
+      const user = userEvent.setup()
+      const digit1 = screen.getByLabelText("Digit 1 of 6")
+      await user.click(digit1)
+      await user.paste(code)
+    }
+
     it("successfully verifies OTP and logs in", async () => {
       await setupOtpCodeEntry()
 
@@ -486,13 +494,8 @@ describe("LoginPage", () => {
         },
       })
 
-      const codeInput = screen.getByLabelText(/login code/i)
-      await userEvent.type(codeInput, "123456")
-
-      const verifyButton = screen.getByRole("button", { name: /verify code/i })
-      await act(async () => {
-        fireEvent.click(verifyButton)
-      })
+      // Fill OTP inputs sequentially - auto-submits on completion
+      await fillOtpInputs("123456")
 
       await waitFor(() => {
         expect(mockVerifyOtp).toHaveBeenCalledWith("test@example.com", "123456")
@@ -510,12 +513,14 @@ describe("LoginPage", () => {
         data: {},
       })
 
-      const codeInput = screen.getByLabelText(/login code/i)
-      await userEvent.type(codeInput, "000000")
-
-      const verifyButton = screen.getByRole("button", { name: /verify code/i })
+      // Fill OTP inputs sequentially - auto-submits on completion
       await act(async () => {
-        fireEvent.click(verifyButton)
+        await fillOtpInputs("000000")
+      })
+
+      // Allow async error handling to complete
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 100))
       })
 
       await waitFor(() => {
@@ -528,29 +533,39 @@ describe("LoginPage", () => {
 
       mockVerifyOtp.mockRejectedValue(new Error("Invalid or expired code"))
 
-      const codeInput = screen.getByLabelText(/login code/i)
-      await userEvent.type(codeInput, "123456")
-
-      const verifyButton = screen.getByRole("button", { name: /verify code/i })
+      // Fill OTP inputs sequentially - auto-submits on completion
       await act(async () => {
-        fireEvent.click(verifyButton)
+        await fillOtpInputs("123456")
       })
 
-      await waitFor(() => {
-        expect(screen.getByRole("alert")).toHaveTextContent(
-          "Invalid or expired code"
-        )
+      // Allow async error handling to complete
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 100))
       })
+
+      await waitFor(
+        () => {
+          expect(screen.getByRole("alert")).toHaveTextContent(
+            "Invalid or expired code"
+          )
+        },
+        { timeout: 3000 }
+      )
     })
 
     it("only allows numeric input in OTP field", async () => {
       await setupOtpCodeEntry()
 
-      const codeInput = screen.getByLabelText(/login code/i)
+      // OtpInput component filters non-numeric input
+      const digit1 = screen.getByLabelText("Digit 1 of 6")
 
-      await userEvent.type(codeInput, "abc123def456")
+      // Try to enter non-numeric value - should be filtered out
+      fireEvent.change(digit1, { target: { value: "a" } })
+      expect(digit1).toHaveValue("")
 
-      expect(codeInput).toHaveValue("123456")
+      // Enter numeric value - should be accepted
+      fireEvent.change(digit1, { target: { value: "1" } })
+      expect(digit1).toHaveValue("1")
     })
 
     it("allows going back to email entry", async () => {
@@ -571,17 +586,27 @@ describe("LoginPage", () => {
     it("shows loading state during verification", async () => {
       await setupOtpCodeEntry()
 
+      // Make verification take some time so we can observe loading state
+      let resolveVerify: (value: { data: { token: string } }) => void
       mockVerifyOtp.mockImplementation(
-        () => new Promise(resolve => setTimeout(resolve, 100))
+        () =>
+          new Promise(resolve => {
+            resolveVerify = resolve
+          })
       )
 
-      const codeInput = screen.getByLabelText(/login code/i)
-      await userEvent.type(codeInput, "123456")
+      // Fill OTP inputs sequentially - auto-submits on completion
+      await fillOtpInputs("123456")
 
-      const verifyButton = screen.getByRole("button", { name: /verify code/i })
-      fireEvent.click(verifyButton)
+      // Loading state shows "Verifying..." text
+      await waitFor(() => {
+        expect(screen.getByText(/verifying/i)).toBeInTheDocument()
+      })
 
-      expect(screen.getByRole("button", { name: /verifying/i })).toBeDisabled()
+      // Clean up by resolving the promise
+      await act(async () => {
+        resolveVerify!({ data: { token: "test-token" } })
+      })
     })
   })
 

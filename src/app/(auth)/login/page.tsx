@@ -12,7 +12,7 @@ import {
   Tab,
 } from "@mui/material"
 import Link from "next/link"
-import { Button, TextField } from "@/components/ui"
+import { Button, TextField, OtpInput } from "@/components/ui"
 import { PasskeyLogin } from "@/components/auth"
 import Cookies from "js-cookie"
 import { useClient } from "@/contexts"
@@ -174,15 +174,14 @@ export default function LoginPage() {
     }
   }
 
-  const handleOtpVerify = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleOtpVerify = async (code: string) => {
     setIsSubmitting(true)
     setError(null)
     setSuccessMessage(null)
 
     try {
       const client = createClient()
-      const response = await client.verifyOtp(otpEmail, otpCode)
+      const response = await client.verifyOtp(otpEmail, code)
 
       if (response.data.token) {
         await handleLoginSuccess(response.data.token)
@@ -374,37 +373,29 @@ export default function LoginPage() {
         )}
 
         {loginMethod === "otp" && otpSent && (
-          <Stack
-            direction="column"
-            component="form"
-            onSubmit={handleOtpVerify}
-            sx={{ mt: 1, width: "100%" }}
-          >
+          <Stack direction="column" sx={{ mt: 1, width: "100%" }}>
             <Typography variant="body2" sx={{ color: "#cccccc", mb: 2 }}>
               Enter the 6-digit code sent to {otpEmail}
             </Typography>
-            <TextField
-              margin="normal"
-              required
-              name="code"
-              label="Login Code"
+            <OtpInput
               value={otpCode}
-              onChange={e => {
-                const value = e.target.value.replace(/\D/g, "")
-                setOtpCode(value)
+              onChange={setOtpCode}
+              onComplete={code => {
+                setOtpCode(code)
+                handleOtpVerify(code)
               }}
+              disabled={isSubmitting}
               autoFocus
-              inputProps={{
-                maxLength: 6,
-                inputMode: "numeric",
-                pattern: "[0-9]*",
-                style: { letterSpacing: "0.5em", textAlign: "center" },
-              }}
             />
-            <Button type="submit" disabled={isSubmitting} sx={{ mt: 2, mb: 2 }}>
-              {isSubmitting ? "Verifying..." : "Verify Code"}
-            </Button>
-            <Box sx={{ textAlign: "center" }}>
+            {isSubmitting && (
+              <Typography
+                variant="body2"
+                sx={{ color: "#cccccc", mt: 2, textAlign: "center" }}
+              >
+                Verifying...
+              </Typography>
+            )}
+            <Box sx={{ textAlign: "center", mt: 2 }}>
               <Button
                 variant="text"
                 size="small"

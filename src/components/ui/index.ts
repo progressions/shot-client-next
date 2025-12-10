@@ -1,6 +1,7 @@
 export * from "@/components/ui/Button"
 export * from "@/components/ui/Card"
 export * from "@/components/ui/TextField"
+export * from "@/components/ui/OtpInput"
 export * from "@/components/ui/SaveButton"
 export * from "@/components/ui/CancelButton"
 export * from "@/components/ui/DeleteButton"
