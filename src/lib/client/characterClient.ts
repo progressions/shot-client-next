@@ -186,6 +186,42 @@ export function createCharacterClient(deps: ClientDependencies) {
     return delete_(`${apiV2.characters(character)}/image`)
   }
 
+  /**
+   * Deletes the image for any entity type using the entity's entity_class property.
+   * Supports: Character (Person), Vehicle, Fight, Weapon, Schtick, Juncture, Site, Party, Faction, User.
+   * Does NOT support: Campaign (will throw an error if called with a Campaign entity).
+   */
+  async function deleteEntityImage(
+    entity: Entity
+  ): Promise<AxiosResponse<Entity>> {
+    const entityClass = entity.entity_class?.toLowerCase() || ""
+
+    // Map entity class to API endpoint
+    // Note: Characters have entity_class "Person" in this codebase
+    const endpointMap: Record<string, string> = {
+      person: `${apiV2.characters({ id: entity.id })}/image`,
+      character: `${apiV2.characters({ id: entity.id })}/image`,
+      vehicle: `${apiV2.vehicles({ id: entity.id })}/image`,
+      fight: `${apiV2.fights({ id: entity.id })}/image`,
+      weapon: `${apiV2.weapons({ id: entity.id })}/image`,
+      schtick: `${apiV2.schticks({ id: entity.id })}/image`,
+      juncture: `${apiV2.junctures({ id: entity.id })}/image`,
+      site: `${apiV2.sites({ id: entity.id })}/image`,
+      party: `${apiV2.parties({ id: entity.id })}/image`,
+      faction: `${apiV2.factions({ id: entity.id })}/image`,
+      user: `${apiV2.users({ id: entity.id })}/image`,
+    }
+
+    const endpoint = endpointMap[entityClass]
+    if (!endpoint) {
+      throw new Error(
+        `Unsupported entity type for image deletion: ${entityClass}`
+      )
+    }
+
+    return delete_(endpoint)
+  }
+
   async function syncCharacter(
     character: Character
   ): Promise<AxiosResponse<Person>> {
@@ -362,6 +398,7 @@ export function createCharacterClient(deps: ClientDependencies) {
     uploadCharacterPdf,
     deleteCharacter,
     deleteCharacterImage,
+    deleteEntityImage,
     syncCharacter,
     spendShots,
     hideCharacter,
