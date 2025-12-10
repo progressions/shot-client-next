@@ -188,7 +188,8 @@ export function createCharacterClient(deps: ClientDependencies) {
 
   /**
    * Deletes the image for any entity type using the entity's entity_class property.
-   * Supports: Character, Vehicle, Fight, Weapon, Schtick, Juncture, Site, Party, Faction, User
+   * Supports: Character (Person), Vehicle, Fight, Weapon, Schtick, Juncture, Site, Party, Faction, User.
+   * Does NOT support: Campaign (will throw an error if called with a Campaign entity).
    */
   async function deleteEntityImage(
     entity: Entity
@@ -196,7 +197,9 @@ export function createCharacterClient(deps: ClientDependencies) {
     const entityClass = entity.entity_class?.toLowerCase() || ""
 
     // Map entity class to API endpoint
+    // Note: Characters have entity_class "Person" in this codebase
     const endpointMap: Record<string, string> = {
+      person: `${apiV2.characters({ id: entity.id })}/image`,
       character: `${apiV2.characters({ id: entity.id })}/image`,
       vehicle: `${apiV2.vehicles({ id: entity.id })}/image`,
       fight: `${apiV2.fights({ id: entity.id })}/image`,

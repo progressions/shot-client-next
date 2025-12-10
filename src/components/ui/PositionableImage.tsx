@@ -419,7 +419,7 @@ export function PositionableImage({
           {!creationMode && (
             <>
               <RepositionButton onClick={() => setIsRepositioning(true)} />
-              <DeleteButton onClick={handleDeleteImage} />
+              <DeleteButton onClick={handleDeleteImage} disabled={isDeleting} />
             </>
           )}
         </Box>

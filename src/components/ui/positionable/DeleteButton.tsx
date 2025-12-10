@@ -6,15 +6,21 @@ import { SystemStyleObject, Theme } from "@mui/system"
 type DeleteButtonProps = {
   onClick?: () => void
   sx?: SystemStyleObject<Theme>
+  disabled?: boolean
 }
 
-export function DeleteButton({ onClick, sx = {} }: DeleteButtonProps) {
+export function DeleteButton({
+  onClick,
+  sx = {},
+  disabled = false,
+}: DeleteButtonProps) {
   return (
     <MiniButton
       className="action-button"
       variant="contained"
       size="mini"
       color="error"
+      disabled={disabled}
       sx={{
         opacity: 0,
         transition: "opacity 0.2s",
@@ -22,7 +28,7 @@ export function DeleteButton({ onClick, sx = {} }: DeleteButtonProps) {
       }}
       onClick={onClick}
     >
-      Delete
+      {disabled ? "Deleting..." : "Delete"}
     </MiniButton>
   )
 }
