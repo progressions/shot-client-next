@@ -55,11 +55,20 @@ export function OtpInput({
     }
   }, [autoFocus])
 
-  // Convert value string to array of digits
-  const digits = value.split("").slice(0, length)
-  while (digits.length < length) {
-    digits.push("")
-  }
+  // Helper to derive digits array from value string
+  const getDigitsArray = useCallback(
+    (val: string) => {
+      const digits = val.split("").slice(0, length)
+      while (digits.length < length) {
+        digits.push("")
+      }
+      return digits
+    },
+    [length]
+  )
+
+  // Convert value string to array of digits for rendering
+  const digits = getDigitsArray(value)
 
   const focusInput = useCallback(
     (index: number) => {
@@ -76,7 +85,8 @@ export function OtpInput({
       const digit = inputValue.replace(/\D/g, "").slice(-1)
 
       if (digit) {
-        const newDigits = [...digits]
+        const currentDigits = getDigitsArray(value)
+        const newDigits = [...currentDigits]
         newDigits[index] = digit
         const newValue = newDigits.join("")
         onChange(newValue)
@@ -86,22 +96,23 @@ export function OtpInput({
           focusInput(index + 1)
         }
 
-        // Check if complete
-        if (newValue.length === length && !newValue.includes("")) {
+        // Check if complete - only need to check length since we only accept digits
+        if (newValue.length === length) {
           onComplete(newValue)
         }
       }
     },
-    [digits, length, onChange, onComplete, focusInput]
+    [value, length, onChange, onComplete, focusInput, getDigitsArray]
   )
 
   const handleKeyDown = useCallback(
     (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Backspace") {
         e.preventDefault()
-        const newDigits = [...digits]
+        const currentDigits = getDigitsArray(value)
+        const newDigits = [...currentDigits]
 
-        if (digits[index]) {
+        if (currentDigits[index]) {
           // Clear current input
           newDigits[index] = ""
           onChange(newDigits.join(""))
@@ -119,7 +130,7 @@ export function OtpInput({
         focusInput(index + 1)
       }
     },
-    [digits, length, onChange, focusInput]
+    [value, length, onChange, focusInput, getDigitsArray]
   )
 
   const handlePaste = useCallback(

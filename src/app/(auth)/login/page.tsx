@@ -174,15 +174,14 @@ export default function LoginPage() {
     }
   }
 
-  const handleOtpVerify = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleOtpVerify = async (code: string) => {
     setIsSubmitting(true)
     setError(null)
     setSuccessMessage(null)
 
     try {
       const client = createClient()
-      const response = await client.verifyOtp(otpEmail, otpCode)
+      const response = await client.verifyOtp(otpEmail, code)
 
       if (response.data.token) {
         await handleLoginSuccess(response.data.token)
@@ -381,29 +380,9 @@ export default function LoginPage() {
             <OtpInput
               value={otpCode}
               onChange={setOtpCode}
-              onComplete={async code => {
+              onComplete={code => {
                 setOtpCode(code)
-                setIsSubmitting(true)
-                setError(null)
-                setSuccessMessage(null)
-                try {
-                  const client = createClient()
-                  const response = await client.verifyOtp(otpEmail, code)
-                  if (response.data.token) {
-                    await handleLoginSuccess(response.data.token)
-                  } else {
-                    throw new Error("Invalid code")
-                  }
-                } catch (error_) {
-                  setError(
-                    error_ instanceof Error
-                      ? error_.message
-                      : "An error occurred"
-                  )
-                  console.error("OTP verify error:", error_)
-                } finally {
-                  setIsSubmitting(false)
-                }
+                handleOtpVerify(code)
               }}
               disabled={isSubmitting}
               autoFocus
