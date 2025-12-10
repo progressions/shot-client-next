@@ -486,13 +486,9 @@ describe("LoginPage", () => {
         },
       })
 
-      const codeInput = screen.getByLabelText(/login code/i)
-      await userEvent.type(codeInput, "123456")
-
-      const verifyButton = screen.getByRole("button", { name: /verify code/i })
-      await act(async () => {
-        fireEvent.click(verifyButton)
-      })
+      // Type into individual OTP digit inputs
+      const digit1 = screen.getByLabelText("Digit 1 of 6")
+      await userEvent.type(digit1, "123456")
 
       await waitFor(() => {
         expect(mockVerifyOtp).toHaveBeenCalledWith("test@example.com", "123456")
@@ -510,13 +506,9 @@ describe("LoginPage", () => {
         data: {},
       })
 
-      const codeInput = screen.getByLabelText(/login code/i)
-      await userEvent.type(codeInput, "000000")
-
-      const verifyButton = screen.getByRole("button", { name: /verify code/i })
-      await act(async () => {
-        fireEvent.click(verifyButton)
-      })
+      // Type into individual OTP digit inputs - auto-submits on completion
+      const digit1 = screen.getByLabelText("Digit 1 of 6")
+      await userEvent.type(digit1, "000000")
 
       await waitFor(() => {
         expect(screen.getByRole("alert")).toHaveTextContent("Invalid code")
@@ -528,13 +520,9 @@ describe("LoginPage", () => {
 
       mockVerifyOtp.mockRejectedValue(new Error("Invalid or expired code"))
 
-      const codeInput = screen.getByLabelText(/login code/i)
-      await userEvent.type(codeInput, "123456")
-
-      const verifyButton = screen.getByRole("button", { name: /verify code/i })
-      await act(async () => {
-        fireEvent.click(verifyButton)
-      })
+      // Type into individual OTP digit inputs - auto-submits on completion
+      const digit1 = screen.getByLabelText("Digit 1 of 6")
+      await userEvent.type(digit1, "123456")
 
       await waitFor(() => {
         expect(screen.getByRole("alert")).toHaveTextContent(
@@ -546,11 +534,12 @@ describe("LoginPage", () => {
     it("only allows numeric input in OTP field", async () => {
       await setupOtpCodeEntry()
 
-      const codeInput = screen.getByLabelText(/login code/i)
+      // OtpInput component filters non-numeric input
+      const digit1 = screen.getByLabelText("Digit 1 of 6")
+      await userEvent.type(digit1, "a1")
 
-      await userEvent.type(codeInput, "abc123def456")
-
-      expect(codeInput).toHaveValue("123456")
+      // Only the digit "1" should be accepted, and focus moves to next input
+      expect(digit1).toHaveValue("1")
     })
 
     it("allows going back to email entry", async () => {
@@ -575,13 +564,14 @@ describe("LoginPage", () => {
         () => new Promise(resolve => setTimeout(resolve, 100))
       )
 
-      const codeInput = screen.getByLabelText(/login code/i)
-      await userEvent.type(codeInput, "123456")
+      // Type into individual OTP digit inputs - auto-submits on completion
+      const digit1 = screen.getByLabelText("Digit 1 of 6")
+      await userEvent.type(digit1, "123456")
 
-      const verifyButton = screen.getByRole("button", { name: /verify code/i })
-      fireEvent.click(verifyButton)
-
-      expect(screen.getByRole("button", { name: /verifying/i })).toBeDisabled()
+      // Loading state shows "Verifying..." text
+      await waitFor(() => {
+        expect(screen.getByText(/verifying/i)).toBeInTheDocument()
+      })
     })
   })
 
