@@ -148,6 +148,8 @@ export interface User extends BaseEntity {
   image_url: string
   onboarding_progress?: OnboardingProgress
   discord_id?: string
+  character_ids?: string[]
+  characters?: Character[]
 }
 
 export interface Site extends BaseEntity {

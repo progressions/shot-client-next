@@ -9,6 +9,7 @@ type AddButtonProps = {
 export function AddButton({ onClick, disabled = false }: AddButtonProps) {
   return (
     <Button
+      type="button"
       variant="contained"
       color="secondary"
       onClick={onClick}
