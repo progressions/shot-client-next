@@ -36,6 +36,7 @@ import PersonIcon from "@mui/icons-material/Person"
 import SettingsIcon from "@mui/icons-material/Settings"
 import SecurityIcon from "@mui/icons-material/Security"
 import BadgeIcon from "@mui/icons-material/Badge"
+import TrendingUpIcon from "@mui/icons-material/TrendingUp"
 import { iconColorMap, type Category } from "@/components/ui/iconColors"
 
 /**
@@ -78,6 +79,7 @@ type Keyword =
   | "Campaign"
   | "Security"
   | "Account"
+  | "Advancement"
 
 // Map keywords to categories
 const categoryMap: Record<Keyword, Category> = {
@@ -116,6 +118,7 @@ const categoryMap: Record<Keyword, Category> = {
   Campaign: "Affiliations",
   Security: "Interface",
   Account: "Interface",
+  Advancement: "Utility",
 }
 
 // Map keywords to JSX icon elements
@@ -167,6 +170,7 @@ const iconMap: Record<Keyword, React.ReactElement> = {
   Campaign: <AutoStoriesIcon />,
   Security: <SecurityIcon />,
   Account: <BadgeIcon />,
+  Advancement: <TrendingUpIcon />,
 }
 
 /**
