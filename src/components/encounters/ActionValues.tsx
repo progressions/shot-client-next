@@ -89,6 +89,7 @@ export default function ActionValues({ character }: ActionValuesProps) {
             label={CS.fortuneType(character)}
             value={CS.fortune(character)}
             maxValue={CS.maxFortune(character)}
+            showZero
           />
         )}
       </Stack>
