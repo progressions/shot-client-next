@@ -1,5 +1,6 @@
 import React from "react"
-import { render, screen, fireEvent, waitFor } from "@testing-library/react"
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import IsTemplateToggle from "./IsTemplateToggle"
 import type { Character } from "@/types"
 
@@ -237,7 +238,13 @@ describe("IsTemplateToggle", () => {
     })
 
     it("should revert UI on error", async () => {
-      mockHandleChangeAndSave.mockRejectedValueOnce(new Error("API Error"))
+      let rejectPromise: (error: Error) => void
+      mockHandleChangeAndSave.mockImplementation(
+        () =>
+          new Promise<void>((_, reject) => {
+            rejectPromise = reject
+          })
+      )
 
       render(
         <IsTemplateToggle
@@ -258,13 +265,19 @@ describe("IsTemplateToggle", () => {
       // Optimistic update shows checked
       expect(toggle).toBeChecked()
 
-      // Wait for error handling
+      // Now reject the promise to trigger error handling
+      await act(async () => {
+        rejectPromise!(new Error("API Error"))
+      })
+
+      // After error handling, UI should revert to unchecked
       await waitFor(() => {
         expect(mockToastError).toHaveBeenCalled()
       })
 
-      // Should revert to unchecked after error
-      expect(toggle).not.toBeChecked()
+      await waitFor(() => {
+        expect(toggle).not.toBeChecked()
+      })
     })
   })
 
