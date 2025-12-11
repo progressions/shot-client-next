@@ -8,7 +8,6 @@ import { ActionValueNumberField } from "@/components/characters"
 
 type FortuneValueEditProps = {
   name: string
-  value: number | string | null
   size: "small" | "large"
   character: Character
   setCharacter: (character: Character) => void
@@ -17,19 +16,19 @@ type FortuneValueEditProps = {
 
 export default function FortuneValueEdit({
   name,
-  value,
   size = "large",
   character,
   setCharacter,
   updateCharacter,
 }: FortuneValueEditProps) {
   const [selectedName, setSelectedName] = useState<string>(name || "")
+  const [serverError, setServerError] = useState<string>("")
 
   const fortuneOptions = ["Fortune", "Chi", "Magic", "Genome"]
 
   useEffect(() => {
     setSelectedName(name)
-  }, [value, name])
+  }, [name])
 
   const validateName = (val: string): string => {
     if (!val.trim()) {
@@ -107,7 +106,7 @@ export default function FortuneValueEdit({
         ))}
       </Select>
       <ActionValueNumberField
-        name={name}
+        name="Max Fortune"
         size={size}
         character={character}
         setCharacter={setCharacter}
