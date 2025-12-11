@@ -7,19 +7,59 @@ import RemoveIcon from "@mui/icons-material/Remove"
 import { SystemStyleObject, Theme } from "@mui/system"
 import { useTheme } from "@mui/material/styles"
 
+/**
+ * Props for the NumberField component.
+ */
 type NumberFieldProps = {
+  /** The name attribute for the input field, used for form identification */
   name: string
+  /** The current value of the field - can be a number, null, or string representation */
   value: number | null | string
+  /** Size preset affecting font size and padding - "small" for compact displays, "large" for prominent fields (default: "large") */
   size: "small" | "large"
+  /** Custom width for the field (CSS value like "100px" or "8rem") */
   width: string
+  /** Whether the field is in an error state, affecting visual styling */
   error: boolean
+  /** Callback fired when the input value changes */
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  /** Callback fired when the input loses focus - also triggered by increment/decrement buttons */
   onBlur: (event: React.FocusEvent<HTMLInputElement>) => void
+  /** Additional MUI sx styles to apply to the input. Defaults to an empty object (`{}`). */
   sx?: SystemStyleObject<Theme>
+  /** Optional label text displayed above the field */
   label?: string
+  /** Background color for the label - defaults to "#262626" for dark theme compatibility */
   labelBackgroundColor?: string
 }
 
+/**
+ * A numeric input field with increment/decrement buttons.
+ *
+ * Features:
+ * - Centered numeric display with configurable size presets
+ * - Increment (+) and decrement (-) buttons that appear on hover/focus
+ * - Smooth slide-in animation for the control buttons
+ * - Optional floating label with customizable background
+ * - Integrates with form state via onChange and onBlur callbacks
+ *
+ * The increment/decrement buttons trigger both onChange and onBlur to ensure
+ * immediate persistence of value changes.
+ *
+ * @example
+ * ```tsx
+ * <NumberField
+ *   name="wounds"
+ *   value={character.wounds}
+ *   size="large"
+ *   width="140px"
+ *   error={false}
+ *   onChange={handleChange}
+ *   onBlur={handleBlur}
+ *   label="Wounds"
+ * />
+ * ```
+ */
 export function NumberField({
   name,
   value,
