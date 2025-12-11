@@ -32,6 +32,9 @@ export default function DiscordLinkingSection({
   const [isLinking, setIsLinking] = useState(false)
   const [isUnlinking, setIsUnlinking] = useState(false)
 
+  // Validate that link code is exactly 6 alphanumeric characters
+  const isValidLinkCode = /^[A-Z0-9]{6}$/.test(linkCode)
+
   const handleLinkDiscord = useCallback(async () => {
     if (!linkCode.trim()) {
       toastError("Please enter a link code")
@@ -47,6 +50,8 @@ export default function DiscordLinkingSection({
         // Refresh user data to show linked status
         const userResponse = await client.getCurrentUser()
         onUserUpdate(userResponse.data)
+      } else {
+        toastError(response.data.message || "Failed to link Discord account")
       }
     } catch (error: unknown) {
       console.error("Failed to link Discord:", error)
@@ -70,6 +75,8 @@ export default function DiscordLinkingSection({
         // Refresh user data to show unlinked status
         const userResponse = await client.getCurrentUser()
         onUserUpdate(userResponse.data)
+      } else {
+        toastError(response.data.message || "Failed to unlink Discord account")
       }
     } catch (error: unknown) {
       console.error("Failed to unlink Discord:", error)
@@ -84,6 +91,15 @@ export default function DiscordLinkingSection({
       setIsUnlinking(false)
     }
   }, [client, toastSuccess, toastError, onUserUpdate])
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" && isValidLinkCode && !isLinking) {
+        handleLinkDiscord()
+      }
+    },
+    [isValidLinkCode, isLinking, handleLinkDiscord]
+  )
 
   const isLinked = !!user.discord_id
 
@@ -152,6 +168,7 @@ export default function DiscordLinkingSection({
               label="Link Code"
               value={linkCode}
               onChange={e => setLinkCode(e.target.value.toUpperCase())}
+              onKeyDown={handleKeyDown}
               placeholder="ABCDEF"
               variant="outlined"
               size="small"
@@ -168,7 +185,7 @@ export default function DiscordLinkingSection({
             <Button
               variant="contained"
               onClick={handleLinkDiscord}
-              disabled={isLinking || linkCode.length !== 6}
+              disabled={isLinking || !isValidLinkCode}
               startIcon={
                 isLinking ? <CircularProgress size={16} /> : <LinkIcon />
               }

@@ -21,6 +21,8 @@ import type {
   WebAuthnAuthenticationResponse,
   WebAuthnCredentialsResponse,
   WebAuthnCredential,
+  LinkDiscordResponse,
+  UnlinkDiscordResponse,
 } from "@/types/auth"
 
 interface ClientDependencies {
@@ -316,17 +318,6 @@ export function createAuthClient(deps: ClientDependencies) {
   }
 
   // Discord Account Linking Methods
-
-  interface LinkDiscordResponse {
-    success: boolean
-    message: string
-    discord_username?: string
-  }
-
-  interface UnlinkDiscordResponse {
-    success: boolean
-    message: string
-  }
 
   /**
    * Link Discord account using a code generated from Discord /link command
