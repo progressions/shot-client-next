@@ -15,7 +15,7 @@ type NumberFieldProps = {
   name: string
   /** The current value of the field - can be a number, null, or string representation */
   value: number | null | string
-  /** Size preset affecting font size and padding - "small" for compact displays, "large" for prominent fields */
+  /** Size preset affecting font size and padding - "small" for compact displays, "large" for prominent fields (default: "large") */
   size: "small" | "large"
   /** Custom width for the field (CSS value like "100px" or "8rem") */
   width: string
@@ -25,7 +25,7 @@ type NumberFieldProps = {
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   /** Callback fired when the input loses focus - also triggered by increment/decrement buttons */
   onBlur: (event: React.FocusEvent<HTMLInputElement>) => void
-  /** Additional MUI sx styles to apply to the input */
+  /** Additional MUI sx styles to apply to the input. Defaults to an empty object (`{}`). */
   sx?: SystemStyleObject<Theme>
   /** Optional label text displayed above the field */
   label?: string
