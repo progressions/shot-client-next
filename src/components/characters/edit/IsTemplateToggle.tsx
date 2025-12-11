@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from "react"
 import { Switch, FormControlLabel, CircularProgress, Box } from "@mui/material"
+import { useToast } from "@/contexts"
 import type { Character } from "@/types"
 
 interface IsTemplateToggleProps {
@@ -15,6 +16,7 @@ export default function IsTemplateToggle({
   character,
   handleChangeAndSave,
 }: IsTemplateToggleProps) {
+  const { toastSuccess, toastError } = useToast()
   const [isTemplate, setIsTemplate] = useState(character.is_template ?? false)
   const [loading, setLoading] = useState(false)
 
@@ -38,15 +40,17 @@ export default function IsTemplateToggle({
         } as React.ChangeEvent<HTMLInputElement>
 
         await handleChangeAndSave(syntheticEvent)
+        toastSuccess("Character template status updated")
       } catch (error) {
         // Revert on error
         setIsTemplate(!newValue)
+        toastError("Failed to update character template status")
         console.error("Error updating character template status:", error)
       } finally {
         setLoading(false)
       }
     },
-    [handleChangeAndSave]
+    [handleChangeAndSave, toastSuccess, toastError]
   )
 
   return (
