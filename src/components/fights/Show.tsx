@@ -1,13 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import {
-  Typography,
-  FormControl,
-  FormHelperText,
-  Stack,
-  Box,
-} from "@mui/material"
+import { FormControl, FormHelperText, Stack, Box } from "@mui/material"
 import type { Fight, Party, Faction } from "@/types"
 import {
   JoinFightButton,
@@ -235,9 +229,6 @@ export default function Show({ fight: initialFight }: ShowProperties) {
         ></SectionHeader>
         <Stack direction="row" spacing={2} sx={{ mt: 2, flexWrap: "wrap" }}>
           <FormControl margin="normal" error={!!errors.season}>
-            <Typography variant="subtitle1" sx={{ fontSize: "0.75rem" }}>
-              Season
-            </Typography>
             <NumberField
               label="Season"
               name="season"
@@ -245,13 +236,11 @@ export default function Show({ fight: initialFight }: ShowProperties) {
               onChange={handleChangeLocal}
               onBlur={handleChangeAndSave}
               size="small"
+              labelBackgroundColor="#0a0a0a"
             />
             {errors.season && <FormHelperText>{errors.season}</FormHelperText>}
           </FormControl>
           <FormControl margin="normal" error={!!errors.session}>
-            <Typography variant="subtitle1" sx={{ fontSize: "0.75rem" }}>
-              Session
-            </Typography>
             <NumberField
               label="Session"
               name="session"
@@ -259,6 +248,7 @@ export default function Show({ fight: initialFight }: ShowProperties) {
               onChange={handleChangeLocal}
               onBlur={handleChangeAndSave}
               size="small"
+              labelBackgroundColor="#0a0a0a"
             />
             {errors.session && (
               <FormHelperText>{errors.session}</FormHelperText>
