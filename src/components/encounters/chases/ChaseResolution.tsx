@@ -363,6 +363,7 @@ export default function ChaseResolution({
                 updateField("typedSwerve", val)
               }
             }}
+            labelBackgroundColor="#0A0A0A"
           />
         </Box>
 

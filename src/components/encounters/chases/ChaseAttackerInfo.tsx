@@ -93,6 +93,7 @@ export default function ChaseAttackerInfo({
                 updateField("actionValue", 7)
               }
             }}
+            labelBackgroundColor="#312A21"
           />
         </Box>
       </Stack>

@@ -175,9 +175,6 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
         </FormControl>
         <Stack direction="row" spacing={2} sx={{ mt: 2, flexWrap: "wrap" }}>
           <FormControl margin="normal" error={!!errors.season}>
-            <Typography variant="subtitle1" sx={{ fontSize: "0.75rem" }}>
-              Season
-            </Typography>
             <NumberField
               label="Season"
               value={data.season || ""}
@@ -186,13 +183,11 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
               required
               margin="normal"
               size="small"
+              labelBackgroundColor="#363636"
             />
             {errors.season && <FormHelperText>{errors.season}</FormHelperText>}
           </FormControl>
           <FormControl margin="normal" error={!!errors.session}>
-            <Typography variant="subtitle1" sx={{ fontSize: "0.75rem" }}>
-              Session
-            </Typography>
             <NumberField
               label="Session"
               value={data.session || ""}
@@ -201,6 +196,7 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
               required
               margin="normal"
               size="small"
+              labelBackgroundColor="#363636"
             />
             {errors.session && (
               <FormHelperText>{errors.session}</FormHelperText>
