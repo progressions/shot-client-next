@@ -41,6 +41,7 @@ export { default as EditNotionLink } from "@/components/characters/edit/EditNoti
 export { default as SkillsManager } from "@/components/characters/edit/SkillsManager"
 export { default as AdvancementsManager } from "@/components/characters/edit/AdvancementsManager"
 export { default as DescriptionValue } from "@/components/characters/edit/DescriptionValue"
+export { default as IsTemplateToggle } from "@/components/characters/edit/IsTemplateToggle"
 export { default as NotFound } from "@/components/characters/NotFound"
 export { default as Table } from "@/components/characters/Table"
 export { default as Extend } from "@/components/characters/Extend"
