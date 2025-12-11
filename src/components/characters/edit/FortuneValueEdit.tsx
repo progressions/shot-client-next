@@ -2,7 +2,7 @@
 
 import type { Character } from "@/types"
 import { useState, useEffect } from "react"
-import { Stack, Select, MenuItem } from "@mui/material"
+import { Stack, Select, MenuItem, FormHelperText } from "@mui/material"
 import { CS } from "@/services"
 import { ActionValueNumberField } from "@/components/characters"
 
@@ -105,6 +105,11 @@ export default function FortuneValueEdit({
           </MenuItem>
         ))}
       </Select>
+      {serverError && (
+        <FormHelperText error sx={{ mt: 0, mb: 1 }}>
+          {serverError}
+        </FormHelperText>
+      )}
       <ActionValueNumberField
         name="Max Fortune"
         size={size}
