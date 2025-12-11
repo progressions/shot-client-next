@@ -97,12 +97,17 @@ export default function ChaseMethodSection({
 
       <Stack spacing={2}>
         {/* First row: Driving, Squeal, Fortune */}
-        <Stack direction="row" spacing={2} alignItems="flex-start">
+        <Stack
+          direction="row"
+          spacing={2}
+          alignItems="flex-start"
+          sx={{ mb: 1 }}
+        >
           {/* Driving Skill Field - Always visible */}
           <NumberField
             name="actionValue"
             label="Driving"
-            labelBackgroundColor="#873230"
+            labelBackgroundColor="#312A21"
             value={formState.data.actionValue || 7}
             size="medium"
             width="80px"
@@ -123,7 +128,7 @@ export default function ChaseMethodSection({
           <NumberField
             name="squeal"
             label="Squeal"
-            labelBackgroundColor="#873230"
+            labelBackgroundColor="#312A21"
             value={formState.data.squeal || 0}
             size="medium"
             width="80px"
@@ -144,7 +149,7 @@ export default function ChaseMethodSection({
               <NumberField
                 name="fortuneBonus"
                 label="Fortune +"
-                labelBackgroundColor="#873230"
+                labelBackgroundColor="#312A21"
                 value={fortuneBonus}
                 size="medium"
                 width="80px"
@@ -177,6 +182,8 @@ export default function ChaseMethodSection({
               <Typography
                 variant="caption"
                 sx={{
+                  display: "block",
+                  textAlign: "center",
                   mt: 0.5,
                   color:
                     fortuneBonus !== "0" ? "warning.main" : "text.secondary",
@@ -185,7 +192,7 @@ export default function ChaseMethodSection({
               >
                 {fortuneBonus !== "0"
                   ? `Cost: 1 (${availableFortune - 1} left)`
-                  : `Available: ${availableFortune}`}
+                  : `${availableFortune} available`}
               </Typography>
             </Box>
           )}
@@ -273,7 +280,7 @@ export default function ChaseMethodSection({
           <NumberField
             name="shotCost"
             label="Shots"
-            labelBackgroundColor="#873230"
+            labelBackgroundColor="#312A21"
             value={formState.data.shotCost || 3}
             size="small"
             width="70px"

@@ -253,7 +253,7 @@ export default function ChaseTargetSection({
                 <NumberField
                   name="defense"
                   label="Driving"
-                  labelBackgroundColor="#730F10"
+                  labelBackgroundColor="#312A21"
                   value={
                     parseInt(formState.data.defense?.toString() || "0") || 0
                   }
@@ -266,7 +266,7 @@ export default function ChaseTargetSection({
                 <NumberField
                   name="handling"
                   label="Handling"
-                  labelBackgroundColor="#730F10"
+                  labelBackgroundColor="#312A21"
                   value={
                     parseInt(formState.data.handling?.toString() || "0") || 0
                   }
@@ -279,7 +279,7 @@ export default function ChaseTargetSection({
                 <NumberField
                   name="frame"
                   label="Frame"
-                  labelBackgroundColor="#730F10"
+                  labelBackgroundColor="#312A21"
                   value={parseInt(formState.data.frame?.toString() || "0") || 0}
                   size="small"
                   width="80px"
@@ -290,7 +290,7 @@ export default function ChaseTargetSection({
                 <NumberField
                   name="targetCrunch"
                   label="Crunch"
-                  labelBackgroundColor="#730F10"
+                  labelBackgroundColor="#312A21"
                   value={
                     parseInt(
                       (
