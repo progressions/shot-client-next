@@ -19,6 +19,7 @@ import {
 } from "@/components/ui"
 import {
   CampaignsList,
+  CharacterManager,
   DiscordLinkingSection,
   OnboardingMilestonesForm,
 } from "@/components/users/profile"
@@ -324,6 +325,8 @@ export default function ProfilePageClient({
       <DiscordLinkingSection user={user} onUserUpdate={setUser} />
 
       <CampaignsList user={user} onUserUpdate={setUser} />
+
+      <CharacterManager user={user} onUserUpdate={setUser} />
 
       <EmailChangeConfirmation
         open={showEmailConfirmation}

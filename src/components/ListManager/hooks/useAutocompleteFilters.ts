@@ -44,10 +44,15 @@ interface Client {
  */
 export function useAutocompleteFilters(
   pluralChildEntityName: string,
-  client: Client
+  client: Client,
+  initialFilters: Record<string, string | boolean | null> = {}
 ) {
   const [loading, setLoading] = useState(true)
-  const contextualFilters: Record<string, string> = useMemo(() => ({}), [])
+  const contextualFilters: Record<string, string | boolean | null> = useMemo(
+    () => initialFilters,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   const { formState, dispatchForm } = useForm<{
     data: {
