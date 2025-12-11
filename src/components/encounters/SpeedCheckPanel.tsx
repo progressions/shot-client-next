@@ -314,6 +314,7 @@ export default function SpeedCheckPanel({
                   onChange={e => setSwerve(parseInt(e.target.value) || 0)}
                   onBlur={e => setSwerve(parseInt(e.target.value) || 0)}
                   size="small"
+                  labelBackgroundColor="#202020"
                 />
               </Box>
               {isPreventerPC && (
@@ -332,6 +333,7 @@ export default function SpeedCheckPanel({
                       setFortuneBonus(finalValue)
                     }}
                     size="small"
+                    labelBackgroundColor="#202020"
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         backgroundColor:
@@ -362,6 +364,7 @@ export default function SpeedCheckPanel({
                   onChange={e => setShotCost(parseInt(e.target.value) || 0)}
                   onBlur={e => setShotCost(parseInt(e.target.value) || 0)}
                   size="small"
+                  labelBackgroundColor="#202020"
                   sx={{
                     width: 80,
                     "& .MuiOutlinedInput-root": {

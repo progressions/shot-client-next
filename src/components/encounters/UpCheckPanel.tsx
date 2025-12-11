@@ -198,6 +198,7 @@ export default function UpCheckPanel({
                           max={6}
                           disabled={isProcessing}
                           size="small"
+                          labelBackgroundColor="#202020"
                         />
                       </Box>
                     </Box>
@@ -246,6 +247,7 @@ export default function UpCheckPanel({
                           max={10}
                           disabled={isProcessing}
                           size="small"
+                          labelBackgroundColor="#202020"
                         />
                       </Box>
 
@@ -277,6 +279,7 @@ export default function UpCheckPanel({
                                   max={6}
                                   disabled={isProcessing}
                                   size="small"
+                                  labelBackgroundColor="#202020"
                                 />
                               </Box>
                             )}

@@ -112,6 +112,7 @@ export default function CheeseItPanel({
               onBlur={e => setShotCost(e.target.value)}
               size="small"
               error={false}
+              labelBackgroundColor="#202020"
             />
           </Box>
 

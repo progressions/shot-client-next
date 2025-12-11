@@ -57,6 +57,7 @@ export default function SpendShotsPanel({
             setShots(Number.isNaN(val) ? 0 : val)
           }}
           sx={{ mb: 2, width: "100%" }}
+          labelBackgroundColor="#141414"
         />
 
         <Button

@@ -186,6 +186,7 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
               required
               margin="normal"
               size="small"
+              labelBackgroundColor="#141414"
             />
             {errors.season && <FormHelperText>{errors.season}</FormHelperText>}
           </FormControl>
@@ -201,6 +202,7 @@ export default function FightForm({ open, onClose }: FightFormProperties) {
               required
               margin="normal"
               size="small"
+              labelBackgroundColor="#141414"
             />
             {errors.session && (
               <FormHelperText>{errors.session}</FormHelperText>
