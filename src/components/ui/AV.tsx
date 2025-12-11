@@ -8,6 +8,7 @@ type AVProps = {
   value: number | string
   maxValue?: number
   change?: number
+  showZero?: boolean
 }
 
 // Mobile abbreviations for common action values
@@ -25,15 +26,15 @@ const mobileLabels: Record<string, string> = {
   Chi: "Chi",
 }
 
-export function AV({ label, value, maxValue, change }: AVProps) {
+export function AV({ label, value, maxValue, change, showZero }: AVProps) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
   if (value === null || value === undefined) return null
 
-  // Don't show values that are 0 or less
+  // Don't show values that are 0 or less (unless showZero is true)
   const numValue = typeof value === "string" ? parseInt(value) : value
-  if (!isNaN(numValue) && numValue <= 0) {
+  if (!isNaN(numValue) && numValue <= 0 && !showZero) {
     return null
   }
 
