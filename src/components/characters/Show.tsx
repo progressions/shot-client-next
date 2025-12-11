@@ -29,6 +29,7 @@ import {
   EditWealth,
   SkillsManager,
   AdvancementsManager,
+  IsTemplateToggle,
 } from "@/components/characters"
 import { EditFaction } from "@/components/factions"
 import { EntityActiveToggle } from "@/components/common"
@@ -239,10 +240,16 @@ export default function Show({
           >
             Manage the visibility and status of this character.
           </SectionHeader>
-          <EntityActiveToggle
-            entity={memoizedCharacter}
-            handleChangeAndSave={handleChangeAndSave}
-          />
+          <Stack direction="row" spacing={3} sx={{ my: 1 }}>
+            <EntityActiveToggle
+              entity={memoizedCharacter}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+            <IsTemplateToggle
+              character={memoizedCharacter}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+          </Stack>
         </>
       )}
     </Box>
