@@ -19,6 +19,7 @@ import {
 } from "@/components/ui"
 import {
   CampaignsList,
+  DiscordLinkingSection,
   OnboardingMilestonesForm,
 } from "@/components/users/profile"
 import { PasskeyManager } from "@/components/settings"
@@ -319,6 +320,8 @@ export default function ProfilePageClient({
         </SectionHeader>
         <PasskeyManager />
       </Box>
+
+      <DiscordLinkingSection user={user} onUserUpdate={setUser} />
 
       <CampaignsList user={user} onUserUpdate={setUser} />
 

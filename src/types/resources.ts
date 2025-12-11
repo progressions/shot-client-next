@@ -147,6 +147,7 @@ export interface User extends BaseEntity {
   admin?: boolean
   image_url: string
   onboarding_progress?: OnboardingProgress
+  discord_id?: number
 }
 
 export interface Site extends BaseEntity {
