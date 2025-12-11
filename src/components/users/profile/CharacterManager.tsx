@@ -39,6 +39,26 @@ export default function CharacterManager({
     loading: filtersLoading,
   } = useAutocompleteFilters("Characters", client, { unassigned: "true" })
 
+  // Handle opening/closing the manager, reset filters when opening
+  const handleToggleOpen = useCallback(
+    (isOpen: boolean) => {
+      setOpen(isOpen)
+      if (isOpen) {
+        // Reset filters when opening the manager
+        updateFilters({
+          unassigned: "true",
+          character_type: null,
+          faction_id: null,
+          archetype: null,
+          character_id: null,
+          character: null,
+          page: 1,
+        })
+      }
+    },
+    [updateFilters]
+  )
+
   // Fetch user's characters
   const fetchMyCharacters = useCallback(async () => {
     if (!campaign) return
@@ -149,7 +169,7 @@ export default function CharacterManager({
     setCurrentPage(newPage)
   }
 
-  const actionButton = <ManageButton open={open} onClick={setOpen} />
+  const actionButton = <ManageButton open={open} onClick={handleToggleOpen} />
 
   if (!campaign) {
     return (
