@@ -160,6 +160,14 @@ class ApiV2 {
     return `${this.api()}/users/current`
   }
 
+  linkDiscord(): string {
+    return `${this.api()}/users/link_discord`
+  }
+
+  unlinkDiscord(): string {
+    return `${this.api()}/users/unlink_discord`
+  }
+
   dismissCongratulations(): string {
     return `${this.api()}/onboarding/dismiss_congratulations`
   }

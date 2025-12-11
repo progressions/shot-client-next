@@ -158,3 +158,15 @@ export interface WebAuthnCredentialsResponse {
 export interface WebAuthnErrorResponse {
   error: string
 }
+
+// Discord Account Linking Types
+export interface LinkDiscordResponse {
+  success: boolean
+  message: string
+  discord_username?: string
+}
+
+export interface UnlinkDiscordResponse {
+  success: boolean
+  message: string
+}

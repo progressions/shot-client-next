@@ -21,6 +21,8 @@ import type {
   WebAuthnAuthenticationResponse,
   WebAuthnCredentialsResponse,
   WebAuthnCredential,
+  LinkDiscordResponse,
+  UnlinkDiscordResponse,
 } from "@/types/auth"
 
 interface ClientDependencies {
@@ -315,6 +317,26 @@ export function createAuthClient(deps: ClientDependencies) {
     return patch(apiV2.webauthnCredential(credentialId), { name })
   }
 
+  // Discord Account Linking Methods
+
+  /**
+   * Link Discord account using a code generated from Discord /link command
+   */
+  async function linkDiscord(
+    code: string
+  ): Promise<AxiosResponse<LinkDiscordResponse>> {
+    return post(apiV2.linkDiscord(), { code })
+  }
+
+  /**
+   * Unlink Discord account from current user
+   */
+  async function unlinkDiscord(): Promise<
+    AxiosResponse<UnlinkDiscordResponse>
+  > {
+    return delete_(apiV2.unlinkDiscord())
+  }
+
   return {
     createUser,
     registerUser,
@@ -349,5 +371,8 @@ export function createAuthClient(deps: ClientDependencies) {
     listPasskeys,
     deletePasskey,
     renamePasskey,
+    // Discord Account Linking
+    linkDiscord,
+    unlinkDiscord,
   }
 }
