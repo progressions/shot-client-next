@@ -76,7 +76,6 @@ export default function ActionValuesEdit({
           {CS.isPC(character) && (
             <FortuneValueEdit
               name={CS.fortuneType(character)}
-              value={CS.fortune(character)}
               size={size}
               character={character}
               setCharacter={setCharacter}
