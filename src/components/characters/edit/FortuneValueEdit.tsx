@@ -2,9 +2,10 @@
 
 import type { Character } from "@/types"
 import { useState, useEffect } from "react"
-import { Stack, Select, MenuItem, FormHelperText } from "@mui/material"
+import { Stack, Select, MenuItem } from "@mui/material"
 import { CS } from "@/services"
 import { ActionValueNumberField } from "@/components/characters"
+import { useToast } from "@/contexts"
 
 type FortuneValueEditProps = {
   name: string
@@ -22,7 +23,7 @@ export default function FortuneValueEdit({
   updateCharacter,
 }: FortuneValueEditProps) {
   const [selectedName, setSelectedName] = useState<string>(name || "")
-  const [serverError, setServerError] = useState<string>("")
+  const { toastError } = useToast()
 
   const fortuneOptions = ["Fortune", "Chi", "Magic", "Genome"]
 
@@ -30,40 +31,28 @@ export default function FortuneValueEdit({
     setSelectedName(name)
   }, [name])
 
-  const validateName = (val: string): string => {
-    if (!val.trim()) {
-      return "Fortune type is required"
-    }
-    if (!fortuneOptions.includes(val)) {
-      return "Invalid fortune type"
-    }
-    return ""
-  }
-
   const handleFortuneNameChange = (
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
     const newName = event.target.value as string
     setSelectedName(newName)
-    setServerError("") // Clear server-side error
   }
 
   const handleFortuneNameBlur = async () => {
-    const nameError = validateName(selectedName)
-    setServerError(nameError)
-    if (!nameError) {
-      const updatedCharacter = CS.changeFortuneType(character, selectedName)
-      setCharacter(updatedCharacter)
-      try {
-        await updateCharacter({
-          ...updatedCharacter,
-          sites: undefined,
-          schticks: undefined,
-          parties: undefined,
-        })
-      } catch (error) {
-        setServerError(error.message)
-      }
+    if (!selectedName.trim() || !fortuneOptions.includes(selectedName)) {
+      return
+    }
+    const updatedCharacter = CS.changeFortuneType(character, selectedName)
+    setCharacter(updatedCharacter)
+    try {
+      await updateCharacter({
+        ...updatedCharacter,
+        sites: undefined,
+        schticks: undefined,
+        parties: undefined,
+      })
+    } catch (error) {
+      toastError(`Error updating fortune type: ${error.message}`)
     }
   }
 
@@ -105,11 +94,6 @@ export default function FortuneValueEdit({
           </MenuItem>
         ))}
       </Select>
-      {serverError && (
-        <FormHelperText error sx={{ mt: 0, mb: 1 }}>
-          {serverError}
-        </FormHelperText>
-      )}
       <ActionValueNumberField
         name="Max Fortune"
         size={size}
