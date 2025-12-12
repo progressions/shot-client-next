@@ -195,3 +195,43 @@ export interface HasCollection<K extends CollectionKey> extends BaseEntity {
   collectionItems?: CollectionItemMap[K][] // e.g., entity.collectionItems is Character[] for K="characters"
   collectionIds?: string[] // e.g., entity.collectionIds is string[] for characters_ids
 }
+
+/**
+ * Confirmation Dialog Types
+ */
+
+export interface ConfirmOptions {
+  /** Dialog title - defaults to "Confirm" */
+  title?: string
+  /** Dialog message/content */
+  message: string
+  /** Confirm button text - defaults to "Confirm" */
+  confirmText?: string
+  /** Cancel button text - defaults to "Cancel" */
+  cancelText?: string
+  /** Confirm button color variant - defaults to "primary" */
+  confirmColor?: "primary" | "error" | "warning" | "success"
+  /** Makes dialog more prominent for destructive actions */
+  destructive?: boolean
+}
+
+export interface ConfirmState {
+  open: boolean
+  options: ConfirmOptions
+  resolve: ((value: boolean) => void) | null
+}
+
+export const defaultConfirmOptions: ConfirmOptions = {
+  title: "Confirm",
+  message: "",
+  confirmText: "Confirm",
+  cancelText: "Cancel",
+  confirmColor: "primary",
+  destructive: false,
+}
+
+export const defaultConfirmState: ConfirmState = {
+  open: false,
+  options: defaultConfirmOptions,
+  resolve: null,
+}

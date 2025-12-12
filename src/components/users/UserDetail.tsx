@@ -11,7 +11,7 @@ import {
 } from "@mui/material"
 import type { User } from "@/types"
 import Link from "next/link"
-import { useCampaign, useClient } from "@/contexts"
+import { useCampaign, useClient, useConfirm } from "@/contexts"
 import DetailButtons from "@/components/DetailButtons"
 
 interface UserDetailProperties {
@@ -27,6 +27,7 @@ export default function UserDetail({
 }: UserDetailProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
+  const { confirm } = useConfirm()
   const [error, setError] = useState<string | null>(null)
   const [user, setUser] = useState<User>(initialUser)
 
@@ -38,8 +39,13 @@ export default function UserDetail({
 
   const handleDelete = async () => {
     if (!user?.id) return
-    if (!confirm(`Are you sure you want to delete the user: ${user.name}?`))
-      return
+    const confirmed = await confirm({
+      title: "Delete User",
+      message: `Are you sure you want to delete the user: ${user.name}?`,
+      confirmText: "Delete",
+      destructive: true,
+    })
+    if (!confirmed) return
 
     try {
       await client.deleteUser(user)

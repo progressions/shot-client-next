@@ -12,7 +12,7 @@ import {
 } from "@mui/material"
 import type { Character } from "@/types"
 import { CharacterDescription } from "@/components/characters"
-import { useCampaign, useClient } from "@/contexts"
+import { useCampaign, useClient, useConfirm } from "@/contexts"
 import {
   TypeLink,
   ArchetypeLink,
@@ -36,6 +36,7 @@ export default function CharacterDetail({
 }: CharacterDetailProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
+  const { confirm } = useConfirm()
   const [error, setError] = useState<string | null>(null)
   const [character, setCharacter] = useState<Character>(initialCharacter)
 
@@ -50,12 +51,13 @@ export default function CharacterDetail({
 
   const handleDelete = async () => {
     if (!character?.id) return
-    if (
-      !confirm(
-        `Are you sure you want to delete the character: ${character.name}?`
-      )
-    )
-      return
+    const confirmed = await confirm({
+      title: "Delete Character",
+      message: `Are you sure you want to delete the character: ${character.name}?`,
+      confirmText: "Delete",
+      destructive: true,
+    })
+    if (!confirmed) return
 
     try {
       await client.deleteCharacter(character)

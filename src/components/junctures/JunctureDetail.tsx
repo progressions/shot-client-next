@@ -12,7 +12,7 @@ import {
 import type { Juncture } from "@/types"
 import Link from "next/link"
 import { JunctureName, JunctureDescription } from "@/components/junctures"
-import { useCampaign, useClient } from "@/contexts"
+import { useCampaign, useClient, useConfirm } from "@/contexts"
 import { CharacterLink, FactionLink } from "@/components/ui"
 import DetailButtons from "@/components/DetailButtons"
 
@@ -29,6 +29,7 @@ export default function JunctureDetail({
 }: JunctureDetailProperties) {
   const { client } = useClient()
   const { subscribeToEntity } = useCampaign()
+  const { confirm } = useConfirm()
   const [error, setError] = useState<string | null>(null)
   const [juncture, setJuncture] = useState<Juncture>(initialJuncture)
 
@@ -44,12 +45,13 @@ export default function JunctureDetail({
 
   const handleDelete = async () => {
     if (!juncture?.id) return
-    if (
-      !confirm(
-        `Are you sure you want to delete the juncture: ${juncture.name}?`
-      )
-    )
-      return
+    const confirmed = await confirm({
+      title: "Delete Juncture",
+      message: `Are you sure you want to delete the juncture: ${juncture.name}?`,
+      confirmText: "Delete",
+      destructive: true,
+    })
+    if (!confirmed) return
 
     try {
       await client.deleteJuncture(juncture)

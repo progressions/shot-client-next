@@ -12,7 +12,7 @@ import {
 import type { Faction } from "@/types"
 import Link from "next/link"
 import { FactionName, FactionDescription } from "@/components/factions"
-import { useCampaign, useClient } from "@/contexts"
+import { useCampaign, useClient, useConfirm } from "@/contexts"
 import { CharacterName } from "@/components/characters"
 import DetailButtons from "@/components/DetailButtons"
 
@@ -29,6 +29,7 @@ export default function FactionDetail({
 }: FactionDetailProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
+  const { confirm } = useConfirm()
   const [error, setError] = useState<string | null>(null)
   const [faction, setFaction] = useState<Faction>(initialFaction)
 
@@ -49,10 +50,13 @@ export default function FactionDetail({
 
   const handleDelete = async () => {
     if (!faction?.id) return
-    if (
-      !confirm(`Are you sure you want to delete the faction: ${faction.name}?`)
-    )
-      return
+    const confirmed = await confirm({
+      title: "Delete Faction",
+      message: `Are you sure you want to delete the faction: ${faction.name}?`,
+      confirmText: "Delete",
+      destructive: true,
+    })
+    if (!confirmed) return
 
     try {
       await client.deleteFaction(faction)

@@ -11,7 +11,7 @@ import {
 } from "@/types"
 import { BaseDataGrid, CampaignLink } from "@/components/ui"
 import { EntityAvatar } from "@/components/avatars"
-import { useClient, useApp, useToast } from "@/contexts"
+import { useClient, useApp, useToast, useConfirm } from "@/contexts"
 
 interface ViewProps {
   formState: FormStateType<CampaignsTableFormState>
@@ -27,6 +27,7 @@ export default function View({ formState, dispatchForm }: ViewProps) {
     refreshUser,
   } = useApp()
   const { toastSuccess, toastError } = useToast()
+  const { confirm } = useConfirm()
   const [loadingCampaignId, setLoadingCampaignId] = useState<string | null>(
     null
   )
@@ -55,12 +56,13 @@ export default function View({ formState, dispatchForm }: ViewProps) {
   }
 
   const handleDeactivateCampaign = async (campaign: Campaign) => {
-    if (
-      !confirm(
-        `Are you sure you want to deactivate the campaign "${campaign.name}"?`
-      )
-    )
-      return
+    const confirmed = await confirm({
+      title: "Deactivate Campaign",
+      message: `Are you sure you want to deactivate the campaign "${campaign.name}"?`,
+      confirmText: "Deactivate",
+      confirmColor: "warning",
+    })
+    if (!confirmed) return
 
     setLoadingCampaignId(campaign.id)
     try {

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Stack, Card, CardContent, Box, Typography } from "@mui/material"
 import type { Fight } from "@/types"
 import { FightChips, FightDescription } from "@/components/fights"
-import { useToast, useCampaign, useClient } from "@/contexts"
+import { useToast, useCampaign, useClient, useConfirm } from "@/contexts"
 import DetailButtons from "@/components/DetailButtons"
 import {
   Icon,
@@ -29,6 +29,7 @@ export default function FightDetail({
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
   const { campaignData } = useCampaign()
+  const { confirm } = useConfirm()
   const [fight, setFight] = useState<Fight>(initialFight)
 
   useEffect(() => {
@@ -39,8 +40,13 @@ export default function FightDetail({
 
   const handleDelete = async () => {
     if (!fight?.id) return
-    if (!confirm(`Are you sure you want to delete the fight: ${fight.name}?`))
-      return
+    const confirmed = await confirm({
+      title: "Delete Fight",
+      message: `Are you sure you want to delete the fight: ${fight.name}?`,
+      confirmText: "Delete",
+      destructive: true,
+    })
+    if (!confirmed) return
 
     try {
       await client.deleteFight(fight)

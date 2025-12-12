@@ -13,7 +13,7 @@ import {
 import type { Weapon } from "@/types"
 import Link from "next/link"
 import { WeaponName } from "@/components/weapons"
-import { useToast, useCampaign, useClient } from "@/contexts"
+import { useToast, useCampaign, useClient, useConfirm } from "@/contexts"
 import { RichTextRenderer } from "@/components/editor"
 import DetailButtons from "@/components/DetailButtons"
 import { PositionableImage } from "@/components/ui"
@@ -32,6 +32,7 @@ export default function WeaponDetail({
 }: WeaponDetailProperties) {
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
+  const { confirm } = useConfirm()
   const { campaignData } = useCampaign()
   const [error, setError] = useState<string | null>(null)
   const [weapon, setWeapon] = useState<Weapon>(initialWeapon)
@@ -56,6 +57,7 @@ export default function WeaponDetail({
         setError(message)
         toastError(message)
       },
+      confirm,
     })
   }
 

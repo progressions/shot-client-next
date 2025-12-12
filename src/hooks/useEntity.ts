@@ -14,6 +14,7 @@
 
 import { useToast } from "@/contexts/ToastContext"
 import { useClient, useApp } from "@/contexts/AppContext"
+import { useConfirm } from "@/contexts"
 import type { Entity } from "@/types"
 import pluralize from "pluralize"
 import { FormActions } from "@/reducers"
@@ -54,6 +55,7 @@ export function useEntity(
 ) {
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
+  const { confirm } = useConfirm()
   const { refreshUser } = useApp()
   const entityClass = entity.entity_class
   const name = entity.entity_class.toLowerCase()
@@ -123,6 +125,7 @@ export function useEntity(
         onError: message => {
           toastError(message)
         },
+        confirm,
       }
     )
   }

@@ -4,7 +4,7 @@ import { VscGithubAction } from "react-icons/vsc"
 import { useEffect } from "react"
 import { FormControl, FormHelperText, Box } from "@mui/material"
 import type { Weapon } from "@/types"
-import { useCampaign, useClient } from "@/contexts"
+import { useCampaign, useClient, useConfirm } from "@/contexts"
 import { WeaponChips, Stats, EditJunctureCategory } from "@/components/weapons"
 import { useToast } from "@/contexts"
 import {
@@ -59,6 +59,7 @@ type FormStateData = {
 export default function Show({ weapon: initialWeapon }: ShowProperties) {
   const { subscribeToEntity, campaign } = useCampaign()
   const { user } = useClient()
+  const { confirm } = useConfirm()
   const { toastError } = useToast()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialWeapon,
@@ -93,11 +94,14 @@ export default function Show({ weapon: initialWeapon }: ShowProperties) {
       await deleteEntity()
     } catch (error: AxiosError) {
       if (error.response?.data?.errors?.carries) {
-        if (
-          confirm(
-            "This weapon is carried by one or more characters. Do you want to delete it anyway?"
-          )
-        ) {
+        const confirmed = await confirm({
+          title: "Force Delete Weapon?",
+          message:
+            "This weapon is carried by one or more characters. Do you want to delete it anyway?",
+          confirmText: "Force Delete",
+          destructive: true,
+        })
+        if (confirmed) {
           try {
             await deleteEntity({ force: true })
           } catch (forceError: unknown) {
@@ -105,11 +109,12 @@ export default function Show({ weapon: initialWeapon }: ShowProperties) {
             toastError("Failed to delete weapon.")
           }
         }
+        return
       }
 
       console.error("Delete weapon error:", error)
+      toastError("Failed to delete weapon.")
     }
-    toastError("Failed to delete weapon.")
   }
 
   const setWeapon = (updatedWeapon: Weapon) => {

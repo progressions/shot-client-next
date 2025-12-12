@@ -7,7 +7,7 @@ import type { User } from "@/types"
 import { useCampaign } from "@/contexts"
 import { EditUserForm } from "@/components/users"
 import RoleManagement from "@/components/users/RoleManagement"
-import { useClient, useToast } from "@/contexts"
+import { useClient, useToast, useConfirm } from "@/contexts"
 import {
   HeroImage,
   SpeedDialMenu,
@@ -27,6 +27,7 @@ export default function Show({
   const { campaignData } = useCampaign()
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
+  const { confirm } = useConfirm()
 
   const [user, setUser] = useState<User>(initialUser)
   const [editOpen, setEditOpen] = useState(false)
@@ -155,8 +156,13 @@ export default function Show({
 
   const handleDelete = async () => {
     if (!user?.id) return
-    if (!confirm(`Are you sure you want to delete the user: ${user.name}?`))
-      return
+    const confirmed = await confirm({
+      title: "Delete User",
+      message: `Are you sure you want to delete the user: ${user.name}?`,
+      confirmText: "Delete",
+      destructive: true,
+    })
+    if (!confirmed) return
 
     try {
       await client.deleteUser(user)
