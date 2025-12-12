@@ -158,7 +158,9 @@ export function createCharacterClient(deps: ClientDependencies) {
     character: Character,
     fight?: Fight | null
   ): Promise<AxiosResponse<Person>> {
-    return post(api.characters(fight, character), { character: character })
+    // Use V2 API for character creation
+    // The Phoenix backend handles campaign association via JWT context
+    return post(apiV2.characters(), { character: character })
   }
 
   async function uploadCharacterPdf(

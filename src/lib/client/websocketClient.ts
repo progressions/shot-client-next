@@ -31,7 +31,7 @@ class ConsumerAdapter {
         disconnected?: () => void
         received: (data: unknown) => void
       }
-    ) => { disconnect: () => void }
+    ) => { disconnect: () => void; unsubscribe: () => void }
   }
 
   constructor(unifiedClient: UnifiedChannelClient) {
@@ -46,7 +46,16 @@ class ConsumerAdapter {
         }
       ) => {
         const { channel, ...rest } = params
-        return this.unifiedClient.subscribe(channel, rest, callbacks)
+        const subscription = this.unifiedClient.subscribe(
+          channel,
+          rest,
+          callbacks
+        )
+        // Return object with both disconnect() and unsubscribe() for ActionCable compatibility
+        return {
+          disconnect: () => subscription.disconnect(),
+          unsubscribe: () => subscription.disconnect(),
+        }
       },
     }
   }
