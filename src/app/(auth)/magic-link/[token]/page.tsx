@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter, useParams } from "next/navigation"
 import {
   Box,
@@ -24,8 +24,18 @@ export default function PlayerViewMagicLinkPage() {
   const router = useRouter()
   const params = useParams()
   const { dispatchCurrentUser } = useClient()
+  const redirectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const token = params.token as string
+
+  useEffect(() => {
+    // Cleanup redirect timeout on unmount
+    return () => {
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     const redeemMagicLink = async () => {
@@ -63,7 +73,7 @@ export default function PlayerViewMagicLinkPage() {
           setStatus("success")
 
           // Redirect to Player View after brief delay
-          setTimeout(() => {
+          redirectTimeoutRef.current = setTimeout(() => {
             router.push(redirect_url)
           }, 1500)
         } else {

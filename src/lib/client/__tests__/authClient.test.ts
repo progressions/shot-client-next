@@ -33,6 +33,9 @@ describe("createAuthClient", () => {
       user ? `/api/v2/users/${user.id}` : "/api/v2/users"
     ),
     currentUser: jest.fn(() => "/api/v2/users/current"),
+    playerTokenRedeem: jest.fn(
+      (token: string) => `/api/v2/player_view_tokens/${token}/redeem`
+    ),
   }
 
   const mockQueryParams = jest.fn((params: Record<string, unknown>) => {
@@ -45,6 +48,7 @@ describe("createAuthClient", () => {
   const mockGet = jest.fn()
   const mockGetPublic = jest.fn()
   const mockPost = jest.fn()
+  const mockPostPublic = jest.fn()
   const mockPatch = jest.fn()
   const mockDelete = jest.fn()
   const mockRequestFormData = jest.fn()
@@ -53,6 +57,7 @@ describe("createAuthClient", () => {
     get: mockGet,
     getPublic: mockGetPublic,
     post: mockPost,
+    postPublic: mockPostPublic,
     patch: mockPatch,
     delete: mockDelete,
     requestFormData: mockRequestFormData,
@@ -101,6 +106,7 @@ describe("createAuthClient", () => {
     mockGet.mockResolvedValue(mockResponse)
     mockGetPublic.mockResolvedValue(mockResponse)
     mockPost.mockResolvedValue(mockResponse)
+    mockPostPublic.mockResolvedValue(mockResponse)
     mockPatch.mockResolvedValue(mockResponse)
     mockDelete.mockResolvedValue({ ...mockResponse, data: undefined })
     mockRequestFormData.mockResolvedValue(mockResponse)
@@ -409,6 +415,91 @@ describe("createAuthClient", () => {
     })
   })
 
+  describe("redeemPlayerViewToken", () => {
+    interface PlayerViewTokenRedemptionResponse {
+      jwt: string
+      user: User
+      encounter_id: string
+      character_id: string
+      redirect_url: string
+    }
+
+    const mockTokenResponse: AxiosResponse<PlayerViewTokenRedemptionResponse> =
+      {
+        data: {
+          jwt: "player-view-jwt-token",
+          user: mockUser,
+          encounter_id: "encounter-123",
+          character_id: "character-456",
+          redirect_url: "/encounters/encounter-123/play/character-456",
+        },
+        status: 200,
+        statusText: "OK",
+        headers: {},
+        config: {},
+      }
+
+    beforeEach(() => {
+      mockPostPublic.mockResolvedValue(mockTokenResponse)
+    })
+
+    it("redeems player view token via public POST request", async () => {
+      await authClient.redeemPlayerViewToken("test-magic-token")
+
+      expect(mockApiV2.playerTokenRedeem).toHaveBeenCalledWith(
+        "test-magic-token"
+      )
+      expect(mockPostPublic).toHaveBeenCalledWith(
+        "/api/v2/player_view_tokens/test-magic-token/redeem",
+        {}
+      )
+    })
+
+    it("returns JWT and user data on successful redemption", async () => {
+      const result = await authClient.redeemPlayerViewToken("valid-token")
+
+      expect(result.data.jwt).toBe("player-view-jwt-token")
+      expect(result.data.user).toEqual(mockUser)
+      expect(result.data.redirect_url).toBe(
+        "/encounters/encounter-123/play/character-456"
+      )
+    })
+
+    it("returns encounter and character IDs", async () => {
+      const result = await authClient.redeemPlayerViewToken("valid-token")
+
+      expect(result.data.encounter_id).toBe("encounter-123")
+      expect(result.data.character_id).toBe("character-456")
+    })
+
+    it("propagates error when token is expired", async () => {
+      const expiredError = new Error("Token has expired")
+      mockPostPublic.mockRejectedValue(expiredError)
+
+      await expect(
+        authClient.redeemPlayerViewToken("expired-token")
+      ).rejects.toThrow("Token has expired")
+    })
+
+    it("propagates error when token is already used", async () => {
+      const usedError = new Error("Token has already been used")
+      mockPostPublic.mockRejectedValue(usedError)
+
+      await expect(
+        authClient.redeemPlayerViewToken("used-token")
+      ).rejects.toThrow("Token has already been used")
+    })
+
+    it("propagates error when token is invalid", async () => {
+      const invalidError = new Error("Invalid token")
+      mockPostPublic.mockRejectedValue(invalidError)
+
+      await expect(
+        authClient.redeemPlayerViewToken("invalid-token")
+      ).rejects.toThrow("Invalid token")
+    })
+  })
+
   describe("client creation", () => {
     it("creates baseClient with correct dependencies", () => {
       createAuthClient(deps)
@@ -431,6 +522,7 @@ describe("createAuthClient", () => {
       expect(authClient.getPlayers).toBeDefined()
       expect(authClient.getCurrentUsers).toBeDefined()
       expect(authClient.getUsers).toBeDefined()
+      expect(authClient.redeemPlayerViewToken).toBeDefined()
     })
   })
 
