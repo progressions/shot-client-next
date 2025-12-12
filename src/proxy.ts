@@ -23,6 +23,7 @@ export function proxy(request: NextRequest) {
     pathname.startsWith("/redeem/") ||
     pathname.startsWith("/invitations/register/") ||
     pathname.startsWith("/reset-password/") ||
+    pathname.startsWith("/magic-link/") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/static")
   ) {

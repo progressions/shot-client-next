@@ -24,8 +24,9 @@ import {
   LocationsDialog,
   EndFightDialog,
   FightEventsDialog,
+  InvitePlayersModal,
 } from "@/components/encounters"
-import { FaPlay, FaPlus, FaMinus, FaStop } from "react-icons/fa6"
+import { FaPlay, FaPlus, FaMinus, FaStop, FaLink } from "react-icons/fa6"
 import {
   FaMapMarkerAlt,
   FaCaretRight,
@@ -57,6 +58,7 @@ export default function MenuBar({
   const [locationsDialogOpen, setLocationsDialogOpen] = useState(false)
   const [endFightDialogOpen, setEndFightDialogOpen] = useState(false)
   const [fightEventsDialogOpen, setFightEventsDialogOpen] = useState(false)
+  const [invitePlayersModalOpen, setInvitePlayersModalOpen] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
   const toggleBox = (type: "character" | "vehicle" | "admin") => {
@@ -453,6 +455,29 @@ export default function MenuBar({
                         {encounter.ended_at !== null ? "Ended" : "End Fight"}
                       </Button>
                     </Paper>
+
+                    {/* Invite Players */}
+                    <Paper
+                      elevation={1}
+                      sx={{ p: 2, height: "100%", minHeight: 100 }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ mb: 2, fontWeight: "bold" }}
+                      >
+                        Invite Players
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        size="small"
+                        startIcon={<FaLink />}
+                        onClick={() => setInvitePlayersModalOpen(true)}
+                        fullWidth
+                      >
+                        Generate Links
+                      </Button>
+                    </Paper>
                   </Box>
                 </Box>
               )}
@@ -493,6 +518,10 @@ export default function MenuBar({
       <FightEventsDialog
         open={fightEventsDialogOpen}
         onClose={() => setFightEventsDialogOpen(false)}
+      />
+      <InvitePlayersModal
+        open={invitePlayersModalOpen}
+        onClose={() => setInvitePlayersModalOpen(false)}
       />
     </>
   )

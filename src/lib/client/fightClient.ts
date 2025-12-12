@@ -228,6 +228,47 @@ export function createFightClient(deps: ClientDependencies) {
     return normalizeFightResponse(response)
   }
 
+  /**
+   * Generate a magic link token for a character in an encounter.
+   * This allows the character's owner to access the Player View without logging in.
+   */
+  async function generatePlayerViewToken(
+    encounterId: string,
+    characterId: string
+  ): Promise<
+    AxiosResponse<{
+      id: string
+      token: string
+      url: string
+      expires_at: string
+      fight_id: string
+      character_id: string
+      user_id: string
+    }>
+  > {
+    return post(apiV2.playerTokens(encounterId), { character_id: characterId })
+  }
+
+  /**
+   * List valid (unexpired, unused) magic link tokens for an encounter.
+   * Returns existing tokens that can be shared with players.
+   */
+  async function listPlayerViewTokens(encounterId: string): Promise<
+    AxiosResponse<{
+      tokens: Array<{
+        id: string
+        token: string
+        url: string
+        expires_at: string
+        fight_id: string
+        character_id: string
+        user_id: string
+      }>
+    }>
+  > {
+    return get(apiV2.playerTokens(encounterId))
+  }
+
   function normalizeFightResponse(
     response: AxiosResponse<{ fight?: Fight }>
   ): AxiosResponse<Fight> {
@@ -254,5 +295,7 @@ export function createFightClient(deps: ClientDependencies) {
     applyChaseAction,
     updateInitiatives,
     endFight,
+    generatePlayerViewToken,
+    listPlayerViewTokens,
   }
 }
