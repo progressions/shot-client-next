@@ -9,7 +9,7 @@
  * @module hooks/useCharacterExtension
  */
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import type { Character, CableData } from "@/types"
 import { Subscription } from "@rails/actioncable"
 import { useClient, useToast } from "@/contexts"
@@ -62,7 +62,16 @@ export function useCharacterExtension({
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
   const [pending, setPending] = useState(false)
-  const [subscription, setSubscription] = useState<Subscription | null>(null)
+
+  // Use refs to avoid stale closure issues and ensure proper cleanup
+  const subscriptionRef = useRef<Subscription | null>(null)
+  const handledRef = useRef(false)
+  const onCompleteRef = useRef(onComplete)
+
+  // Keep onComplete ref updated
+  useEffect(() => {
+    onCompleteRef.current = onComplete
+  }, [onComplete])
 
   // Check if the character is currently being extended (from database field)
   const isExtending = character.extending ?? false
@@ -70,16 +79,26 @@ export function useCharacterExtension({
   // Clean up subscription on unmount
   useEffect(() => {
     return () => {
-      if (subscription) {
-        subscription.disconnect()
+      if (subscriptionRef.current) {
+        subscriptionRef.current.disconnect()
+        subscriptionRef.current = null
       }
     }
-  }, [subscription])
+  }, [])
 
   const extendCharacter = useCallback(async () => {
     // Don't allow extension if already in progress
     if (isExtending || pending) {
       return
+    }
+
+    // Reset handled flag for new extension
+    handledRef.current = false
+
+    // Disconnect existing subscription if any (prevent memory leak)
+    if (subscriptionRef.current) {
+      subscriptionRef.current.disconnect()
+      subscriptionRef.current = null
     }
 
     setPending(true)
@@ -91,27 +110,41 @@ export function useCharacterExtension({
         { channel: "CampaignChannel", id: campaignId },
         {
           received: (data: CableData) => {
-            if (data.status === "character_ready" && data.character) {
+            // Prevent handling multiple messages (race condition)
+            if (handledRef.current) {
+              return
+            }
+
+            // Filter messages to only handle this character's extension
+            if (
+              data.status === "character_ready" &&
+              data.character &&
+              data.character.id === character.id
+            ) {
+              handledRef.current = true
               toastSuccess(
                 `Character "${data.character.name}" extended successfully`
               )
               setPending(false)
               sub.disconnect()
+              subscriptionRef.current = null
 
               // Call the onComplete callback with updated character
-              if (onComplete) {
-                onComplete(data.character)
+              if (onCompleteRef.current) {
+                onCompleteRef.current(data.character)
               }
             } else if (data.status === "error" && data.error) {
+              handledRef.current = true
               console.error("Character extension error:", data.error)
               toastError(data.error)
               setPending(false)
               sub.disconnect()
+              subscriptionRef.current = null
             }
           },
         }
       )
-      setSubscription(sub)
+      subscriptionRef.current = sub
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to extend character"
@@ -124,7 +157,6 @@ export function useCharacterExtension({
     character,
     isExtending,
     pending,
-    onComplete,
     toastSuccess,
     toastError,
   ])
