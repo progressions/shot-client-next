@@ -39,6 +39,27 @@ export interface Campaign extends BaseEntity {
   image_url: string
   created_at: string
   updated_at: string
+  // Seeding status fields
+  seeding_status?: string | null
+  seeding_images_total?: number
+  seeding_images_completed?: number
+  seeded_at?: string | null
+  is_seeding?: boolean
+  is_seeded?: boolean
+}
+
+/**
+ * Helper function to determine if a campaign is currently seeding.
+ * Checks both the is_seeding flag and seeding_status to handle edge cases.
+ */
+export function isCampaignSeeding(
+  campaign: Campaign | null | undefined
+): boolean {
+  if (!campaign) return false
+  return (
+    campaign.is_seeding === true ||
+    (campaign.seeding_status != null && campaign.seeding_status !== "complete")
+  )
 }
 
 export type JunctureName = string

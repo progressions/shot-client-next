@@ -8,10 +8,13 @@ import {
   FormStateAction,
   FormActions,
   CampaignsTableFormState,
+  Campaign,
+  isCampaignSeeding,
 } from "@/types"
 import { BaseDataGrid, CampaignLink } from "@/components/ui"
 import { EntityAvatar } from "@/components/avatars"
 import { useClient, useApp, useToast, useConfirm } from "@/contexts"
+import { SeedingStatus } from "@/components/campaigns"
 
 interface ViewProps {
   formState: FormStateType<CampaignsTableFormState>
@@ -127,8 +130,10 @@ export default function View({ formState, dispatchForm }: ViewProps) {
       editable: false,
       sortable: false,
       renderCell: params => {
-        const isCurrentCampaign = params.row.id === currentCampaign?.id
-        const isActive = params.row.active !== false // active can be true or null/undefined
+        const campaign = params.row as Campaign
+        const isCurrentCampaign = campaign.id === currentCampaign?.id
+        const isActive = campaign.active !== false // active can be true or null/undefined
+        const isSeeding = isCampaignSeeding(campaign)
         return (
           <Box
             sx={{
@@ -138,7 +143,9 @@ export default function View({ formState, dispatchForm }: ViewProps) {
               height: "100%",
             }}
           >
-            {isCurrentCampaign ? (
+            {isSeeding ? (
+              <SeedingStatus campaign={campaign} variant="chip" />
+            ) : isCurrentCampaign ? (
               <Chip
                 icon={<CheckCircle />}
                 label="Current"
@@ -163,8 +170,10 @@ export default function View({ formState, dispatchForm }: ViewProps) {
       editable: false,
       sortable: false,
       renderCell: params => {
-        const isCurrentCampaign = params.row.id === currentCampaign?.id
-        const isLoading = loadingCampaignId === params.row.id
+        const campaign = params.row as Campaign
+        const isCurrentCampaign = campaign.id === currentCampaign?.id
+        const isLoading = loadingCampaignId === campaign.id
+        const isSeeding = isCampaignSeeding(campaign)
 
         return (
           <Box
@@ -182,11 +191,11 @@ export default function View({ formState, dispatchForm }: ViewProps) {
                 color="primary"
                 size="small"
                 startIcon={<PlayArrow />}
-                onClick={() => handleActivateCampaign(params.row)}
-                disabled={isLoading}
+                onClick={() => handleActivateCampaign(campaign)}
+                disabled={isLoading || isSeeding}
                 sx={{ minWidth: 100 }}
               >
-                {isLoading ? "..." : "Activate"}
+                {isLoading ? "..." : isSeeding ? "Seeding..." : "Activate"}
               </Button>
             )}
             {isCurrentCampaign && (
@@ -195,7 +204,7 @@ export default function View({ formState, dispatchForm }: ViewProps) {
                 color="warning"
                 size="small"
                 startIcon={<Stop />}
-                onClick={() => handleDeactivateCampaign(params.row)}
+                onClick={() => handleDeactivateCampaign(campaign)}
                 disabled={isLoading}
                 sx={{ minWidth: 100 }}
               >

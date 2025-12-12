@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect } from "react"
 import { FormControl, FormHelperText, Stack, Box } from "@mui/material"
-import type { Campaign } from "@/types"
+import { type Campaign, isCampaignSeeding } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
 import {
   Manager,
@@ -16,6 +16,7 @@ import {
   SpeedDialMenu,
 } from "@/components/ui"
 import { EntityActiveToggle } from "@/components/common"
+import { SeedingStatus } from "@/components/campaigns"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -87,6 +88,9 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
       <SpeedDialMenu onDelete={deleteEntity} />
       <HeroImage entity={campaign} setEntity={setCampaign} />
       <Alert status={status} />
+      {isCampaignSeeding(campaign) && (
+        <SeedingStatus campaign={campaign} variant="banner" />
+      )}
       <FormControl fullWidth margin="normal" error={!!errors.name}>
         <NameEditor
           entity={campaign}

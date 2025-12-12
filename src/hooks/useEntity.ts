@@ -145,7 +145,7 @@ export function useEntity(
     }
 
     try {
-      await client[createFunction](formData)
+      const response = await client[createFunction](formData)
       toastSuccess(`${entityClass} created successfully`)
 
       // Refresh user data to update onboarding progress for milestone-tracked entities
@@ -166,6 +166,9 @@ export function useEntity(
           `ℹ️ Entity created: ${name} - not a milestone entity, skipping refreshUser()`
         )
       }
+
+      // Return the created entity data
+      return response.data
     } catch (error) {
       console.error("Error creating entity:", error.response.data.errors)
       toastError(`Error creating ${name}.`)

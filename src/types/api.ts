@@ -72,6 +72,11 @@ export interface CampaignCableData {
   sites: Site[] | string | null
   schticks: Schtick[] | string | null
   weapons: Weapon[] | string | null
+  // Seeding status fields for real-time updates
+  seeding_status?: string | null
+  campaign_id?: string
+  images_total?: number
+  images_completed?: number
 }
 
 export interface CableData {
