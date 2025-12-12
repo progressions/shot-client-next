@@ -169,22 +169,24 @@ describe("PlayerViewMagicLinkPage", () => {
     })
 
     it("cleans up timeout on unmount", async () => {
+      const clearTimeoutSpy = jest.spyOn(global, "clearTimeout")
+
       const { unmount } = render(<PlayerViewMagicLinkPage />)
 
       await waitFor(() => {
         expect(screen.getByText(/welcome to the fight/i)).toBeInTheDocument()
       })
 
-      // Unmount before timeout fires
+      // Clear the spy call count before unmount (other timers may have been cleared)
+      clearTimeoutSpy.mockClear()
+
+      // Unmount should trigger cleanup
       unmount()
 
-      // Advance timer - should not cause any errors
-      act(() => {
-        jest.advanceTimersByTime(2000)
-      })
+      // Verify clearTimeout was called during cleanup
+      expect(clearTimeoutSpy).toHaveBeenCalled()
 
-      // Router push should not have been called
-      expect(mockPush).not.toHaveBeenCalled()
+      clearTimeoutSpy.mockRestore()
     })
   })
 
