@@ -234,6 +234,18 @@ export function createCampaignClient(deps: ClientDependencies) {
     )
   }
 
+  interface BatchImageGenerationResponse {
+    message: string
+    total_entities: number
+    campaign_id: string
+  }
+
+  async function generateBatchImages(
+    campaignId: string
+  ): Promise<AxiosResponse<BatchImageGenerationResponse>> {
+    return post(`${apiV2.campaigns({ id: campaignId })}/generate_batch_images`)
+  }
+
   return {
     addPlayer,
     removePlayer,
@@ -251,5 +263,6 @@ export function createCampaignClient(deps: ClientDependencies) {
     setCurrentCampaign,
     getCurrentCampaign,
     getCurrentFight,
+    generateBatchImages,
   }
 }

@@ -46,6 +46,11 @@ export interface Campaign extends BaseEntity {
   seeded_at?: string | null
   is_seeding?: boolean
   is_seeded?: boolean
+  // Batch image generation fields
+  batch_image_status?: string | null
+  batch_images_total?: number
+  batch_images_completed?: number
+  is_batch_images_in_progress?: boolean
 }
 
 /**
@@ -59,6 +64,21 @@ export function isCampaignSeeding(
   return (
     campaign.is_seeding === true ||
     (campaign.seeding_status != null && campaign.seeding_status !== "complete")
+  )
+}
+
+/**
+ * Helper function to determine if batch image generation is currently in progress.
+ * Checks both the is_batch_images_in_progress flag and batch_image_status to handle edge cases.
+ */
+export function isBatchImageGenerating(
+  campaign: Campaign | null | undefined
+): boolean {
+  if (!campaign) return false
+  return (
+    campaign.is_batch_images_in_progress === true ||
+    (campaign.batch_image_status != null &&
+      campaign.batch_image_status !== "complete")
   )
 }
 
