@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import { FormControl, FormHelperText, Stack, Box } from "@mui/material"
 import { type Campaign, isCampaignSeeding } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
@@ -16,7 +16,10 @@ import {
   SpeedDialMenu,
 } from "@/components/ui"
 import { EntityActiveToggle } from "@/components/common"
-import { SeedingStatus } from "@/components/campaigns"
+import {
+  SeedingStatus,
+  BatchImageGenerationButton,
+} from "@/components/campaigns"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -64,14 +67,21 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
     document.title = campaign.name ? `${campaign.name} - Chi War` : "Chi War"
   }, [campaign.name])
 
+  // Use a ref to track current campaign for subscription merging
+  const campaignRef = useRef(campaign)
+  useEffect(() => {
+    campaignRef.current = campaign
+  }, [campaign])
+
   // Subscribe to campaign updates
   useEffect(() => {
     const unsubscribe = subscribeToEntity("campaign", data => {
       if (data && data.id === initialCampaign.id) {
+        // Merge broadcast data with current campaign to preserve existing fields
         dispatchForm({
           type: FormActions.UPDATE,
           name: "entity",
-          value: { ...data },
+          value: { ...campaignRef.current, ...data },
         })
       }
     })
@@ -144,6 +154,7 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
             entity={campaign}
             handleChangeAndSave={handleChangeAndSave}
           />
+          <BatchImageGenerationButton campaign={campaign} />
         </>
       )}
     </Box>
