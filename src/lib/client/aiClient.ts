@@ -4,12 +4,11 @@ import type { Entity, Character, CharacterJson } from "@/types"
 
 interface ClientDependencies {
   jwt?: string
-  api: import("@/lib").Api
   apiV2: import("@/lib").ApiV2
 }
 
 export function createAiClient(deps: ClientDependencies) {
-  const { api, apiV2 } = deps
+  const { apiV2 } = deps
   const { post } = createBaseClient(deps)
 
   async function extendCharacter(
@@ -23,7 +22,7 @@ export function createAiClient(deps: ClientDependencies) {
   async function generateAiCharacter(
     parameters: { description: string } = { description: "" }
   ): Promise<AxiosResponse<CharacterJson>> {
-    return post(api.ai(), { ai: parameters })
+    return post(apiV2.ai(), { ai: parameters })
   }
 
   async function generateAiImages(parameters: {
