@@ -75,8 +75,9 @@ export interface CampaignCableData {
 }
 
 export interface CableData {
-  status: "preview_ready" | "error"
+  status: "preview_ready" | "character_ready" | "error"
   json?: CharacterJson
+  character?: Character
   error?: string
 }
 

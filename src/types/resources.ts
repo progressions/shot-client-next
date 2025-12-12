@@ -264,6 +264,7 @@ export interface Person extends BaseEntity {
   id: string
   name: string
   active: boolean
+  extending?: boolean
   impairments: number
   color: string
   faction_id: string | null

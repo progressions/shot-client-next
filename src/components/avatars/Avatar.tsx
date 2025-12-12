@@ -7,6 +7,7 @@ import { SystemStyleObject, Theme } from "@mui/system"
 import CharacterLink from "../ui/links/CharacterLink"
 import { ImageViewerModal } from "@/components/ui/ImageViewerModal"
 import ImpairmentBadge from "@/components/ui/ImpairmentBadge"
+import ExtendingBadge from "@/components/ui/ExtendingBadge"
 
 interface AvatarProperties {
   entity: Entity
@@ -93,6 +94,12 @@ const Avatar = ({
       ? entity.impairments
       : 0
 
+  // Check if entity is being extended (Character types)
+  const isExtending =
+    "extending" in entity && typeof entity.extending === "boolean"
+      ? entity.extending
+      : false
+
   const avatarElement = (
     <MuiAvatar
       alt={entity.name}
@@ -113,7 +120,11 @@ const Avatar = ({
   )
 
   const baseAvatar = (
-    <ImpairmentBadge impairments={impairments}>{avatarElement}</ImpairmentBadge>
+    <ExtendingBadge extending={isExtending}>
+      <ImpairmentBadge impairments={impairments}>
+        {avatarElement}
+      </ImpairmentBadge>
+    </ExtendingBadge>
   )
 
   const avatarWithViewer = (
