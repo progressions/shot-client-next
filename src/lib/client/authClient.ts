@@ -244,6 +244,25 @@ export function createAuthClient(deps: ClientDependencies) {
     return getPublic(api.otpMagicLink(token))
   }
 
+  // Player View Magic Link Redemption
+  interface PlayerViewTokenRedemptionResponse {
+    jwt: string
+    user: User
+    encounter_id: string
+    character_id: string
+    redirect_url: string
+  }
+
+  /**
+   * Redeem a player view magic link token.
+   * This is a public endpoint that authenticates the user and returns the Player View URL.
+   */
+  async function redeemPlayerViewToken(
+    token: string
+  ): Promise<AxiosResponse<PlayerViewTokenRedemptionResponse>> {
+    return postPublic(apiV2.playerTokenRedeem(token), {})
+  }
+
   // WebAuthn/Passkey Methods
 
   /**
@@ -363,6 +382,8 @@ export function createAuthClient(deps: ClientDependencies) {
     requestOtp,
     verifyOtp,
     verifyMagicLink,
+    // Player View Magic Link
+    redeemPlayerViewToken,
     // WebAuthn/Passkey
     getPasskeyRegistrationOptions,
     verifyPasskeyRegistration,

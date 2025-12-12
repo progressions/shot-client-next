@@ -244,6 +244,15 @@ class ApiV2 {
   webauthnCredential(credentialId: string): string {
     return `${this.api()}/webauthn/credentials/${credentialId}`
   }
+
+  // Player View magic link endpoints
+  playerTokens(encounterId: string): string {
+    return `${this.api()}/encounters/${encounterId}/player_tokens`
+  }
+
+  playerTokenRedeem(token: string): string {
+    return `${this.api()}/player_tokens/${token}/redeem`
+  }
 }
 
 export default ApiV2
