@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useRef, useCallback } from "react"
 import {
   Dialog,
   DialogTitle,
@@ -52,6 +52,7 @@ export default function InvitePlayersModal({
   // Track generated tokens for each character
   const [tokens, setTokens] = useState<Record<string, TokenInfo>>({})
   const [loadingExisting, setLoadingExisting] = useState(false)
+  const copiedTimeoutsRef = useRef<Record<string, NodeJS.Timeout>>({})
 
   // Get PC characters in the encounter
   const pcCharacters = useMemo(() => {
@@ -87,8 +88,18 @@ export default function InvitePlayersModal({
         })
     } else if (!open) {
       setTokens({})
+      // Clear all copied timeouts when modal closes
+      Object.values(copiedTimeoutsRef.current).forEach(clearTimeout)
+      copiedTimeoutsRef.current = {}
     }
   }, [open, encounter, client])
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(copiedTimeoutsRef.current).forEach(clearTimeout)
+    }
+  }, [])
 
   const generateToken = async (character: Character) => {
     if (!encounter) return
@@ -133,19 +144,25 @@ export default function InvitePlayersModal({
       }))
       toastSuccess("Link copied to clipboard!")
 
+      // Clear any existing timeout for this character
+      if (copiedTimeoutsRef.current[characterId]) {
+        clearTimeout(copiedTimeoutsRef.current[characterId])
+      }
+
       // Reset copied state after 3 seconds
-      setTimeout(() => {
+      copiedTimeoutsRef.current[characterId] = setTimeout(() => {
         setTokens(prev => ({
           ...prev,
           [characterId]: { ...prev[characterId], copied: false },
         }))
+        delete copiedTimeoutsRef.current[characterId]
       }, 3000)
     } catch {
       toastError("Failed to copy link")
     }
   }
 
-  const formatExpiry = (expiresAt: string) => {
+  const formatExpiry = useCallback((expiresAt: string) => {
     const expiry = new Date(expiresAt)
     const now = new Date()
     const diffMs = expiry.getTime() - now.getTime()
@@ -154,11 +171,24 @@ export default function InvitePlayersModal({
     if (diffMins <= 0) return "Expired"
     if (diffMins === 1) return "1 minute left"
     return `${diffMins} minutes left`
-  }
+  }, [])
 
-  const isExpired = (expiresAt: string) => {
-    return new Date(expiresAt) <= new Date()
-  }
+  // Memoize expired status for all tokens to avoid repeated date comparisons on each render
+  const expiredTokens = useMemo(() => {
+    const now = new Date()
+    const expired: Record<string, boolean> = {}
+    for (const [characterId, tokenInfo] of Object.entries(tokens)) {
+      if (tokenInfo.expires_at) {
+        expired[characterId] = new Date(tokenInfo.expires_at) <= now
+      }
+    }
+    return expired
+  }, [tokens])
+
+  const isExpired = useCallback(
+    (characterId: string) => expiredTokens[characterId] ?? false,
+    [expiredTokens]
+  )
 
   if (!encounter) return null
 
@@ -190,7 +220,7 @@ export default function InvitePlayersModal({
 
         {loadingExisting ? (
           <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-            <CircularProgress />
+            <CircularProgress aria-label="Loading existing links" />
           </Box>
         ) : pcCharacters.length === 0 ? (
           <Alert severity="info">
@@ -202,7 +232,7 @@ export default function InvitePlayersModal({
             {pcCharacters.map(character => {
               const tokenInfo = tokens[character.id]
               const hasToken = tokenInfo?.url && !tokenInfo.loading
-              const tokenExpired = hasToken && isExpired(tokenInfo.expires_at)
+              const tokenExpired = hasToken && isExpired(character.id)
 
               return (
                 <ListItem
@@ -232,12 +262,16 @@ export default function InvitePlayersModal({
                     />
                     <ListItemSecondaryAction>
                       {tokenInfo?.loading ? (
-                        <CircularProgress size={24} />
+                        <CircularProgress
+                          size={24}
+                          aria-label="Generating link"
+                        />
                       ) : hasToken && !tokenExpired ? (
                         <Box sx={{ display: "flex", gap: 0.5 }}>
                           <Tooltip title="Regenerate link">
                             <IconButton
                               size="small"
+                              aria-label="Regenerate link"
                               onClick={() => generateToken(character)}
                             >
                               <Refresh />
@@ -248,6 +282,9 @@ export default function InvitePlayersModal({
                           >
                             <IconButton
                               size="small"
+                              aria-label={
+                                tokenInfo.copied ? "Copied" : "Copy link"
+                              }
                               onClick={() =>
                                 copyToClipboard(character.id, tokenInfo.url)
                               }

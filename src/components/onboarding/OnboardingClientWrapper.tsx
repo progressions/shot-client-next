@@ -10,7 +10,8 @@ export const OnboardingClientWrapper: React.FC = () => {
   const pathname = usePathname()
 
   // Hide onboarding module on Player View - keep that view focused on gameplay
-  const isPlayerView = /^\/encounters\/\d+\/play\/\d+$/.test(pathname)
+  // Use [^/]+ to match both numeric IDs and UUIDs
+  const isPlayerView = /^\/encounters\/[^/]+\/play\/[^/]+$/.test(pathname)
 
   if (loading || !user || !user.onboarding_progress || isPlayerView) {
     return null
