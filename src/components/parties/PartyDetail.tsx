@@ -12,7 +12,7 @@ import {
 import type { Party } from "@/types"
 import Link from "next/link"
 import { PartyName, PartyDescription } from "@/components/parties"
-import { useCampaign, useClient } from "@/contexts"
+import { useCampaign, useClient, useConfirm } from "@/contexts"
 import { CharacterLink, FactionLink } from "@/components/ui"
 import DetailButtons from "@/components/DetailButtons"
 
@@ -29,6 +29,7 @@ export default function PartyDetail({
 }: PartyDetailProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
+  const { confirm } = useConfirm()
   const [error, setError] = useState<string | null>(null)
   const [party, setParty] = useState<Party>(initialParty)
 
@@ -40,8 +41,13 @@ export default function PartyDetail({
 
   const handleDelete = async () => {
     if (!party?.id) return
-    if (!confirm(`Are you sure you want to delete the party: ${party.name}?`))
-      return
+    const confirmed = await confirm({
+      title: "Delete Party",
+      message: `Are you sure you want to delete the party: ${party.name}?`,
+      confirmText: "Delete",
+      destructive: true,
+    })
+    if (!confirmed) return
 
     try {
       await client.deleteParty(party)

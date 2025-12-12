@@ -7,23 +7,37 @@ import {
   DialogContent,
   DialogActions,
   Button,
+  Typography,
 } from "@mui/material"
 
 interface ConfirmDialogProps {
   open: boolean
   onClose: () => void
   onConfirm: () => void
-  title: string
-  children: React.ReactNode
+  title?: string
+  children?: React.ReactNode
+  message?: string
+  confirmText?: string
+  cancelText?: string
+  confirmColor?: "primary" | "error" | "warning" | "success"
+  destructive?: boolean
 }
 
 export function ConfirmDialog({
   open,
   onClose,
   onConfirm,
-  title,
+  title = "Confirm",
   children,
+  message,
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  confirmColor = "primary",
+  destructive = false,
 }: ConfirmDialogProps) {
+  const buttonColor = destructive ? "error" : confirmColor
+  const borderColor = destructive ? "error.main" : `${confirmColor}.main`
+
   return (
     <Dialog
       open={open}
@@ -35,8 +49,9 @@ export function ConfirmDialog({
           color: "white",
           borderRadius: 2,
           border: "2px solid",
-          borderColor: "primary.main",
+          borderColor: borderColor,
           boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.5)",
+          minWidth: 320,
         },
       }}
     >
@@ -44,7 +59,9 @@ export function ConfirmDialog({
         {title}
       </DialogTitle>
       <DialogContent sx={{ bgcolor: "grey.800", color: "white" }}>
-        {children}
+        {children || (
+          <Typography sx={{ whiteSpace: "pre-line" }}>{message}</Typography>
+        )}
       </DialogContent>
       <DialogActions sx={{ bgcolor: "grey.800", p: 2 }}>
         <Button
@@ -54,18 +71,18 @@ export function ConfirmDialog({
             "&:hover": { bgcolor: "grey.700" },
           }}
         >
-          Cancel
+          {cancelText}
         </Button>
         <Button
           onClick={onConfirm}
           variant="contained"
+          color={buttonColor}
+          autoFocus
           sx={{
-            bgcolor: "primary.main",
             color: "white",
-            "&:hover": { bgcolor: "primary.dark" },
           }}
         >
-          Confirm
+          {confirmText}
         </Button>
       </DialogActions>
     </Dialog>

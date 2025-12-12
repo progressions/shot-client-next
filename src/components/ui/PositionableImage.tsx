@@ -13,6 +13,7 @@ import { ImageViewerModal } from "./ImageViewerModal"
 import { GenerateImageDialog, UploadImageDialog } from "@/components/generate"
 import { useToast } from "@/contexts/ToastContext"
 import { useClient } from "@/contexts/AppContext"
+import { useConfirm } from "@/contexts"
 
 /**
  * Props for the PositionableImage component.
@@ -111,6 +112,7 @@ export function PositionableImage({
   onPositionChange,
 }: PositionableImageProps) {
   const { client } = useClient()
+  const { confirm } = useConfirm()
   const imgRef = useRef<HTMLImageElement>(null)
   const [boxWidth, setBoxWidth] = useState(0)
   const [isRepositioning, setIsRepositioning] = useState(false)
@@ -345,9 +347,13 @@ export function PositionableImage({
     }
 
     // Confirm deletion
-    if (!window.confirm("Are you sure you want to delete this image?")) {
-      return
-    }
+    const confirmed = await confirm({
+      title: "Delete Image",
+      message: "Are you sure you want to delete this image?",
+      confirmText: "Delete",
+      destructive: true,
+    })
+    if (!confirmed) return
 
     setIsDeleting(true)
     try {

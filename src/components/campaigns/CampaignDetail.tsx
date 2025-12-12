@@ -12,7 +12,7 @@ import {
 import type { Campaign } from "@/types"
 import Link from "next/link"
 import { CampaignDescription } from "@/components/campaigns"
-import { useCampaign, useClient, useToast } from "@/contexts"
+import { useCampaign, useClient, useToast, useConfirm } from "@/contexts"
 import { UserName } from "@/components/names"
 import DetailButtons from "@/components/DetailButtons"
 import { handleEntityDeletion } from "@/lib/deletionHandler"
@@ -31,6 +31,7 @@ export default function CampaignDetail({
   const { user, client } = useClient()
   const { subscribeToEntity } = useCampaign()
   const { toastSuccess, toastError } = useToast()
+  const { confirm } = useConfirm()
   const [error, setError] = useState<string | null>(null)
   const [campaign, setCampaign] = useState<Campaign>(initialCampaign)
 
@@ -61,6 +62,7 @@ export default function CampaignDetail({
         setError(message)
         toastError(message)
       },
+      confirm,
     })
   }
 

@@ -19,7 +19,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import type { Character } from "@/types"
 import { CS } from "@/services"
-import { useClient } from "@/contexts"
+import { useClient, useConfirm } from "@/contexts"
 import { Extend } from "@/components/characters"
 
 type Action = {
@@ -44,6 +44,7 @@ export default function CharacterSpeedDial({
 }: CharacterSpeedDialProps) {
   const isExtending = character.extending ?? false
   const { client } = useClient()
+  const { confirm } = useConfirm()
   const router = useRouter()
   const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null)
   const exportMenuOpen = Boolean(exportAnchorEl)
@@ -67,12 +68,13 @@ export default function CharacterSpeedDial({
     if (!character?.id) return
 
     if (!force) {
-      if (
-        !confirm(
-          `Are you sure you want to delete the character: ${character.name || "Unnamed"}?`
-        )
-      )
-        return
+      const confirmed = await confirm({
+        title: "Delete Character",
+        message: `Are you sure you want to delete the character: ${character.name || "Unnamed"}?`,
+        confirmText: "Delete",
+        destructive: true,
+      })
+      if (!confirmed) return
     }
 
     try {
@@ -96,7 +98,13 @@ export default function CharacterSpeedDial({
 
         const message = `Cannot delete ${character.name || "this character"} because it has:\n\n${constraintsList}\n\nThese associations must be removed first, or you can force delete which will remove all associations.\n\nForce delete and remove all associations?`
 
-        if (confirm(message)) {
+        const forceConfirmed = await confirm({
+          title: "Force Delete Character?",
+          message,
+          confirmText: "Force Delete",
+          destructive: true,
+        })
+        if (forceConfirmed) {
           await handleDelete(true)
         }
       } else {

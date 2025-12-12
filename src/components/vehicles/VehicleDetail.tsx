@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material"
 import type { Vehicle } from "@/types"
-import { useCampaign, useClient } from "@/contexts"
+import { useCampaign, useClient, useConfirm } from "@/contexts"
 import { FactionLink, VehicleLink } from "@/components/ui"
 import DetailButtons from "@/components/DetailButtons"
 import { CS } from "@/services"
@@ -28,6 +28,7 @@ export default function VehicleDetail({
 }: VehicleDetailProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
+  const { confirm } = useConfirm()
   const [error, setError] = useState<string | null>(null)
   const [vehicle, setVehicle] = useState<Vehicle>(initialVehicle)
 
@@ -42,10 +43,13 @@ export default function VehicleDetail({
 
   const handleDelete = async () => {
     if (!vehicle?.id) return
-    if (
-      !confirm(`Are you sure you want to delete the vehicle: ${vehicle.name}?`)
-    )
-      return
+    const confirmed = await confirm({
+      title: "Delete Vehicle",
+      message: `Are you sure you want to delete the vehicle: ${vehicle.name}?`,
+      confirmText: "Delete",
+      destructive: true,
+    })
+    if (!confirmed) return
 
     try {
       await client.deleteVehicle(vehicle)

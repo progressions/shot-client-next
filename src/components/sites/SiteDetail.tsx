@@ -12,7 +12,7 @@ import {
 import type { Site } from "@/types"
 import Link from "next/link"
 import { SiteDescription } from "@/components/sites"
-import { useCampaign, useClient } from "@/contexts"
+import { useCampaign, useClient, useConfirm } from "@/contexts"
 import { FactionLink, CharacterLink } from "@/components/ui"
 import DetailButtons from "@/components/DetailButtons"
 
@@ -29,6 +29,7 @@ export default function SiteDetail({
 }: SiteDetailProperties) {
   const { client } = useClient()
   const { campaignData } = useCampaign()
+  const { confirm } = useConfirm()
   const [error, setError] = useState<string | null>(null)
   const [site, setSite] = useState<Site>(initialSite)
 
@@ -45,8 +46,13 @@ export default function SiteDetail({
 
   const handleDelete = async () => {
     if (!site?.id) return
-    if (!confirm(`Are you sure you want to delete the site: ${site.name}?`))
-      return
+    const confirmed = await confirm({
+      title: "Delete Site",
+      message: `Are you sure you want to delete the site: ${site.name}?`,
+      confirmText: "Delete",
+      destructive: true,
+    })
+    if (!confirmed) return
 
     try {
       await client.deleteSite(site)

@@ -1,4 +1,5 @@
 import { AxiosError } from "axios"
+import type { ConfirmOptions } from "@/types/ui"
 
 export interface DeletionConstraint {
   count: number
@@ -51,9 +52,12 @@ export function formatConstraintMessage(
  * @param options.onSuccess - Callback after successful deletion
  * @param options.onError - Callback with error message on failure
  * @param options.confirmMessage - Optional custom confirmation message
+ * @param options.confirm - Async confirm function from useConfirm() hook
  *
  * @example
  * ```tsx
+ * const { confirm } = useConfirm()
+ *
  * await handleEntityDeletion(
  *   character,
  *   (entity, params) => client.deleteCharacter(entity.id, params),
@@ -64,6 +68,7 @@ export function formatConstraintMessage(
  *       toastSuccess("Character deleted")
  *     },
  *     onError: (msg) => toastError(msg),
+ *     confirm,
  *   }
  * )
  * ```
@@ -78,9 +83,10 @@ export async function handleEntityDeletion<
     onSuccess: () => void
     onError: (message: string) => void
     confirmMessage?: string
+    confirm: (options: ConfirmOptions | string) => Promise<boolean>
   }
 ): Promise<void> {
-  const { entityName, onSuccess, onError, confirmMessage } = options
+  const { entityName, onSuccess, onError, confirmMessage, confirm } = options
 
   // Initial confirmation
   const entityLabel = entity.name || entity.id
@@ -88,7 +94,13 @@ export async function handleEntityDeletion<
     confirmMessage ||
     `Are you sure you want to delete ${entityName}: ${entityLabel}?`
 
-  if (!confirm(message)) return
+  const confirmed = await confirm({
+    title: `Delete ${entityName.charAt(0).toUpperCase() + entityName.slice(1)}`,
+    message,
+    confirmText: "Delete",
+    destructive: true,
+  })
+  if (!confirmed) return
 
   try {
     await deleteFunction(entity)
@@ -99,9 +111,14 @@ export async function handleEntityDeletion<
       const constraintMessage = formatConstraintMessage(errorData.constraints)
 
       // Show detailed error and offer force deletion
-      const forceMessage = `This ${errorData.entity_type} has associated records:\n\n${constraintMessage}\n\nDo you want to delete it anyway?`
+      const forceConfirmed = await confirm({
+        title: `Force Delete ${entityName.charAt(0).toUpperCase() + entityName.slice(1)}?`,
+        message: `This ${errorData.entity_type} has associated records:\n\n${constraintMessage}\n\nDo you want to delete it anyway?`,
+        confirmText: "Force Delete",
+        destructive: true,
+      })
 
-      if (confirm(forceMessage)) {
+      if (forceConfirmed) {
         try {
           await deleteFunction(entity, { force: true })
           onSuccess()

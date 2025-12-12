@@ -17,7 +17,7 @@ import {
   SchtickName,
   SchtickDescription,
 } from "@/components/schticks"
-import { useCampaign, useClient } from "@/contexts"
+import { useCampaign, useClient, useConfirm } from "@/contexts"
 import DetailButtons from "@/components/DetailButtons"
 
 interface SchtickDetailProperties {
@@ -32,6 +32,7 @@ export default function SchtickDetail({
   const router = useRouter()
   const { client } = useClient()
   const { campaignData } = useCampaign()
+  const { confirm } = useConfirm()
   const [error, setError] = useState<string | null>(null)
   const [schtick, setSchtick] = useState<Schtick>(initialSchtick)
 
@@ -52,10 +53,13 @@ export default function SchtickDetail({
 
   const handleDelete = async () => {
     if (!schtick?.id) return
-    if (
-      !confirm(`Are you sure you want to delete the schtick: ${schtick.name}?`)
-    )
-      return
+    const confirmed = await confirm({
+      title: "Delete Schtick",
+      message: `Are you sure you want to delete the schtick: ${schtick.name}?`,
+      confirmText: "Delete",
+      destructive: true,
+    })
+    if (!confirmed) return
 
     try {
       await client.deleteSchtick(schtick)
