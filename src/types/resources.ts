@@ -39,6 +39,13 @@ export interface Campaign extends BaseEntity {
   image_url: string
   created_at: string
   updated_at: string
+  // Seeding status fields
+  seeding_status?: string | null
+  seeding_images_total?: number
+  seeding_images_completed?: number
+  seeded_at?: string | null
+  is_seeding?: boolean
+  is_seeded?: boolean
 }
 
 export type JunctureName = string

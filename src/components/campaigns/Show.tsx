@@ -16,6 +16,7 @@ import {
   SpeedDialMenu,
 } from "@/components/ui"
 import { EntityActiveToggle } from "@/components/common"
+import { SeedingStatus } from "@/components/campaigns"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -87,6 +88,11 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
       <SpeedDialMenu onDelete={deleteEntity} />
       <HeroImage entity={campaign} setEntity={setCampaign} />
       <Alert status={status} />
+      {(campaign.is_seeding ||
+        (campaign.seeding_status &&
+          campaign.seeding_status !== "complete")) && (
+        <SeedingStatus campaign={campaign} variant="banner" />
+      )}
       <FormControl fullWidth margin="normal" error={!!errors.name}>
         <NameEditor
           entity={campaign}
