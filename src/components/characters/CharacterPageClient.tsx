@@ -1,7 +1,7 @@
 "use client"
 
 import type { Character } from "@/types"
-import { useClient, useCampaign } from "@/contexts"
+import { useCampaign } from "@/contexts"
 import { useState, useEffect } from "react"
 import { Box, Stack } from "@mui/material"
 import { CS } from "@/services"
@@ -28,7 +28,6 @@ export default function CharacterPageClient({
   character: initialCharacter,
 }: CharacterPageClientProps) {
   const { campaignData } = useCampaign()
-  const { client } = useClient()
   const [character, setCharacter] = useState<Character>(initialCharacter)
 
   useEffect(() => {
@@ -53,8 +52,7 @@ export default function CharacterPageClient({
     >
       <CharacterSpeedDial
         character={character}
-        client={client}
-        setCharacter={setCharacter}
+        onCharacterUpdate={setCharacter}
       />
       <Header character={character} />
       <Owner character={character} />

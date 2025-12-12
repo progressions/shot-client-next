@@ -20,3 +20,5 @@
 
 export * from "@/hooks/useEntity"
 export * from "@/hooks/useEntityFilters"
+export * from "@/hooks/useCharacterExtension"
+export * from "@/hooks/useImageGeneration"

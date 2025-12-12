@@ -4,6 +4,7 @@ import AccessibilityNewIcon from "@mui/icons-material/AccessibilityNew"
 import FileDownloadIcon from "@mui/icons-material/FileDownload"
 import DeleteIcon from "@mui/icons-material/Delete"
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty"
 import {
   SpeedDial,
   SpeedDialAction,
@@ -27,17 +28,21 @@ type Action = {
   name: string
   onClick?: (event: MouseEvent<HTMLElement>) => void
   preventClose?: boolean
+  disabled?: boolean
 }
 
 type CharacterSpeedDialProps = {
   character: Character
   sx?: SystemStyleObject<Theme>
+  onCharacterUpdate?: (character: Character) => void
 }
 
 export default function CharacterSpeedDial({
   character,
   sx = {},
+  onCharacterUpdate,
 }: CharacterSpeedDialProps) {
+  const isExtending = character.extending ?? false
   const { client } = useClient()
   const router = useRouter()
   const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null)
@@ -190,12 +195,23 @@ Action Values: ${JSON.stringify(character.actionValues, null, 2)}
       preventClose: true,
     },
     { icon: <PeopleAltIcon />, name: "Copy", onClick: handleDuplicate },
-    { icon: <AccessibilityNewIcon />, name: "Extend", onClick: handleExtend },
+    {
+      icon: isExtending ? <HourglassEmptyIcon /> : <AccessibilityNewIcon />,
+      name: isExtending ? "Extending..." : "Extend",
+      onClick: handleExtend,
+      disabled: isExtending,
+    },
     { icon: <DeleteIcon />, name: "Delete", onClick: handleDeleteClick },
   ]
 
   const handleActionClick =
     (action: Action) => (event: MouseEvent<HTMLElement>) => {
+      // Don't do anything if the action is disabled
+      if (action.disabled) {
+        event.stopPropagation()
+        return
+      }
+
       if (action.preventClose) {
         event.stopPropagation()
         setPersist(true)
@@ -239,6 +255,12 @@ Action Values: ${JSON.stringify(character.actionValues, null, 2)}
             icon={action.icon}
             tooltipTitle={action.name}
             onClick={handleActionClick(action)}
+            FabProps={{
+              disabled: action.disabled,
+              sx: action.disabled
+                ? { opacity: 0.5, cursor: "not-allowed" }
+                : {},
+            }}
           />
         ))}
       </SpeedDial>
@@ -259,6 +281,7 @@ Action Values: ${JSON.stringify(character.actionValues, null, 2)}
         character={character}
         open={extendOpen}
         onClose={() => setExtendOpen(false)}
+        onCharacterUpdate={onCharacterUpdate}
       />
     </>
   )
