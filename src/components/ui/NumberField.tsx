@@ -126,6 +126,7 @@ export function NumberField({
           sx={{
             opacity: 1,
             backgroundColor: labelBackgroundColor || "#262626",
+            color: "#ffffff",
             px: 0.5,
             ml: -0.5,
           }}
