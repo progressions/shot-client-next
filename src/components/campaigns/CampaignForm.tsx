@@ -49,6 +49,7 @@ export default function CampaignForm({
   const createdCampaignIdRef = useRef<string | null>(null)
   const lastSeedingStatusRef = useRef<string | null>(null)
   const lastImagesCompletedRef = useRef<number | null>(null)
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const { createEntity, handleFormErrors } = useEntity<Campaign>(
     defaultCampaign,
     dispatchForm
@@ -111,13 +112,17 @@ export default function CampaignForm({
       // Close when complete
       if (seedingStatus === "complete") {
         console.log("🎉 CampaignForm: Seeding complete! Closing drawer...")
-        setTimeout(() => {
+        // Clear any existing timeout to prevent duplicates
+        if (closeTimeoutRef.current) {
+          clearTimeout(closeTimeoutRef.current)
+        }
+        closeTimeoutRef.current = setTimeout(() => {
           onCampaignCreated?.()
           handleClose()
         }, 1000) // Brief delay to show "Complete" status
       }
     },
-    [campaignData, onCampaignCreated]
+    [campaignData, onCampaignCreated, handleClose]
   )
 
   // Subscribe to seeding_status updates from WebSocket
@@ -151,6 +156,15 @@ export default function CampaignForm({
       )
     }
   }, [campaignData, createdCampaign, handleSeedingUpdate])
+
+  // Cleanup timeout on unmount to prevent stale closures
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     dispatchForm({
@@ -281,7 +295,12 @@ export default function CampaignForm({
     }
   }
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
+    // Clear any pending close timeout
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current)
+      closeTimeoutRef.current = null
+    }
     dispatchForm({ type: FormActions.RESET, payload: initialFormState })
     setCreatedCampaign(null)
     // Reset refs
@@ -289,7 +308,7 @@ export default function CampaignForm({
     lastSeedingStatusRef.current = null
     lastImagesCompletedRef.current = null
     onClose()
-  }
+  }, [dispatchForm, initialFormState, onClose])
 
   return (
     <Drawer

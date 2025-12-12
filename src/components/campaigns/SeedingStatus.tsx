@@ -32,8 +32,9 @@ export default function SeedingStatus({
     seeding_images_completed,
   } = campaign
 
-  // If seeded and not seeding, show nothing for chip variant or "Ready" for others
-  if (!is_seeding && is_seeded) {
+  // If seeding is complete (check status first to handle transition period)
+  // When seeding_status is "complete", we're done even if is_seeded hasn't updated yet
+  if (seeding_status === "complete" || (!is_seeding && is_seeded)) {
     if (variant === "chip") return null
     return (
       <Chip icon={<CheckCircle />} label="Ready" color="success" size="small" />

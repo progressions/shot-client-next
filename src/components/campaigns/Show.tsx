@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect } from "react"
 import { FormControl, FormHelperText, Stack, Box } from "@mui/material"
-import type { Campaign } from "@/types"
+import { type Campaign, isCampaignSeeding } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
 import {
   Manager,
@@ -88,9 +88,7 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
       <SpeedDialMenu onDelete={deleteEntity} />
       <HeroImage entity={campaign} setEntity={setCampaign} />
       <Alert status={status} />
-      {(campaign.is_seeding ||
-        (campaign.seeding_status &&
-          campaign.seeding_status !== "complete")) && (
+      {isCampaignSeeding(campaign) && (
         <SeedingStatus campaign={campaign} variant="banner" />
       )}
       <FormControl fullWidth margin="normal" error={!!errors.name}>

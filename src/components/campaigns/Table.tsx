@@ -9,6 +9,7 @@ import {
   FormActions,
   CampaignsTableFormState,
   Campaign,
+  isCampaignSeeding,
 } from "@/types"
 import { BaseDataGrid, CampaignLink } from "@/components/ui"
 import { EntityAvatar } from "@/components/avatars"
@@ -132,9 +133,7 @@ export default function View({ formState, dispatchForm }: ViewProps) {
         const campaign = params.row as Campaign
         const isCurrentCampaign = campaign.id === currentCampaign?.id
         const isActive = campaign.active !== false // active can be true or null/undefined
-        const isSeeding =
-          campaign.is_seeding ||
-          (campaign.seeding_status && campaign.seeding_status !== "complete")
+        const isSeeding = isCampaignSeeding(campaign)
         return (
           <Box
             sx={{
@@ -174,9 +173,7 @@ export default function View({ formState, dispatchForm }: ViewProps) {
         const campaign = params.row as Campaign
         const isCurrentCampaign = campaign.id === currentCampaign?.id
         const isLoading = loadingCampaignId === campaign.id
-        const isSeeding =
-          campaign.is_seeding ||
-          (campaign.seeding_status && campaign.seeding_status !== "complete")
+        const isSeeding = isCampaignSeeding(campaign)
 
         return (
           <Box
