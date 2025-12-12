@@ -226,7 +226,7 @@ export default function ActionZone({
                 <NumberField
                   name="swerve"
                   label="Swerve"
-                  labelBackgroundColor="#b71c1c"
+                  labelBackgroundColor={theme => theme.palette.background.paper}
                   value={swerve}
                   size="small"
                   width="90px"

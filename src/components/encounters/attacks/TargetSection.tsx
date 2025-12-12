@@ -8,6 +8,7 @@ import {
   Checkbox,
   Button,
 } from "@mui/material"
+import { useTheme } from "@mui/material/styles"
 import { CS } from "@/services"
 import type { TargetSectionProps, Encounter } from "@/types"
 import { NumberField } from "@/components/ui"
@@ -79,6 +80,8 @@ export default function TargetSection({
   calculateTargetDefense,
   encounter,
 }: TargetSectionProps & { encounter: Encounter }) {
+  const theme = useTheme()
+
   // Extract needed values from formState
   const {
     selectedTargetIds,
@@ -375,7 +378,7 @@ export default function TargetSection({
                         <NumberField
                           name={`defense-${targetId}`}
                           label="Defense"
-                          labelBackgroundColor="#730F10"
+                          labelBackgroundColor={theme.palette.background.paper}
                           value={
                             targetId in manualDefensePerTarget
                               ? manualDefensePerTarget[targetId]
@@ -528,7 +531,9 @@ export default function TargetSection({
                           <NumberField
                             name={`toughness-${targetId}`}
                             label="Toughness"
-                            labelBackgroundColor="#730F10"
+                            labelBackgroundColor={
+                              theme.palette.background.paper
+                            }
                             value={
                               manualToughnessPerTarget[targetId] ??
                               CS.toughness(target)
@@ -857,7 +862,7 @@ export default function TargetSection({
               <NumberField
                 name="defenseValue"
                 label="Defense"
-                labelBackgroundColor="#873230"
+                labelBackgroundColor={theme.palette.background.paper}
                 value={parseInt(defenseValue || "0") || 0}
                 size="small"
                 width="80px"
