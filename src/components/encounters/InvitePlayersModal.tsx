@@ -173,23 +173,12 @@ export default function InvitePlayersModal({
     return `${diffMins} minutes left`
   }, [])
 
-  // Memoize expired status for all tokens to avoid repeated date comparisons on each render
-  const expiredTokens = useMemo(() => {
-    const now = new Date()
-    const expired: Record<string, boolean> = {}
-    for (const [characterId, tokenInfo] of Object.entries(tokens)) {
-      if (tokenInfo.expires_at) {
-        expired[characterId] = new Date(tokenInfo.expires_at) <= now
-      }
-    }
-    return expired
-  }, [tokens])
-
-  const isExpired = useCallback(
-    (characterId: string) => expiredTokens[characterId] ?? false,
-    [expiredTokens]
-  )
-
+  // Check if a token is expired
+  const isExpired = (characterId: string) => {
+    const tokenInfo = tokens[characterId]
+    if (!tokenInfo || !tokenInfo.expires_at) return false
+    return new Date(tokenInfo.expires_at) <= new Date()
+  }
   if (!encounter) return null
 
   return (
