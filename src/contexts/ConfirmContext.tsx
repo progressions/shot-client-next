@@ -15,7 +15,7 @@
  * @module contexts/ConfirmContext
  */
 
-import { createContext, useContext, useState, useCallback } from "react"
+import { createContext, useContext, useState, useCallback, useRef } from "react"
 
 import type { ConfirmOptions, ConfirmState } from "@/types"
 import { defaultConfirmState, defaultConfirmOptions } from "@/types"
@@ -43,6 +43,8 @@ const ConfirmContext = createContext<ConfirmContextType>(defaultContext)
 export function ConfirmProvider({ children }: { children: React.ReactNode }) {
   const [confirmState, setConfirmState] =
     useState<ConfirmState>(defaultConfirmState)
+  // Store resolve function in a ref to avoid dependency in callbacks
+  const resolveRef = useRef<((value: boolean) => void) | null>(null)
 
   const confirm = useCallback(
     (options: ConfirmOptions | string): Promise<boolean> => {
@@ -52,6 +54,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
             ? { ...defaultConfirmOptions, message: options }
             : { ...defaultConfirmOptions, ...options }
 
+        resolveRef.current = resolve
         setConfirmState({
           open: true,
           options: normalizedOptions,
@@ -63,18 +66,16 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
   )
 
   const handleConfirm = useCallback(() => {
-    if (confirmState.resolve) {
-      confirmState.resolve(true)
-    }
+    resolveRef.current?.(true)
+    resolveRef.current = null
     setConfirmState(defaultConfirmState)
-  }, [confirmState.resolve])
+  }, [])
 
   const handleCancel = useCallback(() => {
-    if (confirmState.resolve) {
-      confirmState.resolve(false)
-    }
+    resolveRef.current?.(false)
+    resolveRef.current = null
     setConfirmState(defaultConfirmState)
-  }, [confirmState.resolve])
+  }, [])
 
   return (
     <ConfirmContext.Provider

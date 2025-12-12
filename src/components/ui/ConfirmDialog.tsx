@@ -36,7 +36,7 @@ export function ConfirmDialog({
   destructive = false,
 }: ConfirmDialogProps) {
   const buttonColor = destructive ? "error" : confirmColor
-  const borderColor = destructive ? "error.main" : "primary.main"
+  const borderColor = destructive ? "error.main" : `${confirmColor}.main`
 
   return (
     <Dialog
@@ -77,6 +77,7 @@ export function ConfirmDialog({
           onClick={onConfirm}
           variant="contained"
           color={buttonColor}
+          autoFocus
           sx={{
             color: "white",
           }}
