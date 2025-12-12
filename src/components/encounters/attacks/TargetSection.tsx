@@ -531,7 +531,9 @@ export default function TargetSection({
                           <NumberField
                             name={`toughness-${targetId}`}
                             label="Toughness"
-                            labelBackgroundColor={theme.palette.background.paper}
+                            labelBackgroundColor={
+                              theme.palette.background.paper
+                            }
                             value={
                               manualToughnessPerTarget[targetId] ??
                               CS.toughness(target)
