@@ -119,9 +119,8 @@ export default function Show({
       }}
     >
       <CharacterSpeedDial
-        editing={true}
         character={memoizedCharacter}
-        setCharacter={setCharacter}
+        onCharacterUpdate={setCharacter}
       />
       <PositionableImage
         entity={memoizedCharacter}
