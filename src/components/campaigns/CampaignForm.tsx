@@ -60,6 +60,22 @@ export default function CampaignForm({
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
+  // Define handleClose BEFORE handleSeedingUpdate so it can be used in dependency array
+  const handleClose = useCallback(() => {
+    // Clear any pending close timeout
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current)
+      closeTimeoutRef.current = null
+    }
+    dispatchForm({ type: FormActions.RESET, payload: initialFormState })
+    setCreatedCampaign(null)
+    // Reset refs
+    createdCampaignIdRef.current = null
+    lastSeedingStatusRef.current = null
+    lastImagesCompletedRef.current = null
+    onClose()
+  }, [dispatchForm, initialFormState, onClose])
+
   // Handle seeding status updates from WebSocket
   // The seeding_status key in the WebSocket payload triggers this callback
   const handleSeedingUpdate = useCallback(
@@ -294,21 +310,6 @@ export default function CampaignForm({
       handleFormErrors(error)
     }
   }
-
-  const handleClose = useCallback(() => {
-    // Clear any pending close timeout
-    if (closeTimeoutRef.current) {
-      clearTimeout(closeTimeoutRef.current)
-      closeTimeoutRef.current = null
-    }
-    dispatchForm({ type: FormActions.RESET, payload: initialFormState })
-    setCreatedCampaign(null)
-    // Reset refs
-    createdCampaignIdRef.current = null
-    lastSeedingStatusRef.current = null
-    lastImagesCompletedRef.current = null
-    onClose()
-  }, [dispatchForm, initialFormState, onClose])
 
   return (
     <Drawer
