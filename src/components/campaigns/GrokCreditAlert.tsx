@@ -25,8 +25,9 @@ export default function GrokCreditAlert({ campaign }: GrokCreditAlertProps) {
     setLoading(true)
     try {
       await client.resetGrokCredits(campaign.id)
-      // Refresh the campaign to get updated state
-      await setCurrentCampaign(campaign)
+      // Fetch fresh campaign data and set as current
+      const updatedCampaign = await client.getCampaign(campaign.id)
+      await setCurrentCampaign(updatedCampaign.data)
       toastSuccess("Credit exhaustion warning dismissed")
     } catch (error) {
       console.error("Failed to dismiss grok credits:", error)
@@ -47,6 +48,7 @@ export default function GrokCreditAlert({ campaign }: GrokCreditAlertProps) {
               size="small"
               onClick={handleDismiss}
               disabled={loading}
+              aria-label="Dismiss credit exhaustion warning"
               startIcon={
                 loading ? <CircularProgress size={16} color="inherit" /> : null
               }
