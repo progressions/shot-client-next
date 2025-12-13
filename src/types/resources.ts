@@ -87,22 +87,13 @@ export function isBatchImageGenerating(
 
 /**
  * Helper function to determine if Grok API credits are exhausted.
- * Credits are considered exhausted if marked within the last 24 hours.
+ * Relies on the server-computed flag to maintain single source of truth.
  */
 export function isGrokCreditsExhausted(
   campaign: Campaign | null | undefined
 ): boolean {
   if (!campaign) return false
-
-  // First check the computed flag from the server
-  if (campaign.is_grok_credits_exhausted === true) return true
-
-  // Fallback: check if exhausted_at is within the last 24 hours
-  if (!campaign.grok_credits_exhausted_at) return false
-
-  const exhaustedAt = new Date(campaign.grok_credits_exhausted_at)
-  const hoursAgo = (Date.now() - exhaustedAt.getTime()) / (1000 * 60 * 60)
-  return hoursAgo < 24
+  return campaign.is_grok_credits_exhausted === true
 }
 
 export type JunctureName = string

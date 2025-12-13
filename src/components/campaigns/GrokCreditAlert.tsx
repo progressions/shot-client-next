@@ -16,7 +16,7 @@ export default function GrokCreditAlert({ campaign }: GrokCreditAlertProps) {
       <Alert severity="warning">
         <AlertTitle>AI Image Generation Unavailable</AlertTitle>
         Grok API credits are exhausted. AI image generation is temporarily
-        disabled. Contact your administrator or wait for credits to refresh.
+        disabled. Credits typically refresh monthly.
       </Alert>
     </Box>
   )
