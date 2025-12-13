@@ -13,3 +13,4 @@ export { default as CampaignsMobile } from "@/components/campaigns/CampaignsMobi
 export { default as Table } from "@/components/campaigns/Table"
 export { default as SeedingStatus } from "@/components/campaigns/SeedingStatus"
 export { default as BatchImageGenerationButton } from "@/components/campaigns/BatchImageGenerationButton"
+export { default as GrokCreditAlert } from "@/components/campaigns/GrokCreditAlert"

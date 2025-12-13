@@ -51,6 +51,9 @@ export interface Campaign extends BaseEntity {
   batch_images_total?: number
   batch_images_completed?: number
   is_batch_images_in_progress?: boolean
+  // Grok API credit exhaustion tracking
+  grok_credits_exhausted_at?: string | null
+  is_grok_credits_exhausted?: boolean
 }
 
 /**
@@ -80,6 +83,26 @@ export function isBatchImageGenerating(
     (campaign.batch_image_status != null &&
       campaign.batch_image_status !== "complete")
   )
+}
+
+/**
+ * Helper function to determine if Grok API credits are exhausted.
+ * Credits are considered exhausted if marked within the last 24 hours.
+ */
+export function isGrokCreditsExhausted(
+  campaign: Campaign | null | undefined
+): boolean {
+  if (!campaign) return false
+
+  // First check the computed flag from the server
+  if (campaign.is_grok_credits_exhausted === true) return true
+
+  // Fallback: check if exhausted_at is within the last 24 hours
+  if (!campaign.grok_credits_exhausted_at) return false
+
+  const exhaustedAt = new Date(campaign.grok_credits_exhausted_at)
+  const hoursAgo = (Date.now() - exhaustedAt.getTime()) / (1000 * 60 * 60)
+  return hoursAgo < 24
 }
 
 export type JunctureName = string

@@ -19,6 +19,7 @@ import { EntityActiveToggle } from "@/components/common"
 import {
   SeedingStatus,
   BatchImageGenerationButton,
+  GrokCreditAlert,
 } from "@/components/campaigns"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
@@ -101,6 +102,7 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
       {isCampaignSeeding(campaign) && (
         <SeedingStatus campaign={campaign} variant="banner" />
       )}
+      <GrokCreditAlert campaign={campaign} />
       <FormControl fullWidth margin="normal" error={!!errors.name}>
         <NameEditor
           entity={campaign}
