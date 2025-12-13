@@ -250,7 +250,7 @@ export function createCampaignClient(deps: ClientDependencies) {
     campaignId: string
   ): Promise<AxiosResponse<Campaign>> {
     const response = await post<CampaignPayload>(
-      `${apiV2.campaigns({ id: campaignId })}/reset_grok_credits`
+      apiV2.resetGrokCredits({ id: campaignId })
     )
     return normalizeRequiredCampaignResponse(response)
   }
