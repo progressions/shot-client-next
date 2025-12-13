@@ -246,6 +246,15 @@ export function createCampaignClient(deps: ClientDependencies) {
     return post(`${apiV2.campaigns({ id: campaignId })}/generate_batch_images`)
   }
 
+  async function resetGrokCredits(
+    campaignId: string
+  ): Promise<AxiosResponse<Campaign>> {
+    const response = await post<CampaignPayload>(
+      apiV2.resetGrokCredits({ id: campaignId })
+    )
+    return normalizeRequiredCampaignResponse(response)
+  }
+
   return {
     addPlayer,
     removePlayer,
@@ -264,5 +273,6 @@ export function createCampaignClient(deps: ClientDependencies) {
     getCurrentCampaign,
     getCurrentFight,
     generateBatchImages,
+    resetGrokCredits,
   }
 }

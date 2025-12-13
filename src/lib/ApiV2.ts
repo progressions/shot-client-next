@@ -144,6 +144,10 @@ class ApiV2 {
       : `${this.api()}/campaigns`
   }
 
+  resetGrokCredits(campaign: Campaign | ID): string {
+    return `${this.campaigns(campaign)}/reset_grok_credits`
+  }
+
   campaignMemberships() {
     return `${this.api()}/campaign_memberships`
   }
