@@ -630,6 +630,21 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
     if (!campaignData) return
 
     console.log("🔄 AppContext: Processing campaignData:", campaignData)
+
+    // Handle partial campaign updates from WebSocket (e.g., grok_credits_exhausted_at)
+    if (
+      campaignData.campaign &&
+      typeof campaignData.campaign === "object" &&
+      campaign &&
+      campaignData.campaign.id === campaign.id
+    ) {
+      console.log(
+        "🔄 AppContext: Merging partial campaign update:",
+        campaignData.campaign
+      )
+      setCampaign(prev => (prev ? { ...prev, ...campaignData.campaign } : prev))
+    }
+
     Object.entries(campaignData).forEach(([key, value]) => {
       const callbacks = entityUpdateCallbacks.current.get(key)
       console.log(

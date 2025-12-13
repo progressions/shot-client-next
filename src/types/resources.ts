@@ -51,6 +51,9 @@ export interface Campaign extends BaseEntity {
   batch_images_total?: number
   batch_images_completed?: number
   is_batch_images_in_progress?: boolean
+  // Grok API credit exhaustion tracking
+  grok_credits_exhausted_at?: string | null
+  is_grok_credits_exhausted?: boolean
 }
 
 /**
@@ -80,6 +83,17 @@ export function isBatchImageGenerating(
     (campaign.batch_image_status != null &&
       campaign.batch_image_status !== "complete")
   )
+}
+
+/**
+ * Helper function to determine if Grok API credits are exhausted.
+ * Relies on the server-computed flag to maintain single source of truth.
+ */
+export function isGrokCreditsExhausted(
+  campaign: Campaign | null | undefined
+): boolean {
+  if (!campaign) return false
+  return campaign.is_grok_credits_exhausted === true
 }
 
 export type JunctureName = string
