@@ -173,23 +173,28 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
               control={
                 <Switch
                   checked={campaign.ai_generation_enabled !== false}
-                  onChange={e => {
+                  onChange={async e => {
                     const newValue = e.target.checked
-                    handleChangeAndSave({
-                      target: {
-                        name: "ai_generation_enabled",
-                        value: newValue,
-                      },
-                    })
-                    // Update global campaign context so other components see the change
-                    updateCampaign({ ai_generation_enabled: newValue })
+                    try {
+                      await handleChangeAndSave({
+                        target: {
+                          name: "ai_generation_enabled",
+                          value: newValue,
+                        },
+                      })
+                      // Update global campaign context only after successful API save
+                      updateCampaign({ ai_generation_enabled: newValue })
+                    } catch {
+                      // API save failed, don't update local state
+                    }
                   }}
                 />
               }
               label="AI Generation"
             />
             <Typography variant="body2" color="text.secondary" sx={{ ml: 4.5 }}>
-              Allow AI-powered character and image generation for this campaign
+              Allow AI-powered character and image generation. When disabled,
+              Generate buttons and Extend options are hidden from the UI.
             </Typography>
           </Box>
           <BatchImageGenerationButton campaign={campaign} />
