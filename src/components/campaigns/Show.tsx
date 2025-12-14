@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import {
   FormControl,
   FormHelperText,
@@ -64,6 +64,16 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
   const hasAdminPermission =
     user?.admin ||
     (currentCampaign && user?.id === currentCampaign.gamemaster_id)
+
+  // Local state for AI toggle to control visual state during async operations
+  const [aiToggleValue, setAiToggleValue] = useState(
+    campaign.ai_generation_enabled !== false
+  )
+
+  // Sync local toggle state when campaign changes (e.g., from API or broadcast)
+  useEffect(() => {
+    setAiToggleValue(campaign.ai_generation_enabled !== false)
+  }, [campaign.ai_generation_enabled])
 
   const setCampaign = useCallback(
     (campaign: Campaign) => {
@@ -172,9 +182,12 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
             <FormControlLabel
               control={
                 <Switch
-                  checked={campaign.ai_generation_enabled !== false}
+                  checked={aiToggleValue}
                   onChange={async e => {
                     const newValue = e.target.checked
+                    const previousValue = aiToggleValue
+                    // Optimistically update local state for immediate visual feedback
+                    setAiToggleValue(newValue)
                     try {
                       await handleChangeAndSave({
                         target: {
@@ -182,10 +195,15 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
                           value: newValue,
                         },
                       })
-                      // Update global campaign context only after successful API save
+                      // Update global campaign context after successful API save
                       updateCampaign({ ai_generation_enabled: newValue })
-                    } catch {
-                      // API save failed, don't update local state
+                    } catch (error) {
+                      // API save failed, revert to previous state
+                      setAiToggleValue(previousValue)
+                      console.error(
+                        "Failed to save AI generation toggle:",
+                        error
+                      )
                     }
                   }}
                 />

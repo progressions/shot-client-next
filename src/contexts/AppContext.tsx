@@ -265,8 +265,8 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
     [client, state.user.id]
   )
 
-  // Optimistically update campaign state in the global context.
-  // Used with API calls (e.g., handleChangeAndSave) to sync UI state after successful saves.
+  // Update campaign state in the global context after successful API save.
+  // Used to sync global UI state with form state changes.
   // Also persists to localStorage for consistency across navigation.
   const updateCampaign = useCallback(
     (updates: Partial<Campaign>) => {
