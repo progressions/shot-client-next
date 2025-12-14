@@ -168,6 +168,7 @@ export default function GeneratePage() {
   }
 
   // Show disabled message when AI generation is turned off
+  // SpeedDial is kept for navigation to other character creation options
   if (!aiEnabled) {
     return (
       <Box sx={{ mx: "auto", mt: 4, position: "relative" }}>

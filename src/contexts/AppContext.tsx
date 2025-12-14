@@ -265,8 +265,9 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
     [client, state.user.id]
   )
 
-  // Update campaign state locally without API call
-  // Also updates localStorage cache to ensure consistency across navigation
+  // Update campaign state in the global context after successful API save.
+  // Used to sync global UI state with form state changes.
+  // Also persists to localStorage for consistency across navigation.
   const updateCampaign = useCallback(
     (updates: Partial<Campaign>) => {
       setCampaign(prev => {

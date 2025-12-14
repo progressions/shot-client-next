@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import {
   FormControl,
   FormHelperText,
@@ -64,6 +64,16 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
   const hasAdminPermission =
     user?.admin ||
     (currentCampaign && user?.id === currentCampaign.gamemaster_id)
+
+  // Local state for AI toggle to control visual state during async operations
+  const [aiToggleValue, setAiToggleValue] = useState(
+    campaign.ai_generation_enabled !== false
+  )
+
+  // Sync local toggle state when campaign changes (e.g., from API or broadcast)
+  useEffect(() => {
+    setAiToggleValue(campaign.ai_generation_enabled !== false)
+  }, [campaign.ai_generation_enabled])
 
   const setCampaign = useCallback(
     (campaign: Campaign) => {
@@ -172,24 +182,37 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
             <FormControlLabel
               control={
                 <Switch
-                  checked={campaign.ai_generation_enabled !== false}
-                  onChange={e => {
+                  checked={aiToggleValue}
+                  onChange={async e => {
                     const newValue = e.target.checked
-                    handleChangeAndSave({
-                      target: {
-                        name: "ai_generation_enabled",
-                        value: newValue,
-                      },
-                    })
-                    // Update global campaign context so other components see the change
-                    updateCampaign({ ai_generation_enabled: newValue })
+                    const previousValue = aiToggleValue
+                    // Optimistically update local state for immediate visual feedback
+                    setAiToggleValue(newValue)
+                    try {
+                      await handleChangeAndSave({
+                        target: {
+                          name: "ai_generation_enabled",
+                          value: newValue,
+                        },
+                      })
+                      // Update global campaign context after successful API save
+                      updateCampaign({ ai_generation_enabled: newValue })
+                    } catch (error) {
+                      // API save failed, revert to previous state
+                      setAiToggleValue(previousValue)
+                      console.error(
+                        "Failed to save AI generation toggle:",
+                        error
+                      )
+                    }
                   }}
                 />
               }
               label="AI Generation"
             />
             <Typography variant="body2" color="text.secondary" sx={{ ml: 4.5 }}>
-              Allow AI-powered character and image generation for this campaign
+              Allow AI-powered character and image generation. When disabled,
+              Generate buttons and Extend options are hidden from the UI.
             </Typography>
           </Box>
           <BatchImageGenerationButton campaign={campaign} />
