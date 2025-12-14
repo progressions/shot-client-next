@@ -18,8 +18,9 @@ import type { MouseEvent } from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import type { Character } from "@/types"
+import { isAiGenerationEnabled } from "@/types"
 import { CS } from "@/services"
-import { useClient, useConfirm } from "@/contexts"
+import { useClient, useConfirm, useCampaign } from "@/contexts"
 import { Extend } from "@/components/characters"
 
 type Action = {
@@ -45,6 +46,9 @@ export default function CharacterSpeedDial({
   const isExtending = character.extending ?? false
   const { client } = useClient()
   const { confirm } = useConfirm()
+  const { campaign } = useCampaign()
+  const aiEnabled = isAiGenerationEnabled(campaign)
+
   const router = useRouter()
   const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null)
   const exportMenuOpen = Boolean(exportAnchorEl)
@@ -203,12 +207,21 @@ Action Values: ${JSON.stringify(character.actionValues, null, 2)}
       preventClose: true,
     },
     { icon: <PeopleAltIcon />, name: "Copy", onClick: handleDuplicate },
-    {
-      icon: isExtending ? <HourglassEmptyIcon /> : <AccessibilityNewIcon />,
-      name: isExtending ? "Extending..." : "Extend",
-      onClick: handleExtend,
-      disabled: isExtending,
-    },
+    // Only show Extend action when AI generation is enabled
+    ...(aiEnabled
+      ? [
+          {
+            icon: isExtending ? (
+              <HourglassEmptyIcon />
+            ) : (
+              <AccessibilityNewIcon />
+            ),
+            name: isExtending ? "Extending..." : "Extend",
+            onClick: handleExtend,
+            disabled: isExtending,
+          },
+        ]
+      : []),
     { icon: <DeleteIcon />, name: "Delete", onClick: handleDeleteClick },
   ]
 

@@ -146,6 +146,8 @@ interface AppContextType {
   dispatchCurrentUser: ActionDispatch<[action: UserStateAction]>
   /** Switch to a different campaign, persists to localStorage */
   setCurrentCampaign: (camp: Campaign | null) => Promise<Campaign | null>
+  /** Update campaign state without API call (for local updates) */
+  updateCampaign: (updates: Partial<Campaign>) => void
   /** Subscribe to real-time updates for an entity type */
   subscribeToEntity: (
     entityType: string,
@@ -176,6 +178,7 @@ const AppContext = createContext<AppContextType>({
   currentUserState: initialUserState,
   dispatchCurrentUser: () => {},
   setCurrentCampaign: async (camp: Campaign | null) => camp || defaultCampaign,
+  updateCampaign: () => {},
   subscribeToEntity: () => () => {},
   loading: true,
   error: null,
@@ -260,6 +263,26 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
       }
     },
     [client, state.user.id]
+  )
+
+  // Update campaign state locally without API call
+  // Also updates localStorage cache to ensure consistency across navigation
+  const updateCampaign = useCallback(
+    (updates: Partial<Campaign>) => {
+      setCampaign(prev => {
+        if (!prev) return prev
+        const updated = { ...prev, ...updates }
+        // Persist to localStorage so navigation doesn't reset the value
+        if (state.user.id) {
+          localStorage.setItem(
+            `currentCampaign-${state.user.id}`,
+            JSON.stringify(updated)
+          )
+        }
+        return updated
+      })
+    },
+    [state.user.id]
   )
 
   useEffect(() => {
@@ -711,6 +734,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         currentUserState: state,
         dispatchCurrentUser: dispatch,
         setCurrentCampaign,
+        updateCampaign,
         subscribeToEntity,
         refreshUser,
         loading,
@@ -781,6 +805,7 @@ export function useCampaign() {
     subscription,
     campaignData,
     setCurrentCampaign,
+    updateCampaign,
     subscribeToEntity,
   } = useContext(AppContext)
   return {
@@ -788,6 +813,7 @@ export function useCampaign() {
     subscription,
     campaignData,
     setCurrentCampaign,
+    updateCampaign,
     subscribeToEntity,
   }
 }

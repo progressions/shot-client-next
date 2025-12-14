@@ -54,6 +54,8 @@ export interface Campaign extends BaseEntity {
   // Grok API credit exhaustion tracking
   grok_credits_exhausted_at?: string | null
   is_grok_credits_exhausted?: boolean
+  // AI generation toggle
+  ai_generation_enabled?: boolean
 }
 
 /**
@@ -94,6 +96,18 @@ export function isGrokCreditsExhausted(
 ): boolean {
   if (!campaign) return false
   return campaign.is_grok_credits_exhausted === true
+}
+
+/**
+ * Helper function to determine if AI generation is enabled for a campaign.
+ * Defaults to true if the field is not set (backwards compatibility).
+ */
+export function isAiGenerationEnabled(
+  campaign: Campaign | null | undefined
+): boolean {
+  if (!campaign) return false
+  // Default to true for backwards compatibility
+  return campaign.ai_generation_enabled !== false
 }
 
 export type JunctureName = string

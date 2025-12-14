@@ -16,6 +16,7 @@ import type {
   Character,
   CharacterJson,
 } from "@/types/types"
+import { isAiGenerationEnabled } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { AxiosError } from "axios"
 import { Editor } from "@/components/editor"
@@ -37,6 +38,7 @@ export default function GeneratePage() {
   const theme = useTheme()
   const consumer = client.consumer()
   const { campaign } = useCampaign()
+  const aiEnabled = isAiGenerationEnabled(campaign)
 
   const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
     description: "",
@@ -163,6 +165,20 @@ export default function GeneratePage() {
 
   const cancelForm = () => {
     dispatchForm({ type: FormActions.RESET, payload: initialFormState })
+  }
+
+  // Show disabled message when AI generation is turned off
+  if (!aiEnabled) {
+    return (
+      <Box sx={{ mx: "auto", mt: 4, position: "relative" }}>
+        <SpeedDial />
+        <HeroTitle>Generate Characters</HeroTitle>
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          AI character generation is disabled for this campaign. Contact your
+          gamemaster to enable it.
+        </Alert>
+      </Box>
+    )
   }
 
   return (

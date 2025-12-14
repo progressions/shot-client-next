@@ -11,7 +11,11 @@ import {
 import { AutoFixHigh } from "@mui/icons-material"
 import { useClient, useToast } from "@/contexts"
 import type { Campaign } from "@/types"
-import { isBatchImageGenerating, isGrokCreditsExhausted } from "@/types"
+import {
+  isBatchImageGenerating,
+  isGrokCreditsExhausted,
+  isAiGenerationEnabled,
+} from "@/types"
 
 interface BatchImageGenerationButtonProps {
   campaign: Campaign
@@ -24,6 +28,9 @@ export default function BatchImageGenerationButton({
   const { toastSuccess, toastError, toastInfo } = useToast()
   const [loading, setLoading] = useState(false)
 
+  // Check if AI generation is enabled for this campaign
+  const aiEnabled = isAiGenerationEnabled(campaign)
+
   // Check if batch generation is already in progress
   const isInProgress = isBatchImageGenerating(campaign)
 
@@ -34,7 +41,7 @@ export default function BatchImageGenerationButton({
   const isPaused = isInProgress && creditsExhausted
 
   const handleGenerateBatchImages = async () => {
-    if (loading || isInProgress || creditsExhausted) return
+    if (loading || isInProgress || creditsExhausted || !aiEnabled) return
 
     setLoading(true)
     try {
@@ -83,18 +90,20 @@ export default function BatchImageGenerationButton({
           )
         }
         onClick={handleGenerateBatchImages}
-        disabled={loading || isInProgress || creditsExhausted}
+        disabled={loading || isInProgress || creditsExhausted || !aiEnabled}
         sx={{ minWidth: 200 }}
       >
-        {isPaused
-          ? "Paused - Credits Exhausted"
-          : isInProgress
-            ? "Generating..."
-            : loading
-              ? "Starting..."
-              : creditsExhausted
-                ? "Credits Exhausted"
-                : "Generate Missing Images"}
+        {!aiEnabled
+          ? "AI Disabled"
+          : isPaused
+            ? "Paused - Credits Exhausted"
+            : isInProgress
+              ? "Generating..."
+              : loading
+                ? "Starting..."
+                : creditsExhausted
+                  ? "Credits Exhausted"
+                  : "Generate Missing Images"}
       </Button>
       {isInProgress && progress !== null && (
         <Box sx={{ mt: 1 }}>
