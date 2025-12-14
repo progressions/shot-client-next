@@ -266,9 +266,24 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
   )
 
   // Update campaign state locally without API call
-  const updateCampaign = useCallback((updates: Partial<Campaign>) => {
-    setCampaign(prev => (prev ? { ...prev, ...updates } : prev))
-  }, [])
+  // Also updates localStorage cache to ensure consistency across navigation
+  const updateCampaign = useCallback(
+    (updates: Partial<Campaign>) => {
+      setCampaign(prev => {
+        if (!prev) return prev
+        const updated = { ...prev, ...updates }
+        // Persist to localStorage so navigation doesn't reset the value
+        if (state.user.id) {
+          localStorage.setItem(
+            `currentCampaign-${state.user.id}`,
+            JSON.stringify(updated)
+          )
+        }
+        return updated
+      })
+    },
+    [state.user.id]
+  )
 
   useEffect(() => {
     if (!jwt || hasFetched.current) return

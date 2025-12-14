@@ -48,6 +48,7 @@ export default function CharacterSpeedDial({
   const { confirm } = useConfirm()
   const { campaign } = useCampaign()
   const aiEnabled = isAiGenerationEnabled(campaign)
+
   const router = useRouter()
   const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null)
   const exportMenuOpen = Boolean(exportAnchorEl)
