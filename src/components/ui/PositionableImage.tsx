@@ -1,6 +1,7 @@
 "use client"
 
 import type { Entity } from "@/types"
+import { isAiGenerationEnabled } from "@/types"
 import { Box } from "@mui/material"
 import { useState, useEffect, useRef } from "react"
 import { UploadButton } from "./positionable/UploadButton"
@@ -13,7 +14,7 @@ import { ImageViewerModal } from "./ImageViewerModal"
 import { GenerateImageDialog, UploadImageDialog } from "@/components/generate"
 import { useToast } from "@/contexts/ToastContext"
 import { useClient } from "@/contexts/AppContext"
-import { useConfirm } from "@/contexts"
+import { useConfirm, useCampaign } from "@/contexts"
 
 /**
  * Props for the PositionableImage component.
@@ -113,6 +114,8 @@ export function PositionableImage({
 }: PositionableImageProps) {
   const { client } = useClient()
   const { confirm } = useConfirm()
+  const { campaign } = useCampaign()
+  const aiEnabled = isAiGenerationEnabled(campaign)
   const imgRef = useRef<HTMLImageElement>(null)
   const [boxWidth, setBoxWidth] = useState(0)
   const [isRepositioning, setIsRepositioning] = useState(false)
@@ -421,7 +424,7 @@ export function PositionableImage({
           }}
         >
           <UploadButton onClick={handleUploadImage} />
-          <GenerateButton onClick={handleGenerateImage} />
+          {aiEnabled && <GenerateButton onClick={handleGenerateImage} />}
           {!creationMode && (
             <>
               <RepositionButton onClick={() => setIsRepositioning(true)} />
@@ -442,7 +445,7 @@ export function PositionableImage({
           }}
         >
           <UploadButton onClick={handleUploadImage} />
-          <GenerateButton onClick={handleGenerateImage} />
+          {aiEnabled && <GenerateButton onClick={handleGenerateImage} />}
         </Box>
       )}
       <GenerateImageDialog

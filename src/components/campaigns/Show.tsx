@@ -1,7 +1,15 @@
 "use client"
 
 import { useCallback, useEffect, useRef } from "react"
-import { FormControl, FormHelperText, Stack, Box } from "@mui/material"
+import {
+  FormControl,
+  FormHelperText,
+  Stack,
+  Box,
+  FormControlLabel,
+  Switch,
+  Typography,
+} from "@mui/material"
 import { type Campaign, isCampaignSeeding } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
 import {
@@ -35,7 +43,11 @@ type FormStateData = {
 }
 
 export default function Show({ campaign: initialCampaign }: ShowProperties) {
-  const { subscribeToEntity, campaign: currentCampaign } = useCampaign()
+  const {
+    subscribeToEntity,
+    campaign: currentCampaign,
+    updateCampaign,
+  } = useCampaign()
   const { user } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialCampaign,
@@ -156,6 +168,30 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
             entity={campaign}
             handleChangeAndSave={handleChangeAndSave}
           />
+          <Box sx={{ my: 2 }}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={campaign.ai_generation_enabled !== false}
+                  onChange={e => {
+                    const newValue = e.target.checked
+                    handleChangeAndSave({
+                      target: {
+                        name: "ai_generation_enabled",
+                        value: newValue,
+                      },
+                    })
+                    // Update global campaign context so other components see the change
+                    updateCampaign({ ai_generation_enabled: newValue })
+                  }}
+                />
+              }
+              label="AI Generation"
+            />
+            <Typography variant="body2" color="text.secondary" sx={{ ml: 4.5 }}>
+              Allow AI-powered character and image generation for this campaign
+            </Typography>
+          </Box>
           <BatchImageGenerationButton campaign={campaign} />
         </>
       )}
