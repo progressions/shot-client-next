@@ -282,6 +282,16 @@ export function createCharacterClient(deps: ClientDependencies) {
     // V2 API: Add character by updating fight's character_ids array
     const characterId = typeof character === "string" ? character : character.id
     const currentCharacterIds = fight.character_ids || []
+
+    // Prevent duplicate entries
+    if (currentCharacterIds.includes(characterId)) {
+      // Character already in fight, just return it
+      if (typeof character === "string") {
+        return getCharacter(characterId)
+      }
+      return { data: character } as AxiosResponse<Character>
+    }
+
     const updatedCharacterIds = [...currentCharacterIds, characterId]
 
     // Update the fight with new character_ids using v2 endpoint
@@ -291,8 +301,10 @@ export function createCharacterClient(deps: ClientDependencies) {
       },
     })
 
-    // Return a response with the character data
-    // The character will be in the updated fight's shots
+    // Return the character data with correct type
+    if (typeof character === "string") {
+      return getCharacter(characterId)
+    }
     return { data: character } as AxiosResponse<Character>
   }
 

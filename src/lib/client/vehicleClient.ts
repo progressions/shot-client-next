@@ -124,9 +124,33 @@ export function createVehicleClient(deps: ClientDependencies) {
     fight: Fight,
     vehicle: Vehicle | string
   ): Promise<AxiosResponse<Vehicle>> {
-    return post(api.addVehicle(fight, vehicle), {
-      vehicle: { current_shot: 0 },
+    // V2 API: Add vehicle by updating fight's vehicle_ids array
+    const vehicleId = typeof vehicle === "string" ? vehicle : vehicle.id
+    const currentVehicleIds = fight.vehicle_ids || []
+
+    // Prevent duplicate entries
+    if (currentVehicleIds.includes(vehicleId)) {
+      // Vehicle already in fight, just return it
+      if (typeof vehicle === "string") {
+        return getVehicle(vehicleId)
+      }
+      return { data: vehicle } as AxiosResponse<Vehicle>
+    }
+
+    const updatedVehicleIds = [...currentVehicleIds, vehicleId]
+
+    // Update the fight with new vehicle_ids using v2 endpoint
+    await patch(apiV2.fights(fight), {
+      fight: {
+        vehicle_ids: updatedVehicleIds,
+      },
     })
+
+    // Return the vehicle data with correct type
+    if (typeof vehicle === "string") {
+      return getVehicle(vehicleId)
+    }
+    return { data: vehicle } as AxiosResponse<Vehicle>
   }
 
   async function hideVehicle(
