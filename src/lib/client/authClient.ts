@@ -133,6 +133,32 @@ export function createAuthClient(deps: ClientDependencies) {
     })
   }
 
+  interface ChangePasswordResponse {
+    success: boolean
+    message: string
+  }
+
+  interface ChangePasswordError {
+    errors?: {
+      current_password?: string[]
+      password?: string[]
+      password_confirmation?: string[]
+    }
+    error?: string
+  }
+
+  async function changePassword(
+    currentPassword: string,
+    newPassword: string,
+    passwordConfirmation: string
+  ): Promise<AxiosResponse<ChangePasswordResponse>> {
+    return post(apiV2.changePassword(), {
+      current_password: currentPassword,
+      password: newPassword,
+      password_confirmation: passwordConfirmation,
+    })
+  }
+
   async function getPlayers(
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
@@ -378,6 +404,8 @@ export function createAuthClient(deps: ClientDependencies) {
     // Authentication
     signIn,
     resendConfirmation,
+    // Password Management
+    changePassword,
     // OTP Passwordless Login
     requestOtp,
     verifyOtp,

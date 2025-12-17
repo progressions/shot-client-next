@@ -23,7 +23,7 @@ import {
   DiscordLinkingSection,
   OnboardingMilestonesForm,
 } from "@/components/users/profile"
-import { PasskeyManager } from "@/components/settings"
+import { PasskeyManager, PasswordChangeForm } from "@/components/settings"
 import { useClient, useToast } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
 
@@ -319,7 +319,10 @@ export default function ProfilePageClient({
         >
           Manage your authentication methods and security settings.
         </SectionHeader>
-        <PasskeyManager />
+        <Stack spacing={2}>
+          <PasswordChangeForm />
+          <PasskeyManager />
+        </Stack>
       </Box>
 
       <DiscordLinkingSection user={user} onUserUpdate={setUser} />

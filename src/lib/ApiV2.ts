@@ -172,6 +172,10 @@ class ApiV2 {
     return `${this.api()}/users/unlink_discord`
   }
 
+  changePassword(): string {
+    return `${this.api()}/users/change_password`
+  }
+
   dismissCongratulations(): string {
     return `${this.api()}/onboarding/dismiss_congratulations`
   }
