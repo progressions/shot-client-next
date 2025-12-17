@@ -173,7 +173,7 @@ class ApiV2 {
   }
 
   changePassword(): string {
-    return `${this.api()}/users/change-password`
+    return `${this.api()}/users/change_password`
   }
 
   dismissCongratulations(): string {
