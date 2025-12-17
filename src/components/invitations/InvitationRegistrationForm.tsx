@@ -45,11 +45,9 @@ export default function InvitationRegistrationForm({
   })
   const { validation, validateField } = usePasswordValidation()
 
-  // Real-time validation as user types
+  // Real-time validation as user types (always validate to reset state when cleared)
   useEffect(() => {
-    if (formState.data.password) {
-      validateField(formState.data.password)
-    }
+    validateField(formState.data.password)
   }, [formState.data.password, validateField])
 
   const handleInputChange = (field: string, value: string) => {

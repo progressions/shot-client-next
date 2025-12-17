@@ -31,13 +31,12 @@ export default function ResetPasswordForm({
     null
   )
 
-  const { validation, validateField, validateConfirmation, getFirstError } =
+  const { validation, validateField, validateConfirmation, firstError } =
     usePasswordValidation()
 
+  // Always validate to reset state when password is cleared
   useEffect(() => {
-    if (password) {
-      validateField(password)
-    }
+    validateField(password)
   }, [password, validateField])
 
   useEffect(() => {
@@ -109,7 +108,7 @@ export default function ResetPasswordForm({
         autoFocus
         disabled={loading || success}
         error={password.length > 0 && !validation.isValid}
-        helperText={getFirstError}
+        helperText={firstError}
         autoComplete="new-password"
       />
 

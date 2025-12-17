@@ -82,7 +82,7 @@ export function calculatePasswordStrength(password: string): PasswordStrength {
 
   // Determine message and color
   let message = ""
-  let color: "error" | "warning" | "success" = "error"
+  let color: "error" | "warning" | "success"
 
   if (score < 50) {
     message =
@@ -167,13 +167,26 @@ export function usePasswordValidation() {
 
   /**
    * Check each requirement and return status for rendering
+   * Returns undefined for passed when password is empty (not yet started)
    */
-  const checkRequirements = useCallback((password: string) => {
-    return PASSWORD_REQUIREMENTS.map(req => ({
-      ...req,
-      passed: password.length > 0 && req.test(password),
-    }))
-  }, [])
+  const checkRequirements = useCallback(
+    (
+      password: string
+    ): (PasswordRequirement & { passed: boolean | undefined })[] => {
+      if (password.length === 0) {
+        return PASSWORD_REQUIREMENTS.map(req => ({
+          ...req,
+          passed: undefined,
+        }))
+      }
+
+      return PASSWORD_REQUIREMENTS.map(req => ({
+        ...req,
+        passed: req.test(password),
+      }))
+    },
+    []
+  )
 
   /**
    * Validate password confirmation matches
@@ -189,9 +202,9 @@ export function usePasswordValidation() {
   )
 
   /**
-   * Get first error message (for single error display)
+   * First error message (for single error display)
    */
-  const getFirstError = useMemo(() => {
+  const firstError = useMemo(() => {
     return validation.errors.length > 0 ? validation.errors[0] : null
   }, [validation.errors])
 
@@ -200,10 +213,6 @@ export function usePasswordValidation() {
     validateField,
     checkRequirements,
     validateConfirmation,
-    getFirstError,
-    // Export static utilities for non-hook usage
-    calculatePasswordStrength,
-    validatePassword,
-    PASSWORD_REQUIREMENTS,
+    firstError,
   }
 }

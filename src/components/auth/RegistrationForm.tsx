@@ -39,11 +39,9 @@ export function RegistrationForm({
   const { validation, validateField, validateConfirmation } =
     usePasswordValidation()
 
-  // Real-time validation as user types
+  // Real-time validation as user types (always validate to reset state when cleared)
   useEffect(() => {
-    if (formData.password) {
-      validateField(formData.password)
-    }
+    validateField(formData.password)
   }, [formData.password, validateField])
 
   // Validate confirmation when either password changes
@@ -81,7 +79,7 @@ export function RegistrationForm({
     // Client-side validation before submission
     const clientErrors: Record<string, string[]> = {}
 
-    if (!validation.isValid && formData.password) {
+    if (!validation.isValid) {
       clientErrors.password = validation.errors
     }
 

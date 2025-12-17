@@ -44,6 +44,7 @@ export function PasswordStrengthIndicator({
         variant="determinate"
         value={strength.score}
         color={strength.color}
+        aria-label="Password strength"
         sx={{ height: 6, borderRadius: 3 }}
       />
       <FormHelperText sx={{ color: `${strength.color}.main`, mt: 0.5, mb: 1 }}>
