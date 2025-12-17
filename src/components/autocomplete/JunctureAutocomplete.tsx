@@ -7,7 +7,7 @@ import { useState, useEffect } from "react"
 
 type JuncturesAutocompleteProperties = {
   value: string
-  onChange: (value: string | null) => void
+  onChange: (juncture: Juncture | null) => void
   options?: Option[]
   exclude?: string[]
   allowNone?: boolean
@@ -63,8 +63,18 @@ export default function JuncturesAutocomplete({
       }))
   }
 
-  const handleChange = (selectedOption: Option | null) => {
-    const juncture = junctures.find(s => s.id === selectedOption)
+  const handleChange = (selectedId: string | null) => {
+    if (!selectedId) {
+      onChange(null)
+      return
+    }
+    const juncture = junctures.find(j => j.id === selectedId)
+    if (!juncture) {
+      console.error(
+        `JuncturesAutocomplete: selected juncture with id "${selectedId}" not found in loaded junctures. onChange will not be called.`
+      )
+      return
+    }
     onChange(juncture)
   }
 

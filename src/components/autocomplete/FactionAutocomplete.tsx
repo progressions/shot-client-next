@@ -7,7 +7,7 @@ import { useState, useEffect } from "react"
 
 type FactionAutocompleteProperties = {
   value: string
-  onChange: (value: string | null) => void
+  onChange: (faction: Faction | null) => void
   options?: Option[]
   exclude?: string[]
   allowNone?: boolean
@@ -64,8 +64,18 @@ export default function FactionAutocomplete({
       }))
   }
 
-  const handleChange = (selectedOption: Option | null) => {
-    const faction = factions.find(s => s.id === selectedOption)
+  const handleChange = (selectedId: string | null) => {
+    if (!selectedId) {
+      onChange(null)
+      return
+    }
+    const faction = factions.find(f => f.id === selectedId)
+    if (!faction) {
+      console.error(
+        `Selected faction with id "${selectedId}" was not found in the loaded factions list.`
+      )
+      return
+    }
     onChange(faction)
   }
 
