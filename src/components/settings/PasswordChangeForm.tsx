@@ -18,7 +18,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp"
 import { Button, TextField } from "@/components/ui"
 import { PasswordStrengthIndicator } from "@/components/auth"
 import { useClient, useToast } from "@/contexts"
-import { usePasswordValidation } from "@/hooks/usePasswordValidation"
+import { usePasswordValidation } from "@/hooks"
 import { AxiosError } from "axios"
 
 interface PasswordChangeErrors {
@@ -162,6 +162,7 @@ export function PasswordChangeForm() {
             disabled={isSubmitting}
             fullWidth
             required
+            autoComplete="current-password"
             sx={{ mb: 2 }}
             InputProps={{
               endAdornment: (
@@ -198,6 +199,7 @@ export function PasswordChangeForm() {
             disabled={isSubmitting}
             fullWidth
             required
+            autoComplete="new-password"
             sx={{ mb: 1 }}
             InputProps={{
               endAdornment: (
@@ -237,6 +239,7 @@ export function PasswordChangeForm() {
             disabled={isSubmitting}
             fullWidth
             required
+            autoComplete="new-password"
             sx={{ mt: 2 }}
             InputProps={{
               endAdornment: (
