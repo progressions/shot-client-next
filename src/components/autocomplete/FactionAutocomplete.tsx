@@ -70,7 +70,13 @@ export default function FactionAutocomplete({
       return
     }
     const faction = factions.find(f => f.id === selectedId)
-    onChange(faction || null)
+    if (!faction) {
+      console.error(
+        `Selected faction with id "${selectedId}" was not found in the loaded factions list.`
+      )
+      return
+    }
+    onChange(faction)
   }
 
   return (

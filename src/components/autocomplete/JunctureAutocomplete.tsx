@@ -69,7 +69,13 @@ export default function JuncturesAutocomplete({
       return
     }
     const juncture = junctures.find(j => j.id === selectedId)
-    onChange(juncture || null)
+    if (!juncture) {
+      console.error(
+        `JuncturesAutocomplete: selected juncture with id "${selectedId}" not found in loaded junctures. onChange will not be called.`
+      )
+      return
+    }
+    onChange(juncture)
   }
 
   return (
