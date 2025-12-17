@@ -7,7 +7,7 @@ import { useState, useEffect } from "react"
 
 type JuncturesAutocompleteProperties = {
   value: string
-  onChange: (value: string | null) => void
+  onChange: (juncture: Juncture | null) => void
   options?: Option[]
   exclude?: string[]
   allowNone?: boolean
@@ -63,9 +63,13 @@ export default function JuncturesAutocomplete({
       }))
   }
 
-  const handleChange = (selectedOption: Option | null) => {
-    const juncture = junctures.find(s => s.id === selectedOption)
-    onChange(juncture)
+  const handleChange = (selectedId: string | null) => {
+    if (!selectedId) {
+      onChange(null)
+      return
+    }
+    const juncture = junctures.find(j => j.id === selectedId)
+    onChange(juncture || null)
   }
 
   return (

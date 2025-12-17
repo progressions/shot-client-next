@@ -1,6 +1,6 @@
 "use client"
 
-import type { Entity } from "@/types"
+import type { Entity, Faction } from "@/types"
 import { useState, useEffect } from "react"
 import { FactionAutocomplete } from "@/components/autocomplete"
 
@@ -20,15 +20,13 @@ export default function EditFaction({
     setFaction(entity.faction)
   }, [entity.faction])
 
-  const handleFactionChange = async (value: string | null) => {
-    if (!value) return
-
+  const handleFactionChange = async (selectedFaction: Faction | null) => {
     const updatedEntity = {
       ...entity,
-      faction: value,
-      faction_id: value.id,
+      faction: selectedFaction,
+      faction_id: selectedFaction?.id || null,
     }
-    setFaction(value)
+    setFaction(selectedFaction)
     updateEntity(updatedEntity)
   }
 
@@ -36,7 +34,7 @@ export default function EditFaction({
     <FactionAutocomplete
       value={faction?.id || ""}
       onChange={handleFactionChange}
-      exclude={[entity.faction_id]}
+      exclude={faction?.id ? [faction.id] : []}
     />
   )
 }

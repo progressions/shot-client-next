@@ -1,18 +1,18 @@
 "use client"
 
-import type { Character } from "@/types"
+import type { Character, Juncture } from "@/types"
 import { useState, useEffect } from "react"
 import { JunctureAutocomplete } from "@/components/autocomplete"
 
-type EditTypeProps = {
-  type: string
+type EditJunctureProps = {
+  character: Character
   updateCharacter: (character: Character) => void
 }
 
-export default function EditType({
+export default function EditJuncture({
   character,
   updateCharacter,
-}: EditTypeProps) {
+}: EditJunctureProps) {
   const [juncture, setJuncture] = useState(character.juncture)
 
   // Sync local state when character prop changes
@@ -20,15 +20,13 @@ export default function EditType({
     setJuncture(character.juncture)
   }, [character.juncture])
 
-  const handleJunctureChange = async (value: string | null) => {
-    if (!value) return
-
+  const handleJunctureChange = async (selectedJuncture: Juncture | null) => {
     const updatedCharacter = {
       ...character,
-      juncture: value,
-      juncture_id: value.id,
+      juncture: selectedJuncture,
+      juncture_id: selectedJuncture?.id || null,
     }
-    setJuncture(value)
+    setJuncture(selectedJuncture)
     updateCharacter(updatedCharacter)
   }
 
@@ -36,7 +34,7 @@ export default function EditType({
     <JunctureAutocomplete
       value={juncture?.id || ""}
       onChange={handleJunctureChange}
-      exclude={[character.juncture_id]}
+      exclude={juncture?.id ? [juncture.id] : []}
     />
   )
 }

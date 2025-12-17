@@ -109,7 +109,7 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
       <Stack direction="column" spacing={2}>
         <Manager
           name="faction"
-          title="Attuned Characters"
+          title="Members"
           parentEntity={faction}
           childEntityName="Character"
           description={
