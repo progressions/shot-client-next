@@ -1,15 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import {
-  Stack,
-  Alert,
-  Typography,
-  FormHelperText,
-  LinearProgress,
-  Box,
-} from "@mui/material"
+import { Stack, Alert, Typography } from "@mui/material"
 import { Button, TextField } from "@/components/ui"
+import { PasswordStrengthIndicator } from "./PasswordStrengthIndicator"
+import { usePasswordValidation } from "@/hooks"
 
 interface ResetPasswordFormProps {
   token: string
@@ -19,12 +14,6 @@ interface ResetPasswordFormProps {
   success?: boolean
   tokenValid?: boolean
   tokenExpired?: boolean
-}
-
-interface PasswordStrength {
-  score: number
-  message: string
-  color: "error" | "warning" | "success"
 }
 
 export default function ResetPasswordForm({
@@ -38,126 +27,32 @@ export default function ResetPasswordForm({
 }: ResetPasswordFormProps) {
   const [password, setPassword] = useState("")
   const [passwordConfirmation, setPasswordConfirmation] = useState("")
-  const [passwordError, setPasswordError] = useState<string | null>(null)
   const [confirmationError, setConfirmationError] = useState<string | null>(
     null
   )
-  const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>({
-    score: 0,
-    message: "",
-    color: "error",
-  })
 
-  const checkPasswordStrength = (password: string): PasswordStrength => {
-    if (password.length === 0) {
-      return { score: 0, message: "", color: "error" }
-    }
-
-    let score = 0
-    const issues = []
-
-    // Length check (minimum 8 characters)
-    if (password.length >= 8) {
-      score += 25
-    } else {
-      issues.push("at least 8 characters")
-    }
-
-    // Letters check
-    if (/[a-zA-Z]/.test(password)) {
-      score += 25
-    } else {
-      issues.push("letters")
-    }
-
-    // Numbers check
-    if (/\d/.test(password)) {
-      score += 25
-    } else {
-      issues.push("numbers")
-    }
-
-    // Additional complexity bonus
-    if (password.length >= 12) score += 10
-    if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>?]/.test(password)) score += 15
-
-    // Determine message and color
-    let message = ""
-    let color: "error" | "warning" | "success" = "error"
-
-    if (score < 50) {
-      message =
-        issues.length > 0
-          ? `Password must contain ${issues.join(", ")}`
-          : "Password is too weak"
-      color = "error"
-    } else if (score < 75) {
-      message = "Password strength: Good"
-      color = "warning"
-    } else {
-      message = "Password strength: Strong"
-      color = "success"
-    }
-
-    return { score: Math.min(score, 100), message, color }
-  }
-
-  const validatePassword = (password: string): boolean => {
-    if (password.length < 8) {
-      setPasswordError("Password must be at least 8 characters long")
-      return false
-    }
-
-    if (!/[a-zA-Z]/.test(password)) {
-      setPasswordError("Password must contain letters")
-      return false
-    }
-
-    if (!/\d/.test(password)) {
-      setPasswordError("Password must contain numbers")
-      return false
-    }
-
-    setPasswordError(null)
-    return true
-  }
-
-  const validatePasswordConfirmation = (
-    password: string,
-    confirmation: string
-  ): boolean => {
-    if (confirmation && password !== confirmation) {
-      setConfirmationError("Password confirmation doesn't match password")
-      return false
-    }
-
-    setConfirmationError(null)
-    return true
-  }
+  const { validation, validateField, validateConfirmation, getFirstError } =
+    usePasswordValidation()
 
   useEffect(() => {
-    const strength = checkPasswordStrength(password)
-    setPasswordStrength(strength)
-
     if (password) {
-      validatePassword(password)
+      validateField(password)
     }
+  }, [password, validateField])
 
+  useEffect(() => {
     if (passwordConfirmation) {
-      validatePasswordConfirmation(password, passwordConfirmation)
+      const error = validateConfirmation(password, passwordConfirmation)
+      setConfirmationError(error)
+    } else {
+      setConfirmationError(null)
     }
-  }, [password, passwordConfirmation])
+  }, [password, passwordConfirmation, validateConfirmation])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const isPasswordValid = validatePassword(password)
-    const isConfirmationValid = validatePasswordConfirmation(
-      password,
-      passwordConfirmation
-    )
-
-    if (!isPasswordValid || !isConfirmationValid) {
+    if (!validation.isValid || confirmationError) {
       return
     }
 
@@ -213,26 +108,17 @@ export default function ResetPasswordForm({
         onChange={e => setPassword(e.target.value)}
         autoFocus
         disabled={loading || success}
-        error={!!passwordError}
-        helperText={passwordError}
+        error={password.length > 0 && !validation.isValid}
+        helperText={getFirstError}
         autoComplete="new-password"
       />
 
-      {password && (
-        <Box sx={{ mt: 1, mb: 2 }}>
-          <LinearProgress
-            variant="determinate"
-            value={passwordStrength.score}
-            color={passwordStrength.color}
-            sx={{ height: 6, borderRadius: 3 }}
-          />
-          <FormHelperText
-            sx={{ color: `${passwordStrength.color}.main`, mt: 0.5 }}
-          >
-            {passwordStrength.message}
-          </FormHelperText>
-        </Box>
-      )}
+      {/* Password strength indicator */}
+      <PasswordStrengthIndicator
+        password={password}
+        strength={validation.strength}
+        showRequirements={true}
+      />
 
       <TextField
         margin="normal"
@@ -252,9 +138,8 @@ export default function ResetPasswordForm({
         disabled={
           loading ||
           success ||
-          !!passwordError ||
-          !!confirmationError ||
-          passwordStrength.score < 50
+          (password.length > 0 && !validation.isValid) ||
+          !!confirmationError
         }
         sx={{ mt: 3, mb: 2 }}
       >
