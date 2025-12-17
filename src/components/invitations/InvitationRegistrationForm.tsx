@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import {
   Box,
   TextField,
@@ -11,8 +12,10 @@ import {
   FormHelperText,
 } from "@mui/material"
 import { Button } from "@/components/ui"
+import { PasswordStrengthIndicator } from "@/components/auth"
 import { useClient } from "@/contexts"
 import { useForm, FormActions } from "@/reducers/formState"
+import { usePasswordValidation } from "@/hooks"
 import { Invitation, HttpError } from "@/types"
 
 interface InvitationRegistrationFormProps {
@@ -40,6 +43,12 @@ export default function InvitationRegistrationForm({
     password: "",
     password_confirmation: "",
   })
+  const { validation, validateField } = usePasswordValidation()
+
+  // Real-time validation as user types (always validate to reset state when cleared)
+  useEffect(() => {
+    validateField(formState.data.password)
+  }, [formState.data.password, validateField])
 
   const handleInputChange = (field: string, value: string) => {
     dispatchForm({
@@ -216,11 +225,6 @@ export default function InvitationRegistrationForm({
               value={formState.data.password}
               onChange={e => handleInputChange("password", e.target.value)}
               error={!!formState.errors.password}
-              helperText={
-                !formState.errors.password
-                  ? "Minimum 8 characters with letters and numbers"
-                  : undefined
-              }
               required
               fullWidth
               disabled={formState.saving}
@@ -230,6 +234,13 @@ export default function InvitationRegistrationForm({
                 {formState.errors.password}
               </FormHelperText>
             )}
+
+            {/* Password strength indicator */}
+            <PasswordStrengthIndicator
+              password={formState.data.password}
+              strength={validation.strength}
+              showRequirements={true}
+            />
 
             <TextField
               label="Confirm Password"
@@ -252,7 +263,10 @@ export default function InvitationRegistrationForm({
             <Button
               type="submit"
               size="large"
-              disabled={formState.saving}
+              disabled={
+                formState.saving ||
+                (formState.data.password.length > 0 && !validation.isValid)
+              }
               sx={{ mt: 2 }}
             >
               {formState.saving ? (

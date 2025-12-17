@@ -1,10 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Box, Stack, Alert, InputAdornment, IconButton } from "@mui/material"
 import { Visibility, VisibilityOff } from "@mui/icons-material"
 import { Button, TextField } from "@/components/ui"
 import { useClient } from "@/contexts"
+import { usePasswordValidation } from "@/hooks"
+import { PasswordStrengthIndicator } from "./PasswordStrengthIndicator"
 import type { RegistrationData } from "@/types/auth"
 
 interface RegistrationFormProps {
@@ -29,8 +31,31 @@ export function RegistrationForm({
     useState(false)
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [generalError, setGeneralError] = useState<string | null>(null)
+  const [confirmationError, setConfirmationError] = useState<string | null>(
+    null
+  )
 
   const { client } = useClient()
+  const { validation, validateField, validateConfirmation } =
+    usePasswordValidation()
+
+  // Real-time validation as user types (always validate to reset state when cleared)
+  useEffect(() => {
+    validateField(formData.password)
+  }, [formData.password, validateField])
+
+  // Validate confirmation when either password changes
+  useEffect(() => {
+    if (formData.password_confirmation) {
+      const error = validateConfirmation(
+        formData.password,
+        formData.password_confirmation
+      )
+      setConfirmationError(error)
+    } else {
+      setConfirmationError(null)
+    }
+  }, [formData.password, formData.password_confirmation, validateConfirmation])
 
   const handleChange =
     (field: keyof RegistrationData) =>
@@ -50,6 +75,23 @@ export function RegistrationForm({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
+
+    // Client-side validation before submission
+    const clientErrors: Record<string, string[]> = {}
+
+    if (!validation.isValid) {
+      clientErrors.password = validation.errors
+    }
+
+    if (confirmationError) {
+      clientErrors.password_confirmation = [confirmationError]
+    }
+
+    if (Object.keys(clientErrors).length > 0) {
+      setErrors(clientErrors)
+      return
+    }
+
     setLoading(true)
     setErrors({})
     setGeneralError(null)
@@ -164,14 +206,23 @@ export function RegistrationForm({
           }}
         />
 
+        {/* Password strength indicator */}
+        <PasswordStrengthIndicator
+          password={formData.password}
+          strength={validation.strength}
+          showRequirements={true}
+        />
+
         <TextField
           fullWidth
           label="Confirm Password"
           type={showPasswordConfirmation ? "text" : "password"}
           value={formData.password_confirmation}
           onChange={handleChange("password_confirmation")}
-          error={hasFieldError("password_confirmation")}
-          helperText={getFieldError("password_confirmation")}
+          error={hasFieldError("password_confirmation") || !!confirmationError}
+          helperText={
+            getFieldError("password_confirmation") || confirmationError
+          }
           disabled={loading}
           required
           autoComplete="new-password"
@@ -216,7 +267,11 @@ export function RegistrationForm({
           fullWidth
           variant="contained"
           size="large"
-          disabled={loading}
+          disabled={
+            loading ||
+            (formData.password.length > 0 && !validation.isValid) ||
+            !!confirmationError
+          }
           sx={{ mt: 2 }}
         >
           {loading ? "Creating Account..." : "Create Account"}
