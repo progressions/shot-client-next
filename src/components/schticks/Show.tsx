@@ -16,8 +16,11 @@ import {
   Icon,
 } from "@/components/ui"
 import { EntityActiveToggle } from "@/components/common"
+import { PrerequisiteSchtickAutocomplete } from "@/components/autocomplete"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
+import Link from "next/link"
+import { Typography } from "@mui/material"
 
 interface ShowProperties {
   schtick: Schtick
@@ -94,6 +97,38 @@ export default function Show({ schtick: initialSchtick }: ShowProperties) {
         updateEntity={updateEntity}
         state={formState}
       />
+      <SectionHeader title="Prerequisite" icon={<Icon keyword="Schtick" />}>
+        A schtick that the character must already have before they can learn
+        this schtick.
+      </SectionHeader>
+      {schtick.prerequisite && schtick.prerequisite.id && (
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2" sx={{ color: "text.secondary", mb: 1 }}>
+            Current prerequisite:
+          </Typography>
+          <Link
+            href={`/schticks/${schtick.prerequisite.id}`}
+            style={{ color: "#ffc107", textDecoration: "none" }}
+          >
+            {schtick.prerequisite.name || "Unknown Schtick"}
+            {schtick.prerequisite.category &&
+              ` (${schtick.prerequisite.category})`}
+          </Link>
+        </Box>
+      )}
+      <Box sx={{ mb: 3 }}>
+        <PrerequisiteSchtickAutocomplete
+          value={schtick.prerequisite_id || null}
+          onChange={async prerequisiteId => {
+            await handleChangeAndSave({
+              target: { name: "prerequisite_id", value: prerequisiteId },
+            })
+          }}
+          category={schtick.category}
+          path={schtick.path}
+          exclude={[schtick.id]}
+        />
+      </Box>
       <SectionHeader title="Description" icon={<Icon keyword="Schtick" />}>
         A description of the Schtick, including whether it costs a{" "}
         <InfoLink info="Shot" /> or <InfoLink info="Chi" /> to activate, who it

@@ -11,4 +11,5 @@ export { default as PartyAutocomplete } from "@/components/autocomplete/PartyAut
 export { default as SiteAutocomplete } from "@/components/autocomplete/SiteAutocomplete"
 export { default as JunctureAutocomplete } from "@/components/autocomplete/JunctureAutocomplete"
 export { default as SchtickAutocomplete } from "@/components/autocomplete/SchtickAutocomplete"
+export { default as PrerequisiteSchtickAutocomplete } from "@/components/autocomplete/PrerequisiteSchtickAutocomplete"
 export { default as NotionPageAutocomplete } from "@/components/autocomplete/NotionPageAutocomplete"

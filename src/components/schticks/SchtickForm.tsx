@@ -16,6 +16,7 @@ import { Editor } from "@/components/editor"
 import { useState, useEffect } from "react"
 import { useEntity } from "@/hooks"
 import { EditCategoryPath } from "@/components/schticks"
+import { PrerequisiteSchtickAutocomplete } from "@/components/autocomplete"
 
 type FormStateData = Schtick & {
   [key: string]: unknown
@@ -201,6 +202,21 @@ export default function SchtickForm({
           setEntity={handleSchtickUpdate}
           errors={errors}
         />
+        <Box sx={{ mt: 2, mb: 2 }}>
+          <PrerequisiteSchtickAutocomplete
+            value={data.prerequisite_id || null}
+            onChange={prerequisiteId => {
+              dispatchForm({
+                type: FormActions.UPDATE,
+                name: "prerequisite_id",
+                value: prerequisiteId,
+              })
+            }}
+            category={data.category}
+            path={data.path}
+            exclude={data.id ? [data.id] : []}
+          />
+        </Box>
         <Editor
           name="description"
           value={description}
