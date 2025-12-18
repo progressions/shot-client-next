@@ -241,10 +241,8 @@ export const defaultSchtick: Schtick = {
   campaign_id: "",
   category: "",
   path: "",
-  prerequisite: {
-    id: "",
-    name: "",
-  },
+  prerequisite_id: null,
+  prerequisite: null,
   color: "",
   image_url: "",
   created_at: "",

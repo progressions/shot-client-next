@@ -170,11 +170,12 @@ export interface Schtick extends BaseEntity {
   campaign_id: string
   category: SchtickCategory
   path: SchtickPath
-  schtick_id: string
-  prerequisite: {
+  prerequisite_id?: string | null
+  prerequisite?: {
     id: string
     name?: string
-  }
+    category?: string
+  } | null
   color: string
   image_url: string
   created_at: string

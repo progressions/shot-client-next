@@ -122,10 +122,8 @@ export const createMockSchtick = (
     name: "Test Schtick",
     category: "gun",
     description: "A test schtick",
-    prerequisite: {
-      id: undefined,
-      name: undefined,
-    },
+    prerequisite_id: null,
+    prerequisite: null,
     ...overrides,
   }
 }
