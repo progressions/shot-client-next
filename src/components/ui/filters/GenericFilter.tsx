@@ -4,7 +4,7 @@ import { AddButton } from "../AddButton"
 import { ModelAutocomplete } from "../ModelAutocomplete"
 import { StringAutocomplete } from "../StringAutocomplete"
 import { SearchInput } from "../SearchInput"
-import { useCallback, useEffect, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useRef } from "react"
 import { filterConfigs } from "@/lib/filterConfigs"
 import { debounce } from "lodash"
 import { GroupedSchtickAutocomplete } from "@/components/autocomplete/GroupedSchtickAutocomplete"
@@ -48,6 +48,7 @@ export function GenericFilter({
 }: GenericFilterProps) {
   const config = filterConfigs[entity]
   const { filters, ...data } = formState.data
+  const inputValueRef = useRef("")
   const primaryField = config.fields.find(
     f => f.name.toLowerCase() === entity.toLowerCase()
   )
@@ -234,9 +235,22 @@ export function GenericFilter({
           onInputChange={
             debouncedSearchUpdate && field.name === primaryField.name
               ? (_event, newValue, reason) => {
-                  // Only trigger search on user input, not on selection or reset
-                  if (reason === "input") {
+                  inputValueRef.current = newValue ?? ""
+                  const shouldUpdateSearch =
+                    reason === "input" ||
+                    reason === "clear" ||
+                    (reason === "reset" && !newValue)
+                  if (shouldUpdateSearch) {
                     debouncedSearchUpdate(newValue ?? "", filters)
+                  }
+                }
+              : undefined
+          }
+          onBlur={
+            debouncedSearchUpdate && field.name === primaryField.name
+              ? () => {
+                  if (!inputValueRef.current) {
+                    debouncedSearchUpdate("", filters)
                   }
                 }
               : undefined

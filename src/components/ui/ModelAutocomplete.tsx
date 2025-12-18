@@ -28,6 +28,8 @@ type ModelAutocompleteProps = {
     value: string,
     reason: "input" | "reset" | "clear"
   ) => void
+  /** Optional callback for input blur events */
+  onBlur?: (event: React.FocusEvent<HTMLElement>) => void
   /** Filter parameters to pass to API */
   filters: Record<string, string | boolean>
   /** Pre-fetched records to display as options */
@@ -61,6 +63,7 @@ export function ModelAutocomplete({
   value,
   onChange,
   onInputChange,
+  onBlur,
   filters,
   records,
   allowNone = true,
@@ -186,6 +189,7 @@ export function ModelAutocomplete({
       value={options.find(option => option.id === value) || null}
       onChange={(event, newValue) => onChange(newValue)}
       onInputChange={onInputChange}
+      onBlur={onBlur}
       isOptionEqualToValue={(option, val) => option.id === val.id}
       renderInput={params => (
         <TextField
