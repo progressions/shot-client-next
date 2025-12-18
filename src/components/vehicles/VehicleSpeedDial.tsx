@@ -2,7 +2,7 @@
 
 import FileDownloadIcon from "@mui/icons-material/FileDownload"
 import DeleteIcon from "@mui/icons-material/Delete"
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
+import ContentCopyIcon from "@mui/icons-material/ContentCopy"
 import {
   SpeedDial,
   SpeedDialAction,
@@ -29,11 +29,13 @@ type Action = {
 
 type VehicleSpeedDialProps = {
   vehicle: Vehicle
+  onDelete?: () => Promise<void>
   sx?: SystemStyleObject<Theme>
 }
 
 export default function VehicleSpeedDial({
   vehicle,
+  onDelete,
   sx = {},
 }: VehicleSpeedDialProps) {
   const { client } = useClient()
@@ -62,8 +64,12 @@ export default function VehicleSpeedDial({
     })
     if (!confirmed) return
     try {
-      await client.deleteVehicle(vehicle)
-      router.push("/vehicles")
+      if (onDelete) {
+        await onDelete()
+      } else {
+        await client.deleteVehicle(vehicle)
+        router.push("/vehicles")
+      }
     } catch (error_) {
       console.error("Failed to delete vehicle:", error_)
     }
@@ -152,7 +158,7 @@ Action Values: ${JSON.stringify(vehicle.actionValues, null, 2)}
       onClick: handleExportClick,
       preventClose: true,
     },
-    { icon: <PeopleAltIcon />, name: "Copy", onClick: handleDuplicate },
+    { icon: <ContentCopyIcon />, name: "Copy", onClick: handleDuplicate },
     { icon: <DeleteIcon />, name: "Delete", onClick: handleDelete },
   ]
 

@@ -4,12 +4,15 @@ import { useEffect } from "react"
 import { FormControl, FormHelperText, Box } from "@mui/material"
 import type { Schtick } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
-import { EditCategoryPath, SchtickChips } from "@/components/schticks"
+import {
+  EditCategoryPath,
+  SchtickChips,
+  SchtickSpeedDial,
+} from "@/components/schticks"
 import {
   Alert,
   EditableRichText,
   HeroImage,
-  SpeedDialMenu,
   SectionHeader,
   NameEditor,
   InfoLink,
@@ -79,7 +82,7 @@ export default function Show({ schtick: initialSchtick }: ShowProperties) {
         position: "relative",
       }}
     >
-      <SpeedDialMenu onDelete={deleteEntity} />
+      <SchtickSpeedDial schtick={schtick} onDelete={deleteEntity} />
       <HeroImage entity={schtick} setEntity={setSchtick} />
       <Alert status={status} />
       <FormControl fullWidth margin="normal" error={!!errors.name}>

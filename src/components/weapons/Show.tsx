@@ -5,14 +5,18 @@ import { useEffect } from "react"
 import { FormControl, FormHelperText, Box } from "@mui/material"
 import type { Weapon } from "@/types"
 import { useCampaign, useClient, useConfirm } from "@/contexts"
-import { WeaponChips, Stats, EditJunctureCategory } from "@/components/weapons"
+import {
+  WeaponChips,
+  Stats,
+  EditJunctureCategory,
+  WeaponSpeedDial,
+} from "@/components/weapons"
 import { useToast } from "@/contexts"
 import {
   Alert,
   SectionHeader,
   EditableRichText,
   HeroImage,
-  SpeedDialMenu,
   NameEditor,
   Icon,
 } from "@/components/ui"
@@ -132,7 +136,7 @@ export default function Show({ weapon: initialWeapon }: ShowProperties) {
         position: "relative",
       }}
     >
-      <SpeedDialMenu onDelete={handleDelete} />
+      <WeaponSpeedDial weapon={weapon} onDelete={handleDelete} />
       <HeroImage entity={weapon} setEntity={setWeapon} />
       <Alert status={status} />
       <Box

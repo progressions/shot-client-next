@@ -4,7 +4,12 @@ import { useCallback, useEffect } from "react"
 import { Stack, Box } from "@mui/material"
 import type { Faction } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
-import { JuncturesList, SitesList, PartiesList } from "@/components/factions"
+import {
+  JuncturesList,
+  SitesList,
+  PartiesList,
+  FactionSpeedDial,
+} from "@/components/factions"
 import {
   Icon,
   Alert,
@@ -12,7 +17,6 @@ import {
   InfoLink,
   NameEditor,
   HeroImage,
-  SpeedDialMenu,
   EditableRichText,
   SectionHeader,
 } from "@/components/ui"
@@ -75,7 +79,7 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
         position: "relative",
       }}
     >
-      <SpeedDialMenu onDelete={deleteEntity} />
+      <FactionSpeedDial faction={faction} onDelete={deleteEntity} />
       <HeroImage entity={faction} setEntity={setFaction} />
       <Alert status={status} />
       <Box
