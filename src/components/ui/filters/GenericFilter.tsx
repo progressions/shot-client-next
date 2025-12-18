@@ -250,7 +250,13 @@ export function GenericFilter({
             debouncedSearchUpdate && field.name === primaryField.name
               ? () => {
                   if (!inputValueRef.current) {
-                    debouncedSearchUpdate("", filters)
+                    // Cancel any pending debounced search and clear immediately
+                    debouncedSearchUpdate.cancel()
+                    onFiltersUpdate?.({
+                      ...filters,
+                      search: "",
+                      page: 1,
+                    })
                   }
                 }
               : undefined
