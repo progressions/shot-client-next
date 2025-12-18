@@ -283,7 +283,7 @@ export default function Show({ fight: initialFight }: ShowProperties) {
             </>
           }
           onListUpdate={updateEntity}
-          excludeIds={fight.character_ids || []}
+          allowDuplicates={true}
         />
         <Manager
           icon={<Icon keyword="Vehicles" size="24" />}

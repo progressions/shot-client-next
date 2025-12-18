@@ -40,6 +40,7 @@ import {
  * @property onListUpdate - Callback fired when the child list is modified
  * @property excludeIds - IDs to exclude from the autocomplete options (defaults to [])
  * @property manage - Whether to show add/remove controls (defaults to true)
+ * @property allowDuplicates - Allow adding the same entity multiple times (defaults to false)
  */
 type ListManagerProps = {
   open: boolean
@@ -48,6 +49,7 @@ type ListManagerProps = {
   onListUpdate?: (updatedEntity: Fight) => Promise<void>
   excludeIds?: number[]
   manage?: boolean
+  allowDuplicates?: boolean
 }
 
 /**
@@ -78,6 +80,7 @@ export function ListManager({
   onListUpdate,
   excludeIds = [],
   manage = true,
+  allowDuplicates = false,
 }: ListManagerProps) {
   const { client } = useClient()
   const [currentPage, setCurrentPage] = useState(1)
@@ -100,6 +103,7 @@ export function ListManager({
     childIdsKey,
     childEntityName,
     setCurrentPage,
+    allowDuplicates,
   })
 
   // 4. Filter Logic

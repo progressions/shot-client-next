@@ -29,6 +29,7 @@ interface AutocompleteOption {
  * @property childIdsKey - Property name for child IDs on parent (e.g., "character_ids")
  * @property childEntityName - Type of child entity
  * @property setCurrentPage - Pagination state setter
+ * @property allowDuplicates - Allow adding the same entity multiple times (e.g., multiple instances of same enemy)
  */
 interface UseOptimisticManagerProps {
   childEntities: AutocompleteOption[]
@@ -40,6 +41,7 @@ interface UseOptimisticManagerProps {
   childIdsKey: string
   childEntityName: keyof typeof filterConfigs
   setCurrentPage: (page: number) => void
+  allowDuplicates?: boolean
 }
 
 /**
@@ -84,13 +86,18 @@ export function useOptimisticManager({
   childIdsKey,
   childEntityName,
   setCurrentPage,
+  allowDuplicates = false,
 }: UseOptimisticManagerProps) {
   const handleAdd = useCallback(
     async (child: AutocompleteOption | string | null) => {
+      // Allow duplicates if enabled, otherwise check if already exists
+      const isDuplicate = (childIds as (number | string)[]).includes(
+        child?.id as number | string
+      )
       if (
         child &&
         typeof child !== "string" &&
-        !(childIds as (number | string)[]).includes(child.id)
+        (allowDuplicates || !isDuplicate)
       ) {
         // Mark that we're doing an optimistic update
         optimisticUpdateRef.current = true
@@ -125,6 +132,7 @@ export function useOptimisticManager({
       setChildEntities,
       optimisticUpdateRef,
       setCurrentPage,
+      allowDuplicates,
     ]
   )
 
