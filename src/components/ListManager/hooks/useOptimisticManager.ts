@@ -13,7 +13,7 @@ import type { Fight } from "@/types"
 import { filterConfigs } from "@/lib/filterConfigs"
 
 interface AutocompleteOption {
-  id: number
+  id: string
   name: string
 }
 
@@ -35,7 +35,7 @@ interface UseOptimisticManagerProps {
   childEntities: AutocompleteOption[]
   setChildEntities: (entities: AutocompleteOption[]) => void
   optimisticUpdateRef: React.MutableRefObject<boolean>
-  childIds: (string | number)[]
+  childIds: string[]
   onListUpdate?: (updatedEntity: Fight) => Promise<void>
   parentEntity: Fight
   childIdsKey: string
@@ -90,15 +90,10 @@ export function useOptimisticManager({
 }: UseOptimisticManagerProps) {
   const handleAdd = useCallback(
     async (child: AutocompleteOption | string | null) => {
-      // Allow duplicates if enabled, otherwise check if already exists
-      const isDuplicate = (childIds as (number | string)[]).includes(
-        child?.id as number | string
-      )
-      if (
-        child &&
-        typeof child !== "string" &&
-        (allowDuplicates || !isDuplicate)
-      ) {
+      // Skip duplicate check if duplicates are allowed
+      const isDuplicate =
+        !allowDuplicates && childIds.includes(child?.id as string)
+      if (child && typeof child !== "string" && !isDuplicate) {
         // Mark that we're doing an optimistic update
         optimisticUpdateRef.current = true
         // Locally update childEntities

@@ -11,7 +11,7 @@ import { GroupedSchtickAutocomplete } from "@/components/autocomplete/GroupedSch
 import type { Schtick } from "@/types"
 
 interface AutocompleteOption {
-  id: number
+  id: string
   name: string
 }
 
@@ -35,7 +35,7 @@ interface GenericFilterProps {
   onChange?: (value: AutocompleteOption | null) => void
   onFiltersUpdate?: (filters: Record<string, string | boolean | null>) => void
   omit?: string[]
-  excludeIds?: number[]
+  excludeIds?: string[]
 }
 
 export function GenericFilter({

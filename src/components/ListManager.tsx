@@ -47,7 +47,7 @@ type ListManagerProps = {
   parentEntity: Fight
   childEntityName: keyof typeof filterConfigs
   onListUpdate?: (updatedEntity: Fight) => Promise<void>
-  excludeIds?: number[]
+  excludeIds?: string[]
   manage?: boolean
   allowDuplicates?: boolean
 }

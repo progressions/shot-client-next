@@ -25,7 +25,7 @@ import { filterConfigs } from "@/lib/filterConfigs"
  * @example
  * ```tsx
  * const { childIds, childIdsKey } = useChildIds(fight, "Character")
- * // childIds: [1, 2, 3]
+ * // childIds: ["uuid-1", "uuid-2", "uuid-3"]
  * // childIdsKey: "character_ids"
  * ```
  */
@@ -35,7 +35,7 @@ export function useChildIds(
 ) {
   const childIdsKey = `${childEntityName.toLowerCase()}_ids` as keyof Fight
   const shots = parentEntity.shots
-  const directIds = parentEntity[childIdsKey] as (string | number)[]
+  const directIds = parentEntity[childIdsKey] as string[]
 
   const childIds = useMemo(() => {
     if (childEntityName === "Character" && Array.isArray(shots)) {
