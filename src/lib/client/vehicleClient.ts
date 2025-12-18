@@ -78,7 +78,7 @@ export function createVehicleClient(deps: ClientDependencies) {
 
   async function getVehicleArchetypes(
     cacheOptions: CacheOptions = {}
-  ): Promise<AxiosResponse<VehicleArchetype[]>> {
+  ): Promise<AxiosResponse<{ archetypes: VehicleArchetype[] }>> {
     return get(`${apiV2.vehicles()}/archetypes`, {}, cacheOptions)
   }
 
