@@ -1,26 +1,27 @@
 "use client"
 
 import DeleteIcon from "@mui/icons-material/Delete"
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
+import ContentCopyIcon from "@mui/icons-material/ContentCopy"
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material"
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
 import { SystemStyleObject, Theme } from "@mui/system"
 import type { MouseEvent } from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import type { Site } from "@/types"
-import { useClient, useConfirm } from "@/contexts"
+import { useClient, useConfirm, useToast } from "@/contexts"
 
 type Action = {
   [key: string]: unknown
   icon: React.ReactNode
   name: string
   onClick?: (event: MouseEvent<HTMLElement>) => void
+  preventClose?: boolean
 }
 
 type SiteSpeedDialProps = {
   site: Site
-  onDelete?: () => void
+  onDelete: () => Promise<void>
   sx?: SystemStyleObject<Theme>
 }
 
@@ -31,8 +32,17 @@ export default function SiteSpeedDial({
 }: SiteSpeedDialProps) {
   const { client } = useClient()
   const { confirm } = useConfirm()
+  const { toastError } = useToast()
   const router = useRouter()
   const [speedDialOpen, setSpeedDialOpen] = useState(false)
+  const [persist, setPersist] = useState(false)
+
+  // Reset persist when SpeedDial is closed externally
+  useEffect(() => {
+    if (!speedDialOpen) {
+      setPersist(false)
+    }
+  }, [speedDialOpen])
 
   const handleDelete = async () => {
     if (!site?.id) return
@@ -44,16 +54,10 @@ export default function SiteSpeedDial({
     })
     if (!confirmed) return
     try {
-      if (onDelete) {
-        onDelete()
-      } else {
-        await client.deleteSite(site)
-        router.push("/sites")
-      }
+      await onDelete()
     } catch (error_) {
       console.error("Failed to delete site:", error_)
-    } finally {
-      setSpeedDialOpen(false)
+      toastError("Failed to delete site.")
     }
   }
 
@@ -65,19 +69,26 @@ export default function SiteSpeedDial({
       router.push(`/sites/${newSite.id}`)
     } catch (error_) {
       console.error("Failed to duplicate site:", error_)
+      toastError("Failed to duplicate site.")
     } finally {
       setSpeedDialOpen(false)
     }
   }
 
   const actions = [
-    { icon: <PeopleAltIcon />, name: "Copy", onClick: handleDuplicate },
+    { icon: <ContentCopyIcon />, name: "Copy", onClick: handleDuplicate },
     { icon: <DeleteIcon />, name: "Delete", onClick: handleDelete },
   ]
 
   const handleActionClick =
     (action: Action) => (event: MouseEvent<HTMLElement>) => {
-      setSpeedDialOpen(false)
+      if (action.preventClose) {
+        event.stopPropagation()
+        setPersist(true)
+      } else {
+        setPersist(false)
+        setSpeedDialOpen(false)
+      }
       if (action.onClick) {
         action.onClick(event)
       }
@@ -101,7 +112,11 @@ export default function SiteSpeedDial({
       direction="down"
       open={speedDialOpen}
       onOpen={() => setSpeedDialOpen(true)}
-      onClose={() => setSpeedDialOpen(false)}
+      onClose={() => {
+        if (!persist) {
+          setSpeedDialOpen(false)
+        }
+      }}
     >
       {actions.map(action => (
         <SpeedDialAction

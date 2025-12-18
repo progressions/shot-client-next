@@ -1,7 +1,7 @@
 "use client"
 
 import DeleteIcon from "@mui/icons-material/Delete"
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
+import ContentCopyIcon from "@mui/icons-material/ContentCopy"
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material"
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
 import { SystemStyleObject, Theme } from "@mui/system"
@@ -76,7 +76,7 @@ export default function SchtickSpeedDial({
   }
 
   const actions = [
-    { icon: <PeopleAltIcon />, name: "Copy", onClick: handleDuplicate },
+    { icon: <ContentCopyIcon />, name: "Copy", onClick: handleDuplicate },
     { icon: <DeleteIcon />, name: "Delete", onClick: handleDelete },
   ]
 

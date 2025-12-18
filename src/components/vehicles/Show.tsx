@@ -80,7 +80,7 @@ export default function Show({ vehicle: initialVehicle }: ShowProperties) {
         position: "relative",
       }}
     >
-      <VehicleSpeedDial vehicle={vehicle} />
+      <VehicleSpeedDial vehicle={vehicle} onDelete={deleteEntity} />
       <HeroImage entity={vehicle} setEntity={setVehicle} />
       <VehicleChips vehicle={vehicle} />
       <Alert status={status} />
