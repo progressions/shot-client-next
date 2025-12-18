@@ -135,10 +135,28 @@ export function useOptimisticManager({
     async (item: AutocompleteOption) => {
       // Mark that we're doing an optimistic update
       optimisticUpdateRef.current = true
+
       // Locally update childEntities
-      const updatedEntities = childEntities.filter(
-        entity => entity.id !== item.id
-      )
+      let updatedEntities: AutocompleteOption[]
+
+      if (allowDuplicates) {
+        // When duplicates are allowed, only remove the first matching instance
+        const indexToRemove = childEntities.findIndex(
+          entity => entity.id === item.id
+        )
+        if (indexToRemove !== -1) {
+          updatedEntities = [
+            ...childEntities.slice(0, indexToRemove),
+            ...childEntities.slice(indexToRemove + 1),
+          ]
+        } else {
+          updatedEntities = childEntities
+        }
+      } else {
+        // Standard behavior: remove all with matching ID (should only be one)
+        updatedEntities = childEntities.filter(entity => entity.id !== item.id)
+      }
+
       setChildEntities(updatedEntities)
       // Use the updated entities list to build the new IDs array
       const newChildIds = updatedEntities.map(entity => entity.id)
@@ -151,10 +169,7 @@ export function useOptimisticManager({
         )
         // Revert local update on error
         optimisticUpdateRef.current = false
-        setChildEntities(prev => [
-          ...prev,
-          childEntities.find(entity => entity.id === item.id) || item,
-        ])
+        setChildEntities(prev => [...prev, item])
       }
     },
     [
@@ -165,6 +180,7 @@ export function useOptimisticManager({
       childEntityName,
       setChildEntities,
       optimisticUpdateRef,
+      allowDuplicates,
     ]
   )
 
