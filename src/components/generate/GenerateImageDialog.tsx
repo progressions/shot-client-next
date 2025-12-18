@@ -128,7 +128,7 @@ export function GenerateImageDialog({
               mb: 2,
             }}
             onClick={generateImages}
-            disabled={pending || image_urls.length > 0}
+            disabled={pending}
           >
             Generate
           </Button>
@@ -163,7 +163,7 @@ export function GenerateImageDialog({
               color: "white",
               "&:hover": { bgcolor: "primary.dark" },
             }}
-            disabled={pending || image_urls.length > 0}
+            disabled={pending}
           >
             Generate
           </Button>
