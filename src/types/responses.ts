@@ -16,6 +16,7 @@ import type {
   SchtickCategory,
   WeaponCategory,
   Archetype,
+  VehicleArchetype,
 } from "./ui"
 
 export interface SuggestionsResponse {
@@ -82,6 +83,10 @@ export interface CharactersResponse {
 export interface VehiclesResponse {
   vehicles: Vehicle[]
   meta: PaginationMeta
+}
+
+export interface VehicleArchetypesResponse {
+  archetypes: VehicleArchetype[]
 }
 
 export interface CharactersAndVehiclesResponse {
