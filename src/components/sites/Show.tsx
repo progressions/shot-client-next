@@ -13,8 +13,8 @@ import {
   EditableRichText,
   SectionHeader,
   HeroImage,
-  SpeedDialMenu,
 } from "@/components/ui"
+import { SiteSpeedDial } from "@/components/sites"
 import { EntityActiveToggle } from "@/components/common"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
@@ -84,7 +84,7 @@ export default function Show({ site: initialSite }: ShowProperties) {
         position: "relative",
       }}
     >
-      <SpeedDialMenu onDelete={deleteEntity} />
+      <SiteSpeedDial site={site} onDelete={deleteEntity} />
       <HeroImage entity={site} setEntity={setSite} />
       <Alert status={status} />
       <FormControl fullWidth margin="normal" error={!!errors.name}>

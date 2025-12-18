@@ -108,6 +108,12 @@ export function createSchtickClient(deps: ClientDependencies) {
     return delete_(apiV2.characterSchticks(character, schtick))
   }
 
+  async function duplicateSchtick(
+    schtick: Schtick
+  ): Promise<AxiosResponse<Schtick>> {
+    return post(`${apiV2.schticks(schtick)}/duplicate`)
+  }
+
   return {
     getSchticksBatch,
     getSchtickPaths,
@@ -121,5 +127,6 @@ export function createSchtickClient(deps: ClientDependencies) {
     addSchtick,
     uploadSchticks,
     removeSchtick,
+    duplicateSchtick,
   }
 }

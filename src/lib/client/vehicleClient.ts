@@ -229,6 +229,12 @@ export function createVehicleClient(deps: ClientDependencies) {
     })
   }
 
+  async function duplicateVehicle(
+    vehicle: Vehicle
+  ): Promise<AxiosResponse<Vehicle>> {
+    return post(`${apiV2.vehicles(vehicle)}/duplicate`)
+  }
+
   return {
     getLocationForVehicle,
     setVehicleLocation,
@@ -240,6 +246,7 @@ export function createVehicleClient(deps: ClientDependencies) {
     updateVehicle,
     deleteVehicle,
     deleteVehicleImage,
+    duplicateVehicle,
     actVehicle,
     addVehicle,
     hideVehicle,

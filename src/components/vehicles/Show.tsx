@@ -10,7 +10,6 @@ import {
   Alert,
   NameEditor,
   HeroImage,
-  SpeedDialMenu,
 } from "@/components/ui"
 import { EntityActiveToggle } from "@/components/common"
 import { useCampaign, useClient } from "@/contexts"
@@ -18,6 +17,7 @@ import {
   ActionValuesEdit,
   VehicleChips,
   Archetype,
+  VehicleSpeedDial,
 } from "@/components/vehicles"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
@@ -80,7 +80,7 @@ export default function Show({ vehicle: initialVehicle }: ShowProperties) {
         position: "relative",
       }}
     >
-      <SpeedDialMenu onDelete={deleteEntity} />
+      <VehicleSpeedDial vehicle={vehicle} />
       <HeroImage entity={vehicle} setEntity={setVehicle} />
       <VehicleChips vehicle={vehicle} />
       <Alert status={status} />

@@ -55,6 +55,10 @@ export function createSiteClient(deps: ClientDependencies) {
     return delete_(`${apiV2.sites(site)}/image`)
   }
 
+  async function duplicateSite(site: Site): Promise<AxiosResponse<Site>> {
+    return post(`${apiV2.sites(site)}/duplicate`)
+  }
+
   async function addCharacterToSite(
     site: Site,
     character: Character
@@ -116,6 +120,7 @@ export function createSiteClient(deps: ClientDependencies) {
     getSite,
     deleteSite,
     deleteSiteImage,
+    duplicateSite,
     addCharacterToSite,
     removeCharacterFromSite,
     getJunctures,

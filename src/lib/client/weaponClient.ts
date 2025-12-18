@@ -114,6 +114,12 @@ export function createWeaponClient(deps: ClientDependencies) {
     )
   }
 
+  async function duplicateWeapon(
+    weapon: Weapon
+  ): Promise<AxiosResponse<Weapon>> {
+    return post(`${apiV2.weapons(weapon)}/duplicate`)
+  }
+
   return {
     getWeaponsBatch,
     getWeapons,
@@ -124,6 +130,7 @@ export function createWeaponClient(deps: ClientDependencies) {
     updateWeapon,
     deleteWeapon,
     deleteWeaponImage,
+    duplicateWeapon,
     addWeapon,
     uploadWeapons,
     removeWeapon,

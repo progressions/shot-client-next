@@ -95,6 +95,10 @@ export function createPartyClient(deps: ClientDependencies) {
     return delete_(`${apiV2.parties(party)}/image`)
   }
 
+  async function duplicateParty(party: Party): Promise<AxiosResponse<Party>> {
+    return post(`${apiV2.parties(party)}/duplicate`)
+  }
+
   async function addPartyToFight(
     party: Party | string,
     fight: Fight | string
@@ -113,6 +117,7 @@ export function createPartyClient(deps: ClientDependencies) {
     createParty,
     updateParty,
     deletePartyImage,
+    duplicateParty,
     addPartyToFight,
   }
 }

@@ -58,6 +58,12 @@ export function createFactionClient(deps: ClientDependencies) {
     return delete_(apiV2.factions(faction))
   }
 
+  async function duplicateFaction(
+    faction: Faction
+  ): Promise<AxiosResponse<Faction>> {
+    return post(`${apiV2.factions(faction)}/duplicate`)
+  }
+
   return {
     getFaction,
     getFactions,
@@ -65,5 +71,6 @@ export function createFactionClient(deps: ClientDependencies) {
     updateFaction,
     deleteFactionImage,
     deleteFaction,
+    duplicateFaction,
   }
 }

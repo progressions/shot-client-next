@@ -13,8 +13,8 @@ import {
   EditableRichText,
   SectionHeader,
   HeroImage,
-  SpeedDialMenu,
 } from "@/components/ui"
+import { PartySpeedDial } from "@/components/parties"
 import { EntityActiveToggle } from "@/components/common"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
@@ -80,7 +80,7 @@ export default function Show({ party: initialParty }: ShowProperties) {
         position: "relative",
       }}
     >
-      <SpeedDialMenu onDelete={deleteEntity} />
+      <PartySpeedDial party={party} onDelete={deleteEntity} />
       <HeroImage entity={party} setEntity={setParty} />
       <Alert status={status} />
       <FormControl fullWidth margin="normal" error={!!errors.name}>
