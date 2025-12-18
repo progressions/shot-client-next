@@ -51,6 +51,9 @@ export default function PrerequisiteSchtickAutocomplete({
       console.error("Error in useEffect fetchSchticks:", error)
     })
   }, [client, category, path])
+  // Note: exclude is intentionally omitted from deps - it's only used for filtering
+  // in fetchOptions, not for the API call. The filter uses the current exclude value
+  // from the closure when fetchOptions is called by the Autocomplete.
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
     return schticks
@@ -74,7 +77,6 @@ export default function PrerequisiteSchtickAutocomplete({
       value={value}
       fetchOptions={fetchOptions}
       onChange={handleChange}
-      exclude={exclude}
       allowNone={true}
       sx={{
         "& .MuiInputBase-root": {
