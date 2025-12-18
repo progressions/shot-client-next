@@ -26,6 +26,7 @@ type ManagerProperties = {
   onListUpdate: (entity: Entity) => Promise<void>
   excludeIds?: string[]
   manage?: boolean
+  allowDuplicates?: boolean
 }
 
 export function Manager({
@@ -37,6 +38,7 @@ export function Manager({
   onListUpdate,
   excludeIds = [],
   manage = true,
+  allowDuplicates = false,
 }: ManagerProperties) {
   const [open, setOpen] = useState(false)
 
@@ -72,6 +74,7 @@ export function Manager({
         onListUpdate={onListUpdate}
         excludeIds={excludeIds}
         manage={manage}
+        allowDuplicates={allowDuplicates}
       />
     </Box>
   )

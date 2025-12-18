@@ -38,7 +38,7 @@ interface FilterAccordionProps {
     }
   }
   omit?: string[]
-  excludeIds?: number[]
+  excludeIds?: string[]
 
   // Common props
   title?: string
