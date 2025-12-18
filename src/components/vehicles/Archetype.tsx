@@ -22,7 +22,7 @@ export default function EditArchetype({
 
   const fetchRecords = async () => {
     const response = await client.getVehicleArchetypes()
-    setArchetypes(response.data)
+    setArchetypes(response.data.archetypes || [])
   }
 
   useEffect(() => {

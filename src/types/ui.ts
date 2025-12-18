@@ -92,6 +92,15 @@ export type WeaponCategory = string
 export type SchtickCategory = string
 export type SchtickPath = string
 
+export interface VehicleArchetype {
+  name: string
+  Acceleration: number
+  Handling: number
+  Squeal: number
+  Frame: number
+  Crunch: number
+}
+
 /**
  * Invitation System Types
  */
