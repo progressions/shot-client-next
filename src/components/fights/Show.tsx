@@ -299,7 +299,7 @@ export default function Show({ fight: initialFight }: ShowProperties) {
             </>
           }
           onListUpdate={updateEntity}
-          excludeIds={fight.vehicle_ids || []}
+          allowDuplicates={true}
         />
       </Stack>
       {(user?.admin || (campaign && user?.id === campaign.gamemaster_id)) && (
