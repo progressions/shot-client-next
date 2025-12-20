@@ -161,14 +161,24 @@ export function RegistrationForm({
 
         <Paper
           onClick={() => setRole("gamemaster")}
+          onKeyDown={e => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault()
+              setRole("gamemaster")
+            }
+          }}
+          tabIndex={0}
+          role="button"
+          aria-label="Select Gamemaster role - create and run campaigns for players"
           sx={theme => ({
             p: 3,
             cursor: "pointer",
             border: `1px solid ${theme.palette.divider}`,
             transition: "all 0.2s ease",
-            "&:hover": {
+            "&:hover, &:focus": {
               borderColor: theme.palette.primary.main,
               backgroundColor: theme.palette.action.hover,
+              outline: "none",
             },
           })}
         >
@@ -183,14 +193,24 @@ export function RegistrationForm({
 
         <Paper
           onClick={() => setRole("player")}
+          onKeyDown={e => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault()
+              setRole("player")
+            }
+          }}
+          tabIndex={0}
+          role="button"
+          aria-label="Select Player role - join someone else's game"
           sx={theme => ({
             p: 3,
             cursor: "pointer",
             border: `1px solid ${theme.palette.divider}`,
             transition: "all 0.2s ease",
-            "&:hover": {
+            "&:hover, &:focus": {
               borderColor: theme.palette.primary.main,
               backgroundColor: theme.palette.action.hover,
+              outline: "none",
             },
           })}
         >
@@ -211,6 +231,7 @@ export function RegistrationForm({
       <Stack spacing={2}>
         {/* Back button to change role */}
         <Button
+          type="button"
           startIcon={<ArrowBack />}
           onClick={() => setRole(null)}
           variant="text"
