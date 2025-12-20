@@ -1,7 +1,7 @@
 import { AxiosResponse } from "axios"
 import { createCampaignClient } from "../campaignClient"
 import { createBaseClient } from "../baseClient"
-import type { Campaign } from "@/types"
+import type { Campaign, Invitation } from "@/types"
 
 // Mock the baseClient
 jest.mock("../baseClient")
@@ -20,6 +20,15 @@ describe("createCampaignClient", () => {
     resetGrokCredits: jest.fn(
       (campaign: { id: string }) =>
         `/api/v2/campaigns/${campaign.id}/reset_grok_credits`
+    ),
+    invitations: jest.fn((invitation?: { id: string }) =>
+      invitation
+        ? `/api/v2/invitations/${invitation.id}`
+        : "/api/v2/invitations"
+    ),
+    invitationResend: jest.fn(
+      (invitation: { id: string }) =>
+        `/api/v2/invitations/${invitation.id}/resend`
     ),
   }
 
@@ -175,6 +184,160 @@ describe("createCampaignClient", () => {
       await expect(
         campaignClient.resetGrokCredits("campaign-123")
       ).rejects.toThrow("Network Error")
+    })
+  })
+
+  describe("getInvitations", () => {
+    const mockInvitation: Invitation = {
+      id: "invitation-123",
+      email: "test@example.com",
+      campaign_id: "campaign-123",
+      user_id: "user-456",
+      redeemed: false,
+      redeemed_at: null,
+      created_at: "2024-01-01T00:00:00Z",
+      updated_at: "2024-01-01T00:00:00Z",
+    }
+
+    const mockInvitationsResponse: AxiosResponse<{
+      invitations: Invitation[]
+    }> = {
+      data: { invitations: [mockInvitation] },
+      status: 200,
+      statusText: "OK",
+      headers: {},
+      config: {} as AxiosResponse["config"],
+    }
+
+    beforeEach(() => {
+      mockGet.mockResolvedValue(mockInvitationsResponse)
+    })
+
+    it("calls the correct API endpoint", async () => {
+      await campaignClient.getInvitations()
+
+      expect(mockApiV2.invitations).toHaveBeenCalledWith()
+      expect(mockGet).toHaveBeenCalledWith("/api/v2/invitations", {}, {})
+    })
+
+    it("returns list of invitations", async () => {
+      const result = await campaignClient.getInvitations()
+
+      expect(result.data.invitations).toHaveLength(1)
+      expect(result.data.invitations[0].id).toBe("invitation-123")
+      expect(result.data.invitations[0].email).toBe("test@example.com")
+    })
+
+    it("propagates error on failure", async () => {
+      const error = new Error("Unauthorized")
+      mockGet.mockRejectedValue(error)
+
+      await expect(campaignClient.getInvitations()).rejects.toThrow(
+        "Unauthorized"
+      )
+    })
+  })
+
+  describe("createInvitation", () => {
+    const mockInvitation: Invitation = {
+      id: "invitation-456",
+      email: "newplayer@example.com",
+      campaign_id: "campaign-123",
+      user_id: "user-456",
+      redeemed: false,
+      redeemed_at: null,
+      created_at: "2024-01-01T00:00:00Z",
+      updated_at: "2024-01-01T00:00:00Z",
+    }
+
+    const mockCreateResponse: AxiosResponse<Invitation> = {
+      data: mockInvitation,
+      status: 201,
+      statusText: "Created",
+      headers: {},
+      config: {} as AxiosResponse["config"],
+    }
+
+    beforeEach(() => {
+      mockPost.mockResolvedValue(mockCreateResponse)
+    })
+
+    it("calls the correct API endpoint with email payload", async () => {
+      await campaignClient.createInvitation("newplayer@example.com")
+
+      expect(mockApiV2.invitations).toHaveBeenCalledWith()
+      expect(mockPost).toHaveBeenCalledWith("/api/v2/invitations", {
+        invitation: { email: "newplayer@example.com" },
+      })
+    })
+
+    it("returns created invitation", async () => {
+      const result = await campaignClient.createInvitation(
+        "newplayer@example.com"
+      )
+
+      expect(result.data.id).toBe("invitation-456")
+      expect(result.data.email).toBe("newplayer@example.com")
+      expect(result.data.redeemed).toBe(false)
+    })
+
+    it("propagates error on failure", async () => {
+      const error = new Error("Invalid email")
+      mockPost.mockRejectedValue(error)
+
+      await expect(
+        campaignClient.createInvitation("invalid-email")
+      ).rejects.toThrow("Invalid email")
+    })
+  })
+
+  describe("resendInvitation", () => {
+    const mockInvitation: Invitation = {
+      id: "invitation-789",
+      email: "pending@example.com",
+      campaign_id: "campaign-123",
+      user_id: "user-456",
+      redeemed: false,
+      redeemed_at: null,
+      created_at: "2024-01-01T00:00:00Z",
+      updated_at: "2024-01-01T00:00:00Z",
+    }
+
+    const mockResendResponse: AxiosResponse<Invitation> = {
+      data: mockInvitation,
+      status: 200,
+      statusText: "OK",
+      headers: {},
+      config: {} as AxiosResponse["config"],
+    }
+
+    beforeEach(() => {
+      mockPost.mockResolvedValue(mockResendResponse)
+    })
+
+    it("calls the correct API endpoint with invitation", async () => {
+      await campaignClient.resendInvitation(mockInvitation)
+
+      expect(mockApiV2.invitationResend).toHaveBeenCalledWith(mockInvitation)
+      expect(mockPost).toHaveBeenCalledWith(
+        "/api/v2/invitations/invitation-789/resend"
+      )
+    })
+
+    it("returns invitation after resend", async () => {
+      const result = await campaignClient.resendInvitation(mockInvitation)
+
+      expect(result.data.id).toBe("invitation-789")
+      expect(result.data.email).toBe("pending@example.com")
+    })
+
+    it("propagates error when invitation not found", async () => {
+      const error = new Error("Invitation not found")
+      mockPost.mockRejectedValue(error)
+
+      await expect(
+        campaignClient.resendInvitation(mockInvitation)
+      ).rejects.toThrow("Invitation not found")
     })
   })
 })
