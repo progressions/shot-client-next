@@ -1,13 +1,23 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Box, Stack, Alert, InputAdornment, IconButton } from "@mui/material"
-import { Visibility, VisibilityOff } from "@mui/icons-material"
+import {
+  Box,
+  Stack,
+  Alert,
+  InputAdornment,
+  IconButton,
+  Typography,
+  Paper,
+} from "@mui/material"
+import { Visibility, VisibilityOff, ArrowBack } from "@mui/icons-material"
 import { Button, TextField } from "@/components/ui"
 import { useClient } from "@/contexts"
 import { usePasswordValidation } from "@/hooks"
 import { PasswordStrengthIndicator } from "./PasswordStrengthIndicator"
 import type { RegistrationData } from "@/types/auth"
+
+type UserRole = "gamemaster" | "player" | null
 
 interface RegistrationFormProps {
   onSuccess: () => void
@@ -18,6 +28,7 @@ export function RegistrationForm({
   onSuccess,
   onError,
 }: RegistrationFormProps) {
+  const [role, setRole] = useState<UserRole>(null)
   const [formData, setFormData] = useState<RegistrationData>({
     email: "",
     password: "",
@@ -97,7 +108,10 @@ export function RegistrationForm({
     setGeneralError(null)
 
     try {
-      await client.registerUser(formData)
+      await client.registerUser({
+        ...formData,
+        gamemaster: role === "gamemaster",
+      })
       onSuccess()
     } catch (error: unknown) {
       console.error("Registration error:", error)
@@ -137,9 +151,96 @@ export function RegistrationForm({
     return errors[field]?.length > 0
   }
 
+  // Role selection screen
+  if (role === null) {
+    return (
+      <Stack spacing={3}>
+        <Typography variant="h6" textAlign="center" sx={{ mb: 1 }}>
+          How will you be using Chi War?
+        </Typography>
+
+        <Paper
+          onClick={() => setRole("gamemaster")}
+          onKeyDown={e => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault()
+              setRole("gamemaster")
+            }
+          }}
+          tabIndex={0}
+          role="button"
+          aria-label="Select Gamemaster role - create and run campaigns for players"
+          sx={theme => ({
+            p: 3,
+            cursor: "pointer",
+            border: `1px solid ${theme.palette.divider}`,
+            transition: "all 0.2s ease",
+            "&:hover, &:focus": {
+              borderColor: theme.palette.primary.main,
+              backgroundColor: theme.palette.action.hover,
+              outline: "none",
+            },
+          })}
+        >
+          <Typography variant="h6" sx={{ mb: 0.5 }}>
+            I&apos;m a Gamemaster
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            I&apos;ll create and run campaigns, manage characters, and run games
+            for my players.
+          </Typography>
+        </Paper>
+
+        <Paper
+          onClick={() => setRole("player")}
+          onKeyDown={e => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault()
+              setRole("player")
+            }
+          }}
+          tabIndex={0}
+          role="button"
+          aria-label="Select Player role - join someone else's game"
+          sx={theme => ({
+            p: 3,
+            cursor: "pointer",
+            border: `1px solid ${theme.palette.divider}`,
+            transition: "all 0.2s ease",
+            "&:hover, &:focus": {
+              borderColor: theme.palette.primary.main,
+              backgroundColor: theme.palette.action.hover,
+              outline: "none",
+            },
+          })}
+        >
+          <Typography variant="h6" sx={{ mb: 0.5 }}>
+            I&apos;m a Player
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            I&apos;ve been invited to join someone else&apos;s game.
+          </Typography>
+        </Paper>
+      </Stack>
+    )
+  }
+
+  // Registration form (after role selected)
   return (
     <Box component="form" onSubmit={handleSubmit}>
       <Stack spacing={2}>
+        {/* Back button to change role */}
+        <Button
+          type="button"
+          startIcon={<ArrowBack />}
+          onClick={() => setRole(null)}
+          variant="text"
+          size="small"
+          sx={{ alignSelf: "flex-start", mb: 1 }}
+        >
+          Change role ({role === "gamemaster" ? "Gamemaster" : "Player"})
+        </Button>
+
         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
           <TextField
             fullWidth
