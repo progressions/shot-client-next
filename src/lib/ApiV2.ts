@@ -198,6 +198,10 @@ class ApiV2 {
     return `${this.invitations(invitation)}/register`
   }
 
+  invitationResend(invitation: Invitation | ID): string {
+    return `${this.invitations(invitation)}/resend`
+  }
+
   advancements(character: Character | ID, advancementId?: string): string {
     const characterUrl = this.characters(character)
     if (advancementId) {

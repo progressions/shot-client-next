@@ -67,7 +67,7 @@ function normalizeRequiredCampaignResponse(
 }
 
 export function createCampaignClient(deps: ClientDependencies) {
-  const { api, apiV2, queryParams } = deps
+  const { apiV2, queryParams } = deps
   const {
     get,
     getPublic,
@@ -105,26 +105,31 @@ export function createCampaignClient(deps: ClientDependencies) {
     return getPublic(apiV2.invitations({ id } as Invitation), {}, cacheOptions)
   }
 
+  async function getInvitations(
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<{ invitations: Invitation[] }>> {
+    return get(apiV2.invitations(), {}, cacheOptions)
+  }
+
   async function createInvitation(
-    invitation: Invitation,
-    campaign: Campaign
+    email: string
   ): Promise<AxiosResponse<Invitation>> {
-    return post(api.invitations(), {
-      invitation: { ...invitation, campaign_id: campaign.id },
+    return post(apiV2.invitations(), {
+      invitation: { email },
     })
   }
 
   async function deleteInvitation(
     invitation: Invitation
   ): Promise<AxiosResponse<void>> {
-    return delete_(api.invitations(invitation))
+    return delete_(apiV2.invitations(invitation))
   }
 
   async function redeemInvitation(
     invitation: Invitation,
     user: User | string
   ): Promise<AxiosResponse<User>> {
-    return patch(`${api.invitations(invitation)}/redeem`, { user: user })
+    return patch(apiV2.invitationRedeem(invitation), { user: user })
   }
 
   async function registerInvitation(
@@ -141,8 +146,8 @@ export function createCampaignClient(deps: ClientDependencies) {
 
   async function resendInvitation(
     invitation: Invitation
-  ): Promise<AxiosResponse<void>> {
-    return post(`${api.invitations(invitation)}/resend`)
+  ): Promise<AxiosResponse<Invitation>> {
+    return post(apiV2.invitationResend(invitation))
   }
 
   async function createCampaign(
@@ -259,6 +264,7 @@ export function createCampaignClient(deps: ClientDependencies) {
     addPlayer,
     removePlayer,
     getInvitation,
+    getInvitations,
     createInvitation,
     deleteInvitation,
     redeemInvitation,

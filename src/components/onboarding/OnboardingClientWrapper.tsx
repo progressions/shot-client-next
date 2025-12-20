@@ -13,7 +13,14 @@ export const OnboardingClientWrapper: React.FC = () => {
   // Use [^/]+ to match both numeric IDs and UUIDs
   const isPlayerView = /^\/encounters\/[^/]+\/play\/[^/]+$/.test(pathname)
 
-  if (loading || !user || !user.onboarding_progress || isPlayerView) {
+  // Only show onboarding for gamemasters - players don't need to set up campaigns
+  if (
+    loading ||
+    !user ||
+    !user.gamemaster ||
+    !user.onboarding_progress ||
+    isPlayerView
+  ) {
     return null
   }
 
