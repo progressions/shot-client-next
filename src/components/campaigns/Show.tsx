@@ -29,6 +29,7 @@ import {
   BatchImageGenerationButton,
   GrokCreditAlert,
 } from "@/components/campaigns"
+import { CampaignInvitations } from "@/components/invitations"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -165,6 +166,8 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
           onListUpdate={updateEntity}
         />
       </Stack>
+
+      {hasAdminPermission && <CampaignInvitations />}
 
       {hasAdminPermission && (
         <>

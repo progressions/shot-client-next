@@ -110,9 +110,13 @@ export interface Invitation {
   email?: string
   campaign_id?: string
   campaign?: import("./resources").Campaign
-  maximum_count: number
-  remaining_count: number
-  pending_user: User
+  user?: User
+  pending_user?: User
+  redeemed?: boolean
+  redeemed_at?: string
+  created_at?: string
+  updated_at?: string
+  entity_class?: string
 }
 
 /**
