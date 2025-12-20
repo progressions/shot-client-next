@@ -4,6 +4,7 @@ export interface RegistrationData {
   password_confirmation: string
   first_name: string
   last_name: string
+  gamemaster?: boolean
 }
 
 export interface RegistrationResponse {
