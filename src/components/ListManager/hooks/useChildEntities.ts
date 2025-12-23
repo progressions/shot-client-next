@@ -124,9 +124,23 @@ export function useChildEntities(
             entity,
           ])
         )
+        const missingIds: (string | number)[] = []
         const orderedEntities = childIds
-          .map(id => entityMap.get(id))
+          .map(id => {
+            const entity = entityMap.get(id)
+            if (!entity) {
+              missingIds.push(id)
+            }
+            return entity
+          })
           .filter(Boolean)
+
+        if (missingIds.length > 0) {
+          console.warn(`Missing ${childEntityName} entities for some IDs`, {
+            requestedIds: childIds,
+            missingIds,
+          })
+        }
 
         setChildEntities(orderedEntities)
       } catch (error) {

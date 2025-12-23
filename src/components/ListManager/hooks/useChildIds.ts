@@ -43,13 +43,13 @@ export function useChildIds(
     if (childEntityName === "Character" && Array.isArray(shots)) {
       const idsFromShots = shots
         .map(shot => shot.character_id)
-        .filter(Boolean) as string[]
+        .filter((id): id is string => typeof id === "string")
       if (idsFromShots.length > 0) return idsFromShots
     }
     if (childEntityName === "Vehicle" && Array.isArray(shots)) {
       const idsFromShots = shots
         .map(shot => shot.vehicle_id)
-        .filter(Boolean) as string[]
+        .filter((id): id is string => typeof id === "string")
       if (idsFromShots.length > 0) return idsFromShots
     }
 
