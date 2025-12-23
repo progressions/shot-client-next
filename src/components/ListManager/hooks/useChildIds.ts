@@ -38,21 +38,22 @@ export function useChildIds(
   const directIds = parentEntity[childIdsKey] as string[]
 
   const childIds = useMemo(() => {
+    // For Characters and Vehicles, preserve duplicates from shots
+    // (same entity can have multiple shots in a fight)
     if (childEntityName === "Character" && Array.isArray(shots)) {
       const idsFromShots = shots
         .map(shot => shot.character_id)
-        .filter(Boolean)
-        .filter((id, index, self) => self.indexOf(id) === index)
+        .filter(Boolean) as string[]
       if (idsFromShots.length > 0) return idsFromShots
     }
     if (childEntityName === "Vehicle" && Array.isArray(shots)) {
       const idsFromShots = shots
         .map(shot => shot.vehicle_id)
-        .filter(Boolean)
-        .filter((id, index, self) => self.indexOf(id) === index)
+        .filter(Boolean) as string[]
       if (idsFromShots.length > 0) return idsFromShots
     }
 
+    // Use direct IDs from parent entity (preserves duplicates)
     if (Array.isArray(directIds) && directIds.length > 0) {
       return directIds
     }
