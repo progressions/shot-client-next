@@ -311,6 +311,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
             parsedUser.id === expectedUserId
           ) {
             dispatch({ type: UserActions.USER, payload: parsedUser })
+            // Use cached campaign for immediate display while we fetch fresh data
             const cachedCampaign = localStorage.getItem(
               `currentCampaign-${parsedUser.id}`
             )
@@ -322,15 +323,11 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
                 normalizedCampaign.id &&
                 normalizedCampaign.id !== defaultCampaign.id
               ) {
+                // Set cached data immediately for fast initial render
                 setCampaign(normalizedCampaign)
-                localStorage.setItem(
-                  `currentCampaign-${parsedUser.id}`,
-                  JSON.stringify(normalizedCampaign)
-                )
-                setLoading(false)
-                return
               }
             }
+            // Continue to fetch fresh data from API
           } else if (
             parsedUser &&
             expectedUserId &&
@@ -374,6 +371,7 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
         dispatch({ type: UserActions.USER, payload: userData })
         localStorage.setItem(`currentUser-${jwt}`, JSON.stringify(userData))
 
+        // Use cached campaign for immediate display while we fetch fresh data
         const cachedCampaign = localStorage.getItem(
           `currentCampaign-${userData.id}`
         )
@@ -385,16 +383,12 @@ export function AppProvider({ children, initialUser }: AppProviderProperties) {
             normalizedCampaign.id &&
             normalizedCampaign.id !== defaultCampaign.id
           ) {
+            // Set cached data immediately for fast initial render
             setCampaign(normalizedCampaign)
-            localStorage.setItem(
-              `currentCampaign-${userData.id}`,
-              JSON.stringify(normalizedCampaign)
-            )
-            setLoading(false)
-            return
           }
         }
 
+        // Always fetch fresh campaign data from API to ensure we have latest fields
         const campaignResponse = await client.getCurrentCampaign()
         const { data: campaignData } = campaignResponse || {}
         if (!campaignData) {
