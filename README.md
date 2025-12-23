@@ -1,7 +1,3 @@
-Here’s how you can develop a README for the `@progressions/shot-client-next` codebase based on your prompt and the existing structure:
-
----
-
 # Shot Client Next
 
 A frontend codebase for an RPG game manager focused on the roleplaying game Feng Shui 2. This project connects to [`@progressions/shot-server`](https://github.com/progressions/shot-server) to provide a complete experience for managing player sheets, tracking scenes, and facilitating gameplay.
