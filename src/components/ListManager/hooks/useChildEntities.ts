@@ -107,14 +107,42 @@ export function useChildEntities(
           return
         }
 
+        // Fetch unique entities from API
+        const uniqueIds = [...new Set(childIds)]
         const response = await getFunc({
           sort: "name",
           order: "asc",
-          ids: childIds,
+          ids: uniqueIds,
           per_page: 200,
         })
 
-        setChildEntities(response.data[collection] || [])
+        // Map fetched entities back to childIds order, preserving duplicates
+        const fetchedEntities = response.data[collection] || []
+        const entityMap = new Map(
+          fetchedEntities.map((entity: { id: string | number }) => [
+            entity.id,
+            entity,
+          ])
+        )
+        const missingIds: (string | number)[] = []
+        const orderedEntities = childIds
+          .map(id => {
+            const entity = entityMap.get(id)
+            if (!entity) {
+              missingIds.push(id)
+            }
+            return entity
+          })
+          .filter(Boolean)
+
+        if (missingIds.length > 0) {
+          console.warn(`Missing ${childEntityName} entities for some IDs`, {
+            requestedIds: childIds,
+            missingIds,
+          })
+        }
+
+        setChildEntities(orderedEntities)
       } catch (error) {
         console.error(`Fetch ${childEntityName} error:`, error)
       }
