@@ -17,15 +17,21 @@ export function proxy(request: NextRequest) {
 
   // Skip redirect for public routes
   if (
-    ["/", "/login", "/register", "/confirm", "/forgot-password"].includes(
-      pathname
-    ) ||
+    [
+      "/",
+      "/login",
+      "/register",
+      "/confirm",
+      "/forgot-password",
+      "/favicon.ico",
+    ].includes(pathname) ||
     pathname.startsWith("/redeem/") ||
     pathname.startsWith("/invitations/register/") ||
     pathname.startsWith("/reset-password/") ||
     pathname.startsWith("/magic-link/") ||
     pathname.startsWith("/_next") ||
-    pathname.startsWith("/static")
+    pathname.startsWith("/static") ||
+    pathname.startsWith("/images/")
   ) {
     return NextResponse.next({
       request: {
