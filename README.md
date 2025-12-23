@@ -84,7 +84,3 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 ## Deployment
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app). See [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
----
-
-You can further customize the README to include setup instructions for connecting to the server, contribution guidelines, and specific details about Feng Shui 2 integrations as needed.
