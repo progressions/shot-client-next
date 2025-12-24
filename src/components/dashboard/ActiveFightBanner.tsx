@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect, useCallback, useMemo } from "react"
+import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import Link from "next/link"
 import {
   Paper,
@@ -32,6 +32,7 @@ export default function ActiveFightBanner({
   const [currentFight, setCurrentFight] = useState<Fight | null>(null)
   const [loading, setLoading] = useState(true)
   const [participantCount, setParticipantCount] = useState(0)
+  const hasInitiallyLoaded = useRef(false)
   // Find all user's characters in the fight
   const userCharacters = useMemo(() => {
     if (!currentFight?.characters || !userId) return []
@@ -46,7 +47,10 @@ export default function ActiveFightBanner({
     }
 
     try {
-      setLoading(true)
+      // Only show loading skeleton on initial load, not refreshes
+      if (!hasInitiallyLoaded.current) {
+        setLoading(true)
+      }
       const response = await client.getCurrentFight(campaignId)
 
       if (response.status === 204 || !response.data) {
@@ -79,6 +83,7 @@ export default function ActiveFightBanner({
       }
     } finally {
       setLoading(false)
+      hasInitiallyLoaded.current = true
     }
   }, [campaignId, client])
 
