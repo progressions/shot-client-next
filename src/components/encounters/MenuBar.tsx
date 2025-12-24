@@ -99,18 +99,12 @@ export default function MenuBar({
       // Build shots array for batch update
       const shots = updatedCharacters
         .map(char => {
-          // Find the shot_id for this character
-          const shot = encounter.shots
-            .flatMap(s => s.characters || [])
-            .find(c => c.id === char.id)
-
-          if (shot && shot.shot_id) {
-            return {
-              id: shot.shot_id,
-              shot: char.current_shot,
-            }
+          // Use shot_id directly so duplicate character entries stay distinct.
+          if (!char.shot_id) return null
+          return {
+            id: char.shot_id,
+            shot: char.current_shot,
           }
-          return null
         })
         .filter(Boolean)
 
