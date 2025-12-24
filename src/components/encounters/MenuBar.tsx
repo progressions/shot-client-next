@@ -97,16 +97,13 @@ export default function MenuBar({
   ) => {
     try {
       // Build shots array for batch update
+      // Use shot_id directly from the character - it uniquely identifies each entry
+      // even when the same character appears multiple times in the fight
       const shots = updatedCharacters
         .map(char => {
-          // Find the shot_id for this character
-          const shot = encounter.shots
-            .flatMap(s => s.characters || [])
-            .find(c => c.id === char.id)
-
-          if (shot && shot.shot_id) {
+          if (char.shot_id) {
             return {
-              id: shot.shot_id,
+              id: char.shot_id,
               shot: char.current_shot,
             }
           }
