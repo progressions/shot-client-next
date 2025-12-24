@@ -598,11 +598,14 @@ export default function CharacterEditDialog({
               <Tooltip title="Full Heal">
                 <IconButton
                   onClick={() => {
-                    setWounds(0)
-                    setImpairments(0)
-                    setMarksOfDeath(0)
-                    setFortune(CS.maxFortune(character))
-                    setStatuses(statuses.filter(s => s !== "up_check_required"))
+                    const healed = CS.fullHeal(character)
+                    setWounds(CS.wounds(healed))
+                    setImpairments(healed.impairments || 0)
+                    if (isPC()) {
+                      setMarksOfDeath(CS.marksOfDeath(healed))
+                      setFortune(CS.fortune(healed))
+                    }
+                    setStatuses(healed.status || [])
                   }}
                   disabled={loading}
                   color="success"
