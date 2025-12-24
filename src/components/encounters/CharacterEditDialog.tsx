@@ -340,11 +340,11 @@ export default function CharacterEditDialog({
         }
 
         // Add driving_id to shot update (use vehicle's shot_id, not vehicle id)
-      if (drivingVehicleShotId) {
-        shotUpdate.driving_id = drivingVehicleShotId
-      } else {
-        shotUpdate.driving_id = null
-      }
+        if (drivingVehicleShotId) {
+          shotUpdate.driving_id = drivingVehicleShotId
+        } else {
+          shotUpdate.driving_id = null
+        }
 
         // Update shot
         await client.updateCharacterShot(encounter, character, shotUpdate)
