@@ -97,7 +97,6 @@ export default function InitiativeDialog({
   )
 
   // Handle manual initiative entry
-  // Use shot_id to identify characters since the same character can appear multiple times
   const handleInitiativeChange = (
     character: Character | Vehicle,
     value: string
@@ -105,7 +104,7 @@ export default function InitiativeDialog({
     const numValue = value === "" ? null : parseInt(value, 10)
     setCharacterInitiatives(prev =>
       prev.map(ci =>
-        ci.character.shot_id === character.shot_id
+        ci.character.id === character.id
           ? { ...ci, initiative: numValue, rolled: false }
           : ci
       )
@@ -113,7 +112,6 @@ export default function InitiativeDialog({
   }
 
   // Roll initiative for a single character
-  // Use shot_id to identify characters since the same character can appear multiple times
   const rollInitiativeForCharacter = (character: Character | Vehicle) => {
     const dieResult = Dice.rollDie()
     const speed = getSpeedValue(character)
@@ -121,7 +119,7 @@ export default function InitiativeDialog({
 
     setCharacterInitiatives(prev =>
       prev.map(ci =>
-        ci.character.shot_id === character.shot_id
+        ci.character.id === character.id
           ? { ...ci, initiative, rolled: true }
           : ci
       )
@@ -199,7 +197,7 @@ export default function InitiativeDialog({
 
     return (
       <Box
-        key={ci.character.shot_id}
+        key={ci.character.id}
         sx={{
           display: "flex",
           alignItems: "center",
