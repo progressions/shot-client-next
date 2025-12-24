@@ -27,6 +27,7 @@ import {
   EditArchetype,
   EditJuncture,
   EditWealth,
+  EditColor,
   SkillsManager,
   AdvancementsManager,
   IsTemplateToggle,
@@ -187,6 +188,10 @@ export default function Show({
           updateCharacter={updateCharacter}
         />
         <EditWealth
+          character={memoizedCharacter}
+          updateCharacter={updateCharacter}
+        />
+        <EditColor
           character={memoizedCharacter}
           updateCharacter={updateCharacter}
         />

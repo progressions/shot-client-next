@@ -205,8 +205,8 @@ export default function CharacterSelector({
                     "&:hover": {
                       backgroundColor: "action.hover",
                     },
-                    pl: { xs: 0.5, sm: 1 },
                     transition: "all 0.2s",
+                    p: 4.5,
                   }}
                 >
                   <Box
@@ -221,17 +221,28 @@ export default function CharacterSelector({
                       },
                     }}
                   >
-                    <Avatar
-                      entity={entity}
-                      href={`/characters/${entity.id}`}
-                      disablePopup={isMobile}
-                      disableImageViewer={true}
+                    <Box
                       sx={{
-                        width: { xs: 48, sm: 64 },
-                        height: { xs: 48, sm: 64 },
-                        ml: { xs: 0.25, sm: 0.5 },
+                        borderRadius: "50%",
+                        padding: entity.color ? "3px" : 0,
+                        background: entity.color || "transparent",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
-                    />
+                    >
+                      <Avatar
+                        entity={entity}
+                        href={`/characters/${entity.id}`}
+                        disablePopup={isMobile}
+                        disableImageViewer={true}
+                        sx={{
+                          width: { xs: 48, sm: 64 },
+                          height: { xs: 48, sm: 64 },
+                          ml: { xs: 0.25, sm: 0.5 },
+                        }}
+                      />
+                    </Box>
                   </Box>
                 </Box>
               )

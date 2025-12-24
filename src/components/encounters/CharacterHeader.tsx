@@ -28,7 +28,18 @@ export default function CharacterHeader({
       sx={{ width: "100%" }}
     >
       <Box sx={{ display: { xs: "none", sm: "block" } }}>
-        <EntityAvatar entity={character} />
+        <Box
+          sx={{
+            borderRadius: "50%",
+            padding: character.color ? "3px" : 0,
+            background: character.color || "transparent",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <EntityAvatar entity={character} />
+        </Box>
       </Box>
       <Stack
         direction="column"
