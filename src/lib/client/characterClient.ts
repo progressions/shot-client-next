@@ -373,6 +373,7 @@ export function createCharacterClient(deps: ClientDependencies) {
       impairments?: number
       count?: number
       driving_id?: string | null
+      color?: string | null
     }
   ): Promise<AxiosResponse<void>> {
     // Use V2 API for shot updates
@@ -382,6 +383,7 @@ export function createCharacterClient(deps: ClientDependencies) {
         impairments: updates.impairments,
         count: updates.count,
         driving_id: updates.driving_id,
+        color: updates.color,
       },
     })
   }
