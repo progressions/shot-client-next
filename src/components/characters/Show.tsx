@@ -58,6 +58,7 @@ export default function Show({
   }, [character.name])
 
   // Subscribe to character updates
+  // This also handles image updates from ImageCopyWorker after character duplication
   useEffect(() => {
     const unsubscribe = subscribeToEntity("character", data => {
       if (data && data.id === initialCharacter.id) {
