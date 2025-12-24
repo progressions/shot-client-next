@@ -19,7 +19,7 @@ import {
   Autocomplete,
   TextField as MuiTextField,
 } from "@mui/material"
-import { NumberField, TextField } from "@/components/ui"
+import { NumberField, TextField, ColorPickerField } from "@/components/ui"
 import { useClient, useToast, useEncounter } from "@/contexts"
 import { CS } from "@/services"
 import { FormActions } from "@/reducers"
@@ -49,6 +49,7 @@ export default function CharacterEditDialog({
   const [fortune, setFortune] = useState<number>(0)
   const [drivingVehicleShotId, setDrivingVehicleShotId] = useState<string>("")
   const [statuses, setStatuses] = useState<string[]>(character.status || [])
+  const [color, setColor] = useState<string | null>(character.color || null)
   const [loading, setLoading] = useState(false)
 
   // Helper to check if character is PC
@@ -180,6 +181,9 @@ export default function CharacterEditDialog({
 
       // Set statuses
       setStatuses(character.status || [])
+
+      // Set color (from shot override or character default)
+      setColor(character.color || null)
 
       // Debug logging
       console.log("Character driving info:", {
@@ -320,11 +324,13 @@ export default function CharacterEditDialog({
           impairments?: number
           count?: number
           driving_id?: string | null
+          color?: string | null
         }
 
         const shotUpdate: ShotUpdate = {
           shot_id: character.shot_id,
           current_shot: currentShot,
+          color: color,
         }
 
         // For non-PCs (except Mooks), impairments and count go on the shot
@@ -657,6 +663,23 @@ export default function CharacterEditDialog({
               })}
             </Select>
           </FormControl>
+
+          {/* Ring Color field */}
+          <Box>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: "block", mb: 1 }}
+            >
+              Ring Color
+            </Typography>
+            <ColorPickerField
+              label=""
+              value={color}
+              onChange={setColor}
+              disabled={loading}
+            />
+          </Box>
 
           {/* Status field */}
           <Box>
