@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "motion/react"
-import type { Character } from "@/types"
+import type { Character, Vehicle } from "@/types"
 import {
   ListItemIcon,
   ListItemText,
@@ -46,28 +46,66 @@ import CharacterEffectsDisplay from "./effects/CharacterEffectsDisplay"
 import { VehicleLink } from "@/components/ui/links"
 import Link from "next/link"
 import { encounterTransition } from "@/contexts/EncounterContext"
-import { useEncounter, useClient, useToast } from "@/contexts"
+import { useEncounter, useClient, useToast, useApp } from "@/contexts"
 import { VS } from "@/services"
 
 type CharacterDetailProps = {
   character: Character
 }
 
-export default function CharacterDetail({ character }: CharacterDetailProps) {
+export default function CharacterDetail({
+  character: initialCharacter,
+}: CharacterDetailProps) {
   const { encounter } = useEncounter()
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
+  const { subscribeToEntity } = useApp()
+
+  // Local state for real-time updates
+  const [character, setCharacter] = useState(initialCharacter)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [locationDialogOpen, setLocationDialogOpen] = useState(false)
-  const [newLocation, setNewLocation] = useState(character.location || "")
+  const [newLocation, setNewLocation] = useState(
+    initialCharacter.location || ""
+  )
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [vehicleEditDialogOpen, setVehicleEditDialogOpen] = useState(false)
   const [healDialogOpen, setHealDialogOpen] = useState(false)
 
-  // Use the vehicle data from character.driving which now has full data from serializer
-  const drivingVehicle = useMemo(() => {
-    return character.driving || null
-  }, [character.driving])
+  // Local state for driving vehicle
+  const [drivingVehicle, setDrivingVehicle] = useState<Vehicle | null>(
+    initialCharacter.driving || null
+  )
+
+  // Subscribe to character updates via WebSocket
+  useEffect(() => {
+    const unsubscribe = subscribeToEntity("character", updatedCharacter => {
+      if (updatedCharacter && updatedCharacter.id === initialCharacter.id) {
+        setCharacter(updatedCharacter)
+        // Update driving vehicle (including clearing when character stops driving)
+        setDrivingVehicle(updatedCharacter.driving || null)
+      }
+    })
+    return () => unsubscribe()
+  }, [subscribeToEntity, initialCharacter.id])
+
+  // Subscribe to vehicle updates for the driving vehicle
+  useEffect(() => {
+    if (!drivingVehicle?.id) return
+
+    const unsubscribe = subscribeToEntity("vehicle", updatedVehicle => {
+      if (updatedVehicle && updatedVehicle.id === drivingVehicle.id) {
+        setDrivingVehicle(updatedVehicle as Vehicle)
+      }
+    })
+    return () => unsubscribe()
+  }, [subscribeToEntity, drivingVehicle?.id])
+
+  // Sync with prop changes
+  useEffect(() => {
+    setCharacter(initialCharacter)
+    setDrivingVehicle(initialCharacter.driving || null)
+  }, [initialCharacter])
 
   // Check if character is hidden (current_shot is null)
   const characterWithShot = character as Character & {
