@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "motion/react"
 import type { Vehicle } from "@/types"
 import {
@@ -30,20 +30,41 @@ import {
 } from "@/components/encounters"
 import { CharacterLink } from "@/components/ui/links"
 import { encounterTransition } from "@/contexts/EncounterContext"
-import { useEncounter, useClient, useToast } from "@/contexts"
+import { useEncounter, useClient, useToast, useApp } from "@/contexts"
 
 type VehicleDetailProps = {
   vehicle: Vehicle
 }
 
-export default function VehicleDetail({ vehicle }: VehicleDetailProps) {
+export default function VehicleDetail({
+  vehicle: initialVehicle,
+}: VehicleDetailProps) {
   const { encounter } = useEncounter()
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
+  const { subscribeToEntity } = useApp()
+
+  // Local state for real-time updates
+  const [vehicle, setVehicle] = useState(initialVehicle)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [locationDialogOpen, setLocationDialogOpen] = useState(false)
-  const [newLocation, setNewLocation] = useState(vehicle.location || "")
+  const [newLocation, setNewLocation] = useState(initialVehicle.location || "")
+
+  // Subscribe to vehicle updates via WebSocket
+  useEffect(() => {
+    const unsubscribe = subscribeToEntity("vehicle", updatedVehicle => {
+      if (updatedVehicle && updatedVehicle.id === initialVehicle.id) {
+        setVehicle(updatedVehicle as Vehicle)
+      }
+    })
+    return () => unsubscribe()
+  }, [subscribeToEntity, initialVehicle.id])
+
+  // Sync with prop changes
+  useEffect(() => {
+    setVehicle(initialVehicle)
+  }, [initialVehicle])
 
   // Check if vehicle is hidden (current_shot is null)
   const vehicleWithShot = vehicle as Vehicle & {
