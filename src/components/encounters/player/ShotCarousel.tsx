@@ -275,14 +275,26 @@ export default function ShotCarousel({
                     },
                   }}
                 >
-                  <EntityAvatar
-                    entity={character}
-                    disablePopup={true}
+                  {/* Color ring wrapper */}
+                  <Box
                     sx={{
-                      width: 44,
-                      height: 44,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: "50%",
+                      padding: character.color ? "3px" : 0,
+                      background: character.color || "transparent",
                     }}
-                  />
+                  >
+                    <EntityAvatar
+                      entity={character}
+                      disablePopup={true}
+                      sx={{
+                        width: character.color ? 38 : 44,
+                        height: character.color ? 38 : 44,
+                      }}
+                    />
+                  </Box>
                 </Box>
               )
             })}
