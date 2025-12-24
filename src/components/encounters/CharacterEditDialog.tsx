@@ -18,7 +18,10 @@ import {
   Chip,
   Autocomplete,
   TextField as MuiTextField,
+  IconButton,
+  Tooltip,
 } from "@mui/material"
+import { Healing as HealIcon } from "@mui/icons-material"
 import { NumberField, TextField, ColorPickerField } from "@/components/ui"
 import { useClient, useToast, useEncounter } from "@/contexts"
 import { CS } from "@/services"
@@ -210,6 +213,18 @@ export default function CharacterEditDialog({
       marksOfDeath >= 0 &&
       fortune >= 0
     )
+  }
+
+  // Handle full heal
+  const handleFullHeal = () => {
+    const healed = CS.fullHeal(character)
+    setWounds(CS.wounds(healed))
+    setImpairments(healed.impairments || 0)
+    if (isPC()) {
+      setMarksOfDeath(CS.marksOfDeath(healed))
+      setFortune(CS.fortune(healed))
+    }
+    setStatuses(healed.status || [])
   }
 
   // Handle save
@@ -428,8 +443,8 @@ export default function CharacterEditDialog({
           />
 
           {/* Combat Stats Row */}
-          <Box>
-            <Grid container spacing={2}>
+          <Box sx={{ display: "flex", alignItems: "flex-end", gap: 1 }}>
+            <Grid container spacing={2} sx={{ flex: 1 }}>
               <Grid item xs={isMook() ? 6 : isPC() ? 2.4 : 4}>
                 <Typography
                   variant="caption"
@@ -591,6 +606,19 @@ export default function CharacterEditDialog({
                 </>
               )}
             </Grid>
+            {!isMook() && (
+              <Tooltip title="Full Heal">
+                <IconButton
+                  onClick={handleFullHeal}
+                  disabled={loading}
+                  color="success"
+                  size="large"
+                  sx={{ mb: 0.5 }}
+                >
+                  <HealIcon fontSize="large" />
+                </IconButton>
+              </Tooltip>
+            )}
           </Box>
 
           {/* Driving dropdown */}
