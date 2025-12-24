@@ -215,6 +215,18 @@ export default function CharacterEditDialog({
     )
   }
 
+  // Handle full heal
+  const handleFullHeal = () => {
+    const healed = CS.fullHeal(character)
+    setWounds(CS.wounds(healed))
+    setImpairments(healed.impairments || 0)
+    if (isPC()) {
+      setMarksOfDeath(CS.marksOfDeath(healed))
+      setFortune(CS.fortune(healed))
+    }
+    setStatuses(healed.status || [])
+  }
+
   // Handle save
   const handleSave = async () => {
     if (!isValid()) {
@@ -597,16 +609,7 @@ export default function CharacterEditDialog({
             {!isMook() && (
               <Tooltip title="Full Heal">
                 <IconButton
-                  onClick={() => {
-                    const healed = CS.fullHeal(character)
-                    setWounds(CS.wounds(healed))
-                    setImpairments(healed.impairments || 0)
-                    if (isPC()) {
-                      setMarksOfDeath(CS.marksOfDeath(healed))
-                      setFortune(CS.fortune(healed))
-                    }
-                    setStatuses(healed.status || [])
-                  }}
+                  onClick={handleFullHeal}
                   disabled={loading}
                   color="success"
                   size="large"
