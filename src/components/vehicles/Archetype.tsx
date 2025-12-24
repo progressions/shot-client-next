@@ -7,7 +7,7 @@ import { VS } from "@/services"
 import { useClient } from "@/contexts"
 
 type EditArchetypeProps = {
-  type: string
+  vehicle: Vehicle
   updateEntity: (vehicle: Vehicle) => void
 }
 
