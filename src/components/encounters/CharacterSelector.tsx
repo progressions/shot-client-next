@@ -216,9 +216,6 @@ export default function CharacterSelector({
                       justifyContent: "center",
                       width: "100%",
                       height: "100%",
-                      "& a": {
-                        pointerEvents: "none",
-                      },
                     }}
                   >
                     <Box
