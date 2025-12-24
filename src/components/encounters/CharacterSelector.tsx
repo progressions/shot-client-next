@@ -205,7 +205,6 @@ export default function CharacterSelector({
                     "&:hover": {
                       backgroundColor: "action.hover",
                     },
-                    pl: { xs: 0.5, sm: 1 },
                     transition: "all 0.2s",
                   }}
                 >
@@ -239,7 +238,7 @@ export default function CharacterSelector({
                         sx={{
                           width: { xs: 48, sm: 64 },
                           height: { xs: 48, sm: 64 },
-                          ml: { xs: 0.25, sm: 0.5 },
+                      ml: { xs: 0.25, sm: 0.5 },
                         }}
                       />
                     </Box>
