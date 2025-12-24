@@ -18,7 +18,10 @@ import {
   Chip,
   Autocomplete,
   TextField as MuiTextField,
+  IconButton,
+  Tooltip,
 } from "@mui/material"
+import { Healing as HealIcon } from "@mui/icons-material"
 import { NumberField, TextField, ColorPickerField } from "@/components/ui"
 import { useClient, useToast, useEncounter } from "@/contexts"
 import { CS } from "@/services"
@@ -428,8 +431,8 @@ export default function CharacterEditDialog({
           />
 
           {/* Combat Stats Row */}
-          <Box>
-            <Grid container spacing={2}>
+          <Box sx={{ display: "flex", alignItems: "flex-end", gap: 1 }}>
+            <Grid container spacing={2} sx={{ flex: 1 }}>
               <Grid item xs={isMook() ? 6 : isPC() ? 2.4 : 4}>
                 <Typography
                   variant="caption"
@@ -591,6 +594,25 @@ export default function CharacterEditDialog({
                 </>
               )}
             </Grid>
+            {!isMook() && (
+              <Tooltip title="Full Heal">
+                <IconButton
+                  onClick={() => {
+                    setWounds(0)
+                    setImpairments(0)
+                    setMarksOfDeath(0)
+                    setFortune(CS.maxFortune(character))
+                    setStatuses(statuses.filter(s => s !== "up_check_required"))
+                  }}
+                  disabled={loading}
+                  color="success"
+                  size="large"
+                  sx={{ mb: 0.5 }}
+                >
+                  <HealIcon fontSize="large" />
+                </IconButton>
+              </Tooltip>
+            )}
           </Box>
 
           {/* Driving dropdown */}

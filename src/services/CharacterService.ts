@@ -211,6 +211,7 @@ const CharacterService = {
   },
 
   // Restore Wounds to 0, Fortune to Max Fortune, Impairments to 0, Marks of Death to 0
+  // Also clears up_check_required status
   fullHeal: function (character: Character): Character {
     if (this.isType(character, "Mook")) return character
 
@@ -227,6 +228,12 @@ const CharacterService = {
       maxFortune
     )
     updatedCharacter.impairments = 0
+
+    // Clear up_check_required status
+    const currentStatus = updatedCharacter.status || []
+    updatedCharacter.status = currentStatus.filter(
+      s => s !== "up_check_required"
+    )
 
     return updatedCharacter
   },
