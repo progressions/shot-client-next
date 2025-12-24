@@ -283,15 +283,7 @@ export function createCharacterClient(deps: ClientDependencies) {
     const characterId = typeof character === "string" ? character : character.id
     const currentCharacterIds = fight.character_ids || []
 
-    // Prevent duplicate entries
-    if (currentCharacterIds.includes(characterId)) {
-      // Character already in fight, just return it
-      if (typeof character === "string") {
-        return getCharacter(characterId)
-      }
-      return { data: character } as AxiosResponse<Character>
-    }
-
+    // Allow adding the same character multiple times (e.g., multiple mook groups)
     const updatedCharacterIds = [...currentCharacterIds, characterId]
 
     // Update the fight with new character_ids using v2 endpoint
