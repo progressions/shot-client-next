@@ -79,10 +79,34 @@ export function useAuthState({
   // Initial data fetch with cache validation
   useEffect(() => {
     if (!jwt || hasFetched.current) return
-    if (state.user.id && state.user.id !== defaultUser.id) {
-      setLoading(false)
-      return
+
+    const hasValidUser = state.user.id && state.user.id !== defaultUser.id
+
+    // Only skip fetch if we have both a valid user AND a valid cached campaign
+    if (hasValidUser) {
+      try {
+        const cachedCampaign = localStorage.getItem(
+          getCampaignStorageKey(state.user.id)
+        )
+        if (cachedCampaign) {
+          const parsedCampaign = JSON.parse(cachedCampaign)
+          const normalizedCampaign = normalizeStoredCampaign(parsedCampaign)
+          if (
+            normalizedCampaign &&
+            normalizedCampaign.id &&
+            normalizedCampaign.id !== defaultCampaign.id
+          ) {
+            setCampaign(normalizedCampaign)
+            setLoading(false)
+            hasFetched.current = true
+            return
+          }
+        }
+      } catch {
+        // If campaign cache is invalid or parsing fails, fall through to fetch
+      }
     }
+
     hasFetched.current = true
 
     async function fetchData() {
