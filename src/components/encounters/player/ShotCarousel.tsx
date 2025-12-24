@@ -278,12 +278,11 @@ export default function ShotCarousel({
                   <EntityAvatar
                     entity={character}
                     disablePopup={true}
+                    disableImageViewer={true}
+                    borderColor={character.color}
                     sx={{
                       width: 44,
                       height: 44,
-                      border: character.color
-                        ? `3px solid ${character.color}`
-                        : "none",
                     }}
                   />
                 </Box>

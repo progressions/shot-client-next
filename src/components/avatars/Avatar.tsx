@@ -1,6 +1,6 @@
 "use client"
 
-import { Avatar as MuiAvatar } from "@mui/material"
+import { Avatar as MuiAvatar, Box } from "@mui/material"
 import { useState, useCallback } from "react"
 import type { Entity } from "@/types"
 import { SystemStyleObject, Theme } from "@mui/system"
@@ -15,6 +15,7 @@ interface AvatarProperties {
   disablePopup?: boolean
   sx?: SystemStyleObject<Theme>
   disableImageViewer?: boolean
+  borderColor?: string | null
 }
 
 const Avatar = ({
@@ -23,6 +24,7 @@ const Avatar = ({
   disablePopup,
   sx = {},
   disableImageViewer = false,
+  borderColor,
 }: AvatarProperties) => {
   const [imageViewerOpen, setImageViewerOpen] = useState(false)
 
@@ -119,12 +121,30 @@ const Avatar = ({
     </MuiAvatar>
   )
 
-  const baseAvatar = (
+  const badgedAvatar = (
     <ExtendingBadge extending={isExtending}>
       <ImpairmentBadge impairments={impairments}>
         {avatarElement}
       </ImpairmentBadge>
     </ExtendingBadge>
+  )
+
+  // Wrap in color ring if borderColor is provided
+  const baseAvatar = borderColor ? (
+    <Box
+      sx={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: "50%",
+        padding: "3px",
+        background: borderColor,
+      }}
+    >
+      {badgedAvatar}
+    </Box>
+  ) : (
+    badgedAvatar
   )
 
   const avatarWithViewer = (
