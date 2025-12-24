@@ -25,7 +25,6 @@ interface CharacterSelectorProps {
   selectedShotId?: string
   selectedShotIds?: string[]
   onSelect: (shotId: string) => void
-  borderColor?: string
   disabled?: boolean
   characterTypes?: CharacterTypeFilter[]
   showAllCheckbox?: boolean
@@ -40,7 +39,6 @@ export default function CharacterSelector({
   selectedShotId,
   selectedShotIds = [],
   onSelect,
-  borderColor = "primary.main",
   disabled = false,
   characterTypes,
   showAllCheckbox = false,
@@ -187,7 +185,7 @@ export default function CharacterSelector({
                       e.preventDefault()
                     }
                   }}
-                  sx={{
+                  sx={theme => ({
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
@@ -197,17 +195,19 @@ export default function CharacterSelector({
                     height: { xs: 56, sm: 72 },
                     flexShrink: 0, // Prevent shrinking
                     borderRadius: 2,
-                    border: isSelected ? "3px solid" : "3px solid transparent",
-                    borderColor: isSelected ? borderColor : "transparent",
                     backgroundColor: isSelected
-                      ? "action.selected"
+                      ? theme.palette.custom?.amber?.bg ||
+                        "rgba(255, 191, 0, 0.15)"
                       : "transparent",
                     "&:hover": {
-                      backgroundColor: "action.hover",
+                      backgroundColor: isSelected
+                        ? theme.palette.custom?.amber?.bg ||
+                          "rgba(255, 191, 0, 0.15)"
+                        : "action.hover",
                     },
                     transition: "all 0.2s",
                     p: 4.5,
-                  }}
+                  })}
                 >
                   <Box
                     sx={{
