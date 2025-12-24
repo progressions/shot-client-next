@@ -7,7 +7,14 @@
  * @module contexts/AppContext/hooks/useAuthState
  */
 
-import { useReducer, useEffect, useMemo, useRef, useCallback, useState } from "react"
+import {
+  useReducer,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+  useState,
+} from "react"
 import Cookies from "js-cookie"
 import { Client } from "@/lib"
 import { defaultUser, defaultCampaign, type User, type Campaign } from "@/types"
@@ -72,10 +79,7 @@ export function useAuthState({
   // Initial data fetch with cache validation
   useEffect(() => {
     if (!jwt || hasFetched.current) return
-    if (
-      state.user.id &&
-      state.user.id !== defaultUser.id
-    ) {
+    if (state.user.id && state.user.id !== defaultUser.id) {
       setLoading(false)
       return
     }
@@ -244,4 +248,3 @@ export function useAuthState({
     refreshUser,
   }
 }
-

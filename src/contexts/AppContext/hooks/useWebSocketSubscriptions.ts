@@ -291,17 +291,17 @@ export function useWebSocketSubscriptions({
     console.log("🔄 AppContext: Processing campaignData:", campaignData)
 
     // Handle partial campaign updates from WebSocket (e.g., grok_credits_exhausted_at)
-    if (
-      campaignData.campaign &&
-      typeof campaignData.campaign === "object"
-    ) {
+    if (campaignData.campaign && typeof campaignData.campaign === "object") {
       console.log(
         "🔄 AppContext: Merging partial campaign update:",
         campaignData.campaign
       )
       setCampaign(prev => {
         if (!prev) return prev
-        if (campaignData.campaign && (campaignData.campaign as Campaign).id === prev.id) {
+        if (
+          campaignData.campaign &&
+          (campaignData.campaign as Campaign).id === prev.id
+        ) {
           return { ...prev, ...campaignData.campaign }
         }
         return prev

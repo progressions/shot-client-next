@@ -6,15 +6,13 @@
  * @module contexts/AppContext/hooks/useCampaignState
  */
 
-import { useState, useCallback } from "react"
+import { useCallback } from "react"
 import Cookies from "js-cookie"
 import type { Client } from "@/lib"
-import { defaultCampaign, type Campaign } from "@/types"
+import type { Campaign } from "@/types"
 import { getCampaignStorageKey } from "../utils"
 
 interface UseCampaignStateResult {
-  campaign: Campaign | null
-  setCampaign: React.Dispatch<React.SetStateAction<Campaign | null>>
   setCurrentCampaign: (camp: Campaign | null) => Promise<Campaign | null>
   updateCampaign: (updates: Partial<Campaign>) => void
 }
@@ -22,26 +20,27 @@ interface UseCampaignStateResult {
 interface UseCampaignStateProps {
   userId: string
   client: Client
+  setCampaign: React.Dispatch<React.SetStateAction<Campaign | null>>
+  setError: (error: string | null) => void
 }
 
 /**
  * Internal hook for campaign state management.
  *
  * Handles:
- * - Campaign state
  * - Setting current campaign via API
  * - LocalStorage persistence
  * - Local campaign updates
  *
- * @param props - Configuration including userId and client
- * @returns Campaign state and management functions
+ * @param props - Configuration including userId, client, and state setters
+ * @returns Campaign management functions
  */
 export function useCampaignState({
   userId,
   client,
+  setCampaign,
+  setError,
 }: UseCampaignStateProps): UseCampaignStateResult {
-  const [campaign, setCampaign] = useState<Campaign | null>(defaultCampaign)
-
   const setCurrentCampaign = useCallback(
     async (camp: Campaign | null): Promise<Campaign | null> => {
       try {
@@ -56,11 +55,14 @@ export function useCampaignState({
         }
 
         if (!data) {
-          console.error("Failed to set current campaign")
+          setError("Failed to set current campaign")
           return null
         }
         setCampaign(data)
-        localStorage.setItem(getCampaignStorageKey(userId), JSON.stringify(data))
+        localStorage.setItem(
+          getCampaignStorageKey(userId),
+          JSON.stringify(data)
+        )
         return data
       } catch (error) {
         // Only clear JWT token if it's an authentication error
@@ -73,14 +75,11 @@ export function useCampaignState({
           )
           Cookies.remove("jwtToken")
         }
-        console.error(
-          "Failed to set current campaign:",
-          (error as Error).message
-        )
+        setError("Failed to set current campaign: " + (error as Error).message)
         return null
       }
     },
-    [client, userId]
+    [client, userId, setCampaign, setError]
   )
 
   // Update campaign state in the global context after successful API save.
@@ -101,12 +100,10 @@ export function useCampaignState({
         return updated
       })
     },
-    [userId]
+    [userId, setCampaign]
   )
 
   return {
-    campaign,
-    setCampaign,
     setCurrentCampaign,
     updateCampaign,
   }

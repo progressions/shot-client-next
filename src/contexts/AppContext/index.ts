@@ -8,4 +8,8 @@
  */
 
 export { AppProvider, useApp, useClient, useCampaign } from "./AppContext"
-export type { AppContextType, AppProviderProps, EntityUpdateCallback } from "./types"
+export type {
+  AppContextType,
+  AppProviderProps,
+  EntityUpdateCallback,
+} from "./types"

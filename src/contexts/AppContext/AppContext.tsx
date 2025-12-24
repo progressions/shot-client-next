@@ -17,7 +17,7 @@
  * @module contexts/AppContext
  */
 
-import { createContext, useContext, useState, useMemo } from "react"
+import { createContext, useContext, useState } from "react"
 import { Client } from "@/lib"
 import { defaultUser, defaultCampaign, type Campaign } from "@/types"
 import { initialUserState } from "@/reducers"
@@ -56,6 +56,7 @@ const AppContext = createContext<AppContextType>({
 export function AppProvider({ children, initialUser }: AppProviderProps) {
   // Campaign state - managed at top level for cross-hook access
   const [campaign, setCampaign] = useState<Campaign | null>(defaultCampaign)
+  const [error, setError] = useState<string | null>(null)
 
   // Authentication state and initial data fetch
   const auth = useAuthState({
@@ -64,50 +65,26 @@ export function AppProvider({ children, initialUser }: AppProviderProps) {
   })
 
   // Campaign management (setCurrentCampaign, updateCampaign)
+  // Uses the shared campaign state from above
   const campaignState = useCampaignState({
     userId: auth.user.id,
     client: auth.client,
+    setCampaign,
+    setError,
   })
-
-  // Sync campaign state from campaignState hook
-  // Note: We use local campaign state for useAuthState initial load,
-  // but campaignState.campaign for the provider value
-  const effectiveCampaign = campaign
 
   // WebSocket subscriptions
   const ws = useWebSocketSubscriptions({
     userId: auth.user.id,
-    campaignId: effectiveCampaign?.id,
+    campaignId: campaign?.id,
     client: auth.client,
     setCampaign,
   })
 
-  const hasCampaign = Boolean(
-    effectiveCampaign?.id && effectiveCampaign.id.trim() !== ""
-  )
+  const hasCampaign = Boolean(campaign?.id && campaign.id.trim() !== "")
 
-  // Compose setCurrentCampaign to also update local state
-  const setCurrentCampaign = useMemo(
-    () => async (camp: Campaign | null) => {
-      const result = await campaignState.setCurrentCampaign(camp)
-      if (result) {
-        setCampaign(result)
-      } else if (camp === null) {
-        setCampaign(null)
-      }
-      return result
-    },
-    [campaignState]
-  )
-
-  // Compose updateCampaign to also update local state
-  const updateCampaign = useMemo(
-    () => (updates: Partial<Campaign>) => {
-      campaignState.updateCampaign(updates)
-      setCampaign(prev => (prev ? { ...prev, ...updates } : prev))
-    },
-    [campaignState]
-  )
+  // Combine errors from auth and campaign operations
+  const combinedError = auth.error || error
 
   return (
     <AppContext.Provider
@@ -117,15 +94,15 @@ export function AppProvider({ children, initialUser }: AppProviderProps) {
         jwt: auth.jwt || "",
         user: auth.user,
         loading: auth.loading,
-        error: auth.error,
+        error: combinedError,
         currentUserState: auth.state,
         dispatchCurrentUser: auth.dispatch,
         refreshUser: auth.refreshUser,
 
         // Campaign domain
-        campaign: effectiveCampaign,
-        setCurrentCampaign,
-        updateCampaign,
+        campaign,
+        setCurrentCampaign: campaignState.setCurrentCampaign,
+        updateCampaign: campaignState.updateCampaign,
         hasCampaign,
 
         // WebSocket domain
