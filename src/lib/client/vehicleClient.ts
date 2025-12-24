@@ -128,15 +128,7 @@ export function createVehicleClient(deps: ClientDependencies) {
     const vehicleId = typeof vehicle === "string" ? vehicle : vehicle.id
     const currentVehicleIds = fight.vehicle_ids || []
 
-    // Prevent duplicate entries
-    if (currentVehicleIds.includes(vehicleId)) {
-      // Vehicle already in fight, just return it
-      if (typeof vehicle === "string") {
-        return getVehicle(vehicleId)
-      }
-      return { data: vehicle } as AxiosResponse<Vehicle>
-    }
-
+    // Allow adding the same vehicle multiple times (e.g., multiple enemy vehicles)
     const updatedVehicleIds = [...currentVehicleIds, vehicleId]
 
     // Update the fight with new vehicle_ids using v2 endpoint
