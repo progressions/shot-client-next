@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import {
   Box,
   TextField,
@@ -34,8 +34,20 @@ export function ColorPickerField({
   const [inputValue, setInputValue] = useState(value || "")
   const swatchRef = useRef<HTMLDivElement>(null)
 
+  // Sync inputValue with value prop when it changes externally
+  useEffect(() => {
+    setInputValue(value || "")
+  }, [value])
+
   const handleSwatchClick = (event: React.MouseEvent<HTMLElement>) => {
     if (!disabled) {
+      setAnchorEl(event.currentTarget)
+    }
+  }
+
+  const handleSwatchKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (!disabled && (event.key === "Enter" || event.key === " ")) {
+      event.preventDefault()
       setAnchorEl(event.currentTarget)
     }
   }
@@ -79,6 +91,15 @@ export function ColorPickerField({
       <Box
         ref={swatchRef}
         onClick={handleSwatchClick}
+        onKeyDown={handleSwatchKeyDown}
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        aria-label={
+          value
+            ? `Open color picker, current color: ${value}`
+            : "Open color picker"
+        }
+        aria-disabled={disabled}
         sx={{
           width: 36,
           height: 36,
@@ -92,6 +113,11 @@ export function ColorPickerField({
           flexShrink: 0,
           "&:hover": {
             borderColor: disabled ? undefined : "primary.main",
+          },
+          "&:focus": {
+            outline: "2px solid",
+            outlineColor: "primary.main",
+            outlineOffset: 2,
           },
         }}
       />
