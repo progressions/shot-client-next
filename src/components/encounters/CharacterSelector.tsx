@@ -239,7 +239,7 @@ export default function CharacterSelector({
                         sx={{
                           width: { xs: 48, sm: 64 },
                           height: { xs: 48, sm: 64 },
-                      ml: { xs: 0.25, sm: 0.5 },
+                          ml: { xs: 0.25, sm: 0.5 },
                         }}
                       />
                     </Box>
