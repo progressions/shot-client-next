@@ -82,10 +82,8 @@ export default function CharacterDetail({
     const unsubscribe = subscribeToEntity("character", updatedCharacter => {
       if (updatedCharacter && updatedCharacter.id === initialCharacter.id) {
         setCharacter(updatedCharacter)
-        // Also update driving vehicle if it changed
-        if (updatedCharacter.driving) {
-          setDrivingVehicle(updatedCharacter.driving)
-        }
+        // Update driving vehicle (including clearing when character stops driving)
+        setDrivingVehicle(updatedCharacter.driving || null)
       }
     })
     return () => unsubscribe()
