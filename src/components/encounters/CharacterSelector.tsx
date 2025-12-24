@@ -206,6 +206,7 @@ export default function CharacterSelector({
                       backgroundColor: "action.hover",
                     },
                     transition: "all 0.2s",
+                    p: 4.5,
                   }}
                 >
                   <Box
