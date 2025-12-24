@@ -107,9 +107,6 @@ export function useWebSocketSubscriptions({
       JSON.stringify({ channel: "CampaignChannel", id: campaignId })
     )
 
-    // Track connection state and setup reconnection logic
-    let connectionCheckInterval: NodeJS.Timeout | null = null
-
     console.log(
       "🔧 [AppContext] Creating WebSocket subscription on page:",
       currentPath,
@@ -151,10 +148,6 @@ export function useWebSocketSubscriptions({
             "❌ [AppContext] WebSocket DISCONNECTED from CampaignChannel:",
             campaignId
           )
-          if (connectionCheckInterval) {
-            clearInterval(connectionCheckInterval)
-            connectionCheckInterval = null
-          }
         },
         received: function (data: CampaignCableData) {
           console.log(
@@ -255,7 +248,6 @@ export function useWebSocketSubscriptions({
     )
     setSubscription(sub)
     return () => {
-      if (connectionCheckInterval) clearInterval(connectionCheckInterval)
       sub.disconnect()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- campaignData and client intentionally omitted to prevent reconnection loops
