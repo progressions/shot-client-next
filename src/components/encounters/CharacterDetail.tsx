@@ -69,6 +69,8 @@ export default function CharacterDetail({
     initialCharacter.location || ""
   )
   const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [editDialogCharacter, setEditDialogCharacter] =
+    useState<Character>(initialCharacter)
   const [vehicleEditDialogOpen, setVehicleEditDialogOpen] = useState(false)
   const [healDialogOpen, setHealDialogOpen] = useState(false)
 
@@ -116,6 +118,8 @@ export default function CharacterDetail({
     characterWithShot.current_shot === undefined
 
   const handleEditClick = () => {
+    // Capture character at the moment dialog opens to prevent flicker from WebSocket updates
+    setEditDialogCharacter(character)
     setEditDialogOpen(true)
   }
 
@@ -572,7 +576,7 @@ export default function CharacterDetail({
       <CharacterEditDialog
         open={editDialogOpen}
         onClose={handleEditClose}
-        character={character}
+        character={editDialogCharacter}
       />
 
       {/* Vehicle Edit Dialog */}
