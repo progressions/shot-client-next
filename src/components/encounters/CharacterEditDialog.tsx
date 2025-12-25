@@ -25,7 +25,6 @@ import { Healing as HealIcon } from "@mui/icons-material"
 import { NumberField, TextField, ColorPickerField } from "@/components/ui"
 import { useClient, useToast, useEncounter } from "@/contexts"
 import { CS } from "@/services"
-import { FormActions } from "@/reducers"
 import type { Character, Vehicle } from "@/types"
 
 interface CharacterEditDialogProps {
@@ -401,22 +400,8 @@ export default function CharacterEditDialog({
         }
       }
 
-      // Fetch the updated encounter to refresh the display
-      const updatedEncounterResponse = await client.getEncounter(encounter)
-
       toastSuccess(`Updated ${name}`)
       onClose()
-
-      // Update local encounter state with fresh data (without making another API call)
-      if (updatedEncounterResponse.data) {
-        setTimeout(() => {
-          dispatchEncounter({
-            type: FormActions.UPDATE,
-            name: "encounter",
-            value: updatedEncounterResponse.data,
-          })
-        }, 100)
-      }
     } catch (error) {
       console.error("Error updating character:", error)
       toastError(`Failed to update ${character.name}`)
