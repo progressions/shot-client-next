@@ -402,7 +402,6 @@ export default function CharacterEditDialog({
 
       toastSuccess(`Updated ${name}`)
       onClose()
-      // WebSocket will handle encounter updates automatically
     } catch (error) {
       console.error("Error updating character:", error)
       toastError(`Failed to update ${character.name}`)
