@@ -48,7 +48,7 @@ export default function PlayerViewMagicLinkPage() {
         if (jwt && user) {
           // Store JWT
           Cookies.set("jwtToken", jwt, {
-            expires: 1,
+            expires: 7, // Match JWT token expiry (7 days)
             secure: process.env.NODE_ENV === "production",
             sameSite: "Lax",
             httpOnly: false,
@@ -57,7 +57,7 @@ export default function PlayerViewMagicLinkPage() {
 
           // Store user ID
           Cookies.set("userId", user.id, {
-            expires: 1,
+            expires: 7, // Match JWT token expiry (7 days)
             secure: process.env.NODE_ENV === "production",
             sameSite: "Lax",
             httpOnly: false,

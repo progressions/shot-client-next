@@ -122,7 +122,7 @@ describe("MagicLinkPage", () => {
           "jwtToken",
           "jwt-token-from-magic-link",
           expect.objectContaining({
-            expires: 1,
+            expires: 7,
             sameSite: "Lax",
             path: "/",
           })
@@ -153,7 +153,7 @@ describe("MagicLinkPage", () => {
           "userId",
           "user-123",
           expect.objectContaining({
-            expires: 1,
+            expires: 7,
             sameSite: "Lax",
             path: "/",
           })

@@ -87,7 +87,7 @@ export default function LoginPage() {
   const handleLoginSuccess = async (token: string) => {
     try {
       Cookies.set("jwtToken", token, {
-        expires: 1,
+        expires: 7, // Match JWT token expiry (7 days)
         secure: process.env.NODE_ENV === "production",
         sameSite: "Lax",
         httpOnly: false,
@@ -98,7 +98,7 @@ export default function LoginPage() {
       const temporaryResponse = await temporaryClient.getCurrentUser()
 
       Cookies.set("userId", temporaryResponse.data.id, {
-        expires: 1,
+        expires: 7, // Match JWT token expiry (7 days)
         secure: process.env.NODE_ENV === "production",
         sameSite: "Lax",
         httpOnly: false,
