@@ -116,7 +116,7 @@ describe("PlayerViewMagicLinkPage", () => {
           "jwtToken",
           "jwt-token-from-player-view",
           expect.objectContaining({
-            expires: 1,
+            expires: 7,
             sameSite: "Lax",
             path: "/",
           })
@@ -132,7 +132,7 @@ describe("PlayerViewMagicLinkPage", () => {
           "userId",
           "user-123",
           expect.objectContaining({
-            expires: 1,
+            expires: 7,
             sameSite: "Lax",
             path: "/",
           })
