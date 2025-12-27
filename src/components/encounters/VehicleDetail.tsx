@@ -54,8 +54,9 @@ export default function VehicleDetail({
   // Subscribe to vehicle updates via WebSocket
   useEffect(() => {
     const unsubscribe = subscribeToEntity("vehicle", updatedVehicle => {
-      if (updatedVehicle && updatedVehicle.id === initialVehicle.id) {
-        setVehicle(updatedVehicle as Vehicle)
+      const vehicleUpdate = updatedVehicle as Vehicle | null | undefined
+      if (vehicleUpdate && vehicleUpdate.id === initialVehicle.id) {
+        setVehicle(vehicleUpdate)
       }
     })
     return () => unsubscribe()

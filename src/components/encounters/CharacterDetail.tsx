@@ -80,10 +80,11 @@ export default function CharacterDetail({
   // Subscribe to character updates via WebSocket
   useEffect(() => {
     const unsubscribe = subscribeToEntity("character", updatedCharacter => {
-      if (updatedCharacter && updatedCharacter.id === initialCharacter.id) {
-        setCharacter(updatedCharacter)
+      const characterUpdate = updatedCharacter as Character | null | undefined
+      if (characterUpdate && characterUpdate.id === initialCharacter.id) {
+        setCharacter(characterUpdate)
         // Update driving vehicle (including clearing when character stops driving)
-        setDrivingVehicle(updatedCharacter.driving || null)
+        setDrivingVehicle(characterUpdate.driving || null)
       }
     })
     return () => unsubscribe()
@@ -94,8 +95,9 @@ export default function CharacterDetail({
     if (!drivingVehicle?.id) return
 
     const unsubscribe = subscribeToEntity("vehicle", updatedVehicle => {
-      if (updatedVehicle && updatedVehicle.id === drivingVehicle.id) {
-        setDrivingVehicle(updatedVehicle as Vehicle)
+      const vehicleUpdate = updatedVehicle as Vehicle | null | undefined
+      if (vehicleUpdate && vehicleUpdate.id === drivingVehicle.id) {
+        setDrivingVehicle(vehicleUpdate)
       }
     })
     return () => unsubscribe()

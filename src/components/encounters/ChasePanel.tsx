@@ -121,11 +121,20 @@ export default function ChasePanel({
         return
       }
 
+      // Use shot_id (instance ID) for chase relationship lookup, not vehicle.id (template ID)
+      const attackerShotId = attackerVehicle.shot_id
+      const targetShotId = targetVehicle.shot_id
+
       console.log("Fetching chase relationships for:", {
-        attackerVehicleId: attackerVehicle.id,
-        targetVehicleId: targetVehicle.id,
+        attackerShotId,
+        targetShotId,
         fightId: encounter.id,
       })
+
+      if (!attackerShotId || !targetShotId) {
+        console.log("Missing shot IDs for chase relationship lookup")
+        return
+      }
 
       try {
         // Get chase relationships for this fight
@@ -137,12 +146,9 @@ export default function ChasePanel({
         console.log("Chase relationships response:", response.data)
 
         if (response.data?.chase_relationships) {
-          const attackerVehicleId = attackerVehicle.id
-          const targetVehicleId = targetVehicle.id
-
-          console.log("Looking for relationship with vehicles:", {
-            attackerVehicleId,
-            targetVehicleId,
+          console.log("Looking for relationship with shot IDs:", {
+            attackerShotId,
+            targetShotId,
           })
 
           // Log each relationship check
@@ -151,22 +157,22 @@ export default function ChasePanel({
               console.log("Checking relationship:", {
                 rel,
                 match1:
-                  rel.pursuer_id === attackerVehicleId &&
-                  rel.evader_id === targetVehicleId,
+                  rel.pursuer_id === attackerShotId &&
+                  rel.evader_id === targetShotId,
                 match2:
-                  rel.evader_id === attackerVehicleId &&
-                  rel.pursuer_id === targetVehicleId,
+                  rel.evader_id === attackerShotId &&
+                  rel.pursuer_id === targetShotId,
               })
             }
           )
 
-          // Find relationship between these two vehicles (checking both directions)
+          // Find relationship between these two vehicle instances (using shot IDs)
           const relationship = response.data.chase_relationships.find(
             (rel: ChaseRelationship) =>
-              (rel.pursuer_id === attackerVehicleId &&
-                rel.evader_id === targetVehicleId) ||
-              (rel.evader_id === attackerVehicleId &&
-                rel.pursuer_id === targetVehicleId)
+              (rel.pursuer_id === attackerShotId &&
+                rel.evader_id === targetShotId) ||
+              (rel.evader_id === attackerShotId &&
+                rel.pursuer_id === targetShotId)
           )
 
           console.log("Found relationship:", relationship)
@@ -174,9 +180,9 @@ export default function ChasePanel({
           if (relationship) {
             console.log("Updating form with relationship data:", {
               position: relationship.position,
-              attackerVehicleId,
+              attackerShotId,
               pursuer_id: relationship.pursuer_id,
-              isAttackerPursuer: relationship.pursuer_id === attackerVehicleId,
+              isAttackerPursuer: relationship.pursuer_id === attackerShotId,
             })
 
             // Update position from existing relationship
@@ -205,9 +211,7 @@ export default function ChasePanel({
 
             // Determine attacker's role based on relationship
             const attackerRole =
-              relationship.pursuer_id === attackerVehicleId
-                ? "pursuer"
-                : "evader"
+              relationship.pursuer_id === attackerShotId ? "pursuer" : "evader"
             console.log("Setting attacker role:", attackerRole)
 
             dispatchForm({
