@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Box, Button, Stack, Typography, Alert } from "@mui/material"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { VS, CRS } from "@/services"
-import type { ChaseFormData, Vehicle } from "@/types"
+import type { ChaseFormData, Vehicle, Character } from "@/types"
 import { ChaseMethod } from "@/types/chase"
 import { FormActions } from "@/reducers"
 import { NumberField } from "@/components/ui"
@@ -245,6 +245,12 @@ export default function ChaseResolution({
       const driverShotId = (
         formState.data as ChaseFormData & { attacker?: Character }
       ).attacker?.shot_id
+
+      if (!driverShotId) {
+        toastError("Unable to identify driver for chase action")
+        setIsProcessing(false)
+        return
+      }
 
       console.log("Chase Resolution - Shot cost:", shotCost)
       console.log("Chase Resolution - Driver shot ID:", driverShotId)
