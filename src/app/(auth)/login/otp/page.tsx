@@ -42,7 +42,7 @@ function MagicLinkHandler() {
         if (response.data.token) {
           // Store JWT
           Cookies.set("jwtToken", response.data.token, {
-            expires: 1,
+            expires: 7, // Match JWT token expiry (7 days)
             secure: process.env.NODE_ENV === "production",
             sameSite: "Lax",
             httpOnly: false,
@@ -55,7 +55,7 @@ function MagicLinkHandler() {
 
           // Store user ID
           Cookies.set("userId", userResponse.data.id, {
-            expires: 1,
+            expires: 7, // Match JWT token expiry (7 days)
             secure: process.env.NODE_ENV === "production",
             sameSite: "Lax",
             httpOnly: false,

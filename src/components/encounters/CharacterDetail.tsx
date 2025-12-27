@@ -217,216 +217,199 @@ export default function CharacterDetail({
   }
 
   return (
-    <motion.div
-      key={`${character.id}-${character.shot_id}`}
-      layout
-      layoutId={`character-${character.id}-${character.shot_id}`}
-      transition={encounterTransition}
-    >
-      <ListItem
-        sx={{
-          alignItems: "flex-start",
-          position: "relative",
-          pr: { xs: 0, sm: 0 },
-          pl: { xs: 1, sm: 2 },
-          py: { xs: 1, sm: 1.5 },
-        }}
+    <>
+      <motion.div
+        key={`${character.id}-${character.shot_id}`}
+        layout
+        layoutId={`character-${character.id}-${character.shot_id}`}
+        transition={encounterTransition}
       >
-        <ListItemIcon
+        <ListItem
           sx={{
-            mt: 0,
-            minWidth: { xs: 40, sm: 56 },
-            mr: { xs: 1, sm: 0 },
-            p: 0,
+            alignItems: "flex-start",
+            position: "relative",
+            pr: { xs: 0, sm: 0 },
+            pl: { xs: 1, sm: 2 },
+            py: { xs: 1, sm: 1.5 },
           }}
         >
-          <Wounds character={character} />
-        </ListItemIcon>
-        <ListItemText
-          sx={{ ml: { xs: 0.5, sm: 2 }, pr: { xs: 10, sm: 0 } }}
-          primary={
-            <CharacterHeader
-              character={character}
-              location={character.location}
-              onLocationClick={handleLocationClick}
-            />
-          }
-          secondary={
-            <>
-              <ActionValues character={character} />
-              {drivingVehicle && (
-                <Box
-                  sx={{
-                    display: "block",
-                    mt: 1,
-                    p: 1,
-                    bgcolor: "action.hover",
-                    borderRadius: 1,
-                    position: "relative",
-                  }}
-                >
-                  {/* Alert banner for crashed/boxed in vehicles */}
-                  {VS.isDefeated(drivingVehicle) &&
-                    VS.getDefeatType(drivingVehicle) && (
-                      <Alert
-                        severity={
-                          VS.getDefeatType(drivingVehicle) === "crashed"
-                            ? "error"
-                            : "warning"
-                        }
-                        icon={
-                          VS.getDefeatType(drivingVehicle) === "crashed" ? (
-                            <FaCar size={20} />
-                          ) : (
-                            <FaExclamationTriangle size={20} />
-                          )
-                        }
-                        sx={{
-                          mb: 1,
-                          "& .MuiAlert-icon": {
-                            fontSize: "1.5rem",
-                          },
-                          "& .MuiAlert-message": {
-                            fontWeight: "bold",
-                            fontSize: "0.9rem",
-                            textTransform: "uppercase",
-                            letterSpacing: 1,
-                          },
-                        }}
-                      >
-                        {VS.getDefeatType(drivingVehicle) === "crashed"
-                          ? "Crashed"
-                          : "Boxed In"}
-                      </Alert>
-                    )}
+          <ListItemIcon
+            sx={{
+              mt: 0,
+              minWidth: { xs: 40, sm: 56 },
+              mr: { xs: 1, sm: 0 },
+              p: 0,
+            }}
+          >
+            <Wounds character={character} />
+          </ListItemIcon>
+          <ListItemText
+            sx={{ ml: { xs: 0.5, sm: 2 }, pr: { xs: 10, sm: 0 } }}
+            primary={
+              <CharacterHeader
+                character={character}
+                location={character.location}
+                onLocationClick={handleLocationClick}
+              />
+            }
+            secondary={
+              <>
+                <ActionValues character={character} />
+                {drivingVehicle && (
                   <Box
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
+                      display: "block",
+                      mt: 1,
+                      p: 1,
+                      bgcolor: "action.hover",
+                      borderRadius: 1,
+                      position: "relative",
                     }}
                   >
-                    <Typography
-                      variant="caption"
+                    {/* Alert banner for crashed/boxed in vehicles */}
+                    {VS.isDefeated(drivingVehicle) &&
+                      VS.getDefeatType(drivingVehicle) && (
+                        <Alert
+                          severity={
+                            VS.getDefeatType(drivingVehicle) === "crashed"
+                              ? "error"
+                              : "warning"
+                          }
+                          icon={
+                            VS.getDefeatType(drivingVehicle) === "crashed" ? (
+                              <FaCar size={20} />
+                            ) : (
+                              <FaExclamationTriangle size={20} />
+                            )
+                          }
+                          sx={{
+                            mb: 1,
+                            "& .MuiAlert-icon": {
+                              fontSize: "1.5rem",
+                            },
+                            "& .MuiAlert-message": {
+                              fontWeight: "bold",
+                              fontSize: "0.9rem",
+                              textTransform: "uppercase",
+                              letterSpacing: 1,
+                            },
+                          }}
+                        >
+                          {VS.getDefeatType(drivingVehicle) === "crashed"
+                            ? "Crashed"
+                            : "Boxed In"}
+                        </Alert>
+                      )}
+                    <Box
                       sx={{
-                        color: "text.secondary",
-                        fontStyle: "italic",
-                        display: "block",
-                        mb: 0.5,
-                        fontSize: "0.7rem",
-                        textTransform: "uppercase",
-                        letterSpacing: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
                       }}
                     >
-                      Driving
-                    </Typography>
-                    <Tooltip title="Edit vehicle">
-                      <IconButton
-                        size="small"
-                        onClick={handleVehicleEditClick}
+                      <Typography
+                        variant="caption"
                         sx={{
-                          p: 0.25,
                           color: "text.secondary",
-                          "&:hover": {
-                            color: "primary.main",
-                          },
+                          fontStyle: "italic",
+                          display: "block",
+                          mb: 0.5,
+                          fontSize: "0.7rem",
+                          textTransform: "uppercase",
+                          letterSpacing: 1,
                         }}
                       >
-                        <MdEdit size={14} />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      mb: 1,
-                    }}
-                  >
-                    <VehicleAvatar entity={drivingVehicle} />
+                        Driving
+                      </Typography>
+                      <Tooltip title="Edit vehicle">
+                        <IconButton
+                          size="small"
+                          onClick={handleVehicleEditClick}
+                          sx={{
+                            p: 0.25,
+                            color: "text.secondary",
+                            "&:hover": {
+                              color: "primary.main",
+                            },
+                          }}
+                        >
+                          <MdEdit size={14} />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                     <Box
-                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        mb: 1,
+                      }}
                     >
-                      <VehicleLink vehicle={drivingVehicle} />
-                      {VS.isDefeated(drivingVehicle) &&
-                        VS.getDefeatType(drivingVehicle) &&
-                        (VS.getDefeatType(drivingVehicle) === "crashed" ? (
-                          <FaCar size={16} color="error" />
-                        ) : (
-                          <FaExclamationTriangle size={16} color="warning" />
-                        ))}
+                      <VehicleAvatar entity={drivingVehicle} />
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                      >
+                        <VehicleLink vehicle={drivingVehicle} />
+                        {VS.isDefeated(drivingVehicle) &&
+                          VS.getDefeatType(drivingVehicle) &&
+                          (VS.getDefeatType(drivingVehicle) === "crashed" ? (
+                            <FaCar size={16} color="error" />
+                          ) : (
+                            <FaExclamationTriangle size={16} color="warning" />
+                          ))}
+                      </Box>
+                    </Box>
+                    <VehicleActionValues vehicle={drivingVehicle} />
+                    <Box sx={{ mt: 1 }}>
+                      <ChaseConditionPoints
+                        vehicle={drivingVehicle}
+                        driver={character}
+                      />
                     </Box>
                   </Box>
-                  <VehicleActionValues vehicle={drivingVehicle} />
-                  <Box sx={{ mt: 1 }}>
-                    <ChaseConditionPoints
-                      vehicle={drivingVehicle}
-                      driver={character}
-                    />
-                  </Box>
-                </Box>
-              )}
-              <CharacterEffectsDisplay
-                character={character}
-                effects={character.effects || []}
-              />
-            </>
-          }
-          secondaryTypographyProps={{
-            component: "div",
-          }}
-        />
-        <Box
-          sx={{
-            position: "absolute",
-            top: { xs: 4, sm: 8 },
-            right: { xs: 4, sm: 8 },
-            display: "flex",
-            flexDirection: "row",
-            gap: { xs: 0.25, sm: 0.5 },
-            alignItems: "flex-end",
-          }}
-        >
-          <Tooltip title="Edit character details">
-            <IconButton
-              aria-label="edit"
-              onClick={handleEditClick}
-              size="small"
-              sx={{
-                p: { xs: 0.5, sm: 1 },
-                color: "text.secondary",
-                "&:hover": {
-                  color: "primary.main",
-                  backgroundColor: "action.hover",
-                },
-              }}
-            >
-              <MdEdit size={16} />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Heal wounds">
-            <IconButton
-              aria-label="heal"
-              onClick={handleHealClick}
-              size="small"
-              sx={{
-                p: { xs: 0.5, sm: 1 },
-                color: "text.secondary",
-                "&:hover": {
-                  color: "success.main",
-                  backgroundColor: "action.hover",
-                },
-              }}
-            >
-              <FaHeart size={16} />
-            </IconButton>
-          </Tooltip>
-          {isHidden ? (
-            <Tooltip title="Show character">
+                )}
+                <CharacterEffectsDisplay
+                  character={character}
+                  effects={character.effects || []}
+                />
+              </>
+            }
+            secondaryTypographyProps={{
+              component: "div",
+            }}
+          />
+          <Box
+            sx={{
+              position: "absolute",
+              top: { xs: 4, sm: 8 },
+              right: { xs: 4, sm: 8 },
+              display: "flex",
+              flexDirection: "row",
+              gap: { xs: 0.25, sm: 0.5 },
+              alignItems: "flex-end",
+            }}
+          >
+            <Tooltip title="Edit character details">
               <IconButton
-                aria-label="show"
-                onClick={handleShowClick}
+                aria-label="edit"
+                onClick={handleEditClick}
+                size="small"
+                sx={{
+                  p: { xs: 0.5, sm: 1 },
+                  color: "text.secondary",
+                  "&:hover": {
+                    color: "primary.main",
+                    backgroundColor: "action.hover",
+                  },
+                }}
+              >
+                <MdEdit size={16} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Heal wounds">
+              <IconButton
+                aria-label="heal"
+                onClick={handleHealClick}
                 size="small"
                 sx={{
                   p: { xs: 0.5, sm: 1 },
@@ -437,69 +420,88 @@ export default function CharacterDetail({
                   },
                 }}
               >
-                <FaEye size={16} />
+                <FaHeart size={16} />
               </IconButton>
             </Tooltip>
-          ) : (
-            <Tooltip title="Hide character">
+            {isHidden ? (
+              <Tooltip title="Show character">
+                <IconButton
+                  aria-label="show"
+                  onClick={handleShowClick}
+                  size="small"
+                  sx={{
+                    p: { xs: 0.5, sm: 1 },
+                    color: "text.secondary",
+                    "&:hover": {
+                      color: "success.main",
+                      backgroundColor: "action.hover",
+                    },
+                  }}
+                >
+                  <FaEye size={16} />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Hide character">
+                <IconButton
+                  aria-label="hide"
+                  onClick={handleHideClick}
+                  size="small"
+                  sx={{
+                    p: { xs: 0.5, sm: 1 },
+                    color: "text.secondary",
+                    "&:hover": {
+                      color: "warning.main",
+                      backgroundColor: "action.hover",
+                    },
+                  }}
+                >
+                  <FaEyeSlash size={16} />
+                </IconButton>
+              </Tooltip>
+            )}
+            <Tooltip title="Remove from encounter">
               <IconButton
-                aria-label="hide"
-                onClick={handleHideClick}
+                aria-label="remove"
+                onClick={handleRemoveClick}
                 size="small"
                 sx={{
                   p: { xs: 0.5, sm: 1 },
                   color: "text.secondary",
                   "&:hover": {
-                    color: "warning.main",
+                    color: "error.main",
                     backgroundColor: "action.hover",
                   },
                 }}
               >
-                <FaEyeSlash size={16} />
+                <FaTimes size={16} />
               </IconButton>
             </Tooltip>
-          )}
-          <Tooltip title="Remove from encounter">
-            <IconButton
-              aria-label="remove"
-              onClick={handleRemoveClick}
-              size="small"
-              sx={{
-                p: { xs: 0.5, sm: 1 },
-                color: "text.secondary",
-                "&:hover": {
-                  color: "error.main",
-                  backgroundColor: "action.hover",
-                },
-              }}
-            >
-              <FaTimes size={16} />
-            </IconButton>
-          </Tooltip>
-          {character.user_id && (
-            <Tooltip title="View as player">
-              <IconButton
-                aria-label="player view"
-                component={Link}
-                href={`/encounters/${encounter.id}/play/${character.id}`}
-                target="_blank"
-                size="small"
-                sx={{
-                  p: { xs: 0.5, sm: 1 },
-                  color: "text.secondary",
-                  "&:hover": {
-                    color: "info.main",
-                    backgroundColor: "action.hover",
-                  },
-                }}
-              >
-                <FaUser size={16} />
-              </IconButton>
-            </Tooltip>
-          )}
-          <Actions entity={character} />
-        </Box>
-      </ListItem>
+            {character.user_id && (
+              <Tooltip title="View as player">
+                <IconButton
+                  aria-label="player view"
+                  component={Link}
+                  href={`/encounters/${encounter.id}/play/${character.id}`}
+                  target="_blank"
+                  size="small"
+                  sx={{
+                    p: { xs: 0.5, sm: 1 },
+                    color: "text.secondary",
+                    "&:hover": {
+                      color: "info.main",
+                      backgroundColor: "action.hover",
+                    },
+                  }}
+                >
+                  <FaUser size={16} />
+                </IconButton>
+              </Tooltip>
+            )}
+            <Actions entity={character} />
+          </Box>
+        </ListItem>
+      </motion.div>
 
       {/* Confirmation Dialog */}
       <Dialog
@@ -592,6 +594,6 @@ export default function CharacterDetail({
         onClose={handleHealClose}
         character={character}
       />
-    </motion.div>
+    </>
   )
 }
