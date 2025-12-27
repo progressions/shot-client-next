@@ -216,9 +216,14 @@ export default function ChaseResolution({
         result.target.action_values
       )
 
-      // Get the vehicle IDs (vehicles were already extracted earlier)
+      // Get the vehicle IDs (template IDs) for updating vehicle stats
       const attackerVehicleId = attackerVehicle?.id
       const targetVehicleId = targetVehicle?.id
+
+      // Get the shot IDs (instance IDs) for chase relationships
+      // These uniquely identify vehicle instances in the fight
+      const attackerShotId = attackerVehicle?.shot_id
+      const targetShotId = targetVehicle?.shot_id
 
       if (!attackerVehicleId || !targetVehicleId) {
         toastError("Unable to identify vehicles for chase action")
@@ -226,17 +231,23 @@ export default function ChaseResolution({
         return
       }
 
+      if (!attackerShotId || !targetShotId) {
+        toastError("Unable to identify vehicle instances for chase action")
+        setIsProcessing(false)
+        return
+      }
+
       // Get the shot cost from form state
       const shotCost = formState.data.shotCost || 3
 
-      // Get the driver character ID from form state
+      // Get the driver shot_id from form state
       // The 'attacker' in form state is actually the driver character
-      const driverCharacterId = (
+      const driverShotId = (
         formState.data as ChaseFormData & { attacker?: Character }
-      ).attacker?.id
+      ).attacker?.shot_id
 
       console.log("Chase Resolution - Shot cost:", shotCost)
-      console.log("Chase Resolution - Driver character ID:", driverCharacterId)
+      console.log("Chase Resolution - Driver shot ID:", driverShotId)
       console.log(
         "Chase Resolution - Position change:",
         formState.data.position,
@@ -260,9 +271,12 @@ export default function ChaseResolution({
         {
           vehicle_id: attackerVehicleId,
           target_vehicle_id: targetVehicleId,
+          // Shot IDs uniquely identify vehicle instances in the fight (for chase relationships)
+          shot_id: attackerShotId,
+          target_shot_id: targetShotId,
           role: formState.data.attackerRole || "pursuer", // Include attacker's role
           shot_cost: shotCost, // Add shot cost for the attacker
-          character_id: driverCharacterId, // Use driver's character ID to spend shots
+          driver_shot_id: driverShotId, // Use driver's shot_id to spend shots
           fortune_spent: fortuneUsed, // Add fortune spent
           action_values: attackerVehicleValues,
           position: finalPosition, // Use the calculated position
@@ -281,11 +295,9 @@ export default function ChaseResolution({
           },
         },
         {
+          // Target update: only updates vehicle stats, does NOT create chase relationship
+          // (chase relationship is created by the attacker's update above)
           vehicle_id: targetVehicleId,
-          target_vehicle_id: attackerVehicleId,
-          role:
-            formState.data.attackerRole === "pursuer" ? "evader" : "pursuer", // Target has opposite role
-          position: finalPosition, // Use the calculated position
           action_values: targetVehicleValues,
           action_type: actionType, // Track if target was rammed
         },
