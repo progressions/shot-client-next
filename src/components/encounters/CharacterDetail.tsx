@@ -47,7 +47,7 @@ import { VehicleLink } from "@/components/ui/links"
 import Link from "next/link"
 import { encounterTransition } from "@/contexts/EncounterContext"
 import { useEncounter, useClient, useToast, useApp } from "@/contexts"
-import { VS } from "@/services"
+import { CS, VS } from "@/services"
 
 type CharacterDetailProps = {
   character: Character
@@ -116,6 +116,10 @@ export default function CharacterDetail({
   const isHidden =
     characterWithShot.current_shot === null ||
     characterWithShot.current_shot === undefined
+
+  // Check if mook with zero count (all defeated)
+  const isMookWithZeroCount =
+    CS.isMook(character) && (character.count || 0) === 0
 
   const handleEditClick = () => {
     setEditDialogOpen(true)
@@ -246,11 +250,35 @@ export default function CharacterDetail({
           <ListItemText
             sx={{ ml: { xs: 0.5, sm: 2 }, pr: { xs: 10, sm: 0 } }}
             primary={
-              <CharacterHeader
-                character={character}
-                location={character.location}
-                onLocationClick={handleLocationClick}
-              />
+              <>
+                <CharacterHeader
+                  character={character}
+                  location={character.location}
+                  onLocationClick={handleLocationClick}
+                />
+                {isMookWithZeroCount && (
+                  <Alert
+                    severity="error"
+                    icon={<FaExclamationTriangle size={16} />}
+                    sx={{
+                      mt: 1,
+                      py: 0.5,
+                      "& .MuiAlert-icon": {
+                        fontSize: "1rem",
+                        py: 0.5,
+                      },
+                      "& .MuiAlert-message": {
+                        fontWeight: "bold",
+                        fontSize: "0.8rem",
+                        textTransform: "uppercase",
+                        letterSpacing: 1,
+                      },
+                    }}
+                  >
+                    All Mooks Defeated
+                  </Alert>
+                )}
+              </>
             }
             secondary={
               <>
@@ -374,6 +402,9 @@ export default function CharacterDetail({
                 />
               </>
             }
+            primaryTypographyProps={{
+              component: "div",
+            }}
             secondaryTypographyProps={{
               component: "div",
             }}
