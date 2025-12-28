@@ -205,7 +205,8 @@ export function createWoundUpdate(
     if (isMook) {
       update.count = newWounds
     } else {
-      update.wounds = newWounds
+      // Send incremental wounds, not total - backend adds to current count
+      update.wounds = wounds
     }
   }
 
@@ -309,7 +310,8 @@ export function createMookVsNonMookUpdate(
     }
   } else {
     // For NPCs, wounds go on the shot record
-    update.wounds = newWounds
+    // Send incremental wounds, not total - backend adds to current count
+    update.wounds = totalWounds
   }
 
   return update
