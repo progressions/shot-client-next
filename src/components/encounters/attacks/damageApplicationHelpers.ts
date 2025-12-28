@@ -142,7 +142,7 @@ export async function handleMookApplication({
       calculateEffectiveAttackValue,
       attackerWeapons,
       toastSuccess,
-      selectedTargetIds.length === 1 ? finalDamage : undefined
+      selectedTargetIds.length === 1 && finalDamage ? finalDamage : undefined
     )
     return true
   }

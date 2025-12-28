@@ -271,7 +271,7 @@ export async function handleMookAttack(
     // For single target attacks, use the user-editable finalDamage if provided
     // Otherwise, calculate from the mook rolls
     const totalWounds =
-      finalDamageOverride !== undefined && mookRolls.length === 1
+      finalDamageOverride !== undefined
         ? parseInt(finalDamageOverride) || 0
         : targetGroup.rolls.reduce((sum, r) => sum + r.wounds, 0)
     if (totalWounds === 0) continue // Skip targets with no wounds
