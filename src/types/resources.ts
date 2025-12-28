@@ -350,6 +350,7 @@ export interface Person extends BaseEntity {
   site_ids?: string[]
   weapons: Weapon[]
   weapon_ids?: string[]
+  equipped_weapon_id?: string | null
   party_ids?: string[]
   user?: User
   user_id: string

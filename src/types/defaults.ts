@@ -91,6 +91,7 @@ export const defaultCharacter: Person = {
   advancements: [],
   sites: [],
   weapons: [],
+  equipped_weapon_id: null,
   count: 0,
   shot_id: "",
   image_url: "",
