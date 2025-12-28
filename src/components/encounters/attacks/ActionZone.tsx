@@ -402,7 +402,9 @@ export default function ActionZone({
                     variant="caption"
                     sx={{ color: "rgba(255,255,255,0.8)", display: "block" }}
                   >
-                    Wounds
+                    {primaryTarget && CS.isMook(primaryTarget)
+                      ? "Mooks"
+                      : "Wounds"}
                   </Typography>
                   <Typography
                     variant="h6"
@@ -509,7 +511,9 @@ export default function ActionZone({
                 : hasSwerve && isHit
                   ? selectedTargetIds.length > 1
                     ? "Apply Wounds"
-                    : `Apply ${finalDamage || 0} Wounds`
+                    : primaryTarget && CS.isMook(primaryTarget)
+                      ? `Kill ${finalDamage || 0} Mook${(parseInt(finalDamage) || 0) === 1 ? "" : "s"}`
+                      : `Apply ${finalDamage || 0} Wounds`
                   : hasSwerve && !isHit
                     ? "Apply Miss"
                     : "Enter Swerve to Resolve"}
