@@ -249,6 +249,7 @@ interface CalculateNonMookDamageOutcomeParams {
   allShots: Shot[]
   targetMookCount: number
   targetMookCountPerTarget: { [key: string]: number }
+  manualDefensePerTarget: { [key: string]: string }
   manualToughnessPerTarget: { [key: string]: string }
   encounter: Encounter
   calculateEffectiveAttackValue: () => number
@@ -272,6 +273,7 @@ export function calculateNonMookDamageOutcome({
   allShots,
   targetMookCount,
   targetMookCountPerTarget,
+  manualDefensePerTarget,
   manualToughnessPerTarget,
   encounter,
   calculateEffectiveAttackValue,
@@ -308,7 +310,15 @@ export function calculateNonMookDamageOutcome({
           const targetChar = targetShot?.character
           if (!targetChar) return null
 
-          const targetDefense = CS.defense(targetChar)
+          // Use manual defense override if set, otherwise use effects-adjusted defense
+          const targetDefense = manualDefensePerTarget[targetId]
+            ? parseInt(manualDefensePerTarget[targetId])
+            : CES.adjustedActionValue(
+                targetChar,
+                "Defense",
+                encounter,
+                false
+              )[1]
           // Use manual toughness override if set, otherwise use effects-adjusted toughness
           const targetToughness = manualToughnessPerTarget[targetId]
             ? parseInt(manualToughnessPerTarget[targetId])

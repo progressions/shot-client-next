@@ -276,6 +276,7 @@ export function useAttackPanelController({
       allShots,
       targetMookCount,
       targetMookCountPerTarget,
+      manualDefensePerTarget,
       manualToughnessPerTarget,
       encounter,
       calculateEffectiveAttackValue,
