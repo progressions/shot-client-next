@@ -73,10 +73,14 @@ export default function TargetDefenseDisplay({
   const currentDefense = manualDefensePerTarget[targetId]
     ? parseInt(manualDefensePerTarget[targetId])
     : calculateTargetDefense(char, targetId)
+  // Calculate toughness including character effects
   const baseToughness = CS.toughness(char)
+  const [_toughnessChange, adjustedToughness] = encounter
+    ? CES.adjustedActionValue(char, "Toughness", encounter, true)
+    : [0, baseToughness]
   const currentToughness = manualToughnessPerTarget[targetId]
     ? parseInt(manualToughnessPerTarget[targetId])
-    : baseToughness
+    : adjustedToughness
 
   // For mook attackers, show a simpler display without dodge buttons and fields
   if (CS.isMook(attacker)) {

@@ -9,7 +9,7 @@ import {
   Button,
 } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
-import { CS } from "@/services"
+import { CS, CES } from "@/services"
 import type { TargetSectionProps, Encounter } from "@/types"
 import { NumberField } from "@/components/ui"
 import CharacterSelector from "../CharacterSelector"
@@ -536,7 +536,12 @@ export default function TargetSection({
                             }
                             value={
                               manualToughnessPerTarget[targetId] ??
-                              CS.toughness(target)
+                              CES.adjustedActionValue(
+                                target,
+                                "Toughness",
+                                encounter,
+                                true
+                              )[1]
                             }
                             size="small"
                             width="80px"
