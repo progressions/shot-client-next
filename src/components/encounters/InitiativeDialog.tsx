@@ -66,6 +66,12 @@ export default function InitiativeDialog({
       return baseSpeed
     }
 
+    // If character is driving, use vehicle's Acceleration without applying Speed effects
+    const charWithDriving = entity as Character & { driving?: Vehicle }
+    if (charWithDriving.driving) {
+      return baseSpeed
+    }
+
     // Apply character effects to Speed
     const [, adjustedSpeed] = CharacterEffectService.adjustedValue(
       entity as Character,
