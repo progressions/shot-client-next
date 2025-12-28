@@ -123,7 +123,7 @@ export async function handleMookApplication({
   toastSuccess,
   toastError,
 }: DamageApplicationParams): Promise<boolean> {
-  const { shotCost, weaponDamage } = formStateData
+  const { shotCost, weaponDamage, finalDamage } = formStateData
 
   if (
     CS.isMook(attacker) &&
@@ -141,7 +141,8 @@ export async function handleMookApplication({
       weaponDamage,
       calculateEffectiveAttackValue,
       attackerWeapons,
-      toastSuccess
+      toastSuccess,
+      selectedTargetIds.length === 1 && finalDamage ? finalDamage : undefined
     )
     return true
   }
