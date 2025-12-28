@@ -262,7 +262,13 @@ export default function InitiativeDialog({
         </Box>
         <Typography
           variant="body2"
-          color={hasModifiedSpeed ? "info.main" : "text.secondary"}
+          color={
+            hasModifiedSpeed
+              ? speed > baseSpeed
+                ? "success.main"
+                : "error.main"
+              : "text.secondary"
+          }
           sx={{ width: 90 }}
           title={
             hasModifiedSpeed
