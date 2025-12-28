@@ -59,6 +59,7 @@ export default function AttackPanel({
     attackerShotId,
     attackValue,
     defenseValue,
+    toughnessValue,
     weaponDamage,
     swerve,
     smackdown,
@@ -214,6 +215,7 @@ export default function AttackPanel({
                 finalDamage={finalDamage}
                 shotCost={shotCost}
                 defenseValue={defenseValue}
+                toughnessValue={toughnessValue}
                 weaponDamage={weaponDamage}
                 selectedTargetIds={selectedTargetIds}
                 allShots={allShots}
