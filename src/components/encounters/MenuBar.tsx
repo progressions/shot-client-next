@@ -498,6 +498,7 @@ export default function MenuBar({
         onClose={() => setInitiativeDialogOpen(false)}
         characters={getAllCombatants()}
         onApply={handleApplyInitiatives}
+        encounter={encounter}
       />
       <LocationsDialog
         open={locationsDialogOpen}

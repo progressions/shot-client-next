@@ -14,8 +14,9 @@ import {
   Divider,
 } from "@mui/material"
 import { FaDice } from "react-icons/fa"
-import { Character, Vehicle } from "@/types"
+import { Character, Vehicle, Encounter } from "@/types"
 import CharacterService from "@/services/CharacterService"
+import CharacterEffectService from "@/services/CharacterEffectService"
 import { CS, VS } from "@/services"
 import Dice from "@/services/DiceService"
 
@@ -24,6 +25,7 @@ interface InitiativeDialogProps {
   onClose: () => void
   characters: (Character | Vehicle)[]
   onApply: (updatedCharacters: (Character | Vehicle)[]) => void
+  encounter: Encounter
 }
 
 interface CharacterInitiative {
@@ -37,13 +39,14 @@ export default function InitiativeDialog({
   onClose,
   characters,
   onApply,
+  encounter,
 }: InitiativeDialogProps) {
   const [characterInitiatives, setCharacterInitiatives] = useState<
     CharacterInitiative[]
   >([])
 
-  // Helper function to get speed value - uses vehicle's Acceleration if driving
-  const getSpeedValue = (entity: Character | Vehicle): number => {
+  // Helper function to get base speed value - uses vehicle's Acceleration if driving
+  const getBaseSpeedValue = (entity: Character | Vehicle): number => {
     // Check if this is a character who is driving
     const charWithDriving = entity as Character & { driving?: Vehicle }
     if (charWithDriving.driving && !CS.isVehicle(entity)) {
@@ -52,6 +55,34 @@ export default function InitiativeDialog({
     }
     // Otherwise use normal Speed
     return CharacterService.speed(entity)
+  }
+
+  // Helper function to get speed value including effects
+  const getSpeedValue = (entity: Character | Vehicle): number => {
+    const baseSpeed = getBaseSpeedValue(entity)
+
+    // Vehicles don't have character effects applied to Speed
+    if (CS.isVehicle(entity)) {
+      return baseSpeed
+    }
+
+    // Apply character effects to Speed
+    const [, adjustedSpeed] = CharacterEffectService.adjustedValue(
+      entity as Character,
+      baseSpeed,
+      "Speed",
+      encounter,
+      true // ignoreImpairments - impairments affect Attack/Defense, not Speed
+    )
+    return adjustedSpeed
+  }
+
+  // Helper function to check if speed is modified by effects
+  const isSpeedModified = (entity: Character | Vehicle): boolean => {
+    if (CS.isVehicle(entity)) return false
+    const baseSpeed = getBaseSpeedValue(entity)
+    const adjustedSpeed = getSpeedValue(entity)
+    return baseSpeed !== adjustedSpeed
   }
 
   // Initialize character initiatives when dialog opens
@@ -175,6 +206,8 @@ export default function InitiativeDialog({
 
   const renderCharacterRow = (ci: CharacterInitiative) => {
     const speed = getSpeedValue(ci.character)
+    const baseSpeed = getBaseSpeedValue(ci.character)
+    const hasModifiedSpeed = isSpeedModified(ci.character)
     const isPC = CS.isType(ci.character, ["PC", "Ally"])
 
     // Check if character is driving
@@ -227,8 +260,27 @@ export default function InitiativeDialog({
             </Typography>
           )}
         </Box>
-        <Typography variant="body2" color="text.secondary" sx={{ width: 70 }}>
+        <Typography
+          variant="body2"
+          color={hasModifiedSpeed ? "info.main" : "text.secondary"}
+          sx={{ width: 90 }}
+          title={
+            hasModifiedSpeed
+              ? `Base ${isDriving ? "Acc" : "Speed"}: ${baseSpeed}, Modified by effects`
+              : undefined
+          }
+        >
           {isDriving ? "Acc" : "Speed"}: {speed}
+          {hasModifiedSpeed && (
+            <Typography
+              component="span"
+              variant="body2"
+              color="text.secondary"
+              sx={{ ml: 0.5 }}
+            >
+              ({baseSpeed})
+            </Typography>
+          )}
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <TextField
