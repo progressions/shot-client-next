@@ -256,7 +256,7 @@ export function createMookVsMookUpdate(
 // Helper to create mook vs non-mook wound update
 export function createMookVsNonMookUpdate(
   targetChar: Character,
-  totalWounds: number,
+  damageDealt: number,
   attackerName: string,
   attackerShot: Shot,
   mookCount: number,
@@ -270,7 +270,7 @@ export function createMookVsNonMookUpdate(
 ): CharacterUpdate {
   const isPC = CS.isPC(targetChar)
   const currentWounds = CS.wounds(targetChar)
-  const newWounds = currentWounds + totalWounds
+  const newWounds = currentWounds + damageDealt
 
   // Calculate impairments
   const originalImpairments = targetChar.impairments || 0
@@ -287,11 +287,11 @@ export function createMookVsNonMookUpdate(
     impairments: newImpairments,
     event: {
       type: "attack",
-      description: `${mookCount} ${attackerName} attacked ${targetChar.name} for ${totalWounds} wounds`,
+      description: `${mookCount} ${attackerName} attacked ${targetChar.name} for ${damageDealt} wounds`,
       details: {
         attacker_id: attackerShot.character?.id,
         target_id: targetChar.id,
-        damage: totalWounds,
+        damage: damageDealt,
         attack_value: context.attackValue,
         defense_value: context.defenseValue,
         weapon_damage: context.weaponDamage,
@@ -310,8 +310,8 @@ export function createMookVsNonMookUpdate(
     }
   } else {
     // For NPCs, wounds go on the shot record
-    // Send incremental wounds, not total - backend adds to current count
-    update.wounds = totalWounds
+    // Send incremental damage, not total - backend adds to current count
+    update.wounds = damageDealt
   }
 
   return update

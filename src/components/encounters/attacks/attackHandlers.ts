@@ -270,18 +270,18 @@ export async function handleMookAttack(
 
     // For single target attacks, use the user-editable finalDamage if provided
     // Otherwise, calculate from the mook rolls
-    const totalWounds =
+    const damageDealt =
       finalDamageOverride !== undefined
         ? parseInt(finalDamageOverride) || 0
         : targetGroup.rolls.reduce((sum, r) => sum + r.wounds, 0)
-    if (totalWounds === 0) continue // Skip targets with no wounds
+    if (damageDealt === 0) continue // Skip targets with no damage
 
     // Check if this is mook vs mook combat
     if (CS.isMook(targetChar)) {
       // Mook vs mook: reduce mook count instead of applying wounds
       const update = createMookVsMookUpdate(
         targetChar,
-        totalWounds,
+        damageDealt,
         attacker.name,
         attackerShot,
         targetGroup.rolls.length,
@@ -298,13 +298,13 @@ export async function handleMookAttack(
       )
       characterUpdates.push(update)
       toastSuccess(
-        `Eliminated ${totalWounds} ${targetChar.name}${totalWounds !== 1 ? "s" : ""}`
+        `Eliminated ${damageDealt} ${targetChar.name}${damageDealt !== 1 ? "s" : ""}`
       )
     } else {
       // Mook vs non-mook: apply wounds normally
       const update = createMookVsNonMookUpdate(
         targetChar,
-        totalWounds,
+        damageDealt,
         attacker.name,
         attackerShot,
         targetGroup.rolls.length,
@@ -322,7 +322,7 @@ export async function handleMookAttack(
       )
       characterUpdates.push(update)
       toastSuccess(
-        `Applied ${totalWounds} wound${totalWounds !== 1 ? "s" : ""} to ${targetChar.name}`
+        `Applied ${damageDealt} wound${damageDealt !== 1 ? "s" : ""} to ${targetChar.name}`
       )
     }
   }
