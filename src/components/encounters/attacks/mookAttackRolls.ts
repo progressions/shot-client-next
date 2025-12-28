@@ -1,5 +1,5 @@
-import { CS, DS } from "@/services"
-import type { Character, Shot, Weapon } from "@/types"
+import { CS, DS, CES } from "@/services"
+import type { Character, Shot, Weapon, Encounter } from "@/types"
 
 export interface MookRollResult {
   mookNumber: number
@@ -38,6 +38,9 @@ interface CalculateMookRollsParams {
   toughnessValue: string
   targetShotId: string
   totalAttackingMooks: number
+  manualDefensePerTarget: { [key: string]: string }
+  manualToughnessPerTarget: { [key: string]: string }
+  encounter: Encounter
 }
 
 export function calculateMookRolls({
@@ -53,6 +56,9 @@ export function calculateMookRolls({
   toughnessValue,
   targetShotId,
   totalAttackingMooks,
+  manualDefensePerTarget,
+  manualToughnessPerTarget,
+  encounter,
 }: CalculateMookRollsParams): MookAttackRollsOutput | null {
   if (!attacker || !CS.isMook(attacker)) return null
 
@@ -73,8 +79,14 @@ export function calculateMookRolls({
       if (mookCount === 0) return
 
       // Get defense and toughness for this specific target
-      const targetDefense = CS.defense(targetChar)
-      const targetToughness = CS.toughness(targetChar)
+      // Use manual defense override if set, otherwise use effects-adjusted defense
+      const targetDefense = manualDefensePerTarget[targetId]
+        ? parseInt(manualDefensePerTarget[targetId])
+        : CES.adjustedActionValue(targetChar, "Defense", encounter, false)[1]
+      // Use manual toughness override if set, otherwise use effects-adjusted toughness
+      const targetToughness = manualToughnessPerTarget[targetId]
+        ? parseInt(manualToughnessPerTarget[targetId])
+        : CES.adjustedActionValue(targetChar, "Toughness", encounter, true)[1]
 
       const targetRolls: MookRollResult[] = []
       let targetTotalWounds = 0
