@@ -404,15 +404,20 @@ export function initializeAttackerProperties({
   }
 
   if (charWeapons.length > 0) {
-    const firstWeapon = charWeapons[0]
-    updates.selectedWeaponId = firstWeapon.id?.toString() || ""
+    // Use equipped weapon if available and valid, otherwise use first weapon
+    const equippedWeaponId = attacker.equipped_weapon_id
+    const equippedWeapon = equippedWeaponId
+      ? charWeapons.find(w => w.id === equippedWeaponId)
+      : undefined
+    const selectedWeapon = equippedWeapon || charWeapons[0]
+    updates.selectedWeaponId = selectedWeapon.id?.toString() || ""
     const [damageChange] = CES.adjustedActionValue(
       attacker,
       "Damage",
       encounter,
       true
     )
-    updates.weaponDamage = (firstWeapon.damage + damageChange).toString()
+    updates.weaponDamage = (selectedWeapon.damage + damageChange).toString()
     updates.damageChange = damageChange
   } else {
     updates.selectedWeaponId = "unarmed"
