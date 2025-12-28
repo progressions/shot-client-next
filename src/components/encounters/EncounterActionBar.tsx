@@ -13,7 +13,7 @@ import {
 } from "react-icons/fa6"
 import { MenuButton } from "@/components/ui"
 import type { Character, Vehicle } from "@/types"
-import { VS } from "@/services"
+import { CS, VS } from "@/services"
 import { useEncounter } from "@/contexts"
 import { getAllVisibleShots } from "./attacks/shotSorting"
 
@@ -77,6 +77,12 @@ export default function EncounterActionBar({
     ? VS.isDefeated(drivingVehicle)
     : false
 
+  // Mooks with zero count cannot take actions
+  const isMookWithZeroCount =
+    selectedCharacter &&
+    CS.isMook(selectedCharacter) &&
+    (selectedCharacter.count || 0) === 0
+
   return (
     <Collapse in={true} timeout={300}>
       <Paper
@@ -130,8 +136,16 @@ export default function EncounterActionBar({
         >
           <MenuButton
             onClick={() => handleAction("attack")}
-            disabled={!selectedCharacter || !hasAttackSkills}
-            title={!selectedCharacter ? "Select a character first" : "Attack"}
+            disabled={
+              !selectedCharacter || !hasAttackSkills || isMookWithZeroCount
+            }
+            title={
+              !selectedCharacter
+                ? "Select a character first"
+                : isMookWithZeroCount
+                  ? "All mooks defeated"
+                  : "Attack"
+            }
             isActive={activePanel === "attack"}
           >
             <FaGun size={20} />
@@ -140,8 +154,8 @@ export default function EncounterActionBar({
           {isDriving && !isVehicleDefeated && (
             <MenuButton
               onClick={() => handleAction("chase")}
-              title="Chase"
-              disabled={!selectedCharacter}
+              title={isMookWithZeroCount ? "All mooks defeated" : "Chase"}
+              disabled={!selectedCharacter || isMookWithZeroCount}
               isActive={activePanel === "chase"}
             >
               <FaCar size={20} />
@@ -150,8 +164,14 @@ export default function EncounterActionBar({
 
           <MenuButton
             onClick={() => handleAction("boost")}
-            disabled={!selectedCharacter}
-            title={!selectedCharacter ? "Select a character first" : "Boost"}
+            disabled={!selectedCharacter || isMookWithZeroCount}
+            title={
+              !selectedCharacter
+                ? "Select a character first"
+                : isMookWithZeroCount
+                  ? "All mooks defeated"
+                  : "Boost"
+            }
             isActive={activePanel === "boost"}
           >
             <FaRocket size={20} />
@@ -159,8 +179,14 @@ export default function EncounterActionBar({
 
           <MenuButton
             onClick={() => handleAction("heal")}
-            disabled={!selectedCharacter}
-            title={!selectedCharacter ? "Select a character first" : "Heal"}
+            disabled={!selectedCharacter || isMookWithZeroCount}
+            title={
+              !selectedCharacter
+                ? "Select a character first"
+                : isMookWithZeroCount
+                  ? "All mooks defeated"
+                  : "Heal"
+            }
             isActive={activePanel === "heal"}
           >
             <HealIcon />
@@ -168,9 +194,13 @@ export default function EncounterActionBar({
 
           <MenuButton
             onClick={() => handleAction("cheese")}
-            disabled={!selectedCharacter}
+            disabled={!selectedCharacter || isMookWithZeroCount}
             title={
-              !selectedCharacter ? "Select a character first" : "Cheese It"
+              !selectedCharacter
+                ? "Select a character first"
+                : isMookWithZeroCount
+                  ? "All mooks defeated"
+                  : "Cheese It"
             }
             isActive={activePanel === "cheese"}
           >
