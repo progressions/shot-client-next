@@ -30,6 +30,7 @@ interface ActionZoneProps {
   finalDamage: string
   shotCost: string
   defenseValue: string
+  toughnessValue: string
   weaponDamage: string
 
   // Target info
@@ -60,6 +61,7 @@ export default function ActionZone({
   finalDamage,
   shotCost,
   defenseValue,
+  toughnessValue,
   weaponDamage,
   selectedTargetIds,
   allShots,
@@ -77,6 +79,7 @@ export default function ActionZone({
   const parsedAttack = parseInt(attackValue) || 0
   const parsedDefense = parseInt(defenseValue) || 0
   const parsedDamage = parseInt(weaponDamage) || 0
+  const parsedToughness = parseInt(toughnessValue) || 0
 
   // Calculate outcome preview
   const actionResult = parsedAttack + parsedSwerve
@@ -384,6 +387,25 @@ export default function ActionZone({
                         sx={{ fontWeight: "bold", color: "error.main" }}
                       >
                         {smackdown || outcome + parsedDamage}
+                      </Typography>
+                    </Box>
+                  </>
+                )}
+                {showSmackdown && (
+                  <>
+                    <Typography sx={{ color: "text.secondary" }}>−</Typography>
+                    <Box sx={{ textAlign: "center" }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ color: "text.secondary", display: "block" }}
+                      >
+                        Toughness
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{ fontWeight: "bold", color: "info.main" }}
+                      >
+                        {parsedToughness}
                       </Typography>
                     </Box>
                   </>
