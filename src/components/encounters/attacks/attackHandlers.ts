@@ -247,7 +247,8 @@ export async function handleMookAttack(
     shots: Shot[]
   ) => number,
   attackerWeapons: Weapon[],
-  toastSuccess: (msg: string) => void
+  toastSuccess: (msg: string) => void,
+  finalDamageOverride?: string
 ): Promise<void> {
   // Use the shotCost as-is (it's already a number), default to 3 only if undefined/NaN
   const shots = typeof shotCost === "number" && !isNaN(shotCost) ? shotCost : 3
@@ -267,7 +268,12 @@ export async function handleMookAttack(
     const targetChar = targetShot?.character
     if (!targetChar) continue
 
-    const totalWounds = targetGroup.rolls.reduce((sum, r) => sum + r.wounds, 0)
+    // For single target attacks, use the user-editable finalDamage if provided
+    // Otherwise, calculate from the mook rolls
+    const totalWounds =
+      finalDamageOverride !== undefined && mookRolls.length === 1
+        ? parseInt(finalDamageOverride) || 0
+        : targetGroup.rolls.reduce((sum, r) => sum + r.wounds, 0)
     if (totalWounds === 0) continue // Skip targets with no wounds
 
     // Check if this is mook vs mook combat
