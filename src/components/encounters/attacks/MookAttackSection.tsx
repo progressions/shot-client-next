@@ -63,10 +63,9 @@ export default function MookAttackSection({
                   s => s.character?.shot_id === targetGroup.targetId
                 )
                 const targetChar = targetShot?.character
-                const targetDefense = targetChar ? CS.defense(targetChar) : 0
-                const targetToughness = targetChar
-                  ? CS.toughness(targetChar)
-                  : 0
+                // Use the defense and toughness from the roll results (already effects-adjusted)
+                const targetDefense = targetGroup.targetDefense
+                const targetToughness = targetGroup.targetToughness
                 const hits = targetGroup.rolls.filter(r => r.hit).length
                 const totalWounds = targetGroup.rolls.reduce(
                   (sum, r) => sum + r.wounds,

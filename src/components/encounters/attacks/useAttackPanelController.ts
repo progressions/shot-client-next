@@ -116,6 +116,7 @@ export function useAttackPanelController({
     defenseChoicePerTarget,
     fortuneDiePerTarget,
     manualDefensePerTarget,
+    manualToughnessPerTarget,
     targetShotId,
     fortuneBonus,
   } = formState.data
@@ -275,6 +276,9 @@ export function useAttackPanelController({
       allShots,
       targetMookCount,
       targetMookCountPerTarget,
+      manualDefensePerTarget,
+      manualToughnessPerTarget,
+      encounter,
       calculateEffectiveAttackValue,
     })
 
@@ -296,6 +300,8 @@ export function useAttackPanelController({
     fortuneBonus,
     calculateEffectiveAttackValue,
     targetMookCountPerTarget,
+    manualToughnessPerTarget,
+    encounter,
     updateFields,
   ])
 
@@ -456,6 +462,9 @@ export function useAttackPanelController({
       toughnessValue,
       targetShotId,
       totalAttackingMooks,
+      manualDefensePerTarget,
+      manualToughnessPerTarget,
+      encounter,
     })
 
     if (result) {
@@ -478,6 +487,9 @@ export function useAttackPanelController({
     toughnessValue,
     targetShotId,
     totalAttackingMooks,
+    manualDefensePerTarget,
+    manualToughnessPerTarget,
+    encounter,
     updateFields,
   ])
 
