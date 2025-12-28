@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo, useCallback } from "react"
+import { useState, useEffect, useMemo, useCallback, useRef } from "react"
 import { useEncounter, useToast } from "@/contexts"
 import { CS } from "@/services"
-import type { Character, Weapon, AttackFormData } from "@/types"
+import type { Character, Weapon, AttackFormData, Shot } from "@/types"
 import { useClient } from "@/contexts/AppContext"
 import { useForm } from "@/reducers"
 import {
@@ -421,9 +421,27 @@ export function useAttackPanelController({
     updateField,
   ])
 
-  // Clear attack results when targets change
+  // Track previous target IDs to detect actual target changes
+  const prevTargetIdsRef = useRef<string[]>([])
+  const prevStuntRef = useRef<boolean>(false)
+
+  // Clear attack results when targets actually change (not when mook count changes)
   useEffect(() => {
-    resetAttackRelatedFields(updateFields)
+    // Convert arrays to comparable strings for comparison
+    const prevIds = [...prevTargetIdsRef.current].sort().join(",")
+    const currentIds = [...selectedTargetIds].sort().join(",")
+    const targetSelectionChanged = prevIds !== currentIds
+    const stuntChanged = prevStuntRef.current !== stunt
+
+    // Only reset attack results if target selection actually changed
+    // Don't reset when only mook count or other defense values change
+    if (targetSelectionChanged || stuntChanged) {
+      resetAttackRelatedFields(updateFields)
+    }
+
+    // Update refs
+    prevTargetIdsRef.current = selectedTargetIds
+    prevStuntRef.current = stunt
 
     if (selectedTargetIds.length > 0) {
       updateDefenseAndToughness(selectedTargetIds, stunt)
