@@ -56,7 +56,10 @@ export function useAttackPanelController({
       CS.skill(preselectedAttacker, CS.mainAttack(preselectedAttacker))
     ),
     attackValueChange: 0,
-    selectedWeaponId: preselectedAttacker.weapon_ids?.[0] || "",
+    selectedWeaponId:
+      preselectedAttacker.equipped_weapon_id ||
+      preselectedAttacker.weapon_ids?.[0] ||
+      "",
     weaponDamage: "",
     damageChange: 0,
     shotCost: "3",
