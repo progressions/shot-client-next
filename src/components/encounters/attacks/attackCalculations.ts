@@ -103,6 +103,7 @@ interface GetDefenseAndToughnessValuesParams {
   defenseChoicePerTarget: { [key: string]: "none" | "dodge" | "fortune" }
   fortuneDiePerTarget: { [key: string]: string }
   manualDefensePerTarget: { [key: string]: string }
+  manualToughnessPerTarget: { [key: string]: string }
   targetMookCount: number
   targetMookCountPerTarget: { [key: string]: number }
   encounter: Encounter
@@ -121,6 +122,7 @@ export function getDefenseAndToughnessValues({
   defenseChoicePerTarget,
   fortuneDiePerTarget,
   manualDefensePerTarget,
+  manualToughnessPerTarget,
   targetMookCount,
   targetMookCountPerTarget,
   encounter,
@@ -154,12 +156,20 @@ export function getDefenseAndToughnessValues({
         encounter
       )
 
-      const [_toughnessChange, toughness] = CES.adjustedActionValue(
-        target,
-        "Toughness",
-        encounter,
-        true
-      )
+      // Use manual toughness override if set, otherwise use effects-adjusted toughness
+      const manualToughness = manualToughnessPerTarget[targetId]
+      let toughness: number
+      if (manualToughness !== undefined && manualToughness !== "") {
+        toughness = parseInt(manualToughness) || 0
+      } else {
+        const [_toughnessChange, adjustedToughness] = CES.adjustedActionValue(
+          target,
+          "Toughness",
+          encounter,
+          true
+        )
+        toughness = adjustedToughness
+      }
       defenseValue = finalDefense.toString()
       toughnessValue = toughness.toString()
     }
