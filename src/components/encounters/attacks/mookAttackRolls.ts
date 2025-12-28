@@ -13,6 +13,8 @@ export interface MookRollResult {
 interface MookTargetRolls {
   targetId: string
   targetName: string
+  targetDefense: number
+  targetToughness: number
   rolls: MookRollResult[]
 }
 
@@ -127,6 +129,8 @@ export function calculateMookRolls({
       allTargetRolls.push({
         targetId,
         targetName: targetChar.name,
+        targetDefense,
+        targetToughness,
         rolls: targetRolls,
       })
     })
@@ -178,6 +182,8 @@ export function calculateMookRolls({
     allTargetRolls.push({
       targetId: targetShotId,
       targetName: targetChar.name,
+      targetDefense: dv,
+      targetToughness: toughness,
       rolls: targetRolls,
     })
   }
