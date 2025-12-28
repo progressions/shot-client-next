@@ -72,7 +72,8 @@ export async function handleNonMookMultipleTargets(
   toastError: (msg: string) => void,
   formState: AttackFormState
 ): Promise<void> {
-  const shots = parseInt(shotCost) || 3
+  // Use the shotCost as-is (it's already a number), default to 3 only if undefined/NaN
+  const shots = typeof shotCost === "number" && !isNaN(shotCost) ? shotCost : 3
   const characterUpdates: CharacterUpdate[] = []
 
   // Add attacker's shot spending
@@ -248,7 +249,8 @@ export async function handleMookAttack(
   attackerWeapons: Weapon[],
   toastSuccess: (msg: string) => void
 ): Promise<void> {
-  const shots = parseInt(shotCost) || 3
+  // Use the shotCost as-is (it's already a number), default to 3 only if undefined/NaN
+  const shots = typeof shotCost === "number" && !isNaN(shotCost) ? shotCost : 3
   const characterUpdates: CharacterUpdate[] = []
 
   // Add attacker's shot spending
@@ -345,7 +347,8 @@ export async function handleSingleTargetAttack(
   _toastError: (msg: string) => void,
   formState: AttackFormState
 ): Promise<void> {
-  const shots = parseInt(shotCost) || 3
+  // Use the shotCost as-is (it's already a number), default to 3 only if undefined/NaN
+  const shots = typeof shotCost === "number" && !isNaN(shotCost) ? shotCost : 3
   const damage = parseInt(finalDamage) || 0
 
   const characterUpdates: CharacterUpdate[] = []
