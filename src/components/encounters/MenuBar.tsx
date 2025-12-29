@@ -143,8 +143,9 @@ export default function MenuBar({
       if (response.status === 200) {
         toastSuccess("Fight ended successfully")
         setEndFightDialogOpen(false)
-        // Update the local encounter state to reflect the ended status
-        await updateEncounter(response.data)
+        // Fetch the updated encounter state (endFight returns Fight, not Encounter)
+        const updatedEncounterResponse = await client.getEncounter(encounter.id)
+        await updateEncounter(updatedEncounterResponse.data)
       }
     } catch (error) {
       console.error("Error ending fight:", error)
@@ -159,8 +160,9 @@ export default function MenuBar({
       if (response.status === 200) {
         toastSuccess("Fight reset successfully")
         setResetFightDialogOpen(false)
-        // Update the local encounter state to reflect the reset
-        await updateEncounter(response.data)
+        // Fetch the updated encounter state (resetFight returns Fight, not Encounter)
+        const updatedEncounterResponse = await client.getEncounter(encounter.id)
+        await updateEncounter(updatedEncounterResponse.data)
       }
     } catch (error) {
       console.error("Error resetting fight:", error)
