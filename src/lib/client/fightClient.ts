@@ -228,6 +228,18 @@ export function createFightClient(deps: ClientDependencies) {
     return normalizeFightResponse(response)
   }
 
+  async function resetFight(
+    fight: Fight | string,
+    deleteEvents: boolean = false
+  ): Promise<AxiosResponse<Fight>> {
+    const fightId = typeof fight === "string" ? fight : fight.id
+    const response = await patch<{ fight?: Fight }>(
+      `${apiV2.fights({ id: fightId })}/reset`,
+      { delete_events: deleteEvents }
+    )
+    return normalizeFightResponse(response)
+  }
+
   /**
    * Generate a magic link token for a character in an encounter.
    * This allows the character's owner to access the Player View without logging in.
@@ -295,6 +307,7 @@ export function createFightClient(deps: ClientDependencies) {
     applyChaseAction,
     updateInitiatives,
     endFight,
+    resetFight,
     generatePlayerViewToken,
     listPlayerViewTokens,
   }
