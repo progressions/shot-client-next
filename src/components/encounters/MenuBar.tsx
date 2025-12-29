@@ -93,7 +93,7 @@ export default function MenuBar({
   }
 
   const handleSequenceChange = async (delta: number) => {
-    const newSequence = Math.max(1, (encounter.sequence || 1) + delta)
+    const newSequence = Math.max(0, (encounter.sequence || 0) + delta)
     const updatedEncounter = {
       ...encounter,
       sequence: newSequence,
@@ -223,7 +223,7 @@ export default function MenuBar({
                 fontWeight: "bold",
               }}
             >
-              Sequence {encounter.sequence || 1}
+              Sequence {encounter.sequence ?? 0}
             </Typography>
           </Box>
 
@@ -373,7 +373,7 @@ export default function MenuBar({
                         sx={{ display: "flex", alignItems: "center", gap: 1 }}
                       >
                         <Typography sx={{ fontSize: "0.875rem", flex: 1 }}>
-                          Current: {encounter.sequence || 1}
+                          Current: {encounter.sequence ?? 0}
                         </Typography>
                         <ButtonGroup size="small" variant="contained">
                           <Button
