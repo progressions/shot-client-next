@@ -28,6 +28,7 @@ export { default as CharacterEditDialog } from "@/components/encounters/Characte
 export { default as VehicleEditDialog } from "@/components/encounters/VehicleEditDialog"
 export { default as HealDialog } from "@/components/encounters/HealDialog"
 export { default as EndFightDialog } from "@/components/encounters/EndFightDialog"
+export { default as ResetFightDialog } from "@/components/encounters/ResetFightDialog"
 export { default as FightEventsDialog } from "@/components/encounters/FightEventsDialog"
 export { default as EncounterActionBar } from "@/components/encounters/EncounterActionBar"
 export { default as HealPanel } from "@/components/encounters/HealPanel"

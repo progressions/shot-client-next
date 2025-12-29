@@ -23,10 +23,18 @@ import {
   InitiativeDialog,
   LocationsDialog,
   EndFightDialog,
+  ResetFightDialog,
   FightEventsDialog,
   InvitePlayersModal,
 } from "@/components/encounters"
-import { FaPlay, FaPlus, FaMinus, FaStop, FaLink } from "react-icons/fa6"
+import {
+  FaPlay,
+  FaPlus,
+  FaMinus,
+  FaStop,
+  FaLink,
+  FaArrowRotateLeft,
+} from "react-icons/fa6"
 import {
   FaMapMarkerAlt,
   FaCaretRight,
@@ -57,6 +65,7 @@ export default function MenuBar({
   const [initiativeDialogOpen, setInitiativeDialogOpen] = useState(false)
   const [locationsDialogOpen, setLocationsDialogOpen] = useState(false)
   const [endFightDialogOpen, setEndFightDialogOpen] = useState(false)
+  const [resetFightDialogOpen, setResetFightDialogOpen] = useState(false)
   const [fightEventsDialogOpen, setFightEventsDialogOpen] = useState(false)
   const [invitePlayersModalOpen, setInvitePlayersModalOpen] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -84,7 +93,7 @@ export default function MenuBar({
   }
 
   const handleSequenceChange = async (delta: number) => {
-    const newSequence = Math.max(1, (encounter.sequence || 1) + delta)
+    const newSequence = Math.max(0, (encounter.sequence || 0) + delta)
     const updatedEncounter = {
       ...encounter,
       sequence: newSequence,
@@ -134,12 +143,30 @@ export default function MenuBar({
       if (response.status === 200) {
         toastSuccess("Fight ended successfully")
         setEndFightDialogOpen(false)
-        // Update the local encounter state to reflect the ended status
-        await updateEncounter(response.data)
+        // Fetch the updated encounter state (endFight returns Fight, not Encounter)
+        const updatedEncounterResponse = await client.getEncounter(encounter.id)
+        await updateEncounter(updatedEncounterResponse.data)
       }
     } catch (error) {
       console.error("Error ending fight:", error)
       toastError("Failed to end fight")
+    }
+  }
+
+  const handleResetFight = async (deleteEvents: boolean) => {
+    try {
+      const response = await client.resetFight(encounter.id, deleteEvents)
+
+      if (response.status === 200) {
+        toastSuccess("Fight reset successfully")
+        setResetFightDialogOpen(false)
+        // Fetch the updated encounter state (resetFight returns Fight, not Encounter)
+        const updatedEncounterResponse = await client.getEncounter(encounter.id)
+        await updateEncounter(updatedEncounterResponse.data)
+      }
+    } catch (error) {
+      console.error("Error resetting fight:", error)
+      toastError("Failed to reset fight")
     }
   }
 
@@ -198,7 +225,7 @@ export default function MenuBar({
                 fontWeight: "bold",
               }}
             >
-              Sequence {encounter.sequence || 1}
+              Sequence {encounter.sequence ?? 0}
             </Typography>
           </Box>
 
@@ -348,7 +375,7 @@ export default function MenuBar({
                         sx={{ display: "flex", alignItems: "center", gap: 1 }}
                       >
                         <Typography sx={{ fontSize: "0.875rem", flex: 1 }}>
-                          Current: {encounter.sequence || 1}
+                          Current: {encounter.sequence ?? 0}
                         </Typography>
                         <ButtonGroup size="small" variant="contained">
                           <Button
@@ -421,6 +448,29 @@ export default function MenuBar({
                           },
                         }}
                       />
+                    </Paper>
+
+                    {/* Reset Fight */}
+                    <Paper
+                      elevation={1}
+                      sx={{ p: 2, height: "100%", minHeight: 100 }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ mb: 2, fontWeight: "bold" }}
+                      >
+                        Reset Fight
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        size="small"
+                        startIcon={<FaArrowRotateLeft />}
+                        onClick={() => setResetFightDialogOpen(true)}
+                        fullWidth
+                      >
+                        Reset Fight
+                      </Button>
                     </Paper>
 
                     {/* End Fight */}
@@ -508,6 +558,12 @@ export default function MenuBar({
         open={endFightDialogOpen}
         onClose={() => setEndFightDialogOpen(false)}
         onConfirm={handleEndFight}
+        fightName={encounter.name || ""}
+      />
+      <ResetFightDialog
+        open={resetFightDialogOpen}
+        onClose={() => setResetFightDialogOpen(false)}
+        onConfirm={handleResetFight}
         fightName={encounter.name || ""}
       />
       <FightEventsDialog
