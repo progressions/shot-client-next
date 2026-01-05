@@ -54,20 +54,33 @@ export const AI_PROVIDERS: Record<AiProvider, AiProviderInfo> = {
 }
 
 /**
+ * Credential status values.
+ * - active: Credential is working normally
+ * - suspended: Billing limit reached or quota exhausted
+ * - invalid: Authentication failed (bad API key)
+ */
+export type AiCredentialStatus = "active" | "suspended" | "invalid"
+
+/**
  * AI credential as stored in the database.
  * API key is returned masked for security.
  */
 export interface AiCredential {
   id: string
-  user_id: string
   provider: AiProvider
+  /** Whether the credential is connected/valid */
+  connected: boolean
   /** Masked API key (e.g., "...abcd1234") - only last 8 chars visible */
-  api_key_masked: string | null
-  /** Whether OAuth token is present (for Gemini) */
-  has_access_token: boolean
+  api_key_hint: string | null
   /** OAuth token expiration (for Gemini) */
   token_expires_at: string | null
-  created_at: string
+  /** Credential status: active, suspended, or invalid */
+  status: AiCredentialStatus
+  /** Human-readable message explaining the status (e.g., "Billing hard limit reached") */
+  status_message: string | null
+  /** When the status was last updated */
+  status_updated_at: string | null
+  inserted_at: string
   updated_at: string
 }
 

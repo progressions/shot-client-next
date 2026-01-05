@@ -107,6 +107,22 @@ export function AiProviderSelector({
     connectedProviders.includes(provider.id)
   )
 
+  // Helper to get credential for a provider
+  const getCredentialForProvider = (providerId: AiProvider) =>
+    credentials.find(c => c.provider === providerId)
+
+  // Check if a provider is suspended (billing limit reached)
+  const isProviderSuspended = (providerId: AiProvider) => {
+    const credential = getCredentialForProvider(providerId)
+    return credential?.status === "suspended"
+  }
+
+  // Check if a provider is invalid (auth failed)
+  const isProviderInvalid = (providerId: AiProvider) => {
+    const credential = getCredentialForProvider(providerId)
+    return credential?.status === "invalid"
+  }
+
   if (isLoading) {
     return (
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, my: 2 }}>
@@ -140,11 +156,44 @@ export function AiProviderSelector({
           <MenuItem value="">
             <em>None (use default)</em>
           </MenuItem>
-          {availableProviders.map(provider => (
-            <MenuItem key={provider.id} value={provider.id}>
-              {provider.name}
-            </MenuItem>
-          ))}
+          {availableProviders.map(provider => {
+            const isSuspended = isProviderSuspended(provider.id)
+            const isInvalid = isProviderInvalid(provider.id)
+            const isDisabled = isSuspended || isInvalid
+
+            let statusText = ""
+            if (isSuspended) {
+              statusText = " (billing limit reached)"
+            } else if (isInvalid) {
+              statusText = " (authentication failed)"
+            }
+
+            return (
+              <MenuItem
+                key={provider.id}
+                value={provider.id}
+                disabled={isDisabled}
+                sx={{
+                  color: isDisabled ? "text.disabled" : "inherit",
+                }}
+              >
+                {provider.name}
+                {statusText && (
+                  <Typography
+                    component="span"
+                    variant="body2"
+                    sx={{
+                      color: "error.main",
+                      ml: 0.5,
+                      fontStyle: "italic",
+                    }}
+                  >
+                    {statusText}
+                  </Typography>
+                )}
+              </MenuItem>
+            )
+          })}
         </Select>
       </FormControl>
       <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>

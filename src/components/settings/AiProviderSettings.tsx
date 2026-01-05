@@ -23,6 +23,8 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete"
 import SmartToyIcon from "@mui/icons-material/SmartToy"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
+import WarningIcon from "@mui/icons-material/Warning"
+import ErrorIcon from "@mui/icons-material/Error"
 import { Button, TextField } from "@/components/ui"
 import { useClient, useToast } from "@/contexts"
 import type { AiCredential, AiProvider } from "@/types"
@@ -205,89 +207,147 @@ export function AiProviderSettings() {
           {providers.map(provider => {
             const credential = getCredentialForProvider(provider.id)
             const isConnected = !!credential
+            const isActive = isConnected && credential.status === "active"
+            const isSuspended = isConnected && credential.status === "suspended"
+            const isInvalid = isConnected && credential.status === "invalid"
+
+            // Determine border color based on status
+            const borderColor = !isConnected
+              ? "divider"
+              : isActive
+                ? "success.main"
+                : isSuspended
+                  ? "warning.main"
+                  : "error.main"
 
             return (
               <ListItem
                 key={provider.id}
                 sx={{
                   border: 1,
-                  borderColor: isConnected ? "success.main" : "divider",
+                  borderColor,
                   borderRadius: 1,
                   mb: 1,
                   "&:last-child": { mb: 0 },
                   bgcolor: isConnected ? "action.selected" : "background.paper",
+                  flexDirection: "column",
+                  alignItems: "stretch",
                 }}
               >
-                <ListItemText
-                  primary={
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <Typography variant="body1">{provider.name}</Typography>
-                      {isConnected && (
-                        <Chip
-                          icon={<CheckCircleIcon sx={{ fontSize: 16 }} />}
-                          label="Connected"
-                          size="small"
-                          color="success"
-                          variant="outlined"
-                        />
-                      )}
-                    </Box>
-                  }
-                  secondary={
-                    <Box component="span">
-                      <Typography
-                        variant="body2"
-                        component="span"
-                        color="text.secondary"
+                <Box
+                  sx={{ display: "flex", width: "100%", alignItems: "center" }}
+                >
+                  <ListItemText
+                    primary={
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
                       >
-                        {provider.description}
-                      </Typography>
-                      {isConnected && credential.api_key_masked && (
+                        <Typography variant="body1">{provider.name}</Typography>
+                        {isActive && (
+                          <Chip
+                            icon={<CheckCircleIcon sx={{ fontSize: 16 }} />}
+                            label="Connected"
+                            size="small"
+                            color="success"
+                            variant="outlined"
+                          />
+                        )}
+                        {isSuspended && (
+                          <Chip
+                            icon={<WarningIcon sx={{ fontSize: 16 }} />}
+                            label="Suspended"
+                            size="small"
+                            color="warning"
+                            variant="outlined"
+                          />
+                        )}
+                        {isInvalid && (
+                          <Chip
+                            icon={<ErrorIcon sx={{ fontSize: 16 }} />}
+                            label="Invalid"
+                            size="small"
+                            color="error"
+                            variant="outlined"
+                          />
+                        )}
+                      </Box>
+                    }
+                    secondary={
+                      <Box component="span">
                         <Typography
                           variant="body2"
                           component="span"
                           color="text.secondary"
-                          sx={{ ml: 1 }}
                         >
-                          &middot; Key: {credential.api_key_masked}
+                          {provider.description}
                         </Typography>
-                      )}
-                    </Box>
-                  }
-                />
-                <ListItemSecondaryAction>
-                  {isApiKeyProvider(provider.id) && (
-                    <>
-                      <Button
-                        variant={isConnected ? "outlined" : "contained"}
-                        size="small"
-                        onClick={() => handleAddClick(provider.id)}
-                        sx={{ mr: 1 }}
-                      >
-                        {isConnected ? "Update Key" : "Add Key"}
-                      </Button>
-                      {isConnected && (
-                        <IconButton
-                          edge="end"
-                          aria-label="disconnect"
-                          onClick={() => handleDeleteClick(credential)}
-                          color="error"
+                        {isConnected && credential.api_key_hint && (
+                          <Typography
+                            variant="body2"
+                            component="span"
+                            color="text.secondary"
+                            sx={{ ml: 1 }}
+                          >
+                            &middot; Key: {credential.api_key_hint}
+                          </Typography>
+                        )}
+                      </Box>
+                    }
+                  />
+                  <ListItemSecondaryAction>
+                    {isApiKeyProvider(provider.id) && (
+                      <>
+                        <Button
+                          variant={isConnected ? "outlined" : "contained"}
+                          size="small"
+                          onClick={() => handleAddClick(provider.id)}
+                          sx={{ mr: 1 }}
                         >
-                          <DeleteIcon />
-                        </IconButton>
-                      )}
-                    </>
-                  )}
-                  {!isApiKeyProvider(provider.id) && (
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ fontStyle: "italic" }}
-                    >
-                      OAuth coming soon
-                    </Typography>
-                  )}
-                </ListItemSecondaryAction>
+                          {isConnected ? "Update Key" : "Add Key"}
+                        </Button>
+                        {isConnected && (
+                          <IconButton
+                            edge="end"
+                            aria-label="disconnect"
+                            onClick={() => handleDeleteClick(credential)}
+                            color="error"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        )}
+                      </>
+                    )}
+                    {!isApiKeyProvider(provider.id) && (
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ fontStyle: "italic" }}
+                      >
+                        OAuth coming soon
+                      </Typography>
+                    )}
+                  </ListItemSecondaryAction>
+                </Box>
+                {/* Status message alert for suspended/invalid credentials */}
+                {(isSuspended || isInvalid) && credential.status_message && (
+                  <Alert
+                    severity={isSuspended ? "warning" : "error"}
+                    sx={{ mt: 1, width: "100%" }}
+                  >
+                    {credential.status_message}
+                    {isSuspended && (
+                      <Typography variant="body2" sx={{ mt: 0.5 }}>
+                        Update your API key or check your billing settings to
+                        continue using this provider.
+                      </Typography>
+                    )}
+                    {isInvalid && (
+                      <Typography variant="body2" sx={{ mt: 0.5 }}>
+                        Please update your API key with a valid one.
+                      </Typography>
+                    )}
+                  </Alert>
+                )}
               </ListItem>
             )
           })}

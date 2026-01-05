@@ -18,16 +18,29 @@ import { useClient } from "@/contexts"
 import { handleError } from "@/lib"
 
 /**
+ * Provider display names for error messages.
+ */
+const PROVIDER_NAMES: Record<string, string> = {
+  grok: "Grok (xAI)",
+  openai: "OpenAI",
+  gemini: "Google Gemini",
+}
+
+/**
  * Props for the useImageGeneration hook.
  *
  * @property campaignId - Campaign ID for WebSocket channel subscription
  * @property entity - The entity to generate images for
  * @property dispatchForm - Form dispatch to update image_urls state
+ * @property onError - Optional callback when an error occurs (for showing toasts)
+ * @property providerName - Optional AI provider name for error messages
  */
 interface UseImageGenerationProps {
   campaignId: string | number
   entity: Entity
   dispatchForm: (action: FormStateAction<{ image_urls: string[] }>) => void
+  onError?: (message: string) => void
+  providerName?: string
 }
 
 /**
@@ -60,7 +73,11 @@ export function useImageGeneration({
   campaignId,
   entity,
   dispatchForm,
+  onError,
+  providerName,
 }: UseImageGenerationProps) {
+  const displayProviderName =
+    PROVIDER_NAMES[providerName ?? ""] ?? providerName ?? "AI service"
   const { client } = useClient()
   const [pending, setPending] = useState(false)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
@@ -98,17 +115,25 @@ export function useImageGeneration({
                 setPending(false)
                 sub.disconnect()
               } catch (parseError) {
+                const errorMessage = "Invalid JSON response from server"
                 console.error("Failed to parse image URLs JSON:", parseError)
-                handleError(
-                  new Error("Invalid JSON response from server"),
-                  dispatchForm
-                )
+                handleError(new Error(errorMessage), dispatchForm)
+                onError?.(errorMessage)
                 setPending(false)
                 sub.disconnect()
               }
+            } else if (data.status === "credit_exhausted" && data.error) {
+              // Handle billing/quota limit errors with a user-friendly message
+              const errorMessage = `${displayProviderName} billing limit reached. Please check your API key billing settings or try a different provider.`
+              console.error("AI credits exhausted:", data.error)
+              handleError(new Error(errorMessage), dispatchForm)
+              onError?.(errorMessage)
+              setPending(false)
+              sub.disconnect()
             } else if (data.status === "error" && data.error) {
               console.error("WebSocket error:", data.error)
               handleError(new Error(data.error), dispatchForm)
+              onError?.(data.error)
               setPending(false)
               sub.disconnect()
             }
@@ -117,7 +142,10 @@ export function useImageGeneration({
       )
       setSubscription(sub)
     } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to generate images"
       handleError(err, dispatchForm)
+      onError?.(errorMessage)
       setPending(false)
     }
   }

@@ -45,10 +45,14 @@ export function GenerateImageDialog({
   })
   const { image_urls } = formState.data
   const { pending, generateImages } = useImageGeneration({
-    client,
-    campaignId: campaign?.id,
+    campaignId: campaign?.id ?? "",
     entity,
     dispatchForm,
+    providerName: campaign?.ai_provider ?? undefined,
+    onError: (message: string) => {
+      toastError(message)
+      onClose()
+    },
   })
 
   const handleClose = () => {
