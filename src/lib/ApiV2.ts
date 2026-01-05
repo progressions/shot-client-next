@@ -12,6 +12,8 @@ import {
   Schtick,
   Faction,
   Invitation,
+  AiCredential,
+  AiProvider,
 } from "@/types"
 
 class ApiV2 {
@@ -234,6 +236,17 @@ class ApiV2 {
 
   suggestions(): string {
     return `${this.api()}/suggestions`
+  }
+
+  // AI Credentials endpoints
+  aiCredentials(credential?: AiCredential | ID): string {
+    return credential?.id
+      ? `${this.api()}/ai_credentials/${credential.id}`
+      : `${this.api()}/ai_credentials`
+  }
+
+  aiCredentialByProvider(provider: AiProvider): string {
+    return `${this.api()}/ai_credentials/provider/${provider}`
   }
 
   // WebAuthn/Passkey endpoints
