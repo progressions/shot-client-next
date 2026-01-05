@@ -230,6 +230,12 @@ export function createCharacterClient(deps: ClientDependencies) {
     return post(`${api.characters(null, character)}/sync`)
   }
 
+  async function createNotionPage(
+    character: Character
+  ): Promise<AxiosResponse<Character>> {
+    return post(apiV2.createNotionPage(character))
+  }
+
   async function spendShots(
     fight: Fight,
     entity: Entity,
@@ -408,6 +414,7 @@ export function createCharacterClient(deps: ClientDependencies) {
     deleteCharacterImage,
     deleteEntityImage,
     syncCharacter,
+    createNotionPage,
     spendShots,
     hideCharacter,
     removeCharacterFromFight,
