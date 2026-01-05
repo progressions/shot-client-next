@@ -43,12 +43,21 @@ export default function EditNotionLink({
     setDialogOpen(false)
   }
 
-  const handleSave = (notionPageId: string | null) => {
-    const updatedCharacter = {
-      ...character,
-      notion_page_id: notionPageId,
+  const handleSave = (
+    notionPageId: string | null,
+    updatedCharacterFromApi?: Character
+  ) => {
+    // If we got an updated character from API (e.g., from createNotionPage), use it
+    if (updatedCharacterFromApi) {
+      updateCharacter(updatedCharacterFromApi)
+    } else {
+      // Otherwise, just update the notion_page_id
+      const updatedCharacter = {
+        ...character,
+        notion_page_id: notionPageId,
+      }
+      updateCharacter(updatedCharacter)
     }
-    updateCharacter(updatedCharacter)
   }
 
   // Don't show if user can't edit

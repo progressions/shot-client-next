@@ -228,6 +228,10 @@ class ApiV2 {
     return `${this.api()}/notion/characters`
   }
 
+  createNotionPage(character: Character | ID): string {
+    return `${this.characters(character)}/notion/create`
+  }
+
   suggestions(): string {
     return `${this.api()}/suggestions`
   }
