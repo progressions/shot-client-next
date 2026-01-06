@@ -9,6 +9,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material"
+import SmartToyIcon from "@mui/icons-material/SmartToy"
 import type { User } from "@/types"
 import {
   Icon,
@@ -23,7 +24,11 @@ import {
   DiscordLinkingSection,
   OnboardingMilestonesForm,
 } from "@/components/users/profile"
-import { PasskeyManager, PasswordChangeForm } from "@/components/settings"
+import {
+  PasskeyManager,
+  PasswordChangeForm,
+  AiProviderSettings,
+} from "@/components/settings"
 import { useClient, useToast } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
 
@@ -324,6 +329,19 @@ export default function ProfilePageClient({
           <PasskeyManager />
         </Stack>
       </Box>
+
+      {user.gamemaster && (
+        <Box sx={{ mb: 4 }}>
+          <SectionHeader
+            title="AI Providers"
+            icon={<SmartToyIcon color="primary" />}
+            sx={{ mb: 2 }}
+          >
+            Connect your AI service accounts for character and image generation.
+          </SectionHeader>
+          <AiProviderSettings />
+        </Box>
+      )}
 
       <DiscordLinkingSection user={user} onUserUpdate={setUser} />
 

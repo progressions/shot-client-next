@@ -10,7 +10,7 @@ import {
   Switch,
   Typography,
 } from "@mui/material"
-import { type Campaign, isCampaignSeeding } from "@/types"
+import { type Campaign, type AiProvider, isCampaignSeeding } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
 import {
   Manager,
@@ -28,6 +28,7 @@ import {
   SeedingStatus,
   BatchImageGenerationButton,
   GrokCreditAlert,
+  AiProviderSelector,
 } from "@/components/campaigns"
 import { CampaignInvitations } from "@/components/invitations"
 import { useEntity } from "@/hooks"
@@ -85,6 +86,19 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
       })
     },
     [dispatchForm]
+  )
+
+  // Handle AI provider change
+  const handleProviderChange = useCallback(
+    (provider: AiProvider | null) => {
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "entity",
+        value: { ...campaign, ai_provider: provider },
+      })
+      updateCampaign({ ai_provider: provider })
+    },
+    [campaign, dispatchForm, updateCampaign]
   )
 
   useEffect(() => {
@@ -218,6 +232,10 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
               Generate buttons and Extend options are hidden from the UI.
             </Typography>
           </Box>
+          <AiProviderSelector
+            campaign={campaign}
+            onProviderChange={handleProviderChange}
+          />
           <BatchImageGenerationButton campaign={campaign} />
         </>
       )}

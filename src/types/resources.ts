@@ -6,6 +6,7 @@ import type {
   SchtickCategory,
   SchtickPath,
 } from "./ui"
+import type { AiProvider } from "./ai-credentials"
 import type {
   Character,
   CharacterCategory,
@@ -56,6 +57,8 @@ export interface Campaign extends BaseEntity {
   is_grok_credits_exhausted?: boolean
   // AI generation toggle
   ai_generation_enabled?: boolean
+  // AI provider configuration
+  ai_provider?: AiProvider | null
 }
 
 /**
