@@ -66,6 +66,21 @@ export function AiProviderSettings() {
   const { toastSuccess, toastError } = useToast()
   const searchParams = useSearchParams()
 
+  // Define fetchCredentials before the useEffect that references it
+  const fetchCredentials = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const response = await client.getAiCredentials()
+      setCredentials(response.data.ai_credentials || [])
+    } catch (err) {
+      console.error("Failed to fetch AI credentials:", err)
+      setError("Failed to load AI credentials")
+    } finally {
+      setIsLoading(false)
+    }
+  }, [client])
+
   // Handle OAuth callback from URL params
   useEffect(() => {
     const oauthProvider = searchParams.get("oauth")
@@ -92,20 +107,6 @@ export function AiProviderSettings() {
     }
   }, [searchParams, toastSuccess, toastError, fetchCredentials])
 
-  const fetchCredentials = useCallback(async () => {
-    try {
-      setIsLoading(true)
-      setError(null)
-      const response = await client.getAiCredentials()
-      setCredentials(response.data.ai_credentials || [])
-    } catch (err) {
-      console.error("Failed to fetch AI credentials:", err)
-      setError("Failed to load AI credentials")
-    } finally {
-      setIsLoading(false)
-    }
-  }, [client])
-
   useEffect(() => {
     fetchCredentials()
   }, [fetchCredentials])
@@ -128,8 +129,17 @@ export function AiProviderSettings() {
       return
     }
 
-    // Redirect to backend OAuth endpoint
+    // Validate server URL is configured
     const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL
+    if (!serverUrl) {
+      console.error(
+        "NEXT_PUBLIC_SERVER_URL is not defined. Cannot initiate OAuth flow."
+      )
+      toastError("Server configuration is missing. Please try again later.")
+      return
+    }
+
+    // Redirect to backend OAuth endpoint
     const oauthUrl = `${serverUrl}/auth/google?user_id=${user.id}`
     window.location.href = oauthUrl
   }
@@ -361,10 +371,10 @@ export function AiProviderSettings() {
                     )}
                     {!isApiKeyProvider(provider.id) && (
                       <>
-                        {isConnected ? (
+                        {isConnected && credential ? (
                           <>
                             <Chip
-                              label="Google Account"
+                              label={`${provider.name} (OAuth)`}
                               size="small"
                               variant="outlined"
                               sx={{ mr: 1 }}
@@ -372,7 +382,7 @@ export function AiProviderSettings() {
                             <IconButton
                               edge="end"
                               aria-label="disconnect"
-                              onClick={() => handleDeleteClick(credential!)}
+                              onClick={() => handleDeleteClick(credential)}
                               color="error"
                             >
                               <DeleteIcon />
