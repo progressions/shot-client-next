@@ -101,16 +101,22 @@ export interface UpdateApiKeyCredentialPayload {
 
 /**
  * Response from credential list endpoint.
+ *
+ * This represents the payload returned by the API client, which is
+ * accessed elsewhere as `response.data.ai_credentials`.
  */
 export interface AiCredentialsResponse {
-  data: AiCredential[]
+  ai_credentials: AiCredential[]
 }
 
 /**
  * Response from single credential endpoint.
+ *
+ * This represents the payload returned by the API client, which is
+ * accessed elsewhere as `response.data.ai_credential`.
  */
 export interface AiCredentialResponse {
-  data: AiCredential
+  ai_credential: AiCredential
 }
 
 /**
