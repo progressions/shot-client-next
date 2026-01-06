@@ -28,7 +28,7 @@ import ErrorIcon from "@mui/icons-material/Error"
 import { Button, TextField } from "@/components/ui"
 import { useClient, useToast } from "@/contexts"
 import type { AiCredential, AiProvider } from "@/types"
-import { AI_PROVIDERS, isApiKeyProvider } from "@/types"
+import { AI_PROVIDERS } from "@/types"
 
 /**
  * AiProviderSettings displays and manages the user's AI provider credentials.
@@ -295,36 +295,23 @@ export function AiProviderSettings() {
                     }
                   />
                   <ListItemSecondaryAction>
-                    {isApiKeyProvider(provider.id) && (
-                      <>
-                        <Button
-                          variant={isConnected ? "outlined" : "contained"}
-                          size="small"
-                          onClick={() => handleAddClick(provider.id)}
-                          sx={{ mr: 1 }}
-                        >
-                          {isConnected ? "Update Key" : "Add Key"}
-                        </Button>
-                        {isConnected && (
-                          <IconButton
-                            edge="end"
-                            aria-label="disconnect"
-                            onClick={() => handleDeleteClick(credential)}
-                            color="error"
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        )}
-                      </>
-                    )}
-                    {!isApiKeyProvider(provider.id) && (
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ fontStyle: "italic" }}
+                    <Button
+                      variant={isConnected ? "outlined" : "contained"}
+                      size="small"
+                      onClick={() => handleAddClick(provider.id)}
+                      sx={{ mr: 1 }}
+                    >
+                      {isConnected ? "Update Key" : "Add Key"}
+                    </Button>
+                    {isConnected && (
+                      <IconButton
+                        edge="end"
+                        aria-label="disconnect"
+                        onClick={() => handleDeleteClick(credential)}
+                        color="error"
                       >
-                        OAuth coming soon
-                      </Typography>
+                        <DeleteIcon />
+                      </IconButton>
                     )}
                   </ListItemSecondaryAction>
                 </Box>

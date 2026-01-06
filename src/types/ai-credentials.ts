@@ -8,7 +8,7 @@
  * Supported AI providers.
  * - grok: xAI Grok API (API key authentication)
  * - openai: OpenAI API (API key authentication)
- * - gemini: Google Gemini API (OAuth authentication)
+ * - gemini: Google Gemini API (API key authentication)
  */
 export type AiProvider = "grok" | "openai" | "gemini"
 
@@ -48,8 +48,9 @@ export const AI_PROVIDERS: Record<AiProvider, AiProviderInfo> = {
     id: "gemini",
     name: "Google Gemini",
     description: "Google's Gemini for chat and Imagen for images",
-    authType: "oauth",
-    helpUrl: "https://cloud.google.com/gemini-api",
+    authType: "api_key",
+    placeholder: "AIza...",
+    helpUrl: "https://aistudio.google.com/apikey",
   },
 }
 
@@ -88,7 +89,7 @@ export interface AiCredential {
  * Payload for creating a new API key credential.
  */
 export interface CreateApiKeyCredentialPayload {
-  provider: "grok" | "openai"
+  provider: AiProvider
   api_key: string
 }
 
@@ -123,14 +124,14 @@ export interface AiCredentialResponse {
  * Check if a provider uses API key authentication.
  */
 export function isApiKeyProvider(provider: AiProvider): boolean {
-  return provider === "grok" || provider === "openai"
+  return AI_PROVIDERS[provider]?.authType === "api_key"
 }
 
 /**
  * Check if a provider uses OAuth authentication.
  */
 export function isOAuthProvider(provider: AiProvider): boolean {
-  return provider === "gemini"
+  return AI_PROVIDERS[provider]?.authType === "oauth"
 }
 
 /**
