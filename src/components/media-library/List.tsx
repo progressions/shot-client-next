@@ -2,7 +2,7 @@
 import { useState, useCallback, useEffect } from "react"
 import { Box, Pagination, Chip } from "@mui/material"
 import { PhotoLibrary as MediaIcon } from "@mui/icons-material"
-import { useClient, useToast, useAppContext } from "@/contexts"
+import { useClient, useToast, useApp } from "@/contexts"
 import { MainHeader } from "@/components/ui"
 import type { MediaImage, MediaLibraryFilters } from "@/types"
 import Filter from "./Filter"
@@ -17,8 +17,8 @@ interface ListProps {
 export default function List({ initialFilters }: ListProps) {
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
-  const { state } = useAppContext()
-  const isGamemaster = state.user?.gamemaster || state.user?.admin || false
+  const { user } = useApp()
+  const isGamemaster = user?.gamemaster || user?.admin || false
 
   const [images, setImages] = useState<MediaImage[]>([])
   const [loading, setLoading] = useState(true)
