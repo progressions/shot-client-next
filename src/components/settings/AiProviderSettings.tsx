@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { useSearchParams } from "next/navigation"
 import {
   Box,
   Typography,
@@ -25,8 +26,9 @@ import SmartToyIcon from "@mui/icons-material/SmartToy"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import WarningIcon from "@mui/icons-material/Warning"
 import ErrorIcon from "@mui/icons-material/Error"
+import GoogleIcon from "@mui/icons-material/Google"
 import { Button, TextField } from "@/components/ui"
-import { useClient, useToast } from "@/contexts"
+import { useApp, useClient, useToast } from "@/contexts"
 import type { AiCredential, AiProvider } from "@/types"
 import { AI_PROVIDERS, isApiKeyProvider } from "@/types"
 
@@ -59,8 +61,36 @@ export function AiProviderSettings() {
     useState<AiCredential | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
+  const { user } = useApp()
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
+  const searchParams = useSearchParams()
+
+  // Handle OAuth callback from URL params
+  useEffect(() => {
+    const oauthProvider = searchParams.get("oauth")
+    const oauthStatus = searchParams.get("status")
+    const oauthMessage = searchParams.get("message")
+
+    if (oauthProvider && oauthStatus) {
+      if (oauthStatus === "success") {
+        toastSuccess(
+          `${oauthProvider.charAt(0).toUpperCase() + oauthProvider.slice(1)} connected successfully`
+        )
+        // Refetch credentials to show the newly connected provider
+        fetchCredentials()
+      } else if (oauthStatus === "error") {
+        toastError(oauthMessage || `Failed to connect ${oauthProvider}`)
+      }
+
+      // Clear the URL params after handling
+      const url = new URL(window.location.href)
+      url.searchParams.delete("oauth")
+      url.searchParams.delete("status")
+      url.searchParams.delete("message")
+      window.history.replaceState({}, "", url.toString())
+    }
+  }, [searchParams, toastSuccess, toastError, fetchCredentials])
 
   const fetchCredentials = useCallback(async () => {
     try {
@@ -90,6 +120,18 @@ export function AiProviderSettings() {
     setSelectedProvider(provider)
     setApiKeyInput("")
     setAddDialogOpen(true)
+  }
+
+  const handleOAuthConnect = (provider: AiProvider) => {
+    if (!user?.id) {
+      toastError("Please log in to connect your account")
+      return
+    }
+
+    // Redirect to backend OAuth endpoint
+    const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL
+    const oauthUrl = `${serverUrl}/auth/google?user_id=${user.id}`
+    window.location.href = oauthUrl
   }
 
   const handleAddConfirm = async () => {
@@ -318,13 +360,35 @@ export function AiProviderSettings() {
                       </>
                     )}
                     {!isApiKeyProvider(provider.id) && (
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ fontStyle: "italic" }}
-                      >
-                        OAuth coming soon
-                      </Typography>
+                      <>
+                        {isConnected ? (
+                          <>
+                            <Chip
+                              label="Google Account"
+                              size="small"
+                              variant="outlined"
+                              sx={{ mr: 1 }}
+                            />
+                            <IconButton
+                              edge="end"
+                              aria-label="disconnect"
+                              onClick={() => handleDeleteClick(credential!)}
+                              color="error"
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </>
+                        ) : (
+                          <Button
+                            variant="contained"
+                            size="small"
+                            startIcon={<GoogleIcon />}
+                            onClick={() => handleOAuthConnect(provider.id)}
+                          >
+                            Connect with Google
+                          </Button>
+                        )}
+                      </>
                     )}
                   </ListItemSecondaryAction>
                 </Box>
