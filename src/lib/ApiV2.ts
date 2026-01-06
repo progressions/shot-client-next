@@ -63,6 +63,29 @@ class ApiV2 {
     return `${this.api()}/ai_images`
   }
 
+  // Media Library endpoints
+  mediaLibrary(imageId?: string): string {
+    return imageId
+      ? `${this.api()}/media_library/${imageId}`
+      : `${this.api()}/media_library`
+  }
+
+  mediaLibraryBulkDelete(): string {
+    return `${this.api()}/media_library/bulk_delete`
+  }
+
+  mediaLibraryDuplicate(imageId: string): string {
+    return `${this.api()}/media_library/${imageId}/duplicate`
+  }
+
+  mediaLibraryAttach(imageId: string): string {
+    return `${this.api()}/media_library/${imageId}/attach`
+  }
+
+  mediaLibraryDownload(imageId: string): string {
+    return `${this.api()}/media_library/${imageId}/download`
+  }
+
   imagePositions(): string {
     return `${this.api()}/image_positions`
   }

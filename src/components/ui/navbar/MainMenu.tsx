@@ -133,6 +133,20 @@ export function MainMenu() {
             Campaigns
           </Link>
         </MenuItem>
+        {(user.gamemaster || user.admin) && (
+          <MenuItem onClick={handleMenuClose}>
+            <Link
+              href="/media-library"
+              style={{
+                color: "#ffffff",
+                textDecoration: "none",
+                width: "100%",
+              }}
+            >
+              Media Library
+            </Link>
+          </MenuItem>
+        )}
         {user.admin && <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />}
         {user.admin && (
           <MenuItem onClick={handleMenuClose}>
