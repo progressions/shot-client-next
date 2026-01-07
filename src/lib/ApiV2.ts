@@ -186,7 +186,8 @@ class ApiV2 {
       : `${this.api()}/campaigns`
   }
 
-  resetGrokCredits(campaign: Campaign | ID): string {
+  resetAiCredits(campaign: Campaign | ID): string {
+    // Note: Backend endpoint still named reset_grok_credits, frontend uses provider-agnostic naming
     return `${this.campaigns(campaign)}/reset_grok_credits`
   }
 

@@ -3,34 +3,53 @@
 import { useState } from "react"
 import { Alert, AlertTitle, Box, Button, CircularProgress } from "@mui/material"
 import type { Campaign } from "@/types"
-import { isGrokCreditsExhausted } from "@/types"
+import { isAiCreditsExhausted } from "@/types"
 import { useClient, useToast, useApp, useCampaign } from "@/contexts"
 
-interface GrokCreditAlertProps {
+interface AiCreditAlertProps {
   campaign: Campaign
 }
 
-export default function GrokCreditAlert({ campaign }: GrokCreditAlertProps) {
+/**
+ * Formats the AI provider name for display
+ */
+function formatProviderName(provider: string | null | undefined): string {
+  switch (provider) {
+    case "grok":
+      return "Grok"
+    case "openai":
+      return "OpenAI"
+    case "gemini":
+      return "Gemini"
+    default:
+      return "AI provider"
+  }
+}
+
+export default function AiCreditAlert({ campaign }: AiCreditAlertProps) {
   const [loading, setLoading] = useState(false)
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
   const { user } = useApp()
   const { setCurrentCampaign } = useCampaign()
 
-  if (!isGrokCreditsExhausted(campaign)) return null
+  if (!isAiCreditsExhausted(campaign)) return null
 
   const isGamemaster = user?.id === campaign.gamemaster?.id
+  const providerName = formatProviderName(
+    campaign.ai_credits_exhausted_provider
+  )
 
   const handleDismiss = async () => {
     setLoading(true)
     try {
-      await client.resetGrokCredits(campaign.id)
+      await client.resetAiCredits(campaign.id)
       // Fetch fresh campaign data and set as current
       const updatedCampaign = await client.getCampaign(campaign.id)
       await setCurrentCampaign(updatedCampaign.data)
       toastSuccess("Credit exhaustion warning dismissed")
     } catch (error) {
-      console.error("Failed to dismiss grok credits:", error)
+      console.error("Failed to dismiss AI credit alert:", error)
       toastError("Failed to dismiss warning")
     } finally {
       setLoading(false)
@@ -59,8 +78,8 @@ export default function GrokCreditAlert({ campaign }: GrokCreditAlertProps) {
         }
       >
         <AlertTitle>AI Image Generation Unavailable</AlertTitle>
-        Grok API credits are exhausted. AI image generation is temporarily
-        disabled. Credits typically refresh monthly.
+        {providerName} API credits are exhausted. AI image generation is
+        temporarily disabled. Credits typically refresh monthly.
       </Alert>
     </Box>
   )
