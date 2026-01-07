@@ -51,16 +51,18 @@ export default function NotionSyncLogList({
         setTotalPages(response.data.meta.total_pages)
       } catch (error) {
         console.error("Error fetching Notion sync logs:", error)
+        toastError("Failed to load Notion sync logs. Please try again.")
       } finally {
         setLoading(false)
       }
     },
-    [client, character.id]
+    [client, character.id, toastError]
   )
 
   useEffect(() => {
+    if (!open) return
     fetchLogs(page)
-  }, [fetchLogs, page])
+  }, [fetchLogs, page, open])
 
   // Subscribe to WebSocket for real-time sync log updates
   useEffect(() => {
@@ -70,6 +72,7 @@ export default function NotionSyncLogList({
         // Check if this is a reload signal for our character
         if (data === "reload") {
           // No character_id filter, reload all
+          setPage(1)
           fetchLogs(1)
         } else if (
           typeof data === "object" &&
@@ -79,6 +82,7 @@ export default function NotionSyncLogList({
           // Check if the reload is for this specific character
           const cableData = data as CampaignCableData
           if (cableData.character_id === character.id) {
+            setPage(1)
             fetchLogs(1)
           }
         }
@@ -185,6 +189,14 @@ export default function NotionSyncLogList({
                   alignItems="center"
                   sx={{ p: 1.5, cursor: "pointer" }}
                   onClick={() => toggleLogDetails(log.id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault()
+                      toggleLogDetails(log.id)
+                    }
+                  }}
                 >
                   {log.status === "success" ? (
                     <Chip
@@ -219,7 +231,7 @@ export default function NotionSyncLogList({
                       {log.error_message}
                     </Typography>
                   )}
-                  <Box sx={{ ml: "auto" }}>
+                  <Box sx={{ ml: log.error_message ? undefined : "auto" }}>
                     {expandedLogId === log.id ? (
                       <ExpandLessIcon fontSize="small" />
                     ) : (
