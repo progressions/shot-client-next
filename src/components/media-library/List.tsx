@@ -37,11 +37,18 @@ const buildQueryString = (filters: MediaLibraryFilters): string => {
   return queryString ? `?${queryString}` : ""
 }
 
-interface ListProps {
-  initialFilters?: MediaLibraryFilters
+interface InitialData {
+  images: MediaImage[]
+  meta: { total_pages: number; current_page: number; total_count: number }
+  stats: MediaLibraryStats
 }
 
-export default function List({ initialFilters }: ListProps) {
+interface ListProps {
+  initialFilters?: MediaLibraryFilters
+  initialData?: InitialData
+}
+
+export default function List({ initialFilters, initialData }: ListProps) {
   const router = useRouter()
   const { client } = useClient()
   const { toastSuccess, toastError, toastInfo } = useToast()
@@ -50,20 +57,25 @@ export default function List({ initialFilters }: ListProps) {
   const isGamemaster = user?.gamemaster || user?.admin || false
   const isInitialRender = useRef(true)
 
-  const [images, setImages] = useState<MediaImage[]>([])
-  const [loading, setLoading] = useState(true)
+  // Initialize from server-fetched data when available
+  const [images, setImages] = useState<MediaImage[]>(initialData?.images || [])
+  const [loading, setLoading] = useState(!initialData)
   const [filters, setFilters] = useState<MediaLibraryFilters>(
     initialFilters || { page: 1, per_page: 24 }
   )
-  const [totalPages, setTotalPages] = useState(1)
-  const [stats, setStats] = useState<MediaLibraryStats>({
-    total: 0,
-    orphan: 0,
-    attached: 0,
-    uploaded: 0,
-    ai_generated: 0,
-    total_size_bytes: 0,
-  })
+  const [totalPages, setTotalPages] = useState(
+    initialData?.meta?.total_pages || 1
+  )
+  const [stats, setStats] = useState<MediaLibraryStats>(
+    initialData?.stats || {
+      total: 0,
+      orphan: 0,
+      attached: 0,
+      uploaded: 0,
+      ai_generated: 0,
+      total_size_bytes: 0,
+    }
+  )
 
   // Selection state
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -96,9 +108,14 @@ export default function List({ initialFilters }: ListProps) {
     }
   }, [client, filters, toastError])
 
+  // Only fetch client-side when filters change (skip if we have initial data)
   useEffect(() => {
+    // Skip initial fetch if we have server-fetched data
+    if (isInitialRender.current && initialData) {
+      return
+    }
     fetchImages()
-  }, [fetchImages])
+  }, [fetchImages, initialData])
 
   // Clear selection when filters change
   useEffect(() => {
