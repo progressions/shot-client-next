@@ -316,6 +316,20 @@ export default function List({ initialFilters }: ListProps) {
         />
       )}
 
+      {totalPages > 1 && (
+        <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+          <Pagination
+            count={totalPages}
+            page={filters.page || 1}
+            onChange={handlePageChange}
+            variant="outlined"
+            color="primary"
+            shape="rounded"
+            size="large"
+          />
+        </Box>
+      )}
+
       <ImageGrid
         images={images}
         loading={loading}
@@ -334,7 +348,10 @@ export default function List({ initialFilters }: ListProps) {
             count={totalPages}
             page={filters.page || 1}
             onChange={handlePageChange}
+            variant="outlined"
             color="primary"
+            shape="rounded"
+            size="large"
           />
         </Box>
       )}
