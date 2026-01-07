@@ -30,6 +30,7 @@ export default function Badge({
   title,
   children,
   disableAvatar = false,
+  onClick,
   sx = {},
 }: BadgeProps) {
   const { campaignData } = useCampaign()
@@ -62,6 +63,7 @@ export default function Badge({
     <Stack
       direction="row"
       spacing={1}
+      onClick={onClick}
       sx={{
         flexShrink: 0,
         backgroundColor: "#1d1d1d",

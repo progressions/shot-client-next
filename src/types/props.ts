@@ -43,9 +43,10 @@ export interface BadgeProps extends BaseProps {
   name?: string
   entity: Entity
   size?: "sm" | "md" | "lg"
-  title: React.ReactNode
+  title?: React.ReactNode
   children: React.ReactNode
   disableAvatar?: boolean
+  onClick?: () => void
 }
 
 /**

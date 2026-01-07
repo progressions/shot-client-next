@@ -123,14 +123,22 @@ export default function PartySlotCard({
               entity={{ id: slot.id, name: "Empty slot" }}
               size="sm"
               disableAvatar
+              onClick={onPopulate ? () => onPopulate(slot.id) : undefined}
               sx={{
                 backgroundColor: "transparent",
                 border: "1px dashed",
                 borderColor: "divider",
+                cursor: onPopulate ? "pointer" : "default",
+                "&:hover": onPopulate
+                  ? {
+                      borderColor: "primary.main",
+                      backgroundColor: "action.hover",
+                    }
+                  : {},
               }}
             >
               <Typography variant="caption" color="text.secondary">
-                Click + to assign character
+                Click to assign character
               </Typography>
             </Badge>
           ) : character ? (
