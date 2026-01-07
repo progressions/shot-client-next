@@ -17,6 +17,7 @@ import {
   Delete as DeleteIcon,
   ContentCopy as DuplicateIcon,
   Info as InfoIcon,
+  Link as LinkIcon,
 } from "@mui/icons-material"
 import type { MediaImage } from "@/types"
 import { EntityLink } from "@/components/ui/links"
@@ -29,6 +30,7 @@ interface ImageCardProps {
   onDuplicate: (id: string) => void
   onDownload: (image: MediaImage) => void
   onShowDetails: (image: MediaImage) => void
+  onAttach: (id: string) => void
   isGamemaster: boolean
 }
 
@@ -40,6 +42,7 @@ export default function ImageCard({
   onDuplicate,
   onDownload,
   onShowDetails,
+  onAttach,
   isGamemaster,
 }: ImageCardProps) {
   const [imageError, setImageError] = useState(false)
@@ -203,6 +206,13 @@ export default function ImageCard({
         </Tooltip>
         {isGamemaster && (
           <>
+            {image.status === "orphan" && (
+              <Tooltip title="Attach to Entity">
+                <IconButton size="small" onClick={() => onAttach(image.id)}>
+                  <LinkIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
             <Tooltip title="Duplicate">
               <IconButton size="small" onClick={() => onDuplicate(image.id)}>
                 <DuplicateIcon fontSize="small" />

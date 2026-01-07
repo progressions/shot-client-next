@@ -13,3 +13,4 @@ export { default as JunctureAutocomplete } from "@/components/autocomplete/Junct
 export { default as SchtickAutocomplete } from "@/components/autocomplete/SchtickAutocomplete"
 export { default as PrerequisiteSchtickAutocomplete } from "@/components/autocomplete/PrerequisiteSchtickAutocomplete"
 export { default as NotionPageAutocomplete } from "@/components/autocomplete/NotionPageAutocomplete"
+export { default as FightAutocomplete } from "@/components/autocomplete/FightAutocomplete"

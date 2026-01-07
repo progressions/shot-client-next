@@ -17,6 +17,7 @@ import {
   Delete as DeleteIcon,
   ContentCopy as DuplicateIcon,
   OpenInNew as OpenInNewIcon,
+  Link as LinkIcon,
 } from "@mui/icons-material"
 import type { MediaImage } from "@/types"
 
@@ -27,6 +28,7 @@ interface ImageDetailsDialogProps {
   onDelete: (id: string) => void
   onDuplicate: (id: string) => void
   onDownload: (image: MediaImage) => void
+  onAttach: (id: string) => void
   isGamemaster: boolean
 }
 
@@ -37,6 +39,7 @@ export default function ImageDetailsDialog({
   onDelete,
   onDuplicate,
   onDownload,
+  onAttach,
   isGamemaster,
 }: ImageDetailsDialogProps) {
   if (!image) return null
@@ -69,6 +72,11 @@ export default function ImageDetailsDialog({
 
   const handleDuplicate = () => {
     onDuplicate(image.id)
+    onClose()
+  }
+
+  const handleAttach = () => {
+    onAttach(image.id)
     onClose()
   }
 
@@ -238,6 +246,15 @@ export default function ImageDetailsDialog({
         </Button>
         {isGamemaster && (
           <>
+            {image.status === "orphan" && (
+              <Button
+                startIcon={<LinkIcon />}
+                onClick={handleAttach}
+                size="small"
+              >
+                Attach to Entity
+              </Button>
+            )}
             <Button
               startIcon={<DuplicateIcon />}
               onClick={handleDuplicate}

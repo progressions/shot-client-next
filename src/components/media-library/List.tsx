@@ -11,11 +11,13 @@ import type {
   MediaImage,
   MediaLibraryFilters,
   MediaLibraryStats,
+  MediaImageEntityType,
 } from "@/types"
 import Filter from "./Filter"
 import ImageGrid from "./ImageGrid"
 import BulkActions from "./BulkActions"
 import ImageDetailsDialog from "./ImageDetailsDialog"
+import AttachImageDialog from "./AttachImageDialog"
 
 interface InitialData {
   images: MediaImage[]
@@ -69,6 +71,10 @@ export default function List({ initialFilters, initialData }: ListProps) {
   // Details dialog
   const [detailsImage, setDetailsImage] = useState<MediaImage | null>(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
+
+  // Attach dialog
+  const [attachImage, setAttachImage] = useState<MediaImage | null>(null)
+  const [attachDialogOpen, setAttachDialogOpen] = useState(false)
 
   const fetchImages = useCallback(async () => {
     setLoading(true)
@@ -313,6 +319,36 @@ export default function List({ initialFilters, initialData }: ListProps) {
     setDetailsImage(null)
   }
 
+  const handleAttachClick = (id: string) => {
+    const image = images.find(img => img.id === id)
+    if (image) {
+      setAttachImage(image)
+      setAttachDialogOpen(true)
+    }
+  }
+
+  const handleAttachClose = () => {
+    setAttachDialogOpen(false)
+    setAttachImage(null)
+  }
+
+  const handleAttach = async (
+    entityType: MediaImageEntityType,
+    entityId: string
+  ) => {
+    if (!attachImage) return
+
+    try {
+      await client.attachMediaImage(attachImage.id, entityType, entityId)
+      toastSuccess("Image attached to entity")
+      fetchImages()
+    } catch (error) {
+      console.error("Failed to attach image:", error)
+      toastError("Failed to attach image")
+      throw error
+    }
+  }
+
   return (
     <Box>
       <Box
@@ -398,6 +434,7 @@ export default function List({ initialFilters, initialData }: ListProps) {
         onDuplicate={handleDuplicate}
         onDownload={handleDownload}
         onShowDetails={handleShowDetails}
+        onAttach={handleAttachClick}
         isGamemaster={isGamemaster}
       />
 
@@ -422,7 +459,15 @@ export default function List({ initialFilters, initialData }: ListProps) {
         onDelete={handleDelete}
         onDuplicate={handleDuplicate}
         onDownload={handleDownload}
+        onAttach={handleAttachClick}
         isGamemaster={isGamemaster}
+      />
+
+      <AttachImageDialog
+        image={attachImage}
+        open={attachDialogOpen}
+        onClose={handleAttachClose}
+        onAttach={handleAttach}
       />
     </Box>
   )
