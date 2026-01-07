@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { List } from "@/components/media-library"
-import { requireCampaign, getCurrentUser } from "@/lib"
+import { requireCampaign, getCurrentUser, getServerClient } from "@/lib"
 import type { MediaLibraryFilters } from "@/types"
 
 export const metadata = {
@@ -82,5 +82,52 @@ export default async function MediaLibraryPage({
     ...(entity_type && { entity_type }),
   }
 
-  return <List initialFilters={initialFilters} />
+  // Fetch data server-side (like characters page)
+  const client = await getServerClient()
+  if (!client) {
+    redirect("/login")
+  }
+
+  // Fetch with error handling - fall back to empty data if request fails
+  let images: (typeof import("@/types"))["MediaImage"][] = []
+  let meta = { total_pages: 1, current_page: 1, total_count: 0 }
+  let stats = {
+    total: 0,
+    orphan: 0,
+    attached: 0,
+    uploaded: 0,
+    ai_generated: 0,
+    total_size_bytes: 0,
+  }
+
+  try {
+    const response = await client.getMediaLibrary(initialFilters)
+    if (response?.data) {
+      images = response.data.images || []
+      meta = response.data.meta || meta
+      stats = response.data.stats || stats
+    }
+  } catch (error) {
+    // If the media library request fails, fall back to empty initial data
+    // The List component will handle showing an error or empty state
+    console.error("Failed to fetch media library:", error)
+  }
+
+  return (
+    <List
+      initialFilters={initialFilters}
+      initialData={{
+        images,
+        meta,
+        stats: {
+          total: stats?.total ?? 0,
+          orphan: stats?.orphan ?? 0,
+          attached: stats?.attached ?? 0,
+          uploaded: stats?.uploaded ?? 0,
+          ai_generated: stats?.ai_generated ?? 0,
+          total_size_bytes: stats?.total_size_bytes ?? 0,
+        },
+      }}
+    />
+  )
 }

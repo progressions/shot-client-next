@@ -6,6 +6,7 @@ import { PhotoLibrary as MediaIcon } from "@mui/icons-material"
 import JSZip from "jszip"
 import { useClient, useToast, useApp, useConfirm } from "@/contexts"
 import { MainHeader } from "@/components/ui"
+import { queryParams } from "@/lib"
 import type {
   MediaImage,
   MediaLibraryFilters,
@@ -16,32 +17,18 @@ import ImageGrid from "./ImageGrid"
 import BulkActions from "./BulkActions"
 import ImageDetailsDialog from "./ImageDetailsDialog"
 
-// Build URL query string from filters
-const buildQueryString = (filters: MediaLibraryFilters): string => {
-  const params = new URLSearchParams()
-
-  if (filters.page && filters.page > 1) {
-    params.set("page", String(filters.page))
-  }
-  if (filters.status && filters.status !== "all") {
-    params.set("status", filters.status)
-  }
-  if (filters.source && filters.source !== "all") {
-    params.set("source", filters.source)
-  }
-  if (filters.entity_type && filters.entity_type !== "") {
-    params.set("entity_type", filters.entity_type)
-  }
-
-  const queryString = params.toString()
-  return queryString ? `?${queryString}` : ""
+interface InitialData {
+  images: MediaImage[]
+  meta: { total_pages: number; current_page: number; total_count: number }
+  stats: MediaLibraryStats
 }
 
 interface ListProps {
   initialFilters?: MediaLibraryFilters
+  initialData?: InitialData
 }
 
-export default function List({ initialFilters }: ListProps) {
+export default function List({ initialFilters, initialData }: ListProps) {
   const router = useRouter()
   const { client } = useClient()
   const { toastSuccess, toastError, toastInfo } = useToast()
@@ -50,20 +37,31 @@ export default function List({ initialFilters }: ListProps) {
   const isGamemaster = user?.gamemaster || user?.admin || false
   const isInitialRender = useRef(true)
 
-  const [images, setImages] = useState<MediaImage[]>([])
-  const [loading, setLoading] = useState(true)
-  const [filters, setFilters] = useState<MediaLibraryFilters>(
-    initialFilters || { page: 1, per_page: 24 }
-  )
-  const [totalPages, setTotalPages] = useState(1)
-  const [stats, setStats] = useState<MediaLibraryStats>({
-    total: 0,
-    orphan: 0,
-    attached: 0,
-    uploaded: 0,
-    ai_generated: 0,
-    total_size_bytes: 0,
+  // Initialize from server-fetched data when available
+  const [images, setImages] = useState<MediaImage[]>(initialData?.images || [])
+  const [loading, setLoading] = useState(!initialData)
+  // Initialize filters with ALL fields (like characters page) so queryParams outputs all params
+  const [filters, setFilters] = useState<MediaLibraryFilters>({
+    status: "all",
+    source: "all",
+    entity_type: "",
+    page: 1,
+    per_page: 24,
+    ...initialFilters,
   })
+  const [totalPages, setTotalPages] = useState(
+    initialData?.meta?.total_pages || 1
+  )
+  const [stats, setStats] = useState<MediaLibraryStats>(
+    initialData?.stats || {
+      total: 0,
+      orphan: 0,
+      attached: 0,
+      uploaded: 0,
+      ai_generated: 0,
+      total_size_bytes: 0,
+    }
+  )
 
   // Selection state
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -96,9 +94,31 @@ export default function List({ initialFilters }: ListProps) {
     }
   }, [client, filters, toastError])
 
+  // Only fetch client-side on initial mount if no server data was provided
+  // After initial render, URL changes trigger server-side fetch via page.tsx
   useEffect(() => {
-    fetchImages()
-  }, [fetchImages])
+    if (!initialData) {
+      fetchImages()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Sync state when server provides new data (e.g., after URL-triggered fetch)
+  useEffect(() => {
+    if (initialData) {
+      setImages(initialData.images)
+      setTotalPages(initialData.meta?.total_pages || 1)
+      setStats({
+        total: initialData.stats?.total ?? 0,
+        orphan: initialData.stats?.orphan ?? 0,
+        attached: initialData.stats?.attached ?? 0,
+        uploaded: initialData.stats?.uploaded ?? 0,
+        ai_generated: initialData.stats?.ai_generated ?? 0,
+        total_size_bytes: initialData.stats?.total_size_bytes ?? 0,
+      })
+      setLoading(false)
+    }
+  }, [initialData])
 
   // Clear selection when filters change
   useEffect(() => {
@@ -112,7 +132,7 @@ export default function List({ initialFilters }: ListProps) {
       return
     }
 
-    const url = `/media${buildQueryString(filters)}`
+    const url = `/media?${queryParams(filters)}`
     router.push(url, { scroll: false })
   }, [filters, router])
 
