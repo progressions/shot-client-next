@@ -25,10 +25,10 @@ class ApiV2 {
     return `${this.base()}/api/v2`
   }
 
-  encounters(fight?: Fight | ID): string {
-    return fight?.id
-      ? `${this.api()}/encounters/${fight.id}`
-      : `${this.api()}/encounters`
+  encounters(fight?: Fight | ID | string): string {
+    if (!fight) return `${this.api()}/encounters`
+    const id = typeof fight === "string" ? fight : fight.id
+    return `${this.api()}/encounters/${id}`
   }
 
   characters(character?: Character | ID): string {
