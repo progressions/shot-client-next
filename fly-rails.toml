@@ -1,17 +1,19 @@
-# fly.toml app configuration file generated for shot-client-phoenix
+# fly-rails.toml - LEGACY Rails backend configuration
+#
+# WARNING: This is for legacy Rails backend deployment only.
+# For production deployments, use the default fly.toml (Phoenix backend).
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "shot-client-phoenix"
+app = "shot-client-next"
 primary_region = "dfw"
 
 [build]
   [build.args]
-    NEXT_PUBLIC_API_BASE_URL = "https://shot-elixir.fly.dev"
-    NEXT_PUBLIC_SERVER_URL = "https://shot-elixir.fly.dev"
-    NEXT_PUBLIC_WEBSOCKET_URL = "wss://shot-elixir.fly.dev"
-    NEXT_PUBLIC_BACKEND_TYPE = "phoenix"
+    NEXT_PUBLIC_API_BASE_URL = "https://shot-counter.fly.dev"
+    NEXT_PUBLIC_SERVER_URL = "https://shot-counter.fly.dev"
+    NEXT_PUBLIC_WEBSOCKET_URL = "wss://shot-counter.fly.dev"
 
 [env]
   PORT = "3000"
