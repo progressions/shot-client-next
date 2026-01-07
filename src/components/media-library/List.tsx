@@ -23,7 +23,7 @@ export default function List({ initialFilters }: ListProps) {
   const { client } = useClient()
   const { toastSuccess, toastError, toastInfo } = useToast()
   const { confirm } = useConfirm()
-  const { user } = useApp()
+  const { user, campaign } = useApp()
   const isGamemaster = user?.gamemaster || user?.admin || false
 
   const [images, setImages] = useState<MediaImage[]>([])
@@ -225,7 +225,13 @@ export default function List({ initialFilters }: ListProps) {
       const url = URL.createObjectURL(zipBlob)
       const link = document.createElement("a")
       link.href = url
-      link.download = `media-library-${new Date().toISOString().split("T")[0]}.zip`
+
+      // Format campaign name for filename: replace spaces with dashes, truncate to 50 chars
+      const campaignSlug = (campaign?.name || "media")
+        .replace(/\s+/g, "-")
+        .slice(0, 50)
+      const dateStr = new Date().toISOString().split("T")[0]
+      link.download = `${campaignSlug}-media-${dateStr}.zip`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
