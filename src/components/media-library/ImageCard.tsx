@@ -83,6 +83,9 @@ export default function ImageCard({
         <Checkbox
           checked={selected}
           onChange={() => onSelect(image.id)}
+          inputProps={{
+            "aria-label": `Select image ${image.filename || image.entity_name || "unnamed"}`,
+          }}
           sx={{
             position: "absolute",
             top: 4,
@@ -129,9 +132,23 @@ export default function ImageCard({
         image={imageError ? "/placeholder-image.png" : thumbnailUrl}
         alt={image.filename || "AI Generated Image"}
         onError={() => setImageError(true)}
+        tabIndex={0}
+        role="button"
+        aria-label={`View details for ${image.filename || image.entity_name || "image"}`}
+        onKeyDown={(e: React.KeyboardEvent) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault()
+            onShowDetails(image)
+          }
+        }}
         sx={{
           cursor: "pointer",
           objectFit: "cover",
+          "&:focus": {
+            outline: "2px solid",
+            outlineColor: "primary.main",
+            outlineOffset: 2,
+          },
         }}
         onClick={() => onShowDetails(image)}
       />

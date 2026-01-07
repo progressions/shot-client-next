@@ -2,7 +2,8 @@
 import { useState, useCallback, useEffect } from "react"
 import { Box, Pagination, Chip } from "@mui/material"
 import { PhotoLibrary as MediaIcon } from "@mui/icons-material"
-import { useClient, useToast, useApp } from "@/contexts"
+import JSZip from "jszip"
+import { useClient, useToast, useApp, useConfirm } from "@/contexts"
 import { MainHeader } from "@/components/ui"
 import type {
   MediaImage,
@@ -20,7 +21,8 @@ interface ListProps {
 
 export default function List({ initialFilters }: ListProps) {
   const { client } = useClient()
-  const { toastSuccess, toastError } = useToast()
+  const { toastSuccess, toastError, toastInfo } = useToast()
+  const { confirm } = useConfirm()
   const { user } = useApp()
   const isGamemaster = user?.gamemaster || user?.admin || false
 
@@ -30,7 +32,6 @@ export default function List({ initialFilters }: ListProps) {
     initialFilters || { page: 1, per_page: 24 }
   )
   const [totalPages, setTotalPages] = useState(1)
-  const [totalCount, setTotalCount] = useState(0)
   const [stats, setStats] = useState<MediaLibraryStats>({
     total: 0,
     orphan: 0,
@@ -53,7 +54,6 @@ export default function List({ initialFilters }: ListProps) {
       const response = await client.getMediaLibrary(filters)
       setImages(response.data.images)
       setTotalPages(response.data.meta.total_pages)
-      setTotalCount(response.data.meta.total_count)
       // Ensure all stats fields have default values
       const apiStats = response.data.stats || {}
       setStats({
@@ -110,13 +110,16 @@ export default function List({ initialFilters }: ListProps) {
   }
 
   const handleDelete = async (id: string) => {
-    if (
-      !confirm(
-        "Are you sure you want to delete this image? This cannot be undone."
-      )
-    ) {
-      return
-    }
+    const confirmed = await confirm({
+      title: "Delete Image",
+      message:
+        "Are you sure you want to delete this image? This cannot be undone.",
+      confirmText: "Delete",
+      confirmColor: "error",
+      destructive: true,
+    })
+
+    if (!confirmed) return
 
     try {
       await client.deleteMediaImage(id)
@@ -136,13 +139,15 @@ export default function List({ initialFilters }: ListProps) {
   const handleBulkDelete = async () => {
     if (selectedIds.size === 0) return
 
-    if (
-      !confirm(
-        `Are you sure you want to delete ${selectedIds.size} images? This cannot be undone.`
-      )
-    ) {
-      return
-    }
+    const confirmed = await confirm({
+      title: "Delete Images",
+      message: `Are you sure you want to delete ${selectedIds.size} images? This cannot be undone.`,
+      confirmText: "Delete All",
+      confirmColor: "error",
+      destructive: true,
+    })
+
+    if (!confirmed) return
 
     try {
       const result = await client.bulkDeleteMediaImages(Array.from(selectedIds))
@@ -175,16 +180,62 @@ export default function List({ initialFilters }: ListProps) {
   }
 
   const handleDownload = (image: MediaImage) => {
-    // Open image in new tab for download
-    window.open(image.imagekit_url, "_blank")
+    // Create a download link and trigger download
+    const link = document.createElement("a")
+    link.href = image.imagekit_url
+    link.download = image.filename || `image-${image.id}.jpg`
+    link.target = "_blank"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 
-  const handleBulkDownload = () => {
-    // Download all selected images
+  const handleBulkDownload = async () => {
     const selectedImages = images.filter(img => selectedIds.has(img.id))
-    selectedImages.forEach(img => {
-      window.open(img.imagekit_url, "_blank")
-    })
+
+    if (selectedImages.length === 0) return
+
+    toastInfo(`Preparing ${selectedImages.length} images for download...`)
+
+    try {
+      const zip = new JSZip()
+
+      // Fetch all images and add to zip
+      const fetchPromises = selectedImages.map(async (img, index) => {
+        try {
+          const response = await fetch(img.imagekit_url)
+          const blob = await response.blob()
+
+          // Generate unique filename
+          const extension = img.content_type?.includes("png") ? "png" : "jpg"
+          const filename =
+            img.filename ||
+            `${img.entity_name || "image"}-${index + 1}.${extension}`
+
+          zip.file(filename, blob)
+        } catch (error) {
+          console.error(`Failed to fetch image ${img.id}:`, error)
+        }
+      })
+
+      await Promise.all(fetchPromises)
+
+      // Generate and download the zip file
+      const zipBlob = await zip.generateAsync({ type: "blob" })
+      const url = URL.createObjectURL(zipBlob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `media-library-${new Date().toISOString().split("T")[0]}.zip`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+
+      toastSuccess(`Downloaded ${selectedImages.length} images as zip`)
+    } catch (error) {
+      console.error("Failed to create zip:", error)
+      toastError("Failed to download images")
+    }
   }
 
   const handleShowDetails = (image: MediaImage) => {

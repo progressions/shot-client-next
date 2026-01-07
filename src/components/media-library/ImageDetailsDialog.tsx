@@ -78,6 +78,7 @@ export default function ImageDetailsDialog({
         Image Details
         <IconButton
           onClick={onClose}
+          aria-label="Close dialog"
           sx={{ position: "absolute", right: 8, top: 8 }}
         >
           <CloseIcon />

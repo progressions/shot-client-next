@@ -1,6 +1,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --sticky-top-offset: 80px;
 }
 
 @media (prefers-color-scheme: dark) {

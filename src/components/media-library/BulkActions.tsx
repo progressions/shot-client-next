@@ -33,7 +33,7 @@ export default function BulkActions({
       elevation={3}
       sx={theme => ({
         position: "sticky",
-        top: 80,
+        top: "var(--sticky-top-offset, 80px)",
         zIndex: 10,
         p: 2,
         mb: 2,
@@ -45,7 +45,7 @@ export default function BulkActions({
       })}
     >
       <Typography variant="body1" sx={{ flexGrow: 1 }}>
-        {selectedCount} of {totalCount} selected
+        {selectedCount} of {totalCount} selected on this page
       </Typography>
 
       <Button
@@ -54,7 +54,7 @@ export default function BulkActions({
         onClick={onSelectAll}
         disabled={selectedCount === totalCount}
       >
-        Select All
+        Select All on Page
       </Button>
 
       <Button size="small" startIcon={<ClearIcon />} onClick={onClearSelection}>
