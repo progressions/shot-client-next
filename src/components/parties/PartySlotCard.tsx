@@ -46,7 +46,7 @@ export default function PartySlotCard({
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = parseInt(event.target.value, 10)
-    if (!isNaN(value) && value >= 1 && onMookCountChange) {
+    if (!isNaN(value) && value >= 1 && value <= 100 && onMookCountChange) {
       onMookCountChange(slot.id, value)
     }
   }
@@ -78,6 +78,7 @@ export default function PartySlotCard({
         {/* Drag Handle */}
         {isDraggable && (
           <DragIndicator
+            aria-hidden="true"
             sx={{
               color: "text.disabled",
               cursor: "grab",
@@ -201,6 +202,7 @@ export default function PartySlotCard({
                 size="small"
                 onClick={() => onPopulate(slot.id)}
                 color="primary"
+                aria-label="Add character to slot"
               >
                 <PersonAddOutlined fontSize="small" />
               </IconButton>
@@ -212,6 +214,7 @@ export default function PartySlotCard({
                 size="small"
                 onClick={() => onClear(slot.id)}
                 color="default"
+                aria-label="Remove character from slot"
               >
                 <ClearOutlined fontSize="small" />
               </IconButton>
@@ -223,6 +226,7 @@ export default function PartySlotCard({
                 size="small"
                 onClick={() => onRemove(slot.id)}
                 color="error"
+                aria-label="Delete slot"
               >
                 <DeleteOutlined fontSize="small" />
               </IconButton>

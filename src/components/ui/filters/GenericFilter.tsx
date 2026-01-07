@@ -287,7 +287,6 @@ export function GenericFilter({
   return (
     <Stack
       direction={{ xs: "column", sm: "row" }}
-      spacing={1}
       alignItems={{ xs: "stretch", sm: "center" }}
       sx={{ flexWrap: "wrap", gap: 1 }}
     >

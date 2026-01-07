@@ -54,9 +54,6 @@ export default function PartyCompositionBuilder({
 
   // Character selection modal state
   const [selectingSlotId, setSelectingSlotId] = useState<string | null>(null)
-  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
-    null
-  )
 
   // Add slot modal state
   const [isAddSlotOpen, setIsAddSlotOpen] = useState(false)
@@ -148,7 +145,6 @@ export default function PartyCompositionBuilder({
         onUpdate(response.data)
         toastSuccess(`${character.name} assigned to slot`)
         setSelectingSlotId(null)
-        setSelectedCharacter(null)
       } catch (error) {
         console.error("Error populating slot:", error)
         toastError("Failed to assign character")
@@ -197,7 +193,7 @@ export default function PartyCompositionBuilder({
         setIsLoading(false)
       }
     },
-    [client, party, slots, onUpdate, toastSuccess, toastError]
+    [client, party, onUpdate, toastSuccess, toastError]
   )
 
   // Update mook count
@@ -243,11 +239,21 @@ export default function PartyCompositionBuilder({
                   onChange={e => setSelectedTemplate(e.target.value)}
                   disabled={isLoading || isLoadingTemplates}
                 >
-                  {templates.map(template => (
-                    <MenuItem key={template.key} value={template.key}>
-                      {template.name}
+                  {isLoadingTemplates ? (
+                    <MenuItem disabled value="">
+                      <em>Loading templates...</em>
                     </MenuItem>
-                  ))}
+                  ) : templates.length === 0 ? (
+                    <MenuItem disabled value="">
+                      <em>No templates available</em>
+                    </MenuItem>
+                  ) : (
+                    templates.map(template => (
+                      <MenuItem key={template.key} value={template.key}>
+                        {template.name}
+                      </MenuItem>
+                    ))
+                  )}
                 </Select>
               </FormControl>
               <Button
@@ -328,10 +334,7 @@ export default function PartyCompositionBuilder({
       {/* Character Selection Dialog */}
       <Dialog
         open={selectingSlotId !== null}
-        onClose={() => {
-          setSelectingSlotId(null)
-          setSelectedCharacter(null)
-        }}
+        onClose={() => setSelectingSlotId(null)}
         maxWidth="md"
         fullWidth
       >
@@ -340,16 +343,12 @@ export default function PartyCompositionBuilder({
           <Box sx={{ mt: 2 }}>
             {selectingSlotId && (
               <CharacterFilter
-                setSelectedChild={setSelectedCharacter}
                 addMember={handlePopulateSlot}
                 omit={[]}
-                defaultCharacterType={
-                  slots.find(s => s.id === selectingSlotId)?.role
-                    ? roleToCharacterType[
-                        slots.find(s => s.id === selectingSlotId)!.role
-                      ]
-                    : null
-                }
+                defaultCharacterType={(() => {
+                  const slot = slots.find(s => s.id === selectingSlotId)
+                  return slot?.role ? roleToCharacterType[slot.role] : null
+                })()}
               />
             )}
             <Typography
@@ -363,14 +362,7 @@ export default function PartyCompositionBuilder({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={() => {
-              setSelectingSlotId(null)
-              setSelectedCharacter(null)
-            }}
-          >
-            Cancel
-          </Button>
+          <Button onClick={() => setSelectingSlotId(null)}>Cancel</Button>
         </DialogActions>
       </Dialog>
 
