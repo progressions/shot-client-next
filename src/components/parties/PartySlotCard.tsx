@@ -10,7 +10,7 @@ import {
 } from "@mui/icons-material"
 import { NumberField } from "@/components/ui"
 import { CharacterBadge, Badge } from "@/components/badges"
-import RoleBadge from "./RoleBadge"
+import { getRoleConfig } from "./RoleBadge"
 import type { PartySlot } from "@/types"
 
 interface PartySlotCardProps {
@@ -57,31 +57,65 @@ export default function PartySlotCard({
     }
   }
 
+  const roleConfig = getRoleConfig(slot.role)
+
   return (
     <Stack
-      spacing={0.5}
+      spacing={0}
       sx={{
         opacity: isLoading ? 0.5 : 1,
         transition: "opacity 0.2s",
+        borderRadius: 1,
+        overflow: "hidden",
       }}
     >
-      {/* Top row: Role Badge */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      {/* Top row: Role Header Bar */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          px: 1.5,
+          py: 0.5,
+          backgroundColor: roleConfig.bgcolor,
+          color: roleConfig.color,
+        }}
+      >
         {isDraggable && (
           <DragIndicator
             aria-hidden="true"
             sx={{
-              color: "text.disabled",
+              color: "inherit",
+              opacity: 0.7,
               cursor: "grab",
               "&:active": { cursor: "grabbing" },
             }}
           />
         )}
-        <RoleBadge role={slot.role} />
+        <Typography
+          variant="caption"
+          sx={{
+            fontWeight: 600,
+            textTransform: "uppercase",
+            fontSize: "0.7rem",
+            letterSpacing: "0.05em",
+          }}
+        >
+          {roleConfig.label}
+        </Typography>
       </Box>
 
       {/* Bottom row: Character Badge + Count + Actions */}
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack
+        direction="row"
+        spacing={1}
+        alignItems="center"
+        sx={{
+          px: 1,
+          py: 1,
+          backgroundColor: "background.paper",
+        }}
+      >
         {/* Character Badge or Empty State */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
           {isEmpty ? (
@@ -110,16 +144,18 @@ export default function PartySlotCard({
 
         {/* Mook Count */}
         {isMook && (
-          <NumberField
-            name="mook_count"
-            value={mookCount}
-            size="small"
-            width="70px"
-            error={false}
-            onChange={handleMookCountChange}
-            onBlur={handleMookCountBlur}
-            label="Count"
-          />
+          <Box sx={{ pt: 1 }}>
+            <NumberField
+              name="mook_count"
+              label="Count"
+              value={mookCount}
+              size="small"
+              width="70px"
+              error={false}
+              onChange={handleMookCountChange}
+              onBlur={handleMookCountBlur}
+            />
+          </Box>
         )}
 
         {/* Actions */}

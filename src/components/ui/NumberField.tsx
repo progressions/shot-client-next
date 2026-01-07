@@ -29,7 +29,7 @@ type NumberFieldProps = {
   sx?: SystemStyleObject<Theme>
   /** Optional label text displayed above the field */
   label?: string
-  /** Background color for the label - defaults to "#262626" for dark theme compatibility */
+  /** Background color for the label - defaults to theme.palette.background.paper for dark theme compatibility */
   labelBackgroundColor?: string
 }
 
@@ -125,7 +125,8 @@ export function NumberField({
           shrink
           sx={{
             opacity: 1,
-            backgroundColor: labelBackgroundColor || "#262626",
+            backgroundColor:
+              labelBackgroundColor || theme.palette.background.paper,
             color: "#ffffff",
             px: 0.5,
             ml: -0.5,

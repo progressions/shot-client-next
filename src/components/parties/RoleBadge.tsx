@@ -75,3 +75,8 @@ export function getRoleDisplayName(role: PartyRole): string {
 export function getRoleColor(role: PartyRole): string {
   return roleConfig[role]?.bgcolor ?? "#525252"
 }
+
+// Helper to get full role config (useful for custom rendering)
+export function getRoleConfig(role: PartyRole) {
+  return roleConfig[role] ?? roleConfig.mook
+}
