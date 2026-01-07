@@ -149,7 +149,7 @@ export function GenericFilter({
           onChange={newValue => changeFilter(field.name, newValue)}
           records={field.staticOptions || []}
           allowNone={field.allowNone ?? true}
-          sx={{ width: 200 }}
+          sx={{ width: { xs: "100%", sm: 200 } }}
         />
       )
     }
@@ -167,7 +167,7 @@ export function GenericFilter({
             ) || []
           }
           allowNone={field.allowNone ?? true}
-          sx={{ width: 200 }}
+          sx={{ width: { xs: "100%", sm: 200 } }}
         />
       )
     }
@@ -201,7 +201,7 @@ export function GenericFilter({
             filters={{}}
             records={userOptions}
             allowNone={field.allowNone ?? true}
-            sx={{ width: 300 }}
+            sx={{ width: { xs: "100%", sm: 300 } }}
           />
         )
       }
@@ -219,7 +219,7 @@ export function GenericFilter({
               changeFilter(field.name + "_id", newValue, true)
             }
             allowNone={field.allowNone ?? true}
-            sx={{ width: 350 }}
+            sx={{ width: { xs: "100%", sm: 350 } }}
           />
         )
       }
@@ -264,7 +264,7 @@ export function GenericFilter({
           filters={{}}
           records={data[responseKey] || []}
           allowNone={field.allowNone ?? true}
-          sx={{ width: 200 }}
+          sx={{ width: { xs: "100%", sm: 200 } }}
         />
       )
     }
@@ -285,7 +285,12 @@ export function GenericFilter({
   }
 
   return (
-    <Stack direction="row" spacing={1} alignItems="center">
+    <Stack
+      direction={{ xs: "column", sm: "row" }}
+      spacing={1}
+      alignItems={{ xs: "stretch", sm: "center" }}
+      sx={{ flexWrap: "wrap", gap: 1 }}
+    >
       {config.fields.map(field => renderField(field))}
       {!omit.includes("add") &&
         primaryField &&

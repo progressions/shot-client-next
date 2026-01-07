@@ -30,6 +30,8 @@ type CharacterFilterProps = {
   addMember?: (character: Character) => void
   dispatch?: React.Dispatch<FormStateData>
   omit: OmitType[]
+  // Optional initial character type to pre-populate the filter
+  defaultCharacterType?: string | null
 }
 
 export default function CharacterFilter({
@@ -38,11 +40,12 @@ export default function CharacterFilter({
   addMember,
   dispatch: _dispatch,
   omit = [],
+  defaultCharacterType = null,
 }: CharacterFilterProps) {
   const { client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     filters: {
-      character_type: null,
+      character_type: defaultCharacterType,
       archetype: null,
       faction_id: null,
       faction: null,

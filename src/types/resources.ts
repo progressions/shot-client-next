@@ -131,6 +131,35 @@ export interface Weapon extends BaseEntity {
   updated_at: string
 }
 
+// Party composition role types
+export type PartyRole = "boss" | "featured_foe" | "mook" | "ally"
+
+// Party composition slot (membership with role)
+export interface PartySlot {
+  id: string
+  role: PartyRole
+  character_id?: string | null
+  vehicle_id?: string | null
+  character?: Character | null
+  vehicle?: Vehicle | null
+  default_mook_count?: number | null
+  position: number
+}
+
+// Party template for preset compositions
+export interface PartyTemplate {
+  key: string
+  name: string
+  description: string
+  slots: PartyTemplateSlot[]
+}
+
+export interface PartyTemplateSlot {
+  role: PartyRole
+  label: string
+  default_mook_count?: number | null
+}
+
 export interface Party extends BaseEntity {
   id: string
   name: string
@@ -144,6 +173,9 @@ export interface Party extends BaseEntity {
   image_url: string
   created_at: string
   updated_at: string
+  // Party composition
+  slots?: PartySlot[]
+  has_composition?: boolean
 }
 
 export interface Faction extends BaseEntity {

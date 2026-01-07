@@ -14,7 +14,7 @@ import {
   SectionHeader,
   HeroImage,
 } from "@/components/ui"
-import { PartySpeedDial } from "@/components/parties"
+import { PartySpeedDial, PartyCompositionBuilder } from "@/components/parties"
 import { EntityActiveToggle } from "@/components/common"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
@@ -120,6 +120,21 @@ export default function Show({ party: initialParty }: ShowProperties) {
           editable={true}
           onChange={handleChangeAndSave}
           fallback="No description available."
+        />
+      </Box>
+      <Box sx={{ mb: 4 }}>
+        <SectionHeader
+          title="Party Composition"
+          icon={<Icon keyword="Fighters" />}
+          sx={{ mb: 2 }}
+        >
+          Define the role-based composition of this party. Use templates for
+          quick setup, or add slots manually.
+        </SectionHeader>
+        <PartyCompositionBuilder
+          party={party}
+          onUpdate={setParty}
+          isEditing={true}
         />
       </Box>
       <Stack direction="column" spacing={2}>
