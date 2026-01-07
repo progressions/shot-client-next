@@ -38,9 +38,7 @@ export default function SitesAutocomplete({
       }
     }
 
-    fetchSites().catch(error => {
-      console.error("Error in useEffect fetchSites:", error)
-    })
+    fetchSites()
   }, [client])
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
@@ -63,9 +61,8 @@ export default function SitesAutocomplete({
       }))
   }
 
-  const handleChange = (selectedOption: Option | null) => {
-    const site = sites.find(s => s.id === selectedOption)
-    onChange(site)
+  const handleChange = (value: string | null) => {
+    onChange(value)
   }
 
   return (

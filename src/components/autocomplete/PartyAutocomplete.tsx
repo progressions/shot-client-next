@@ -37,9 +37,7 @@ export default function PartyAutocomplete({
         console.error("Error fetching parties:", error)
       }
     }
-    fetchParties().catch(error => {
-      console.error("Error in useEffect fetchParties:", error)
-    })
+    fetchParties()
   }, [client])
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
@@ -52,15 +50,18 @@ export default function PartyAutocomplete({
 
       return filteredOptions
     }
-    return parties.map(party => ({
-      label: party.name,
-      value: party.id,
-    }))
+    return parties
+      .filter(party =>
+        party.name.toLowerCase().includes(inputValue.toLowerCase())
+      )
+      .map(party => ({
+        label: party.name,
+        value: party.id,
+      }))
   }
 
-  const handleChange = (selectedOption: Option | null) => {
-    const party = parties.find(s => s.id === selectedOption)
-    onChange(party)
+  const handleChange = (value: string | null) => {
+    onChange(value)
   }
 
   return (

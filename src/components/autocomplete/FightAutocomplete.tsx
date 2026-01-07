@@ -37,9 +37,7 @@ export default function FightAutocomplete({
         console.error("Error fetching fights:", error)
       }
     }
-    fetchFights().catch(error => {
-      console.error("Error in useEffect fetchFights:", error)
-    })
+    fetchFights()
   }, [client])
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
@@ -52,15 +50,18 @@ export default function FightAutocomplete({
 
       return filteredOptions
     }
-    return fights.map(fight => ({
-      label: fight.name,
-      value: fight.id,
-    }))
+    return fights
+      .filter(fight =>
+        fight.name.toLowerCase().includes(inputValue.toLowerCase())
+      )
+      .map(fight => ({
+        label: fight.name,
+        value: fight.id,
+      }))
   }
 
-  const handleChange = (selectedOption: Option | null) => {
-    const fight = fights.find(f => f.id === selectedOption)
-    onChange(fight)
+  const handleChange = (value: string | null) => {
+    onChange(value)
   }
 
   return (
