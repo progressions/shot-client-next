@@ -93,12 +93,25 @@ export function isBatchImageGenerating(
 /**
  * Helper function to determine if Grok API credits are exhausted.
  * Relies on the server-computed flag to maintain single source of truth.
+ *
+ * Only returns true if:
+ * 1. Credits are actually exhausted (is_grok_credits_exhausted === true)
+ * 2. The campaign is using Grok as the AI provider (ai_provider is null/undefined or "grok")
+ *
+ * If the user has switched to a different provider (openai, gemini),
+ * this returns false since Grok credit exhaustion doesn't affect them.
  */
 export function isGrokCreditsExhausted(
   campaign: Campaign | null | undefined
 ): boolean {
   if (!campaign) return false
-  return campaign.is_grok_credits_exhausted === true
+  if (campaign.is_grok_credits_exhausted !== true) return false
+
+  // If using a non-Grok provider, credit exhaustion doesn't apply
+  const provider = campaign.ai_provider
+  if (provider && provider !== "grok") return false
+
+  return true
 }
 
 /**
