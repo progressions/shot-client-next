@@ -17,7 +17,7 @@ describe("createCampaignClient", () => {
         ? `/api/v2/campaigns/${typeof campaign === "string" ? campaign : campaign.id}`
         : "/api/v2/campaigns"
     ),
-    resetGrokCredits: jest.fn(
+    resetAiCredits: jest.fn(
       (campaign: { id: string }) =>
         `/api/v2/campaigns/${campaign.id}/reset_grok_credits`
     ),
@@ -72,7 +72,7 @@ describe("createCampaignClient", () => {
     campaignClient = createCampaignClient(deps)
   })
 
-  describe("resetGrokCredits", () => {
+  describe("resetAiCredits", () => {
     const mockCampaign: Campaign = {
       id: "campaign-123",
       name: "Test Campaign",
@@ -131,9 +131,9 @@ describe("createCampaignClient", () => {
     })
 
     it("calls the correct API endpoint with campaign ID", async () => {
-      await campaignClient.resetGrokCredits("campaign-123")
+      await campaignClient.resetAiCredits("campaign-123")
 
-      expect(mockApiV2.resetGrokCredits).toHaveBeenCalledWith({
+      expect(mockApiV2.resetAiCredits).toHaveBeenCalledWith({
         id: "campaign-123",
       })
       expect(mockPost).toHaveBeenCalledWith(
@@ -142,7 +142,7 @@ describe("createCampaignClient", () => {
     })
 
     it("returns normalized campaign data on successful reset", async () => {
-      const result = await campaignClient.resetGrokCredits("campaign-123")
+      const result = await campaignClient.resetAiCredits("campaign-123")
 
       expect(result.data.id).toBe("campaign-123")
       expect(result.data.name).toBe("Test Campaign")
@@ -151,7 +151,7 @@ describe("createCampaignClient", () => {
     })
 
     it("returns campaign with cleared batch image status", async () => {
-      const result = await campaignClient.resetGrokCredits("campaign-123")
+      const result = await campaignClient.resetAiCredits("campaign-123")
 
       expect(result.data.batch_image_status).toBeNull()
       expect(result.data.batch_images_completed).toBe(0)
@@ -164,7 +164,7 @@ describe("createCampaignClient", () => {
       mockPost.mockRejectedValue(notFoundError)
 
       await expect(
-        campaignClient.resetGrokCredits("invalid-campaign")
+        campaignClient.resetAiCredits("invalid-campaign")
       ).rejects.toThrow("Campaign not found")
     })
 
@@ -173,7 +173,7 @@ describe("createCampaignClient", () => {
       mockPost.mockRejectedValue(forbiddenError)
 
       await expect(
-        campaignClient.resetGrokCredits("campaign-123")
+        campaignClient.resetAiCredits("campaign-123")
       ).rejects.toThrow("Forbidden")
     })
 
@@ -182,7 +182,7 @@ describe("createCampaignClient", () => {
       mockPost.mockRejectedValue(networkError)
 
       await expect(
-        campaignClient.resetGrokCredits("campaign-123")
+        campaignClient.resetAiCredits("campaign-123")
       ).rejects.toThrow("Network Error")
     })
   })

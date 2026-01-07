@@ -43,7 +43,7 @@ export default function AiCreditAlert({ campaign }: AiCreditAlertProps) {
   const handleDismiss = async () => {
     setLoading(true)
     try {
-      await client.resetGrokCredits(campaign.id)
+      await client.resetAiCredits(campaign.id)
       // Fetch fresh campaign data and set as current
       const updatedCampaign = await client.getCampaign(campaign.id)
       await setCurrentCampaign(updatedCampaign.data)
