@@ -111,6 +111,23 @@ class ApiV2 {
     return memberId ? `${partyUrl}/members/${memberId}` : `${partyUrl}/members`
   }
 
+  partyTemplates(): string {
+    return `${this.api()}/parties/templates`
+  }
+
+  partySlots(party: Party | ID, slotId?: string): string {
+    const partyUrl = this.parties(party)
+    return slotId ? `${partyUrl}/slots/${slotId}` : `${partyUrl}/slots`
+  }
+
+  partyApplyTemplate(party: Party | ID): string {
+    return `${this.parties(party)}/apply_template`
+  }
+
+  partyReorderSlots(party: Party | ID): string {
+    return `${this.parties(party)}/reorder_slots`
+  }
+
   weapons(weapon?: Weapon | ID): string {
     return weapon?.id
       ? `${this.api()}/weapons/${weapon.id}`

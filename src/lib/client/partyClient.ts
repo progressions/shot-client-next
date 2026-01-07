@@ -8,6 +8,8 @@ import type {
   Fight,
   Character,
   Vehicle,
+  PartyTemplate,
+  PartyRole,
 } from "@/types"
 
 interface ClientDependencies {
@@ -19,7 +21,13 @@ interface ClientDependencies {
 
 export function createPartyClient(deps: ClientDependencies) {
   const { api, apiV2, queryParams } = deps
-  const { get, post, delete: delete_, requestFormData } = createBaseClient(deps)
+  const {
+    get,
+    post,
+    patch,
+    delete: delete_,
+    requestFormData,
+  } = createBaseClient(deps)
 
   async function addCharacterToParty(
     party: Party | string,
@@ -106,6 +114,84 @@ export function createPartyClient(deps: ClientDependencies) {
     return post(api.addPartyToFight(party, fight))
   }
 
+  // Party Composition / Slot Management Functions
+
+  async function getTemplates(): Promise<
+    AxiosResponse<{ templates: PartyTemplate[] }>
+  > {
+    return get(apiV2.partyTemplates())
+  }
+
+  async function applyTemplate(
+    party: Party | string,
+    templateKey: string
+  ): Promise<AxiosResponse<Party>> {
+    const partyId = typeof party === "string" ? party : party.id
+    return post(apiV2.partyApplyTemplate({ id: partyId }), {
+      template_key: templateKey,
+    })
+  }
+
+  async function addSlot(
+    party: Party | string,
+    slot: {
+      role: PartyRole
+      character_id?: string | null
+      vehicle_id?: string | null
+      default_mook_count?: number | null
+    }
+  ): Promise<AxiosResponse<Party>> {
+    const partyId = typeof party === "string" ? party : party.id
+    return post(apiV2.partySlots({ id: partyId }), slot)
+  }
+
+  async function updateSlot(
+    party: Party | string,
+    slotId: string,
+    attrs: {
+      role?: PartyRole
+      character_id?: string | null
+      vehicle_id?: string | null
+      default_mook_count?: number | null
+    }
+  ): Promise<AxiosResponse<Party>> {
+    const partyId = typeof party === "string" ? party : party.id
+    return patch(apiV2.partySlots({ id: partyId }, slotId), attrs)
+  }
+
+  async function removeSlot(
+    party: Party | string,
+    slotId: string
+  ): Promise<AxiosResponse<void>> {
+    const partyId = typeof party === "string" ? party : party.id
+    return delete_(apiV2.partySlots({ id: partyId }, slotId))
+  }
+
+  async function reorderSlots(
+    party: Party | string,
+    slotIds: string[]
+  ): Promise<AxiosResponse<Party>> {
+    const partyId = typeof party === "string" ? party : party.id
+    return post(apiV2.partyReorderSlots({ id: partyId }), {
+      slot_ids: slotIds,
+    })
+  }
+
+  async function populateSlot(
+    party: Party | string,
+    slotId: string,
+    characterId: string
+  ): Promise<AxiosResponse<Party>> {
+    return updateSlot(party, slotId, { character_id: characterId })
+  }
+
+  async function clearSlot(
+    party: Party | string,
+    slotId: string
+  ): Promise<AxiosResponse<Party>> {
+    return updateSlot(party, slotId, { character_id: null, vehicle_id: null })
+  }
+
   return {
     addCharacterToParty,
     addVehicleToParty,
@@ -119,5 +205,14 @@ export function createPartyClient(deps: ClientDependencies) {
     deletePartyImage,
     duplicateParty,
     addPartyToFight,
+    // Party Composition / Slot Management
+    getTemplates,
+    applyTemplate,
+    addSlot,
+    updateSlot,
+    removeSlot,
+    reorderSlots,
+    populateSlot,
+    clearSlot,
   }
 }
