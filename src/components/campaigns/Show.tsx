@@ -27,7 +27,7 @@ import { EntityActiveToggle } from "@/components/common"
 import {
   SeedingStatus,
   BatchImageGenerationButton,
-  GrokCreditAlert,
+  AiCreditAlert,
   AiProviderSelector,
 } from "@/components/campaigns"
 import { CampaignInvitations } from "@/components/invitations"
@@ -139,7 +139,7 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
       {isCampaignSeeding(campaign) && (
         <SeedingStatus campaign={campaign} variant="banner" />
       )}
-      <GrokCreditAlert campaign={campaign} />
+      <AiCreditAlert campaign={campaign} />
       <FormControl fullWidth margin="normal" error={!!errors.name}>
         <NameEditor
           entity={campaign}

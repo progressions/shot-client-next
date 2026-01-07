@@ -52,7 +52,11 @@ export interface Campaign extends BaseEntity {
   batch_images_total?: number
   batch_images_completed?: number
   is_batch_images_in_progress?: boolean
-  // Grok API credit exhaustion tracking
+  // Provider-agnostic AI credit exhaustion tracking
+  ai_credits_exhausted_at?: string | null
+  ai_credits_exhausted_provider?: AiProvider | null
+  is_ai_credits_exhausted?: boolean
+  // Grok API credit exhaustion tracking (legacy - for backward compatibility)
   grok_credits_exhausted_at?: string | null
   is_grok_credits_exhausted?: boolean
   // AI generation toggle
@@ -91,7 +95,41 @@ export function isBatchImageGenerating(
 }
 
 /**
+ * Helper function to determine if any AI provider's credits are exhausted.
+ * Relies on the server-computed flag to maintain single source of truth.
+ *
+ * Only returns true if:
+ * 1. Credits are actually exhausted (is_ai_credits_exhausted === true)
+ * 2. The exhausted provider matches the current provider
+ *
+ * If the user has switched to a different provider than the one that exhausted,
+ * this returns false since that provider's credit exhaustion doesn't affect them.
+ */
+export function isAiCreditsExhausted(
+  campaign: Campaign | null | undefined
+): boolean {
+  if (!campaign) return false
+  if (campaign.is_ai_credits_exhausted !== true) return false
+
+  // If using a different provider than the exhausted one, credit exhaustion doesn't apply
+  const currentProvider = campaign.ai_provider
+  const exhaustedProvider = campaign.ai_credits_exhausted_provider
+
+  // If we know both providers and they're different, don't show the alert
+  if (
+    currentProvider &&
+    exhaustedProvider &&
+    currentProvider !== exhaustedProvider
+  ) {
+    return false
+  }
+
+  return true
+}
+
+/**
  * Helper function to determine if Grok API credits are exhausted.
+ * LEGACY - kept for backward compatibility. Use isAiCreditsExhausted instead.
  * Relies on the server-computed flag to maintain single source of truth.
  *
  * Only returns true if:
