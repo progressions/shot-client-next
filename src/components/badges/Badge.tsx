@@ -64,6 +64,8 @@ export default function Badge({
       direction="row"
       spacing={1}
       onClick={onClick}
+      tabIndex={onClick ? 0 : undefined}
+      role={onClick ? "button" : undefined}
       sx={{
         flexShrink: 0,
         backgroundColor: "#1d1d1d",
@@ -122,9 +124,11 @@ export default function Badge({
         </div>
       )}
       <Stack direction="column" sx={{ justifyContent: "center" }}>
-        <Typography variant="h6" sx={{ fontSize: titleFont }}>
-          {title}
-        </Typography>
+        {title && (
+          <Typography variant="h6" sx={{ fontSize: titleFont }}>
+            {title}
+          </Typography>
+        )}
         <Typography
           component="div"
           variant="body2"

@@ -135,6 +135,14 @@ export default function PartySlotCard({
                       backgroundColor: "action.hover",
                     }
                   : {},
+                "&:focus-visible": onPopulate
+                  ? {
+                      borderColor: "primary.main",
+                      outline: "2px solid",
+                      outlineColor: "primary.main",
+                      outlineOffset: 2,
+                    }
+                  : {},
               }}
             >
               <Typography variant="caption" color="text.secondary">
