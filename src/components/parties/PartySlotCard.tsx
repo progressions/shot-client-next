@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import {
   Box,
   Card,
@@ -7,7 +8,6 @@ import {
   Typography,
   IconButton,
   Avatar as MuiAvatar,
-  TextField,
   Tooltip,
 } from "@mui/material"
 import {
@@ -16,6 +16,7 @@ import {
   DeleteOutlined,
   DragIndicator,
 } from "@mui/icons-material"
+import { NumberField } from "@/components/ui"
 import RoleBadge from "./RoleBadge"
 import type { PartySlot } from "@/types"
 
@@ -42,12 +43,24 @@ export default function PartySlotCard({
   const isMook = slot.role === "mook"
   const isEmpty = !character && !slot.vehicle
 
+  // Local state for mook count to work with NumberField
+  const [mookCount, setMookCount] = useState<number | string>(
+    slot.default_mook_count || 1
+  )
+
   const handleMookCountChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    setMookCount(event.target.value)
+  }
+
+  const handleMookCountBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     const value = parseInt(event.target.value, 10)
     if (!isNaN(value) && value >= 1 && value <= 100 && onMookCountChange) {
       onMookCountChange(slot.id, value)
+    } else {
+      // Reset to current slot value if invalid
+      setMookCount(slot.default_mook_count || 1)
     }
   }
 
@@ -168,30 +181,16 @@ export default function PartySlotCard({
 
         {/* Mook Count */}
         {isMook && (
-          <Box sx={{ width: 80 }}>
-            <TextField
-              type="number"
-              label="Count"
-              size="small"
-              value={slot.default_mook_count || 1}
-              onChange={handleMookCountChange}
-              slotProps={{
-                htmlInput: {
-                  min: 1,
-                  max: 100,
-                },
-              }}
-              sx={{
-                "& .MuiInputBase-root": {
-                  height: 32,
-                },
-                "& .MuiInputBase-input": {
-                  textAlign: "center",
-                  py: 0.5,
-                },
-              }}
-            />
-          </Box>
+          <NumberField
+            name="mook_count"
+            value={mookCount}
+            size="small"
+            width="70px"
+            error={false}
+            onChange={handleMookCountChange}
+            onBlur={handleMookCountBlur}
+            label="Count"
+          />
         )}
 
         {/* Actions */}
