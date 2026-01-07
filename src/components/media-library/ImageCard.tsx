@@ -19,6 +19,7 @@ import {
   Info as InfoIcon,
 } from "@mui/icons-material"
 import type { MediaImage } from "@/types"
+import { EntityLink } from "@/components/ui/links"
 
 interface ImageCardProps {
   image: MediaImage
@@ -137,10 +138,23 @@ export default function ImageCard({
 
       {/* Content */}
       <CardContent sx={{ flexGrow: 1, pb: 1 }}>
-        {image.entity_name && (
-          <Typography variant="subtitle2" noWrap>
-            {image.entity_name}
-          </Typography>
+        {image.entity_name && image.entity_id && image.entity_type && (
+          <Box
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              "& a": { fontSize: "0.875rem" },
+            }}
+          >
+            <EntityLink
+              entity={{
+                id: image.entity_id,
+                entity_class: image.entity_type,
+                name: image.entity_name,
+              }}
+            />
+          </Box>
         )}
         {image.entity_type && (
           <Typography variant="caption" color="text.secondary" display="block">
