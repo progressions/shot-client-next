@@ -6,6 +6,7 @@ import { PhotoLibrary as MediaIcon } from "@mui/icons-material"
 import JSZip from "jszip"
 import { useClient, useToast, useApp, useConfirm } from "@/contexts"
 import { MainHeader } from "@/components/ui"
+import { queryParams } from "@/lib"
 import type {
   MediaImage,
   MediaLibraryFilters,
@@ -15,27 +16,6 @@ import Filter from "./Filter"
 import ImageGrid from "./ImageGrid"
 import BulkActions from "./BulkActions"
 import ImageDetailsDialog from "./ImageDetailsDialog"
-
-// Build URL query string from filters
-const buildQueryString = (filters: MediaLibraryFilters): string => {
-  const params = new URLSearchParams()
-
-  if (filters.page && filters.page > 1) {
-    params.set("page", String(filters.page))
-  }
-  if (filters.status && filters.status !== "all") {
-    params.set("status", filters.status)
-  }
-  if (filters.source && filters.source !== "all") {
-    params.set("source", filters.source)
-  }
-  if (filters.entity_type && filters.entity_type !== "") {
-    params.set("entity_type", filters.entity_type)
-  }
-
-  const queryString = params.toString()
-  return queryString ? `?${queryString}` : ""
-}
 
 interface InitialData {
   images: MediaImage[]
@@ -60,9 +40,15 @@ export default function List({ initialFilters, initialData }: ListProps) {
   // Initialize from server-fetched data when available
   const [images, setImages] = useState<MediaImage[]>(initialData?.images || [])
   const [loading, setLoading] = useState(!initialData)
-  const [filters, setFilters] = useState<MediaLibraryFilters>(
-    initialFilters || { page: 1, per_page: 24 }
-  )
+  // Initialize filters with ALL fields (like characters page) so queryParams outputs all params
+  const [filters, setFilters] = useState<MediaLibraryFilters>({
+    status: "all",
+    source: "all",
+    entity_type: "",
+    page: 1,
+    per_page: 24,
+    ...initialFilters,
+  })
   const [totalPages, setTotalPages] = useState(
     initialData?.meta?.total_pages || 1
   )
@@ -108,14 +94,31 @@ export default function List({ initialFilters, initialData }: ListProps) {
     }
   }, [client, filters, toastError])
 
-  // Only fetch client-side when filters change (skip if we have initial data)
+  // Only fetch client-side on initial mount if no server data was provided
+  // After initial render, URL changes trigger server-side fetch via page.tsx
   useEffect(() => {
-    // Skip initial fetch if we have server-fetched data
-    if (isInitialRender.current && initialData) {
-      return
+    if (!initialData) {
+      fetchImages()
     }
-    fetchImages()
-  }, [fetchImages, initialData])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Sync state when server provides new data (e.g., after URL-triggered fetch)
+  useEffect(() => {
+    if (initialData) {
+      setImages(initialData.images)
+      setTotalPages(initialData.meta?.total_pages || 1)
+      setStats({
+        total: initialData.stats?.total ?? 0,
+        orphan: initialData.stats?.orphan ?? 0,
+        attached: initialData.stats?.attached ?? 0,
+        uploaded: initialData.stats?.uploaded ?? 0,
+        ai_generated: initialData.stats?.ai_generated ?? 0,
+        total_size_bytes: initialData.stats?.total_size_bytes ?? 0,
+      })
+      setLoading(false)
+    }
+  }, [initialData])
 
   // Clear selection when filters change
   useEffect(() => {
@@ -129,7 +132,7 @@ export default function List({ initialFilters, initialData }: ListProps) {
       return
     }
 
-    const url = `/media${buildQueryString(filters)}`
+    const url = `/media?${queryParams(filters)}`
     router.push(url, { scroll: false })
   }, [filters, router])
 
