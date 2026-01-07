@@ -31,6 +31,7 @@ import {
   SkillsManager,
   AdvancementsManager,
   IsTemplateToggle,
+  NotionSyncLogList,
 } from "@/components/characters"
 import { EditFaction } from "@/components/factions"
 import { EntityActiveToggle } from "@/components/common"
@@ -255,6 +256,7 @@ export default function Show({
               handleChangeAndSave={handleChangeAndSave}
             />
           </Stack>
+          <NotionSyncLogList character={memoizedCharacter} />
         </>
       )}
     </Box>

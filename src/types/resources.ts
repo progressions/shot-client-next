@@ -468,6 +468,18 @@ export interface Advancement {
   updated_at: string
 }
 
+// Notion Sync Log - records of character syncs to Notion
+export interface NotionSyncLog {
+  id: string
+  status: "success" | "error"
+  payload: Record<string, unknown>
+  response: Record<string, unknown>
+  error_message: string | null
+  character_id: string
+  created_at: string
+  updated_at: string
+}
+
 // Entity union type - all entity types that can be displayed with avatars
 export type Entity =
   | Campaign

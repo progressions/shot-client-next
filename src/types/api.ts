@@ -72,6 +72,9 @@ export interface CampaignCableData {
   sites: Site[] | string | null
   schticks: Schtick[] | string | null
   weapons: Weapon[] | string | null
+  // Notion sync log reload signal
+  notion_sync_logs?: string | null
+  character_id?: string
   // Seeding status fields for real-time updates
   seeding_status?: string | null
   campaign_id?: string

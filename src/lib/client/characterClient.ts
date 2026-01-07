@@ -13,7 +13,18 @@ import type {
   Entity,
   ImagePosition,
   NotionPage,
+  NotionSyncLog,
 } from "@/types"
+
+interface NotionSyncLogsResponse {
+  notion_sync_logs: NotionSyncLog[]
+  meta: {
+    current_page: number
+    per_page: number
+    total_count: number
+    total_pages: number
+  }
+}
 
 interface ClientDependencies {
   jwt?: string
@@ -236,6 +247,27 @@ export function createCharacterClient(deps: ClientDependencies) {
     return post(apiV2.createNotionPage(character))
   }
 
+  async function getNotionSyncLogs(
+    character: Character | string,
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<NotionSyncLogsResponse>> {
+    const characterId = typeof character === "string" ? character : character.id
+    const query = queryParams(parameters)
+    return get(
+      `${apiV2.notionSyncLogs({ id: characterId })}?${query}`,
+      {},
+      cacheOptions
+    )
+  }
+
+  async function syncCharacterToNotion(
+    character: Character | string
+  ): Promise<AxiosResponse<{ status: string }>> {
+    const characterId = typeof character === "string" ? character : character.id
+    return post(`${apiV2.characters({ id: characterId })}/sync`)
+  }
+
   async function spendShots(
     fight: Fight,
     entity: Entity,
@@ -415,6 +447,8 @@ export function createCharacterClient(deps: ClientDependencies) {
     deleteEntityImage,
     syncCharacter,
     createNotionPage,
+    getNotionSyncLogs,
+    syncCharacterToNotion,
     spendShots,
     hideCharacter,
     removeCharacterFromFight,
