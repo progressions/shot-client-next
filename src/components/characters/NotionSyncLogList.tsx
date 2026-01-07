@@ -16,7 +16,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess"
 import SyncIcon from "@mui/icons-material/Sync"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import ErrorIcon from "@mui/icons-material/Error"
-import type { Character, NotionSyncLog, CampaignCableData } from "@/types"
+import type { Character, NotionSyncLog } from "@/types"
 import { useClient, useToast, useCampaign } from "@/contexts"
 import { SectionHeader, Icon } from "@/components/ui"
 
@@ -66,30 +66,16 @@ export default function NotionSyncLogList({
 
   // Subscribe to WebSocket for real-time sync log updates
   useEffect(() => {
-    const unsubscribe = subscribeToEntity(
-      "notion_sync_logs",
-      (data: CampaignCableData | string) => {
-        // Check if this is a reload signal for our character
-        if (data === "reload") {
-          // No character_id filter, reload all
-          setPage(1)
-          fetchLogs(1)
-        } else if (
-          typeof data === "object" &&
-          data !== null &&
-          "character_id" in data
-        ) {
-          // Check if the reload is for this specific character
-          const cableData = data as CampaignCableData
-          if (cableData.character_id === character.id) {
-            setPage(1)
-            fetchLogs(1)
-          }
-        }
+    const unsubscribe = subscribeToEntity("notion_sync_logs", () => {
+      // Reload logs when any notion sync log is created for this campaign
+      // The component is already scoped to a specific character via props
+      if (open) {
+        setPage(1)
+        fetchLogs(1)
       }
-    )
+    })
     return unsubscribe
-  }, [subscribeToEntity, character.id, fetchLogs])
+  }, [subscribeToEntity, fetchLogs, open])
 
   const handleSync = async () => {
     try {
