@@ -125,14 +125,18 @@ export default function List({ initialFilters, initialData }: ListProps) {
     setSelectedIds(new Set())
   }, [filters])
 
-  // Update URL when filters change (skip initial render)
+  // Update URL when filters change
   useEffect(() => {
+    const url = `/media?${queryParams(filters)}`
+
     if (isInitialRender.current) {
+      // On initial render, just update URL without triggering navigation
       isInitialRender.current = false
+      window.history.replaceState(null, "", url)
       return
     }
 
-    const url = `/media?${queryParams(filters)}`
+    // On subsequent changes, navigate to trigger server-side fetch
     router.push(url, { scroll: false })
   }, [filters, router])
 
