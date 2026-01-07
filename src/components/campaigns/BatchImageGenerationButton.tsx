@@ -13,7 +13,7 @@ import { useClient, useToast } from "@/contexts"
 import type { Campaign } from "@/types"
 import {
   isBatchImageGenerating,
-  isGrokCreditsExhausted,
+  isAiCreditsExhausted,
   isAiGenerationEnabled,
 } from "@/types"
 
@@ -35,7 +35,7 @@ export default function BatchImageGenerationButton({
   const isInProgress = isBatchImageGenerating(campaign)
 
   // Check if credits are exhausted
-  const creditsExhausted = isGrokCreditsExhausted(campaign)
+  const creditsExhausted = isAiCreditsExhausted(campaign)
 
   // Determine if generation is paused due to credit exhaustion
   const isPaused = isInProgress && creditsExhausted
