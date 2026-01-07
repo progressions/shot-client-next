@@ -1,16 +1,20 @@
-# fly.toml app configuration file generated for shot-client-next
+# fly.toml app configuration file for shot-client-phoenix
+#
+# This is the primary deployment configuration for the Next.js frontend.
+# It deploys to Fly.io and connects to the Phoenix/Elixir backend (shot-elixir).
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "shot-client-next"
+app = "shot-client-phoenix"
 primary_region = "dfw"
 
 [build]
   [build.args]
-    NEXT_PUBLIC_API_BASE_URL = "https://shot-counter.fly.dev"
-    NEXT_PUBLIC_SERVER_URL = "https://shot-counter.fly.dev"
-    NEXT_PUBLIC_WEBSOCKET_URL = "wss://shot-counter.fly.dev"
+    NEXT_PUBLIC_API_BASE_URL = "https://shot-elixir.fly.dev"
+    NEXT_PUBLIC_SERVER_URL = "https://shot-elixir.fly.dev"
+    NEXT_PUBLIC_WEBSOCKET_URL = "wss://shot-elixir.fly.dev"
+    NEXT_PUBLIC_BACKEND_TYPE = "phoenix"
 
 [env]
   PORT = "3000"
