@@ -96,19 +96,30 @@ export default function ImageCard({
         />
       )}
 
-      {/* Status chip */}
-      <Chip
-        label={image.status}
-        size="small"
-        color={image.status === "attached" ? "success" : "warning"}
+      {/* Status and source chips */}
+      <Box
         sx={{
           position: "absolute",
           top: 8,
           right: 8,
           zIndex: 1,
-          textTransform: "capitalize",
+          display: "flex",
+          flexDirection: "column",
+          gap: 0.5,
         }}
-      />
+      >
+        <Chip
+          label={image.status}
+          size="small"
+          color={image.status === "attached" ? "success" : "warning"}
+          sx={{ textTransform: "capitalize" }}
+        />
+        <Chip
+          label={image.source === "ai_generated" ? "AI" : "Upload"}
+          size="small"
+          color={image.source === "ai_generated" ? "secondary" : "primary"}
+        />
+      </Box>
 
       {/* Image */}
       <CardMedia

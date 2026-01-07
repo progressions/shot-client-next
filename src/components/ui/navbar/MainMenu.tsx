@@ -136,7 +136,7 @@ export function MainMenu() {
         {(user.gamemaster || user.admin) && (
           <MenuItem onClick={handleMenuClose}>
             <Link
-              href="/media-library"
+              href="/media"
               style={{
                 color: "#ffffff",
                 textDecoration: "none",

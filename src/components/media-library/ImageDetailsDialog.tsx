@@ -109,12 +109,21 @@ export default function ImageDetailsDialog({
 
           {/* Metadata */}
           <Box sx={{ flex: "1 1 250px", minWidth: 250 }}>
-            <Box sx={{ mb: 2 }}>
+            <Box sx={{ mb: 2, display: "flex", gap: 1 }}>
               <Chip
                 label={image.status}
                 size="small"
                 color={image.status === "attached" ? "success" : "warning"}
                 sx={{ textTransform: "capitalize" }}
+              />
+              <Chip
+                label={
+                  image.source === "ai_generated" ? "AI Generated" : "Uploaded"
+                }
+                size="small"
+                color={
+                  image.source === "ai_generated" ? "secondary" : "primary"
+                }
               />
             </Box>
 

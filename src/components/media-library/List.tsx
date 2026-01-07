@@ -4,7 +4,11 @@ import { Box, Pagination, Chip } from "@mui/material"
 import { PhotoLibrary as MediaIcon } from "@mui/icons-material"
 import { useClient, useToast, useApp } from "@/contexts"
 import { MainHeader } from "@/components/ui"
-import type { MediaImage, MediaLibraryFilters } from "@/types"
+import type {
+  MediaImage,
+  MediaLibraryFilters,
+  MediaLibraryStats,
+} from "@/types"
 import Filter from "./Filter"
 import ImageGrid from "./ImageGrid"
 import BulkActions from "./BulkActions"
@@ -27,7 +31,14 @@ export default function List({ initialFilters }: ListProps) {
   )
   const [totalPages, setTotalPages] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
-  const [stats, setStats] = useState({ total: 0, orphan: 0, attached: 0 })
+  const [stats, setStats] = useState<MediaLibraryStats>({
+    total: 0,
+    orphan: 0,
+    attached: 0,
+    uploaded: 0,
+    ai_generated: 0,
+    total_size_bytes: 0,
+  })
 
   // Selection state
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -43,7 +54,16 @@ export default function List({ initialFilters }: ListProps) {
       setImages(response.data.images)
       setTotalPages(response.data.meta.total_pages)
       setTotalCount(response.data.meta.total_count)
-      setStats(response.data.stats)
+      // Ensure all stats fields have default values
+      const apiStats = response.data.stats || {}
+      setStats({
+        total: apiStats.total ?? 0,
+        orphan: apiStats.orphan ?? 0,
+        attached: apiStats.attached ?? 0,
+        uploaded: apiStats.uploaded ?? 0,
+        ai_generated: apiStats.ai_generated ?? 0,
+        total_size_bytes: apiStats.total_size_bytes ?? 0,
+      })
     } catch (error) {
       console.error("Failed to fetch media library:", error)
       toastError("Failed to load media library")
@@ -193,10 +213,22 @@ export default function List({ initialFilters }: ListProps) {
           title="Media Library"
           icon={<MediaIcon fontSize="large" />}
         />
-        <Box sx={{ display: "flex", gap: 1 }}>
+        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
           <Chip
             label={`${stats.total} total`}
             size="small"
+            variant="outlined"
+          />
+          <Chip
+            label={`${stats.uploaded} uploaded`}
+            size="small"
+            color="primary"
+            variant="outlined"
+          />
+          <Chip
+            label={`${stats.ai_generated} AI`}
+            size="small"
+            color="secondary"
             variant="outlined"
           />
           <Chip

@@ -7,7 +7,11 @@ import {
   MenuItem,
   SelectChangeEvent,
 } from "@mui/material"
-import type { MediaLibraryFilters, MediaImageEntityType } from "@/types"
+import type {
+  MediaLibraryFilters,
+  MediaImageEntityType,
+  MediaImageSource,
+} from "@/types"
 
 interface FilterProps {
   filters: MediaLibraryFilters
@@ -45,6 +49,15 @@ export default function Filter({ filters, onFilterChange }: FilterProps) {
     })
   }
 
+  const handleSourceChange = (event: SelectChangeEvent) => {
+    const value = event.target.value
+    onFilterChange({
+      ...filters,
+      source: value === "all" ? undefined : (value as MediaImageSource),
+      page: 1,
+    })
+  }
+
   return (
     <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap" }}>
       <FormControl size="small" sx={{ minWidth: 150 }}>
@@ -77,6 +90,21 @@ export default function Filter({ filters, onFilterChange }: FilterProps) {
               {type}
             </MenuItem>
           ))}
+        </Select>
+      </FormControl>
+
+      <FormControl size="small" sx={{ minWidth: 150 }}>
+        <InputLabel id="source-filter-label">Source</InputLabel>
+        <Select
+          labelId="source-filter-label"
+          id="source-filter"
+          value={filters.source || "all"}
+          label="Source"
+          onChange={handleSourceChange}
+        >
+          <MenuItem value="all">All Sources</MenuItem>
+          <MenuItem value="upload">Uploaded</MenuItem>
+          <MenuItem value="ai_generated">AI Generated</MenuItem>
         </Select>
       </FormControl>
     </Box>
