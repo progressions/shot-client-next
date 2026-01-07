@@ -1,5 +1,6 @@
 "use client"
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback, useEffect, useRef } from "react"
+import { useRouter } from "next/navigation"
 import { Box, Pagination, Chip } from "@mui/material"
 import { PhotoLibrary as MediaIcon } from "@mui/icons-material"
 import JSZip from "jszip"
@@ -15,16 +16,39 @@ import ImageGrid from "./ImageGrid"
 import BulkActions from "./BulkActions"
 import ImageDetailsDialog from "./ImageDetailsDialog"
 
+// Build URL query string from filters
+const buildQueryString = (filters: MediaLibraryFilters): string => {
+  const params = new URLSearchParams()
+
+  if (filters.page && filters.page > 1) {
+    params.set("page", String(filters.page))
+  }
+  if (filters.status && filters.status !== "all") {
+    params.set("status", filters.status)
+  }
+  if (filters.source && filters.source !== "all") {
+    params.set("source", filters.source)
+  }
+  if (filters.entity_type && filters.entity_type !== "") {
+    params.set("entity_type", filters.entity_type)
+  }
+
+  const queryString = params.toString()
+  return queryString ? `?${queryString}` : ""
+}
+
 interface ListProps {
   initialFilters?: MediaLibraryFilters
 }
 
 export default function List({ initialFilters }: ListProps) {
+  const router = useRouter()
   const { client } = useClient()
   const { toastSuccess, toastError, toastInfo } = useToast()
   const { confirm } = useConfirm()
   const { user, campaign } = useApp()
   const isGamemaster = user?.gamemaster || user?.admin || false
+  const isInitialRender = useRef(true)
 
   const [images, setImages] = useState<MediaImage[]>([])
   const [loading, setLoading] = useState(true)
@@ -80,6 +104,17 @@ export default function List({ initialFilters }: ListProps) {
   useEffect(() => {
     setSelectedIds(new Set())
   }, [filters])
+
+  // Update URL when filters change (skip initial render)
+  useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false
+      return
+    }
+
+    const url = `/media${buildQueryString(filters)}`
+    router.push(url, { scroll: false })
+  }, [filters, router])
 
   const handleFilterChange = (newFilters: MediaLibraryFilters) => {
     setFilters(newFilters)
