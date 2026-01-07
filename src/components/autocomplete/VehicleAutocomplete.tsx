@@ -38,9 +38,7 @@ export default function VehicleAutocomplete({
       }
     }
 
-    fetchVehicles().catch(error => {
-      console.error("Error in useEffect fetchVehicles:", error)
-    })
+    fetchVehicles()
   }, [client])
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
@@ -63,9 +61,8 @@ export default function VehicleAutocomplete({
       }))
   }
 
-  const handleChange = (selectedOption: Option | null) => {
-    const vehicle = vehicles.find(s => s.id === selectedOption)
-    onChange(vehicle)
+  const handleChange = (value: string | null) => {
+    onChange(value)
   }
 
   return (

@@ -1,11 +1,11 @@
 "use client"
 
-import type { Site } from "@/types"
+import type { Fight } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
 import { useState, useEffect } from "react"
 
-type SitesAutocompleteProperties = {
+type FightAutocompleteProperties = {
   value: string
   onChange: (value: string | null) => void
   options?: Option[]
@@ -13,32 +13,31 @@ type SitesAutocompleteProperties = {
   allowNone?: boolean
 }
 
-export default function SitesAutocomplete({
+export default function FightAutocomplete({
   value,
   onChange,
   options,
   exclude = [],
   allowNone = true,
-}: SitesAutocompleteProperties) {
+}: FightAutocompleteProperties) {
   const { client } = useClient()
-  const [sites, setSites] = useState<Site[]>([])
+  const [fights, setFights] = useState<Fight[]>([])
 
   useEffect(() => {
-    const fetchSites = async () => {
+    const fetchFights = async () => {
       try {
-        const response = await client.getSites({
-          per_page: 200,
+        const response = await client.getFights({
+          per_page: 100,
           page: 1,
           sort: "name",
           order: "asc",
         })
-        setSites(response.data.sites || [])
+        setFights(response.data.fights || [])
       } catch (error) {
-        console.error("Error fetching sites:", error)
+        console.error("Error fetching fights:", error)
       }
     }
-
-    fetchSites()
+    fetchFights()
   }, [client])
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
@@ -51,13 +50,13 @@ export default function SitesAutocomplete({
 
       return filteredOptions
     }
-    return sites
-      .filter(site =>
-        site.name.toLowerCase().includes(inputValue.toLowerCase())
+    return fights
+      .filter(fight =>
+        fight.name.toLowerCase().includes(inputValue.toLowerCase())
       )
-      .map(site => ({
-        label: site.name,
-        value: site.id,
+      .map(fight => ({
+        label: fight.name,
+        value: fight.id,
       }))
   }
 
@@ -67,7 +66,7 @@ export default function SitesAutocomplete({
 
   return (
     <Autocomplete
-      label="Site"
+      label="Fight"
       value={value}
       fetchOptions={fetchOptions}
       onChange={handleChange}

@@ -12,6 +12,7 @@ interface ImageGridProps {
   onDuplicate: (id: string) => void
   onDownload: (image: MediaImage) => void
   onShowDetails: (image: MediaImage) => void
+  onAttach: (id: string) => void
   isGamemaster: boolean
 }
 
@@ -24,6 +25,7 @@ export default function ImageGrid({
   onDuplicate,
   onDownload,
   onShowDetails,
+  onAttach,
   isGamemaster,
 }: ImageGridProps) {
   if (loading) {
@@ -76,6 +78,7 @@ export default function ImageGrid({
             onDuplicate={onDuplicate}
             onDownload={onDownload}
             onShowDetails={onShowDetails}
+            onAttach={onAttach}
             isGamemaster={isGamemaster}
           />
         </Grid>
