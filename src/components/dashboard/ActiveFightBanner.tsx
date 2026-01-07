@@ -1,15 +1,7 @@
 "use client"
 import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import Link from "next/link"
-import {
-  Paper,
-  Box,
-  Typography,
-  Chip,
-  Stack,
-  Skeleton,
-  Avatar,
-} from "@mui/material"
+import { Paper, Box, Typography, Chip, Stack, Avatar } from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
 import { FaFire, FaUsers, FaPlay } from "react-icons/fa6"
 import { useApp, useClient } from "@/contexts"
@@ -138,14 +130,15 @@ export default function ActiveFightBanner({
     }
   }, [subscribeToEntity, currentFight?.id, fetchCurrentFight, currentFight])
 
-  // Don't render anything if no fight is active
-  if (!loading && !currentFight) {
+  // Don't render anything until we have confirmed fight data
+  // This prevents the banner from flashing during initial load when there's no active fight
+  if (!currentFight) {
     return null
   }
 
   return (
     <AnimatePresence>
-      {(loading || currentFight) && (
+      {currentFight && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -168,138 +161,116 @@ export default function ActiveFightBanner({
             }}
           >
             <Box sx={{ position: "relative", zIndex: 1 }}>
-              {loading ? (
-                <Stack spacing={1}>
-                  <Skeleton
-                    variant="text"
-                    width={300}
-                    height={40}
-                    sx={{ bgcolor: "rgba(255, 255, 255, 0.2)" }}
-                  />
-                  <Skeleton
-                    variant="text"
-                    width={200}
-                    height={24}
-                    sx={{ bgcolor: "rgba(255, 255, 255, 0.2)" }}
-                  />
-                </Stack>
-              ) : (
-                <Stack
-                  direction={{ xs: "column", sm: "row" }}
-                  alignItems={{ xs: "flex-start", sm: "center" }}
-                  justifyContent="space-between"
-                  spacing={2}
-                >
-                  <Box>
-                    <Stack
-                      direction="row"
-                      alignItems="center"
-                      spacing={1}
-                      mb={1}
-                    >
-                      <FaFire size={24} />
-                      <Typography variant="h5" fontWeight="bold">
-                        Active Fight: {currentFight?.name}
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                justifyContent="space-between"
+                spacing={2}
+              >
+                <Box>
+                  <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+                    <FaFire size={24} />
+                    <Typography variant="h5" fontWeight="bold">
+                      Active Fight: {currentFight?.name}
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <Chip
+                      label={`Sequence ${currentFight?.sequence || 1}`}
+                      size="small"
+                      sx={{
+                        bgcolor: "rgba(255, 255, 255, 0.2)",
+                        color: "white",
+                        fontWeight: "bold",
+                      }}
+                    />
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                      <FaUsers size={16} />
+                      <Typography variant="body2">
+                        {participantCount} participants in combat
                       </Typography>
                     </Stack>
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Chip
-                        label={`Sequence ${currentFight?.sequence || 1}`}
-                        size="small"
-                        sx={{
-                          bgcolor: "rgba(255, 255, 255, 0.2)",
-                          color: "white",
-                          fontWeight: "bold",
-                        }}
-                      />
-                      <Stack direction="row" alignItems="center" spacing={0.5}>
-                        <FaUsers size={16} />
-                        <Typography variant="body2">
-                          {participantCount} participants in combat
-                        </Typography>
-                      </Stack>
-                    </Stack>
-                  </Box>
+                  </Stack>
+                </Box>
 
-                  <Stack
-                    direction={{ xs: "column", sm: "row" }}
-                    spacing={1}
-                    alignItems="center"
-                  >
-                    {userCharacters.length > 0 && currentFight && (
-                      <Stack direction="row" spacing={1}>
-                        {userCharacters.map(character => (
-                          <EntityLink
-                            key={character.id}
-                            entity={{
-                              id: character.id,
-                              name: character.name,
-                              entity_class: "Character",
+                <Stack
+                  direction={{ xs: "column", sm: "row" }}
+                  spacing={1}
+                  alignItems="center"
+                >
+                  {userCharacters.length > 0 && currentFight && (
+                    <Stack direction="row" spacing={1}>
+                      {userCharacters.map(character => (
+                        <EntityLink
+                          key={character.id}
+                          entity={{
+                            id: character.id,
+                            name: character.name,
+                            entity_class: "Character",
+                          }}
+                          href={`/encounters/${currentFight.id}/play/${character.id}`}
+                          popupOverride={PlayAsCharacterPopup}
+                          noUnderline
+                        >
+                          <Avatar
+                            src={character.image_url || ""}
+                            alt={character.name}
+                            sx={{
+                              width: 48,
+                              height: 48,
+                              border: "3px solid white",
+                              transition: "all 0.2s ease",
+                              "&:hover": {
+                                transform: "scale(1.1)",
+                                boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                              },
                             }}
-                            href={`/encounters/${currentFight.id}/play/${character.id}`}
-                            popupOverride={PlayAsCharacterPopup}
-                            noUnderline
                           >
-                            <Avatar
-                              src={character.image_url || ""}
-                              alt={character.name}
-                              sx={{
-                                width: 48,
-                                height: 48,
-                                border: "3px solid white",
-                                transition: "all 0.2s ease",
-                                "&:hover": {
-                                  transform: "scale(1.1)",
-                                  boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
-                                },
-                              }}
-                            >
-                              {character.name?.charAt(0) || "?"}
-                            </Avatar>
-                          </EntityLink>
-                        ))}
-                      </Stack>
-                    )}
-                    {currentFight && (
-                      <Link
-                        href={`/encounters/${currentFight.id}`}
-                        target="_blank"
-                        style={{ textDecoration: "none" }}
+                            {character.name?.charAt(0) || "?"}
+                          </Avatar>
+                        </EntityLink>
+                      ))}
+                    </Stack>
+                  )}
+                  {currentFight && (
+                    <Link
+                      href={`/encounters/${currentFight.id}`}
+                      target="_blank"
+                      style={{ textDecoration: "none" }}
+                    >
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        alignItems="center"
+                        sx={{
+                          bgcolor: "white",
+                          borderRadius: 2,
+                          px: 2,
+                          py: 1,
+                          transition: "all 0.2s ease",
+                          "&:hover": {
+                            bgcolor: "rgba(255, 255, 255, 0.9)",
+                            transform: "scale(1.02)",
+                          },
+                        }}
                       >
-                        <Stack
-                          direction="row"
-                          spacing={1}
-                          alignItems="center"
+                        <FaPlay color="#ff6b6b" />
+                        <Typography
                           sx={{
-                            bgcolor: "white",
-                            borderRadius: 2,
-                            px: 2,
-                            py: 1,
-                            transition: "all 0.2s ease",
-                            "&:hover": {
-                              bgcolor: "rgba(255, 255, 255, 0.9)",
-                              transform: "scale(1.02)",
-                            },
+                            color: "#ff6b6b",
+                            fontWeight: "bold",
+                            fontSize: "0.95rem",
                           }}
                         >
-                          <FaPlay color="#ff6b6b" />
-                          <Typography
-                            sx={{
-                              color: "#ff6b6b",
-                              fontWeight: "bold",
-                              fontSize: "0.95rem",
-                            }}
-                          >
-                            {userCharacters.length > 0
-                              ? "Manage Fight"
-                              : "Join Fight"}
-                          </Typography>
-                        </Stack>
-                      </Link>
-                    )}
-                  </Stack>
+                          {userCharacters.length > 0
+                            ? "Manage Fight"
+                            : "Join Fight"}
+                        </Typography>
+                      </Stack>
+                    </Link>
+                  )}
                 </Stack>
-              )}
+              </Stack>
             </Box>
           </Paper>
         </motion.div>
