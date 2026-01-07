@@ -389,7 +389,7 @@ describe("NotionSyncLogList", () => {
       expect(mockUnsubscribe).toHaveBeenCalled()
     })
 
-    it("reloads logs when WebSocket broadcasts for this character", async () => {
+    it("reloads logs when WebSocket broadcasts notion_sync_logs", async () => {
       let wsCallback: (data: unknown) => void = () => {}
 
       mockSubscribeToEntity.mockImplementation(
@@ -408,39 +408,13 @@ describe("NotionSyncLogList", () => {
         expect(mockGetNotionSyncLogs).toHaveBeenCalledTimes(1)
       })
 
-      // Simulate WebSocket message for this character
-      wsCallback({ character_id: "char-1" })
+      // Simulate WebSocket broadcast - callback receives the value ("reload")
+      // Component reloads for any notion_sync_logs broadcast in the campaign
+      wsCallback("reload")
 
       await waitFor(() => {
         expect(mockGetNotionSyncLogs).toHaveBeenCalledTimes(2)
       })
-    })
-
-    it("ignores WebSocket broadcasts for other characters", async () => {
-      let wsCallback: (data: unknown) => void = () => {}
-
-      mockSubscribeToEntity.mockImplementation(
-        (_entity: string, callback: (data: unknown) => void) => {
-          wsCallback = callback
-          return jest.fn()
-        }
-      )
-
-      render(<NotionSyncLogList character={mockCharacter} />)
-
-      // Expand to trigger initial fetch
-      fireEvent.click(screen.getByText("Show"))
-
-      await waitFor(() => {
-        expect(mockGetNotionSyncLogs).toHaveBeenCalledTimes(1)
-      })
-
-      // Simulate WebSocket message for different character
-      wsCallback({ character_id: "other-char" })
-
-      // Should not trigger another fetch - wait a bit to ensure no additional call
-      await new Promise(resolve => setTimeout(resolve, 100))
-      expect(mockGetNotionSyncLogs).toHaveBeenCalledTimes(1)
     })
   })
 })
