@@ -17,6 +17,7 @@ import * as ai from "@/lib/client/aiClient"
 import * as editor from "@/lib/client/editorClient"
 import * as characterEffect from "@/lib/client/characterEffectClient"
 import * as chaseRelationship from "@/lib/client/chaseRelationshipClient"
+import * as mediaLibrary from "@/lib/client/mediaLibraryClient"
 
 interface ClientParameters {
   jwt?: string
@@ -91,5 +92,6 @@ export default function createClient(parameters: ClientParameters = {}) {
       apiV2,
       queryParams,
     }),
+    ...mediaLibrary.createMediaLibraryClient({ jwt, apiV2 }),
   }
 }

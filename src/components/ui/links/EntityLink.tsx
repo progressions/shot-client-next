@@ -3,6 +3,73 @@ import { Box, Popover, Link } from "@mui/material"
 import { useRef, useState, useEffect, useCallback } from "react"
 import type { Entity } from "@/types"
 import pluralize from "pluralize"
+import dynamic from "next/dynamic"
+
+// Dynamically import popup components to avoid loading all upfront
+const CharacterPopup = dynamic(
+  () => import("@/components/popups/CharacterPopup"),
+  { ssr: false }
+)
+const VehiclePopup = dynamic(() => import("@/components/popups/VehiclePopup"), {
+  ssr: false,
+})
+const SitePopup = dynamic(() => import("@/components/popups/SitePopup"), {
+  ssr: false,
+})
+const PartyPopup = dynamic(() => import("@/components/popups/PartyPopup"), {
+  ssr: false,
+})
+const FactionPopup = dynamic(() => import("@/components/popups/FactionPopup"), {
+  ssr: false,
+})
+const JuncturePopup = dynamic(
+  () => import("@/components/popups/JuncturePopup"),
+  { ssr: false }
+)
+const SchtickPopup = dynamic(() => import("@/components/popups/SchtickPopup"), {
+  ssr: false,
+})
+const WeaponPopup = dynamic(() => import("@/components/popups/WeaponPopup"), {
+  ssr: false,
+})
+const FightPopup = dynamic(() => import("@/components/popups/FightPopup"), {
+  ssr: false,
+})
+const UserPopup = dynamic(() => import("@/components/popups/UserPopup"), {
+  ssr: false,
+})
+const CampaignPopup = dynamic(
+  () => import("@/components/popups/CampaignPopup"),
+  { ssr: false }
+)
+const TypePopup = dynamic(() => import("@/components/popups/TypePopup"), {
+  ssr: false,
+})
+const ArchetypePopup = dynamic(
+  () => import("@/components/popups/ArchetypePopup"),
+  { ssr: false }
+)
+
+/**
+ * Maps entity_class to default popup component.
+ * Used when popupOverride is not provided.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const defaultPopupMap: Record<string, React.ComponentType<any>> = {
+  Character: CharacterPopup,
+  Vehicle: VehiclePopup,
+  Site: SitePopup,
+  Party: PartyPopup,
+  Faction: FactionPopup,
+  Juncture: JuncturePopup,
+  Schtick: SchtickPopup,
+  Weapon: WeaponPopup,
+  Fight: FightPopup,
+  User: UserPopup,
+  Campaign: CampaignPopup,
+  Type: TypePopup,
+  Archetype: ArchetypePopup,
+}
 
 /**
  * Maps entity_class to keyword generation function for popup components.
@@ -24,7 +91,7 @@ const keywordMap: Record<string, (id: string) => string | undefined> = {
  * @property disablePopup - Disable hover popup (defaults to false)
  * @property children - Custom link text (defaults to entity.name)
  * @property sx - Custom styles for the link
- * @property popupOverride - Custom popup component to show on hover
+ * @property popupOverride - Override the default popup component (auto-detected from entity_class)
  * @property href - Override the auto-generated URL
  * @property noUnderline - Remove underline from link (defaults to false)
  */
@@ -46,14 +113,15 @@ type EntityLinkProperties = {
 }
 
 /**
- * Polymorphic link component for any entity type with optional hover popup.
+ * Polymorphic link component for any entity type with automatic hover popup.
  *
  * Automatically generates URLs based on entity_class (e.g., Character → /characters/{id}).
- * Supports hover-triggered popups that show entity details without navigating away.
+ * Automatically selects the appropriate popup component based on entity_class.
  * Used extensively in rich text content for @mentions.
  *
  * Features:
  * - Auto-generates href from entity_class (pluralized, lowercase)
+ * - Auto-selects popup component based on entity_class
  * - Opens in new tab by default
  * - Hover popup with 500ms delay (cancelable)
  * - Popup stays open when hovering over it
@@ -61,11 +129,11 @@ type EntityLinkProperties = {
  *
  * @example
  * ```tsx
- * // Basic usage - auto-generates URL
+ * // Basic usage - auto-generates URL and popup
  * <EntityLink entity={character} />
  *
- * // With custom popup
- * <EntityLink entity={character} popupOverride={CharacterPopup} />
+ * // With custom popup override
+ * <EntityLink entity={character} popupOverride={CustomPopup} />
  *
  * // Custom text and no popup
  * <EntityLink entity={faction} disablePopup>
@@ -165,7 +233,9 @@ export default function EntityLink({
 
   if (!entity || !entity.id || !entity.entity_class) return null
 
-  const PopupComponent = popupOverride
+  // Use popupOverride if provided, otherwise look up default popup for entity_class
+  const PopupComponent =
+    popupOverride || defaultPopupMap[entity.entity_class] || null
   const keyword = keywordMap[entity.entity_class]?.(entity.id)
 
   return (
