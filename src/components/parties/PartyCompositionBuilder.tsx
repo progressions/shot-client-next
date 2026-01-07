@@ -204,12 +204,13 @@ export default function PartyCompositionBuilder({
           default_mook_count: count,
         })
         onUpdate(response.data)
+        toastSuccess("Mook count updated")
       } catch (error) {
         console.error("Error updating mook count:", error)
         toastError("Failed to update mook count")
       }
     },
-    [client, party.id, onUpdate, toastError]
+    [client, party.id, onUpdate, toastSuccess, toastError]
   )
 
   if (!isEditing && slots.length === 0) {
