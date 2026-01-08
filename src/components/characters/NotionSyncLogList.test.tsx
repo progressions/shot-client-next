@@ -198,7 +198,7 @@ describe("NotionSyncLogList", () => {
     })
   })
 
-  describe("Sync Now Button", () => {
+  describe("Sync to Notion Button", () => {
     it("triggers sync when clicked", async () => {
       mockSyncCharacterToNotion.mockResolvedValue({})
 
@@ -207,10 +207,10 @@ describe("NotionSyncLogList", () => {
       fireEvent.click(screen.getByText("Show"))
 
       await waitFor(() => {
-        expect(screen.getByText("Sync Now")).toBeInTheDocument()
+        expect(screen.getByText("Sync to Notion")).toBeInTheDocument()
       })
 
-      fireEvent.click(screen.getByText("Sync Now"))
+      fireEvent.click(screen.getByText("Sync to Notion"))
 
       await waitFor(() => {
         expect(mockSyncCharacterToNotion).toHaveBeenCalledWith("char-1")
@@ -226,10 +226,10 @@ describe("NotionSyncLogList", () => {
       fireEvent.click(screen.getByText("Show"))
 
       await waitFor(() => {
-        expect(screen.getByText("Sync Now")).toBeInTheDocument()
+        expect(screen.getByText("Sync to Notion")).toBeInTheDocument()
       })
 
-      fireEvent.click(screen.getByText("Sync Now"))
+      fireEvent.click(screen.getByText("Sync to Notion"))
 
       await waitFor(() => {
         expect(mockToastError).toHaveBeenCalledWith(
