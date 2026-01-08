@@ -34,6 +34,7 @@ export default function NotionSyncLogList({
   const [logs, setLogs] = useState<NotionSyncLog[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
+  const [syncingFrom, setSyncingFrom] = useState(false)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [open, setOpen] = useState(false)
@@ -91,6 +92,23 @@ export default function NotionSyncLogList({
     }
   }
 
+  const handleSyncFromNotion = async () => {
+    try {
+      setSyncingFrom(true)
+      await client.syncCharacterFromNotion(character.id)
+      toastSuccess("Character updated from Notion")
+      // Refresh logs to show any changes
+      if (open) {
+        fetchLogs(1)
+      }
+    } catch (error) {
+      console.error("Error syncing from Notion:", error)
+      toastError("Failed to sync from Notion")
+    } finally {
+      setSyncingFrom(false)
+    }
+  }
+
   const handlePageChange = (
     _event: React.ChangeEvent<unknown>,
     newPage: number
@@ -130,8 +148,9 @@ export default function NotionSyncLogList({
       <Collapse in={open}>
         <Stack
           direction="row"
-          justifyContent="space-between"
+          justifyContent="flex-start"
           alignItems="center"
+          spacing={1}
           sx={{ mb: 2, mt: 1 }}
         >
           <Button
@@ -141,7 +160,18 @@ export default function NotionSyncLogList({
             disabled={syncing}
             size="small"
           >
-            {syncing ? "Syncing..." : "Sync Now"}
+            {syncing ? "Syncing..." : "Sync to Notion"}
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={
+              syncingFrom ? <CircularProgress size={16} /> : <SyncIcon />
+            }
+            onClick={handleSyncFromNotion}
+            disabled={syncingFrom || !character.notion_page_id}
+            size="small"
+          >
+            {syncingFrom ? "Syncing..." : "Sync from Notion"}
           </Button>
         </Stack>
 

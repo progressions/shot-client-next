@@ -268,6 +268,13 @@ export function createCharacterClient(deps: ClientDependencies) {
     return post(`${apiV2.characters({ id: characterId })}/sync`)
   }
 
+  async function syncCharacterFromNotion(
+    character: Character | string
+  ): Promise<AxiosResponse<Character>> {
+    const characterId = typeof character === "string" ? character : character.id
+    return post(`${apiV2.characters({ id: characterId })}/sync_from_notion`)
+  }
+
   async function spendShots(
     fight: Fight,
     entity: Entity,
@@ -449,6 +456,7 @@ export function createCharacterClient(deps: ClientDependencies) {
     createNotionPage,
     getNotionSyncLogs,
     syncCharacterToNotion,
+    syncCharacterFromNotion,
     spendShots,
     hideCharacter,
     removeCharacterFromFight,
