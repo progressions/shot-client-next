@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react"
 import {
-  Box,
   Typography,
   List,
   ListItem,
@@ -12,6 +11,7 @@ import {
   Alert,
   Chip,
   Stack,
+  Paper,
 } from "@mui/material"
 import TerminalIcon from "@mui/icons-material/Terminal"
 import ComputerIcon from "@mui/icons-material/Computer"
@@ -27,7 +27,7 @@ import { formatDistanceToNow } from "date-fns"
  * user agent, and timestamps. Sessions are created when users
  * authenticate via the CLI browser flow.
  */
-export default function CliSessionsDisplay() {
+export function CliSessionsDisplay() {
   const [sessions, setSessions] = useState<CliSession[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -76,7 +76,7 @@ export default function CliSessionsDisplay() {
 
   if (isLoading) {
     return (
-      <Box sx={{ mb: 4 }}>
+      <Paper sx={{ p: 3 }}>
         <SectionHeader
           title="CLI Sessions"
           icon={<TerminalIcon />}
@@ -88,13 +88,13 @@ export default function CliSessionsDisplay() {
           <Skeleton variant="rectangular" height={60} />
           <Skeleton variant="rectangular" height={60} />
         </Stack>
-      </Box>
+      </Paper>
     )
   }
 
   if (error) {
     return (
-      <Box sx={{ mb: 4 }}>
+      <Paper sx={{ p: 3 }}>
         <SectionHeader
           title="CLI Sessions"
           icon={<TerminalIcon />}
@@ -103,12 +103,12 @@ export default function CliSessionsDisplay() {
           Devices authenticated via the Chi War CLI.
         </SectionHeader>
         <Alert severity="error">{error}</Alert>
-      </Box>
+      </Paper>
     )
   }
 
   return (
-    <Box sx={{ mb: 4 }}>
+    <Paper sx={{ p: 3 }}>
       <SectionHeader
         title="CLI Sessions"
         icon={<TerminalIcon />}
@@ -175,6 +175,8 @@ export default function CliSessionsDisplay() {
           </List>
         </>
       )}
-    </Box>
+    </Paper>
   )
 }
+
+export default CliSessionsDisplay
