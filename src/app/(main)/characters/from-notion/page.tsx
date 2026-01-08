@@ -3,14 +3,13 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Box, Typography, CircularProgress, Stack, Paper } from "@mui/material"
-import { useClient, useCampaign, useToast } from "@/contexts"
+import { useClient, useToast } from "@/contexts"
 import { MainHeader, Icon, Button } from "@/components/ui"
 import { SpeedDial } from "@/components/characters"
 import { NotionPageAutocomplete } from "@/components/autocomplete"
 
 export default function ImportFromNotionPage() {
   const { client } = useClient()
-  const { campaign } = useCampaign()
   const { toastSuccess, toastError } = useToast()
   const router = useRouter()
   const [selectedPageId, setSelectedPageId] = useState<string>("")
@@ -46,10 +45,7 @@ export default function ImportFromNotionPage() {
   return (
     <Box
       sx={{
-        justifyContent: "space-between",
-        alignItems: "center",
         mb: 2,
-        position: "relative",
       }}
     >
       <SpeedDial />
