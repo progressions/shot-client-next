@@ -332,6 +332,10 @@ class ApiV2 {
   cliAuthApprove(): string {
     return `${this.api()}/cli/auth/approve`
   }
+
+  cliSessions(): string {
+    return `${this.api()}/cli/sessions`
+  }
 }
 
 export default ApiV2
