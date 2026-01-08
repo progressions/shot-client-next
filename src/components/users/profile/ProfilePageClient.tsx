@@ -9,7 +9,6 @@ import {
   TextField,
   Typography,
 } from "@mui/material"
-import SmartToyIcon from "@mui/icons-material/SmartToy"
 import type { User } from "@/types"
 import {
   Icon,
@@ -20,16 +19,8 @@ import {
 } from "@/components/ui"
 import {
   CampaignsList,
-  CharacterManager,
-  DiscordLinkingSection,
   OnboardingMilestonesForm,
 } from "@/components/users/profile"
-import {
-  PasskeyManager,
-  PasswordChangeForm,
-  AiProviderSettings,
-  CliSessionsDisplay,
-} from "@/components/settings"
 import { useClient, useToast } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
 
@@ -317,39 +308,7 @@ export default function ProfilePageClient({
 
       <OnboardingMilestonesForm />
 
-      <Box sx={{ mb: 4 }}>
-        <SectionHeader
-          title="Security"
-          icon={<Icon keyword="Security" />}
-          sx={{ mb: 2 }}
-        >
-          Manage your authentication methods and security settings.
-        </SectionHeader>
-        <Stack spacing={2}>
-          <PasswordChangeForm />
-          <PasskeyManager />
-          <CliSessionsDisplay />
-        </Stack>
-      </Box>
-
-      {user.gamemaster && (
-        <Box sx={{ mb: 4 }}>
-          <SectionHeader
-            title="AI Providers"
-            icon={<SmartToyIcon color="primary" />}
-            sx={{ mb: 2 }}
-          >
-            Connect your AI service accounts for character and image generation.
-          </SectionHeader>
-          <AiProviderSettings />
-        </Box>
-      )}
-
-      <DiscordLinkingSection user={user} onUserUpdate={setUser} />
-
       <CampaignsList user={user} onUserUpdate={setUser} />
-
-      <CharacterManager user={user} onUserUpdate={setUser} />
 
       <EmailChangeConfirmation
         open={showEmailConfirmation}

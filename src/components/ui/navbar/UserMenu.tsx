@@ -73,6 +73,22 @@ export function UserMenu({ user }: UserMenuProps) {
             Profile
           </Link>
         </MenuItem>
+        <MenuItem onClick={handleMenuClose}>
+          <Link
+            href="/settings"
+            style={{ color: "#ffffff", textDecoration: "none", width: "100%" }}
+          >
+            Settings
+          </Link>
+        </MenuItem>
+        <MenuItem onClick={handleMenuClose}>
+          <Link
+            href="/integrations"
+            style={{ color: "#ffffff", textDecoration: "none", width: "100%" }}
+          >
+            Integrations
+          </Link>
+        </MenuItem>
         <MenuItem
           onClick={() => {
             handleMenuClose()
