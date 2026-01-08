@@ -8,6 +8,7 @@ import {
   Divider,
   ListSubheader,
   AutocompleteProps as MuiAutocompleteProps,
+  Box,
 } from "@mui/material"
 import { FormActions, useForm } from "@/reducers"
 
@@ -243,6 +244,18 @@ export function Autocomplete({
           }}
         />
       )}
+      renderOption={(props, option: Option) => {
+        // Use option.value as key instead of label to handle duplicate names
+        const { key, ...otherProps } = props as {
+          key: string
+          [key: string]: unknown
+        }
+        return (
+          <Box component="li" {...otherProps} key={option.value}>
+            {option.label}
+          </Box>
+        )
+      }}
       renderGroup={params =>
         params.group === "" ? (
           <Divider key={params.key} />

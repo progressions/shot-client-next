@@ -20,9 +20,11 @@ export default function NotionPageAutocomplete({
 }: NotionPageAutocompleteProperties) {
   const { client } = useClient()
   const [pages, setPages] = useState<NotionPage[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchPages = async () => {
+      setIsLoading(true)
       try {
         const response = await client.getNotionCharacters({
           name: characterName,
@@ -30,11 +32,14 @@ export default function NotionPageAutocomplete({
         setPages(response.data || [])
       } catch (error) {
         console.error("Error fetching Notion pages:", error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
     fetchPages().catch(error => {
       console.error("Error in useEffect fetchPages:", error)
+      setIsLoading(false)
     })
   }, [client, characterName])
 
@@ -56,11 +61,12 @@ export default function NotionPageAutocomplete({
 
   return (
     <Autocomplete
-      label="Notion Page"
+      label={isLoading ? "Loading Notion pages..." : "Notion Page"}
       value={value}
       fetchOptions={fetchOptions}
       onChange={handleChange}
       allowNone={allowNone}
+      disabled={isLoading}
     />
   )
 }
