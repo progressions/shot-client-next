@@ -382,6 +382,21 @@ export function createAuthClient(deps: ClientDependencies) {
     return delete_(apiV2.unlinkDiscord())
   }
 
+  // CLI Authorization Methods
+
+  interface CliAuthApproveResponse {
+    success: boolean
+  }
+
+  /**
+   * Approve a CLI authorization code (requires authentication)
+   */
+  async function approveCliAuth(
+    code: string
+  ): Promise<AxiosResponse<CliAuthApproveResponse>> {
+    return post(apiV2.cliAuthApprove(), { code })
+  }
+
   return {
     createUser,
     registerUser,
@@ -423,5 +438,7 @@ export function createAuthClient(deps: ClientDependencies) {
     // Discord Account Linking
     linkDiscord,
     unlinkDiscord,
+    // CLI Authorization
+    approveCliAuth,
   }
 }
