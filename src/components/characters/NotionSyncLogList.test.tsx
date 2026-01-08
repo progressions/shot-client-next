@@ -13,11 +13,14 @@ const mockToastSuccess = jest.fn()
 const mockToastError = jest.fn()
 const mockSubscribeToEntity = jest.fn()
 
+const mockSyncCharacterFromNotion = jest.fn()
+
 // Create stable mock objects to prevent infinite re-renders
 // (useCallback depends on client, which must be a stable reference)
 const mockClient = {
   getNotionSyncLogs: mockGetNotionSyncLogs,
   syncCharacterToNotion: mockSyncCharacterToNotion,
+  syncCharacterFromNotion: mockSyncCharacterFromNotion,
 }
 const mockClientHook = { client: mockClient }
 const mockToastHook = {
@@ -198,7 +201,7 @@ describe("NotionSyncLogList", () => {
     })
   })
 
-  describe("Sync Now Button", () => {
+  describe("Sync to Notion Button", () => {
     it("triggers sync when clicked", async () => {
       mockSyncCharacterToNotion.mockResolvedValue({})
 
@@ -207,10 +210,10 @@ describe("NotionSyncLogList", () => {
       fireEvent.click(screen.getByText("Show"))
 
       await waitFor(() => {
-        expect(screen.getByText("Sync Now")).toBeInTheDocument()
+        expect(screen.getByText("Sync to Notion")).toBeInTheDocument()
       })
 
-      fireEvent.click(screen.getByText("Sync Now"))
+      fireEvent.click(screen.getByText("Sync to Notion"))
 
       await waitFor(() => {
         expect(mockSyncCharacterToNotion).toHaveBeenCalledWith("char-1")
@@ -226,16 +229,97 @@ describe("NotionSyncLogList", () => {
       fireEvent.click(screen.getByText("Show"))
 
       await waitFor(() => {
-        expect(screen.getByText("Sync Now")).toBeInTheDocument()
+        expect(screen.getByText("Sync to Notion")).toBeInTheDocument()
       })
 
-      fireEvent.click(screen.getByText("Sync Now"))
+      fireEvent.click(screen.getByText("Sync to Notion"))
 
       await waitFor(() => {
         expect(mockToastError).toHaveBeenCalledWith(
           "Failed to queue character sync"
         )
       })
+    })
+  })
+
+  describe("Sync from Notion Button", () => {
+    const characterWithNotionPage: Character = {
+      id: "char-1",
+      name: "Test Character",
+      notion_page_id: "notion-page-123",
+    } as Character
+
+    it("triggers sync from Notion when clicked", async () => {
+      mockSyncCharacterFromNotion.mockResolvedValue({
+        data: characterWithNotionPage,
+      })
+
+      render(<NotionSyncLogList character={characterWithNotionPage} />)
+
+      fireEvent.click(screen.getByText("Show"))
+
+      await waitFor(() => {
+        expect(screen.getByText("Sync from Notion")).toBeInTheDocument()
+      })
+
+      fireEvent.click(screen.getByText("Sync from Notion"))
+
+      await waitFor(() => {
+        expect(mockSyncCharacterFromNotion).toHaveBeenCalledWith("char-1")
+        expect(mockToastSuccess).toHaveBeenCalledWith(
+          "Character updated from Notion"
+        )
+      })
+    })
+
+    it("shows error toast when sync from Notion fails", async () => {
+      mockSyncCharacterFromNotion.mockRejectedValue(new Error("Sync failed"))
+
+      render(<NotionSyncLogList character={characterWithNotionPage} />)
+
+      fireEvent.click(screen.getByText("Show"))
+
+      await waitFor(() => {
+        expect(screen.getByText("Sync from Notion")).toBeInTheDocument()
+      })
+
+      fireEvent.click(screen.getByText("Sync from Notion"))
+
+      await waitFor(() => {
+        expect(mockToastError).toHaveBeenCalledWith(
+          "Failed to sync from Notion"
+        )
+      })
+    })
+
+    it("button is disabled when character has no notion_page_id", async () => {
+      render(<NotionSyncLogList character={mockCharacter} />)
+
+      fireEvent.click(screen.getByText("Show"))
+
+      await waitFor(() => {
+        expect(screen.getByText("Sync from Notion")).toBeInTheDocument()
+      })
+
+      const syncFromButton = screen
+        .getByText("Sync from Notion")
+        .closest("button")
+      expect(syncFromButton).toBeDisabled()
+    })
+
+    it("button is enabled when character has notion_page_id", async () => {
+      render(<NotionSyncLogList character={characterWithNotionPage} />)
+
+      fireEvent.click(screen.getByText("Show"))
+
+      await waitFor(() => {
+        expect(screen.getByText("Sync from Notion")).toBeInTheDocument()
+      })
+
+      const syncFromButton = screen
+        .getByText("Sync from Notion")
+        .closest("button")
+      expect(syncFromButton).not.toBeDisabled()
     })
   })
 
