@@ -5,6 +5,7 @@ import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
 import UploadIcon from "@mui/icons-material/Upload"
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
 import GroupsIcon from "@mui/icons-material/Groups"
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload"
 import { SpeedDialMenu } from "@/components/ui"
 import { useState, useMemo } from "react"
 import { useCampaign } from "@/contexts"
@@ -26,10 +27,19 @@ const handleGMCTemplates = () => {
   redirect("/characters/gmc")
 }
 
+const handleImportFromNotion = () => {
+  redirect("/characters/from-notion")
+}
+
 export const actions = [
   { icon: <PersonAddAlt1Icon />, name: "Create (PC)", onClick: handleCreate },
   { icon: <GroupsIcon />, name: "Create (GMC)", onClick: handleGMCTemplates },
   { icon: <UploadIcon />, name: "Import (from PDF)", onClick: handleImport },
+  {
+    icon: <CloudDownloadIcon />,
+    name: "Import (from Notion)",
+    onClick: handleImportFromNotion,
+  },
   {
     icon: <AddCircleOutlineIcon />,
     name: "Generate (by AI)",

@@ -275,6 +275,10 @@ class ApiV2 {
     return `${this.characters(character)}/notion/create`
   }
 
+  createCharacterFromNotion(): string {
+    return `${this.api()}/characters/from_notion`
+  }
+
   notionSyncLogs(character: Character | ID): string {
     return `${this.characters(character)}/notion_sync_logs`
   }
