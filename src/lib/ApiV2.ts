@@ -327,6 +327,11 @@ class ApiV2 {
   playerTokenRedeem(token: string): string {
     return `${this.api()}/player_tokens/${token}/redeem`
   }
+
+  // CLI Authorization endpoints
+  cliAuthApprove(): string {
+    return `${this.api()}/cli/auth/approve`
+  }
 }
 
 export default ApiV2

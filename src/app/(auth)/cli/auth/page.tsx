@@ -15,72 +15,96 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline"
 import TerminalIcon from "@mui/icons-material/Terminal"
 import { Button } from "@/components/ui"
 import { useClient, useApp } from "@/contexts"
-import Cookies from "js-cookie"
 
 export default function CliAuthPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const client = useClient()
-  const { user } = useApp()
+  const { client } = useClient()
+  const { user, loading: authLoading } = useApp()
 
-  const [loading, setLoading] = useState(true)
   const [approving, setApproving] = useState(false)
   const [approved, setApproved] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const code = searchParams.get("code")
 
-  // Check if user is logged in
+  // Check if user is logged in using useApp's loading state
   useEffect(() => {
-    const token = Cookies.get("jwtToken") || localStorage.getItem("jwtToken")
+    if (authLoading) return // Wait for auth to finish loading
 
     if (!code) {
       setError("No authorization code provided")
-      setLoading(false)
       return
     }
 
-    if (!token) {
+    if (!user) {
       // Redirect to login with return URL
       const returnUrl = encodeURIComponent(`/cli/auth?code=${code}`)
       router.push(`/login?redirect=${returnUrl}`)
-      return
     }
-
-    // User is logged in, show approval screen
-    setLoading(false)
-  }, [code, router])
+  }, [code, router, user, authLoading])
 
   const handleApprove = useCallback(async () => {
     if (!code) return
 
     setApproving(true)
     try {
-      const response = await client.post("/api/v2/cli/auth/approve", { code })
+      const response = await client.approveCliAuth(code)
 
       if (response.status === 200) {
         setApproved(true)
       } else {
-        setError(response.data?.error || "Failed to approve authorization")
+        // Extract error message from response with proper type checking
+        let message = "Failed to approve authorization"
+
+        if (response && typeof response === "object") {
+          const data = response.data as Record<string, unknown> | undefined
+
+          if (
+            data &&
+            typeof data === "object" &&
+            "error" in data &&
+            typeof data.error === "string"
+          ) {
+            message = data.error
+          } else if (typeof response.status === "number") {
+            message = `Failed to approve authorization (status ${String(response.status)})`
+          }
+        }
+
+        setError(message)
       }
     } catch (err) {
       console.error("Approval error:", err)
-      setError("An error occurred while approving authorization")
+      // Extract specific error details from error object
+      const message =
+        (err as { response?: { data?: { error?: string } } })?.response?.data
+          ?.error ??
+        (err as Error)?.message ??
+        "An error occurred while approving authorization"
+      setError(message)
     } finally {
       setApproving(false)
     }
   }, [code, client])
 
   const handleDeny = useCallback(() => {
-    // Just close the window or redirect home
-    window.close()
-    // If window.close doesn't work (not opened by script), redirect
-    setTimeout(() => {
-      router.push("/")
-    }, 100)
+    // If opened by another window (e.g., CLI flow popup), try to close this window
+    if (
+      typeof window !== "undefined" &&
+      window.opener &&
+      !window.opener.closed
+    ) {
+      window.close()
+      return
+    }
+
+    // Otherwise, fall back to redirecting home in the current tab
+    router.push("/")
   }, [router])
 
-  if (loading) {
+  // Show loading while auth is initializing
+  if (authLoading) {
     return (
       <Box
         sx={{
