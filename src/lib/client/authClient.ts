@@ -23,6 +23,7 @@ import type {
   WebAuthnCredential,
   LinkDiscordResponse,
   UnlinkDiscordResponse,
+  CliSessionsResponse,
 } from "@/types/auth"
 
 interface ClientDependencies {
@@ -397,6 +398,15 @@ export function createAuthClient(deps: ClientDependencies) {
     return post(apiV2.cliAuthApprove(), { code })
   }
 
+  /**
+   * List all CLI sessions for the current user (requires authentication)
+   */
+  async function listCliSessions(): Promise<
+    AxiosResponse<CliSessionsResponse>
+  > {
+    return get(apiV2.cliSessions())
+  }
+
   return {
     createUser,
     registerUser,
@@ -440,5 +450,6 @@ export function createAuthClient(deps: ClientDependencies) {
     unlinkDiscord,
     // CLI Authorization
     approveCliAuth,
+    listCliSessions,
   }
 }

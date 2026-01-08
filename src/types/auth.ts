@@ -171,3 +171,16 @@ export interface UnlinkDiscordResponse {
   success: boolean
   message: string
 }
+
+// CLI Session Types
+export interface CliSession {
+  id: string
+  ip_address: string | null
+  user_agent: string | null
+  last_seen_at: string | null
+  created_at: string
+}
+
+export interface CliSessionsResponse {
+  cli_sessions: CliSession[]
+}

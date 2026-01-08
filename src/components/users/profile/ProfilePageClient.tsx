@@ -28,6 +28,7 @@ import {
   PasskeyManager,
   PasswordChangeForm,
   AiProviderSettings,
+  CliSessionsDisplay,
 } from "@/components/settings"
 import { useClient, useToast } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
@@ -327,6 +328,7 @@ export default function ProfilePageClient({
         <Stack spacing={2}>
           <PasswordChangeForm />
           <PasskeyManager />
+          <CliSessionsDisplay />
         </Stack>
       </Box>
 
