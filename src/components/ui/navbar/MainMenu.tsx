@@ -84,30 +84,34 @@ export function MainMenu() {
           </Link>
         </MenuItem>
         {/* World items - GM only */}
+        {isGM && <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />}
         {isGM && (
-          <>
-            <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />
-            <MenuItem onClick={handleMenuClose}>
-              <Link href="/parties" style={linkStyle}>
-                Parties
-              </Link>
-            </MenuItem>
-            <MenuItem onClick={handleMenuClose}>
-              <Link href="/factions" style={linkStyle}>
-                Factions
-              </Link>
-            </MenuItem>
-            <MenuItem onClick={handleMenuClose}>
-              <Link href="/sites" style={linkStyle}>
-                Sites
-              </Link>
-            </MenuItem>
-            <MenuItem onClick={handleMenuClose}>
-              <Link href="/junctures" style={linkStyle}>
-                Junctures
-              </Link>
-            </MenuItem>
-          </>
+          <MenuItem onClick={handleMenuClose}>
+            <Link href="/parties" style={linkStyle}>
+              Parties
+            </Link>
+          </MenuItem>
+        )}
+        {isGM && (
+          <MenuItem onClick={handleMenuClose}>
+            <Link href="/factions" style={linkStyle}>
+              Factions
+            </Link>
+          </MenuItem>
+        )}
+        {isGM && (
+          <MenuItem onClick={handleMenuClose}>
+            <Link href="/sites" style={linkStyle}>
+              Sites
+            </Link>
+          </MenuItem>
+        )}
+        {isGM && (
+          <MenuItem onClick={handleMenuClose}>
+            <Link href="/junctures" style={linkStyle}>
+              Junctures
+            </Link>
+          </MenuItem>
         )}
         <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />
         {/* Campaigns - everyone */}
@@ -125,15 +129,13 @@ export function MainMenu() {
           </MenuItem>
         )}
         {/* Admin items */}
+        {user.admin && <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />}
         {user.admin && (
-          <>
-            <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />
-            <MenuItem onClick={handleMenuClose}>
-              <Link href="/users" style={linkStyle}>
-                Users
-              </Link>
-            </MenuItem>
-          </>
+          <MenuItem onClick={handleMenuClose}>
+            <Link href="/users" style={linkStyle}>
+              Users
+            </Link>
+          </MenuItem>
         )}
       </Menu>
     </>
