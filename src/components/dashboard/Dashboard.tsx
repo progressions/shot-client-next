@@ -22,7 +22,7 @@ export default async function Dashboard({
   initialIsMobile: _initialIsMobile,
 }: DashboardProperties) {
   const user = await getCurrentUser()
-  const isGamemaster = user?.gamemaster || false
+  const isGamemaster = user?.gamemaster || user?.admin || false
 
   return (
     <Box>
