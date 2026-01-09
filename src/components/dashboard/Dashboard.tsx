@@ -32,22 +32,49 @@ export default async function Dashboard({
         userId={user.id}
         isGamemaster={isGamemaster}
       />
-      <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 2 }}>
-        <Suspense fallback={<LoadingModule />}>
-          <FightsModule userId={user.id} />
-        </Suspense>
-        <Suspense fallback={<LoadingModule />}>
-          <CharactersModule userId={user.id} />
-        </Suspense>
-      </Stack>
-      <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 2 }}>
-        <Suspense fallback={<LoadingModule />}>
-          <PartiesModule userId={user.id} size="small" />
-        </Suspense>
-        <Suspense fallback={<LoadingModule />}>
-          <SitesModule userId={user.id} size="small" />
-        </Suspense>
-      </Stack>
+
+      {/* Gamemaster view - full dashboard */}
+      {isGamemaster && (
+        <>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            sx={{ mb: 2 }}
+          >
+            <Suspense fallback={<LoadingModule />}>
+              <FightsModule userId={user.id} />
+            </Suspense>
+            <Suspense fallback={<LoadingModule />}>
+              <CharactersModule userId={user.id} />
+            </Suspense>
+          </Stack>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            sx={{ mb: 2 }}
+          >
+            <Suspense fallback={<LoadingModule />}>
+              <PartiesModule userId={user.id} size="small" />
+            </Suspense>
+            <Suspense fallback={<LoadingModule />}>
+              <SitesModule userId={user.id} size="small" />
+            </Suspense>
+          </Stack>
+        </>
+      )}
+
+      {/* Player view - just characters */}
+      {!isGamemaster && (
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          sx={{ mb: 2 }}
+        >
+          <Suspense fallback={<LoadingModule />}>
+            <CharactersModule userId={user.id} />
+          </Suspense>
+        </Stack>
+      )}
     </Box>
   )
 }
