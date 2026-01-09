@@ -49,12 +49,30 @@ export function MainMenu() {
           },
         }}
       >
-        {/* Player items - visible to everyone */}
+        {/* Fights - GM only */}
+        {isGM && (
+          <MenuItem onClick={handleMenuClose}>
+            <Link href="/fights" style={linkStyle}>
+              Fights
+            </Link>
+          </MenuItem>
+        )}
+        {/* Characters - everyone */}
         <MenuItem onClick={handleMenuClose}>
           <Link href="/characters" style={linkStyle}>
             Characters
           </Link>
         </MenuItem>
+        {/* Vehicles - GM only */}
+        {isGM && (
+          <MenuItem onClick={handleMenuClose}>
+            <Link href="/vehicles" style={linkStyle}>
+              Vehicles
+            </Link>
+          </MenuItem>
+        )}
+        <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />
+        {/* Schticks & Weapons - everyone */}
         <MenuItem onClick={handleMenuClose}>
           <Link href="/schticks" style={linkStyle}>
             Schticks
@@ -65,29 +83,8 @@ export function MainMenu() {
             Weapons
           </Link>
         </MenuItem>
-        <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />
-        <MenuItem onClick={handleMenuClose}>
-          <Link href="/campaigns" style={linkStyle}>
-            Campaigns
-          </Link>
-        </MenuItem>
-
-        {/* GM items - only visible to gamemasters and admins */}
+        {/* World items - GM only */}
         {isGM && <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />}
-        {isGM && (
-          <MenuItem onClick={handleMenuClose}>
-            <Link href="/fights" style={linkStyle}>
-              Fights
-            </Link>
-          </MenuItem>
-        )}
-        {isGM && (
-          <MenuItem onClick={handleMenuClose}>
-            <Link href="/vehicles" style={linkStyle}>
-              Vehicles
-            </Link>
-          </MenuItem>
-        )}
         {isGM && (
           <MenuItem onClick={handleMenuClose}>
             <Link href="/parties" style={linkStyle}>
@@ -116,6 +113,14 @@ export function MainMenu() {
             </Link>
           </MenuItem>
         )}
+        <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />
+        {/* Campaigns - everyone */}
+        <MenuItem onClick={handleMenuClose}>
+          <Link href="/campaigns" style={linkStyle}>
+            Campaigns
+          </Link>
+        </MenuItem>
+        {/* Media Library - GM only */}
         {isGM && (
           <MenuItem onClick={handleMenuClose}>
             <Link href="/media" style={linkStyle}>
@@ -123,7 +128,6 @@ export function MainMenu() {
             </Link>
           </MenuItem>
         )}
-
         {/* Admin items */}
         {user.admin && <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />}
         {user.admin && (
