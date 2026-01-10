@@ -6,7 +6,7 @@ import { useClient } from "@/contexts"
 import { useEffect, useState } from "react"
 
 type NotionPageAutocompleteProperties = {
-  value: string
+  value: string | null
   onChange: (value: string | null) => void
   characterName?: string
   allowNone?: boolean

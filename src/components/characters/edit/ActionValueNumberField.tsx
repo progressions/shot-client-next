@@ -40,7 +40,7 @@ export default function ActionValue({
   const lastSavedValueRef = useRef<string>(value)
 
   useEffect(() => {
-    if (character.action_values[name] !== undefined) {
+    if (character.action_values[name] != null) {
       const newValue = character.action_values[name].toString()
       setValue(newValue)
       lastSavedValueRef.current = newValue
