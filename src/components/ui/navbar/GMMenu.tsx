@@ -72,14 +72,16 @@ export function GMMenu({ onClose, isAdmin }: GMMenuProps) {
           Media Library
         </Link>
       </MenuItem>
-      {isAdmin && [
-        <Divider key="admin-divider" sx={dividerStyle} />,
-        <MenuItem key="users" onClick={onClose}>
-          <Link href="/users" style={linkStyle}>
-            Users
-          </Link>
-        </MenuItem>,
-      ]}
+      {isAdmin && (
+        <>
+          <Divider sx={dividerStyle} />
+          <MenuItem onClick={onClose}>
+            <Link href="/users" style={linkStyle}>
+              Users
+            </Link>
+          </MenuItem>
+        </>
+      )}
     </>
   )
 }
