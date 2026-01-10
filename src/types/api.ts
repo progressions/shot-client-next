@@ -72,6 +72,8 @@ export interface CampaignCableData {
   sites: Site[] | string | null
   schticks: Schtick[] | string | null
   weapons: Weapon[] | string | null
+  // Media library reload signal
+  images?: string | null
   // Notion sync log reload signal
   notion_sync_logs?: string | null
   character_id?: string
