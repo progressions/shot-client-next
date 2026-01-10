@@ -39,12 +39,11 @@ const ENTITY_TYPES: MediaImageEntityType[] = [
 ]
 
 const SORT_OPTIONS: { value: MediaLibrarySortField; label: string }[] = [
-  { value: "created_at", label: "Date Created" },
+  { value: "inserted_at", label: "Date Created" },
   { value: "updated_at", label: "Date Modified" },
   { value: "filename", label: "Filename" },
-  { value: "file_size", label: "File Size" },
+  { value: "byte_size", label: "File Size" },
   { value: "entity_type", label: "Entity Type" },
-  { value: "entity_name", label: "Entity Name" },
 ]
 
 export default function Filter({ filters, onFilterChange }: FilterProps) {
@@ -149,7 +148,7 @@ export default function Filter({ filters, onFilterChange }: FilterProps) {
           <Select
             labelId="sort-filter-label"
             id="sort-filter"
-            value={filters.sort || "created_at"}
+            value={filters.sort || "inserted_at"}
             label="Sort By"
             onChange={handleSortChange}
           >

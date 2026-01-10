@@ -54,7 +54,7 @@ export default function List({ initialFilters, initialData }: ListProps) {
     status: "all",
     source: "all",
     entity_type: "",
-    sort: "created_at",
+    sort: "inserted_at",
     order: "desc",
     page: 1,
     per_page: 24,

@@ -27,12 +27,11 @@ const VALID_ENTITY_TYPES = [
   "User",
 ] as const
 const VALID_SORT_FIELDS = [
-  "created_at",
+  "inserted_at",
   "updated_at",
   "filename",
-  "file_size",
+  "byte_size",
   "entity_type",
-  "entity_name",
 ] as const
 const VALID_ORDERS = ["asc", "desc"] as const
 

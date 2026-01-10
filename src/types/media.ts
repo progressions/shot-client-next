@@ -63,12 +63,11 @@ export interface MediaLibraryListResponse {
 }
 
 export type MediaLibrarySortField =
-  | "created_at"
+  | "inserted_at"
   | "updated_at"
   | "filename"
-  | "file_size"
+  | "byte_size"
   | "entity_type"
-  | "entity_name"
 
 export type SortOrder = "asc" | "desc"
 
