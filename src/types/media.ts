@@ -62,10 +62,22 @@ export interface MediaLibraryListResponse {
   stats: MediaLibraryStats
 }
 
+export type MediaLibrarySortField =
+  | "created_at"
+  | "updated_at"
+  | "filename"
+  | "file_size"
+  | "entity_type"
+  | "entity_name"
+
+export type SortOrder = "asc" | "desc"
+
 export interface MediaLibraryFilters {
   status?: MediaImageStatus | "all"
   source?: MediaImageSource | "all"
   entity_type?: MediaImageEntityType | ""
+  sort?: MediaLibrarySortField
+  order?: SortOrder
   page?: number
   per_page?: number
 }

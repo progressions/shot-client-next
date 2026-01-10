@@ -19,7 +19,7 @@ export function createMediaLibraryClient(deps: ClientDependencies) {
   const { get, post, delete: delete_ } = createBaseClient(deps)
 
   /**
-   * List all images in the current campaign with optional filtering
+   * List all images in the current campaign with optional filtering and sorting
    */
   async function getMediaLibrary(
     filters?: MediaLibraryFilters
@@ -29,8 +29,17 @@ export function createMediaLibraryClient(deps: ClientDependencies) {
     if (filters?.status && filters.status !== "all") {
       params.append("status", filters.status)
     }
+    if (filters?.source && filters.source !== "all") {
+      params.append("source", filters.source)
+    }
     if (filters?.entity_type) {
       params.append("entity_type", filters.entity_type)
+    }
+    if (filters?.sort) {
+      params.append("sort", filters.sort)
+    }
+    if (filters?.order) {
+      params.append("order", filters.order)
     }
     if (filters?.page) {
       params.append("page", String(filters.page))
