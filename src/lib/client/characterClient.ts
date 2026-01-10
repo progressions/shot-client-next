@@ -275,6 +275,18 @@ export function createCharacterClient(deps: ClientDependencies) {
     return post(`${apiV2.characters({ id: characterId })}/sync_from_notion`)
   }
 
+  async function pruneNotionSyncLogs(
+    character: Character | string,
+    daysOld: number = 30
+  ): Promise<
+    AxiosResponse<{ pruned_count: number; days_old: number; message: string }>
+  > {
+    const characterId = typeof character === "string" ? character : character.id
+    return delete_(
+      `${apiV2.notionSyncLogs({ id: characterId })}/prune?days_old=${daysOld}`
+    )
+  }
+
   async function createCharacterFromNotion(
     notionPageId: string
   ): Promise<AxiosResponse<Character>> {
@@ -463,6 +475,7 @@ export function createCharacterClient(deps: ClientDependencies) {
     syncCharacter,
     createNotionPage,
     getNotionSyncLogs,
+    pruneNotionSyncLogs,
     syncCharacterToNotion,
     syncCharacterFromNotion,
     createCharacterFromNotion,

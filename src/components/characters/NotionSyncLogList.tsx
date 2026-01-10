@@ -14,6 +14,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import ExpandLessIcon from "@mui/icons-material/ExpandLess"
 import SyncIcon from "@mui/icons-material/Sync"
+import DeleteSweepIcon from "@mui/icons-material/DeleteSweep"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import ErrorIcon from "@mui/icons-material/Error"
 import type { Character, NotionSyncLog } from "@/types"
@@ -35,6 +36,7 @@ export default function NotionSyncLogList({
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
   const [syncingFrom, setSyncingFrom] = useState(false)
+  const [pruning, setPruning] = useState(false)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [open, setOpen] = useState(false)
@@ -109,6 +111,29 @@ export default function NotionSyncLogList({
     }
   }
 
+  const handlePrune = async () => {
+    try {
+      setPruning(true)
+      const response = await client.pruneNotionSyncLogs(character.id, 30)
+      const { pruned_count } = response.data
+      if (pruned_count > 0) {
+        toastSuccess(
+          `Deleted ${pruned_count} old sync log${pruned_count === 1 ? "" : "s"}`
+        )
+        // Refresh logs after pruning
+        setPage(1)
+        fetchLogs(1)
+      } else {
+        toastSuccess("No old logs to delete")
+      }
+    } catch (error) {
+      console.error("Error pruning sync logs:", error)
+      toastError("Failed to prune old sync logs")
+    } finally {
+      setPruning(false)
+    }
+  }
+
   const handlePageChange = (
     _event: React.ChangeEvent<unknown>,
     newPage: number
@@ -172,6 +197,18 @@ export default function NotionSyncLogList({
             size="small"
           >
             {syncingFrom ? "Syncing..." : "Sync from Notion"}
+          </Button>
+          <Button
+            variant="outlined"
+            color="warning"
+            startIcon={
+              pruning ? <CircularProgress size={16} /> : <DeleteSweepIcon />
+            }
+            onClick={handlePrune}
+            disabled={pruning || logs.length === 0}
+            size="small"
+          >
+            {pruning ? "Pruning..." : "Prune Old Logs"}
           </Button>
         </Stack>
 
