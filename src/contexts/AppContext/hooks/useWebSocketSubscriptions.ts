@@ -248,7 +248,7 @@ export function useWebSocketSubscriptions({
     )
     setSubscription(sub)
     return () => {
-      sub.disconnect()
+      sub.unsubscribe()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- campaignData and client intentionally omitted to prevent reconnection loops
   }, [userId, campaignId])
@@ -272,7 +272,7 @@ export function useWebSocketSubscriptions({
     )
 
     return () => {
-      userSub.disconnect()
+      userSub.unsubscribe()
     }
   }, [userId, client])
 
