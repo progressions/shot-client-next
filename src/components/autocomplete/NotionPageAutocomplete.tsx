@@ -46,11 +46,11 @@ export default function NotionPageAutocomplete({
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
     return pages
       .filter(page => {
-        const pageName = page.properties?.Name?.title?.[0]?.plain_text || ""
+        const pageName = page.title || ""
         return pageName.toLowerCase().includes(inputValue.toLowerCase())
       })
       .map(page => ({
-        label: page.properties?.Name?.title?.[0]?.plain_text || "Untitled",
+        label: page.title || "Untitled",
         value: page.id,
       }))
   }
