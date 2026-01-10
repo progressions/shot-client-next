@@ -4,7 +4,13 @@ import { useRouter } from "next/navigation"
 import { Box, Pagination, Chip } from "@mui/material"
 import { PhotoLibrary as MediaIcon } from "@mui/icons-material"
 import JSZip from "jszip"
-import { useClient, useToast, useApp, useConfirm, useCampaign } from "@/contexts"
+import {
+  useClient,
+  useToast,
+  useApp,
+  useConfirm,
+  useCampaign,
+} from "@/contexts"
 import { MainHeader } from "@/components/ui"
 import { queryParams } from "@/lib"
 import type {
@@ -77,29 +83,35 @@ export default function List({ initialFilters, initialData }: ListProps) {
   const [attachImage, setAttachImage] = useState<MediaImage | null>(null)
   const [attachDialogOpen, setAttachDialogOpen] = useState(false)
 
-  const fetchImages = useCallback(async () => {
-    setLoading(true)
-    try {
-      const response = await client.getMediaLibrary(filters)
-      setImages(response.data.images)
-      setTotalPages(response.data.meta.total_pages)
-      // Ensure all stats fields have default values
-      const apiStats = response.data.stats || {}
-      setStats({
-        total: apiStats.total ?? 0,
-        orphan: apiStats.orphan ?? 0,
-        attached: apiStats.attached ?? 0,
-        uploaded: apiStats.uploaded ?? 0,
-        ai_generated: apiStats.ai_generated ?? 0,
-        total_size_bytes: apiStats.total_size_bytes ?? 0,
-      })
-    } catch (error) {
-      console.error("Failed to fetch media library:", error)
-      toastError("Failed to load media library")
-    } finally {
-      setLoading(false)
-    }
-  }, [client, filters, toastError])
+  const fetchImages = useCallback(
+    async (
+      overrideFilters?: MediaLibraryFilters & { cache_buster?: string }
+    ) => {
+      const fetchFilters = overrideFilters || filters
+      setLoading(true)
+      try {
+        const response = await client.getMediaLibrary(fetchFilters)
+        setImages(response.data.images)
+        setTotalPages(response.data.meta.total_pages)
+        // Ensure all stats fields have default values
+        const apiStats = response.data.stats || {}
+        setStats({
+          total: apiStats.total ?? 0,
+          orphan: apiStats.orphan ?? 0,
+          attached: apiStats.attached ?? 0,
+          uploaded: apiStats.uploaded ?? 0,
+          ai_generated: apiStats.ai_generated ?? 0,
+          total_size_bytes: apiStats.total_size_bytes ?? 0,
+        })
+      } catch (error) {
+        console.error("Failed to fetch media library:", error)
+        toastError("Failed to load media library")
+      } finally {
+        setLoading(false)
+      }
+    },
+    [client, filters, toastError]
+  )
 
   // Only fetch client-side on initial mount if no server data was provided
   // After initial render, URL changes trigger server-side fetch via page.tsx
@@ -131,11 +143,12 @@ export default function List({ initialFilters, initialData }: ListProps) {
   useEffect(() => {
     const unsubscribe = subscribeToEntity("images", data => {
       if (data === "reload") {
-        fetchImages()
+        // Use cache_buster for WebSocket-triggered reloads
+        fetchImages({ ...filters, cache_buster: "true" })
       }
     })
     return unsubscribe
-  }, [subscribeToEntity, fetchImages])
+  }, [subscribeToEntity, fetchImages, filters])
 
   // Clear selection when filters change
   useEffect(() => {
