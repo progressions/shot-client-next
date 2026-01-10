@@ -1,12 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { Divider, IconButton, Menu, MenuItem } from "@mui/material"
+import { IconButton, Menu } from "@mui/material"
 import MenuIcon from "@mui/icons-material/Menu"
-import Link from "next/link"
 import { useClient } from "@/contexts"
-
-const linkStyle = { color: "#ffffff", textDecoration: "none", width: "100%" }
+import { GMMenu } from "./GMMenu"
+import { PlayerMenu } from "./PlayerMenu"
 
 export function MainMenu() {
   const { user } = useClient()
@@ -49,93 +48,10 @@ export function MainMenu() {
           },
         }}
       >
-        {/* Fights - GM only */}
-        {isGM && (
-          <MenuItem onClick={handleMenuClose}>
-            <Link href="/fights" style={linkStyle}>
-              Fights
-            </Link>
-          </MenuItem>
-        )}
-        {/* Characters - everyone */}
-        <MenuItem onClick={handleMenuClose}>
-          <Link href="/characters" style={linkStyle}>
-            Characters
-          </Link>
-        </MenuItem>
-        {/* Vehicles - GM only */}
-        {isGM && (
-          <MenuItem onClick={handleMenuClose}>
-            <Link href="/vehicles" style={linkStyle}>
-              Vehicles
-            </Link>
-          </MenuItem>
-        )}
-        <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />
-        {/* Schticks & Weapons - everyone */}
-        <MenuItem onClick={handleMenuClose}>
-          <Link href="/schticks" style={linkStyle}>
-            Schticks
-          </Link>
-        </MenuItem>
-        <MenuItem onClick={handleMenuClose}>
-          <Link href="/weapons" style={linkStyle}>
-            Weapons
-          </Link>
-        </MenuItem>
-        {/* World items - GM only */}
-        {isGM && <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />}
-        {isGM && (
-          <MenuItem onClick={handleMenuClose}>
-            <Link href="/parties" style={linkStyle}>
-              Parties
-            </Link>
-          </MenuItem>
-        )}
-        {isGM && (
-          <MenuItem onClick={handleMenuClose}>
-            <Link href="/factions" style={linkStyle}>
-              Factions
-            </Link>
-          </MenuItem>
-        )}
-        {isGM && (
-          <MenuItem onClick={handleMenuClose}>
-            <Link href="/sites" style={linkStyle}>
-              Sites
-            </Link>
-          </MenuItem>
-        )}
-        {isGM && (
-          <MenuItem onClick={handleMenuClose}>
-            <Link href="/junctures" style={linkStyle}>
-              Junctures
-            </Link>
-          </MenuItem>
-        )}
-        <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />
-        {/* Campaigns - everyone */}
-        <MenuItem onClick={handleMenuClose}>
-          <Link href="/campaigns" style={linkStyle}>
-            Campaigns
-          </Link>
-        </MenuItem>
-        {/* Media Library - GM only */}
-        {isGM && (
-          <MenuItem onClick={handleMenuClose}>
-            <Link href="/media" style={linkStyle}>
-              Media Library
-            </Link>
-          </MenuItem>
-        )}
-        {/* Admin items */}
-        {user.admin && <Divider sx={{ my: 0.5, bgcolor: "#2a2a2a" }} />}
-        {user.admin && (
-          <MenuItem onClick={handleMenuClose}>
-            <Link href="/users" style={linkStyle}>
-              Users
-            </Link>
-          </MenuItem>
+        {isGM ? (
+          <GMMenu onClose={handleMenuClose} isAdmin={user.admin} />
+        ) : (
+          <PlayerMenu onClose={handleMenuClose} />
         )}
       </Menu>
     </>
