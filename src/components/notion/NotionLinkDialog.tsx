@@ -21,23 +21,25 @@ export default function NotionLinkDialog({
   onClose,
   onSave,
 }: NotionLinkDialogProps) {
-  const [pageId, setPageId] = useState<string>(character?.notion_page_id || "")
+  const [pageId, setPageId] = useState<string | null>(
+    character?.notion_page_id ?? null
+  )
   const [isCreating, setIsCreating] = useState(false)
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
 
   // Sync local state when character prop changes
   useEffect(() => {
-    setPageId(character?.notion_page_id || "")
+    setPageId(character?.notion_page_id ?? null)
   }, [character?.notion_page_id])
 
   const handleSave = () => {
-    onSave(pageId || null)
+    onSave(pageId)
     onClose()
   }
 
   const handleChange = (newPageId: string | null) => {
-    setPageId(newPageId || "")
+    setPageId(newPageId)
   }
 
   const handleCreateNewPage = async () => {
