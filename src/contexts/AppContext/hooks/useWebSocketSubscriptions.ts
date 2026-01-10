@@ -272,7 +272,7 @@ export function useWebSocketSubscriptions({
     )
 
     return () => {
-      userSub.disconnect()
+      userSub.unsubscribe()
     }
   }, [userId, client])
 
