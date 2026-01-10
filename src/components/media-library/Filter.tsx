@@ -6,11 +6,19 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
+  IconButton,
+  Tooltip,
 } from "@mui/material"
+import {
+  ArrowUpward as AscIcon,
+  ArrowDownward as DescIcon,
+} from "@mui/icons-material"
 import type {
   MediaLibraryFilters,
   MediaImageEntityType,
   MediaImageSource,
+  MediaLibrarySortField,
+  SortOrder,
 } from "@/types"
 
 interface FilterProps {
@@ -28,6 +36,14 @@ const ENTITY_TYPES: MediaImageEntityType[] = [
   "Party",
   "Fight",
   "User",
+]
+
+const SORT_OPTIONS: { value: MediaLibrarySortField; label: string }[] = [
+  { value: "inserted_at", label: "Date Created" },
+  { value: "updated_at", label: "Date Modified" },
+  { value: "filename", label: "Filename" },
+  { value: "byte_size", label: "File Size" },
+  { value: "entity_type", label: "Entity Type" },
 ]
 
 export default function Filter({ filters, onFilterChange }: FilterProps) {
@@ -54,6 +70,24 @@ export default function Filter({ filters, onFilterChange }: FilterProps) {
     onFilterChange({
       ...filters,
       source: value === "all" ? undefined : (value as MediaImageSource),
+      page: 1,
+    })
+  }
+
+  const handleSortChange = (event: SelectChangeEvent) => {
+    const value = event.target.value as MediaLibrarySortField
+    onFilterChange({
+      ...filters,
+      sort: value,
+      page: 1,
+    })
+  }
+
+  const handleOrderToggle = () => {
+    const newOrder: SortOrder = filters.order === "asc" ? "desc" : "asc"
+    onFilterChange({
+      ...filters,
+      order: newOrder,
       page: 1,
     })
   }
@@ -107,6 +141,38 @@ export default function Filter({ filters, onFilterChange }: FilterProps) {
           <MenuItem value="ai_generated">AI Generated</MenuItem>
         </Select>
       </FormControl>
+
+      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+        <FormControl size="small" sx={{ minWidth: 150 }}>
+          <InputLabel id="sort-filter-label">Sort By</InputLabel>
+          <Select
+            labelId="sort-filter-label"
+            id="sort-filter"
+            value={filters.sort || "inserted_at"}
+            label="Sort By"
+            onChange={handleSortChange}
+          >
+            {SORT_OPTIONS.map(option => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <Tooltip
+          title={filters.order === "asc" ? "Ascending" : "Descending"}
+          placement="top"
+        >
+          <IconButton
+            size="small"
+            onClick={handleOrderToggle}
+            sx={{ ml: 0.5 }}
+            aria-label={`Sort ${filters.order === "asc" ? "ascending" : "descending"}`}
+          >
+            {filters.order === "asc" ? <AscIcon /> : <DescIcon />}
+          </IconButton>
+        </Tooltip>
+      </Box>
     </Box>
   )
 }

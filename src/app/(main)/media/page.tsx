@@ -1,7 +1,11 @@
 import { redirect } from "next/navigation"
 import { List } from "@/components/media-library"
 import { requireCampaign, getCurrentUser, getServerClient } from "@/lib"
-import type { MediaLibraryFilters } from "@/types"
+import type {
+  MediaLibraryFilters,
+  MediaLibrarySortField,
+  SortOrder,
+} from "@/types"
 
 export const metadata = {
   title: "Media Library - Chi War",
@@ -22,6 +26,14 @@ const VALID_ENTITY_TYPES = [
   "Fight",
   "User",
 ] as const
+const VALID_SORT_FIELDS = [
+  "inserted_at",
+  "updated_at",
+  "filename",
+  "byte_size",
+  "entity_type",
+] as const
+const VALID_ORDERS = ["asc", "desc"] as const
 
 export default async function MediaLibraryPage({
   searchParams,
@@ -31,6 +43,8 @@ export default async function MediaLibraryPage({
     status?: string
     source?: string
     entity_type?: string
+    sort?: string
+    order?: string
   }>
 }) {
   // Server-side campaign check - will redirect if no campaign
@@ -73,6 +87,22 @@ export default async function MediaLibraryPage({
       ? params.entity_type
       : undefined
 
+  // Validate sort parameter
+  const sort =
+    params.sort &&
+    VALID_SORT_FIELDS.includes(
+      params.sort as (typeof VALID_SORT_FIELDS)[number]
+    )
+      ? (params.sort as MediaLibrarySortField)
+      : undefined
+
+  // Validate order parameter
+  const order =
+    params.order &&
+    VALID_ORDERS.includes(params.order as (typeof VALID_ORDERS)[number])
+      ? (params.order as SortOrder)
+      : undefined
+
   // Build initial filters from URL params
   const initialFilters: MediaLibraryFilters = {
     page: validPage,
@@ -80,6 +110,8 @@ export default async function MediaLibraryPage({
     ...(status && status !== "all" && { status }),
     ...(source && source !== "all" && { source }),
     ...(entity_type && { entity_type }),
+    ...(sort && { sort }),
+    ...(order && { order }),
   }
 
   // Fetch data server-side (like characters page)
