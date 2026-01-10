@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import { Box, Pagination, Chip } from "@mui/material"
 import { PhotoLibrary as MediaIcon } from "@mui/icons-material"
 import JSZip from "jszip"
-import { useClient, useToast, useApp, useConfirm } from "@/contexts"
+import { useClient, useToast, useApp, useConfirm, useCampaign } from "@/contexts"
 import { MainHeader } from "@/components/ui"
 import { queryParams } from "@/lib"
 import type {
@@ -36,6 +36,7 @@ export default function List({ initialFilters, initialData }: ListProps) {
   const { toastSuccess, toastError, toastInfo } = useToast()
   const { confirm } = useConfirm()
   const { user, campaign } = useApp()
+  const { subscribeToEntity } = useCampaign()
   const isGamemaster = user?.gamemaster || user?.admin || false
   const isInitialRender = useRef(true)
 
@@ -125,6 +126,16 @@ export default function List({ initialFilters, initialData }: ListProps) {
       setLoading(false)
     }
   }, [initialData])
+
+  // Subscribe to image updates via WebSocket
+  useEffect(() => {
+    const unsubscribe = subscribeToEntity("images", data => {
+      if (data === "reload") {
+        fetchImages()
+      }
+    })
+    return unsubscribe
+  }, [subscribeToEntity, fetchImages])
 
   // Clear selection when filters change
   useEffect(() => {
