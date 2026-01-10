@@ -118,7 +118,7 @@ export default function NotionSyncLogList({
       const { pruned_count } = response.data
       if (pruned_count > 0) {
         toastSuccess(
-          `Deleted ${pruned_count} sync log${pruned_count === 1 ? "" : "s"}`
+          `Deleted ${pruned_count} sync log${pruned_count === 1 ? "" : "s"} older than 30 days`
         )
         // Refresh logs after pruning
         setPage(1)
