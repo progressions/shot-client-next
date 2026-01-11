@@ -337,6 +337,7 @@ export interface Juncture extends BaseEntity {
   faction?: Faction | null
   faction_id: string | null
   characters: Character[]
+  character_ids: string[]
   active: boolean
   image_url: string
   created_at: string
