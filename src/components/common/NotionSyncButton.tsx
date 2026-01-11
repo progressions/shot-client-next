@@ -55,7 +55,9 @@ export function NotionSyncButton({
 
       if (response?.data) {
         onSync(response.data)
-        toastSuccess(`${entityType.charAt(0).toUpperCase() + entityType.slice(1)} synced to Notion`)
+        toastSuccess(
+          `${entityType.charAt(0).toUpperCase() + entityType.slice(1)} synced to Notion`
+        )
       }
     } catch (error) {
       console.error(`Error syncing ${entityType} to Notion:`, error)
@@ -93,9 +95,7 @@ export function NotionSyncButton({
           size="small"
           onClick={handleSync}
           disabled={isSyncing}
-          startIcon={
-            isSyncing ? <CircularProgress size={16} /> : <SyncIcon />
-          }
+          startIcon={isSyncing ? <CircularProgress size={16} /> : <SyncIcon />}
         >
           {hasNotionLink ? "Sync to Notion" : "Create in Notion"}
         </Button>
