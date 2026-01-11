@@ -202,8 +202,13 @@ export default function List({ initialFilters, initialData }: ListProps) {
     setFilters(prev => ({ ...prev, page: 1 }))
   }
 
-  // Update URL when filters change
+  // Update URL when filters change (but not during tag search)
   useEffect(() => {
+    // Skip URL updates when in search mode - search results are client-side only
+    if (searchTags.length > 0) {
+      return
+    }
+
     const url = `/media?${queryParams(filters)}`
 
     if (isInitialRender.current) {
@@ -215,7 +220,7 @@ export default function List({ initialFilters, initialData }: ListProps) {
 
     // On subsequent changes, navigate to trigger server-side fetch
     router.push(url, { scroll: false })
-  }, [filters, router])
+  }, [filters, router, searchTags.length])
 
   const handleFilterChange = (newFilters: MediaLibraryFilters) => {
     setFilters(newFilters)

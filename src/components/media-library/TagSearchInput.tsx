@@ -24,7 +24,7 @@ export default function TagSearchInput({
   onChange,
   placeholder = "Search by AI tags...",
 }: TagSearchInputProps) {
-  const client = useClient()
+  const { client } = useClient()
   const [availableTags, setAvailableTags] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [inputValue, setInputValue] = useState("")
@@ -41,7 +41,11 @@ export default function TagSearchInput({
           setAvailableTags(response.data.tags || [])
         }
       } catch (error) {
-        console.error("Failed to fetch AI tags:", error)
+        // Silently handle errors (e.g., no campaign selected)
+        // User can still type free-form tags
+        if (!cancelled) {
+          setAvailableTags([])
+        }
       } finally {
         if (!cancelled) {
           setLoading(false)
