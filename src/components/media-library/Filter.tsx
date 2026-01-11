@@ -104,7 +104,15 @@ export default function Filter({
   }
 
   return (
-    <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap", alignItems: "center" }}>
+    <Box
+      sx={{
+        display: "flex",
+        gap: 2,
+        mb: 3,
+        flexWrap: "wrap",
+        alignItems: "center",
+      }}
+    >
       {/* AI Tag Search */}
       <TagSearchInput
         value={searchTags}
