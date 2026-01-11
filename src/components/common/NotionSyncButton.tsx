@@ -74,7 +74,7 @@ export function NotionSyncButton({
 
   const hasNotionLink = !!entity.notion_page_id
   const notionLink = hasNotionLink
-    ? `https://notion.so/${entity.notion_page_id?.replace(/-/g, "")}`
+    ? `https://www.notion.so/isaacrpg/${entity.notion_page_id?.replace(/-/g, "")}`
     : null
 
   const lastSynced = entity.last_synced_to_notion_at
