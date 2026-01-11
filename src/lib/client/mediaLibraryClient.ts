@@ -7,6 +7,8 @@ import type {
   BulkDeleteResult,
   DownloadInfo,
   MediaImageEntityType,
+  MediaSearchResponse,
+  AiTagsListResponse,
 } from "@/types"
 
 interface ClientDependencies {
@@ -111,6 +113,35 @@ export function createMediaLibraryClient(deps: ClientDependencies) {
     return get(apiV2.mediaLibraryDownload(id))
   }
 
+  /**
+   * Search images by AI-generated tags
+   * @param query - Comma or space-separated search terms
+   * @param options - Pagination options
+   */
+  async function searchByTags(
+    query: string,
+    options?: { page?: number; per_page?: number }
+  ): Promise<AxiosResponse<MediaSearchResponse>> {
+    const params = new URLSearchParams()
+    params.append("q", query)
+
+    if (options?.page) {
+      params.append("page", String(options.page))
+    }
+    if (options?.per_page) {
+      params.append("per_page", String(options.per_page))
+    }
+
+    return get(`${apiV2.mediaLibrarySearch()}?${params.toString()}`)
+  }
+
+  /**
+   * Get all unique AI tag names for autocomplete
+   */
+  async function getAiTags(): Promise<AxiosResponse<AiTagsListResponse>> {
+    return get(apiV2.mediaLibraryAiTags())
+  }
+
   return {
     getMediaLibrary,
     getMediaImage,
@@ -119,5 +150,7 @@ export function createMediaLibraryClient(deps: ClientDependencies) {
     duplicateMediaImage,
     attachMediaImage,
     getDownloadUrl,
+    searchByTags,
+    getAiTags,
   }
 }

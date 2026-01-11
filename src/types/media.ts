@@ -17,6 +17,15 @@ export type MediaImageEntityType =
   | "Fight"
   | "User"
 
+/**
+ * AI-generated tag from Google Vision via ImageKit
+ */
+export interface AiTag {
+  name: string
+  confidence: number
+  source: string
+}
+
 export interface MediaImage {
   id: string
   campaign_id: string
@@ -36,6 +45,7 @@ export interface MediaImage {
   height?: number
   prompt?: string
   ai_provider?: string
+  ai_tags?: AiTag[]
   generated_by_id?: string
   uploaded_by_id?: string
   inserted_at: string
@@ -89,4 +99,24 @@ export interface BulkDeleteResult {
 export interface DownloadInfo {
   download_url: string
   filename: string
+}
+
+/**
+ * Response from AI tag search endpoint
+ */
+export interface MediaSearchResponse {
+  images: MediaImage[]
+  meta: {
+    page: number
+    per_page: number
+    total_count: number
+    total_pages: number
+  }
+}
+
+/**
+ * Response from AI tags list endpoint (for autocomplete)
+ */
+export interface AiTagsListResponse {
+  tags: string[]
 }

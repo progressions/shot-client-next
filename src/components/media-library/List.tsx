@@ -85,6 +85,10 @@ export default function List({ initialFilters, initialData }: ListProps) {
   const [attachImage, setAttachImage] = useState<MediaImage | null>(null)
   const [attachDialogOpen, setAttachDialogOpen] = useState(false)
 
+  // Tag search state
+  const [searchTags, setSearchTags] = useState<string[]>([])
+  const isSearchMode = searchTags.length > 0
+
   const fetchImages = useCallback(
     async (
       overrideFilters?: MediaLibraryFilters & { cache_buster?: string }
@@ -113,6 +117,30 @@ export default function List({ initialFilters, initialData }: ListProps) {
       }
     },
     [client, filters, toastError]
+  )
+
+  // Search by AI tags
+  const searchByTags = useCallback(
+    async (tags: string[], page: number = 1) => {
+      if (tags.length === 0) return
+
+      setLoading(true)
+      try {
+        const query = tags.join(",")
+        const response = await client.searchByTags(query, {
+          page,
+          per_page: filters.per_page,
+        })
+        setImages(response.data.images)
+        setTotalPages(response.data.meta.total_pages)
+      } catch (error) {
+        console.error("Failed to search by tags:", error)
+        toastError("Failed to search images")
+      } finally {
+        setLoading(false)
+      }
+    },
+    [client, filters.per_page, toastError]
   )
 
   // Only fetch client-side on initial mount if no server data was provided
@@ -157,6 +185,23 @@ export default function List({ initialFilters, initialData }: ListProps) {
     setSelectedIds(new Set())
   }, [filters])
 
+  // Handle tag search changes
+  useEffect(() => {
+    if (searchTags.length > 0) {
+      searchByTags(searchTags, 1)
+    } else if (!initialData) {
+      // When clearing search, fetch normal images
+      fetchImages()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTags])
+
+  const handleSearchTagsChange = (tags: string[]) => {
+    setSearchTags(tags)
+    // Reset pagination when search changes
+    setFilters(prev => ({ ...prev, page: 1 }))
+  }
+
   // Update URL when filters change
   useEffect(() => {
     const url = `/media?${queryParams(filters)}`
@@ -178,6 +223,10 @@ export default function List({ initialFilters, initialData }: ListProps) {
 
   const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
     setFilters(prev => ({ ...prev, page }))
+    // If in search mode, re-search with new page
+    if (isSearchMode) {
+      searchByTags(searchTags, page)
+    }
   }
 
   const handleSelect = (id: string) => {
@@ -424,7 +473,13 @@ export default function List({ initialFilters, initialData }: ListProps) {
         </Box>
       </Box>
 
-      <Filter filters={filters} onFilterChange={handleFilterChange} />
+      <Filter
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        searchTags={searchTags}
+        onSearchTagsChange={handleSearchTagsChange}
+        isSearchMode={isSearchMode}
+      />
 
       {isGamemaster && (
         <BulkActions
