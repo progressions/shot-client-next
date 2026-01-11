@@ -272,6 +272,18 @@ class ApiV2 {
     return `${this.api()}/notion/characters`
   }
 
+  notionSites(): string {
+    return `${this.api()}/notion/sites`
+  }
+
+  notionParties(): string {
+    return `${this.api()}/notion/parties`
+  }
+
+  notionFactions(): string {
+    return `${this.api()}/notion/factions`
+  }
+
   createNotionPage(character: Character | ID): string {
     return `${this.characters(character)}/notion/create`
   }

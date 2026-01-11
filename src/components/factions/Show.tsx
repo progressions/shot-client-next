@@ -20,7 +20,11 @@ import {
   EditableRichText,
   SectionHeader,
 } from "@/components/ui"
-import { EntityActiveToggle, NotionSyncButton } from "@/components/common"
+import {
+  EntityActiveToggle,
+  NotionSyncButton,
+  EditEntityNotionLink,
+} from "@/components/common"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -82,20 +86,25 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
       <FactionSpeedDial faction={faction} onDelete={deleteEntity} />
       <HeroImage entity={faction} setEntity={setFaction} />
       <Alert status={status} />
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          mb: 1,
-        }}
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        sx={{ my: 1, flexWrap: "wrap" }}
       >
-        <NameEditor
+        <Box sx={{ flexGrow: 1 }}>
+          <NameEditor
+            entity={faction}
+            setEntity={setFaction}
+            updateEntity={updateEntity}
+          />
+        </Box>
+        <EditEntityNotionLink
           entity={faction}
-          setEntity={setFaction}
-          updateEntity={updateEntity}
+          entityType="faction"
+          updateEntity={setFaction}
         />
-      </Box>
+      </Stack>
       <Box>
         <SectionHeader
           title="Description"

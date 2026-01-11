@@ -10,6 +10,7 @@ import type {
   Vehicle,
   PartyTemplate,
   PartyRole,
+  NotionPage,
 } from "@/types"
 
 interface ClientDependencies {
@@ -114,6 +115,14 @@ export function createPartyClient(deps: ClientDependencies) {
     return post(`${apiV2.parties({ id: partyId })}/sync`)
   }
 
+  async function getNotionParties(
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<NotionPage[]>> {
+    const query = queryParams(parameters)
+    return get(`${apiV2.notionParties()}?${query}`, {}, cacheOptions)
+  }
+
   async function addPartyToFight(
     party: Party | string,
     fight: Fight | string
@@ -212,6 +221,7 @@ export function createPartyClient(deps: ClientDependencies) {
     deletePartyImage,
     duplicateParty,
     syncPartyToNotion,
+    getNotionParties,
     addPartyToFight,
     // Party Composition / Slot Management
     getTemplates,

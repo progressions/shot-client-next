@@ -15,7 +15,11 @@ import {
   HeroImage,
 } from "@/components/ui"
 import { SiteSpeedDial } from "@/components/sites"
-import { EntityActiveToggle, NotionSyncButton } from "@/components/common"
+import {
+  EntityActiveToggle,
+  NotionSyncButton,
+  EditEntityNotionLink,
+} from "@/components/common"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import { EditFaction } from "@/components/factions"
@@ -87,14 +91,26 @@ export default function Show({ site: initialSite }: ShowProperties) {
       <SiteSpeedDial site={site} onDelete={deleteEntity} />
       <HeroImage entity={site} setEntity={setSite} />
       <Alert status={status} />
-      <FormControl fullWidth margin="normal" error={!!errors.name}>
-        <NameEditor
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        sx={{ my: 1, flexWrap: "wrap" }}
+      >
+        <FormControl error={!!errors.name} sx={{ flexGrow: 1 }}>
+          <NameEditor
+            entity={site}
+            setEntity={setSite}
+            updateEntity={updateEntity}
+          />
+          {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
+        </FormControl>
+        <EditEntityNotionLink
           entity={site}
-          setEntity={setSite}
-          updateEntity={updateEntity}
+          entityType="site"
+          updateEntity={setSite}
         />
-        {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
-      </FormControl>
+      </Stack>
       <Box sx={{ mb: 4 }}>
         <SectionHeader
           title="Faction"
