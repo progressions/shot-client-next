@@ -34,7 +34,9 @@ export interface NotificationWebSocketData {
  * Callback function for notification subscriptions.
  * Called when a new notification arrives via WebSocket.
  */
-export type NotificationCallback = (notification: NotificationWebSocketData) => void
+export type NotificationCallback = (
+  notification: NotificationWebSocketData
+) => void
 
 /**
  * Main application context type providing global state and services.

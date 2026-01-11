@@ -10,7 +10,11 @@ import { useState, useCallback, useEffect, useRef } from "react"
 import type { Client } from "@/lib"
 import { defaultCampaign, type Campaign, type CampaignCableData } from "@/types"
 import type { Subscription } from "@rails/actioncable"
-import type { EntityUpdateCallback, NotificationCallback, NotificationWebSocketData } from "../types"
+import type {
+  EntityUpdateCallback,
+  NotificationCallback,
+  NotificationWebSocketData,
+} from "../types"
 
 interface UseWebSocketSubscriptionsResult {
   subscription: Subscription | null
@@ -280,9 +284,18 @@ export function useWebSocketSubscriptions({
         },
         received: (data: unknown) => {
           // Check if this is a notification event
-          const typedData = data as { notification?: NotificationWebSocketData } | CampaignCableData
-          if (typedData && "notification" in typedData && typedData.notification) {
-            console.log("🔔 [UserChannel] Notification received:", typedData.notification)
+          const typedData = data as
+            | { notification?: NotificationWebSocketData }
+            | CampaignCableData
+          if (
+            typedData &&
+            "notification" in typedData &&
+            typedData.notification
+          ) {
+            console.log(
+              "🔔 [UserChannel] Notification received:",
+              typedData.notification
+            )
             notificationCallbacks.current.forEach(callback => {
               try {
                 callback(typedData.notification as NotificationWebSocketData)
@@ -292,7 +305,10 @@ export function useWebSocketSubscriptions({
             })
           } else if (data) {
             // Merge campaign data with existing to prevent overwrites
-            setCampaignData(prev => ({ ...prev, ...(data as CampaignCableData) }))
+            setCampaignData(prev => ({
+              ...prev,
+              ...(data as CampaignCableData),
+            }))
           }
         },
       }

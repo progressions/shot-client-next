@@ -59,23 +59,29 @@ export function NotificationBell() {
 
   // Subscribe to real-time notification updates via WebSocket
   useEffect(() => {
-    const unsubscribe = subscribeToNotifications((notification) => {
-      console.log("🔔 NotificationBell: Real-time notification received:", notification)
+    const unsubscribe = subscribeToNotifications(notification => {
+      console.log(
+        "🔔 NotificationBell: Real-time notification received:",
+        notification
+      )
       // Increment unread count immediately
       setUnreadCount(prev => prev + 1)
       // If menu is open, add to the list
       if (anchorEl) {
-        setNotifications(prev => [{
-          id: notification.id,
-          type: notification.type,
-          title: notification.title,
-          message: notification.message,
-          read_at: null,
-          dismissed_at: null,
-          created_at: notification.created_at,
-          updated_at: notification.created_at,
-          payload: {},
-        }, ...prev])
+        setNotifications(prev => [
+          {
+            id: notification.id,
+            type: notification.type,
+            title: notification.title,
+            message: notification.message,
+            read_at: null,
+            dismissed_at: null,
+            created_at: notification.created_at,
+            updated_at: notification.created_at,
+            payload: {},
+          },
+          ...prev,
+        ])
       }
     })
     return unsubscribe
