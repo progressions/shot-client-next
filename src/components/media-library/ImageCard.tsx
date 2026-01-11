@@ -190,6 +190,46 @@ export default function ImageCard({
             {formatDate(image.inserted_at)}
           </Typography>
         </Box>
+
+        {/* AI Tags */}
+        {image.ai_tags && image.ai_tags.length > 0 && (
+          <Box
+            sx={{
+              mt: 1,
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 0.5,
+              maxHeight: 48,
+              overflow: "hidden",
+            }}
+          >
+            {image.ai_tags.slice(0, 4).map((tag, index) => (
+              <Chip
+                key={`${tag.name}-${index}`}
+                label={tag.name}
+                size="small"
+                variant="outlined"
+                sx={{
+                  height: 20,
+                  fontSize: "0.65rem",
+                  "& .MuiChip-label": { px: 0.75 },
+                }}
+              />
+            ))}
+            {image.ai_tags.length > 4 && (
+              <Chip
+                label={`+${image.ai_tags.length - 4}`}
+                size="small"
+                variant="outlined"
+                sx={{
+                  height: 20,
+                  fontSize: "0.65rem",
+                  "& .MuiChip-label": { px: 0.75 },
+                }}
+              />
+            )}
+          </Box>
+        )}
       </CardContent>
 
       {/* Actions */}

@@ -87,6 +87,14 @@ class ApiV2 {
     return `${this.api()}/media_library/${imageId}/download`
   }
 
+  mediaLibrarySearch(): string {
+    return `${this.api()}/media_library/search`
+  }
+
+  mediaLibraryAiTags(): string {
+    return `${this.api()}/media_library/ai_tags`
+  }
+
   imagePositions(): string {
     return `${this.api()}/image_positions`
   }

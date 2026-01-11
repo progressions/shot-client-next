@@ -224,6 +224,33 @@ export default function ImageDetailsDialog({
                   </Typography>
                 </Box>
               )}
+
+              {/* AI Tags */}
+              {image.ai_tags && image.ai_tags.length > 0 && (
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    AI Tags
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: 0.5,
+                      mt: 0.5,
+                    }}
+                  >
+                    {image.ai_tags.map((tag, index) => (
+                      <Chip
+                        key={`${tag.name}-${index}`}
+                        label={`${tag.name} (${Math.round(tag.confidence)}%)`}
+                        size="small"
+                        variant="outlined"
+                        sx={{ fontSize: "0.75rem" }}
+                      />
+                    ))}
+                  </Box>
+                </Box>
+              )}
             </Box>
           </Box>
         </Box>
