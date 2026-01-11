@@ -32,7 +32,11 @@ export default function EditFightOwner({
     if (user.admin) return true
 
     // Gamemaster can edit fights in their campaign
-    if (campaign.gamemaster?.id === user.id) return true
+    if (
+      campaign.gamemaster?.id === user.id ||
+      campaign.gamemaster_id === user.id
+    )
+      return true
 
     return false
   }
