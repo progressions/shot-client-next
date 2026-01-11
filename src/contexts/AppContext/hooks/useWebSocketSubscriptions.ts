@@ -10,10 +10,10 @@ import { useState, useCallback, useEffect, useRef } from "react"
 import type { Client } from "@/lib"
 import { defaultCampaign, type Campaign, type CampaignCableData } from "@/types"
 import type { Subscription } from "@rails/actioncable"
-import type {
-  EntityUpdateCallback,
-  NotificationCallback,
-  NotificationWebSocketData,
+import {
+  isValidNotificationData,
+  type EntityUpdateCallback,
+  type NotificationCallback,
 } from "../types"
 
 interface UseWebSocketSubscriptionsResult {
@@ -277,28 +277,30 @@ export function useWebSocketSubscriptions({
       { channel: "UserChannel", id: userId },
       {
         connected: () => {
-          console.log("🔔 [UserChannel] Connected for notifications")
+          console.debug("🔔 [UserChannel] Connected for notifications")
         },
         disconnected: () => {
-          console.log("🔔 [UserChannel] Disconnected")
+          console.debug("🔔 [UserChannel] Disconnected")
         },
         received: (data: unknown) => {
-          // Check if this is a notification event
+          // Check if this is a notification event with proper validation
           const typedData = data as
-            | { notification?: NotificationWebSocketData }
+            | { notification?: unknown }
             | CampaignCableData
           if (
             typedData &&
             "notification" in typedData &&
-            typedData.notification
+            typedData.notification &&
+            isValidNotificationData(typedData.notification)
           ) {
-            console.log(
+            console.debug(
               "🔔 [UserChannel] Notification received:",
               typedData.notification
             )
+            const notification = typedData.notification
             notificationCallbacks.current.forEach(callback => {
               try {
-                callback(typedData.notification as NotificationWebSocketData)
+                callback(notification)
               } catch (error) {
                 console.error("Error in notification callback:", error)
               }

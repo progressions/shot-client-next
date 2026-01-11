@@ -28,6 +28,24 @@ export interface NotificationWebSocketData {
   title: string
   message: string | null
   created_at: string
+  payload?: Record<string, unknown>
+}
+
+/**
+ * Type guard to validate notification data structure from WebSocket.
+ */
+export function isValidNotificationData(
+  data: unknown
+): data is NotificationWebSocketData {
+  if (!data || typeof data !== "object") return false
+  const obj = data as Record<string, unknown>
+  return (
+    typeof obj.id === "string" &&
+    typeof obj.type === "string" &&
+    typeof obj.title === "string" &&
+    (obj.message === null || typeof obj.message === "string") &&
+    typeof obj.created_at === "string"
+  )
 }
 
 /**
