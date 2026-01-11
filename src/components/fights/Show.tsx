@@ -20,6 +20,7 @@ import {
 import { EntityActiveToggle } from "@/components/common"
 import { useCampaign, useClient } from "@/contexts"
 import { FightChips, AddParty, EditFightOwner } from "@/components/fights"
+import { SoloModeSettings } from "@/components/solo"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -305,6 +306,22 @@ export default function Show({ fight: initialFight }: ShowProperties) {
           allowDuplicates={true}
         />
       </Stack>
+      {/* Solo Play Section */}
+      <Box>
+        <SectionHeader title="Solo Play" icon={<Icon keyword="Solo" />}>
+          Enable solo play mode to run this encounter as a single-player
+          experience. NPCs will act automatically based on the selected
+          behavior.
+        </SectionHeader>
+        <SoloModeSettings
+          fight={fight}
+          characters={fight.characters || []}
+          onUpdate={async updates => {
+            const updatedFight = { ...fight, ...updates }
+            await updateEntity(updatedFight)
+          }}
+        />
+      </Box>
       {(user?.admin || (campaign && user?.id === campaign.gamemaster_id)) && (
         <>
           <SectionHeader

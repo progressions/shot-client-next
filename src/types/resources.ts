@@ -297,6 +297,10 @@ export interface Fight extends BaseEntity {
   session: number | null
   user_id?: string | null
   user?: User | null
+  // Solo play fields
+  solo_mode?: boolean
+  solo_player_character_ids?: string[]
+  solo_behavior_type?: "simple" | "ai"
 }
 
 export interface User extends BaseEntity {

@@ -26,5 +26,6 @@
 export * from "@/contexts/LocalStorageContext"
 export * from "@/contexts/ToastContext"
 export * from "@/contexts/EncounterContext"
+export * from "@/contexts/SoloEncounterContext"
 export * from "@/contexts/AppContext"
 export * from "@/contexts/ConfirmContext"
