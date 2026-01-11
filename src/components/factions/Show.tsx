@@ -20,7 +20,11 @@ import {
   EditableRichText,
   SectionHeader,
 } from "@/components/ui"
-import { EntityActiveToggle, NotionSyncButton } from "@/components/common"
+import {
+  EntityActiveToggle,
+  NotionSyncButton,
+  EditEntityNotionLink,
+} from "@/components/common"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -96,6 +100,13 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
           updateEntity={updateEntity}
         />
       </Box>
+      <Stack direction="row" spacing={2} alignItems="center" sx={{ my: 1 }}>
+        <EditEntityNotionLink
+          entity={faction}
+          entityType="faction"
+          updateEntity={setFaction}
+        />
+      </Stack>
       <Box>
         <SectionHeader
           title="Description"

@@ -8,6 +8,7 @@ import type {
   Character,
   CacheOptions,
   Parameters_,
+  NotionPage,
 } from "@/types"
 
 interface ClientDependencies {
@@ -64,6 +65,14 @@ export function createSiteClient(deps: ClientDependencies) {
   ): Promise<AxiosResponse<Site>> {
     const siteId = typeof site === "string" ? site : site.id
     return post(`${apiV2.sites({ id: siteId })}/sync`)
+  }
+
+  async function getNotionSites(
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<NotionPage[]>> {
+    const query = queryParams(parameters)
+    return get(`${apiV2.notionSites()}?${query}`, {}, cacheOptions)
   }
 
   async function addCharacterToSite(
@@ -129,6 +138,7 @@ export function createSiteClient(deps: ClientDependencies) {
     deleteSiteImage,
     duplicateSite,
     syncSiteToNotion,
+    getNotionSites,
     addCharacterToSite,
     removeCharacterFromSite,
     getJunctures,

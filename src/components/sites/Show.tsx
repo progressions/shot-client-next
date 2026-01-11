@@ -15,7 +15,11 @@ import {
   HeroImage,
 } from "@/components/ui"
 import { SiteSpeedDial } from "@/components/sites"
-import { EntityActiveToggle, NotionSyncButton } from "@/components/common"
+import {
+  EntityActiveToggle,
+  NotionSyncButton,
+  EditEntityNotionLink,
+} from "@/components/common"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import { EditFaction } from "@/components/factions"
@@ -95,6 +99,13 @@ export default function Show({ site: initialSite }: ShowProperties) {
         />
         {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
       </FormControl>
+      <Stack direction="row" spacing={2} alignItems="center" sx={{ my: 1 }}>
+        <EditEntityNotionLink
+          entity={site}
+          entityType="site"
+          updateEntity={setSite}
+        />
+      </Stack>
       <Box sx={{ mb: 4 }}>
         <SectionHeader
           title="Faction"

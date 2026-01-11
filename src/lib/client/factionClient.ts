@@ -5,6 +5,7 @@ import type {
   FactionsResponse,
   CacheOptions,
   Parameters_,
+  NotionPage,
 } from "@/types"
 
 interface ClientDependencies {
@@ -71,6 +72,14 @@ export function createFactionClient(deps: ClientDependencies) {
     return post(`${apiV2.factions({ id: factionId })}/sync`)
   }
 
+  async function getNotionFactions(
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<NotionPage[]>> {
+    const query = queryParams(parameters)
+    return get(`${apiV2.notionFactions()}?${query}`, {}, cacheOptions)
+  }
+
   return {
     getFaction,
     getFactions,
@@ -80,5 +89,6 @@ export function createFactionClient(deps: ClientDependencies) {
     deleteFaction,
     duplicateFaction,
     syncFactionToNotion,
+    getNotionFactions,
   }
 }
