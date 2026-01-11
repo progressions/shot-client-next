@@ -19,6 +19,8 @@ import type { Entity } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useToast, useClient } from "@/contexts"
 
+const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
+
 interface UploadImageDialogProps {
   open: boolean
   onClose: () => void
@@ -116,8 +118,6 @@ export function UploadImageDialog({
       value: false,
     })
   }
-
-  const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
 
   const handleFileChange = async (files: FileList | null) => {
     if (!files || files.length === 0) return
