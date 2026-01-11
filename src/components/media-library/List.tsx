@@ -193,8 +193,7 @@ export default function List({ initialFilters, initialData }: ListProps) {
       // When clearing search, fetch normal images
       fetchImages()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTags])
+  }, [searchTags, searchByTags, fetchImages, initialData])
 
   const handleSearchTagsChange = (tags: string[]) => {
     setSearchTags(tags)

@@ -79,9 +79,7 @@ export default function TagSearchInput({
       options={availableTags}
       value={value}
       onChange={(_, newValue) => {
-        // Handle both selected options and free text
-        const tags = newValue.map(v => (typeof v === "string" ? v : v))
-        onChange(tags)
+        onChange(newValue)
       }}
       inputValue={inputValue}
       onInputChange={(_, newInputValue) => {
