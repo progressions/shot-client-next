@@ -15,7 +15,7 @@ import {
   HeroImage,
 } from "@/components/ui"
 import { PartySpeedDial, PartyCompositionBuilder } from "@/components/parties"
-import { EntityActiveToggle } from "@/components/common"
+import { EntityActiveToggle, NotionSyncButton } from "@/components/common"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import { EditFaction } from "@/components/factions"
@@ -161,10 +161,17 @@ export default function Show({ party: initialParty }: ShowProperties) {
           >
             Manage the visibility and status of this party.
           </SectionHeader>
-          <EntityActiveToggle
-            entity={party}
-            handleChangeAndSave={handleChangeAndSave}
-          />
+          <Stack direction="column" spacing={2} sx={{ my: 2 }}>
+            <EntityActiveToggle
+              entity={party}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+            <NotionSyncButton
+              entity={party}
+              entityType="party"
+              onSync={setParty}
+            />
+          </Stack>
         </>
       )}
     </Box>

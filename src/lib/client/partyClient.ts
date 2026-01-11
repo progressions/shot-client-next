@@ -107,6 +107,13 @@ export function createPartyClient(deps: ClientDependencies) {
     return post(`${apiV2.parties(party)}/duplicate`)
   }
 
+  async function syncPartyToNotion(
+    party: Party | string
+  ): Promise<AxiosResponse<Party>> {
+    const partyId = typeof party === "string" ? party : party.id
+    return post(`${apiV2.parties({ id: partyId })}/sync`)
+  }
+
   async function addPartyToFight(
     party: Party | string,
     fight: Fight | string
@@ -204,6 +211,7 @@ export function createPartyClient(deps: ClientDependencies) {
     updateParty,
     deletePartyImage,
     duplicateParty,
+    syncPartyToNotion,
     addPartyToFight,
     // Party Composition / Slot Management
     getTemplates,

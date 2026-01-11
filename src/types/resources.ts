@@ -227,6 +227,8 @@ export interface Party extends BaseEntity {
   // Party composition
   slots?: PartySlot[]
   has_composition?: boolean
+  notion_page_id?: string | null
+  last_synced_to_notion_at?: string | null
 }
 
 export interface Faction extends BaseEntity {
@@ -247,6 +249,8 @@ export interface Faction extends BaseEntity {
   image_url: string
   created_at: string
   updated_at: string
+  notion_page_id?: string | null
+  last_synced_to_notion_at?: string | null
 }
 
 export interface Schtick extends BaseEntity {
@@ -318,6 +322,8 @@ export interface Site extends BaseEntity {
   image_url: string
   created_at: string
   updated_at: string
+  notion_page_id?: string | null
+  last_synced_to_notion_at?: string | null
 }
 
 export interface Juncture extends BaseEntity {

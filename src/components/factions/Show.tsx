@@ -20,7 +20,7 @@ import {
   EditableRichText,
   SectionHeader,
 } from "@/components/ui"
-import { EntityActiveToggle } from "@/components/common"
+import { EntityActiveToggle, NotionSyncButton } from "@/components/common"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -138,10 +138,17 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
           >
             Manage the visibility and status of this faction.
           </SectionHeader>
-          <EntityActiveToggle
-            entity={faction}
-            handleChangeAndSave={handleChangeAndSave}
-          />
+          <Stack direction="column" spacing={2} sx={{ my: 2 }}>
+            <EntityActiveToggle
+              entity={faction}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+            <NotionSyncButton
+              entity={faction}
+              entityType="faction"
+              onSync={setFaction}
+            />
+          </Stack>
         </>
       )}
     </Box>
