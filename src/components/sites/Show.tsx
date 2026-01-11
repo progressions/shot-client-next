@@ -15,7 +15,7 @@ import {
   HeroImage,
 } from "@/components/ui"
 import { SiteSpeedDial } from "@/components/sites"
-import { EntityActiveToggle } from "@/components/common"
+import { EntityActiveToggle, NotionSyncButton } from "@/components/common"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import { EditFaction } from "@/components/factions"
@@ -151,10 +151,17 @@ export default function Show({ site: initialSite }: ShowProperties) {
           >
             Manage the visibility and status of this site.
           </SectionHeader>
-          <EntityActiveToggle
-            entity={site}
-            handleChangeAndSave={handleChangeAndSave}
-          />
+          <Stack direction="column" spacing={2} sx={{ my: 2 }}>
+            <EntityActiveToggle
+              entity={site}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+            <NotionSyncButton
+              entity={site}
+              entityType="site"
+              onSync={setSite}
+            />
+          </Stack>
         </>
       )}
     </Box>

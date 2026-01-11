@@ -59,6 +59,13 @@ export function createSiteClient(deps: ClientDependencies) {
     return post(`${apiV2.sites(site)}/duplicate`)
   }
 
+  async function syncSiteToNotion(
+    site: Site | string
+  ): Promise<AxiosResponse<Site>> {
+    const siteId = typeof site === "string" ? site : site.id
+    return post(`${apiV2.sites({ id: siteId })}/sync`)
+  }
+
   async function addCharacterToSite(
     site: Site,
     character: Character
@@ -121,6 +128,7 @@ export function createSiteClient(deps: ClientDependencies) {
     deleteSite,
     deleteSiteImage,
     duplicateSite,
+    syncSiteToNotion,
     addCharacterToSite,
     removeCharacterFromSite,
     getJunctures,

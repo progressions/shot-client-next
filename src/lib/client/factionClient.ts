@@ -64,6 +64,13 @@ export function createFactionClient(deps: ClientDependencies) {
     return post(`${apiV2.factions(faction)}/duplicate`)
   }
 
+  async function syncFactionToNotion(
+    faction: Faction | string
+  ): Promise<AxiosResponse<Faction>> {
+    const factionId = typeof faction === "string" ? faction : faction.id
+    return post(`${apiV2.factions({ id: factionId })}/sync`)
+  }
+
   return {
     getFaction,
     getFactions,
@@ -72,5 +79,6 @@ export function createFactionClient(deps: ClientDependencies) {
     deleteFactionImage,
     deleteFaction,
     duplicateFaction,
+    syncFactionToNotion,
   }
 }
