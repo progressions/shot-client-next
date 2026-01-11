@@ -10,7 +10,7 @@ import { useState, useCallback, useEffect, useRef } from "react"
 import type { Client } from "@/lib"
 import { defaultCampaign, type Campaign, type CampaignCableData } from "@/types"
 import type { Subscription } from "@rails/actioncable"
-import type { EntityUpdateCallback } from "../types"
+import type { EntityUpdateCallback, NotificationCallback, NotificationWebSocketData } from "../types"
 
 interface UseWebSocketSubscriptionsResult {
   subscription: Subscription | null
@@ -19,6 +19,7 @@ interface UseWebSocketSubscriptionsResult {
     entityType: string,
     callback: EntityUpdateCallback
   ) => () => void
+  subscribeToNotifications: (callback: NotificationCallback) => () => void
 }
 
 interface UseWebSocketSubscriptionsProps {
@@ -53,6 +54,7 @@ export function useWebSocketSubscriptions({
   const entityUpdateCallbacks = useRef<Map<string, Set<EntityUpdateCallback>>>(
     new Map()
   )
+  const notificationCallbacks = useRef<Set<NotificationCallback>>(new Set())
 
   const subscribeToEntity = useCallback(
     (entityType: string, callback: EntityUpdateCallback) => {
@@ -66,6 +68,16 @@ export function useWebSocketSubscriptions({
         if (entityUpdateCallbacks.current.get(entityType)?.size === 0) {
           entityUpdateCallbacks.current.delete(entityType)
         }
+      }
+    },
+    []
+  )
+
+  const subscribeToNotifications = useCallback(
+    (callback: NotificationCallback) => {
+      notificationCallbacks.current.add(callback)
+      return () => {
+        notificationCallbacks.current.delete(callback)
       }
     },
     []
@@ -253,19 +265,34 @@ export function useWebSocketSubscriptions({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- campaignData and client intentionally omitted to prevent reconnection loops
   }, [userId, campaignId])
 
-  // UserChannel subscription for campaign list updates
+  // UserChannel subscription for campaign list updates and notifications
   useEffect(() => {
     if (!userId) return
 
     const userSub = client.consumer().subscriptions.create(
       { channel: "UserChannel", id: userId },
       {
-        connected: () => {}, // Connected to UserChannel
-        disconnected: () => {}, // Disconnected from UserChannel
-        received: (data: CampaignCableData) => {
-          if (data) {
-            // Merge new data with existing to prevent overwrites
-            setCampaignData(prev => ({ ...prev, ...data }))
+        connected: () => {
+          console.log("🔔 [UserChannel] Connected for notifications")
+        },
+        disconnected: () => {
+          console.log("🔔 [UserChannel] Disconnected")
+        },
+        received: (data: unknown) => {
+          // Check if this is a notification event
+          const typedData = data as { notification?: NotificationWebSocketData } | CampaignCableData
+          if (typedData && "notification" in typedData && typedData.notification) {
+            console.log("🔔 [UserChannel] Notification received:", typedData.notification)
+            notificationCallbacks.current.forEach(callback => {
+              try {
+                callback(typedData.notification as NotificationWebSocketData)
+              } catch (error) {
+                console.error("Error in notification callback:", error)
+              }
+            })
+          } else if (data) {
+            // Merge campaign data with existing to prevent overwrites
+            setCampaignData(prev => ({ ...prev, ...(data as CampaignCableData) }))
           }
         },
       }
@@ -334,5 +361,6 @@ export function useWebSocketSubscriptions({
     subscription,
     campaignData,
     subscribeToEntity,
+    subscribeToNotifications,
   }
 }

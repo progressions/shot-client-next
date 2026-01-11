@@ -20,6 +20,23 @@ import type { Subscription } from "@rails/actioncable"
 export type EntityUpdateCallback = (data: unknown) => void
 
 /**
+ * Notification data received from WebSocket.
+ */
+export interface NotificationWebSocketData {
+  id: string
+  type: string
+  title: string
+  message: string | null
+  created_at: string
+}
+
+/**
+ * Callback function for notification subscriptions.
+ * Called when a new notification arrives via WebSocket.
+ */
+export type NotificationCallback = (notification: NotificationWebSocketData) => void
+
+/**
  * Main application context type providing global state and services.
  * Includes authentication, campaign management, and real-time subscriptions.
  */
@@ -49,6 +66,8 @@ export interface AppContextType {
     entityType: string,
     callback: EntityUpdateCallback
   ) => () => void
+  /** Subscribe to real-time notification updates */
+  subscribeToNotifications: (callback: NotificationCallback) => () => void
   /** Re-fetch current user data from backend */
   refreshUser: () => Promise<void>
   /** True while initial user data is loading */

@@ -38,6 +38,7 @@ const AppContext = createContext<AppContextType>({
   setCurrentCampaign: async (camp: Campaign | null) => camp || defaultCampaign,
   updateCampaign: () => {},
   subscribeToEntity: () => () => {},
+  subscribeToNotifications: () => () => {},
   refreshUser: async () => {},
   loading: true,
   error: null,
@@ -109,6 +110,7 @@ export function AppProvider({ children, initialUser }: AppProviderProps) {
         subscription: ws.subscription,
         campaignData: ws.campaignData,
         subscribeToEntity: ws.subscribeToEntity,
+        subscribeToNotifications: ws.subscribeToNotifications,
       }}
     >
       {children}
@@ -176,6 +178,7 @@ export function useCampaign() {
     setCurrentCampaign,
     updateCampaign,
     subscribeToEntity,
+    subscribeToNotifications,
   } = useContext(AppContext)
   return {
     campaign,
@@ -184,5 +187,6 @@ export function useCampaign() {
     setCurrentCampaign,
     updateCampaign,
     subscribeToEntity,
+    subscribeToNotifications,
   }
 }
