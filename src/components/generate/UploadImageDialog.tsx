@@ -19,6 +19,8 @@ import type { Entity } from "@/types"
 import { FormActions, useForm } from "@/reducers"
 import { useToast, useClient } from "@/contexts"
 
+const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
+
 interface UploadImageDialogProps {
   open: boolean
   onClose: () => void
@@ -120,6 +122,24 @@ export function UploadImageDialog({
   const handleFileChange = async (files: FileList | null) => {
     if (!files || files.length === 0) return
     const file = files[0]
+
+    // Check file size before attempting upload
+    if (file.size > MAX_FILE_SIZE) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1)
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "uploadStatus",
+        value: "error",
+      })
+      dispatchForm({
+        type: FormActions.UPDATE,
+        name: "uploadErrorMsg",
+        value: `File too large (${sizeMB}MB). Maximum size is 50MB.`,
+      })
+      toastError(`File too large (${sizeMB}MB). Maximum size is 50MB.`)
+      return
+    }
+
     if (file.type.startsWith("image/")) {
       dispatchForm({
         type: FormActions.UPDATE,
@@ -191,8 +211,20 @@ export function UploadImageDialog({
         }
       } catch (error) {
         console.error("Error uploading image:", error)
-        const errorMsg =
-          error instanceof Error ? error.message : "Failed to upload image"
+        let errorMsg = "Failed to upload image"
+
+        // Provide more meaningful error messages
+        if (error instanceof Error) {
+          if (error.message === "Network Error") {
+            errorMsg =
+              "Upload failed. The file may be too large or there was a connection issue."
+          } else if (error.message.includes("timeout")) {
+            errorMsg = "Upload timed out. Please try again with a smaller file."
+          } else {
+            errorMsg = error.message
+          }
+        }
+
         dispatchForm({
           type: FormActions.UPDATE,
           name: "uploadStatus",
@@ -203,9 +235,7 @@ export function UploadImageDialog({
           name: "uploadErrorMsg",
           value: errorMsg,
         })
-        toastError(
-          creationMode ? "Failed to select image" : "Failed to upload image"
-        )
+        toastError(creationMode ? "Failed to select image" : errorMsg)
       }
     } else {
       dispatchForm({
