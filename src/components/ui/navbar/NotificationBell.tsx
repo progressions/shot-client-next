@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import {
   Badge,
   IconButton,
@@ -13,15 +13,18 @@ import {
 } from "@mui/material"
 import NotificationsIcon from "@mui/icons-material/Notifications"
 import CloseIcon from "@mui/icons-material/Close"
-import { useClient } from "@/contexts"
+import { useClient, useCampaign } from "@/contexts"
 import type { Notification } from "@/types"
 
 export function NotificationBell() {
   const { client, jwt } = useClient()
+  const { subscribeToNotifications } = useCampaign()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [loading, setLoading] = useState(false)
+  // Use ref to track menu open state without causing subscription recreation
+  const isMenuOpenRef = useRef(false)
 
   const open = Boolean(anchorEl)
 
@@ -48,12 +51,48 @@ export function NotificationBell() {
     }
   }, [client, jwt])
 
-  // Fetch unread count on mount and periodically
+  // Fetch unread count on mount and periodically (as fallback)
   useEffect(() => {
     fetchUnreadCount()
-    const interval = setInterval(fetchUnreadCount, 30000) // Every 30 seconds
+    // Reduced polling interval since we have real-time updates
+    const interval = setInterval(fetchUnreadCount, 60000) // Every 60 seconds as fallback
     return () => clearInterval(interval)
   }, [fetchUnreadCount])
+
+  // Keep ref in sync with anchorEl state
+  useEffect(() => {
+    isMenuOpenRef.current = Boolean(anchorEl)
+  }, [anchorEl])
+
+  // Subscribe to real-time notification updates via WebSocket
+  useEffect(() => {
+    const unsubscribe = subscribeToNotifications(notification => {
+      console.debug(
+        "🔔 NotificationBell: Real-time notification received:",
+        notification
+      )
+      // Increment unread count immediately
+      setUnreadCount(prev => prev + 1)
+      // If menu is open, add to the list (using ref to avoid dependency)
+      if (isMenuOpenRef.current) {
+        setNotifications(prev => [
+          {
+            id: notification.id,
+            type: notification.type,
+            title: notification.title,
+            message: notification.message,
+            read_at: null,
+            dismissed_at: null,
+            created_at: notification.created_at,
+            updated_at: notification.created_at,
+            payload: notification.payload ?? {},
+          },
+          ...prev,
+        ])
+      }
+    })
+    return unsubscribe
+  }, [subscribeToNotifications])
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
