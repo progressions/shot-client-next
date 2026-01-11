@@ -42,7 +42,7 @@ export default function EditEntityNotionLink<T extends NotionLinkableEntity>({
     if (user.admin) return true
 
     // Gamemaster can edit entities in their campaign
-    if (campaign.gamemaster_id === user.id) return true
+    if (campaign.gamemaster?.id === user.id) return true
 
     return false
   }
