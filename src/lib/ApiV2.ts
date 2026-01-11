@@ -14,6 +14,7 @@ import {
   Invitation,
   AiCredential,
   AiProvider,
+  Notification,
 } from "@/types"
 
 class ApiV2 {
@@ -296,6 +297,21 @@ class ApiV2 {
 
   aiCredentialByProvider(provider: AiProvider): string {
     return `${this.api()}/ai_credentials/provider/${provider}`
+  }
+
+  // Notifications endpoints
+  notifications(notification?: Notification | ID): string {
+    return notification?.id
+      ? `${this.api()}/notifications/${notification.id}`
+      : `${this.api()}/notifications`
+  }
+
+  notificationsUnreadCount(): string {
+    return `${this.api()}/notifications/unread_count`
+  }
+
+  notificationsDismissAll(): string {
+    return `${this.api()}/notifications/dismiss_all`
   }
 
   // WebAuthn/Passkey endpoints

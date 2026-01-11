@@ -2,6 +2,7 @@ import { Box, AppBar, Toolbar, Typography } from "@mui/material"
 import { Button } from "../Button"
 import { ConditionalMenu } from "./ConditionalMenu"
 import { UserMenu } from "./UserMenu"
+import { NotificationBell } from "./NotificationBell"
 
 export async function Navbar({ user }) {
   return (
@@ -32,7 +33,10 @@ export async function Navbar({ user }) {
           sx={{ display: "flex", alignItems: "center", gap: { xs: 1, sm: 2 } }}
         >
           {user?.id ? (
-            <UserMenu user={user} />
+            <>
+              <NotificationBell />
+              <UserMenu user={user} />
+            </>
           ) : (
             <Button
               variant="contained"
