@@ -33,6 +33,7 @@ export interface Campaign extends BaseEntity {
   name: string
   description: string
   gamemaster: User
+  gamemaster_id?: string
   new?: boolean
   players: User[]
   player_ids: string[]
@@ -294,6 +295,8 @@ export interface Fight extends BaseEntity {
   ended_at: string | null
   season: number | null
   session: number | null
+  user_id?: string | null
+  user?: User | null
 }
 
 export interface User extends BaseEntity {

@@ -19,7 +19,7 @@ import {
 } from "@/components/ui"
 import { EntityActiveToggle } from "@/components/common"
 import { useCampaign, useClient } from "@/contexts"
-import { FightChips, AddParty } from "@/components/fights"
+import { FightChips, AddParty, EditFightOwner } from "@/components/fights"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -201,6 +201,9 @@ export default function Show({ fight: initialFight }: ShowProperties) {
         />
         {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
       </FormControl>
+      <Stack direction="row" spacing={2} alignItems="center" sx={{ my: 1 }}>
+        <EditFightOwner fight={fight} updateFight={updateEntity} />
+      </Stack>
       <Box>
         <SectionHeader
           title="Description"
