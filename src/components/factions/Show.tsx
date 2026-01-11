@@ -86,21 +86,19 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
       <FactionSpeedDial faction={faction} onDelete={deleteEntity} />
       <HeroImage entity={faction} setEntity={setFaction} />
       <Alert status={status} />
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          mb: 1,
-        }}
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        sx={{ my: 1, flexWrap: "wrap" }}
       >
-        <NameEditor
-          entity={faction}
-          setEntity={setFaction}
-          updateEntity={updateEntity}
-        />
-      </Box>
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ my: 1 }}>
+        <Box sx={{ flexGrow: 1 }}>
+          <NameEditor
+            entity={faction}
+            setEntity={setFaction}
+            updateEntity={updateEntity}
+          />
+        </Box>
         <EditEntityNotionLink
           entity={faction}
           entityType="faction"

@@ -87,15 +87,20 @@ export default function Show({ party: initialParty }: ShowProperties) {
       <PartySpeedDial party={party} onDelete={deleteEntity} />
       <HeroImage entity={party} setEntity={setParty} />
       <Alert status={status} />
-      <FormControl fullWidth margin="normal" error={!!errors.name}>
-        <NameEditor
-          entity={party}
-          setEntity={setParty}
-          updateEntity={updateEntity}
-        />
-        {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
-      </FormControl>
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ my: 1 }}>
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        sx={{ my: 1, flexWrap: "wrap" }}
+      >
+        <FormControl error={!!errors.name} sx={{ flexGrow: 1 }}>
+          <NameEditor
+            entity={party}
+            setEntity={setParty}
+            updateEntity={updateEntity}
+          />
+          {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
+        </FormControl>
         <EditEntityNotionLink
           entity={party}
           entityType="party"

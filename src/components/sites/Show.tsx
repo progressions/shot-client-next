@@ -91,15 +91,20 @@ export default function Show({ site: initialSite }: ShowProperties) {
       <SiteSpeedDial site={site} onDelete={deleteEntity} />
       <HeroImage entity={site} setEntity={setSite} />
       <Alert status={status} />
-      <FormControl fullWidth margin="normal" error={!!errors.name}>
-        <NameEditor
-          entity={site}
-          setEntity={setSite}
-          updateEntity={updateEntity}
-        />
-        {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
-      </FormControl>
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ my: 1 }}>
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        sx={{ my: 1, flexWrap: "wrap" }}
+      >
+        <FormControl error={!!errors.name} sx={{ flexGrow: 1 }}>
+          <NameEditor
+            entity={site}
+            setEntity={setSite}
+            updateEntity={updateEntity}
+          />
+          {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
+        </FormControl>
         <EditEntityNotionLink
           entity={site}
           entityType="site"
