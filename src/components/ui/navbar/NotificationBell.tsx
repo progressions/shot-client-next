@@ -18,12 +18,12 @@ import type { Notification } from "@/types"
 
 export function NotificationBell() {
   const { client, jwt } = useClient()
-  const [anchorElement, setAnchorElement] = useState<null | HTMLElement>(null)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [loading, setLoading] = useState(false)
 
-  const open = Boolean(anchorElement)
+  const open = Boolean(anchorEl)
 
   const fetchUnreadCount = useCallback(async () => {
     if (!jwt) return // Don't fetch if not authenticated
@@ -56,20 +56,25 @@ export function NotificationBell() {
   }, [fetchUnreadCount])
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElement(event.currentTarget)
+    setAnchorEl(event.currentTarget)
     fetchNotifications()
   }
 
   const handleMenuClose = () => {
-    setAnchorElement(null)
+    setAnchorEl(null)
   }
 
   const handleDismiss = async (id: string, event: React.MouseEvent) => {
     event.stopPropagation()
     try {
+      // Find the notification to check if it was unread
+      const notification = notifications.find(n => n.id === id)
       await client.dismissNotification(id)
       setNotifications(prev => prev.filter(n => n.id !== id))
-      setUnreadCount(prev => Math.max(0, prev - 1))
+      // Only decrement unread count if the notification was unread
+      if (notification && !notification.read_at) {
+        setUnreadCount(prev => Math.max(0, prev - 1))
+      }
     } catch (error) {
       console.error("Failed to dismiss notification:", error)
     }
@@ -104,6 +109,7 @@ export function NotificationBell() {
     <>
       <IconButton
         onClick={handleMenuOpen}
+        aria-label="Notifications"
         sx={{
           color: "#ffffff",
           "&:hover": {
@@ -127,7 +133,7 @@ export function NotificationBell() {
         </Badge>
       </IconButton>
       <Menu
-        anchorEl={anchorElement}
+        anchorEl={anchorEl}
         open={open}
         onClose={handleMenuClose}
         anchorOrigin={{

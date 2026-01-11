@@ -94,6 +94,6 @@ export default function createClient(parameters: ClientParameters = {}) {
       queryParams,
     }),
     ...mediaLibrary.createMediaLibraryClient({ jwt, apiV2 }),
-    ...notification.createNotificationClient({ jwt, apiV2 }),
+    ...notification.createNotificationClient({ jwt, apiV2, queryParams }),
   }
 }

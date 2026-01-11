@@ -10,18 +10,20 @@ import type {
 interface ClientDependencies {
   jwt?: string
   apiV2: import("@/lib").ApiV2
+  queryParams: typeof import("@/lib").queryParams
 }
 
 export function createNotificationClient(deps: ClientDependencies) {
-  const { apiV2 } = deps
+  const { apiV2, queryParams } = deps
   const { get, patch, post, delete: delete_ } = createBaseClient(deps)
 
   async function getNotifications(params?: {
     status?: "unread"
     limit?: number
   }): Promise<AxiosResponse<NotificationsResponse>> {
-    const url = params
-      ? `${apiV2.notifications()}?${new URLSearchParams(params as Record<string, string>).toString()}`
+    const query = queryParams(params)
+    const url = query
+      ? `${apiV2.notifications()}?${query}`
       : apiV2.notifications()
     return get(url)
   }
