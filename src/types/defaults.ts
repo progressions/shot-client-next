@@ -264,6 +264,7 @@ export const defaultJuncture: Juncture = {
   active: true,
   image_url: "",
   characters: [],
+  character_ids: [],
   created_at: "",
   updated_at: "",
 }
@@ -277,6 +278,7 @@ export const defaultSite: Site = {
   faction_id: null,
   image_url: "",
   characters: [],
+  character_ids: [],
   created_at: "",
   updated_at: "",
 }
