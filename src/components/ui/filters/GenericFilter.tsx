@@ -1,5 +1,5 @@
 "use client"
-import { Stack } from "@mui/material"
+import { Box, Stack } from "@mui/material"
 import { AddButton } from "../AddButton"
 import { ModelAutocomplete } from "../ModelAutocomplete"
 import { StringAutocomplete } from "../StringAutocomplete"
@@ -288,16 +288,18 @@ export function GenericFilter({
     <Stack
       direction={{ xs: "column", sm: "row" }}
       alignItems={{ xs: "stretch", sm: "center" }}
-      sx={{ flexWrap: "wrap", gap: 1 }}
+      sx={{ flexWrap: { xs: "wrap", sm: "nowrap" }, gap: 1 }}
     >
       {config.fields.map(field => renderField(field))}
       {!omit.includes("add") &&
         primaryField &&
         primaryField.type === "entity" && (
-          <AddButton
-            onClick={handleAdd}
-            disabled={!filters?.[primaryFieldId]}
-          />
+          <Box sx={{ flexShrink: 0 }}>
+            <AddButton
+              onClick={handleAdd}
+              disabled={!filters?.[primaryFieldId]}
+            />
+          </Box>
         )}
     </Stack>
   )
