@@ -46,9 +46,7 @@ export function createNotificationClient(deps: ClientDependencies) {
     return delete_(apiV2.notifications({ id }))
   }
 
-  async function getUnreadCount(): Promise<
-    AxiosResponse<UnreadCountResponse>
-  > {
+  async function getUnreadCount(): Promise<AxiosResponse<UnreadCountResponse>> {
     return get(apiV2.notificationsUnreadCount())
   }
 

@@ -68,8 +68,8 @@ export function NotificationBell() {
     event.stopPropagation()
     try {
       await client.dismissNotification(id)
-      setNotifications((prev) => prev.filter((n) => n.id !== id))
-      setUnreadCount((prev) => Math.max(0, prev - 1))
+      setNotifications(prev => prev.filter(n => n.id !== id))
+      setUnreadCount(prev => Math.max(0, prev - 1))
     } catch (error) {
       console.error("Failed to dismiss notification:", error)
     }
@@ -153,7 +153,15 @@ export function NotificationBell() {
           },
         }}
       >
-        <Box sx={{ px: 2, py: 1, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Box
+          sx={{
+            px: 2,
+            py: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
             Notifications
           </Typography>
@@ -182,7 +190,7 @@ export function NotificationBell() {
             </Typography>
           </Box>
         ) : (
-          notifications.map((notification) => (
+          notifications.map(notification => (
             <MenuItem
               key={notification.id}
               sx={{
@@ -191,7 +199,9 @@ export function NotificationBell() {
                 py: 1.5,
                 px: 2,
                 whiteSpace: "normal",
-                bgcolor: notification.read_at ? "transparent" : "rgba(255, 255, 255, 0.03)",
+                bgcolor: notification.read_at
+                  ? "transparent"
+                  : "rgba(255, 255, 255, 0.03)",
               }}
             >
               <Box sx={{ flex: 1, mr: 1 }}>
@@ -218,11 +228,14 @@ export function NotificationBell() {
               </Box>
               <IconButton
                 size="small"
-                onClick={(e) => handleDismiss(notification.id, e)}
+                onClick={e => handleDismiss(notification.id, e)}
                 sx={{
                   color: "#666",
                   p: 0.5,
-                  "&:hover": { color: "#fff", bgcolor: "rgba(255, 255, 255, 0.1)" },
+                  "&:hover": {
+                    color: "#fff",
+                    bgcolor: "rgba(255, 255, 255, 0.1)",
+                  },
                 }}
               >
                 <CloseIcon sx={{ fontSize: 16 }} />
