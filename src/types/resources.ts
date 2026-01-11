@@ -322,6 +322,7 @@ export interface Site extends BaseEntity {
   faction?: Faction | null
   faction_id: string | null
   characters: Character[]
+  character_ids: string[]
   image_url: string
   created_at: string
   updated_at: string
