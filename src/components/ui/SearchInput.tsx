@@ -1,7 +1,7 @@
 "use client"
 import { TextField } from "@mui/material"
 import { useCallback, useState } from "react"
-import { debounce } from "lodash"
+import debounce from "lodash.debounce"
 
 interface SearchInputProps {
   name?: string

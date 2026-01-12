@@ -52,9 +52,7 @@ describe("IsTemplateToggle", () => {
         />
       )
 
-      const toggle = screen.getByRole("checkbox", {
-        name: /Toggle character template status/i,
-      })
+      const toggle = screen.getByRole("switch")
       expect(toggle).toBeChecked()
     })
 
@@ -66,9 +64,7 @@ describe("IsTemplateToggle", () => {
         />
       )
 
-      const toggle = screen.getByRole("checkbox", {
-        name: /Toggle character template status/i,
-      })
+      const toggle = screen.getByRole("switch")
       expect(toggle).not.toBeChecked()
     })
 
@@ -80,9 +76,7 @@ describe("IsTemplateToggle", () => {
         />
       )
 
-      const toggle = screen.getByRole("checkbox", {
-        name: /Toggle character template status/i,
-      })
+      const toggle = screen.getByRole("switch")
       expect(toggle).not.toBeChecked()
     })
 
@@ -96,9 +90,7 @@ describe("IsTemplateToggle", () => {
         />
       )
 
-      const toggle = screen.getByRole("checkbox", {
-        name: /Toggle character template status/i,
-      })
+      const toggle = screen.getByRole("switch")
       fireEvent.click(toggle)
 
       await waitFor(() => {
@@ -123,9 +115,7 @@ describe("IsTemplateToggle", () => {
         />
       )
 
-      const toggle = screen.getByRole("checkbox", {
-        name: /Toggle character template status/i,
-      })
+      const toggle = screen.getByRole("switch")
       fireEvent.click(toggle)
 
       await waitFor(() => {
@@ -145,9 +135,7 @@ describe("IsTemplateToggle", () => {
         />
       )
 
-      const toggle = screen.getByRole("checkbox", {
-        name: /Toggle character template status/i,
-      })
+      const toggle = screen.getByRole("switch")
 
       // Initially should be unchecked
       expect(toggle).not.toBeChecked()
@@ -178,9 +166,7 @@ describe("IsTemplateToggle", () => {
         />
       )
 
-      const toggle = screen.getByRole("checkbox", {
-        name: /Toggle character template status/i,
-      })
+      const toggle = screen.getByRole("switch")
 
       // Initially should be enabled
       expect(toggle).not.toBeDisabled()
@@ -217,9 +203,7 @@ describe("IsTemplateToggle", () => {
         />
       )
 
-      const toggle = screen.getByRole("checkbox", {
-        name: /Toggle character template status/i,
-      })
+      const toggle = screen.getByRole("switch")
       fireEvent.click(toggle)
 
       // Should immediately show checked state (optimistic)
@@ -252,9 +236,7 @@ describe("IsTemplateToggle", () => {
         />
       )
 
-      const toggle = screen.getByRole("checkbox", {
-        name: /Toggle character template status/i,
-      })
+      const toggle = screen.getByRole("switch")
 
       // Initially unchecked
       expect(toggle).not.toBeChecked()

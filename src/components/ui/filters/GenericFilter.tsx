@@ -6,7 +6,7 @@ import { StringAutocomplete } from "../StringAutocomplete"
 import { SearchInput } from "../SearchInput"
 import { useCallback, useEffect, useMemo, useRef } from "react"
 import { filterConfigs } from "@/lib/filterConfigs"
-import { debounce } from "lodash"
+import debounce from "lodash.debounce"
 import { GroupedSchtickAutocomplete } from "@/components/autocomplete/GroupedSchtickAutocomplete"
 import type { Schtick } from "@/types"
 

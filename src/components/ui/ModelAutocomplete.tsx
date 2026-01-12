@@ -2,7 +2,7 @@
 import { Autocomplete, TextField, CircularProgress } from "@mui/material"
 import { useClient } from "@/contexts"
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { debounce } from "lodash"
+import debounce from "lodash.debounce"
 import { getApiMethodForModel } from "@/lib/modelApiMapping"
 
 interface AutocompleteOption {
