@@ -41,9 +41,7 @@ describe("EntityActiveToggle", () => {
       )
 
       expect(
-        screen.queryByRole("checkbox", {
-          name: /Toggle Character active status/i,
-        })
+        screen.queryByRole("switch")
       ).not.toBeInTheDocument()
     })
 
@@ -57,9 +55,7 @@ describe("EntityActiveToggle", () => {
         />
       )
 
-      const checkbox = screen.getByRole("checkbox", {
-        name: /Toggle Character active status/i,
-      })
+      const checkbox = screen.getByRole("switch")
       expect(checkbox).toBeInTheDocument()
       expect(screen.getByText("Active")).toBeInTheDocument()
     })
@@ -75,9 +71,7 @@ describe("EntityActiveToggle", () => {
         />
       )
 
-      const checkbox = screen.getByRole("checkbox", {
-        name: /Toggle Character active status/i,
-      })
+      const checkbox = screen.getByRole("switch")
       expect(checkbox).toBeInTheDocument()
       expect(screen.getByText("Active")).toBeInTheDocument()
     })
@@ -94,9 +88,7 @@ describe("EntityActiveToggle", () => {
       )
 
       expect(
-        screen.queryByRole("checkbox", {
-          name: /Toggle Character active status/i,
-        })
+        screen.queryByRole("switch")
       ).not.toBeInTheDocument()
     })
   })
@@ -114,9 +106,7 @@ describe("EntityActiveToggle", () => {
         />
       )
 
-      const toggle = screen.getByRole("checkbox", {
-        name: /Toggle Character active status/i,
-      })
+      const toggle = screen.getByRole("switch")
       expect(toggle).toBeChecked()
     })
 
@@ -128,9 +118,7 @@ describe("EntityActiveToggle", () => {
         />
       )
 
-      const toggle = screen.getByRole("checkbox", {
-        name: /Toggle Character active status/i,
-      })
+      const toggle = screen.getByRole("switch")
       expect(toggle).not.toBeChecked()
     })
 
@@ -144,9 +132,7 @@ describe("EntityActiveToggle", () => {
         />
       )
 
-      const toggle = screen.getByRole("checkbox", {
-        name: /Toggle Character active status/i,
-      })
+      const toggle = screen.getByRole("switch")
       fireEvent.click(toggle)
 
       await waitFor(() => {
@@ -171,9 +157,7 @@ describe("EntityActiveToggle", () => {
         />
       )
 
-      const toggle = screen.getByRole("checkbox", {
-        name: /Toggle Character active status/i,
-      })
+      const toggle = screen.getByRole("switch")
       fireEvent.click(toggle)
 
       await waitFor(() => {
@@ -193,9 +177,7 @@ describe("EntityActiveToggle", () => {
         />
       )
 
-      const toggle = screen.getByRole("checkbox", {
-        name: /Toggle Character active status/i,
-      })
+      const toggle = screen.getByRole("switch")
 
       // Initially should be checked
       expect(toggle).toBeChecked()
@@ -226,9 +208,7 @@ describe("EntityActiveToggle", () => {
         />
       )
 
-      const toggle = screen.getByRole("checkbox", {
-        name: /Toggle Character active status/i,
-      })
+      const toggle = screen.getByRole("switch")
 
       // Initially should be enabled
       expect(toggle).not.toBeDisabled()
@@ -269,9 +249,7 @@ describe("EntityActiveToggle", () => {
         />
       )
 
-      const toggle = screen.getByRole("checkbox", {
-        name: /Toggle Character active status/i,
-      })
+      const toggle = screen.getByRole("switch")
       fireEvent.click(toggle)
 
       // Should immediately show unchecked state (optimistic)
