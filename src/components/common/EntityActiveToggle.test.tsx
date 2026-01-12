@@ -40,9 +40,7 @@ describe("EntityActiveToggle", () => {
         />
       )
 
-      expect(
-        screen.queryByRole("switch")
-      ).not.toBeInTheDocument()
+      expect(screen.queryByRole("switch")).not.toBeInTheDocument()
     })
 
     it("should render for admin users", () => {
@@ -87,9 +85,7 @@ describe("EntityActiveToggle", () => {
         />
       )
 
-      expect(
-        screen.queryByRole("switch")
-      ).not.toBeInTheDocument()
+      expect(screen.queryByRole("switch")).not.toBeInTheDocument()
     })
   })
 
