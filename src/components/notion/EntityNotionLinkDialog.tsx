@@ -5,11 +5,11 @@ import { EntityNotionPageAutocomplete } from "@/components/autocomplete"
 import type { EntityType } from "@/components/autocomplete/EntityNotionPageAutocomplete"
 import { Stack, Typography, Divider, CircularProgress } from "@mui/material"
 import AddIcon from "@mui/icons-material/Add"
-import type { Site, Party, Faction } from "@/types"
+import type { Site, Party, Faction, Juncture } from "@/types"
 import { useState, useEffect } from "react"
 import { useClient, useToast } from "@/contexts"
 
-type NotionLinkableEntity = Site | Party | Faction
+type NotionLinkableEntity = Site | Party | Faction | Juncture
 
 type EntityNotionLinkDialogProps<T extends NotionLinkableEntity> = {
   entity: T
@@ -62,6 +62,9 @@ export default function EntityNotionLinkDialog<T extends NotionLinkableEntity>({
           break
         case "faction":
           response = await client.syncFactionToNotion(entity as Faction)
+          break
+        case "juncture":
+          response = await client.syncJunctureToNotion(entity as Juncture)
           break
       }
 

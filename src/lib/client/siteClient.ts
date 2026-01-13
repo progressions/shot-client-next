@@ -9,6 +9,7 @@ import type {
   CacheOptions,
   Parameters_,
   NotionPage,
+  NotionSyncLogsResponse,
 } from "@/types"
 
 interface ClientDependencies {
@@ -67,12 +68,53 @@ export function createSiteClient(deps: ClientDependencies) {
     return post(`${apiV2.sites({ id: siteId })}/sync`)
   }
 
+  async function syncSiteFromNotion(
+    site: Site | string
+  ): Promise<AxiosResponse<Site>> {
+    const siteId = typeof site === "string" ? site : site.id
+    return post(apiV2.syncSiteFromNotion({ id: siteId }))
+  }
+
+  async function getNotionSyncLogsForSite(
+    site: Site | string,
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<NotionSyncLogsResponse>> {
+    const siteId = typeof site === "string" ? site : site.id
+    const query = queryParams(parameters)
+    return get(
+      `${apiV2.notionSyncLogsForSite({ id: siteId })}?${query}`,
+      {},
+      cacheOptions
+    )
+  }
+
+  async function pruneNotionSyncLogsForSite(
+    site: Site | string,
+    daysOld: number = 30
+  ): Promise<
+    AxiosResponse<{ pruned_count: number; days_old: number; message: string }>
+  > {
+    const siteId = typeof site === "string" ? site : site.id
+    return delete_(
+      `${apiV2.notionSyncLogsForSite({ id: siteId })}/prune?days_old=${daysOld}`
+    )
+  }
+
   async function getNotionSites(
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<NotionPage[]>> {
     const query = queryParams(parameters)
     return get(`${apiV2.notionSites()}?${query}`, {}, cacheOptions)
+  }
+
+  async function getNotionJunctures(
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<NotionPage[]>> {
+    const query = queryParams(parameters)
+    return get(`${apiV2.notionJunctures()}?${query}`, {}, cacheOptions)
   }
 
   async function addCharacterToSite(
@@ -129,6 +171,46 @@ export function createSiteClient(deps: ClientDependencies) {
     return delete_(`${apiV2.junctures(juncture)}/image`)
   }
 
+  async function syncJunctureToNotion(
+    juncture: Juncture | string
+  ): Promise<AxiosResponse<Juncture>> {
+    const junctureId = typeof juncture === "string" ? juncture : juncture.id
+    return post(`${apiV2.junctures({ id: junctureId })}/sync`)
+  }
+
+  async function syncJunctureFromNotion(
+    juncture: Juncture | string
+  ): Promise<AxiosResponse<Juncture>> {
+    const junctureId = typeof juncture === "string" ? juncture : juncture.id
+    return post(apiV2.syncJunctureFromNotion({ id: junctureId }))
+  }
+
+  async function getNotionSyncLogsForJuncture(
+    juncture: Juncture | string,
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<NotionSyncLogsResponse>> {
+    const junctureId = typeof juncture === "string" ? juncture : juncture.id
+    const query = queryParams(parameters)
+    return get(
+      `${apiV2.notionSyncLogsForJuncture({ id: junctureId })}?${query}`,
+      {},
+      cacheOptions
+    )
+  }
+
+  async function pruneNotionSyncLogsForJuncture(
+    juncture: Juncture | string,
+    daysOld: number = 30
+  ): Promise<
+    AxiosResponse<{ pruned_count: number; days_old: number; message: string }>
+  > {
+    const junctureId = typeof juncture === "string" ? juncture : juncture.id
+    return delete_(
+      `${apiV2.notionSyncLogsForJuncture({ id: junctureId })}/prune?days_old=${daysOld}`
+    )
+  }
+
   return {
     getSites,
     createSite,
@@ -138,7 +220,11 @@ export function createSiteClient(deps: ClientDependencies) {
     deleteSiteImage,
     duplicateSite,
     syncSiteToNotion,
+    syncSiteFromNotion,
+    getNotionSyncLogsForSite,
+    pruneNotionSyncLogsForSite,
     getNotionSites,
+    getNotionJunctures,
     addCharacterToSite,
     removeCharacterFromSite,
     getJunctures,
@@ -147,5 +233,9 @@ export function createSiteClient(deps: ClientDependencies) {
     getJuncture,
     deleteJuncture,
     deleteJunctureImage,
+    syncJunctureToNotion,
+    syncJunctureFromNotion,
+    getNotionSyncLogsForJuncture,
+    pruneNotionSyncLogsForJuncture,
   }
 }
