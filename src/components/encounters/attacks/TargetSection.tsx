@@ -450,7 +450,7 @@ export default function TargetSection({
                           <NumberField
                             name={`count-${targetId}`}
                             label="Count"
-                            labelBackgroundColor="#730F10"
+                            labelBackgroundColor="#131313"
                             value={targetMookCountPerTarget[targetId] || 1}
                             size="small"
                             width="80px"
@@ -717,7 +717,7 @@ export default function TargetSection({
                                 <NumberField
                                   name={`fortuneDie-${targetId}`}
                                   label="Fortune"
-                                  labelBackgroundColor="#730F10"
+                                  labelBackgroundColor="#202020"
                                   value={
                                     parseInt(
                                       fortuneDiePerTarget[targetId] || "0"

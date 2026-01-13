@@ -150,7 +150,7 @@ export default function AttackerBar({
           <NumberField
             name="attackValue"
             label="AV"
-            labelBackgroundColor="#424242"
+            labelBackgroundColor="#202020"
             value={parseInt(attackValue) || 0}
             size="small"
             width="70px"
@@ -170,7 +170,7 @@ export default function AttackerBar({
           <NumberField
             name="weaponDamage"
             label="Dmg"
-            labelBackgroundColor="#424242"
+            labelBackgroundColor="#202020"
             value={parseInt(weaponDamage) || 0}
             size="small"
             width="70px"
@@ -192,7 +192,7 @@ export default function AttackerBar({
             <NumberField
               name="fortuneBonus"
               label="Fortune"
-              labelBackgroundColor="#f57c00"
+              labelBackgroundColor="#202020"
               value={fortuneBonus}
               size="small"
               width="70px"
@@ -225,7 +225,7 @@ export default function AttackerBar({
           <NumberField
             name="shotCost"
             label="Shots"
-            labelBackgroundColor="#424242"
+            labelBackgroundColor="#202020"
             value={parseInt(shotCost) || 0}
             size="small"
             width="70px"
