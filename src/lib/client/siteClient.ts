@@ -119,6 +119,14 @@ export function createSiteClient(deps: ClientDependencies) {
     return get(`${apiV2.notionSites()}?${query}`, {}, cacheOptions)
   }
 
+  async function getNotionJunctures(
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<NotionPage[]>> {
+    const query = queryParams(parameters)
+    return get(`${apiV2.notionJunctures()}?${query}`, {}, cacheOptions)
+  }
+
   async function addCharacterToSite(
     site: Site,
     character: Character
@@ -173,6 +181,46 @@ export function createSiteClient(deps: ClientDependencies) {
     return delete_(`${apiV2.junctures(juncture)}/image`)
   }
 
+  async function syncJunctureToNotion(
+    juncture: Juncture | string
+  ): Promise<AxiosResponse<Juncture>> {
+    const junctureId = typeof juncture === "string" ? juncture : juncture.id
+    return post(`${apiV2.junctures({ id: junctureId })}/sync`)
+  }
+
+  async function syncJunctureFromNotion(
+    juncture: Juncture | string
+  ): Promise<AxiosResponse<Juncture>> {
+    const junctureId = typeof juncture === "string" ? juncture : juncture.id
+    return post(apiV2.syncJunctureFromNotion({ id: junctureId }))
+  }
+
+  async function getNotionSyncLogsForJuncture(
+    juncture: Juncture | string,
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<NotionSyncLogsResponse>> {
+    const junctureId = typeof juncture === "string" ? juncture : juncture.id
+    const query = queryParams(parameters)
+    return get(
+      `${apiV2.notionSyncLogsForJuncture({ id: junctureId })}?${query}`,
+      {},
+      cacheOptions
+    )
+  }
+
+  async function pruneNotionSyncLogsForJuncture(
+    juncture: Juncture | string,
+    daysOld: number = 30
+  ): Promise<
+    AxiosResponse<{ pruned_count: number; days_old: number; message: string }>
+  > {
+    const junctureId = typeof juncture === "string" ? juncture : juncture.id
+    return delete_(
+      `${apiV2.notionSyncLogsForJuncture({ id: junctureId })}/prune?days_old=${daysOld}`
+    )
+  }
+
   return {
     getSites,
     createSite,
@@ -186,6 +234,7 @@ export function createSiteClient(deps: ClientDependencies) {
     getNotionSyncLogsForSite,
     pruneNotionSyncLogsForSite,
     getNotionSites,
+    getNotionJunctures,
     addCharacterToSite,
     removeCharacterFromSite,
     getJunctures,
@@ -194,5 +243,9 @@ export function createSiteClient(deps: ClientDependencies) {
     getJuncture,
     deleteJuncture,
     deleteJunctureImage,
+    syncJunctureToNotion,
+    syncJunctureFromNotion,
+    getNotionSyncLogsForJuncture,
+    pruneNotionSyncLogsForJuncture,
   }
 }

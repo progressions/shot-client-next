@@ -17,13 +17,13 @@ import SyncIcon from "@mui/icons-material/Sync"
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import ErrorIcon from "@mui/icons-material/Error"
-import type { Character, Faction, Party, Site, NotionSyncLog } from "@/types"
+import type { Character, Faction, Party, Site, Juncture, NotionSyncLog } from "@/types"
 import { useClient, useToast, useCampaign } from "@/contexts"
 import { SectionHeader, Icon } from "@/components/ui"
 
-type NotionSyncEntity = Character | Site | Party | Faction
+type NotionSyncEntity = Character | Site | Party | Faction | Juncture
 
-type NotionEntityType = "character" | "site" | "party" | "faction"
+type NotionEntityType = "character" | "site" | "party" | "faction" | "juncture"
 
 type NotionSyncLogsResponse = {
   notion_sync_logs: NotionSyncLog[]
@@ -86,6 +86,12 @@ export default function NotionSyncLogList({
             break
           case "faction":
             response = await client.getNotionSyncLogsForFaction(
+              entity.id,
+              params
+            )
+            break
+          case "juncture":
+            response = await client.getNotionSyncLogsForJuncture(
               entity.id,
               params
             )
@@ -154,6 +160,12 @@ export default function NotionSyncLogList({
           onSync?.(response.data)
           break
         }
+        case "juncture": {
+          const response = await client.syncJunctureToNotion(entity.id)
+          toastSuccess("Juncture synced to Notion")
+          onSync?.(response.data)
+          break
+        }
         default:
           throw new Error(`Unsupported entity type: ${entityType}`)
       }
@@ -182,6 +194,9 @@ export default function NotionSyncLogList({
           break
         case "faction":
           response = await client.syncFactionFromNotion(entity.id)
+          break
+        case "juncture":
+          response = await client.syncJunctureFromNotion(entity.id)
           break
         default:
           throw new Error(`Unsupported entity type: ${entityType}`)
@@ -219,6 +234,9 @@ export default function NotionSyncLogList({
           break
         case "faction":
           response = await client.pruneNotionSyncLogsForFaction(entity.id, 30)
+          break
+        case "juncture":
+          response = await client.pruneNotionSyncLogsForJuncture(entity.id, 30)
           break
         default:
           throw new Error(`Unsupported entity type: ${entityType}`)

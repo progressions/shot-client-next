@@ -346,6 +346,8 @@ export interface Juncture extends BaseEntity {
   image_url: string
   created_at: string
   updated_at: string
+  notion_page_id?: string | null
+  last_synced_to_notion_at?: string | null
 }
 
 export interface Effect {

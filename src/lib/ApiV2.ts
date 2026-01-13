@@ -292,6 +292,10 @@ class ApiV2 {
     return `${this.api()}/notion/factions`
   }
 
+  notionJunctures(): string {
+    return `${this.api()}/notion/junctures`
+  }
+
   createNotionPage(character: Character | ID): string {
     return `${this.characters(character)}/notion/create`
   }
@@ -316,6 +320,10 @@ class ApiV2 {
     return `${this.factions(faction)}/notion_sync_logs`
   }
 
+  notionSyncLogsForJuncture(juncture: Juncture | ID): string {
+    return `${this.junctures(juncture)}/notion_sync_logs`
+  }
+
   syncSiteFromNotion(site: Site | ID): string {
     return `${this.sites(site)}/sync_from_notion`
   }
@@ -326,6 +334,10 @@ class ApiV2 {
 
   syncFactionFromNotion(faction: Faction | ID): string {
     return `${this.factions(faction)}/sync_from_notion`
+  }
+
+  syncJunctureFromNotion(juncture: Juncture | ID): string {
+    return `${this.junctures(juncture)}/sync_from_notion`
   }
 
   suggestions(): string {
