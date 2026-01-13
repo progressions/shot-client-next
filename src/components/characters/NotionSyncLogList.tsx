@@ -17,7 +17,14 @@ import SyncIcon from "@mui/icons-material/Sync"
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import ErrorIcon from "@mui/icons-material/Error"
-import type { Character, Faction, Party, Site, Juncture, NotionSyncLog } from "@/types"
+import type {
+  Character,
+  Faction,
+  Party,
+  Site,
+  Juncture,
+  NotionSyncLog,
+} from "@/types"
 import { useClient, useToast, useCampaign } from "@/contexts"
 import { SectionHeader, Icon } from "@/components/ui"
 
