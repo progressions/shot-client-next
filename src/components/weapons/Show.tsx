@@ -2,7 +2,7 @@
 
 import { VscGithubAction } from "react-icons/vsc"
 import { useEffect } from "react"
-import { FormControl, FormHelperText, Box } from "@mui/material"
+import { FormControl, FormHelperText, Box, Stack } from "@mui/material"
 import type { Weapon } from "@/types"
 import { useCampaign, useClient, useConfirm } from "@/contexts"
 import {

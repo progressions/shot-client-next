@@ -1,7 +1,13 @@
 "use client"
 
 import { useEffect } from "react"
-import { FormControl, FormHelperText, Box } from "@mui/material"
+import {
+  FormControl,
+  FormHelperText,
+  Box,
+  Stack,
+  Typography,
+} from "@mui/material"
 import type { Schtick } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
 import {
@@ -23,7 +29,6 @@ import { PrerequisiteSchtickAutocomplete } from "@/components/autocomplete"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import Link from "next/link"
-import { Typography } from "@mui/material"
 
 interface ShowProperties {
   schtick: Schtick
