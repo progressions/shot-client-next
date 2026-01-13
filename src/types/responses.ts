@@ -10,6 +10,7 @@ import type {
   Weapon,
   Juncture,
   Fight,
+  NotionSyncLog,
 } from "./resources"
 import type {
   SchtickPath,
@@ -78,6 +79,18 @@ export interface CharactersResponse {
   meta: PaginationMeta
   factions: Faction[]
   archetypes: Archetype[]
+}
+
+export interface NotionSyncLogsMeta {
+  current_page: number
+  per_page: number
+  total_count: number
+  total_pages: number
+}
+
+export interface NotionSyncLogsResponse {
+  notion_sync_logs: NotionSyncLog[]
+  meta: NotionSyncLogsMeta
 }
 
 export interface VehiclesResponse {

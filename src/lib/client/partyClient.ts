@@ -11,18 +11,8 @@ import type {
   PartyTemplate,
   PartyRole,
   NotionPage,
-  NotionSyncLog,
+  NotionSyncLogsResponse,
 } from "@/types"
-
-interface NotionSyncLogsResponse {
-  notion_sync_logs: NotionSyncLog[]
-  meta: {
-    current_page: number
-    per_page: number
-    total_count: number
-    total_pages: number
-  }
-}
 
 interface ClientDependencies {
   jwt?: string

@@ -492,7 +492,7 @@ export interface NotionSyncLog {
   payload: Record<string, unknown> | null
   response: Record<string, unknown> | null
   error_message: string | null
-  entity_type: "character" | "site" | "party" | "faction"
+  entity_type: "character" | "site" | "party" | "faction" | "juncture"
   entity_id: string
   character_id?: string | null
   created_at: string

@@ -24,6 +24,7 @@ import type {
   Site,
   Juncture,
   NotionSyncLog,
+  NotionSyncLogsResponse,
 } from "@/types"
 import { useClient, useToast, useCampaign } from "@/contexts"
 import { SectionHeader, Icon } from "@/components/ui"
@@ -31,16 +32,6 @@ import { SectionHeader, Icon } from "@/components/ui"
 type NotionSyncEntity = Character | Site | Party | Faction | Juncture
 
 type NotionEntityType = "character" | "site" | "party" | "faction" | "juncture"
-
-type NotionSyncLogsResponse = {
-  notion_sync_logs: NotionSyncLog[]
-  meta: {
-    current_page: number
-    per_page: number
-    total_count: number
-    total_pages: number
-  }
-}
 
 type PruneResponse = {
   pruned_count: number
@@ -188,31 +179,25 @@ export default function NotionSyncLogList({
   const handleSyncFromNotion = async () => {
     try {
       setSyncingFrom(true)
-      let response: { data: NotionSyncEntity } | null = null
-      switch (entityType) {
-        case "character":
-          response = await client.syncCharacterFromNotion(entity.id)
-          break
-        case "site":
-          response = await client.syncSiteFromNotion(entity.id)
-          break
-        case "party":
-          response = await client.syncPartyFromNotion(entity.id)
-          break
-        case "faction":
-          response = await client.syncFactionFromNotion(entity.id)
-          break
-        case "juncture":
-          response = await client.syncJunctureFromNotion(entity.id)
-          break
-        default:
-          throw new Error(`Unsupported entity type: ${entityType}`)
-      }
+      const response: { data: NotionSyncEntity } = await (async () => {
+        switch (entityType) {
+          case "character":
+            return client.syncCharacterFromNotion(entity.id)
+          case "site":
+            return client.syncSiteFromNotion(entity.id)
+          case "party":
+            return client.syncPartyFromNotion(entity.id)
+          case "faction":
+            return client.syncFactionFromNotion(entity.id)
+          case "juncture":
+            return client.syncJunctureFromNotion(entity.id)
+          default:
+            throw new Error(`Unsupported entity type: ${entityType}`)
+        }
+      })()
 
       toastSuccess(`${entityLabel} updated from Notion`)
-      if (response) {
-        onSync?.(response.data)
-      }
+      onSync?.(response.data)
       // Refresh logs to show any changes
       if (open) {
         fetchLogs(1)
