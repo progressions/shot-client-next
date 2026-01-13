@@ -246,7 +246,7 @@ export default function HealPanel({
                           max={20}
                           disabled={isProcessing}
                           size="small"
-                          labelBackgroundColor="#312A21"
+                          labelBackgroundColor="#202020"
                         />
                       </Box>
                       <Box sx={{ width: 100 }}>
@@ -263,7 +263,7 @@ export default function HealPanel({
                           max={10}
                           disabled={isProcessing}
                           size="small"
-                          labelBackgroundColor="#312A21"
+                          labelBackgroundColor="#202020"
                         />
                       </Box>
                     </Box>
@@ -347,7 +347,7 @@ export default function HealPanel({
                       max={10}
                       disabled={isProcessing}
                       size="small"
-                      labelBackgroundColor="#0a0a0a"
+                      labelBackgroundColor="#202020"
                     />
                   </Box>
 

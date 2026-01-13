@@ -378,7 +378,7 @@ export default function TargetSection({
                         <NumberField
                           name={`defense-${targetId}`}
                           label="Defense"
-                          labelBackgroundColor={theme.palette.background.paper}
+                          labelBackgroundColor="#131313"
                           value={
                             targetId in manualDefensePerTarget
                               ? manualDefensePerTarget[targetId]
@@ -867,7 +867,7 @@ export default function TargetSection({
               <NumberField
                 name="defenseValue"
                 label="Defense"
-                labelBackgroundColor={theme.palette.background.paper}
+                labelBackgroundColor="#131313"
                 value={parseInt(defenseValue || "0") || 0}
                 size="small"
                 width="80px"
