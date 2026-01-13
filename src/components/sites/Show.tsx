@@ -18,9 +18,9 @@ import { SiteSpeedDial } from "@/components/sites"
 import {
   EntityActiveToggle,
   EntityAtAGlanceToggle,
-  NotionSyncButton,
   EditEntityNotionLink,
 } from "@/components/common"
+import { NotionSyncLogList } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import { EditFaction } from "@/components/factions"
@@ -177,12 +177,12 @@ export default function Show({ site: initialSite }: ShowProperties) {
               entity={site}
               handleChangeAndSave={handleChangeAndSave}
             />
-            <NotionSyncButton
-              entity={site}
-              entityType="site"
-              onSync={setSite}
-            />
           </Stack>
+          <NotionSyncLogList
+            entity={site}
+            entityType="site"
+            onSync={setSite}
+          />
         </>
       )}
     </Box>

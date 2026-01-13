@@ -11,7 +11,18 @@ import type {
   PartyTemplate,
   PartyRole,
   NotionPage,
+  NotionSyncLog,
 } from "@/types"
+
+interface NotionSyncLogsResponse {
+  notion_sync_logs: NotionSyncLog[]
+  meta: {
+    current_page: number
+    per_page: number
+    total_count: number
+    total_pages: number
+  }
+}
 
 interface ClientDependencies {
   jwt?: string
@@ -113,6 +124,39 @@ export function createPartyClient(deps: ClientDependencies) {
   ): Promise<AxiosResponse<Party>> {
     const partyId = typeof party === "string" ? party : party.id
     return post(`${apiV2.parties({ id: partyId })}/sync`)
+  }
+
+  async function syncPartyFromNotion(
+    party: Party | string
+  ): Promise<AxiosResponse<Party>> {
+    const partyId = typeof party === "string" ? party : party.id
+    return post(apiV2.syncPartyFromNotion({ id: partyId }))
+  }
+
+  async function getNotionSyncLogsForParty(
+    party: Party | string,
+    parameters: Parameters_ = {},
+    cacheOptions: CacheOptions = {}
+  ): Promise<AxiosResponse<NotionSyncLogsResponse>> {
+    const partyId = typeof party === "string" ? party : party.id
+    const query = queryParams(parameters)
+    return get(
+      `${apiV2.notionSyncLogsForParty({ id: partyId })}?${query}`,
+      {},
+      cacheOptions
+    )
+  }
+
+  async function pruneNotionSyncLogsForParty(
+    party: Party | string,
+    daysOld: number = 30
+  ): Promise<
+    AxiosResponse<{ pruned_count: number; days_old: number; message: string }>
+  > {
+    const partyId = typeof party === "string" ? party : party.id
+    return delete_(
+      `${apiV2.notionSyncLogsForParty({ id: partyId })}/prune?days_old=${daysOld}`
+    )
   }
 
   async function getNotionParties(
@@ -221,6 +265,9 @@ export function createPartyClient(deps: ClientDependencies) {
     deletePartyImage,
     duplicateParty,
     syncPartyToNotion,
+    syncPartyFromNotion,
+    getNotionSyncLogsForParty,
+    pruneNotionSyncLogsForParty,
     getNotionParties,
     addPartyToFight,
     // Party Composition / Slot Management

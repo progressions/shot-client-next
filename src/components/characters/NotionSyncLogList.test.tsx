@@ -76,23 +76,30 @@ describe("NotionSyncLogList", () => {
   const mockCharacter: Character = {
     id: "char-1",
     name: "Test Character",
+    notion_page_id: null,
   } as Character
 
   const mockLogs: NotionSyncLog[] = [
     {
       id: "log-1",
+      entity_type: "character",
+      entity_id: "char-1",
       character_id: "char-1",
       status: "success",
       created_at: "2026-01-07T12:00:00Z",
+      updated_at: "2026-01-07T12:00:00Z",
       payload: { name: "Test Character" },
       response: { id: "notion-page-1" },
       error_message: null,
     },
     {
       id: "log-2",
+      entity_type: "character",
+      entity_id: "char-1",
       character_id: "char-1",
       status: "error",
       created_at: "2026-01-06T12:00:00Z",
+      updated_at: "2026-01-06T12:00:00Z",
       payload: { name: "Test Character" },
       response: null,
       error_message: "API rate limit exceeded",
@@ -114,7 +121,7 @@ describe("NotionSyncLogList", () => {
 
   describe("Initial State", () => {
     it("renders the section header", () => {
-      render(<NotionSyncLogList character={mockCharacter} />)
+      render(<NotionSyncLogList entity={mockCharacter} entityType="character" />)
 
       expect(screen.getByText("Notion Sync History")).toBeInTheDocument()
       expect(
@@ -125,14 +132,14 @@ describe("NotionSyncLogList", () => {
     })
 
     it("starts collapsed and does not fetch logs initially", () => {
-      render(<NotionSyncLogList character={mockCharacter} />)
+      render(<NotionSyncLogList entity={mockCharacter} entityType="character" />)
 
       expect(screen.getByText("Show")).toBeInTheDocument()
       expect(mockGetNotionSyncLogs).not.toHaveBeenCalled()
     })
 
     it("fetches logs when expanded", async () => {
-      render(<NotionSyncLogList character={mockCharacter} />)
+      render(<NotionSyncLogList entity={mockCharacter} entityType="character" />)
 
       fireEvent.click(screen.getByText("Show"))
 
@@ -147,7 +154,7 @@ describe("NotionSyncLogList", () => {
 
   describe("Log Display", () => {
     it("displays logs after expanding", async () => {
-      render(<NotionSyncLogList character={mockCharacter} />)
+      render(<NotionSyncLogList entity={mockCharacter} entityType="character" />)
 
       await act(async () => {
         fireEvent.click(screen.getByText("Show"))
@@ -161,7 +168,7 @@ describe("NotionSyncLogList", () => {
     })
 
     it("displays error message for failed syncs", async () => {
-      render(<NotionSyncLogList character={mockCharacter} />)
+      render(<NotionSyncLogList entity={mockCharacter} entityType="character" />)
 
       await act(async () => {
         fireEvent.click(screen.getByText("Show"))
@@ -186,7 +193,7 @@ describe("NotionSyncLogList", () => {
         },
       })
 
-      render(<NotionSyncLogList character={mockCharacter} />)
+      render(<NotionSyncLogList entity={mockCharacter} entityType="character" />)
 
       await act(async () => {
         fireEvent.click(screen.getByText("Show"))
@@ -205,7 +212,7 @@ describe("NotionSyncLogList", () => {
     it("triggers sync when clicked", async () => {
       mockSyncCharacterToNotion.mockResolvedValue({})
 
-      render(<NotionSyncLogList character={mockCharacter} />)
+      render(<NotionSyncLogList entity={mockCharacter} entityType="character" />)
 
       fireEvent.click(screen.getByText("Show"))
 
@@ -224,7 +231,7 @@ describe("NotionSyncLogList", () => {
     it("shows error toast when sync fails", async () => {
       mockSyncCharacterToNotion.mockRejectedValue(new Error("Sync failed"))
 
-      render(<NotionSyncLogList character={mockCharacter} />)
+      render(<NotionSyncLogList entity={mockCharacter} entityType="character" />)
 
       fireEvent.click(screen.getByText("Show"))
 
@@ -236,7 +243,7 @@ describe("NotionSyncLogList", () => {
 
       await waitFor(() => {
         expect(mockToastError).toHaveBeenCalledWith(
-          "Failed to queue character sync"
+          "Failed to sync character to Notion"
         )
       })
     })
@@ -254,7 +261,7 @@ describe("NotionSyncLogList", () => {
         data: characterWithNotionPage,
       })
 
-      render(<NotionSyncLogList character={characterWithNotionPage} />)
+      render(<NotionSyncLogList entity={characterWithNotionPage} entityType="character" />)
 
       fireEvent.click(screen.getByText("Show"))
 
@@ -275,7 +282,7 @@ describe("NotionSyncLogList", () => {
     it("shows error toast when sync from Notion fails", async () => {
       mockSyncCharacterFromNotion.mockRejectedValue(new Error("Sync failed"))
 
-      render(<NotionSyncLogList character={characterWithNotionPage} />)
+      render(<NotionSyncLogList entity={characterWithNotionPage} entityType="character" />)
 
       fireEvent.click(screen.getByText("Show"))
 
@@ -293,7 +300,7 @@ describe("NotionSyncLogList", () => {
     })
 
     it("button is disabled when character has no notion_page_id", async () => {
-      render(<NotionSyncLogList character={mockCharacter} />)
+      render(<NotionSyncLogList entity={mockCharacter} entityType="character" />)
 
       fireEvent.click(screen.getByText("Show"))
 
@@ -308,7 +315,7 @@ describe("NotionSyncLogList", () => {
     })
 
     it("button is enabled when character has notion_page_id", async () => {
-      render(<NotionSyncLogList character={characterWithNotionPage} />)
+      render(<NotionSyncLogList entity={characterWithNotionPage} entityType="character" />)
 
       fireEvent.click(screen.getByText("Show"))
 
@@ -325,7 +332,7 @@ describe("NotionSyncLogList", () => {
 
   describe("Pagination", () => {
     it("renders pagination controls after loading", async () => {
-      render(<NotionSyncLogList character={mockCharacter} />)
+      render(<NotionSyncLogList entity={mockCharacter} entityType="character" />)
 
       await act(async () => {
         fireEvent.click(screen.getByText("Show"))
@@ -340,7 +347,7 @@ describe("NotionSyncLogList", () => {
     })
 
     it("fetches new page when pagination changes", async () => {
-      render(<NotionSyncLogList character={mockCharacter} />)
+      render(<NotionSyncLogList entity={mockCharacter} entityType="character" />)
 
       await act(async () => {
         fireEvent.click(screen.getByText("Show"))
@@ -375,7 +382,7 @@ describe("NotionSyncLogList", () => {
 
   describe("Expand/Collapse Log Details", () => {
     it("expands log details when clicked", async () => {
-      render(<NotionSyncLogList character={mockCharacter} />)
+      render(<NotionSyncLogList entity={mockCharacter} entityType="character" />)
 
       await act(async () => {
         fireEvent.click(screen.getByText("Show"))
@@ -405,7 +412,7 @@ describe("NotionSyncLogList", () => {
     })
 
     it("supports keyboard navigation for accessibility", async () => {
-      render(<NotionSyncLogList character={mockCharacter} />)
+      render(<NotionSyncLogList entity={mockCharacter} entityType="character" />)
 
       await act(async () => {
         fireEvent.click(screen.getByText("Show"))
@@ -438,7 +445,7 @@ describe("NotionSyncLogList", () => {
     it("shows toast error when log fetch fails", async () => {
       mockGetNotionSyncLogs.mockRejectedValue(new Error("Network error"))
 
-      render(<NotionSyncLogList character={mockCharacter} />)
+      render(<NotionSyncLogList entity={mockCharacter} entityType="character" />)
 
       fireEvent.click(screen.getByText("Show"))
 
@@ -452,7 +459,7 @@ describe("NotionSyncLogList", () => {
 
   describe("WebSocket Updates", () => {
     it("subscribes to WebSocket on mount", () => {
-      render(<NotionSyncLogList character={mockCharacter} />)
+      render(<NotionSyncLogList entity={mockCharacter} entityType="character" />)
 
       expect(mockSubscribeToEntity).toHaveBeenCalledWith(
         "notion_sync_logs",
@@ -465,7 +472,7 @@ describe("NotionSyncLogList", () => {
       mockSubscribeToEntity.mockReturnValue(mockUnsubscribe)
 
       const { unmount } = render(
-        <NotionSyncLogList character={mockCharacter} />
+        <NotionSyncLogList entity={mockCharacter} entityType="character" />
       )
 
       unmount()
@@ -483,7 +490,7 @@ describe("NotionSyncLogList", () => {
         }
       )
 
-      render(<NotionSyncLogList character={mockCharacter} />)
+      render(<NotionSyncLogList entity={mockCharacter} entityType="character" />)
 
       // Expand to trigger initial fetch
       fireEvent.click(screen.getByText("Show"))

@@ -483,14 +483,16 @@ export interface Advancement {
   updated_at: string
 }
 
-// Notion Sync Log - records of character syncs to Notion
+// Notion Sync Log - records of entity syncs to Notion
 export interface NotionSyncLog {
   id: string
   status: "success" | "error"
-  payload: Record<string, unknown>
-  response: Record<string, unknown>
+  payload: Record<string, unknown> | null
+  response: Record<string, unknown> | null
   error_message: string | null
-  character_id: string
+  entity_type: "character" | "site" | "party" | "faction"
+  entity_id: string
+  character_id?: string | null
   created_at: string
   updated_at: string
 }

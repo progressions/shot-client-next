@@ -23,9 +23,9 @@ import {
 import {
   EntityActiveToggle,
   EntityAtAGlanceToggle,
-  NotionSyncButton,
   EditEntityNotionLink,
 } from "@/components/common"
+import { NotionSyncLogList } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -157,12 +157,12 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
               entity={faction}
               handleChangeAndSave={handleChangeAndSave}
             />
-            <NotionSyncButton
-              entity={faction}
-              entityType="faction"
-              onSync={setFaction}
-            />
           </Stack>
+          <NotionSyncLogList
+            entity={faction}
+            entityType="faction"
+            onSync={setFaction}
+          />
         </>
       )}
     </Box>
