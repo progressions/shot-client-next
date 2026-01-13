@@ -17,20 +17,43 @@ import SyncIcon from "@mui/icons-material/Sync"
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import ErrorIcon from "@mui/icons-material/Error"
-import type { Character, NotionSyncLog } from "@/types"
+import type {
+  Character,
+  Faction,
+  Party,
+  Site,
+  Juncture,
+  NotionSyncLog,
+  NotionSyncLogsResponse,
+} from "@/types"
 import { useClient, useToast, useCampaign } from "@/contexts"
 import { SectionHeader, Icon } from "@/components/ui"
 
+type NotionSyncEntity = Character | Site | Party | Faction | Juncture
+
+type NotionEntityType = "character" | "site" | "party" | "faction" | "juncture"
+
+type PruneResponse = {
+  pruned_count: number
+  days_old: number
+  message: string
+}
+
 interface NotionSyncLogListProps {
-  character: Character
+  entity: NotionSyncEntity
+  entityType: NotionEntityType
+  onSync?: (entity: NotionSyncEntity) => void
 }
 
 export default function NotionSyncLogList({
-  character,
+  entity,
+  entityType,
+  onSync,
 }: NotionSyncLogListProps) {
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
   const { subscribeToEntity } = useCampaign()
+  const entityLabel = `${entityType.charAt(0).toUpperCase()}${entityType.slice(1)}`
 
   const [logs, setLogs] = useState<NotionSyncLog[]>([])
   const [loading, setLoading] = useState(true)
@@ -46,10 +69,39 @@ export default function NotionSyncLogList({
     async (pageNum: number) => {
       try {
         setLoading(true)
-        const response = await client.getNotionSyncLogs(character.id, {
-          page: pageNum,
-          per_page: 5,
-        })
+        let response: { data: NotionSyncLogsResponse } | null = null
+        const params = { page: pageNum, per_page: 5 }
+
+        switch (entityType) {
+          case "character":
+            response = await client.getNotionSyncLogs(entity.id, params)
+            break
+          case "site":
+            response = await client.getNotionSyncLogsForSite(entity.id, params)
+            break
+          case "party":
+            response = await client.getNotionSyncLogsForParty(entity.id, params)
+            break
+          case "faction":
+            response = await client.getNotionSyncLogsForFaction(
+              entity.id,
+              params
+            )
+            break
+          case "juncture":
+            response = await client.getNotionSyncLogsForJuncture(
+              entity.id,
+              params
+            )
+            break
+          default:
+            throw new Error(`Unsupported entity type: ${entityType}`)
+        }
+
+        if (!response) {
+          throw new Error(`Unsupported entity type: ${entityType}`)
+        }
+
         setLogs(response.data.notion_sync_logs)
         setTotalPages(response.data.meta.total_pages)
       } catch (error) {
@@ -59,7 +111,7 @@ export default function NotionSyncLogList({
         setLoading(false)
       }
     },
-    [client, character.id, toastError]
+    [client, entity.id, entityType, toastError]
   )
 
   useEffect(() => {
@@ -71,7 +123,7 @@ export default function NotionSyncLogList({
   useEffect(() => {
     const unsubscribe = subscribeToEntity("notion_sync_logs", () => {
       // Reload logs when any notion sync log is created for this campaign
-      // The component is already scoped to a specific character via props
+      // The component is already scoped to a specific entity via props
       if (open) {
         setPage(1)
         fetchLogs(1)
@@ -83,12 +135,42 @@ export default function NotionSyncLogList({
   const handleSync = async () => {
     try {
       setSyncing(true)
-      await client.syncCharacterToNotion(character.id)
-      toastSuccess("Character sync queued")
+      switch (entityType) {
+        case "character":
+          await client.syncCharacterToNotion(entity.id)
+          toastSuccess("Character sync queued")
+          break
+        case "site": {
+          const response = await client.syncSiteToNotion(entity.id)
+          toastSuccess("Site synced to Notion")
+          onSync?.(response.data)
+          break
+        }
+        case "party": {
+          const response = await client.syncPartyToNotion(entity.id)
+          toastSuccess("Party synced to Notion")
+          onSync?.(response.data)
+          break
+        }
+        case "faction": {
+          const response = await client.syncFactionToNotion(entity.id)
+          toastSuccess("Faction synced to Notion")
+          onSync?.(response.data)
+          break
+        }
+        case "juncture": {
+          const response = await client.syncJunctureToNotion(entity.id)
+          toastSuccess("Juncture synced to Notion")
+          onSync?.(response.data)
+          break
+        }
+        default:
+          throw new Error(`Unsupported entity type: ${entityType}`)
+      }
       // Logs will refresh automatically via WebSocket when sync completes
     } catch (error) {
-      console.error("Error syncing character:", error)
-      toastError("Failed to queue character sync")
+      console.error(`Error syncing ${entityType}:`, error)
+      toastError(`Failed to sync ${entityLabel.toLowerCase()} to Notion`)
     } finally {
       setSyncing(false)
     }
@@ -97,8 +179,25 @@ export default function NotionSyncLogList({
   const handleSyncFromNotion = async () => {
     try {
       setSyncingFrom(true)
-      await client.syncCharacterFromNotion(character.id)
-      toastSuccess("Character updated from Notion")
+      const response: { data: NotionSyncEntity } = await (async () => {
+        switch (entityType) {
+          case "character":
+            return client.syncCharacterFromNotion(entity.id)
+          case "site":
+            return client.syncSiteFromNotion(entity.id)
+          case "party":
+            return client.syncPartyFromNotion(entity.id)
+          case "faction":
+            return client.syncFactionFromNotion(entity.id)
+          case "juncture":
+            return client.syncJunctureFromNotion(entity.id)
+          default:
+            throw new Error(`Unsupported entity type: ${entityType}`)
+        }
+      })()
+
+      toastSuccess(`${entityLabel} updated from Notion`)
+      onSync?.(response.data)
       // Refresh logs to show any changes
       if (open) {
         fetchLogs(1)
@@ -114,7 +213,31 @@ export default function NotionSyncLogList({
   const handlePrune = async () => {
     try {
       setPruning(true)
-      const response = await client.pruneNotionSyncLogs(character.id, 30)
+      let response: { data: PruneResponse } | null = null
+      switch (entityType) {
+        case "character":
+          response = await client.pruneNotionSyncLogs(entity.id, 30)
+          break
+        case "site":
+          response = await client.pruneNotionSyncLogsForSite(entity.id, 30)
+          break
+        case "party":
+          response = await client.pruneNotionSyncLogsForParty(entity.id, 30)
+          break
+        case "faction":
+          response = await client.pruneNotionSyncLogsForFaction(entity.id, 30)
+          break
+        case "juncture":
+          response = await client.pruneNotionSyncLogsForJuncture(entity.id, 30)
+          break
+        default:
+          throw new Error(`Unsupported entity type: ${entityType}`)
+      }
+
+      if (!response) {
+        throw new Error(`Unsupported entity type: ${entityType}`)
+      }
+
       const { pruned_count } = response.data
       if (pruned_count > 0) {
         toastSuccess(
@@ -167,7 +290,8 @@ export default function NotionSyncLogList({
           </Button>
         }
       >
-        View the history of syncs to Notion for this character.
+        View the history of syncs to Notion for this {entityLabel.toLowerCase()}
+        .
       </SectionHeader>
 
       <Collapse in={open}>
@@ -193,7 +317,7 @@ export default function NotionSyncLogList({
               syncingFrom ? <CircularProgress size={16} /> : <SyncIcon />
             }
             onClick={handleSyncFromNotion}
-            disabled={syncingFrom || !character.notion_page_id}
+            disabled={syncingFrom || !entity.notion_page_id}
             size="small"
           >
             {syncingFrom ? "Syncing..." : "Sync from Notion"}

@@ -265,7 +265,11 @@ export default function Show({
               handleChangeAndSave={handleChangeAndSave}
             />
           </Stack>
-          <NotionSyncLogList character={memoizedCharacter} />
+          <NotionSyncLogList
+            entity={memoizedCharacter}
+            entityType="character"
+            onSync={setCharacter}
+          />
         </>
       )}
     </Box>

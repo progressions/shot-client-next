@@ -265,6 +265,8 @@ export const defaultJuncture: Juncture = {
   image_url: "",
   characters: [],
   character_ids: [],
+  notion_page_id: null,
+  last_synced_to_notion_at: null,
   created_at: "",
   updated_at: "",
 }

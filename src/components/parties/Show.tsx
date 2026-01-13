@@ -18,9 +18,9 @@ import { PartySpeedDial, PartyCompositionBuilder } from "@/components/parties"
 import {
   EntityActiveToggle,
   EntityAtAGlanceToggle,
-  NotionSyncButton,
   EditEntityNotionLink,
 } from "@/components/common"
+import { NotionSyncLogList } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import { EditFaction } from "@/components/factions"
@@ -187,12 +187,12 @@ export default function Show({ party: initialParty }: ShowProperties) {
               entity={party}
               handleChangeAndSave={handleChangeAndSave}
             />
-            <NotionSyncButton
-              entity={party}
-              entityType="party"
-              onSync={setParty}
-            />
           </Stack>
+          <NotionSyncLogList
+            entity={party}
+            entityType="party"
+            onSync={setParty}
+          />
         </>
       )}
     </Box>

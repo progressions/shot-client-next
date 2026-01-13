@@ -292,6 +292,10 @@ class ApiV2 {
     return `${this.api()}/notion/factions`
   }
 
+  notionJunctures(): string {
+    return `${this.api()}/notion/junctures`
+  }
+
   createNotionPage(character: Character | ID): string {
     return `${this.characters(character)}/notion/create`
   }
@@ -302,6 +306,38 @@ class ApiV2 {
 
   notionSyncLogs(character: Character | ID): string {
     return `${this.characters(character)}/notion_sync_logs`
+  }
+
+  notionSyncLogsForSite(site: Site | ID): string {
+    return `${this.sites(site)}/notion_sync_logs`
+  }
+
+  notionSyncLogsForParty(party: Party | ID): string {
+    return `${this.parties(party)}/notion_sync_logs`
+  }
+
+  notionSyncLogsForFaction(faction: Faction | ID): string {
+    return `${this.factions(faction)}/notion_sync_logs`
+  }
+
+  notionSyncLogsForJuncture(juncture: Juncture | ID): string {
+    return `${this.junctures(juncture)}/notion_sync_logs`
+  }
+
+  syncSiteFromNotion(site: Site | ID): string {
+    return `${this.sites(site)}/sync_from_notion`
+  }
+
+  syncPartyFromNotion(party: Party | ID): string {
+    return `${this.parties(party)}/sync_from_notion`
+  }
+
+  syncFactionFromNotion(faction: Faction | ID): string {
+    return `${this.factions(faction)}/sync_from_notion`
+  }
+
+  syncJunctureFromNotion(juncture: Juncture | ID): string {
+    return `${this.junctures(juncture)}/sync_from_notion`
   }
 
   suggestions(): string {

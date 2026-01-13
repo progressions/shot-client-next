@@ -16,6 +16,8 @@ import {
   Icon,
 } from "@/components/ui"
 import { EntityActiveToggle, EntityAtAGlanceToggle } from "@/components/common"
+import { EditEntityNotionLink } from "@/components/common"
+import { NotionSyncLogList } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { EditFaction } from "@/components/factions"
 import { FormActions, useForm } from "@/reducers"
@@ -83,19 +85,24 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
       <SpeedDialMenu onDelete={deleteEntity} />
       <HeroImage entity={juncture} setEntity={setJuncture} />
       <Alert status={status} />
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          mb: 1,
-        }}
-      >
-        <NameEditor
-          entity={juncture}
-          setEntity={setJuncture}
-          updateEntity={updateEntity}
-        />
+      <Box sx={{ mb: 1 }}>
+        <Stack
+          direction="row"
+          spacing={2}
+          alignItems="center"
+          sx={{ flexWrap: "wrap" }}
+        >
+          <NameEditor
+            entity={juncture}
+            setEntity={setJuncture}
+            updateEntity={updateEntity}
+          />
+          <EditEntityNotionLink
+            entity={juncture}
+            entityType="juncture"
+            updateEntity={setJuncture}
+          />
+        </Stack>
       </Box>
       <Box sx={{ mb: 2 }}>
         <SectionHeader title="Faction" icon={<Icon keyword="Factions" />}>
@@ -158,6 +165,11 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
               handleChangeAndSave={handleChangeAndSave}
             />
           </Stack>
+          <NotionSyncLogList
+            entity={juncture}
+            entityType="juncture"
+            onSync={setJuncture}
+          />
         </>
       )}
     </Box>
