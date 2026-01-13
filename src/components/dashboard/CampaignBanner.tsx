@@ -67,7 +67,12 @@ export default function CampaignBanner({ campaign }: CampaignProperties) {
           <Typography variant="body2" color="white" textAlign="center">
             Current Campaign
           </Typography>
-          <Typography variant="h5" color="white" textAlign="center" gutterBottom>
+          <Typography
+            variant="h5"
+            color="white"
+            textAlign="center"
+            gutterBottom
+          >
             <CampaignName campaign={campaign} />
           </Typography>
           <RichTextRenderer html={campaign.description} />
