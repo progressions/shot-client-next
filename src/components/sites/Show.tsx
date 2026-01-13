@@ -17,6 +17,7 @@ import {
 import { SiteSpeedDial } from "@/components/sites"
 import {
   EntityActiveToggle,
+  EntityAtAGlanceToggle,
   NotionSyncButton,
   EditEntityNotionLink,
 } from "@/components/common"
@@ -169,6 +170,10 @@ export default function Show({ site: initialSite }: ShowProperties) {
           </SectionHeader>
           <Stack direction="column" spacing={2} sx={{ my: 2 }}>
             <EntityActiveToggle
+              entity={site}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+            <EntityAtAGlanceToggle
               entity={site}
               handleChangeAndSave={handleChangeAndSave}
             />

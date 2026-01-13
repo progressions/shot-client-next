@@ -34,7 +34,7 @@ import {
   NotionSyncLogList,
 } from "@/components/characters"
 import { EditFaction } from "@/components/factions"
-import { EntityActiveToggle } from "@/components/common"
+import { EntityActiveToggle, EntityAtAGlanceToggle } from "@/components/common"
 
 type ShowProps = {
   character: Character
@@ -248,6 +248,10 @@ export default function Show({
           </SectionHeader>
           <Stack direction="row" spacing={3} sx={{ my: 1 }}>
             <EntityActiveToggle
+              entity={memoizedCharacter}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+            <EntityAtAGlanceToggle
               entity={memoizedCharacter}
               handleChangeAndSave={handleChangeAndSave}
             />

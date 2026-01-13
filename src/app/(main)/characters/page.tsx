@@ -18,6 +18,7 @@ export default async function CharactersPage({
     search?: string
     show_hidden?: string
     template_filter?: string
+    at_a_glance?: string
     [key: string]: string | undefined
   }>
 }) {
@@ -66,6 +67,7 @@ export default async function CharactersPage({
           faction_id: additionalParams?.faction_id || defaults.faction_id || "",
           show_hidden:
             additionalParams?.show_hidden || defaults.show_hidden || false,
+          at_a_glance: additionalParams?.at_a_glance ?? false,
           template_filter:
             additionalParams?.template_filter ||
             defaults.template_filter ||

@@ -98,8 +98,15 @@ export function consumer({
 
   if (backendType === "phoenix") {
     // Use unified client with Phoenix Channels
-    const phoenixUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL
-      ? `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/socket`
+    const baseUrl =
+      process.env.NEXT_PUBLIC_WEBSOCKET_URL ||
+      process.env.NEXT_PUBLIC_SERVER_URL ||
+      ""
+    const normalizedBaseUrl = baseUrl
+      .replace(/^http(s?):\/\//, "ws$1://")
+      .replace(/\/socket\/?$/, "")
+    const phoenixUrl = normalizedBaseUrl
+      ? `${normalizedBaseUrl}/socket`
       : "ws://localhost:4002/socket"
 
     const unifiedClient = createUnifiedChannelClient(phoenixUrl, jwt, "phoenix")

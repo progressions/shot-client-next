@@ -20,7 +20,7 @@ import {
   NameEditor,
   Icon,
 } from "@/components/ui"
-import { EntityActiveToggle } from "@/components/common"
+import { EntityActiveToggle, EntityAtAGlanceToggle } from "@/components/common"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -185,10 +185,16 @@ export default function Show({ weapon: initialWeapon }: ShowProperties) {
           >
             Manage the visibility and status of this weapon.
           </SectionHeader>
-          <EntityActiveToggle
-            entity={weapon}
-            handleChangeAndSave={handleChangeAndSave}
-          />
+          <Box sx={{ my: 1 }}>
+            <EntityActiveToggle
+              entity={weapon}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+            <EntityAtAGlanceToggle
+              entity={weapon}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+          </Box>
         </>
       )}
     </Box>

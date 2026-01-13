@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation"
 import { useState, useEffect, useCallback } from "react"
-import { Alert, Box, Stack } from "@mui/material"
+import { Alert, Box, Stack, Typography } from "@mui/material"
 import type { User } from "@/types"
 import { useCampaign } from "@/contexts"
 import { EditUserForm } from "@/components/users"
@@ -14,6 +14,7 @@ import {
   TextField,
   EmailChangeConfirmation,
 } from "@/components/ui"
+import { EntityAtAGlanceToggle } from "@/components/common"
 
 interface ShowProperties {
   user: User
@@ -69,7 +70,7 @@ export default function Show({
 
   // Update user field following the same pattern as RoleManagement
   const updateUserField = useCallback(
-    async (fieldName: string, fieldValue: string) => {
+    async (fieldName: string, fieldValue: string | boolean) => {
       setUpdating(fieldName)
 
       try {
@@ -133,6 +134,13 @@ export default function Show({
       await updateUserField(name, value)
     },
     [originalEmail, detectEmailChange, updateUserField]
+  )
+
+  const handleChangeAndSave = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      await updateUserField(event.target.name, event.target.value)
+    },
+    [updateUserField]
   )
 
   // Email change confirmation handlers
@@ -220,6 +228,17 @@ export default function Show({
         />
       </Box>
       <RoleManagement user={user} onUserUpdate={handleUserUpdate} />
+      {campaignData?.user?.admin && (
+        <Box sx={{ my: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Administrative Controls
+          </Typography>
+          <EntityAtAGlanceToggle
+            entity={user}
+            handleChangeAndSave={handleChangeAndSave}
+          />
+        </Box>
+      )}
       <EditUserForm
         key={JSON.stringify(user)}
         open={editOpen}

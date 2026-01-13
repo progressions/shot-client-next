@@ -11,7 +11,7 @@ import {
   NameEditor,
   HeroImage,
 } from "@/components/ui"
-import { EntityActiveToggle } from "@/components/common"
+import { EntityActiveToggle, EntityAtAGlanceToggle } from "@/components/common"
 import { useCampaign, useClient } from "@/contexts"
 import {
   ActionValuesEdit,
@@ -123,10 +123,16 @@ export default function Show({ vehicle: initialVehicle }: ShowProperties) {
           >
             Manage the visibility and status of this vehicle.
           </SectionHeader>
-          <EntityActiveToggle
-            entity={vehicle}
-            handleChangeAndSave={handleChangeAndSave}
-          />
+          <Stack direction="row" spacing={3} sx={{ my: 1, flexWrap: "wrap" }}>
+            <EntityActiveToggle
+              entity={vehicle}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+            <EntityAtAGlanceToggle
+              entity={vehicle}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+          </Stack>
         </>
       )}
     </Box>

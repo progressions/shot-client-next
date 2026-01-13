@@ -18,7 +18,7 @@ import {
   InfoLink,
   Icon,
 } from "@/components/ui"
-import { EntityActiveToggle } from "@/components/common"
+import { EntityActiveToggle, EntityAtAGlanceToggle } from "@/components/common"
 import { PrerequisiteSchtickAutocomplete } from "@/components/autocomplete"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
@@ -152,10 +152,16 @@ export default function Show({ schtick: initialSchtick }: ShowProperties) {
           >
             Manage the visibility and status of this schtick.
           </SectionHeader>
-          <EntityActiveToggle
-            entity={schtick}
-            handleChangeAndSave={handleChangeAndSave}
-          />
+          <Box sx={{ my: 1 }}>
+            <EntityActiveToggle
+              entity={schtick}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+            <EntityAtAGlanceToggle
+              entity={schtick}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+          </Box>
         </>
       )}
     </Box>

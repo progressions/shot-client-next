@@ -27,6 +27,7 @@ export type FormStateData = {
     page: number
     search?: string
     show_hidden?: boolean
+    at_a_glance?: boolean
   }
 }
 

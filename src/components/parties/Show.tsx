@@ -17,6 +17,7 @@ import {
 import { PartySpeedDial, PartyCompositionBuilder } from "@/components/parties"
 import {
   EntityActiveToggle,
+  EntityAtAGlanceToggle,
   NotionSyncButton,
   EditEntityNotionLink,
 } from "@/components/common"
@@ -179,6 +180,10 @@ export default function Show({ party: initialParty }: ShowProperties) {
           </SectionHeader>
           <Stack direction="column" spacing={2} sx={{ my: 2 }}>
             <EntityActiveToggle
+              entity={party}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+            <EntityAtAGlanceToggle
               entity={party}
               handleChangeAndSave={handleChangeAndSave}
             />
