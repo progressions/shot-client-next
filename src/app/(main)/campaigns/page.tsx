@@ -43,7 +43,8 @@ export default async function CampaignsPage({
           order,
           page,
           search,
-          at_a_glance: additionalParams?.at_a_glance ?? false,
+          at_a_glance:
+            additionalParams?.at_a_glance || defaults.at_a_glance || false,
         },
       })}
       ListComponent={List}

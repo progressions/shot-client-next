@@ -55,7 +55,8 @@ export default async function SitesPage({
           faction_id: additionalParams?.faction_id || defaults.faction_id || "",
           show_hidden:
             additionalParams?.show_hidden || defaults.show_hidden || false,
-          at_a_glance: additionalParams?.at_a_glance ?? false,
+          at_a_glance:
+            additionalParams?.at_a_glance || defaults.at_a_glance || false,
         },
       })}
       ListComponent={List}

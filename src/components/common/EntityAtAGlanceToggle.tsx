@@ -39,7 +39,7 @@ export function EntityAtAGlanceToggle({
           target: {
             ...event.target,
             name: "at_a_glance",
-            value: newValue,
+            checked: newValue,
           },
         } as React.ChangeEvent<HTMLInputElement>
 

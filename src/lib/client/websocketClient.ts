@@ -103,10 +103,15 @@ export function consumer({
       process.env.NEXT_PUBLIC_SERVER_URL ||
       ""
     const normalizedBaseUrl = baseUrl
+      .trim()
       .replace(/^http(s?):\/\//, "ws$1://")
       .replace(/\/socket\/?$/, "")
-    const phoenixUrl = normalizedBaseUrl
-      ? `${normalizedBaseUrl}/socket`
+    const websocketBaseUrl =
+      normalizedBaseUrl && !/^wss?:\/\//.test(normalizedBaseUrl)
+        ? `ws://${normalizedBaseUrl}`
+        : normalizedBaseUrl
+    const phoenixUrl = websocketBaseUrl
+      ? `${websocketBaseUrl}/socket`
       : "ws://localhost:4002/socket"
 
     const unifiedClient = createUnifiedChannelClient(phoenixUrl, jwt, "phoenix")

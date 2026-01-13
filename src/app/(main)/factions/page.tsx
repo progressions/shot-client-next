@@ -53,7 +53,8 @@ export default async function FactionsPage({
           search,
           show_hidden:
             additionalParams?.show_hidden || defaults.show_hidden || false,
-          at_a_glance: additionalParams?.at_a_glance ?? false,
+          at_a_glance:
+            additionalParams?.at_a_glance || defaults.at_a_glance || false,
         },
         drawerOpen: false,
       })}

@@ -41,7 +41,7 @@ export function EntityActiveToggle({
           target: {
             ...event.target,
             name: "active",
-            value: newValue,
+            checked: newValue,
           },
         } as React.ChangeEvent<HTMLInputElement>
 

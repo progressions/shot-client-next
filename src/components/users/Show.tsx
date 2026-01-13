@@ -138,7 +138,11 @@ export default function Show({
 
   const handleChangeAndSave = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
-      await updateUserField(event.target.name, event.target.value)
+      const value =
+        event.target.type === "checkbox"
+          ? event.target.checked
+          : event.target.value
+      await updateUserField(event.target.name, value)
     },
     [updateUserField]
   )

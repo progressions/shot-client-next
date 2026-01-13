@@ -185,7 +185,7 @@ export default function Show({ weapon: initialWeapon }: ShowProperties) {
           >
             Manage the visibility and status of this weapon.
           </SectionHeader>
-          <Box sx={{ my: 1 }}>
+          <Stack direction="row" spacing={3} sx={{ my: 1, flexWrap: "wrap" }}>
             <EntityActiveToggle
               entity={weapon}
               handleChangeAndSave={handleChangeAndSave}
@@ -194,7 +194,7 @@ export default function Show({ weapon: initialWeapon }: ShowProperties) {
               entity={weapon}
               handleChangeAndSave={handleChangeAndSave}
             />
-          </Box>
+          </Stack>
         </>
       )}
     </Box>

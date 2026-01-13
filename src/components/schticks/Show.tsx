@@ -152,7 +152,7 @@ export default function Show({ schtick: initialSchtick }: ShowProperties) {
           >
             Manage the visibility and status of this schtick.
           </SectionHeader>
-          <Box sx={{ my: 1 }}>
+          <Stack direction="row" spacing={3} sx={{ my: 1, flexWrap: "wrap" }}>
             <EntityActiveToggle
               entity={schtick}
               handleChangeAndSave={handleChangeAndSave}
@@ -161,7 +161,7 @@ export default function Show({ schtick: initialSchtick }: ShowProperties) {
               entity={schtick}
               handleChangeAndSave={handleChangeAndSave}
             />
-          </Box>
+          </Stack>
         </>
       )}
     </Box>
