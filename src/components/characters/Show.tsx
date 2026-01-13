@@ -95,12 +95,17 @@ export default function Show({
     [character.id, client, toastSuccess]
   )
 
-  // Handle change and save for EntityActiveToggle
+  // Handle change and save for EntityActiveToggle and EntityAtAGlanceToggle
   const handleChangeAndSave = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
+      // Use checked for checkbox inputs, value for others
+      const newValue =
+        event.target.type === "checkbox"
+          ? event.target.checked
+          : event.target.value
       const updatedCharacter = {
         ...character,
-        [event.target.name]: event.target.value,
+        [event.target.name]: newValue,
       }
       await updateCharacter(updatedCharacter)
     },
