@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useCallback } from "react"
+import React, { useState, useCallback, useEffect } from "react"
 import { Switch, FormControlLabel, CircularProgress, Box } from "@mui/material"
 import { useClient, useCampaign, useToast } from "@/contexts"
 
@@ -25,6 +25,12 @@ export function EntityAtAGlanceToggle({
 
   const [atAGlance, setAtAGlance] = useState(entity.at_a_glance ?? false)
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!loading) {
+      setAtAGlance(entity.at_a_glance ?? false)
+    }
+  }, [entity.at_a_glance, entity.id, loading])
 
   const handleToggle = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
