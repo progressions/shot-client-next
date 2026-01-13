@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useCallback } from "react"
+import React, { useState, useCallback, useEffect } from "react"
 import { Switch, FormControlLabel, CircularProgress, Box } from "@mui/material"
 import { useClient, useCampaign, useToast } from "@/contexts"
 
@@ -25,6 +25,12 @@ export function EntityActiveToggle({
 
   const [isActive, setIsActive] = useState(entity.active ?? true)
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!loading) {
+      setIsActive(entity.active ?? true)
+    }
+  }, [entity.active, entity.id, loading])
 
   const handleToggle = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
