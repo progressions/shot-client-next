@@ -136,7 +136,7 @@ describe("EntityActiveToggle", () => {
           expect.objectContaining({
             target: expect.objectContaining({
               name: "active",
-              value: false,
+              checked: false,
             }),
           })
         )
