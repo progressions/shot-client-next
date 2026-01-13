@@ -179,9 +179,13 @@ export function useEntity(
   const handleChangeAndSave = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    const value =
+      event.target.type === "checkbox"
+        ? event.target.checked
+        : event.target.value
     const updatedEntity = {
       ...entity,
-      [event.target.name]: event.target.value,
+      [event.target.name]: value,
     }
     await updateEntity(updatedEntity)
   }

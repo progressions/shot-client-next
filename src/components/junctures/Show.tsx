@@ -15,7 +15,7 @@ import {
   InfoLink,
   Icon,
 } from "@/components/ui"
-import { EntityActiveToggle } from "@/components/common"
+import { EntityActiveToggle, EntityAtAGlanceToggle } from "@/components/common"
 import { useEntity } from "@/hooks"
 import { EditFaction } from "@/components/factions"
 import { FormActions, useForm } from "@/reducers"
@@ -148,10 +148,16 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
           >
             Manage the visibility and status of this juncture.
           </SectionHeader>
-          <EntityActiveToggle
-            entity={juncture}
-            handleChangeAndSave={handleChangeAndSave}
-          />
+          <Stack direction="row" spacing={3} sx={{ my: 1, flexWrap: "wrap" }}>
+            <EntityActiveToggle
+              entity={juncture}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+            <EntityAtAGlanceToggle
+              entity={juncture}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+          </Stack>
         </>
       )}
     </Box>

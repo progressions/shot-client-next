@@ -200,6 +200,7 @@ export interface BaseEntity {
   updated_at: string
   image_positions: ImagePosition[]
   entity_class?: string
+  at_a_glance?: boolean
 }
 
 // Generic interface for entities that have a specific collection

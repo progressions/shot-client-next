@@ -17,6 +17,7 @@ export default async function VehiclesPage({
     order?: string
     search?: string
     show_hidden?: string
+    at_a_glance?: string
     [key: string]: string | undefined
   }>
 }) {
@@ -58,6 +59,8 @@ export default async function VehiclesPage({
           faction_id: additionalParams?.faction_id || defaults.faction_id || "",
           show_hidden:
             additionalParams?.show_hidden || defaults.show_hidden || false,
+          at_a_glance:
+            additionalParams?.at_a_glance || defaults.at_a_glance || false,
         },
         drawerOpen: false,
       })}

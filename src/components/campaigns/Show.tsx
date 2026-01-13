@@ -23,7 +23,7 @@ import {
   HeroImage,
   SpeedDialMenu,
 } from "@/components/ui"
-import { EntityActiveToggle } from "@/components/common"
+import { EntityActiveToggle, EntityAtAGlanceToggle } from "@/components/common"
 import {
   SeedingStatus,
   BatchImageGenerationButton,
@@ -191,10 +191,16 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
           >
             Manage the visibility and status of this campaign.
           </SectionHeader>
-          <EntityActiveToggle
-            entity={campaign}
-            handleChangeAndSave={handleChangeAndSave}
-          />
+          <Stack direction="row" spacing={3} sx={{ my: 1, flexWrap: "wrap" }}>
+            <EntityActiveToggle
+              entity={campaign}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+            <EntityAtAGlanceToggle
+              entity={campaign}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+          </Stack>
           <Box sx={{ my: 2 }}>
             <FormControlLabel
               control={

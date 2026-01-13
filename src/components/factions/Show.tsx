@@ -22,6 +22,7 @@ import {
 } from "@/components/ui"
 import {
   EntityActiveToggle,
+  EntityAtAGlanceToggle,
   NotionSyncButton,
   EditEntityNotionLink,
 } from "@/components/common"
@@ -149,6 +150,10 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
           </SectionHeader>
           <Stack direction="column" spacing={2} sx={{ my: 2 }}>
             <EntityActiveToggle
+              entity={faction}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+            <EntityAtAGlanceToggle
               entity={faction}
               handleChangeAndSave={handleChangeAndSave}
             />

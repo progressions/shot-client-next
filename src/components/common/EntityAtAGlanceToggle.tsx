@@ -4,43 +4,41 @@ import React, { useState, useCallback } from "react"
 import { Switch, FormControlLabel, CircularProgress, Box } from "@mui/material"
 import { useClient, useCampaign, useToast } from "@/contexts"
 
-interface EntityActiveToggleProps {
+interface EntityAtAGlanceToggleProps {
   entity: {
     id: string
     entity_class: string
-    active?: boolean
+    at_a_glance?: boolean
   }
   handleChangeAndSave: (
     event: React.ChangeEvent<HTMLInputElement>
   ) => Promise<void>
 }
 
-export function EntityActiveToggle({
+export function EntityAtAGlanceToggle({
   entity,
   handleChangeAndSave,
-}: EntityActiveToggleProps) {
+}: EntityAtAGlanceToggleProps) {
   const { user } = useClient()
   const { campaign } = useCampaign()
   const { toastSuccess, toastError } = useToast()
 
-  const [isActive, setIsActive] = useState(entity.active ?? true)
+  const [atAGlance, setAtAGlance] = useState(entity.at_a_glance ?? false)
   const [loading, setLoading] = useState(false)
 
   const handleToggle = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = event.target.checked
 
-      // Optimistic update
-      setIsActive(newValue)
+      setAtAGlance(newValue)
       setLoading(true)
 
       try {
-        // Create synthetic event with active field
         const syntheticEvent = {
           ...event,
           target: {
             ...event.target,
-            name: "active",
+            name: "at_a_glance",
             checked: newValue,
           },
         } as React.ChangeEvent<HTMLInputElement>
@@ -48,10 +46,9 @@ export function EntityActiveToggle({
         await handleChangeAndSave(syntheticEvent)
         toastSuccess(`${entity.entity_class} updated successfully`)
       } catch (error) {
-        // Revert on error
-        setIsActive(!newValue)
+        setAtAGlance(!newValue)
         toastError(`Failed to update ${entity.entity_class}`)
-        console.error("Error updating entity active status:", error)
+        console.error("Error updating entity at-a-glance status:", error)
       } finally {
         setLoading(false)
       }
@@ -59,11 +56,9 @@ export function EntityActiveToggle({
     [entity.entity_class, handleChangeAndSave, toastSuccess, toastError]
   )
 
-  // Check permissions: admin OR gamemaster of current campaign
   const hasPermission =
     user?.admin || (campaign && user?.id === campaign.gamemaster_id)
 
-  // Don't render if user doesn't have permission
   if (!hasPermission) {
     return null
   }
@@ -73,17 +68,17 @@ export function EntityActiveToggle({
       <FormControlLabel
         control={
           <Switch
-            checked={isActive}
+            checked={atAGlance}
             onChange={handleToggle}
             disabled={loading}
-            name="active"
+            name="at_a_glance"
             inputProps={{
-              "aria-label": `Toggle ${entity.entity_class} active status`,
+              "aria-label": `Toggle ${entity.entity_class} at a glance`,
               role: "checkbox",
             }}
           />
         }
-        label="Active"
+        label="At a Glance"
         labelPlacement="end"
       />
       {loading && <CircularProgress size={16} sx={{ ml: 1 }} />}
@@ -91,4 +86,4 @@ export function EntityActiveToggle({
   )
 }
 
-export default EntityActiveToggle
+export default EntityAtAGlanceToggle

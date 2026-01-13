@@ -27,6 +27,7 @@ export type FormStateData = {
     category: string
     juncture: string
     show_hidden?: boolean
+    at_a_glance?: boolean
   }
 }
 

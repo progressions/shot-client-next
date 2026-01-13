@@ -16,6 +16,7 @@ export default async function CampaignsPage({
     sort?: string
     order?: string
     search?: string
+    at_a_glance?: string
   }>
 }) {
   return (
@@ -32,7 +33,8 @@ export default async function CampaignsPage({
         page,
         sort,
         order,
-        search
+        search,
+        additionalParams
       ) => ({
         campaigns: data.campaigns,
         meta: data.meta,
@@ -41,6 +43,8 @@ export default async function CampaignsPage({
           order,
           page,
           search,
+          at_a_glance:
+            additionalParams?.at_a_glance || defaults.at_a_glance || false,
         },
       })}
       ListComponent={List}

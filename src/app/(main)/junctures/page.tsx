@@ -16,6 +16,7 @@ export default async function JuncturesPage({
     sort?: string
     order?: string
     search?: string
+    at_a_glance?: string
   }>
 }) {
   // Server-side campaign check - will redirect if no campaign
@@ -50,6 +51,8 @@ export default async function JuncturesPage({
           page,
           search,
           faction_id: additionalParams?.faction_id || defaults.faction_id || "",
+          at_a_glance:
+            additionalParams?.at_a_glance || defaults.at_a_glance || false,
         },
       })}
       ListComponent={List}

@@ -28,6 +28,7 @@ export default async function CharactersModule({
       per_page: 5,
       sort: "created_at",
       order: "desc",
+      at_a_glance: true,
     })
     characters = charactersResponse.data?.characters || []
   } catch (error) {

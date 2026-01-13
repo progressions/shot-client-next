@@ -2,7 +2,7 @@
 
 import { VscGithubAction } from "react-icons/vsc"
 import { useEffect } from "react"
-import { FormControl, FormHelperText, Box } from "@mui/material"
+import { FormControl, FormHelperText, Box, Stack } from "@mui/material"
 import type { Weapon } from "@/types"
 import { useCampaign, useClient, useConfirm } from "@/contexts"
 import {
@@ -20,7 +20,7 @@ import {
   NameEditor,
   Icon,
 } from "@/components/ui"
-import { EntityActiveToggle } from "@/components/common"
+import { EntityActiveToggle, EntityAtAGlanceToggle } from "@/components/common"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 
@@ -185,10 +185,16 @@ export default function Show({ weapon: initialWeapon }: ShowProperties) {
           >
             Manage the visibility and status of this weapon.
           </SectionHeader>
-          <EntityActiveToggle
-            entity={weapon}
-            handleChangeAndSave={handleChangeAndSave}
-          />
+          <Stack direction="row" spacing={3} sx={{ my: 1, flexWrap: "wrap" }}>
+            <EntityActiveToggle
+              entity={weapon}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+            <EntityAtAGlanceToggle
+              entity={weapon}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+          </Stack>
         </>
       )}
     </Box>

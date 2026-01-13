@@ -16,6 +16,7 @@ export default async function UsersPage({
     sort?: string
     order?: string
     search?: string
+    at_a_glance?: string
   }>
 }) {
   return (
@@ -27,7 +28,14 @@ export default async function UsersPage({
         return client.getUsers(paramsWithDefaults)
       }}
       validSorts={["name", "created_at", "updated_at"]}
-      getInitialFormData={(data: UsersResponse, page, sort, order, search) => ({
+      getInitialFormData={(
+        data: UsersResponse,
+        page,
+        sort,
+        order,
+        search,
+        additionalParams
+      ) => ({
         users: data.users,
         meta: data.meta,
         filters: {
@@ -35,6 +43,8 @@ export default async function UsersPage({
           order,
           page,
           search,
+          at_a_glance:
+            additionalParams?.at_a_glance || defaults.at_a_glance || false,
         },
       })}
       ListComponent={List}

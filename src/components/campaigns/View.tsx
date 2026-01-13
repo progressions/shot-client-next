@@ -48,6 +48,12 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
               { value: "all", label: "All" },
             ],
           },
+          {
+            name: "at_a_glance",
+            label: "At a Glance",
+            type: "checkbox",
+            defaultValue: false,
+          },
         ]}
         onFiltersUpdate={updateFilters}
         entity="Campaign"
