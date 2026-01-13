@@ -1,5 +1,5 @@
 import React from "react"
-import { render, screen, fireEvent, waitFor } from "@testing-library/react"
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react"
 import { EntityAtAGlanceToggle } from "./EntityAtAGlanceToggle"
 
 const mockHandleChangeAndSave = jest.fn()
@@ -34,6 +34,7 @@ describe("EntityAtAGlanceToggle", () => {
   describe("Permission visibility", () => {
     it("should not render for regular users", () => {
       mockUser = { id: "1", admin: false, gamemaster: false }
+      mockCampaign = { id: "campaign1", gamemaster_id: "2" }
 
       render(
         <EntityAtAGlanceToggle
@@ -178,7 +179,13 @@ describe("EntityAtAGlanceToggle", () => {
     })
 
     it("should show error toast on failed toggle", async () => {
-      mockHandleChangeAndSave.mockRejectedValueOnce(new Error("API Error"))
+      let rejectPromise: ((error: Error) => void) | undefined
+      mockHandleChangeAndSave.mockImplementation(
+        () =>
+          new Promise((_resolve, reject) => {
+            rejectPromise = reject
+          })
+      )
 
       render(
         <EntityAtAGlanceToggle
@@ -192,13 +199,21 @@ describe("EntityAtAGlanceToggle", () => {
 
       fireEvent.click(toggle)
 
+      expect(toggle).not.toBeChecked()
+
+      await act(async () => {
+        rejectPromise?.(new Error("API Error"))
+      })
+
       await waitFor(() => {
         expect(mockToastError).toHaveBeenCalledWith(
           "Failed to update Character"
         )
       })
 
-      expect(toggle).toBeChecked()
+      await waitFor(() => {
+        expect(screen.getByRole("switch")).toBeChecked()
+      })
     })
 
     it("should disable toggle during update", async () => {
