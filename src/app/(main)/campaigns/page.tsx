@@ -1,7 +1,7 @@
 // app/campaigns/page.tsx
 import { List } from "@/components/campaigns"
 import ResourcePage from "@/components/ResourcePage"
-import { applyFilterDefaults } from "@/lib"
+import { applyFilterDefaults, getFilterDefaults } from "@/lib"
 import type { CampaignsResponse } from "@/types"
 
 export const metadata = {
@@ -19,6 +19,9 @@ export default async function CampaignsPage({
     at_a_glance?: string
   }>
 }) {
+  // Get default filter values for Campaign entity
+  const defaults = getFilterDefaults("Campaign")
+
   return (
     <ResourcePage
       resourceName="campaigns"
