@@ -40,6 +40,7 @@ export function EntityAtAGlanceToggle({
             ...event.target,
             name: "at_a_glance",
             checked: newValue,
+            type: "checkbox",
           },
         } as React.ChangeEvent<HTMLInputElement>
 
