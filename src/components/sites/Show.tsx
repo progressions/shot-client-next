@@ -178,11 +178,7 @@ export default function Show({ site: initialSite }: ShowProperties) {
               handleChangeAndSave={handleChangeAndSave}
             />
           </Stack>
-          <NotionSyncLogList
-            entity={site}
-            entityType="site"
-            onSync={setSite}
-          />
+          <NotionSyncLogList entity={site} entityType="site" onSync={setSite} />
         </>
       )}
     </Box>

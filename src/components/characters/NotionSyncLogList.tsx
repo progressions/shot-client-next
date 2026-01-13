@@ -85,7 +85,10 @@ export default function NotionSyncLogList({
             response = await client.getNotionSyncLogsForParty(entity.id, params)
             break
           case "faction":
-            response = await client.getNotionSyncLogsForFaction(entity.id, params)
+            response = await client.getNotionSyncLogsForFaction(
+              entity.id,
+              params
+            )
             break
           default:
             throw new Error(`Unsupported entity type: ${entityType}`)
@@ -277,7 +280,8 @@ export default function NotionSyncLogList({
           </Button>
         }
       >
-        View the history of syncs to Notion for this {entityLabel.toLowerCase()}.
+        View the history of syncs to Notion for this {entityLabel.toLowerCase()}
+        .
       </SectionHeader>
 
       <Collapse in={open}>
