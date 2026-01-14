@@ -11,7 +11,11 @@ import {
   NameEditor,
   HeroImage,
 } from "@/components/ui"
-import { EntityActiveToggle, EntityAtAGlanceToggle } from "@/components/common"
+import {
+  EntityActiveToggle,
+  EntityAtAGlanceToggle,
+  EntityTaskToggle,
+} from "@/components/common"
 import { useCampaign, useClient } from "@/contexts"
 import {
   ActionValuesEdit,
@@ -129,6 +133,10 @@ export default function Show({ vehicle: initialVehicle }: ShowProperties) {
               handleChangeAndSave={handleChangeAndSave}
             />
             <EntityAtAGlanceToggle
+              entity={vehicle}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+            <EntityTaskToggle
               entity={vehicle}
               handleChangeAndSave={handleChangeAndSave}
             />
