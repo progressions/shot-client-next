@@ -13,7 +13,7 @@ interface EntityTaskToggleProps {
   onChange?: (checked: boolean) => void
 }
 
-export default function EntityTaskToggle({
+export function EntityTaskToggle({
   entity,
   handleChangeAndSave,
   onChange,
@@ -93,3 +93,5 @@ export default function EntityTaskToggle({
     </Box>
   )
 }
+
+export default EntityTaskToggle
