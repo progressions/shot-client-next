@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import {
   Box,
   Button,
@@ -42,13 +42,7 @@ export default function NotionIntegration({
 
   const isConnected = campaign.notion_connected
 
-  useEffect(() => {
-    if (isConnected) {
-      loadDatabases()
-    }
-  }, [isConnected])
-
-  const loadDatabases = async () => {
+  const loadDatabases = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
@@ -60,14 +54,36 @@ export default function NotionIntegration({
     } finally {
       setLoading(false)
     }
+  }, [campaign.id, client])
+
+  useEffect(() => {
+    if (isConnected) {
+      loadDatabases()
+    }
+  }, [isConnected, loadDatabases])
+
+  // Don't render if Notion OAuth is not configured on the backend
+  if (!campaign.notion_oauth_available) {
+    return null
   }
 
   const handleConnect = () => {
     // Redirect to Notion OAuth flow
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/notion/authorize?campaign_id=${campaign.id}`
+    // Include JWT token in URL since browser redirects can't include Authorization headers
+    const token = client.jwt
+    if (!token) {
+      setError("Authentication required. Please log in again.")
+      return
+    }
+    const params = new URLSearchParams({
+      campaign_id: campaign.id,
+      token,
+    })
+    window.location.href = `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/notion/authorize?${params}`
   }
 
   const handleMappingChange = async (key: string, value: string) => {
+    const previousMappings = mappings
     const newMappings = { ...mappings, [key]: value }
     setMappings(newMappings)
 
@@ -81,6 +97,7 @@ export default function NotionIntegration({
       toastSuccess("Notion mapping saved")
     } catch (err) {
       console.error("Failed to save mapping", err)
+      setMappings(previousMappings)
       setError("Failed to save mapping settings.")
       toastError("Failed to save mapping")
     }

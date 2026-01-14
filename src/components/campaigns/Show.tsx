@@ -186,22 +186,10 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
 
       {hasAdminPermission && (
         <>
-          <SectionHeader
-            title="Administrative Controls"
-            icon={<Icon keyword="Administration" />}
-          >
-            Manage the visibility and status of this campaign.
+          <SectionHeader title="AI Integrations" icon={<Icon keyword="AI" />}>
+            Configure AI-powered features and external integrations for this
+            campaign.
           </SectionHeader>
-          <Stack direction="row" spacing={3} sx={{ my: 1, flexWrap: "wrap" }}>
-            <EntityActiveToggle
-              entity={campaign}
-              handleChangeAndSave={handleChangeAndSave}
-            />
-            <EntityAtAGlanceToggle
-              entity={campaign}
-              handleChangeAndSave={handleChangeAndSave}
-            />
-          </Stack>
           <Box sx={{ my: 2 }}>
             <FormControlLabel
               control={
@@ -239,12 +227,30 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
               Generate buttons and Extend options are hidden from the UI.
             </Typography>
           </Box>
-          <NotionIntegration campaign={campaign} />
           <AiProviderSelector
             campaign={campaign}
             onProviderChange={handleProviderChange}
           />
           <BatchImageGenerationButton campaign={campaign} />
+          <NotionIntegration campaign={campaign} />
+
+          <SectionHeader
+            title="Administrative Controls"
+            icon={<Icon keyword="Administration" />}
+            sx={{ mt: 3 }}
+          >
+            Manage the visibility and status of this campaign.
+          </SectionHeader>
+          <Stack direction="row" spacing={3} sx={{ my: 1, flexWrap: "wrap" }}>
+            <EntityActiveToggle
+              entity={campaign}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+            <EntityAtAGlanceToggle
+              entity={campaign}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+          </Stack>
         </>
       )}
     </Box>

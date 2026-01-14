@@ -347,7 +347,7 @@ export default function HealPanel({
                       max={10}
                       disabled={isProcessing}
                       size="small"
-                      labelBackgroundColor="#202020"
+                      labelBackgroundColor="#312A21"
                     />
                   </Box>
 

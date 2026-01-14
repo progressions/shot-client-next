@@ -37,6 +37,7 @@ import SettingsIcon from "@mui/icons-material/Settings"
 import SecurityIcon from "@mui/icons-material/Security"
 import BadgeIcon from "@mui/icons-material/Badge"
 import TrendingUpIcon from "@mui/icons-material/TrendingUp"
+import SmartToyIcon from "@mui/icons-material/SmartToy"
 import { iconColorMap, type Category } from "@/components/ui/iconColors"
 
 /**
@@ -80,6 +81,7 @@ type Keyword =
   | "Security"
   | "Account"
   | "Advancement"
+  | "AI"
 
 // Map keywords to categories
 const categoryMap: Record<Keyword, Category> = {
@@ -119,6 +121,7 @@ const categoryMap: Record<Keyword, Category> = {
   Security: "Interface",
   Account: "Interface",
   Advancement: "Utility",
+  AI: "Utility",
 }
 
 // Map keywords to JSX icon elements
@@ -171,6 +174,7 @@ const iconMap: Record<Keyword, React.ReactElement> = {
   Security: <SecurityIcon />,
   Account: <BadgeIcon />,
   Advancement: <TrendingUpIcon />,
+  AI: <SmartToyIcon />,
 }
 
 /**
