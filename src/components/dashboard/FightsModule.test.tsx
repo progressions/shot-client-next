@@ -47,6 +47,8 @@ describe("FightsModule", () => {
         user_id: "user-123",
       })
     )
+    const callArgs = mockGetFights.mock.calls[0]?.[0]
+    expect(callArgs).not.toHaveProperty("status")
   })
 
   it("handles errors gracefully", async () => {
@@ -57,7 +59,7 @@ describe("FightsModule", () => {
     })
 
     const result = await FightsModule({ userId: "user-123" })
-    
+
     // It should return the ErrorModule
     expect(result).toBeDefined()
   })
