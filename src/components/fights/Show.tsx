@@ -17,7 +17,7 @@ import {
   Icon,
   Manager,
 } from "@/components/ui"
-import { EntityActiveToggle } from "@/components/common"
+import { EntityActiveToggle, EntityAtAGlanceToggle } from "@/components/common"
 import { useCampaign, useClient } from "@/contexts"
 import { FightChips, AddParty, EditFightOwner } from "@/components/fights"
 import { SoloModeSettings } from "@/components/solo"
@@ -330,10 +330,16 @@ export default function Show({ fight: initialFight }: ShowProperties) {
           >
             Manage the visibility and status of this fight.
           </SectionHeader>
-          <EntityActiveToggle
-            entity={fight}
-            handleChangeAndSave={handleChangeAndSave}
-          />
+          <Stack direction="row" spacing={3} sx={{ my: 1 }}>
+            <EntityActiveToggle
+              entity={fight}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+            <EntityAtAGlanceToggle
+              entity={fight}
+              handleChangeAndSave={handleChangeAndSave}
+            />
+          </Stack>
         </>
       )}
     </Box>
