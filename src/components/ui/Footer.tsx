@@ -18,6 +18,8 @@ const footerColumns: FooterColumn[] = [
     links: [
       { label: "About Us", href: "/about" },
       { label: "Support", href: "/support" },
+      { label: "Terms of Use", href: "/terms-of-use" },
+      { label: "Privacy Policy", href: "/privacy-policy" },
     ],
   },
   {
