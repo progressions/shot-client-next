@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import {
   Box,
   Button,
+  Collapse,
   Typography,
   Stack,
   FormControl,
@@ -13,7 +14,7 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material"
-import { Icon, SectionHeader, InfoLink } from "@/components/ui"
+import { Icon, SectionHeader, InfoLink, ManageButton } from "@/components/ui"
 import { type Campaign } from "@/types"
 import { useClient, useToast } from "@/contexts"
 
@@ -34,6 +35,7 @@ export default function NotionIntegration({
   const [databases, setDatabases] = useState<DatabaseMapping[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [open, setOpen] = useState(false)
 
   // Local state for mappings to allow optimistic updates or form handling
   const [mappings, setMappings] = useState<Record<string, string>>(
@@ -108,98 +110,101 @@ export default function NotionIntegration({
       <SectionHeader
         title="Notion Integration"
         icon={<Icon keyword="Notion" />}
+        actions={<ManageButton open={open} onClick={setOpen} />}
       >
         Sync your campaign data with{" "}
         <InfoLink href="https://notion.so" info="Notion" />.
       </SectionHeader>
 
-      <Box sx={{ mt: 2 }}>
-        {!isConnected ? (
-          <Stack spacing={2} alignItems="flex-start">
-            <Typography variant="body2" color="text.secondary">
-              Connect your Notion workspace to sync characters, factions, and
-              more.
-            </Typography>
-            <Button
-              variant="contained"
-              startIcon={<Icon keyword="Link" />}
-              onClick={handleConnect}
-            >
-              Connect to Notion
-            </Button>
-          </Stack>
-        ) : (
-          <Stack spacing={3}>
-            <Alert severity="success" icon={<Icon keyword="Check" />}>
-              Connected to{" "}
-              <strong>
-                {campaign.notion_workspace_name || "Notion Workspace"}
-              </strong>
-            </Alert>
+      <Collapse in={open}>
+        <Box sx={{ mt: 2 }}>
+          {!isConnected ? (
+            <Stack spacing={2} alignItems="flex-start">
+              <Typography variant="body2" color="text.secondary">
+                Connect your Notion workspace to sync characters, factions, and
+                more.
+              </Typography>
+              <Button
+                variant="contained"
+                startIcon={<Icon keyword="Link" />}
+                onClick={handleConnect}
+              >
+                Connect to Notion
+              </Button>
+            </Stack>
+          ) : (
+            <Stack spacing={3}>
+              <Alert severity="success" icon={<Icon keyword="Check" />}>
+                Connected to{" "}
+                <strong>
+                  {campaign.notion_workspace_name || "Notion Workspace"}
+                </strong>
+              </Alert>
 
-            <Typography variant="h6" fontSize="small">
-              Database Mapping
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Select which Notion database corresponds to each entity type.
-            </Typography>
+              <Typography variant="h6" fontSize="small">
+                Database Mapping
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Select which Notion database corresponds to each entity type.
+              </Typography>
 
-            {loading ? (
-              <CircularProgress size={24} />
-            ) : (
-              <Stack spacing={2} sx={{ maxWidth: 400 }}>
-                {renderMappingSelect(
-                  "characters",
-                  "Characters",
-                  databases,
-                  mappings,
-                  handleMappingChange
-                )}
-                {renderMappingSelect(
-                  "factions",
-                  "Factions",
-                  databases,
-                  mappings,
-                  handleMappingChange
-                )}
-                {renderMappingSelect(
-                  "parties",
-                  "Parties",
-                  databases,
-                  mappings,
-                  handleMappingChange
-                )}
-                {renderMappingSelect(
-                  "sites",
-                  "Sites",
-                  databases,
-                  mappings,
-                  handleMappingChange
-                )}
-                {renderMappingSelect(
-                  "junctures",
-                  "Junctures",
-                  databases,
-                  mappings,
-                  handleMappingChange
-                )}
-              </Stack>
-            )}
+              {loading ? (
+                <CircularProgress size={24} />
+              ) : (
+                <Stack spacing={2} sx={{ maxWidth: 400 }}>
+                  {renderMappingSelect(
+                    "characters",
+                    "Characters",
+                    databases,
+                    mappings,
+                    handleMappingChange
+                  )}
+                  {renderMappingSelect(
+                    "factions",
+                    "Factions",
+                    databases,
+                    mappings,
+                    handleMappingChange
+                  )}
+                  {renderMappingSelect(
+                    "parties",
+                    "Parties",
+                    databases,
+                    mappings,
+                    handleMappingChange
+                  )}
+                  {renderMappingSelect(
+                    "sites",
+                    "Sites",
+                    databases,
+                    mappings,
+                    handleMappingChange
+                  )}
+                  {renderMappingSelect(
+                    "junctures",
+                    "Junctures",
+                    databases,
+                    mappings,
+                    handleMappingChange
+                  )}
+                </Stack>
+              )}
 
-            {error && <Alert severity="error">{error}</Alert>}
+              {error && <Alert severity="error">{error}</Alert>}
 
-            <Button
-              variant="outlined"
-              color="warning"
-              startIcon={<Icon keyword="Refresh" />}
-              onClick={handleConnect}
-              sx={{ alignSelf: "flex-start" }}
-            >
-              Reconnect / Change Workspace
-            </Button>
-          </Stack>
-        )}
-      </Box>
+              <Button
+                variant="outlined"
+                color="warning"
+                startIcon={<Icon keyword="Refresh" />}
+                onClick={handleConnect}
+                sx={{ alignSelf: "flex-start" }}
+              >
+                Reconnect / Change Workspace
+              </Button>
+            </Stack>
+          )}
+        </Box>
+      </Collapse>
     </Box>
   )
 }
