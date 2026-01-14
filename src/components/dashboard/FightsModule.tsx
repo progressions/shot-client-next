@@ -25,7 +25,7 @@ export default async function FightsModule({
   try {
     const fightsResponse = await client.getFights({
       user_id: userId,
-      status: "Unstarted",
+      at_a_glance: true,
       per_page: 5,
       sort: "created_at",
       order: "desc",
