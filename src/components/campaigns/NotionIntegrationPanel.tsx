@@ -18,7 +18,7 @@ import { Icon, SectionHeader, InfoLink, ManageButton } from "@/components/ui"
 import { type Campaign } from "@/types"
 import { useClient, useToast } from "@/contexts"
 
-interface NotionIntegrationProps {
+interface NotionIntegrationPanelProps {
   campaign: Campaign
 }
 
@@ -27,9 +27,9 @@ type DatabaseMapping = {
   title: string | null
 }
 
-export default function NotionIntegration({
+export default function NotionIntegrationPanel({
   campaign,
-}: NotionIntegrationProps) {
+}: NotionIntegrationPanelProps) {
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
   const [databases, setDatabases] = useState<DatabaseMapping[]>([])

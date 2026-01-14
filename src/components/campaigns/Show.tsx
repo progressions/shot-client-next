@@ -29,7 +29,7 @@ import {
   BatchImageGenerationButton,
   AiCreditAlert,
   AiProviderSelector,
-  NotionIntegration,
+  NotionIntegrationPanel,
 } from "@/components/campaigns"
 import { CampaignInvitations } from "@/components/invitations"
 import { useEntity } from "@/hooks"
@@ -232,7 +232,7 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
             onProviderChange={handleProviderChange}
           />
           <BatchImageGenerationButton campaign={campaign} />
-          <NotionIntegration campaign={campaign} />
+          <NotionIntegrationPanel campaign={campaign} />
 
           <SectionHeader
             title="Administrative Controls"
