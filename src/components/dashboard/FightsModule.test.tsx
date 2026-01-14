@@ -12,7 +12,9 @@ jest.mock("@/components/badges", () => ({
 
 jest.mock("./FightsModuleClient", () => ({
   __esModule: true,
-  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  default: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }))
 
 jest.mock("@/components/dashboard", () => ({
