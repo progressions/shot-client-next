@@ -164,7 +164,6 @@ export default function PartySlotCard({
             <NumberField
               name="mook_count"
               label="Count"
-              labelBackgroundColor="#131313"
               value={mookCount}
               size="small"
               width="70px"

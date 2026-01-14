@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import {
   Box,
   Button,
@@ -42,13 +42,7 @@ export default function NotionIntegration({
 
   const isConnected = campaign.notion_connected
 
-  useEffect(() => {
-    if (isConnected) {
-      loadDatabases()
-    }
-  }, [isConnected])
-
-  const loadDatabases = async () => {
+  const loadDatabases = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
@@ -60,7 +54,13 @@ export default function NotionIntegration({
     } finally {
       setLoading(false)
     }
-  }
+  }, [campaign.id, client])
+
+  useEffect(() => {
+    if (isConnected) {
+      loadDatabases()
+    }
+  }, [isConnected, loadDatabases])
 
   const handleConnect = () => {
     // Redirect to Notion OAuth flow
@@ -68,6 +68,7 @@ export default function NotionIntegration({
   }
 
   const handleMappingChange = async (key: string, value: string) => {
+    const previousMappings = mappings
     const newMappings = { ...mappings, [key]: value }
     setMappings(newMappings)
 
@@ -81,6 +82,7 @@ export default function NotionIntegration({
       toastSuccess("Notion mapping saved")
     } catch (err) {
       console.error("Failed to save mapping", err)
+      setMappings(previousMappings)
       setError("Failed to save mapping settings.")
       toastError("Failed to save mapping")
     }

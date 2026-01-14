@@ -38,9 +38,8 @@ export interface Option {
  * @property allowNone - Whether to show "None" option (defaults to true)
  * @property freeSolo - Allow arbitrary text input (defaults to false)
  */
-interface AutocompleteProperties extends Partial<
-  MuiAutocompleteProps<Option, false, false, boolean>
-> {
+interface AutocompleteProperties
+  extends Partial<MuiAutocompleteProps<Option, false, false, boolean>> {
   label: string
   fetchOptions: (query: string) => Promise<Option[]>
   onChange: (value: string | null) => void

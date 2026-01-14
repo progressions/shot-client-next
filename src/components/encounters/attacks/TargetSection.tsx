@@ -867,7 +867,6 @@ export default function TargetSection({
               <NumberField
                 name="defenseValue"
                 label="Defense"
-                labelBackgroundColor="#131313"
                 value={parseInt(defenseValue || "0") || 0}
                 size="small"
                 width="80px"
