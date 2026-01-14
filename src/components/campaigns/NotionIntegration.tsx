@@ -69,7 +69,17 @@ export default function NotionIntegration({
 
   const handleConnect = () => {
     // Redirect to Notion OAuth flow
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/notion/authorize?campaign_id=${campaign.id}`
+    // Include JWT token in URL since browser redirects can't include Authorization headers
+    const token = client.jwt
+    if (!token) {
+      setError("Authentication required. Please log in again.")
+      return
+    }
+    const params = new URLSearchParams({
+      campaign_id: campaign.id,
+      token,
+    })
+    window.location.href = `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/notion/authorize?${params}`
   }
 
   const handleMappingChange = async (key: string, value: string) => {
