@@ -62,6 +62,11 @@ export default function NotionIntegration({
     }
   }, [isConnected, loadDatabases])
 
+  // Don't render if Notion OAuth is not configured on the backend
+  if (!campaign.notion_oauth_available) {
+    return null
+  }
+
   const handleConnect = () => {
     // Redirect to Notion OAuth flow
     window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/notion/authorize?campaign_id=${campaign.id}`

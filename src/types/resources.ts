@@ -69,6 +69,7 @@ export interface Campaign extends BaseEntity {
   notion_workspace_name?: string
   notion_workspace_icon?: string
   notion_database_ids?: Record<string, string>
+  notion_oauth_available?: boolean
 }
 
 /**
