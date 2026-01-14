@@ -19,6 +19,7 @@ import * as characterEffect from "@/lib/client/characterEffectClient"
 import * as chaseRelationship from "@/lib/client/chaseRelationshipClient"
 import * as mediaLibrary from "@/lib/client/mediaLibraryClient"
 import * as notification from "@/lib/client/notificationClient"
+import * as notion from "@/lib/client/notionClient"
 
 interface ClientParameters {
   jwt?: string
@@ -95,5 +96,6 @@ export default function createClient(parameters: ClientParameters = {}) {
     }),
     ...mediaLibrary.createMediaLibraryClient({ jwt, apiV2 }),
     ...notification.createNotificationClient({ jwt, apiV2, queryParams }),
+    ...notion.createNotionClient({ jwt, api, apiV2, queryParams }),
   }
 }

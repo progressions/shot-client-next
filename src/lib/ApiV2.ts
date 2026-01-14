@@ -276,6 +276,10 @@ class ApiV2 {
       : `${characterUrl}/schticks`
   }
 
+  notion(): string {
+    return `${this.api()}/notion`
+  }
+
   notionCharacters(): string {
     return `${this.api()}/notion/characters`
   }

@@ -29,6 +29,7 @@ import {
   BatchImageGenerationButton,
   AiCreditAlert,
   AiProviderSelector,
+  NotionIntegration,
 } from "@/components/campaigns"
 import { CampaignInvitations } from "@/components/invitations"
 import { useEntity } from "@/hooks"
@@ -238,6 +239,7 @@ export default function Show({ campaign: initialCampaign }: ShowProperties) {
               Generate buttons and Extend options are hidden from the UI.
             </Typography>
           </Box>
+          <NotionIntegration campaign={campaign} />
           <AiProviderSelector
             campaign={campaign}
             onProviderChange={handleProviderChange}
