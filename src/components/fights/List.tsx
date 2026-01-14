@@ -26,6 +26,7 @@ export type FormStateData = {
     status: "Started" | "Unstarted" | "Ended" | ""
     search: string
     show_hidden?: boolean
+    at_a_glance?: boolean
   }
 }
 

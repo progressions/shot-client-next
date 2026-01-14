@@ -17,6 +17,7 @@ export default async function FightsPage({
     order?: string
     search?: string
     show_hidden?: string
+    at_a_glance?: string
     [key: string]: string | undefined
   }>
 }) {
@@ -55,6 +56,8 @@ export default async function FightsPage({
             season: additionalParams?.season || "",
             status: additionalParams?.status || defaults.status || "",
             show_hidden: additionalParams?.show_hidden || false,
+            at_a_glance:
+              additionalParams?.at_a_glance || defaults.at_a_glance || false,
           },
           drawerOpen: false,
         }
