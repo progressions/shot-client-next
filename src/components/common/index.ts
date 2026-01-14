@@ -1,4 +1,5 @@
 export { EntityActiveToggle } from "./EntityActiveToggle"
 export { EntityAtAGlanceToggle } from "./EntityAtAGlanceToggle"
+export { default as EntityTaskToggle } from "./EntityTaskToggle"
 export { NotionSyncButton } from "./NotionSyncButton"
 export { default as EditEntityNotionLink } from "./EditEntityNotionLink"
