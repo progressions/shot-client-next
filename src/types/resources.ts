@@ -64,6 +64,11 @@ export interface Campaign extends BaseEntity {
   ai_generation_enabled?: boolean
   // AI provider configuration
   ai_provider?: AiProvider | null
+  // Notion Integration
+  notion_connected?: boolean
+  notion_workspace_name?: string
+  notion_workspace_icon?: string
+  notion_database_ids?: Record<string, string>
 }
 
 /**
