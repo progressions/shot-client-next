@@ -6,7 +6,7 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
 import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/Delete"
 import { SystemStyleObject, Theme } from "@mui/system"
-import type { MouseEvent } from "react"
+import type { MouseEvent, SyntheticEvent } from "react"
 
 type Action = {
   [key: string]: unknown
@@ -21,8 +21,8 @@ type SpeedDialMenuProps = {
   onDelete?: () => void
   actions?: Action[]
   sx?: SystemStyleObject<Theme>
-  open: boolean
-  onOpen: () => void
+  open?: boolean
+  onOpen?: () => void
   onClose?: () => void // Made optional
 }
 
@@ -31,11 +31,14 @@ export function SpeedDialMenu({
   onDelete,
   actions: initialActions,
   sx = {},
-  open,
+  open: openProp,
   onOpen,
   onClose,
 }: SpeedDialMenuProps) {
   const [persist, setPersist] = useState(false)
+  const [localOpen, setLocalOpen] = useState(false)
+  const isControlled = typeof openProp === "boolean"
+  const open = isControlled ? openProp : localOpen
 
   // Reset persist when SpeedDial is closed externally
   useEffect(() => {
@@ -58,26 +61,55 @@ export function SpeedDialMenu({
 
   const actions = initialActions || defaultActions
 
+  const closeMenu = () => {
+    setPersist(false)
+    if (isControlled) {
+      onClose?.()
+    } else {
+      setLocalOpen(false)
+    }
+  }
+
+  const handleOpen = (_event: SyntheticEvent, reason: string) => {
+    if (reason !== "toggle") {
+      return
+    }
+    if (isControlled) {
+      onOpen?.()
+    } else {
+      setLocalOpen(true)
+    }
+  }
+
   const handleActionClick =
     (action: Action) => (event: MouseEvent<HTMLElement>) => {
       if (action.preventClose) {
         event.stopPropagation()
         setPersist(true)
       } else {
-        setPersist(false)
-        if (onClose) {
-          onClose() // Guarded call to onClose
-        }
+        closeMenu()
       }
       if (action.onClick) {
         action.onClick(event)
       }
     }
 
-  const handleClose = () => {
-    if (!persist && onClose) {
-      onClose() // Guarded call to onClose
+  const handleClose = (_event: SyntheticEvent, reason: string) => {
+    if (reason === "escapeKeyDown") {
+      closeMenu()
+      return
     }
+
+    if (reason !== "toggle") {
+      return
+    }
+
+    if (persist) {
+      setPersist(false)
+      return
+    }
+
+    closeMenu()
   }
 
   return (
@@ -97,7 +129,7 @@ export function SpeedDialMenu({
       icon={<SpeedDialIcon openIcon={<MoreHorizIcon />} />}
       direction="down"
       open={open}
-      onOpen={onOpen}
+      onOpen={handleOpen}
       onClose={handleClose}
     >
       {actions.map(action => (

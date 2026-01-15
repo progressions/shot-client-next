@@ -5,7 +5,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy"
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material"
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
 import { SystemStyleObject, Theme } from "@mui/system"
-import type { MouseEvent } from "react"
+import type { MouseEvent, SyntheticEvent } from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import type { Adventure } from "@/types"
@@ -93,6 +93,33 @@ export default function AdventureSpeedDial({
       }
     }
 
+  const handleOpen = (_event: SyntheticEvent, reason: string) => {
+    if (reason !== "toggle") {
+      return
+    }
+
+    setSpeedDialOpen(true)
+  }
+
+  const handleClose = (_event: SyntheticEvent, reason: string) => {
+    if (reason === "escapeKeyDown") {
+      setPersist(false)
+      setSpeedDialOpen(false)
+      return
+    }
+
+    if (reason !== "toggle") {
+      return
+    }
+
+    if (persist) {
+      setPersist(false)
+      return
+    }
+
+    setSpeedDialOpen(false)
+  }
+
   return (
     <SpeedDial
       ariaLabel="Adventure actions"
@@ -110,12 +137,8 @@ export default function AdventureSpeedDial({
       icon={<SpeedDialIcon openIcon={<MoreHorizIcon />} />}
       direction="down"
       open={speedDialOpen}
-      onOpen={() => setSpeedDialOpen(true)}
-      onClose={() => {
-        if (!persist) {
-          setSpeedDialOpen(false)
-        }
-      }}
+      onOpen={handleOpen}
+      onClose={handleClose}
     >
       {actions.map(action => (
         <SpeedDialAction
