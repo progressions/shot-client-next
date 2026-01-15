@@ -101,7 +101,9 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
         viewMode={viewMode}
         formState={formState}
         dispatchForm={dispatchForm}
-        initialIsMobile={initialIsMobile}
+        onDelete={() =>
+          fetchAdventures({ ...filters, cache_buster: Date.now().toString() })
+        }
       />
     </>
   )

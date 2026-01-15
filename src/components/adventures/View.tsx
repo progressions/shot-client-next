@@ -10,10 +10,15 @@ interface ViewProps {
   viewMode: "table" | "mobile"
   formState: FormStateType<FormStateData>
   dispatchForm: (action: FormStateAction<FormStateData>) => void
-  initialIsMobile: boolean
+  onDelete: () => void
 }
 
-export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
+export default function View({
+  viewMode,
+  formState,
+  dispatchForm,
+  onDelete,
+}: ViewProps) {
   const updateFilters = useCallback(
     filters => {
       dispatchForm({
@@ -73,7 +78,7 @@ export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
           <GridView
             resourceName="adventure"
             entities={formState.data.adventures}
-            handleDelete={() => {}}
+            handleDelete={onDelete}
             DetailComponent={AdventureDetail}
           />
         ) : (

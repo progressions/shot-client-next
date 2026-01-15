@@ -1,4 +1,3 @@
-import { headers } from "next/headers"
 import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getCurrentUser } from "@/lib"
 import { NotFound, Show } from "@/components/adventures"
@@ -20,11 +19,6 @@ export default async function AdventurePage({
   try {
     const response = await client.getAdventure({ id })
     const adventure = response.data
-
-    // Detect mobile device on the server
-    const headersState = await headers()
-    const userAgent = headersState.get("user-agent") || ""
-    const initialIsMobile = /mobile/i.test(userAgent)
 
     return (
       <>

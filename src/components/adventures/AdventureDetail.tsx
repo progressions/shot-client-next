@@ -19,7 +19,7 @@ import { RichTextRenderer } from "@/components/editor"
 interface AdventureDetailProperties {
   adventure: Adventure
   onDelete: (adventureId: string) => void
-  onEdit: (adventure: Adventure) => void
+  onEdit?: (adventure: Adventure) => void
 }
 
 export default function AdventureDetail({
@@ -64,9 +64,11 @@ export default function AdventureDetail({
     }
   }
 
-  const handleEdit = () => {
-    onEdit(adventure)
-  }
+  const handleEdit = onEdit
+    ? () => {
+        onEdit(adventure)
+      }
+    : undefined
 
   const formattedCreatedAt = adventure.created_at
     ? new Date(adventure.created_at).toLocaleString("en-US", {
