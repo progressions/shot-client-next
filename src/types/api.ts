@@ -1,4 +1,5 @@
 import type {
+  Adventure,
   Campaign,
   Character,
   User,
@@ -50,6 +51,7 @@ export interface ConfirmationResponse {
  */
 
 export interface CampaignCableData {
+  adventure: Adventure | null
   fight: Fight | null
   encounter: Fight | null
   character: Character | null
@@ -62,6 +64,7 @@ export interface CampaignCableData {
   site: Site | null
   weapon: Weapon | null
   schtick: Schtick | null
+  adventures: Adventure[] | string | null
   campaigns: Campaign[] | string | null
   fights: Fight[] | string | null
   junctures: Juncture[] | string | null
