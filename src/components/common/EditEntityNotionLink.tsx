@@ -1,6 +1,6 @@
 "use client"
 
-import type { Site, Party, Faction, Juncture } from "@/types"
+import type { Site, Party, Faction, Juncture, Adventure } from "@/types"
 import { EntityNotionLinkDialog } from "@/components/notion"
 import type { EntityType } from "@/components/autocomplete/EntityNotionPageAutocomplete"
 import { useState } from "react"
@@ -9,7 +9,7 @@ import { IconButton, Stack, Tooltip } from "@mui/material"
 import LaunchIcon from "@mui/icons-material/Launch"
 import LibraryAddIcon from "@mui/icons-material/LibraryAdd"
 
-type NotionLinkableEntity = Site | Party | Faction | Juncture
+type NotionLinkableEntity = Site | Party | Faction | Juncture | Adventure
 
 type EditEntityNotionLinkProps<T extends NotionLinkableEntity> = {
   entity: T
