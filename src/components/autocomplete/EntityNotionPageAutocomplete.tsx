@@ -29,8 +29,8 @@ export default function EntityNotionPageAutocomplete({
 
   useEffect(() => {
     const fetchPages = async () => {
-      // Campaign check is optional - the backend uses the current user's current_campaign_id
-      // But we keep it to avoid unnecessary API calls when no campaign is selected
+      // We still check for campaign?.id to avoid unnecessary API calls when no campaign is
+      // selected in the frontend, even though the backend uses the user's current_campaign_id
       if (!campaign?.id) {
         setIsLoading(false)
         return
