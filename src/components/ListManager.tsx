@@ -88,7 +88,11 @@ export function ListManager({
   const [currentPage, setCurrentPage] = useState(1)
 
   // 1. Data Derivation
-  const { childIds, childIdsKey } = useChildIds(parentEntity, childEntityName, relationship)
+  const { childIds, childIdsKey } = useChildIds(
+    parentEntity,
+    childEntityName,
+    relationship
+  )
 
   // 2. Data Fetching & State
   const { childEntities, setChildEntities, optimisticUpdateRef, collection } =

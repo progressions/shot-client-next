@@ -9,7 +9,9 @@ type AdventurePageProperties = {
   params: Promise<{ id: string }>
 }
 
-export default async function AdventurePage({ params }: AdventurePageProperties) {
+export default async function AdventurePage({
+  params,
+}: AdventurePageProperties) {
   const { id } = await params
   const client = await getServerClient()
   const user = await getCurrentUser()

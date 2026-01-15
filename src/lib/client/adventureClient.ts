@@ -90,10 +90,8 @@ export function createAdventureClient(deps: ClientDependencies) {
     adventure: Adventure | string,
     character: Character | string
   ): Promise<AxiosResponse<Adventure>> {
-    const adventureId =
-      typeof adventure === "string" ? adventure : adventure.id
-    const characterId =
-      typeof character === "string" ? character : character.id
+    const adventureId = typeof adventure === "string" ? adventure : adventure.id
+    const characterId = typeof character === "string" ? character : character.id
     return post(apiV2.adventureCharacters({ id: adventureId }), {
       character_id: characterId,
     })
@@ -103,13 +101,9 @@ export function createAdventureClient(deps: ClientDependencies) {
     adventure: Adventure | string,
     character: Character | string
   ): Promise<AxiosResponse<void>> {
-    const adventureId =
-      typeof adventure === "string" ? adventure : adventure.id
-    const characterId =
-      typeof character === "string" ? character : character.id
-    return delete_(
-      apiV2.adventureCharacters({ id: adventureId }, characterId)
-    )
+    const adventureId = typeof adventure === "string" ? adventure : adventure.id
+    const characterId = typeof character === "string" ? character : character.id
+    return delete_(apiV2.adventureCharacters({ id: adventureId }, characterId))
   }
 
   // Villain management
@@ -117,10 +111,8 @@ export function createAdventureClient(deps: ClientDependencies) {
     adventure: Adventure | string,
     character: Character | string
   ): Promise<AxiosResponse<Adventure>> {
-    const adventureId =
-      typeof adventure === "string" ? adventure : adventure.id
-    const characterId =
-      typeof character === "string" ? character : character.id
+    const adventureId = typeof adventure === "string" ? adventure : adventure.id
+    const characterId = typeof character === "string" ? character : character.id
     return post(apiV2.adventureVillains({ id: adventureId }), {
       character_id: characterId,
     })
@@ -130,10 +122,8 @@ export function createAdventureClient(deps: ClientDependencies) {
     adventure: Adventure | string,
     character: Character | string
   ): Promise<AxiosResponse<void>> {
-    const adventureId =
-      typeof adventure === "string" ? adventure : adventure.id
-    const characterId =
-      typeof character === "string" ? character : character.id
+    const adventureId = typeof adventure === "string" ? adventure : adventure.id
+    const characterId = typeof character === "string" ? character : character.id
     return delete_(apiV2.adventureVillains({ id: adventureId }, characterId))
   }
 
@@ -142,8 +132,7 @@ export function createAdventureClient(deps: ClientDependencies) {
     adventure: Adventure | string,
     fight: Fight | string
   ): Promise<AxiosResponse<Adventure>> {
-    const adventureId =
-      typeof adventure === "string" ? adventure : adventure.id
+    const adventureId = typeof adventure === "string" ? adventure : adventure.id
     const fightId = typeof fight === "string" ? fight : fight.id
     return post(apiV2.adventureFights({ id: adventureId }), {
       fight_id: fightId,
@@ -154,8 +143,7 @@ export function createAdventureClient(deps: ClientDependencies) {
     adventure: Adventure | string,
     fight: Fight | string
   ): Promise<AxiosResponse<void>> {
-    const adventureId =
-      typeof adventure === "string" ? adventure : adventure.id
+    const adventureId = typeof adventure === "string" ? adventure : adventure.id
     const fightId = typeof fight === "string" ? fight : fight.id
     return delete_(apiV2.adventureFights({ id: adventureId }, fightId))
   }
@@ -164,16 +152,14 @@ export function createAdventureClient(deps: ClientDependencies) {
   async function syncAdventureToNotion(
     adventure: Adventure | string
   ): Promise<AxiosResponse<Adventure>> {
-    const adventureId =
-      typeof adventure === "string" ? adventure : adventure.id
+    const adventureId = typeof adventure === "string" ? adventure : adventure.id
     return post(`${apiV2.adventures({ id: adventureId })}/sync`)
   }
 
   async function syncAdventureFromNotion(
     adventure: Adventure | string
   ): Promise<AxiosResponse<Adventure>> {
-    const adventureId =
-      typeof adventure === "string" ? adventure : adventure.id
+    const adventureId = typeof adventure === "string" ? adventure : adventure.id
     return post(apiV2.syncAdventureFromNotion({ id: adventureId }))
   }
 
@@ -182,8 +168,7 @@ export function createAdventureClient(deps: ClientDependencies) {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<NotionSyncLogsResponse>> {
-    const adventureId =
-      typeof adventure === "string" ? adventure : adventure.id
+    const adventureId = typeof adventure === "string" ? adventure : adventure.id
     const query = queryParams(parameters)
     return get(
       `${apiV2.notionSyncLogsForAdventure({ id: adventureId })}?${query}`,
@@ -198,8 +183,7 @@ export function createAdventureClient(deps: ClientDependencies) {
   ): Promise<
     AxiosResponse<{ pruned_count: number; days_old: number; message: string }>
   > {
-    const adventureId =
-      typeof adventure === "string" ? adventure : adventure.id
+    const adventureId = typeof adventure === "string" ? adventure : adventure.id
     return delete_(
       `${apiV2.notionSyncLogsForAdventure({ id: adventureId })}/prune?days_old=${daysOld}`
     )

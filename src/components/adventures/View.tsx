@@ -13,11 +13,7 @@ interface ViewProps {
   initialIsMobile: boolean
 }
 
-export default function View({
-  viewMode,
-  formState,
-  dispatchForm,
-}: ViewProps) {
+export default function View({ viewMode, formState, dispatchForm }: ViewProps) {
   const updateFilters = useCallback(
     filters => {
       dispatchForm({

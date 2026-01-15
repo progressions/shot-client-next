@@ -60,9 +60,7 @@ export default function Show({ adventure: initialAdventure }: ShowProperties) {
   )
 
   useEffect(() => {
-    document.title = adventure.name
-      ? `${adventure.name} - Chi War`
-      : "Chi War"
+    document.title = adventure.name ? `${adventure.name} - Chi War` : "Chi War"
   }, [adventure.name])
 
   // Subscribe to adventure updates

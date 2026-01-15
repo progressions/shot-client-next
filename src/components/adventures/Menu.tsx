@@ -55,7 +55,10 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
   return (
     <>
       <SpeedDial actions={actions} />
-      <CreateAdventureForm open={drawerOpen} onClose={handleCloseCreateDrawer} />
+      <CreateAdventureForm
+        open={drawerOpen}
+        onClose={handleCloseCreateDrawer}
+      />
     </>
   )
 }
