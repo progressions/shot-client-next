@@ -29,6 +29,8 @@ export default function EntityNotionPageAutocomplete({
 
   useEffect(() => {
     const fetchPages = async () => {
+      // We still check for campaign?.id to avoid unnecessary API calls when no campaign is
+      // selected in the frontend, even though the backend uses the user's current_campaign_id
       if (!campaign?.id) {
         setIsLoading(false)
         return
@@ -37,7 +39,8 @@ export default function EntityNotionPageAutocomplete({
       setIsLoading(true)
       try {
         let response
-        const params: Record<string, string> = { campaign_id: campaign.id }
+        // No longer passing campaign_id - backend uses current user's current_campaign_id
+        const params: Record<string, string> = {}
         if (entityName) {
           params.name = entityName
         }
