@@ -77,6 +77,7 @@ export default function NotionSyncLogList({
   const [totalPages, setTotalPages] = useState(1)
   const [open, setOpen] = useState(false)
   const [expandedLogId, setExpandedLogId] = useState<string | null>(null)
+  const [fetchError, setFetchError] = useState(false)
 
   const fetchLogs = useCallback(
     async (pageNum: number) => {
@@ -123,33 +124,38 @@ export default function NotionSyncLogList({
 
         setLogs(response.data.notion_sync_logs)
         setTotalPages(response.data.meta.total_pages)
+        setFetchError(false)
       } catch (error) {
         console.error("Error fetching Notion sync logs:", error)
-        toastError("Failed to load Notion sync logs. Please try again.")
+        setFetchError(true)
       } finally {
         setLoading(false)
       }
     },
-    [client, entity.id, entityType, toastError]
+     
+    [client, entity.id, entityType]
   )
 
   useEffect(() => {
-    if (!open) return
+    if (!open || fetchError) return
     fetchLogs(page)
-  }, [fetchLogs, page, open])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entity.id, entityType, page, open])
 
   // Subscribe to WebSocket for real-time sync log updates
   useEffect(() => {
     const unsubscribe = subscribeToEntity("notion_sync_logs", () => {
       // Reload logs when any notion sync log is created for this campaign
       // The component is already scoped to a specific entity via props
-      if (open) {
+      if (open && !fetchError) {
+        setFetchError(false) // Reset error state to allow retry on new data
         setPage(1)
         fetchLogs(1)
       }
     })
     return unsubscribe
-  }, [subscribeToEntity, fetchLogs, open])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subscribeToEntity, open, fetchError])
 
   const handleSync = async () => {
     try {
