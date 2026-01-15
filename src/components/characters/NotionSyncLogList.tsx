@@ -18,6 +18,7 @@ import DeleteSweepIcon from "@mui/icons-material/DeleteSweep"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import ErrorIcon from "@mui/icons-material/Error"
 import type {
+  Adventure,
   Character,
   Faction,
   Party,
@@ -29,9 +30,21 @@ import type {
 import { useClient, useToast, useCampaign } from "@/contexts"
 import { SectionHeader, Icon } from "@/components/ui"
 
-type NotionSyncEntity = Character | Site | Party | Faction | Juncture
+type NotionSyncEntity =
+  | Adventure
+  | Character
+  | Site
+  | Party
+  | Faction
+  | Juncture
 
-type NotionEntityType = "character" | "site" | "party" | "faction" | "juncture"
+type NotionEntityType =
+  | "adventure"
+  | "character"
+  | "site"
+  | "party"
+  | "faction"
+  | "juncture"
 
 type PruneResponse = {
   pruned_count: number
@@ -73,6 +86,12 @@ export default function NotionSyncLogList({
         const params = { page: pageNum, per_page: 5 }
 
         switch (entityType) {
+          case "adventure":
+            response = await client.getNotionSyncLogsForAdventure(
+              entity.id,
+              params
+            )
+            break
           case "character":
             response = await client.getNotionSyncLogs(entity.id, params)
             break
@@ -136,6 +155,12 @@ export default function NotionSyncLogList({
     try {
       setSyncing(true)
       switch (entityType) {
+        case "adventure": {
+          const response = await client.syncAdventureToNotion(entity.id)
+          toastSuccess("Adventure synced to Notion")
+          onSync?.(response.data)
+          break
+        }
         case "character":
           await client.syncCharacterToNotion(entity.id)
           toastSuccess("Character sync queued")
@@ -181,6 +206,8 @@ export default function NotionSyncLogList({
       setSyncingFrom(true)
       const response: { data: NotionSyncEntity } = await (async () => {
         switch (entityType) {
+          case "adventure":
+            return client.syncAdventureFromNotion(entity.id)
           case "character":
             return client.syncCharacterFromNotion(entity.id)
           case "site":
@@ -215,6 +242,9 @@ export default function NotionSyncLogList({
       setPruning(true)
       let response: { data: PruneResponse } | null = null
       switch (entityType) {
+        case "adventure":
+          response = await client.pruneNotionSyncLogsForAdventure(entity.id, 30)
+          break
         case "character":
           response = await client.pruneNotionSyncLogs(entity.id, 30)
           break
