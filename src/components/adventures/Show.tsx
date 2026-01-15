@@ -130,7 +130,6 @@ export default function Show({ adventure: initialAdventure }: ShowProperties) {
           parentEntity={adventure}
           childEntityName="Character"
           title="Heroes"
-          relationship="characters"
           description={
             <>
               The <InfoLink href="/characters" info="Characters" /> who are the

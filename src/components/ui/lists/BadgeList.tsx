@@ -48,6 +48,9 @@ const badgeMap: Record<string, (thing: Entity) => React.ReactNode> = {
   characters: (thing: Entity) => (
     <CharacterBadge character={thing as Character} />
   ),
+  villains: (thing: Entity) => (
+    <CharacterBadge character={thing as Character} />
+  ),
   vehicles: (thing: Entity) => <VehicleBadge vehicle={thing as Vehicle} />,
   parties: (thing: Entity) => <PartyBadge party={thing as Party} />,
   junctures: (thing: Entity) => <JunctureBadge juncture={thing as Juncture} />,

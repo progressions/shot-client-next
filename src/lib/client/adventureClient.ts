@@ -29,13 +29,7 @@ interface ClientDependencies {
 
 export function createAdventureClient(deps: ClientDependencies) {
   const { apiV2, queryParams } = deps
-  const {
-    get,
-    post,
-    patch,
-    delete: delete_,
-    requestFormData,
-  } = createBaseClient(deps)
+  const { get, post, delete: delete_, requestFormData } = createBaseClient(deps)
 
   async function getAdventures(
     parameters: Parameters_ = {},
