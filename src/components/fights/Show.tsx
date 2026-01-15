@@ -305,6 +305,21 @@ export default function Show({ fight: initialFight }: ShowProperties) {
           onListUpdate={updateEntity}
           allowDuplicates={true}
         />
+        <Manager
+          icon={<Icon keyword="Adventures" size="24" />}
+          parentEntity={fight}
+          childEntityName="Adventure"
+          title="Adventures"
+          relationship="adventures"
+          description={
+            <>
+              The <InfoLink href="/adventures" info="Adventures" /> that include
+              this <InfoLink href="/fights" info="Fight" /> as part of their
+              storyline.
+            </>
+          }
+          onListUpdate={updateEntity}
+        />
       </Stack>
       {/* Solo Play Section */}
       <Box>

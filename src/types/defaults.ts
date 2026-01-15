@@ -14,6 +14,7 @@ import type {
   Site,
   Party,
   Weapon,
+  Adventure,
 } from "./resources"
 import type { VehicleActionValues } from "./types"
 import type { PaginationMeta } from "./responses"
@@ -297,6 +298,29 @@ export const defaultParty: Party = {
   character_ids: [],
   vehicle_ids: [],
   image_url: "",
+  created_at: "",
+  updated_at: "",
+}
+
+export const defaultAdventure: Adventure = {
+  entity_class: "Adventure",
+  id: "",
+  name: "",
+  description: "",
+  season: null,
+  started_at: null,
+  ended_at: null,
+  active: true,
+  at_a_glance: false,
+  user_id: "",
+  campaign_id: "",
+  image_url: null,
+  character_ids: [],
+  characters: [],
+  villain_ids: [],
+  villains: [],
+  fight_ids: [],
+  fights: [],
   created_at: "",
   updated_at: "",
 }

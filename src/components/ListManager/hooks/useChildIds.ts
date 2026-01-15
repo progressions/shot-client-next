@@ -9,17 +9,27 @@
  */
 
 import { useMemo } from "react"
-import type { Fight } from "@/types"
+import type { Entity, Fight } from "@/types"
 import { filterConfigs } from "@/lib/filterConfigs"
 
 /**
- * Hook to extract child entity IDs from a parent Fight.
+ * Parent entity type that can contain child relationships.
+ * Includes Fight (with shots) and other entities with ID arrays.
+ */
+type ParentEntity = Entity & {
+  shots?: Fight["shots"]
+  [key: string]: unknown
+}
+
+/**
+ * Hook to extract child entity IDs from a parent entity.
  *
- * For Characters and Vehicles, first attempts to extract IDs from the shots array
+ * For Characters and Vehicles in Fights, first attempts to extract IDs from the shots array
  * (character_id/vehicle_id), falling back to direct ID arrays on the parent entity.
  *
- * @param parentEntity - The parent Fight entity
+ * @param parentEntity - The parent entity (Fight, Adventure, etc.)
  * @param childEntityName - Type of child entity (e.g., "Character", "Vehicle")
+ * @param relationship - Optional override for the relationship key (e.g., "villains" instead of "characters")
  * @returns Object with childIds array and childIdsKey property name
  *
  * @example
@@ -27,13 +37,21 @@ import { filterConfigs } from "@/lib/filterConfigs"
  * const { childIds, childIdsKey } = useChildIds(fight, "Character")
  * // childIds: ["uuid-1", "uuid-2", "uuid-3"]
  * // childIdsKey: "character_ids"
+ *
+ * // With relationship override:
+ * const { childIds, childIdsKey } = useChildIds(adventure, "Character", "villains")
+ * // childIdsKey: "villain_ids"
  * ```
  */
 export function useChildIds(
-  parentEntity: Fight,
-  childEntityName: keyof typeof filterConfigs
+  parentEntity: ParentEntity,
+  childEntityName: keyof typeof filterConfigs,
+  relationship?: string
 ) {
-  const childIdsKey = `${childEntityName.toLowerCase()}_ids` as keyof Fight
+  // Use relationship override if provided, otherwise derive from childEntityName
+  const childIdsKey = relationship
+    ? `${relationship.replace(/s$/, "")}_ids`
+    : `${childEntityName.toLowerCase()}_ids`
   const shots = parentEntity.shots
   const directIds = parentEntity[childIdsKey] as string[]
 
@@ -58,7 +76,7 @@ export function useChildIds(
       return directIds
     }
     return []
-  }, [childEntityName, shots, directIds])
+  }, [childEntityName, shots, directIds, relationship])
 
   return { childIds, childIdsKey }
 }

@@ -4,7 +4,7 @@ import EditIcon from "@mui/icons-material/Edit"
 
 type DetailButtonsProps = {
   name: string
-  onEdit: () => void
+  onEdit?: () => void
   onDelete: () => Promise<void>
 }
 
@@ -15,11 +15,13 @@ export default function DetailButtons({
 }: DetailButtonsProps) {
   return (
     <Box sx={{ display: "flex", gap: "0.5rem" }}>
-      <Tooltip title={`Edit ${name}`}>
-        <IconButton color="inherit" onClick={onEdit} size="small">
-          <EditIcon />
-        </IconButton>
-      </Tooltip>
+      {onEdit && (
+        <Tooltip title={`Edit ${name}`}>
+          <IconButton color="inherit" onClick={onEdit} size="small">
+            <EditIcon />
+          </IconButton>
+        </Tooltip>
+      )}
       <Tooltip title={`Delete ${name}`}>
         <IconButton color="inherit" onClick={onDelete} size="small">
           <DeleteIcon />

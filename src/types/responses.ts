@@ -1,4 +1,5 @@
 import type {
+  Adventure,
   Character,
   User,
   Campaign,
@@ -34,6 +35,11 @@ export interface SuggestionsResponse {
 export interface PartiesResponse {
   parties: Party[]
   factions: Faction[]
+  meta: PaginationMeta
+}
+
+export interface AdventuresResponse {
+  adventures: Adventure[]
   meta: PaginationMeta
 }
 

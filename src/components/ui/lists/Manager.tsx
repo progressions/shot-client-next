@@ -13,6 +13,7 @@ type ManagerProperties = {
   description: React.ReactNode
   parentEntity: Entity
   childEntityName:
+    | "Adventure"
     | "Character"
     | "Schtick"
     | "Weapon"
@@ -27,6 +28,7 @@ type ManagerProperties = {
   excludeIds?: string[]
   manage?: boolean
   allowDuplicates?: boolean
+  relationship?: string // Override for the relationship key (e.g., "villains" instead of "characters")
 }
 
 export function Manager({
@@ -39,6 +41,7 @@ export function Manager({
   excludeIds = [],
   manage = true,
   allowDuplicates = false,
+  relationship,
 }: ManagerProperties) {
   const [open, setOpen] = useState(false)
 
@@ -75,6 +78,7 @@ export function Manager({
         excludeIds={excludeIds}
         manage={manage}
         allowDuplicates={allowDuplicates}
+        relationship={relationship}
       />
     </Box>
   )

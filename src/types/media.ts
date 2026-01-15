@@ -7,6 +7,7 @@ export type MediaImageStatus = "orphan" | "attached"
 export type MediaImageSource = "upload" | "ai_generated"
 
 export type MediaImageEntityType =
+  | "Adventure"
   | "Character"
   | "Vehicle"
   | "Weapon"

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 
 // Entity types that support .json endpoints
 const ENTITY_TYPES = [
+  "adventures",
   "parties",
   "characters",
   "fights",
