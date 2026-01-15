@@ -14,7 +14,7 @@ import {
 } from "@mui/material"
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
 import { SystemStyleObject, Theme } from "@mui/system"
-import type { MouseEvent } from "react"
+import type { MouseEvent, SyntheticEvent } from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import type { Character } from "@/types"
@@ -245,6 +245,32 @@ Action Values: ${JSON.stringify(character.actionValues, null, 2)}
       }
     }
 
+  const handleOpen = (_event: SyntheticEvent, reason: string) => {
+    if (reason !== "toggle") {
+      return
+    }
+
+    setSpeedDialOpen(true)
+  }
+
+  const handleClose = (_event: SyntheticEvent, reason: string) => {
+    if (reason === "escapeKeyDown") {
+      setSpeedDialOpen(false)
+      return
+    }
+
+    if (reason !== "toggle") {
+      return
+    }
+
+    if (persist) {
+      setPersist(false)
+      return
+    }
+
+    setSpeedDialOpen(false)
+  }
+
   return (
     <>
       <SpeedDial
@@ -263,12 +289,8 @@ Action Values: ${JSON.stringify(character.actionValues, null, 2)}
         icon={<SpeedDialIcon openIcon={<MoreHorizIcon />} />}
         direction="down"
         open={speedDialOpen}
-        onOpen={() => setSpeedDialOpen(true)}
-        onClose={() => {
-          if (!persist) {
-            setSpeedDialOpen(false)
-          }
-        }}
+        onOpen={handleOpen}
+        onClose={handleClose}
       >
         {actions.map(action => (
           <SpeedDialAction
