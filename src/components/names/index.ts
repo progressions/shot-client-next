@@ -1,3 +1,4 @@
+export { AdventureName } from "@/components/adventures"
 export { WeaponName } from "@/components/weapons"
 export { CharacterName } from "@/components/characters"
 export { VehicleName } from "@/components/vehicles"

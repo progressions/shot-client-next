@@ -3,6 +3,7 @@ import { headers } from "next/headers"
 import { Breadcrumbs as MuiBreadcrumbs, Typography } from "@mui/material"
 import NavigateNextIcon from "@mui/icons-material/NavigateNext"
 import {
+  AdventureName,
   SiteName,
   WeaponName,
   CharacterName,
@@ -92,11 +93,16 @@ async function fetchCrumbName(
     const response = await client.getUser({ id })
     return <UserName user={response.data} />
   }
+  if (pathnames[0] === "adventures") {
+    const response = await client.getAdventure({ id })
+    return <AdventureName adventure={response.data} />
+  }
   return null
 }
 
 export default async function Breadcrumbs({ client }) {
   const labelMap: { [key: string]: string } = {
+    adventures: "Adventures",
     characters: "Characters",
     vehicles: "Vehicles",
     fights: "Fights",
