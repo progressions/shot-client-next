@@ -187,6 +187,13 @@ export default function NotionIntegrationPanel({
                     mappings,
                     handleMappingChange
                   )}
+                  {renderMappingSelect(
+                    "adventures",
+                    "Adventures",
+                    databases,
+                    mappings,
+                    handleMappingChange
+                  )}
                 </Stack>
               )}
 
