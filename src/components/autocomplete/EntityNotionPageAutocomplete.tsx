@@ -5,7 +5,7 @@ import { type Option, Autocomplete } from "@/components/ui"
 import { useClient } from "@/contexts"
 import { useEffect, useState } from "react"
 
-export type EntityType = "site" | "party" | "faction" | "juncture"
+export type EntityType = "site" | "party" | "faction" | "juncture" | "adventure"
 
 type EntityNotionPageAutocompleteProperties = {
   value: string | null
@@ -45,6 +45,9 @@ export default function EntityNotionPageAutocomplete({
             break
           case "juncture":
             response = await client.getNotionJunctures(params)
+            break
+          case "adventure":
+            response = await client.getNotionAdventures(params)
             break
         }
 
