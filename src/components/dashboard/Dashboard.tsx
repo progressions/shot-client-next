@@ -7,6 +7,7 @@ import {
   PartiesModule,
   CharactersModule,
   FightsModule,
+  AdventuresModule,
   CampaignBanner,
   SitesModule,
   ActiveFightBanner,
@@ -36,6 +37,11 @@ export default async function Dashboard({
       {/* Gamemaster view - full dashboard */}
       {isGamemaster && (
         <>
+          <Box sx={{ mb: 2 }}>
+            <Suspense fallback={<LoadingModule />}>
+              <AdventuresModule userId={user.id} />
+            </Suspense>
+          </Box>
           <Stack
             direction={{ xs: "column", sm: "row" }}
             spacing={2}
