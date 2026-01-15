@@ -132,7 +132,7 @@ export default function NotionSyncLogList({
         setLoading(false)
       }
     },
-     
+
     [client, entity.id, entityType]
   )
 
