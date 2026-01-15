@@ -104,6 +104,7 @@ export default function FactionSpeedDial({
 
   const handleClose = (_event: SyntheticEvent, reason: string) => {
     if (reason === "escapeKeyDown") {
+      setPersist(false)
       setSpeedDialOpen(false)
       return
     }

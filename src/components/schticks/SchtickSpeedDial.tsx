@@ -104,6 +104,7 @@ export default function SchtickSpeedDial({
 
   const handleClose = (_event: SyntheticEvent, reason: string) => {
     if (reason === "escapeKeyDown") {
+      setPersist(false)
       setSpeedDialOpen(false)
       return
     }

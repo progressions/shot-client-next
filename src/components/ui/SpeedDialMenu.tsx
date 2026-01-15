@@ -61,21 +61,10 @@ export function SpeedDialMenu({
 
   const actions = initialActions || defaultActions
 
-  const openMenu = () => {
-    if (isControlled) {
-      if (onOpen) {
-        onOpen()
-      }
-    } else {
-      setLocalOpen(true)
-    }
-  }
-
   const closeMenu = () => {
+    setPersist(false)
     if (isControlled) {
-      if (onClose) {
-        onClose()
-      }
+      onClose?.()
     } else {
       setLocalOpen(false)
     }
@@ -85,8 +74,11 @@ export function SpeedDialMenu({
     if (reason !== "toggle") {
       return
     }
-
-    openMenu()
+    if (isControlled) {
+      onOpen?.()
+    } else {
+      setLocalOpen(true)
+    }
   }
 
   const handleActionClick =
@@ -95,7 +87,6 @@ export function SpeedDialMenu({
         event.stopPropagation()
         setPersist(true)
       } else {
-        setPersist(false)
         closeMenu()
       }
       if (action.onClick) {
