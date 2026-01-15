@@ -5,10 +5,12 @@ import type { PaginationMeta, Entity } from "@/types"
 import { useState } from "react"
 import DeleteIcon from "@mui/icons-material/Delete"
 import {
+  AdventureBadge,
   CharacterBadge,
   VehicleBadge,
   PartyBadge,
   FactionBadge,
+  FightBadge,
   JunctureBadge,
   SiteBadge,
   WeaponBadge,
@@ -16,6 +18,19 @@ import {
   UserBadge,
   Badge,
 } from "@/components/badges"
+import type {
+  Adventure,
+  Character,
+  Vehicle,
+  Party,
+  Faction,
+  Fight,
+  Juncture,
+  Site,
+  Weapon,
+  Schtick,
+  User,
+} from "@/types"
 
 type BadgeListProps = {
   items: Entity[]
@@ -27,6 +42,9 @@ type BadgeListProps = {
 }
 
 const badgeMap: Record<string, (thing: Entity) => React.ReactNode> = {
+  adventures: (thing: Entity) => (
+    <AdventureBadge adventure={thing as Adventure} />
+  ),
   characters: (thing: Entity) => (
     <CharacterBadge character={thing as Character} />
   ),
@@ -37,6 +55,7 @@ const badgeMap: Record<string, (thing: Entity) => React.ReactNode> = {
   weapons: (thing: Entity) => <WeaponBadge weapon={thing as Weapon} />,
   factions: (thing: Entity) => <FactionBadge faction={thing as Faction} />,
   schticks: (thing: Entity) => <SchtickBadge schtick={thing as Schtick} />,
+  fights: (thing: Entity) => <FightBadge fight={thing as Fight} />,
   users: (thing: Entity) => <UserBadge user={thing as User} />,
   players: (thing: Entity) => <UserBadge user={thing as User} />,
 }

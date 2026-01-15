@@ -1,6 +1,15 @@
 import type { FilterConfig } from "@/types"
 
 export const filterConfigs: Record<string, FilterConfig> = {
+  Adventure: {
+    entityName: "Adventure",
+    fields: [
+      { name: "season", type: "string" },
+      { name: "adventure", type: "entity", allowNone: false },
+      { name: "search", type: "search" },
+    ],
+    responseKeys: { season: "seasons", adventure: "adventures" },
+  },
   Character: {
     entityName: "Character",
     fields: [

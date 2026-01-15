@@ -50,6 +50,7 @@ type ListManagerProps = {
   excludeIds?: string[]
   manage?: boolean
   allowDuplicates?: boolean
+  relationship?: string // Override for the relationship key (e.g., "villains" instead of "characters")
 }
 
 /**
@@ -81,12 +82,13 @@ export function ListManager({
   excludeIds = [],
   manage = true,
   allowDuplicates = false,
+  relationship,
 }: ListManagerProps) {
   const { client } = useClient()
   const [currentPage, setCurrentPage] = useState(1)
 
   // 1. Data Derivation
-  const { childIds, childIdsKey } = useChildIds(parentEntity, childEntityName)
+  const { childIds, childIdsKey } = useChildIds(parentEntity, childEntityName, relationship)
 
   // 2. Data Fetching & State
   const { childEntities, setChildEntities, optimisticUpdateRef, collection } =

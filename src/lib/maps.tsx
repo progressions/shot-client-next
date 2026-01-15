@@ -27,6 +27,7 @@ import {
 
 export function getUrl(className: string, id: string) {
   const urlMap: { [key: string]: string } = {
+    Adventure: `/adventures/${id}`,
     Fight: `/fights/${id}`,
     Character: `/characters/${id}`,
     Vehicle: `/vehicles/${id}`,
@@ -76,6 +77,7 @@ export const nameComponents: Record<string, React.ComponentType<unknown>> = {
 
 // Map entity_class to the prop name expected by the Name component
 export const namePropNames: Record<string, string> = {
+  Adventure: "adventure",
   Fight: "fight",
   Character: "character",
   Vehicle: "vehicle",
@@ -90,6 +92,7 @@ export const namePropNames: Record<string, string> = {
 }
 
 export const collectionNames: Record<string, string> = {
+  Adventure: "adventures",
   Fight: "fights",
   Character: "characters",
   Vehicle: "vehicles",

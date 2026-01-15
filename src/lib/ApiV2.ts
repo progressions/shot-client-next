@@ -15,6 +15,7 @@ import {
   AiCredential,
   AiProvider,
   Notification,
+  Adventure,
 } from "@/types"
 
 class ApiV2 {
@@ -135,6 +136,46 @@ class ApiV2 {
 
   partyReorderSlots(party: Party | ID): string {
     return `${this.parties(party)}/reorder_slots`
+  }
+
+  // Adventures
+  adventures(adventure?: Adventure | ID): string {
+    return adventure?.id
+      ? `${this.api()}/adventures/${adventure.id}`
+      : `${this.api()}/adventures`
+  }
+
+  adventureCharacters(adventure: Adventure | ID, characterId?: string): string {
+    const adventureUrl = this.adventures(adventure)
+    return characterId
+      ? `${adventureUrl}/characters/${characterId}`
+      : `${adventureUrl}/characters`
+  }
+
+  adventureVillains(adventure: Adventure | ID, characterId?: string): string {
+    const adventureUrl = this.adventures(adventure)
+    return characterId
+      ? `${adventureUrl}/villains/${characterId}`
+      : `${adventureUrl}/villains`
+  }
+
+  adventureFights(adventure: Adventure | ID, fightId?: string): string {
+    const adventureUrl = this.adventures(adventure)
+    return fightId
+      ? `${adventureUrl}/fights/${fightId}`
+      : `${adventureUrl}/fights`
+  }
+
+  notionSyncLogsForAdventure(adventure: Adventure | ID): string {
+    return `${this.adventures(adventure)}/notion_sync_logs`
+  }
+
+  syncAdventureFromNotion(adventure: Adventure | ID): string {
+    return `${this.adventures(adventure)}/sync_from_notion`
+  }
+
+  notionAdventures(): string {
+    return `${this.api()}/notion/adventures`
   }
 
   weapons(weapon?: Weapon | ID): string {

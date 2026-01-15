@@ -13,6 +13,7 @@ import * as site from "@/lib/client/siteClient"
 import * as faction from "@/lib/client/factionClient"
 import * as weapon from "@/lib/client/weaponClient"
 import * as schtick from "@/lib/client/schtickClient"
+import * as adventure from "@/lib/client/adventureClient"
 import * as ai from "@/lib/client/aiClient"
 import * as editor from "@/lib/client/editorClient"
 import * as characterEffect from "@/lib/client/characterEffectClient"
@@ -80,6 +81,7 @@ export default function createClient(parameters: ClientParameters = {}) {
     ...faction.createFactionClient({ jwt, api, apiV2, queryParams }),
     ...weapon.createWeaponClient({ jwt, api, apiV2, queryParams }),
     ...schtick.createSchtickClient({ jwt, api, apiV2, queryParams }),
+    ...adventure.createAdventureClient({ jwt, api, apiV2, queryParams }),
     ...ai.createAiClient({ jwt, api, apiV2 }),
     ...editor.createEditorClient({ jwt, api, apiV2, queryParams }),
     ...characterEffect.createCharacterEffectClient({

@@ -5,6 +5,7 @@ import type {
   Severity,
   SchtickCategory,
   SchtickPath,
+  ImagePosition,
 } from "./ui"
 import type { AiProvider } from "./ai-credentials"
 import type {
@@ -307,6 +308,9 @@ export interface Fight extends BaseEntity {
   solo_mode?: boolean
   solo_player_character_ids?: string[]
   solo_behavior_type?: "simple" | "ai"
+  // Adventure associations
+  adventures?: Adventure[]
+  adventure_ids?: string[]
 }
 
 export interface User extends BaseEntity {
@@ -354,6 +358,33 @@ export interface Juncture extends BaseEntity {
   updated_at: string
   notion_page_id?: string | null
   last_synced_to_notion_at?: string | null
+}
+
+export interface Adventure extends BaseEntity {
+  id: string
+  name: string
+  description?: string
+  season?: number | null
+  started_at: string | null
+  ended_at: string | null
+  active: boolean
+  at_a_glance: boolean
+  user_id: string
+  user?: User
+  campaign_id: string
+  notion_page_id?: string | null
+  last_synced_to_notion_at?: string | null
+  image_url: string | null
+  image_positions?: ImagePosition[]
+  character_ids: string[]
+  characters: Character[]
+  villain_ids: string[]
+  villains: Character[]
+  fight_ids: string[]
+  fights: Fight[]
+  entity_class: "Adventure"
+  created_at: string
+  updated_at: string
 }
 
 export interface Effect {
@@ -507,6 +538,7 @@ export interface NotionSyncLog {
 
 // Entity union type - all entity types that can be displayed with avatars
 export type Entity =
+  | Adventure
   | Campaign
   | Character
   | Fight

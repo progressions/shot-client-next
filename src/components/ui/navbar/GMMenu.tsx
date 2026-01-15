@@ -61,6 +61,11 @@ export function GMMenu({ onClose, isAdmin }: GMMenuProps) {
           Junctures
         </Link>
       </MenuItem>
+      <MenuItem onClick={onClose}>
+        <Link href="/adventures" style={linkStyle}>
+          Adventures
+        </Link>
+      </MenuItem>
       <Divider sx={dividerStyle} />
       <MenuItem onClick={onClose}>
         <Link href="/campaigns" style={linkStyle}>

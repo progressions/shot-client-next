@@ -20,6 +20,7 @@ import { filterConfigs } from "@/lib/filterConfigs"
  *
  * @param parentEntity - The parent Fight entity
  * @param childEntityName - Type of child entity (e.g., "Character", "Vehicle")
+ * @param relationship - Optional override for the relationship key (e.g., "villains" instead of "characters")
  * @returns Object with childIds array and childIdsKey property name
  *
  * @example
@@ -27,13 +28,21 @@ import { filterConfigs } from "@/lib/filterConfigs"
  * const { childIds, childIdsKey } = useChildIds(fight, "Character")
  * // childIds: ["uuid-1", "uuid-2", "uuid-3"]
  * // childIdsKey: "character_ids"
+ *
+ * // With relationship override:
+ * const { childIds, childIdsKey } = useChildIds(adventure, "Character", "villains")
+ * // childIdsKey: "villain_ids"
  * ```
  */
 export function useChildIds(
   parentEntity: Fight,
-  childEntityName: keyof typeof filterConfigs
+  childEntityName: keyof typeof filterConfigs,
+  relationship?: string
 ) {
-  const childIdsKey = `${childEntityName.toLowerCase()}_ids` as keyof Fight
+  // Use relationship override if provided, otherwise derive from childEntityName
+  const childIdsKey = relationship
+    ? (`${relationship.replace(/s$/, "")}_ids` as keyof Fight)
+    : (`${childEntityName.toLowerCase()}_ids` as keyof Fight)
   const shots = parentEntity.shots
   const directIds = parentEntity[childIdsKey] as string[]
 
@@ -58,7 +67,7 @@ export function useChildIds(
       return directIds
     }
     return []
-  }, [childEntityName, shots, directIds])
+  }, [childEntityName, shots, directIds, relationship])
 
   return { childIds, childIdsKey }
 }
