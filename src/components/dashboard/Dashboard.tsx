@@ -37,6 +37,11 @@ export default async function Dashboard({
       {/* Gamemaster view - full dashboard */}
       {isGamemaster && (
         <>
+          <Box sx={{ mb: 2 }}>
+            <Suspense fallback={<LoadingModule />}>
+              <AdventuresModule userId={user.id} />
+            </Suspense>
+          </Box>
           <Stack
             direction={{ xs: "column", sm: "row" }}
             spacing={2}
@@ -59,15 +64,6 @@ export default async function Dashboard({
             </Suspense>
             <Suspense fallback={<LoadingModule />}>
               <SitesModule userId={user.id} size="small" />
-            </Suspense>
-          </Stack>
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={2}
-            sx={{ mb: 2 }}
-          >
-            <Suspense fallback={<LoadingModule />}>
-              <AdventuresModule userId={user.id} />
             </Suspense>
           </Stack>
         </>

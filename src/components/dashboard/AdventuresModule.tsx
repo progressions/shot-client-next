@@ -53,8 +53,7 @@ export default async function AdventuresModule({
     <AdventuresModuleClient>
       <Box
         sx={{
-          flexGrow: 1,
-          width: { xs: "100%", sm: "auto" },
+          width: "100%",
           p: 2,
           borderRadius: 2,
           backgroundColor: "#2d2d2d",
