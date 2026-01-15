@@ -16,6 +16,7 @@ interface AvatarProperties {
   sx?: SystemStyleObject<Theme>
   disableImageViewer?: boolean
   borderColor?: string | null
+  showImpairments?: boolean
 }
 
 const Avatar = ({
@@ -25,6 +26,7 @@ const Avatar = ({
   sx = {},
   disableImageViewer = false,
   borderColor,
+  showImpairments = false,
 }: AvatarProperties) => {
   const [imageViewerOpen, setImageViewerOpen] = useState(false)
 
@@ -92,7 +94,9 @@ const Avatar = ({
 
   // Check if entity has impairments (Character or Vehicle types)
   const impairments =
-    "impairments" in entity && typeof entity.impairments === "number"
+    showImpairments &&
+    "impairments" in entity &&
+    typeof entity.impairments === "number"
       ? entity.impairments
       : 0
 

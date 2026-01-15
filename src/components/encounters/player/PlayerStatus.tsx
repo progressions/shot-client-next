@@ -256,7 +256,11 @@ export default function PlayerStatus({ character }: PlayerStatusProps) {
                   p: 0.25,
                 }}
               >
-                <EntityAvatar entity={drivingVehicle} size={48} />
+                <EntityAvatar
+                  entity={drivingVehicle}
+                  size={48}
+                  showImpairments
+                />
               </Box>
               <Box sx={{ flex: 1 }}>
                 <Stack

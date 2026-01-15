@@ -288,7 +288,12 @@ export default function SpeedCheckPanel({
                 <Box
                   sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}
                 >
-                  <Avatar character={selectedTarget} hideVehicle size={48} />
+                  <Avatar
+                    character={selectedTarget}
+                    hideVehicle
+                    size={48}
+                    showImpairments
+                  />
                   <Box>
                     <CharacterLink character={selectedTarget} />
                     <Typography variant="body2" color="text.secondary">

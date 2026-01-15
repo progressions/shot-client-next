@@ -38,7 +38,7 @@ export default function CharacterHeader({
             justifyContent: "center",
           }}
         >
-          <EntityAvatar entity={character} />
+          <EntityAvatar entity={character} showImpairments />
         </Box>
       </Box>
       <Stack

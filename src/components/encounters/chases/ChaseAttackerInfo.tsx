@@ -62,7 +62,11 @@ export default function ChaseAttackerInfo({
       </Typography>
 
       <Stack direction="row" spacing={2} alignItems="center">
-        <Avatar entity={attacker} sx={{ width: 48, height: 48 }} />
+        <Avatar
+          entity={attacker}
+          sx={{ width: 48, height: 48 }}
+          showImpairments
+        />
         <Box sx={{ flex: 1 }}>
           <Typography variant="subtitle1" fontWeight="bold">
             <CharacterLink character={attacker}>{attacker.name}</CharacterLink>

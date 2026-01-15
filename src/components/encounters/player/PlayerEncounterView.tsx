@@ -153,7 +153,7 @@ export default function PlayerEncounterView({
               <ArrowBack />
             </IconButton>
           </Link>
-          <EntityAvatar entity={character} size={32} />
+          <EntityAvatar entity={character} size={32} showImpairments />
           <Typography
             variant="h6"
             component="h2"

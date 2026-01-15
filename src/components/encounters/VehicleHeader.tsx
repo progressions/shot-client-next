@@ -29,7 +29,7 @@ export default function VehicleHeader({
       sx={{ width: "100%" }}
     >
       <Box sx={{ display: { xs: "none", sm: "block" } }}>
-        <EntityAvatar entity={vehicle} />
+        <EntityAvatar entity={vehicle} showImpairments />
       </Box>
       <Stack
         direction="column"

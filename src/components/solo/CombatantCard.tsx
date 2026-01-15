@@ -66,7 +66,12 @@ export function CombatantCard({
     >
       <Stack direction="row" spacing={1.5} alignItems="center">
         {/* Avatar */}
-        <EntityAvatar entity={avatarEntity} disablePopup size={40} />
+        <EntityAvatar
+          entity={avatarEntity}
+          disablePopup
+          size={40}
+          showImpairments
+        />
 
         {/* Info */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
