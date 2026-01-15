@@ -1,3 +1,4 @@
+export { default as AdventureName } from "@/components/adventures/AdventureName"
 export { default as List } from "@/components/adventures/List"
 export { default as AdventureDetail } from "@/components/adventures/AdventureDetail"
 export { default as AdventureForm } from "@/components/adventures/AdventureForm"
