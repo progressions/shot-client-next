@@ -2,7 +2,7 @@
 
 import type { NotionPage } from "@/types"
 import { type Option, Autocomplete } from "@/components/ui"
-import { useClient } from "@/contexts"
+import { useClient, useCampaign } from "@/contexts"
 import { useEffect, useState } from "react"
 
 export type EntityType = "site" | "party" | "faction" | "juncture" | "adventure"
@@ -23,15 +23,24 @@ export default function EntityNotionPageAutocomplete({
   allowNone = true,
 }: EntityNotionPageAutocompleteProperties) {
   const { client } = useClient()
+  const { campaign } = useCampaign()
   const [pages, setPages] = useState<NotionPage[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchPages = async () => {
+      if (!campaign?.id) {
+        setIsLoading(false)
+        return
+      }
+
       setIsLoading(true)
       try {
         let response
-        const params = entityName ? { name: entityName } : {}
+        const params: Record<string, string> = { campaign_id: campaign.id }
+        if (entityName) {
+          params.name = entityName
+        }
 
         switch (entityType) {
           case "site":
@@ -63,7 +72,7 @@ export default function EntityNotionPageAutocomplete({
       console.error("Error in useEffect fetchPages:", error)
       setIsLoading(false)
     })
-  }, [client, entityType, entityName])
+  }, [client, campaign?.id, entityType, entityName])
 
   const fetchOptions = async (inputValue: string): Promise<Option[]> => {
     return pages
