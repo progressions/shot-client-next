@@ -89,13 +89,24 @@ export default function CharacterDetail({
           ...characterUpdate,
           // Preserve shot-related fields from previous state if not in update
           count: characterUpdate.count ?? prev.count,
-          shot_id: prev.shot_id,
-          current_shot: (prev as Character & { current_shot?: number | null })
-            .current_shot,
+          shot_id:
+            (characterUpdate as Character & { shot_id?: string }).shot_id ??
+            prev.shot_id,
+          current_shot:
+            (characterUpdate as Character & { current_shot?: number | null })
+              .current_shot ??
+            (prev as Character & { current_shot?: number | null }).current_shot,
           impairments: characterUpdate.impairments ?? prev.impairments,
-          location: (prev as Character & { location?: string }).location,
-          driving_id: (prev as Character & { driving_id?: string }).driving_id,
-          effects: (prev as Character & { effects?: unknown[] }).effects,
+          location:
+            (characterUpdate as Character & { location?: string }).location ??
+            (prev as Character & { location?: string }).location,
+          driving_id:
+            (characterUpdate as Character & { driving_id?: string })
+              .driving_id ??
+            (prev as Character & { driving_id?: string }).driving_id,
+          effects:
+            (characterUpdate as Character & { effects?: unknown[] }).effects ??
+            (prev as Character & { effects?: unknown[] }).effects,
         }))
         // Update driving vehicle (including clearing when character stops driving)
         setDrivingVehicle(characterUpdate.driving || null)
