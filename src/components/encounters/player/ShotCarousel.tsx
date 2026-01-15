@@ -289,6 +289,7 @@ export default function ShotCarousel({
                       entity={character}
                       disablePopup={true}
                       disableImageViewer={true}
+                      showImpairments
                       sx={{
                         width: 44,
                         height: 44,

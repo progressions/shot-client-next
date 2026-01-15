@@ -233,6 +233,7 @@ export default function CharacterSelector({
                         href={`/characters/${entity.id}`}
                         disablePopup={isMobile}
                         disableImageViewer={true}
+                        showImpairments
                         sx={{
                           width: { xs: 48, sm: 64 },
                           height: { xs: 48, sm: 64 },

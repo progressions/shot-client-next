@@ -141,7 +141,7 @@ export default function AttackerBar({
             minWidth: 100,
           }}
         >
-          <EntityAvatar entity={attacker} size="small" />
+          <EntityAvatar entity={attacker} size="small" showImpairments />
           <CharacterLink character={attacker} />
         </Box>
 

@@ -98,7 +98,12 @@ export default function CheeseItPanel({
     >
       <Box sx={{ mb: 3 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-          <Avatar character={preselectedCharacter} hideVehicle size={64} />
+          <Avatar
+            character={preselectedCharacter}
+            hideVehicle
+            size={64}
+            showImpairments
+          />
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "flex-end", gap: 2, mb: 2 }}>
