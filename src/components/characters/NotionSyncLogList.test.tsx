@@ -690,7 +690,7 @@ describe("NotionSyncLogList", () => {
   })
 
   describe("Error Handling", () => {
-    it("shows toast error when log fetch fails", async () => {
+    it("stops fetching after fetch error to prevent infinite loops", async () => {
       mockGetNotionSyncLogs.mockRejectedValue(new Error("Network error"))
 
       render(
@@ -699,11 +699,16 @@ describe("NotionSyncLogList", () => {
 
       fireEvent.click(screen.getByText("Show"))
 
+      // Wait for the fetch to fail
       await waitFor(() => {
-        expect(mockToastError).toHaveBeenCalledWith(
-          "Failed to load Notion sync logs. Please try again."
-        )
+        expect(mockGetNotionSyncLogs).toHaveBeenCalledTimes(1)
       })
+
+      // Wait a bit to ensure no retry loop occurs
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      // Should NOT have retried - only called once
+      expect(mockGetNotionSyncLogs).toHaveBeenCalledTimes(1)
     })
   })
 
