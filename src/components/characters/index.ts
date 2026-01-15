@@ -1,6 +1,5 @@
 export { default as CharacterName } from "@/components/characters/CharacterName"
 export { default as List } from "@/components/characters/List"
-export { default as CharactersMobile } from "@/components/characters/CharactersMobile"
 export { default as CharacterPageClient } from "@/components/characters/CharacterPageClient"
 export { default as ImportPage } from "@/components/characters/ImportPage"
 export { default as GeneratePage } from "@/components/characters/GeneratePage"
