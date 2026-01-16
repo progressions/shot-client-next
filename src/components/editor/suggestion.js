@@ -52,21 +52,28 @@ const suggestion = (user, client) => ({
       },
 
       onUpdate(properties) {
+        if (!component) {
+          return
+        }
+
         component.updateProps(properties)
 
         if (!properties.clientRect) {
           return
         }
 
-        popup[0].setProps({
+        popup?.[0]?.setProps({
           getReferenceClientRect: properties.clientRect,
         })
       },
 
       onKeyDown(properties) {
-        if (properties.event.key === "Escape") {
-          popup[0].hide()
+        if (!component) {
+          return false
+        }
 
+        if (properties.event.key === "Escape") {
+          popup?.[0]?.hide()
           return true
         }
 
@@ -74,8 +81,8 @@ const suggestion = (user, client) => ({
       },
 
       onExit() {
-        popup[0].destroy()
-        component.destroy()
+        popup?.[0]?.destroy()
+        component?.destroy()
       },
     }
   },
