@@ -12,6 +12,7 @@ import {
   WeaponPopup,
   JuncturePopup,
 } from "@/components/popups"
+import { useEntityName } from "@/hooks"
 
 const popupMap: Record<string, React.ComponentType<unknown>> = {
   Character: CharacterPopup,
@@ -27,6 +28,10 @@ const popupMap: Record<string, React.ComponentType<unknown>> = {
 export default function MentionComponent({ node }: NodeViewProps) {
   const { id, label, className } = node.attrs
   const PopupComponent = popupMap[className]
+  const { name } = useEntityName(id, className)
+
+  // Use fetched name, fall back to static label (shown immediately, no loading state)
+  const displayName = name || label
 
   return (
     <NodeViewWrapper as="span">
@@ -34,7 +39,7 @@ export default function MentionComponent({ node }: NodeViewProps) {
         entity={{ id, entity_class: className }}
         popupOverride={PopupComponent}
       >
-        {label}
+        {displayName}
       </EntityLink>
     </NodeViewWrapper>
   )

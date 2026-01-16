@@ -20,6 +20,7 @@
 
 export * from "@/hooks/useEntity"
 export * from "@/hooks/useEntityFilters"
+export * from "@/hooks/useEntityName"
 export * from "@/hooks/useCharacterExtension"
 export * from "@/hooks/useImageGeneration"
 export * from "@/hooks/usePasswordValidation"
