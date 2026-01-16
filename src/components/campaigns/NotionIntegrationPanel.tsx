@@ -43,7 +43,9 @@ export default function NotionIntegrationPanel({
   )
 
   const isConnected = campaign.notion_connected
-  const notionStatus: NotionStatus = campaign.notion_status || "disconnected"
+  // Default to "working" when connected (since we have a token), "disconnected" otherwise
+  const notionStatus: NotionStatus =
+    campaign.notion_status || (isConnected ? "working" : "disconnected")
 
   const loadDatabases = useCallback(async () => {
     setLoading(true)
@@ -231,10 +233,16 @@ function renderStatusAlert(status: NotionStatus, workspaceName: string) {
         </Alert>
       )
     case "disconnected":
-    default:
       return (
         <Alert severity="info" icon={<Icon keyword="Info" />}>
           <strong>{workspaceName}</strong> is disconnected.
+        </Alert>
+      )
+    default:
+      // Fallback for unknown status - treat as working
+      return (
+        <Alert severity="success" icon={<Icon keyword="Check" />}>
+          Connected to <strong>{workspaceName}</strong>
         </Alert>
       )
   }
