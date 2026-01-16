@@ -7,7 +7,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   IconButton,
   Paper,
   Skeleton,
@@ -294,7 +293,14 @@ export function AiProviderSettings() {
                       </Box>
                     }
                   />
-                  <ListItemSecondaryAction>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      ml: "auto",
+                      flexShrink: 0,
+                    }}
+                  >
                     <Button
                       variant={isConnected ? "outlined" : "contained"}
                       size="small"
@@ -313,7 +319,7 @@ export function AiProviderSettings() {
                         <DeleteIcon />
                       </IconButton>
                     )}
-                  </ListItemSecondaryAction>
+                  </Box>
                 </Box>
                 {/* Status message alert for suspended/invalid credentials */}
                 {(isSuspended || isInvalid) && credential.status_message && (
