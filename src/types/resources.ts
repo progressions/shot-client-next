@@ -18,6 +18,9 @@ import type {
 import type { VehicleActionValues } from "./types"
 import type { OnboardingProgress } from "@/lib/onboarding"
 
+// Notion integration status
+export type NotionStatus = "working" | "disconnected" | "needs_attention"
+
 export enum VehicleDescriptionKeys {
   Size = "Size",
   Weight = "Weight",
@@ -67,6 +70,7 @@ export interface Campaign extends BaseEntity {
   ai_provider?: AiProvider | null
   // Notion Integration
   notion_connected?: boolean
+  notion_status?: NotionStatus
   notion_workspace_name?: string
   notion_workspace_icon?: string
   notion_database_ids?: Record<string, string>

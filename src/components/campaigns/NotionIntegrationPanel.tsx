@@ -15,7 +15,7 @@ import {
   Alert,
 } from "@mui/material"
 import { Icon, SectionHeader, InfoLink, ManageButton } from "@/components/ui"
-import { type Campaign } from "@/types"
+import { type Campaign, type NotionStatus } from "@/types"
 import { useClient, useToast } from "@/contexts"
 
 interface NotionIntegrationPanelProps {
@@ -43,6 +43,7 @@ export default function NotionIntegrationPanel({
   )
 
   const isConnected = campaign.notion_connected
+  const notionStatus: NotionStatus = campaign.notion_status || "disconnected"
 
   const loadDatabases = useCallback(async () => {
     setLoading(true)
@@ -134,12 +135,10 @@ export default function NotionIntegrationPanel({
             </Stack>
           ) : (
             <Stack spacing={3}>
-              <Alert severity="success" icon={<Icon keyword="Check" />}>
-                Connected to{" "}
-                <strong>
-                  {campaign.notion_workspace_name || "Notion Workspace"}
-                </strong>
-              </Alert>
+              {renderStatusAlert(
+                notionStatus,
+                campaign.notion_workspace_name || "Notion Workspace"
+              )}
 
               <Typography variant="h6" fontSize="small">
                 Database Mapping
@@ -214,6 +213,31 @@ export default function NotionIntegrationPanel({
       </Collapse>
     </Box>
   )
+}
+
+function renderStatusAlert(status: NotionStatus, workspaceName: string) {
+  switch (status) {
+    case "working":
+      return (
+        <Alert severity="success" icon={<Icon keyword="Check" />}>
+          Connected to <strong>{workspaceName}</strong>
+        </Alert>
+      )
+    case "needs_attention":
+      return (
+        <Alert severity="warning" icon={<Icon keyword="Warning" />}>
+          <strong>{workspaceName}</strong> needs attention. There may be sync
+          issues.
+        </Alert>
+      )
+    case "disconnected":
+    default:
+      return (
+        <Alert severity="info" icon={<Icon keyword="Info" />}>
+          <strong>{workspaceName}</strong> is disconnected.
+        </Alert>
+      )
+  }
 }
 
 function renderMappingSelect(
