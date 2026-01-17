@@ -228,7 +228,7 @@ describe("CreatePage", () => {
         expect(mockToastSuccess).toHaveBeenCalledWith(
           "Created new character: New Archer"
         )
-        expect(mockPush).toHaveBeenCalledWith("/characters/new-1")
+        expect(mockPush).toHaveBeenCalledWith("/characters/new-archer-new-1")
       })
     })
 
