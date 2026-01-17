@@ -241,6 +241,8 @@ export interface Party extends BaseEntity {
   has_composition?: boolean
   notion_page_id?: string | null
   last_synced_to_notion_at?: string | null
+  rich_description?: string | null
+  mentions?: Record<string, string[]>
 }
 
 export interface Faction extends BaseEntity {
@@ -263,6 +265,8 @@ export interface Faction extends BaseEntity {
   updated_at: string
   notion_page_id?: string | null
   last_synced_to_notion_at?: string | null
+  rich_description?: string | null
+  mentions?: Record<string, string[]>
 }
 
 export interface Schtick extends BaseEntity {
@@ -346,6 +350,8 @@ export interface Site extends BaseEntity {
   updated_at: string
   notion_page_id?: string | null
   last_synced_to_notion_at?: string | null
+  rich_description?: string | null
+  mentions?: Record<string, string[]>
 }
 
 export interface Juncture extends BaseEntity {
@@ -362,6 +368,8 @@ export interface Juncture extends BaseEntity {
   updated_at: string
   notion_page_id?: string | null
   last_synced_to_notion_at?: string | null
+  rich_description?: string | null
+  mentions?: Record<string, string[]>
 }
 
 export interface Adventure extends BaseEntity {
@@ -378,6 +386,8 @@ export interface Adventure extends BaseEntity {
   campaign_id: string
   notion_page_id?: string | null
   last_synced_to_notion_at?: string | null
+  rich_description?: string | null
+  mentions?: Record<string, string[]>
   image_url: string | null
   image_positions?: ImagePosition[]
   character_ids: string[]
@@ -509,6 +519,8 @@ export interface Person extends BaseEntity {
   task: boolean
   status?: string[]
   notion_page_id: string | null
+  rich_description?: string | null
+  mentions?: Record<string, string[]>
   driving?: Vehicle
   wealth: string
   juncture_id: string | null

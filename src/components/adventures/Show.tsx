@@ -13,6 +13,7 @@ import {
   EditableRichText,
   SectionHeader,
   HeroImage,
+  RichDescription,
 } from "@/components/ui"
 import { AdventureSpeedDial } from "@/components/adventures"
 import {
@@ -124,6 +125,22 @@ export default function Show({ adventure: initialAdventure }: ShowProperties) {
           fallback="No description available."
         />
       </Box>
+      {adventure.rich_description && (
+        <Box sx={{ mb: 2 }}>
+          <SectionHeader
+            title="Notion Content"
+            icon={<Icon keyword="Notion" />}
+            sx={{ mb: 2 }}
+          >
+            Rich content synced from Notion, including linked mentions to other
+            entities.
+          </SectionHeader>
+          <RichDescription
+            markdown={adventure.rich_description}
+            mentions={adventure.mentions}
+          />
+        </Box>
+      )}
       <Stack direction="column" spacing={4}>
         <Manager
           icon={<Icon keyword="Fighters" size="24" />}

@@ -13,6 +13,7 @@ import {
   EditableRichText,
   SectionHeader,
   HeroImage,
+  RichDescription,
 } from "@/components/ui"
 import { SiteSpeedDial } from "@/components/sites"
 import {
@@ -143,6 +144,22 @@ export default function Show({ site: initialSite }: ShowProperties) {
           fallback="No description available."
         />
       </Box>
+      {site.rich_description && (
+        <Box sx={{ mb: 2 }}>
+          <SectionHeader
+            title="Notion Content"
+            icon={<Icon keyword="Notion" />}
+            sx={{ mb: 2 }}
+          >
+            Rich content synced from Notion, including linked mentions to other
+            entities.
+          </SectionHeader>
+          <RichDescription
+            markdown={site.rich_description}
+            mentions={site.mentions}
+          />
+        </Box>
+      )}
       <Stack direction="column" spacing={2}>
         <Manager
           icon={<Icon keyword="Characters" size="24" />}
