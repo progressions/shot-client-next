@@ -30,6 +30,8 @@ import type {
 import { useClient, useToast, useCampaign } from "@/contexts"
 import { SectionHeader, Icon } from "@/components/ui"
 
+const PRUNE_THRESHOLD_DAYS = 30
+
 type NotionSyncEntity =
   | Adventure
   | Character
@@ -73,67 +75,109 @@ export default function NotionSyncLogList({
   const [syncing, setSyncing] = useState(false)
   const [syncingFrom, setSyncingFrom] = useState(false)
   const [pruning, setPruning] = useState(false)
+  const [hasPrunableLogs, setHasPrunableLogs] = useState(false)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [open, setOpen] = useState(false)
   const [expandedLogId, setExpandedLogId] = useState<string | null>(null)
   const [fetchError, setFetchError] = useState(false)
 
+  const hasLogsOlderThanThreshold = useCallback((list: NotionSyncLog[]) => {
+    const cutoff = Date.now() - PRUNE_THRESHOLD_DAYS * 24 * 60 * 60 * 1000
+    return list.some(log => new Date(log.created_at).getTime() < cutoff)
+  }, [])
+
+  const fetchLogsForPage = useCallback(
+    async (pageNum: number, perPage = 5) => {
+      let response: { data: NotionSyncLogsResponse } | null = null
+      const params = { page: pageNum, per_page: perPage }
+
+      switch (entityType) {
+        case "adventure":
+          response = await client.getNotionSyncLogsForAdventure(
+            entity.id,
+            params
+          )
+          break
+        case "character":
+          response = await client.getNotionSyncLogs(entity.id, params)
+          break
+        case "site":
+          response = await client.getNotionSyncLogsForSite(entity.id, params)
+          break
+        case "party":
+          response = await client.getNotionSyncLogsForParty(entity.id, params)
+          break
+        case "faction":
+          response = await client.getNotionSyncLogsForFaction(entity.id, params)
+          break
+        case "juncture":
+          response = await client.getNotionSyncLogsForJuncture(
+            entity.id,
+            params
+          )
+          break
+        default:
+          throw new Error(`Unsupported entity type: ${entityType}`)
+      }
+
+      if (!response) {
+        throw new Error(`Unsupported entity type: ${entityType}`)
+      }
+
+      return response
+    },
+    [client, entity.id, entityType]
+  )
+
+  const updatePruneEligibility = useCallback(
+    async (logsResponse: NotionSyncLogsResponse) => {
+      const { notion_sync_logs, meta } = logsResponse
+
+      if (hasLogsOlderThanThreshold(notion_sync_logs)) {
+        setHasPrunableLogs(true)
+        return
+      }
+
+      if (meta.total_pages <= 1 || notion_sync_logs.length === 0) {
+        setHasPrunableLogs(false)
+        return
+      }
+
+      try {
+        const oldestPageResponse = await fetchLogsForPage(meta.total_pages, 1)
+        setHasPrunableLogs(
+          hasLogsOlderThanThreshold(oldestPageResponse.data.notion_sync_logs)
+        )
+      } catch (error) {
+        console.error("Error checking prunable Notion logs:", error)
+        setHasPrunableLogs(false)
+      }
+    },
+    [fetchLogsForPage, hasLogsOlderThanThreshold]
+  )
+
   const fetchLogs = useCallback(
     async (pageNum: number) => {
       try {
         setLoading(true)
-        let response: { data: NotionSyncLogsResponse } | null = null
-        const params = { page: pageNum, per_page: 5 }
+        setHasPrunableLogs(false)
 
-        switch (entityType) {
-          case "adventure":
-            response = await client.getNotionSyncLogsForAdventure(
-              entity.id,
-              params
-            )
-            break
-          case "character":
-            response = await client.getNotionSyncLogs(entity.id, params)
-            break
-          case "site":
-            response = await client.getNotionSyncLogsForSite(entity.id, params)
-            break
-          case "party":
-            response = await client.getNotionSyncLogsForParty(entity.id, params)
-            break
-          case "faction":
-            response = await client.getNotionSyncLogsForFaction(
-              entity.id,
-              params
-            )
-            break
-          case "juncture":
-            response = await client.getNotionSyncLogsForJuncture(
-              entity.id,
-              params
-            )
-            break
-          default:
-            throw new Error(`Unsupported entity type: ${entityType}`)
-        }
-
-        if (!response) {
-          throw new Error(`Unsupported entity type: ${entityType}`)
-        }
-
+        const response = await fetchLogsForPage(pageNum)
         setLogs(response.data.notion_sync_logs)
         setTotalPages(response.data.meta.total_pages)
         setFetchError(false)
+        await updatePruneEligibility(response.data)
       } catch (error) {
         console.error("Error fetching Notion sync logs:", error)
         setFetchError(true)
+        setHasPrunableLogs(false)
       } finally {
         setLoading(false)
       }
     },
 
-    [client, entity.id, entityType]
+    [fetchLogsForPage, updatePruneEligibility]
   )
 
   useEffect(() => {
@@ -249,22 +293,40 @@ export default function NotionSyncLogList({
       let response: { data: PruneResponse } | null = null
       switch (entityType) {
         case "adventure":
-          response = await client.pruneNotionSyncLogsForAdventure(entity.id, 30)
+          response = await client.pruneNotionSyncLogsForAdventure(
+            entity.id,
+            PRUNE_THRESHOLD_DAYS
+          )
           break
         case "character":
-          response = await client.pruneNotionSyncLogs(entity.id, 30)
+          response = await client.pruneNotionSyncLogs(
+            entity.id,
+            PRUNE_THRESHOLD_DAYS
+          )
           break
         case "site":
-          response = await client.pruneNotionSyncLogsForSite(entity.id, 30)
+          response = await client.pruneNotionSyncLogsForSite(
+            entity.id,
+            PRUNE_THRESHOLD_DAYS
+          )
           break
         case "party":
-          response = await client.pruneNotionSyncLogsForParty(entity.id, 30)
+          response = await client.pruneNotionSyncLogsForParty(
+            entity.id,
+            PRUNE_THRESHOLD_DAYS
+          )
           break
         case "faction":
-          response = await client.pruneNotionSyncLogsForFaction(entity.id, 30)
+          response = await client.pruneNotionSyncLogsForFaction(
+            entity.id,
+            PRUNE_THRESHOLD_DAYS
+          )
           break
         case "juncture":
-          response = await client.pruneNotionSyncLogsForJuncture(entity.id, 30)
+          response = await client.pruneNotionSyncLogsForJuncture(
+            entity.id,
+            PRUNE_THRESHOLD_DAYS
+          )
           break
         default:
           throw new Error(`Unsupported entity type: ${entityType}`)
@@ -277,13 +339,13 @@ export default function NotionSyncLogList({
       const { pruned_count } = response.data
       if (pruned_count > 0) {
         toastSuccess(
-          `Deleted ${pruned_count} sync log${pruned_count === 1 ? "" : "s"} older than 30 days`
+          `Deleted ${pruned_count} sync log${pruned_count === 1 ? "" : "s"} older than ${PRUNE_THRESHOLD_DAYS} days`
         )
         // Refresh logs after pruning
         setPage(1)
         fetchLogs(1)
       } else {
-        toastSuccess("No logs older than 30 days to prune")
+        toastSuccess(`No logs older than ${PRUNE_THRESHOLD_DAYS} days to prune`)
       }
     } catch (error) {
       console.error("Error pruning sync logs:", error)
@@ -365,7 +427,7 @@ export default function NotionSyncLogList({
               pruning ? <CircularProgress size={16} /> : <DeleteSweepIcon />
             }
             onClick={handlePrune}
-            disabled={pruning || logs.length === 0}
+            disabled={pruning || loading || !hasPrunableLogs}
             size="small"
           >
             {pruning ? "Pruning..." : "Prune Old Logs"}

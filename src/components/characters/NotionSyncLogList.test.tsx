@@ -13,6 +13,8 @@ import {
 // Helper to flush all pending promises
 const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0))
 
+let dateNowSpy: jest.SpyInstance<number, []>
+
 // Mock the contexts
 const mockGetNotionSyncLogs = jest.fn()
 const mockSyncCharacterToNotion = jest.fn()
@@ -219,12 +221,19 @@ describe("NotionSyncLogList", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    dateNowSpy = jest
+      .spyOn(Date, "now")
+      .mockReturnValue(new Date("2026-02-10T12:00:00Z").getTime())
     mockSubscribeToEntity.mockReturnValue(jest.fn()) // Return unsubscribe function
     mockGetNotionSyncLogs.mockResolvedValue(mockLogsResponse)
     mockGetNotionSyncLogsForSite.mockResolvedValue(mockLogsResponse)
     mockGetNotionSyncLogsForParty.mockResolvedValue(mockLogsResponse)
     mockGetNotionSyncLogsForFaction.mockResolvedValue(mockLogsResponse)
     mockGetNotionSyncLogsForJuncture.mockResolvedValue(mockLogsResponse)
+  })
+
+  afterEach(() => {
+    dateNowSpy.mockRestore()
   })
 
   describe("Initial State", () => {
@@ -568,6 +577,96 @@ describe("NotionSyncLogList", () => {
         })
       }
     )
+  })
+
+  describe("Prune Old Logs Button", () => {
+    it("disables pruning when no logs meet the threshold", async () => {
+      const recentLog: NotionSyncLog = {
+        ...mockLogs[0],
+        created_at: "2026-02-05T12:00:00Z",
+        updated_at: "2026-02-05T12:00:00Z",
+      }
+
+      mockGetNotionSyncLogs.mockResolvedValue({
+        data: {
+          notion_sync_logs: [recentLog],
+          meta: {
+            total_pages: 1,
+            current_page: 1,
+            per_page: 5,
+            total_count: 1,
+          },
+        },
+      })
+
+      render(
+        <NotionSyncLogList entity={mockCharacter} entityType="character" />
+      )
+
+      await act(async () => {
+        fireEvent.click(screen.getByText("Show"))
+        await flushPromises()
+      })
+
+      const pruneButton = screen.getByText("Prune Old Logs").closest("button")
+      expect(pruneButton).toBeDisabled()
+    })
+
+    it("checks the oldest page when recent logs are not prunable", async () => {
+      const recentLog: NotionSyncLog = {
+        ...mockLogs[0],
+        created_at: "2026-02-09T12:00:00Z",
+        updated_at: "2026-02-09T12:00:00Z",
+      }
+      const oldLog: NotionSyncLog = {
+        ...mockLogs[1],
+        created_at: "2025-12-01T12:00:00Z",
+        updated_at: "2025-12-01T12:00:00Z",
+      }
+
+      mockGetNotionSyncLogs.mockResolvedValueOnce({
+        data: {
+          notion_sync_logs: [recentLog],
+          meta: {
+            total_pages: 2,
+            current_page: 1,
+            per_page: 5,
+            total_count: 6,
+          },
+        },
+      })
+
+      mockGetNotionSyncLogs.mockResolvedValueOnce({
+        data: {
+          notion_sync_logs: [oldLog],
+          meta: {
+            total_pages: 2,
+            current_page: 2,
+            per_page: 1,
+            total_count: 6,
+          },
+        },
+      })
+
+      render(
+        <NotionSyncLogList entity={mockCharacter} entityType="character" />
+      )
+
+      await act(async () => {
+        fireEvent.click(screen.getByText("Show"))
+        await flushPromises()
+      })
+
+      await waitFor(() => {
+        expect(mockGetNotionSyncLogs).toHaveBeenCalledWith("char-1", {
+          page: 2,
+          per_page: 1,
+        })
+      })
+
+      const pruneButton = screen.getByText("Prune Old Logs").closest("button")
+      expect(pruneButton).not.toBeDisabled()
+    })
   })
 
   describe("Pagination", () => {
