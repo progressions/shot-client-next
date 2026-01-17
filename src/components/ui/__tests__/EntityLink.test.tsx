@@ -66,11 +66,17 @@ describe("EntityLink", () => {
 
   describe("navigable entity types", () => {
     const navigableTypes = [
-      { entityClass: "Character", expectedPath: "/characters/test-id" },
-      { entityClass: "Site", expectedPath: "/sites/test-id" },
-      // Note: pluralize converts "Party" to "partys" (not "parties")
-      { entityClass: "Party", expectedPath: "/partys/test-id" },
-      { entityClass: "Faction", expectedPath: "/factions/test-id" },
+      {
+        entityClass: "Character",
+        expectedPath: "/characters/test-character-test-id",
+      },
+      { entityClass: "Site", expectedPath: "/sites/test-site-test-id" },
+      // pluralize('party') currently returns 'partys' in this codebase
+      { entityClass: "Party", expectedPath: "/partys/test-party-test-id" },
+      {
+        entityClass: "Faction",
+        expectedPath: "/factions/test-faction-test-id",
+      },
     ]
 
     navigableTypes.forEach(({ entityClass, expectedPath }) => {
