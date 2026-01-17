@@ -89,6 +89,17 @@ const keywordMap: Record<string, (id: string) => string | undefined> = {
 }
 
 /**
+ * Entity types that are popup-only and should not navigate to a page.
+ * These entities don't have dedicated pages - they only show popups on hover.
+ */
+const popupOnlyEntityTypes = new Set([
+  "Info",
+  "ActionValue",
+  "Type",
+  "Archetype",
+])
+
+/**
  * Props for the EntityLink component.
  *
  * @property entity - The entity object to link to (must have id and entity_class)
@@ -243,15 +254,42 @@ export default function EntityLink({
     popupOverride || defaultPopupMap[entity.entity_class] || null
   const keyword = keywordMap[entity.entity_class]?.(entity.id)
 
+  // Check if this entity type is popup-only (no dedicated page to navigate to)
+  const isPopupOnly = popupOnlyEntityTypes.has(entity.entity_class)
+
+  // Generate href only for navigable entity types
+  const linkHref = isPopupOnly
+    ? undefined
+    : href ||
+      `/${pluralize(entity.entity_class?.toLowerCase() || "")}/${entity.id}`
+
+  // Prevent navigation for popup-only entity types
+  const handleClick = isPopupOnly
+    ? (e: React.MouseEvent) => e.preventDefault()
+    : undefined
+
+  // Keyboard handler for popup-only links (accessibility)
+  const handleKeyDown = isPopupOnly
+    ? (e: React.KeyboardEvent) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault()
+          // Trigger the popup on Enter/Space for accessibility
+          if (!disablePopup && target.current) {
+            setAnchorEl(target.current)
+            setIsOpen(true)
+          }
+        }
+      }
+    : undefined
+
   return (
     <>
       <Link
         component="a"
-        href={
-          href ||
-          `/${pluralize(entity.entity_class?.toLowerCase() || "")}/${entity.id}`
-        }
-        target="_blank"
+        href={linkHref}
+        target={isPopupOnly ? undefined : "_blank"}
+        role={isPopupOnly ? "button" : undefined}
+        tabIndex={isPopupOnly ? 0 : undefined}
         data-mention-id={entity.id}
         data-mention-class-name={entity.entity_class}
         data-mention-data={data ? JSON.stringify(data) : undefined}
@@ -265,6 +303,8 @@ export default function EntityLink({
         }}
         onMouseEnter={handleMouseEnterLink}
         onMouseLeave={handleMouseLeave}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
       >
         {children || entity.name}
       </Link>
