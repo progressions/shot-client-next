@@ -6,6 +6,10 @@ import pluralize from "pluralize"
 import dynamic from "next/dynamic"
 
 // Dynamically import popup components to avoid loading all upfront
+const AdventurePopup = dynamic(
+  () => import("@/components/popups/AdventurePopup"),
+  { ssr: false }
+)
 const CharacterPopup = dynamic(
   () => import("@/components/popups/CharacterPopup"),
   { ssr: false }
@@ -56,6 +60,7 @@ const ArchetypePopup = dynamic(
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const defaultPopupMap: Record<string, React.ComponentType<any>> = {
+  Adventure: AdventurePopup,
   Character: CharacterPopup,
   Vehicle: VehiclePopup,
   Site: SitePopup,

@@ -3,6 +3,7 @@
 import { NodeViewWrapper, NodeViewProps } from "@tiptap/react"
 import { EntityLink } from "@/components/ui"
 import {
+  AdventurePopup,
   CharacterPopup,
   VehiclePopup,
   SitePopup,
@@ -15,6 +16,7 @@ import {
 import { useEntityName } from "@/hooks"
 
 const popupMap: Record<string, React.ComponentType<unknown>> = {
+  Adventure: AdventurePopup,
   Character: CharacterPopup,
   Vehicle: VehiclePopup,
   Site: SitePopup,

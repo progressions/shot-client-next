@@ -13,7 +13,7 @@ type AdventureLinkProperties = {
 export default function AdventureLink({
   adventure,
   data,
-  disablePopup = true,
+  disablePopup = false,
   children,
   sx,
 }: AdventureLinkProperties) {
