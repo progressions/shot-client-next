@@ -128,12 +128,11 @@ export default function Show({ adventure: initialAdventure }: ShowProperties) {
       {adventure.rich_description && (
         <Box sx={{ mb: 2 }}>
           <SectionHeader
-            title="Notion Content"
-            icon={<Icon keyword="Notion" />}
+            title="Full Description"
+            icon={<Icon keyword="Description" />}
             sx={{ mb: 2 }}
           >
-            Rich content synced from Notion, including linked mentions to other
-            entities.
+            Extended description with linked mentions to other entities.
           </SectionHeader>
           <RichDescription
             markdown={adventure.rich_description}
