@@ -4,8 +4,9 @@ import { useMemo } from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { Box, Typography, Link as MuiLink } from "@mui/material"
-import Link from "next/link"
 import type { Components } from "react-markdown"
+import EntityLink from "@/components/ui/links/EntityLink"
+import { useEntityName } from "@/hooks"
 
 type RichDescriptionProps = {
   markdown: string | null | undefined
@@ -15,19 +16,50 @@ type RichDescriptionProps = {
 // Regex to match mention syntax: [[@entity_type:uuid|Display Name]]
 const MENTION_REGEX = /\[\[@(\w+):([a-f0-9-]+)\|([^\]]+)\]\]/g
 
-// Entity type to URL path mapping
-const ENTITY_PATHS: Record<string, string> = {
-  character: "/characters",
-  site: "/sites",
-  party: "/parties",
-  faction: "/factions",
-  juncture: "/junctures",
-  adventure: "/adventures",
+// Valid entity types for mentions
+const VALID_ENTITY_TYPES = new Set([
+  "character",
+  "site",
+  "party",
+  "faction",
+  "juncture",
+  "adventure",
+])
+
+/**
+ * Capitalize first letter of entity type for EntityLink's entity_class.
+ * e.g., "character" -> "Character"
+ */
+function capitalizeEntityType(entityType: string): string {
+  return entityType.charAt(0).toUpperCase() + entityType.slice(1)
 }
 
 /**
- * Process markdown text and convert mention syntax to clickable links.
- * Converts [[@character:uuid|Name]] to <Link href="/characters/uuid">Name</Link>
+ * MentionLink component renders a single mention using EntityLink.
+ * Uses useEntityName hook for real-time name updates via WebSocket.
+ */
+function MentionLink({
+  entityType,
+  entityId,
+  displayName,
+}: {
+  entityType: string
+  entityId: string
+  displayName: string
+}) {
+  const entityClass = capitalizeEntityType(entityType)
+  const { name } = useEntityName(entityId, entityClass)
+
+  return (
+    <EntityLink entity={{ id: entityId, entity_class: entityClass }}>
+      {name || displayName}
+    </EntityLink>
+  )
+}
+
+/**
+ * Process markdown text and convert mention syntax to EntityLink components.
+ * Converts [[@character:uuid|Name]] to <MentionLink> with hover popups and real-time updates.
  */
 function processMentions(text: string): React.ReactNode[] {
   const parts: React.ReactNode[] = []
@@ -44,29 +76,15 @@ function processMentions(text: string): React.ReactNode[] {
     }
 
     const [, entityType, entityId, displayName] = match
-    const basePath = ENTITY_PATHS[entityType]
 
-    if (basePath) {
+    if (VALID_ENTITY_TYPES.has(entityType)) {
       parts.push(
-        <Link
+        <MentionLink
           key={`${entityId}-${match.index}`}
-          href={`${basePath}/${entityId}`}
-          passHref
-          legacyBehavior
-        >
-          <MuiLink
-            sx={{
-              color: "primary.main",
-              fontWeight: 500,
-              textDecoration: "none",
-              "&:hover": {
-                textDecoration: "underline",
-              },
-            }}
-          >
-            {displayName}
-          </MuiLink>
-        </Link>
+          entityType={entityType}
+          entityId={entityId}
+          displayName={displayName}
+        />
       )
     } else {
       // Unknown entity type - just show the display name
