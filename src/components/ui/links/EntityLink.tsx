@@ -92,7 +92,12 @@ const keywordMap: Record<string, (id: string) => string | undefined> = {
  * Entity types that are popup-only and should not navigate to a page.
  * These entities don't have dedicated pages - they only show popups on hover.
  */
-const popupOnlyEntityTypes = new Set(["Info"])
+const popupOnlyEntityTypes = new Set([
+  "Info",
+  "ActionValue",
+  "Type",
+  "Archetype",
+])
 
 /**
  * Props for the EntityLink component.
@@ -263,12 +268,28 @@ export default function EntityLink({
     ? (e: React.MouseEvent) => e.preventDefault()
     : undefined
 
+  // Keyboard handler for popup-only links (accessibility)
+  const handleKeyDown = isPopupOnly
+    ? (e: React.KeyboardEvent) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault()
+          // Trigger the popup on Enter/Space for accessibility
+          if (!disablePopup && target.current) {
+            setAnchorEl(target.current)
+            setIsOpen(true)
+          }
+        }
+      }
+    : undefined
+
   return (
     <>
       <Link
         component="a"
         href={linkHref}
         target={isPopupOnly ? undefined : "_blank"}
+        role={isPopupOnly ? "button" : undefined}
+        tabIndex={isPopupOnly ? 0 : undefined}
         data-mention-id={entity.id}
         data-mention-class-name={entity.entity_class}
         data-mention-data={data ? JSON.stringify(data) : undefined}
@@ -283,6 +304,7 @@ export default function EntityLink({
         onMouseEnter={handleMouseEnterLink}
         onMouseLeave={handleMouseLeave}
         onClick={handleClick}
+        onKeyDown={handleKeyDown}
       >
         {children || entity.name}
       </Link>
