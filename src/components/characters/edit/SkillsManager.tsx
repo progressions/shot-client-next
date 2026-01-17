@@ -234,31 +234,23 @@ export default function SkillsManager({
                   key={`column-${index}-${skillIndex}`}
                   sx={{
                     display: "flex",
-                    justifyContent: "space-between",
                     alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "100%",
                   }}
                 >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      width: "100%",
-                    }}
-                  >
-                    <Typography variant="body1">
-                      {skill[0]}: {skill[1]}
-                    </Typography>
-                    {open && (
-                      <IconButton
-                        aria-label={`delete ${skill[0]}`}
-                        onClick={() => handleDelete(skill[0])}
-                      >
-                        <DeleteIcon color="error" />
-                      </IconButton>
-                    )}
-                    {!open && <Box sx={{ width: 40, height: 40 }} />}
-                  </Box>
+                  <Typography variant="body1">
+                    {skill[0]}: {skill[1]}
+                  </Typography>
+                  {open && (
+                    <IconButton
+                      aria-label={`delete ${skill[0]}`}
+                      onClick={() => handleDelete(skill[0])}
+                    >
+                      <DeleteIcon color="error" />
+                    </IconButton>
+                  )}
+                  {!open && <Box sx={{ width: 40, height: 40 }} />}
                 </Box>
               ))}
             </Stack>
