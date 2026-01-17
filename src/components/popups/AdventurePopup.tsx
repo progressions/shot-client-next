@@ -81,8 +81,8 @@ export default function AdventurePopup({ id }: PopupProps) {
       </Typography>
       <Box mt={1}>
         <RichTextRenderer
-          key={adventure.rich_description || adventure.description}
-          html={adventure.rich_description || adventure.description || ""}
+          key={adventure.description}
+          html={adventure.description || ""}
         />
       </Box>
       <MembersGroup items={adventure.characters || []} />
