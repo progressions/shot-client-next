@@ -51,23 +51,26 @@ export default function EntityNotionLinkDialog<T extends NotionLinkableEntity>({
     setIsSaving(true)
     try {
       let response
-      const updateData = { notion_page_id: pageId }
+      // Build FormData with entity-type-prefixed JSON data
+      // Backend expects: { "faction": "{\"notion_page_id\": \"...\"}" }
+      const formData = new FormData()
+      formData.append(entityType, JSON.stringify({ notion_page_id: pageId }))
 
       switch (entityType) {
         case "site":
-          response = await client.updateSite(entity.id, updateData)
+          response = await client.updateSite(entity.id, formData)
           break
         case "party":
-          response = await client.updateParty(entity.id, updateData)
+          response = await client.updateParty(entity.id, formData)
           break
         case "faction":
-          response = await client.updateFaction(entity.id, updateData)
+          response = await client.updateFaction(entity.id, formData)
           break
         case "juncture":
-          response = await client.updateJuncture(entity.id, updateData)
+          response = await client.updateJuncture(entity.id, formData)
           break
         case "adventure":
-          response = await client.updateAdventure(entity.id, updateData)
+          response = await client.updateAdventure(entity.id, formData)
           break
       }
 
