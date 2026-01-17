@@ -7,6 +7,7 @@ import { Box, Typography, Link as MuiLink } from "@mui/material"
 import type { Components } from "react-markdown"
 import EntityLink from "@/components/ui/links/EntityLink"
 import { useEntityName } from "@/hooks"
+import type { Entity } from "@/types"
 
 type RichDescriptionProps = {
   markdown: string | null | undefined
@@ -17,13 +18,13 @@ type RichDescriptionProps = {
 const MENTION_REGEX = /\[\[@(\w+):([a-f0-9-]+)\|([^\]]+)\]\]/g
 
 // Valid entity types for mentions
+// Must match entity types supported by useEntityName hook
 const VALID_ENTITY_TYPES = new Set([
   "character",
   "site",
   "party",
   "faction",
   "juncture",
-  "adventure",
 ])
 
 /**
@@ -51,7 +52,7 @@ function MentionLink({
   const { name } = useEntityName(entityId, entityClass)
 
   return (
-    <EntityLink entity={{ id: entityId, entity_class: entityClass }}>
+    <EntityLink entity={{ id: entityId, entity_class: entityClass } as Entity}>
       {name || displayName}
     </EntityLink>
   )
