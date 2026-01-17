@@ -19,6 +19,7 @@ import {
   HeroImage,
   EditableRichText,
   SectionHeader,
+  RichDescription,
 } from "@/components/ui"
 import {
   EntityActiveToggle,
@@ -119,6 +120,22 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
           fallback="No description available."
         />
       </Box>
+      {faction.rich_description && (
+        <Box sx={{ mb: 2 }}>
+          <SectionHeader
+            title="Notion Content"
+            icon={<Icon keyword="Notion" />}
+            sx={{ mb: 2 }}
+          >
+            Rich content synced from Notion, including linked mentions to other
+            entities.
+          </SectionHeader>
+          <RichDescription
+            markdown={faction.rich_description}
+            mentions={faction.mentions}
+          />
+        </Box>
+      )}
 
       <Stack direction="column" spacing={2}>
         <Manager

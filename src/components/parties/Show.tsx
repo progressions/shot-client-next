@@ -13,6 +13,7 @@ import {
   EditableRichText,
   SectionHeader,
   HeroImage,
+  RichDescription,
 } from "@/components/ui"
 import { PartySpeedDial, PartyCompositionBuilder } from "@/components/parties"
 import {
@@ -139,6 +140,22 @@ export default function Show({ party: initialParty }: ShowProperties) {
           fallback="No description available."
         />
       </Box>
+      {party.rich_description && (
+        <Box sx={{ mb: 2 }}>
+          <SectionHeader
+            title="Notion Content"
+            icon={<Icon keyword="Notion" />}
+            sx={{ mb: 2 }}
+          >
+            Rich content synced from Notion, including linked mentions to other
+            entities.
+          </SectionHeader>
+          <RichDescription
+            markdown={party.rich_description}
+            mentions={party.mentions}
+          />
+        </Box>
+      )}
       <Box sx={{ mb: 4 }}>
         <SectionHeader
           title="Party Composition"

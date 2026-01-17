@@ -12,6 +12,7 @@ import {
   NameEditor,
   SectionHeader,
   PositionableImage,
+  RichDescription,
 } from "@/components/ui"
 import {
   CharacterSpeedDial,
@@ -217,6 +218,23 @@ export default function Show({
         character={memoizedCharacter}
         updateCharacter={updateCharacter}
       />
+
+      {memoizedCharacter.rich_description && (
+        <Box sx={{ mb: 2 }}>
+          <SectionHeader
+            title="Notion Content"
+            icon={<Icon keyword="Notion" />}
+            sx={{ mb: 2 }}
+          >
+            Rich content synced from Notion, including linked mentions to other
+            entities.
+          </SectionHeader>
+          <RichDescription
+            markdown={memoizedCharacter.rich_description}
+            mentions={memoizedCharacter.mentions}
+          />
+        </Box>
+      )}
 
       {memoizedCharacter.action_values?.Type === "PC" && (
         <AdvancementsManager character={memoizedCharacter} />

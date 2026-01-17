@@ -168,6 +168,22 @@ jest.mock("uuid", () => ({
   v1: jest.fn(() => "mock-uuid-v1"),
 }))
 
+// Mock react-markdown (ESM-only package)
+jest.mock("react-markdown", () => {
+  return {
+    __esModule: true,
+    default: ({ children }) => children,
+  }
+})
+
+// Mock remark-gfm (ESM-only package)
+jest.mock("remark-gfm", () => {
+  return {
+    __esModule: true,
+    default: () => {},
+  }
+})
+
 // Suppress console errors for tests
 const originalError = console.error
 beforeAll(() => {
