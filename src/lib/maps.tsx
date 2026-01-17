@@ -1,4 +1,5 @@
 import {
+  AdventurePopup,
   CharacterPopup,
   FightPopup,
   VehiclePopup,
@@ -47,6 +48,7 @@ export const popupComponents: Record<
   string,
   React.ComponentType<{ id: string }>
 > = {
+  Adventure: AdventurePopup,
   Fight: FightPopup,
   Character: CharacterPopup,
   Vehicle: VehiclePopup,
