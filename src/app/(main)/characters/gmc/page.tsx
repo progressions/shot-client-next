@@ -21,6 +21,7 @@ import { SpeedDial } from "@/components/characters"
 import { RichTextRenderer } from "@/components/editor"
 import { CS } from "@/services"
 import type { Character } from "@/types"
+import { sluggedPath } from "@/lib/slug"
 
 // GMC Types in Feng Shui 2
 const GMC_TYPES = [
@@ -342,7 +343,7 @@ export default function GMCTemplatesPage() {
       const newCharacter = response.data
 
       toastSuccess(`Created new GMC: ${newCharacter.name}`)
-      router.push(`/characters/${newCharacter.id}`)
+      router.push(sluggedPath("characters", newCharacter.name, newCharacter.id))
     } catch (error) {
       console.error("Error creating character from template:", error)
       toastError("Failed to create GMC from template")

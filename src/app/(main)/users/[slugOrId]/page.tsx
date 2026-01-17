@@ -6,13 +6,15 @@ import type { User } from "@/types"
 import { NotFound, Show } from "@/components/users"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
+import { extractId, buildSluggedId, sluggedPath } from "@/lib/slug"
 
 type UserPageProperties = {
-  params: Promise<{ id: string }>
+  params: Promise<{ slugOrId: string }>
 }
 
 export default async function UserPage({ params }: UserPageProperties) {
-  const { id } = await params
+  const { slugOrId } = await params
+  const id = extractId(slugOrId)
   const client = await getServerClient()
   const currentUser = await getCurrentUser()
   if (!client || !currentUser) return <Typography>Not logged in</Typography>
@@ -23,6 +25,10 @@ export default async function UserPage({ params }: UserPageProperties) {
   try {
     const response = await client.getUser({ id })
     const user: User = response.data
+    const canonicalId = buildSluggedId(user.name, user.id)
+    if (canonicalId !== slugOrId) {
+      redirect(sluggedPath("users", user.name, user.id))
+    }
 
     // Detect mobile device on the server
     const headersState = await headers()

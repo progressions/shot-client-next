@@ -72,6 +72,19 @@ export type {
   ChaseRelationship,
 } from "./resources"
 
+// Re-export default factory data used across tests and services
+export {
+  defaultCharacter,
+  defaultVehicle,
+  defaultFight,
+  defaultWeapon,
+  defaultSchtick,
+  defaultUser,
+  defaultCampaign,
+  defaultParty,
+  defaultFaction,
+} from "./defaults"
+
 // Re-export character enums
 export { CharacterTypes } from "./character"
 

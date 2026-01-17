@@ -19,6 +19,7 @@ import { FormActions, useForm } from "@/reducers/formState"
 import { AxiosError } from "axios"
 import { HeroTitle } from "@/components/ui"
 import { SpeedDial } from "@/components/characters"
+import { sluggedPath } from "@/lib/slug"
 
 type FormStateData = {
   files: File[]
@@ -307,7 +308,11 @@ export default function UploadForm() {
                       )}
                       {p.status === "success" && p.character ? (
                         <Link
-                          href={`/characters/${p.character.id}`}
+                          href={sluggedPath(
+                            "characters",
+                            p.character.name,
+                            p.character.id
+                          )}
                           target="_blank"
                           sx={{
                             ml: 1,

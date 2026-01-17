@@ -25,21 +25,22 @@ import {
   UserName,
   CampaignName,
 } from "@/components/names"
+import { buildSluggedId } from "@/lib/slug"
 
-export function getUrl(className: string, id: string) {
+export function getUrl(className: string, id: string, name?: string) {
   const urlMap: { [key: string]: string } = {
-    Adventure: `/adventures/${id}`,
-    Fight: `/fights/${id}`,
-    Character: `/characters/${id}`,
-    Vehicle: `/vehicles/${id}`,
-    Schtick: `/schticks/${id}`,
-    Weapon: `/weapons/${id}`,
-    Site: `/sites/${id}`,
-    Party: `/parties/${id}`,
-    Faction: `/factions/${id}`,
-    Juncture: `/junctures/${id}`,
-    User: `/users/${id}`,
-    Campaign: `/campaigns/${id}`,
+    Adventure: `/adventures/${buildSluggedId(name, id)}`,
+    Fight: `/fights/${buildSluggedId(name, id)}`,
+    Character: `/characters/${buildSluggedId(name, id)}`,
+    Vehicle: `/vehicles/${buildSluggedId(name, id)}`,
+    Schtick: `/schticks/${buildSluggedId(name, id)}`,
+    Weapon: `/weapons/${buildSluggedId(name, id)}`,
+    Site: `/sites/${buildSluggedId(name, id)}`,
+    Party: `/parties/${buildSluggedId(name, id)}`,
+    Faction: `/factions/${buildSluggedId(name, id)}`,
+    Juncture: `/junctures/${buildSluggedId(name, id)}`,
+    User: `/users/${buildSluggedId(name, id)}`,
+    Campaign: `/campaigns/${buildSluggedId(name, id)}`,
   }
   return urlMap[className] || "#"
 }

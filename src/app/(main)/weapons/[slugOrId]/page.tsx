@@ -1,17 +1,20 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
+import { redirect } from "next/navigation"
 import { getServerClient, getCurrentUser } from "@/lib"
 import type { Weapon } from "@/types"
 import { NotFound, Show } from "@/components/weapons"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
+import { extractId, buildSluggedId, sluggedPath } from "@/lib/slug"
 
 type WeaponPageProperties = {
-  params: Promise<{ id: string }>
+  params: Promise<{ slugOrId: string }>
 }
 
 export default async function WeaponPage({ params }: WeaponPageProperties) {
-  const { id } = await params
+  const { slugOrId } = await params
+  const id = extractId(slugOrId)
   const client = await getServerClient()
   const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
@@ -19,6 +22,10 @@ export default async function WeaponPage({ params }: WeaponPageProperties) {
   try {
     const response = await client.getWeapon({ id })
     const weapon: Weapon = response.data
+    const canonicalId = buildSluggedId(weapon.name, weapon.id)
+    if (canonicalId !== slugOrId) {
+      redirect(sluggedPath("weapons", weapon.name, weapon.id))
+    }
 
     // Detect mobile device on the server
     const headersState = await headers()

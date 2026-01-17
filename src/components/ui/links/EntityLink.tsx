@@ -4,6 +4,7 @@ import { useRef, useState, useEffect, useCallback } from "react"
 import type { Entity } from "@/types"
 import pluralize from "pluralize"
 import dynamic from "next/dynamic"
+import { sluggedPath } from "@/lib/slug"
 
 // Dynamically import popup components to avoid loading all upfront
 const AdventurePopup = dynamic(
@@ -261,7 +262,11 @@ export default function EntityLink({
   const linkHref = isPopupOnly
     ? undefined
     : href ||
-      `/${pluralize(entity.entity_class?.toLowerCase() || "")}/${entity.id}`
+      sluggedPath(
+        pluralize(entity.entity_class?.toLowerCase() || ""),
+        entity.name,
+        entity.id
+      )
 
   // Prevent navigation for popup-only entity types
   const handleClick = isPopupOnly

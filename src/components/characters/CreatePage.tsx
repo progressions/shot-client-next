@@ -15,6 +15,7 @@ import { MainHeader, Icon } from "@/components/ui"
 import { SpeedDial, PCTemplatePreviewCard } from "@/components/characters"
 import { useClient, useApp, useToast } from "@/contexts"
 import type { Character } from "@/types"
+import { sluggedPath } from "@/lib/slug"
 
 type CreatePageProps = {
   templates?: Character[]
@@ -59,7 +60,7 @@ export default function CreatePage({ templates = [] }: CreatePageProps) {
       await refreshUser()
 
       toastSuccess(`Created new character: ${newCharacter.name}`)
-      router.push(`/characters/${newCharacter.id}`)
+      router.push(sluggedPath("characters", newCharacter.name, newCharacter.id))
     } catch (error) {
       console.error("Error creating character from template:", error)
       toastError("Failed to create character from template")

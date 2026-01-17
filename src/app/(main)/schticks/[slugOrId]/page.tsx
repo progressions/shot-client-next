@@ -1,24 +1,31 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
+import { redirect } from "next/navigation"
 import { getServerClient, getCurrentUser } from "@/lib"
-import type { Site } from "@/types"
-import { NotFound, Show } from "@/components/sites"
+import type { Schtick } from "@/types"
+import { NotFound, Show } from "@/components/schticks"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
+import { extractId, buildSluggedId, sluggedPath } from "@/lib/slug"
 
-type SitePageProperties = {
-  params: Promise<{ id: string }>
+type SchtickPageProperties = {
+  params: Promise<{ slugOrId: string }>
 }
 
-export default async function SitePage({ params }: SitePageProperties) {
-  const { id } = await params
+export default async function SchtickPage({ params }: SchtickPageProperties) {
+  const { slugOrId } = await params
+  const id = extractId(slugOrId)
   const client = await getServerClient()
   const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
   try {
-    const response = await client.getSite({ id })
-    const site: Site = response.data
+    const response = await client.getSchtick({ id })
+    const schtick: Schtick = response.data
+    const canonicalId = buildSluggedId(schtick.name, schtick.id)
+    if (canonicalId !== slugOrId) {
+      redirect(sluggedPath("schticks", schtick.name, schtick.id))
+    }
 
     // Detect mobile device on the server
     const headersState = await headers()
@@ -29,7 +36,7 @@ export default async function SitePage({ params }: SitePageProperties) {
       <>
         <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
-          <Show site={site} initialIsMobile={initialIsMobile} />
+          <Show schtick={schtick} initialIsMobile={initialIsMobile} />
         </Suspense>
       </>
     )

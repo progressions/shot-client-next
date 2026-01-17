@@ -1,17 +1,20 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
+import { redirect } from "next/navigation"
 import { getServerClient, getCurrentUser } from "@/lib"
 import type { Fight } from "@/types"
 import { NotFound, Show } from "@/components/fights"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
+import { extractId, buildSluggedId, sluggedPath } from "@/lib/slug"
 
 type FightPageProperties = {
-  params: Promise<{ id: string }>
+  params: Promise<{ slugOrId: string }>
 }
 
 export async function generateMetadata({ params }: FightPageProperties) {
-  const { id } = await params
+  const { slugOrId } = await params
+  const id = extractId(slugOrId)
   const client = await getServerClient()
 
   if (!client) {
@@ -37,7 +40,8 @@ export async function generateMetadata({ params }: FightPageProperties) {
 }
 
 export default async function FightPage({ params }: FightPageProperties) {
-  const { id } = await params
+  const { slugOrId } = await params
+  const id = extractId(slugOrId)
   const client = await getServerClient()
   const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
@@ -45,6 +49,10 @@ export default async function FightPage({ params }: FightPageProperties) {
   try {
     const response = await client.getFight({ id })
     const fight: Fight = response.data
+    const canonicalId = buildSluggedId(fight.name, fight.id)
+    if (canonicalId !== slugOrId) {
+      redirect(sluggedPath("fights", fight.name, fight.id))
+    }
 
     // Detect mobile device on the server
     const headersState = await headers()

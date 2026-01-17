@@ -18,6 +18,10 @@ import type {
 import type { VehicleActionValues } from "./types"
 import type { OnboardingProgress } from "@/lib/onboarding"
 
+// Re-export commonly used value maps
+export type { VehicleActionValues } from "./types"
+export type { ActionValues, SkillValues, CharacterEffects } from "./character"
+
 // Notion integration status
 export type NotionStatus = "working" | "disconnected" | "needs_attention"
 
