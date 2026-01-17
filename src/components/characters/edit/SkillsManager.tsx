@@ -191,12 +191,13 @@ export default function SkillsManager({
       {open && (
         <Box>
           <Stack
-            direction="row"
+            direction={{ xs: "column", sm: "row" }}
             spacing={2}
             component="form"
             onSubmit={handleSave}
+            sx={{ alignItems: { sm: "center" } }}
           >
-            <Box sx={{ width: 300 }}>
+            <Box sx={{ width: { xs: "100%", sm: 300 } }}>
               <Autocomplete
                 label="Add Skill"
                 fetchOptions={fetchOptions}
@@ -211,26 +212,26 @@ export default function SkillsManager({
               type="number"
               value={skillValue === null ? "" : skillValue}
               onChange={handleValueChange}
-              sx={{ width: 100 }}
+              sx={{ width: { xs: "100%", sm: 100 } }}
               inputProps={{ min: 8 }}
             />
             <SaveButton disabled={disabled} />
           </Stack>
         </Box>
       )}
-      <Grid container spacing={0}>
-        <Grid sx={{ width: "50%", maxWidth: "50%", p: 1 }}>
-          <Stack direction="column" spacing={0}>
-            {leftColumnSkills.map((skill, index) => (
-              <Box
-                key={`left-${index}`}
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
+      <Grid container spacing={1}>
+        {[leftColumnSkills, rightColumnSkills].map((columnSkills, index) => (
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            key={`skills-column-${index}`}
+            sx={{ p: { sm: 1, xs: 0 } }}
+          >
+            <Stack direction="column" spacing={0}>
+              {columnSkills.map((skill, skillIndex) => (
                 <Box
+                  key={`column-${index}-${skillIndex}`}
                   sx={{
                     display: "flex",
                     alignItems: "center",
@@ -251,46 +252,10 @@ export default function SkillsManager({
                   )}
                   {!open && <Box sx={{ width: 40, height: 40 }} />}
                 </Box>
-              </Box>
-            ))}
-          </Stack>
-        </Grid>
-        <Grid sx={{ width: "50%", maxWidth: "50%", p: 1 }}>
-          <Stack direction="column" spacing={0}>
-            {rightColumnSkills.map((skill, index) => (
-              <Box
-                key={`right-${index}`}
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                  }}
-                >
-                  <Typography variant="body1">
-                    {skill[0]}: {skill[1]}
-                  </Typography>
-                  {open && (
-                    <IconButton
-                      aria-label={`delete ${skill[0]}`}
-                      onClick={() => handleDelete(skill[0])}
-                    >
-                      <DeleteIcon color="error" />
-                    </IconButton>
-                  )}
-                  {!open && <Box sx={{ width: 40, height: 40 }} />}
-                </Box>
-              </Box>
-            ))}
-          </Stack>
-        </Grid>
+              ))}
+            </Stack>
+          </Grid>
+        ))}
       </Grid>
     </>
   )

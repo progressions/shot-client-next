@@ -180,7 +180,17 @@ export default function Show({
         <InfoLink info="Type" />, <InfoLink info="Archetype" />,
         <InfoLink info="Juncture" />, and <InfoLink info="Wealth" />.
       </SectionHeader>
-      <Stack direction="row" spacing={2} sx={{ my: 2 }}>
+      <Stack
+        direction={{ xs: "column", lg: "row" }}
+        spacing={2}
+        sx={{
+          my: 2,
+          "& > *": {
+            flex: 1,
+            width: { xs: "100%", lg: "auto" },
+          },
+        }}
+      >
         <EditType
           character={memoizedCharacter}
           updateCharacter={updateCharacter}
@@ -190,7 +200,18 @@ export default function Show({
           updateCharacter={updateCharacter}
         />
       </Stack>
-      <Stack direction="row" spacing={2} sx={{ my: 2 }}>
+      <Stack
+        direction={{ xs: "column", lg: "row" }}
+        spacing={2}
+        sx={{
+          my: 2,
+          flexWrap: "wrap",
+          "& > *": {
+            flex: 1,
+            minWidth: { xs: "100%", lg: "auto" },
+          },
+        }}
+      >
         <EditFaction
           entity={memoizedCharacter}
           updateEntity={updateCharacter}
@@ -272,7 +293,18 @@ export default function Show({
           >
             Manage the visibility and status of this character.
           </SectionHeader>
-          <Stack direction="row" spacing={3} sx={{ my: 1 }}>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            sx={{
+              my: 1,
+              flexWrap: "wrap",
+              "& > *": {
+                flex: 1,
+                minWidth: { xs: "100%", sm: "auto" },
+              },
+            }}
+          >
             <EntityActiveToggle
               entity={memoizedCharacter}
               handleChangeAndSave={handleChangeAndSave}
