@@ -186,7 +186,7 @@ type EntityReturnValue =
   | ErrorMessages
   | ShotType
   | ShotType[]
-  | import("./character").CharacterEffects
+  | import("./resources").CharacterEffects
   | import("./resources").VehicleActionValues
   | import("./resources").ActionValues
   | import("./resources").SkillValues
