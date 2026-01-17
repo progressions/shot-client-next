@@ -5,11 +5,11 @@ import { EntityNotionPageAutocomplete } from "@/components/autocomplete"
 import type { EntityType } from "@/components/autocomplete/EntityNotionPageAutocomplete"
 import { Stack, Typography, Divider, CircularProgress } from "@mui/material"
 import AddIcon from "@mui/icons-material/Add"
-import type { Site, Party, Faction, Juncture } from "@/types"
+import type { Site, Party, Faction, Juncture, Adventure } from "@/types"
 import { useState, useEffect } from "react"
 import { useClient, useToast } from "@/contexts"
 
-type NotionLinkableEntity = Site | Party | Faction | Juncture
+type NotionLinkableEntity = Site | Party | Faction | Juncture | Adventure
 
 type EntityNotionLinkDialogProps<T extends NotionLinkableEntity> = {
   entity: T
@@ -30,6 +30,7 @@ export default function EntityNotionLinkDialog<T extends NotionLinkableEntity>({
     entity?.notion_page_id ?? null
   )
   const [isCreating, setIsCreating] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
 
@@ -40,9 +41,50 @@ export default function EntityNotionLinkDialog<T extends NotionLinkableEntity>({
     setPageId(entity?.notion_page_id ?? null)
   }, [entity?.notion_page_id])
 
-  const handleSave = () => {
-    onSave(pageId)
-    onClose()
+  const handleSave = async () => {
+    // If the pageId hasn't changed, just close the dialog
+    if (pageId === entity?.notion_page_id) {
+      onClose()
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      let response
+      const updateData = { notion_page_id: pageId }
+
+      switch (entityType) {
+        case "site":
+          response = await client.updateSite(entity.id, updateData)
+          break
+        case "party":
+          response = await client.updateParty(entity.id, updateData)
+          break
+        case "faction":
+          response = await client.updateFaction(entity.id, updateData)
+          break
+        case "juncture":
+          response = await client.updateJuncture(entity.id, updateData)
+          break
+        case "adventure":
+          response = await client.updateAdventure(entity.id, updateData)
+          break
+      }
+
+      const updatedEntity = response?.data as T
+      toastSuccess(
+        pageId
+          ? `${entityLabel} linked to Notion`
+          : `${entityLabel} unlinked from Notion`
+      )
+      onSave(pageId, updatedEntity)
+      onClose()
+    } catch (error) {
+      console.error(`Error updating ${entityType} Notion link:`, error)
+      toastError(`Failed to update ${entityLabel.toLowerCase()} Notion link`)
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handleChange = (newPageId: string | null) => {
@@ -65,6 +107,9 @@ export default function EntityNotionLinkDialog<T extends NotionLinkableEntity>({
           break
         case "juncture":
           response = await client.syncJunctureToNotion(entity as Juncture)
+          break
+        case "adventure":
+          response = await client.syncAdventureToNotion(entity as Adventure)
           break
       }
 
@@ -91,11 +136,17 @@ export default function EntityNotionLinkDialog<T extends NotionLinkableEntity>({
       title={`Link ${entityLabel} to Notion`}
       actions={
         <Stack direction="row" spacing={2}>
-          <Button variant="outlined" onClick={onClose}>
+          <Button variant="outlined" onClick={onClose} disabled={isSaving}>
             Cancel
           </Button>
-          <Button variant="contained" color="primary" onClick={handleSave}>
-            Save
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSave}
+            disabled={isSaving}
+            startIcon={isSaving ? <CircularProgress size={16} /> : undefined}
+          >
+            {isSaving ? "Saving..." : "Save"}
           </Button>
         </Stack>
       }
