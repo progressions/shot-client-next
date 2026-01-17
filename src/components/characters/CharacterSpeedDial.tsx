@@ -22,6 +22,7 @@ import { isAiGenerationEnabled } from "@/types"
 import { CS } from "@/services"
 import { useClient, useConfirm, useCampaign } from "@/contexts"
 import { Extend } from "@/components/characters"
+import { sluggedPath } from "@/lib/slug"
 
 type Action = {
   [key: string]: unknown
@@ -178,7 +179,7 @@ Action Values: ${JSON.stringify(character.actionValues, null, 2)}
     try {
       const response = await client.duplicateCharacter(character)
       const newCharacter = response.data
-      router.push(`/characters/${newCharacter.id}`)
+      router.push(sluggedPath("characters", newCharacter.name, newCharacter.id))
     } catch (error_) {
       console.error("Failed to duplicate character:", error_)
     } finally {

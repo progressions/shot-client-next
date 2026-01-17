@@ -1,24 +1,31 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
+import { redirect } from "next/navigation"
 import { getServerClient, getCurrentUser } from "@/lib"
-import type { Schtick } from "@/types"
-import { NotFound, Show } from "@/components/schticks"
+import type { Juncture } from "@/types"
+import { NotFound, Show } from "@/components/junctures"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
+import { extractId, buildSluggedId, sluggedPath } from "@/lib/slug"
 
-type SchtickPageProperties = {
-  params: Promise<{ id: string }>
+type JuncturePageProperties = {
+  params: Promise<{ slugOrId: string }>
 }
 
-export default async function SchtickPage({ params }: SchtickPageProperties) {
-  const { id } = await params
+export default async function JuncturePage({ params }: JuncturePageProperties) {
+  const { slugOrId } = await params
+  const id = extractId(slugOrId)
   const client = await getServerClient()
   const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
   try {
-    const response = await client.getSchtick({ id })
-    const schtick: Schtick = response.data
+    const response = await client.getJuncture({ id })
+    const juncture: Juncture = response.data
+    const canonicalId = buildSluggedId(juncture.name, juncture.id)
+    if (canonicalId !== slugOrId) {
+      redirect(sluggedPath("junctures", juncture.name, juncture.id))
+    }
 
     // Detect mobile device on the server
     const headersState = await headers()
@@ -29,7 +36,7 @@ export default async function SchtickPage({ params }: SchtickPageProperties) {
       <>
         <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
-          <Show schtick={schtick} initialIsMobile={initialIsMobile} />
+          <Show juncture={juncture} initialIsMobile={initialIsMobile} />
         </Suspense>
       </>
     )
