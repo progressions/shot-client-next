@@ -2,11 +2,7 @@
 
 import { Box, Typography, Stack } from "@mui/material"
 import { CS } from "@/services"
-import type {
-  TargetSectionProps,
-  Encounter,
-  DefenseChoice,
-} from "@/types"
+import type { TargetSectionProps, Encounter, DefenseChoice } from "@/types"
 import CharacterSelector from "../CharacterSelector"
 import MookDistribution from "./MookDistribution"
 import TargetCard from "./TargetCard"
