@@ -15,6 +15,7 @@ import { useCampaign, useClient, useConfirm } from "@/contexts"
 import { CharacterLink } from "@/components/ui"
 import DetailButtons from "@/components/DetailButtons"
 import { RichTextRenderer } from "@/components/editor"
+import { sluggedPath } from "@/lib/slug"
 
 interface AdventureDetailProperties {
   adventure: Adventure
@@ -99,7 +100,7 @@ export default function AdventureDetail({
         >
           <Typography variant="h6" sx={{ color: "#ffffff" }}>
             <Link
-              href={`/adventures/${adventure.id}`}
+              href={sluggedPath("adventures", adventure.name, adventure.id)}
               style={{ color: "#fff" }}
             >
               {adventure.name}
