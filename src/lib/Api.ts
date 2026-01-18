@@ -17,12 +17,14 @@ import type {
   Juncture,
   ID,
 } from "@/types"
+import { getEntityId } from "@/lib/entityId"
 
 class Api {
+  /**
+   * Normalizes an entity or string ID into a plain ID string.
+   */
   private id(entity?: { id?: string } | ID | string): string | undefined {
-    if (!entity) return undefined
-    if (typeof entity === "string") return entity
-    return (entity as { id?: string }).id
+    return getEntityId(entity)
   }
 
   base(): string {
@@ -63,7 +65,11 @@ class Api {
   }
 
   addPartyToFight(party: Party | ID, fight: Fight | ID): string {
-    return `${this.parties(party)}/fight/${this.id(fight)}`
+    const fightId = this.id(fight)
+    if (!fightId) {
+      throw new Error("addPartyToFight requires a fight with a valid id")
+    }
+    return `${this.parties(party)}/fight/${fightId}`
   }
 
   fights(fight?: Fight | ID): string {
@@ -260,7 +266,7 @@ class Api {
     return `${this.base()}/users`
   }
 
-  factions(faction?: Faction | ID | string): string {
+  factions(faction?: Faction | ID): string {
     const id = this.id(faction)
     return id ? `${this.api()}/factions/${id}` : `${this.api()}/factions`
   }

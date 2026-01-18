@@ -17,13 +17,12 @@ import {
   Notification,
   Adventure,
 } from "@/types"
+import { getEntityId } from "@/lib/entityId"
 
 class ApiV2 {
   // Normalizes an entity or string ID into a plain ID string.
   private id(entity?: { id?: string } | ID | string): string | undefined {
-    if (!entity) return undefined
-    if (typeof entity === "string") return entity
-    return (entity as { id?: string }).id
+    return getEntityId(entity)
   }
 
   base(): string {
@@ -34,7 +33,7 @@ class ApiV2 {
     return `${this.base()}/api/v2`
   }
 
-  encounters(fight?: Fight | ID | string): string {
+  encounters(fight?: Fight | ID): string {
     const id = this.id(fight)
     return id ? `${this.api()}/encounters/${id}` : `${this.api()}/encounters`
   }
@@ -206,7 +205,7 @@ class ApiV2 {
     return `${this.api()}/schticks/paths`
   }
 
-  factions(faction?: Faction | ID | string): string {
+  factions(faction?: Faction | ID): string {
     const id = this.id(faction)
     return id ? `${this.api()}/factions/${id}` : `${this.api()}/factions`
   }
