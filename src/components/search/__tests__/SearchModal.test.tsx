@@ -2,6 +2,15 @@ import React from "react"
 import { render, screen, fireEvent, waitFor } from "@/test-utils"
 import { SearchModal } from "../SearchModal"
 
+// Mock lodash.debounce to execute immediately in tests
+jest.mock("lodash.debounce", () =>
+  jest.fn(fn => {
+    const debounced = fn
+    debounced.cancel = jest.fn()
+    return debounced
+  })
+)
+
 // Mock next/navigation
 const mockPush = jest.fn()
 jest.mock("next/navigation", () => ({
@@ -34,13 +43,8 @@ describe("SearchModal", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    jest.useFakeTimers()
     // Mock scrollIntoView which is not implemented in jsdom
     Element.prototype.scrollIntoView = jest.fn()
-  })
-
-  afterEach(() => {
-    jest.useRealTimers()
   })
 
   it("renders when open", () => {
@@ -62,17 +66,19 @@ describe("SearchModal", () => {
     expect(screen.getByText("Start typing to search")).toBeInTheDocument()
   })
 
-  it("calls search after debounce when typing", async () => {
-    mockSearch.mockResolvedValue({ data: { results: {} } })
+  it("calls search when typing", async () => {
+    mockSearch.mockResolvedValue({
+      data: {
+        results: {},
+        meta: { query: "test", limit_per_type: 5, total_count: 0 },
+      },
+    })
     render(<SearchModal {...defaultProps} />)
 
     const input = screen.getByPlaceholderText(
       "Search characters, sites, factions..."
     )
     fireEvent.change(input, { target: { value: "test" } })
-
-    // Advance timers past debounce
-    jest.advanceTimersByTime(200)
 
     await waitFor(() => {
       expect(mockSearch).toHaveBeenCalledWith("test")
@@ -95,26 +101,32 @@ describe("SearchModal", () => {
     )
     fireEvent.change(input, { target: { value: "test" } })
 
-    jest.advanceTimersByTime(200)
-
     await waitFor(() => {
       expect(screen.getByRole("progressbar")).toBeInTheDocument()
     })
 
     // Resolve the promise to clean up
-    resolveSearch!({ data: { results: {} } })
+    resolveSearch!({
+      data: {
+        results: {},
+        meta: { query: "test", limit_per_type: 5, total_count: 0 },
+      },
+    })
   })
 
   it("displays 'No results found' when search returns empty", async () => {
-    mockSearch.mockResolvedValue({ data: { results: {} } })
+    mockSearch.mockResolvedValue({
+      data: {
+        results: {},
+        meta: { query: "nonexistent", limit_per_type: 5, total_count: 0 },
+      },
+    })
     render(<SearchModal {...defaultProps} />)
 
     const input = screen.getByPlaceholderText(
       "Search characters, sites, factions..."
     )
     fireEvent.change(input, { target: { value: "nonexistent" } })
-
-    jest.advanceTimersByTime(200)
 
     await waitFor(() => {
       expect(screen.getByText("No results found")).toBeInTheDocument()
@@ -144,6 +156,7 @@ describe("SearchModal", () => {
             },
           ],
         },
+        meta: { query: "test", limit_per_type: 5, total_count: 2 },
       },
     })
 
@@ -153,8 +166,6 @@ describe("SearchModal", () => {
       "Search characters, sites, factions..."
     )
     fireEvent.change(input, { target: { value: "test" } })
-
-    jest.advanceTimersByTime(200)
 
     await waitFor(() => {
       expect(screen.getByText("Characters")).toBeInTheDocument()
@@ -178,6 +189,7 @@ describe("SearchModal", () => {
             },
           ],
         },
+        meta: { query: "test", limit_per_type: 5, total_count: 1 },
       },
     })
 
@@ -187,8 +199,6 @@ describe("SearchModal", () => {
       "Search characters, sites, factions..."
     )
     fireEvent.change(input, { target: { value: "test" } })
-
-    jest.advanceTimersByTime(200)
 
     await waitFor(() => {
       expect(screen.getByText("Test Character")).toBeInTheDocument()
@@ -232,6 +242,7 @@ describe("SearchModal", () => {
             },
           ],
         },
+        meta: { query: "char", limit_per_type: 5, total_count: 2 },
       },
     })
 
@@ -241,8 +252,6 @@ describe("SearchModal", () => {
       "Search characters, sites, factions..."
     )
     fireEvent.change(input, { target: { value: "char" } })
-
-    jest.advanceTimersByTime(200)
 
     await waitFor(() => {
       expect(screen.getByText("First Character")).toBeInTheDocument()
@@ -277,6 +286,7 @@ describe("SearchModal", () => {
             },
           ],
         },
+        meta: { query: "test", limit_per_type: 5, total_count: 1 },
       },
     })
 
@@ -286,8 +296,6 @@ describe("SearchModal", () => {
       "Search characters, sites, factions..."
     )
     fireEvent.change(input, { target: { value: "test" } })
-
-    jest.advanceTimersByTime(200)
 
     await waitFor(() => {
       expect(screen.getByText("Test Character")).toBeInTheDocument()
@@ -313,6 +321,7 @@ describe("SearchModal", () => {
             },
           ],
         },
+        meta: { query: "test", limit_per_type: 5, total_count: 1 },
       },
     })
 
@@ -329,7 +338,6 @@ describe("SearchModal", () => {
     expect(input).toHaveAttribute("aria-label", "Search")
 
     fireEvent.change(input, { target: { value: "test" } })
-    jest.advanceTimersByTime(200)
 
     await waitFor(() => {
       expect(screen.getByText("Test Character")).toBeInTheDocument()
@@ -341,21 +349,5 @@ describe("SearchModal", () => {
     // Result items should have option role
     const options = screen.getAllByRole("option")
     expect(options.length).toBeGreaterThan(0)
-  })
-
-  it("cleans up debounce timeout on unmount", () => {
-    const clearTimeoutSpy = jest.spyOn(global, "clearTimeout")
-
-    const { unmount } = render(<SearchModal {...defaultProps} />)
-
-    const input = screen.getByPlaceholderText(
-      "Search characters, sites, factions..."
-    )
-    fireEvent.change(input, { target: { value: "test" } })
-
-    unmount()
-
-    expect(clearTimeoutSpy).toHaveBeenCalled()
-    clearTimeoutSpy.mockRestore()
   })
 })

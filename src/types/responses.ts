@@ -147,6 +147,13 @@ export interface SearchResultItem {
   description: string | null
 }
 
+// Search metadata
+export interface SearchMeta {
+  query: string
+  limit_per_type: number
+  total_count: number
+}
+
 // Search response grouped by entity type
 export interface SearchResponse {
   results: {
@@ -161,4 +168,5 @@ export interface SearchResponse {
     junctures?: SearchResultItem[]
     adventures?: SearchResultItem[]
   }
+  meta: SearchMeta
 }

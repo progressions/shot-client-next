@@ -4,6 +4,7 @@ import type { SearchResponse } from "@/types"
 
 interface ClientDependencies {
   jwt?: string
+  api: import("@/lib").Api
   apiV2: import("@/lib").ApiV2
   queryParams: typeof import("@/lib").queryParams
 }
@@ -14,8 +15,7 @@ export function createSearchClient(deps: ClientDependencies) {
 
   async function search(query: string): Promise<AxiosResponse<SearchResponse>> {
     const params = queryParams({ q: query })
-    const url = params ? `${apiV2.search()}?${params}` : apiV2.search()
-    return get(url)
+    return get(`${apiV2.search()}?${params}`)
   }
 
   return {

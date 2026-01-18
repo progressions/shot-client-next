@@ -33,8 +33,10 @@ describe("createSearchClient", () => {
   }
 
   const mockJWT = "test-jwt-token"
+  const mockApi = {} as import("@/lib").Api
   const deps = {
     jwt: mockJWT,
+    api: mockApi,
     apiV2: mockApiV2 as unknown as import("@/lib").ApiV2,
     queryParams: mockQueryParams,
   }

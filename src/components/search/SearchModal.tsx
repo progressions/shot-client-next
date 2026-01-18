@@ -14,6 +14,7 @@ import {
 } from "@mui/material"
 import SearchIcon from "@mui/icons-material/Search"
 import { useRouter } from "next/navigation"
+import debounce from "lodash.debounce"
 import { useClient } from "@/contexts"
 import { getUrl } from "@/lib/maps"
 import type { SearchResultItem, SearchResponse } from "@/types"
@@ -59,10 +60,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
   const [loading, setLoading] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
-  const debounceRef = useRef<NodeJS.Timeout | null>(null)
-  const abortControllerRef = useRef<AbortController | null>(null)
-  const resultsContainerRef = useRef<HTMLDivElement>(null)
-  const selectedItemRefs = useRef<Map<number, HTMLDivElement>>(new Map())
+  const selectedItemRef = useRef<HTMLDivElement>(null)
 
   // Flatten results for keyboard navigation
   const flatResults = useMemo(() => {
@@ -78,7 +76,37 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
     return flat
   }, [results])
 
-  // Reset state when modal opens/closes
+  // Perform search
+  const performSearch = useCallback(
+    async (searchQuery: string) => {
+      if (!searchQuery.trim()) {
+        setResults({})
+        setLoading(false)
+        return
+      }
+
+      setLoading(true)
+      try {
+        const response = await client.search(searchQuery)
+        setResults(response.data.results)
+        setSelectedIndex(0)
+      } catch (error) {
+        console.error("Search failed:", error)
+        setResults({})
+      } finally {
+        setLoading(false)
+      }
+    },
+    [client]
+  )
+
+  // Debounced search using lodash.debounce
+  const debouncedSearch = useMemo(
+    () => debounce((searchQuery: string) => performSearch(searchQuery), 150),
+    [performSearch]
+  )
+
+  // Reset state when modal opens
   useEffect(() => {
     if (open) {
       setQuery("")
@@ -87,91 +115,30 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
       // Focus input after a short delay to ensure modal is rendered
       setTimeout(() => inputRef.current?.focus(), 100)
     }
-
-    // Cleanup on close or unmount
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current)
-        debounceRef.current = null
-      }
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort()
-        abortControllerRef.current = null
-      }
-    }
   }, [open])
+
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel()
+    }
+  }, [debouncedSearch])
 
   // Scroll selected item into view
   useEffect(() => {
-    const selectedElement = selectedItemRefs.current.get(selectedIndex)
-    if (selectedElement) {
-      selectedElement.scrollIntoView({
+    if (selectedItemRef.current) {
+      selectedItemRef.current.scrollIntoView({
         behavior: "smooth",
         block: "nearest",
       })
     }
   }, [selectedIndex])
 
-  // Debounced search with abort controller
-  const performSearch = useCallback(
-    async (searchQuery: string) => {
-      // Cancel any in-flight request
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort()
-      }
-
-      if (!searchQuery.trim()) {
-        setResults({})
-        setLoading(false)
-        return
-      }
-
-      // Create new abort controller for this request
-      const controller = new AbortController()
-      abortControllerRef.current = controller
-
-      setLoading(true)
-      try {
-        const response = await client.search(searchQuery)
-
-        // Check if this request was aborted
-        if (controller.signal.aborted) {
-          return
-        }
-
-        setResults(response.data.results)
-        setSelectedIndex(0)
-      } catch (error) {
-        // Ignore abort errors
-        if (error instanceof Error && error.name === "AbortError") {
-          return
-        }
-        console.error("Search failed:", error)
-        setResults({})
-      } finally {
-        // Only update loading state if not aborted
-        if (!controller.signal.aborted) {
-          setLoading(false)
-        }
-      }
-    },
-    [client]
-  )
-
   // Handle input change with debounce
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setQuery(value)
-
-    // Clear existing debounce
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current)
-    }
-
-    // Set new debounce
-    debounceRef.current = setTimeout(() => {
-      performSearch(value)
-    }, 150)
+    debouncedSearch(value)
   }
 
   // Navigate to selected result
@@ -210,13 +177,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
     return (
       <Box
         key={item.id}
-        ref={(el: HTMLDivElement | null) => {
-          if (el) {
-            selectedItemRefs.current.set(globalIndex, el)
-          } else {
-            selectedItemRefs.current.delete(globalIndex)
-          }
-        }}
+        ref={isSelected ? selectedItemRef : undefined}
         role="option"
         aria-selected={isSelected}
         onClick={() => navigateToResult(item)}
@@ -430,7 +391,6 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
         />
         <Box
           id="search-results"
-          ref={resultsContainerRef}
           sx={{
             mt: 2,
             maxHeight: "50vh",
