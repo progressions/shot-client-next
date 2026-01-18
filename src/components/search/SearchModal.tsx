@@ -3,17 +3,19 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import {
   Dialog,
+  DialogTitle,
   DialogContent,
   TextField,
   Box,
   Typography,
   CircularProgress,
   InputAdornment,
+  Avatar,
 } from "@mui/material"
 import SearchIcon from "@mui/icons-material/Search"
 import { useRouter } from "next/navigation"
 import { useClient } from "@/contexts"
-import { badgeComponents, badgePropNames, getUrl } from "@/lib/maps"
+import { getUrl } from "@/lib/maps"
 import type { SearchResultItem, SearchResponse } from "@/types"
 
 interface SearchModalProps {
@@ -58,6 +60,9 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const resultsContainerRef = useRef<HTMLDivElement>(null)
+  const selectedItemRefs = useRef<Map<number, HTMLDivElement>>(new Map())
 
   // Flatten results for keyboard navigation
   const flatResults = useMemo(() => {
@@ -82,27 +87,72 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
       // Focus input after a short delay to ensure modal is rendered
       setTimeout(() => inputRef.current?.focus(), 100)
     }
+
+    // Cleanup on close or unmount
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current)
+        debounceRef.current = null
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+        abortControllerRef.current = null
+      }
+    }
   }, [open])
 
-  // Debounced search
+  // Scroll selected item into view
+  useEffect(() => {
+    const selectedElement = selectedItemRefs.current.get(selectedIndex)
+    if (selectedElement) {
+      selectedElement.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      })
+    }
+  }, [selectedIndex])
+
+  // Debounced search with abort controller
   const performSearch = useCallback(
     async (searchQuery: string) => {
+      // Cancel any in-flight request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+
       if (!searchQuery.trim()) {
         setResults({})
         setLoading(false)
         return
       }
 
+      // Create new abort controller for this request
+      const controller = new AbortController()
+      abortControllerRef.current = controller
+
       setLoading(true)
       try {
         const response = await client.search(searchQuery)
+
+        // Check if this request was aborted
+        if (controller.signal.aborted) {
+          return
+        }
+
         setResults(response.data.results)
         setSelectedIndex(0)
       } catch (error) {
+        // Ignore abort errors
+        if (error instanceof Error && error.name === "AbortError") {
+          return
+        }
         console.error("Search failed:", error)
         setResults({})
       } finally {
-        setLoading(false)
+        // Only update loading state if not aborted
+        if (!controller.signal.aborted) {
+          setLoading(false)
+        }
       }
     },
     [client]
@@ -153,28 +203,28 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
     }
   }
 
-  // Render a single result item with its badge
-  const renderResultItem = (
-    item: SearchResultItem,
-    index: number,
-    globalIndex: number
-  ) => {
-    const BadgeComponent = badgeComponents[item.entity_class]
-    const propName = badgePropNames[item.entity_class]
+  // Render a single result item - simple display for search results
+  const renderResultItem = (item: SearchResultItem, globalIndex: number) => {
     const isSelected = globalIndex === selectedIndex
-
-    if (!BadgeComponent || !propName) {
-      return null
-    }
-
-    // Create the entity prop dynamically
-    const entityProp = { [propName]: item }
 
     return (
       <Box
         key={item.id}
+        ref={(el: HTMLDivElement | null) => {
+          if (el) {
+            selectedItemRefs.current.set(globalIndex, el)
+          } else {
+            selectedItemRefs.current.delete(globalIndex)
+          }
+        }}
+        role="option"
+        aria-selected={isSelected}
         onClick={() => navigateToResult(item)}
         sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1.5,
+          p: 1,
           cursor: "pointer",
           bgcolor: isSelected ? "rgba(255, 255, 255, 0.1)" : "transparent",
           borderRadius: 1,
@@ -184,7 +234,56 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
           },
         }}
       >
-        <BadgeComponent {...entityProp} size="sm" />
+        <Avatar
+          src={item.image_url || undefined}
+          sx={{
+            width: 32,
+            height: 32,
+            bgcolor: "rgba(255, 255, 255, 0.1)",
+            fontSize: "0.875rem",
+          }}
+        >
+          {item.name.charAt(0).toUpperCase()}
+        </Avatar>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 500,
+              color: "#fff",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {item.name}
+          </Typography>
+          {item.description && (
+            <Typography
+              variant="caption"
+              sx={{
+                color: "#888",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                display: "block",
+              }}
+            >
+              {item.description}
+            </Typography>
+          )}
+        </Box>
+        <Typography
+          variant="caption"
+          sx={{
+            color: "#666",
+            textTransform: "uppercase",
+            fontSize: "0.625rem",
+            letterSpacing: "0.05em",
+          }}
+        >
+          {item.entity_class}
+        </Typography>
       </Box>
     )
   }
@@ -221,14 +320,17 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
 
     let globalIndex = 0
     return (
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <Box
+        role="listbox"
+        aria-label="Search results"
+        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+      >
         {ENTITY_ORDER.map(type => {
           const items = results[type as keyof typeof results]
           if (!items || items.length === 0) return null
 
-          const startIndex = globalIndex
-          const renderedItems = items.map((item, index) => {
-            const result = renderResultItem(item, index, globalIndex)
+          const renderedItems = items.map(item => {
+            const result = renderResultItem(item, globalIndex)
             globalIndex++
             return result
           })
@@ -262,6 +364,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      aria-labelledby="search-dialog-title"
       PaperProps={{
         sx: {
           bgcolor: "#1d1d1d",
@@ -271,6 +374,19 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
         },
       }}
     >
+      <DialogTitle
+        id="search-dialog-title"
+        sx={{
+          p: 0,
+          position: "absolute",
+          width: 1,
+          height: 1,
+          overflow: "hidden",
+          clip: "rect(0,0,0,0)",
+        }}
+      >
+        Search
+      </DialogTitle>
       <DialogContent sx={{ p: 2 }}>
         <TextField
           inputRef={inputRef}
@@ -280,6 +396,10 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           autoComplete="off"
+          inputProps={{
+            "aria-label": "Search",
+            "aria-controls": "search-results",
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -309,6 +429,8 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
           }}
         />
         <Box
+          id="search-results"
+          ref={resultsContainerRef}
           sx={{
             mt: 2,
             maxHeight: "50vh",
