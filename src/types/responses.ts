@@ -138,15 +138,6 @@ export interface PaginationMeta {
   total_count: number
 }
 
-// Search result item returned from the search endpoint
-export interface SearchResultItem {
-  id: string
-  name: string
-  image_url: string | null
-  entity_class: string
-  description: string | null
-}
-
 // Search metadata
 export interface SearchMeta {
   query: string
@@ -155,18 +146,19 @@ export interface SearchMeta {
 }
 
 // Search response grouped by entity type
+// Returns full entity data compatible with badge components
 export interface SearchResponse {
   results: {
-    characters?: SearchResultItem[]
-    vehicles?: SearchResultItem[]
-    fights?: SearchResultItem[]
-    sites?: SearchResultItem[]
-    parties?: SearchResultItem[]
-    factions?: SearchResultItem[]
-    schticks?: SearchResultItem[]
-    weapons?: SearchResultItem[]
-    junctures?: SearchResultItem[]
-    adventures?: SearchResultItem[]
+    characters?: Character[]
+    vehicles?: Vehicle[]
+    fights?: Fight[]
+    sites?: Site[]
+    parties?: Party[]
+    factions?: Faction[]
+    schticks?: Schtick[]
+    weapons?: Weapon[]
+    junctures?: Juncture[]
+    adventures?: Adventure[]
   }
   meta: SearchMeta
 }

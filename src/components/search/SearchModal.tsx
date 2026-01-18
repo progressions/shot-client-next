@@ -10,14 +10,37 @@ import {
   Typography,
   CircularProgress,
   InputAdornment,
-  Avatar,
 } from "@mui/material"
 import SearchIcon from "@mui/icons-material/Search"
 import { useRouter } from "next/navigation"
 import debounce from "lodash.debounce"
 import { useClient } from "@/contexts"
 import { getUrl } from "@/lib/maps"
-import type { SearchResultItem, SearchResponse } from "@/types"
+import type {
+  Character,
+  Vehicle,
+  Fight,
+  Site,
+  Party,
+  Faction,
+  Schtick,
+  Weapon,
+  Juncture,
+  Adventure,
+  SearchResponse,
+} from "@/types"
+import {
+  CharacterBadge,
+  VehicleBadge,
+  FightBadge,
+  SiteBadge,
+  PartyBadge,
+  FactionBadge,
+  SchtickBadge,
+  WeaponBadge,
+  JunctureBadge,
+  AdventureBadge,
+} from "@/components/badges"
 
 interface SearchModalProps {
   open: boolean
@@ -52,6 +75,19 @@ const ENTITY_ORDER = [
   "adventures",
 ]
 
+// Union type for all searchable entities
+type SearchableEntity =
+  | Character
+  | Vehicle
+  | Fight
+  | Site
+  | Party
+  | Faction
+  | Schtick
+  | Weapon
+  | Juncture
+  | Adventure
+
 export function SearchModal({ open, onClose }: SearchModalProps) {
   const { client } = useClient()
   const router = useRouter()
@@ -64,12 +100,12 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
 
   // Flatten results for keyboard navigation
   const flatResults = useMemo(() => {
-    const flat: { type: string; item: SearchResultItem }[] = []
+    const flat: { type: string; item: SearchableEntity }[] = []
     for (const type of ENTITY_ORDER) {
       const items = results[type as keyof typeof results]
       if (items && items.length > 0) {
         for (const item of items) {
-          flat.push({ type, item })
+          flat.push({ type, item: item as SearchableEntity })
         }
       }
     }
@@ -143,13 +179,41 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
 
   // Navigate to selected result
   const navigateToResult = useCallback(
-    (item: SearchResultItem) => {
-      const url = getUrl(item.entity_class, item.id, item.name)
+    (item: SearchableEntity) => {
+      const entityClass =
+        "entity_class" in item ? item.entity_class : getEntityClass(item)
+      const url = getUrl(entityClass, item.id, item.name)
       router.push(url)
       onClose()
     },
     [router, onClose]
   )
+
+  // Get entity class from item type
+  const getEntityClass = (item: SearchableEntity): string => {
+    if ("action_values" in item && "description" in item) {
+      // Could be Character or Vehicle - check for vehicle-specific fields
+      if ("impairments" in item && !("extending" in item)) {
+        return "Vehicle"
+      }
+      return "Character"
+    }
+    if ("sequence" in item) return "Fight"
+    if (
+      "attunements" in item ||
+      ("faction_id" in item &&
+        "character_ids" in item &&
+        !("memberships" in item))
+    )
+      return "Site"
+    if ("memberships" in item) return "Party"
+    if ("character_ids" in item && !("faction_id" in item)) return "Faction"
+    if ("path" in item) return "Schtick"
+    if ("damage" in item) return "Weapon"
+    if ("faction_id" in item && !("character_ids" in item)) return "Juncture"
+    if ("season" in item) return "Adventure"
+    return "Character"
+  }
 
   // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -170,8 +234,12 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
     }
   }
 
-  // Render a single result item - simple display for search results
-  const renderResultItem = (item: SearchResultItem, globalIndex: number) => {
+  // Render a single result item using the appropriate badge component
+  const renderResultItem = (
+    type: string,
+    item: SearchableEntity,
+    globalIndex: number
+  ) => {
     const isSelected = globalIndex === selectedIndex
 
     return (
@@ -182,10 +250,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
         aria-selected={isSelected}
         onClick={() => navigateToResult(item)}
         sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: 1.5,
-          p: 1,
+          p: 0.5,
           cursor: "pointer",
           bgcolor: isSelected ? "rgba(255, 255, 255, 0.1)" : "transparent",
           borderRadius: 1,
@@ -195,58 +260,37 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
           },
         }}
       >
-        <Avatar
-          src={item.image_url || undefined}
-          sx={{
-            width: 32,
-            height: 32,
-            bgcolor: "rgba(255, 255, 255, 0.1)",
-            fontSize: "0.875rem",
-          }}
-        >
-          {item.name.charAt(0).toUpperCase()}
-        </Avatar>
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography
-            variant="body2"
-            sx={{
-              fontWeight: 500,
-              color: "#fff",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {item.name}
-          </Typography>
-          {item.description && (
-            <Typography
-              variant="caption"
-              sx={{
-                color: "#888",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-                display: "block",
-              }}
-            >
-              {item.description}
-            </Typography>
-          )}
-        </Box>
-        <Typography
-          variant="caption"
-          sx={{
-            color: "#666",
-            textTransform: "uppercase",
-            fontSize: "0.625rem",
-            letterSpacing: "0.05em",
-          }}
-        >
-          {item.entity_class}
-        </Typography>
+        {renderBadgeForType(type, item)}
       </Box>
     )
+  }
+
+  // Render the appropriate badge component based on entity type
+  const renderBadgeForType = (type: string, item: SearchableEntity) => {
+    switch (type) {
+      case "characters":
+        return <CharacterBadge character={item as Character} size="sm" />
+      case "vehicles":
+        return <VehicleBadge vehicle={item as Vehicle} size="sm" />
+      case "fights":
+        return <FightBadge fight={item as Fight} size="sm" />
+      case "sites":
+        return <SiteBadge site={item as Site} size="sm" />
+      case "parties":
+        return <PartyBadge party={item as Party} size="sm" />
+      case "factions":
+        return <FactionBadge faction={item as Faction} size="sm" />
+      case "schticks":
+        return <SchtickBadge schtick={item as Schtick} size="sm" />
+      case "weapons":
+        return <WeaponBadge weapon={item as Weapon} size="sm" />
+      case "junctures":
+        return <JunctureBadge juncture={item as Juncture} size="sm" />
+      case "adventures":
+        return <AdventureBadge adventure={item as Adventure} size="sm" />
+      default:
+        return null
+    }
   }
 
   // Render results grouped by entity type
@@ -291,7 +335,11 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
           if (!items || items.length === 0) return null
 
           const renderedItems = items.map(item => {
-            const result = renderResultItem(item, globalIndex)
+            const result = renderResultItem(
+              type,
+              item as SearchableEntity,
+              globalIndex
+            )
             globalIndex++
             return result
           })
@@ -348,10 +396,11 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
       >
         Search
       </DialogTitle>
-      <DialogContent sx={{ p: 2 }}>
+      <DialogContent sx={{ p: 2, pt: 4 }}>
         <TextField
           inputRef={inputRef}
           fullWidth
+          sx={{ mt: 2 }}
           placeholder="Search characters, sites, factions..."
           value={query}
           onChange={handleInputChange}

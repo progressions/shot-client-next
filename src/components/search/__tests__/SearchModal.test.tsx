@@ -33,7 +33,124 @@ jest.mock("@/contexts", () => ({
       search: mockSearch,
     },
   }),
+  useCampaign: () => ({
+    campaignData: null,
+  }),
 }))
+
+// Mock badge components to avoid circular dependency issues
+jest.mock("@/components/badges", () => ({
+  CharacterBadge: ({ character }: { character: { name: string } }) => (
+    <div data-testid="character-badge">{character.name}</div>
+  ),
+  VehicleBadge: ({ vehicle }: { vehicle: { name: string } }) => (
+    <div data-testid="vehicle-badge">{vehicle.name}</div>
+  ),
+  FightBadge: ({ fight }: { fight: { name: string } }) => (
+    <div data-testid="fight-badge">{fight.name}</div>
+  ),
+  SiteBadge: ({ site }: { site: { name: string } }) => (
+    <div data-testid="site-badge">{site.name}</div>
+  ),
+  PartyBadge: ({ party }: { party: { name: string } }) => (
+    <div data-testid="party-badge">{party.name}</div>
+  ),
+  FactionBadge: ({ faction }: { faction: { name: string } }) => (
+    <div data-testid="faction-badge">{faction.name}</div>
+  ),
+  SchtickBadge: ({ schtick }: { schtick: { name: string } }) => (
+    <div data-testid="schtick-badge">{schtick.name}</div>
+  ),
+  WeaponBadge: ({ weapon }: { weapon: { name: string } }) => (
+    <div data-testid="weapon-badge">{weapon.name}</div>
+  ),
+  JunctureBadge: ({ juncture }: { juncture: { name: string } }) => (
+    <div data-testid="juncture-badge">{juncture.name}</div>
+  ),
+  AdventureBadge: ({ adventure }: { adventure: { name: string } }) => (
+    <div data-testid="adventure-badge">{adventure.name}</div>
+  ),
+}))
+
+// Helper to create mock character data matching what badge components expect
+const createMockCharacter = (
+  overrides: Partial<{
+    id: string
+    name: string
+    image_url: string | null
+    action_values: Record<string, unknown>
+    description: Record<string, string>
+    faction: { id: string; name: string; entity_class: string } | null
+  }> = {}
+) => ({
+  id: "1",
+  name: "Test Character",
+  image_url: null,
+  entity_class: "Character",
+  action_values: {
+    Type: "PC",
+    Archetype: "Martial Artist",
+    MainAttack: "Martial Arts",
+    "Martial Arts": 14,
+    Defense: 13,
+    Toughness: 6,
+    Speed: 7,
+    Fortune: 7,
+    "Max Fortune": 7,
+    Wounds: 0,
+    "Marks of Death": 0,
+  },
+  description: {
+    Nicknames: "",
+    Age: "",
+    Height: "",
+    Weight: "",
+    "Hair Color": "",
+    "Eye Color": "",
+    "Style of Dress": "",
+    Appearance: "A test character",
+    Background: "",
+    "Melodramatic Hook": "",
+  },
+  skills: {},
+  faction: null,
+  faction_id: null,
+  juncture_id: null,
+  user_id: "user-1",
+  task: false,
+  active: true,
+  at_a_glance: false,
+  extending: false,
+  color: "#000000",
+  created_at: "2024-01-01T00:00:00Z",
+  ...overrides,
+})
+
+// Helper to create mock site data
+const createMockSite = (
+  overrides: Partial<{
+    id: string
+    name: string
+    description: string | null
+    image_url: string | null
+  }> = {}
+) => ({
+  id: "2",
+  name: "Test Site",
+  description: "A test site",
+  image_url: null,
+  entity_class: "Site",
+  faction: null,
+  faction_id: null,
+  campaign_id: "campaign-1",
+  characters: [],
+  character_ids: [],
+  active: true,
+  at_a_glance: false,
+  created_at: "2024-01-01T00:00:00Z",
+  updated_at: "2024-01-01T00:00:00Z",
+  ...overrides,
+})
 
 describe("SearchModal", () => {
   const defaultProps = {
@@ -138,23 +255,9 @@ describe("SearchModal", () => {
       data: {
         results: {
           characters: [
-            {
-              id: "1",
-              name: "Test Character",
-              entity_class: "Character",
-              image_url: null,
-              description: "A test character",
-            },
+            createMockCharacter({ id: "1", name: "Test Character" }),
           ],
-          sites: [
-            {
-              id: "2",
-              name: "Test Site",
-              entity_class: "Site",
-              image_url: null,
-              description: "A test site",
-            },
-          ],
+          sites: [createMockSite({ id: "2", name: "Test Site" })],
         },
         meta: { query: "test", limit_per_type: 5, total_count: 2 },
       },
@@ -180,13 +283,7 @@ describe("SearchModal", () => {
       data: {
         results: {
           characters: [
-            {
-              id: "abc123",
-              name: "Test Character",
-              entity_class: "Character",
-              image_url: null,
-              description: null,
-            },
+            createMockCharacter({ id: "abc123", name: "Test Character" }),
           ],
         },
         meta: { query: "test", limit_per_type: 5, total_count: 1 },
@@ -226,20 +323,8 @@ describe("SearchModal", () => {
       data: {
         results: {
           characters: [
-            {
-              id: "1",
-              name: "First Character",
-              entity_class: "Character",
-              image_url: null,
-              description: null,
-            },
-            {
-              id: "2",
-              name: "Second Character",
-              entity_class: "Character",
-              image_url: null,
-              description: null,
-            },
+            createMockCharacter({ id: "1", name: "First Character" }),
+            createMockCharacter({ id: "2", name: "Second Character" }),
           ],
         },
         meta: { query: "char", limit_per_type: 5, total_count: 2 },
@@ -277,13 +362,7 @@ describe("SearchModal", () => {
       data: {
         results: {
           characters: [
-            {
-              id: "abc123",
-              name: "Test Character",
-              entity_class: "Character",
-              image_url: null,
-              description: null,
-            },
+            createMockCharacter({ id: "abc123", name: "Test Character" }),
           ],
         },
         meta: { query: "test", limit_per_type: 5, total_count: 1 },
@@ -312,13 +391,7 @@ describe("SearchModal", () => {
       data: {
         results: {
           characters: [
-            {
-              id: "1",
-              name: "Test Character",
-              entity_class: "Character",
-              image_url: null,
-              description: null,
-            },
+            createMockCharacter({ id: "1", name: "Test Character" }),
           ],
         },
         meta: { query: "test", limit_per_type: 5, total_count: 1 },
