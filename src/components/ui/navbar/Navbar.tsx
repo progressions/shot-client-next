@@ -3,6 +3,7 @@ import { Button } from "../Button"
 import { ConditionalMenu } from "./ConditionalMenu"
 import { UserMenu } from "./UserMenu"
 import { NotificationBell } from "./NotificationBell"
+import { SearchButton } from "./SearchButton"
 
 export async function Navbar({ user }) {
   return (
@@ -34,6 +35,7 @@ export async function Navbar({ user }) {
         >
           {user?.id ? (
             <>
+              <SearchButton />
               <NotificationBell />
               <UserMenu user={user} />
             </>

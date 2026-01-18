@@ -137,3 +137,28 @@ export interface PaginationMeta {
   total_pages: number
   total_count: number
 }
+
+// Search result item returned from the search endpoint
+export interface SearchResultItem {
+  id: string
+  name: string
+  image_url: string | null
+  entity_class: string
+  description: string | null
+}
+
+// Search response grouped by entity type
+export interface SearchResponse {
+  results: {
+    characters?: SearchResultItem[]
+    vehicles?: SearchResultItem[]
+    fights?: SearchResultItem[]
+    sites?: SearchResultItem[]
+    parties?: SearchResultItem[]
+    factions?: SearchResultItem[]
+    schticks?: SearchResultItem[]
+    weapons?: SearchResultItem[]
+    junctures?: SearchResultItem[]
+    adventures?: SearchResultItem[]
+  }
+}

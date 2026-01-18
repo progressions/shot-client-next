@@ -387,6 +387,11 @@ class ApiV2 {
     return `${this.api()}/suggestions`
   }
 
+  // Search endpoint
+  search(): string {
+    return `${this.api()}/search`
+  }
+
   // AI Credentials endpoints
   aiCredentials(credential?: AiCredential | ID): string {
     const id = this.id(credential)

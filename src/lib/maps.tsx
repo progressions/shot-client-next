@@ -25,6 +25,20 @@ import {
   UserName,
   CampaignName,
 } from "@/components/names"
+import {
+  AdventureBadge,
+  CharacterBadge,
+  FightBadge,
+  VehicleBadge,
+  SchtickBadge,
+  WeaponBadge,
+  SiteBadge,
+  PartyBadge,
+  FactionBadge,
+  JunctureBadge,
+  UserBadge,
+  CampaignBadge,
+} from "@/components/badges"
 import { buildSluggedId } from "@/lib/slug"
 
 export function getUrl(className: string, id: string, name?: string) {
@@ -107,4 +121,37 @@ export const collectionNames: Record<string, string> = {
   Juncture: "junctures",
   User: "users",
   Campaign: "campaigns",
+}
+
+// Map entity_class to Badge components
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const badgeComponents: Record<string, React.ComponentType<any>> = {
+  Adventure: AdventureBadge,
+  Fight: FightBadge,
+  Character: CharacterBadge,
+  Vehicle: VehicleBadge,
+  Schtick: SchtickBadge,
+  Weapon: WeaponBadge,
+  Site: SiteBadge,
+  Party: PartyBadge,
+  Faction: FactionBadge,
+  Juncture: JunctureBadge,
+  User: UserBadge,
+  Campaign: CampaignBadge,
+}
+
+// Map entity_class to the prop name expected by the Badge component
+export const badgePropNames: Record<string, string> = {
+  Adventure: "adventure",
+  Fight: "fight",
+  Character: "character",
+  Vehicle: "vehicle",
+  Schtick: "schtick",
+  Weapon: "weapon",
+  Site: "site",
+  Party: "party",
+  Faction: "faction",
+  Juncture: "juncture",
+  User: "user",
+  Campaign: "campaign",
 }
