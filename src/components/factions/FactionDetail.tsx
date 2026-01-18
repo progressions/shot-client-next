@@ -15,6 +15,7 @@ import { FactionName, FactionDescription } from "@/components/factions"
 import { useCampaign, useClient, useConfirm } from "@/contexts"
 import { CharacterName } from "@/components/characters"
 import DetailButtons from "@/components/DetailButtons"
+import { sluggedPath } from "@/lib/slug"
 
 interface FactionDetailProperties {
   faction: Faction
@@ -106,7 +107,10 @@ export default function FactionDetail({
           }}
         >
           <Typography variant="h6" sx={{ color: "#ffffff" }}>
-            <Link href={`/factions/${faction.id}`} style={{ color: "#fff" }}>
+            <Link
+              href={sluggedPath("factions", faction.name, faction.id)}
+              style={{ color: "#fff" }}
+            >
               <FactionName faction={faction} />
             </Link>
           </Typography>

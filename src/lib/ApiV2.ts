@@ -19,6 +19,13 @@ import {
 } from "@/types"
 
 class ApiV2 {
+  // Normalizes an entity or string ID into a plain ID string.
+  private id(entity?: { id?: string } | ID | string): string | undefined {
+    if (!entity) return undefined
+    if (typeof entity === "string") return entity
+    return (entity as { id?: string }).id
+  }
+
   base(): string {
     return process.env.NEXT_PUBLIC_SERVER_URL as string
   }
@@ -28,15 +35,13 @@ class ApiV2 {
   }
 
   encounters(fight?: Fight | ID | string): string {
-    if (!fight) return `${this.api()}/encounters`
-    const id = typeof fight === "string" ? fight : fight.id
-    return `${this.api()}/encounters/${id}`
+    const id = this.id(fight)
+    return id ? `${this.api()}/encounters/${id}` : `${this.api()}/encounters`
   }
 
   characters(character?: Character | ID): string {
-    return character?.id
-      ? `${this.api()}/characters/${character.id}`
-      : `${this.api()}/characters`
+    const id = this.id(character)
+    return id ? `${this.api()}/characters/${id}` : `${this.api()}/characters`
   }
 
   characterPdf(character: Character | ID): string {
@@ -44,9 +49,8 @@ class ApiV2 {
   }
 
   vehicles(vehicle?: Vehicle | ID): string {
-    return vehicle?.id
-      ? `${this.api()}/vehicles/${vehicle.id}`
-      : `${this.api()}/vehicles`
+    const id = this.id(vehicle)
+    return id ? `${this.api()}/vehicles/${id}` : `${this.api()}/vehicles`
   }
 
   chaseRelationships(): string {
@@ -101,19 +105,18 @@ class ApiV2 {
   }
 
   sites(site?: Site | ID): string {
-    return site?.id ? `${this.api()}/sites/${site.id}` : `${this.api()}/sites`
+    const id = this.id(site)
+    return id ? `${this.api()}/sites/${id}` : `${this.api()}/sites`
   }
 
   junctures(juncture?: Juncture | ID): string {
-    return juncture?.id
-      ? `${this.api()}/junctures/${juncture.id}`
-      : `${this.api()}/junctures`
+    const id = this.id(juncture)
+    return id ? `${this.api()}/junctures/${id}` : `${this.api()}/junctures`
   }
 
   parties(party?: Party | ID): string {
-    return party?.id
-      ? `${this.api()}/parties/${party.id}`
-      : `${this.api()}/parties`
+    const id = this.id(party)
+    return id ? `${this.api()}/parties/${id}` : `${this.api()}/parties`
   }
 
   partyMembers(party: Party | ID, memberId?: string): string {
@@ -140,9 +143,8 @@ class ApiV2 {
 
   // Adventures
   adventures(adventure?: Adventure | ID): string {
-    return adventure?.id
-      ? `${this.api()}/adventures/${adventure.id}`
-      : `${this.api()}/adventures`
+    const id = this.id(adventure)
+    return id ? `${this.api()}/adventures/${id}` : `${this.api()}/adventures`
   }
 
   adventureCharacters(adventure: Adventure | ID, characterId?: string): string {
@@ -179,9 +181,8 @@ class ApiV2 {
   }
 
   weapons(weapon?: Weapon | ID): string {
-    return weapon?.id
-      ? `${this.api()}/weapons/${weapon.id}`
-      : `${this.api()}/weapons`
+    const id = this.id(weapon)
+    return id ? `${this.api()}/weapons/${id}` : `${this.api()}/weapons`
   }
 
   weaponJunctures(): string {
@@ -193,9 +194,8 @@ class ApiV2 {
   }
 
   schticks(schtick?: Schtick | ID): string {
-    return schtick?.id
-      ? `${this.api()}/schticks/${schtick.id}`
-      : `${this.api()}/schticks`
+    const id = this.id(schtick)
+    return id ? `${this.api()}/schticks/${id}` : `${this.api()}/schticks`
   }
 
   schtickCategories(): string {
@@ -206,20 +206,18 @@ class ApiV2 {
     return `${this.api()}/schticks/paths`
   }
 
-  factions(faction?: Faction | ID): string {
-    return faction?.id
-      ? `${this.api()}/factions/${faction.id}`
-      : `${this.api()}/factions`
+  factions(faction?: Faction | ID | string): string {
+    const id = this.id(faction)
+    return id ? `${this.api()}/factions/${id}` : `${this.api()}/factions`
   }
 
   fights(fight?: Fight | ID): string {
-    return fight?.id
-      ? `${this.api()}/fights/${fight.id}`
-      : `${this.api()}/fights`
+    const id = this.id(fight)
+    return id ? `${this.api()}/fights/${id}` : `${this.api()}/fights`
   }
 
   fightEvents(fight: Fight | ID | string): string {
-    const fightId = typeof fight === "string" ? fight : fight?.id
+    const fightId = this.id(fight)
     if (!fightId) {
       throw new Error("fightEvents requires a valid fight ID")
     }
@@ -231,9 +229,8 @@ class ApiV2 {
   }
 
   campaigns(campaign?: Campaign | ID) {
-    return campaign
-      ? `${this.api()}/campaigns/${campaign.id}`
-      : `${this.api()}/campaigns`
+    const id = this.id(campaign)
+    return id ? `${this.api()}/campaigns/${id}` : `${this.api()}/campaigns`
   }
 
   resetAiCredits(campaign: Campaign | ID): string {
@@ -246,7 +243,8 @@ class ApiV2 {
   }
 
   users(user?: User | ID): string {
-    return user ? `${this.api()}/users/${user.id}` : `${this.api()}/users`
+    const id = this.id(user)
+    return id ? `${this.api()}/users/${id}` : `${this.api()}/users`
   }
 
   usersRegister(): string {
@@ -278,9 +276,8 @@ class ApiV2 {
   }
 
   invitations(invitation?: Invitation | ID): string {
-    return invitation?.id
-      ? `${this.api()}/invitations/${invitation.id}`
-      : `${this.api()}/invitations`
+    const id = this.id(invitation)
+    return id ? `${this.api()}/invitations/${id}` : `${this.api()}/invitations`
   }
 
   invitationRedeem(invitation: Invitation | ID): string {
@@ -305,15 +302,17 @@ class ApiV2 {
 
   characterWeapons(character: Character | ID, weapon?: Weapon | ID): string {
     const characterUrl = this.characters(character)
-    return weapon?.id
-      ? `${characterUrl}/weapons/${weapon.id}`
+    const weaponId = this.id(weapon)
+    return weaponId
+      ? `${characterUrl}/weapons/${weaponId}`
       : `${characterUrl}/weapons`
   }
 
   characterSchticks(character: Character | ID, schtick?: Schtick | ID): string {
     const characterUrl = this.characters(character)
-    return schtick?.id
-      ? `${characterUrl}/schticks/${schtick.id}`
+    const schtickId = this.id(schtick)
+    return schtickId
+      ? `${characterUrl}/schticks/${schtickId}`
       : `${characterUrl}/schticks`
   }
 
@@ -391,8 +390,9 @@ class ApiV2 {
 
   // AI Credentials endpoints
   aiCredentials(credential?: AiCredential | ID): string {
-    return credential?.id
-      ? `${this.api()}/ai_credentials/${credential.id}`
+    const id = this.id(credential)
+    return id
+      ? `${this.api()}/ai_credentials/${id}`
       : `${this.api()}/ai_credentials`
   }
 
@@ -402,8 +402,9 @@ class ApiV2 {
 
   // Notifications endpoints
   notifications(notification?: Notification | ID): string {
-    return notification?.id
-      ? `${this.api()}/notifications/${notification.id}`
+    const id = this.id(notification)
+    return id
+      ? `${this.api()}/notifications/${id}`
       : `${this.api()}/notifications`
   }
 
