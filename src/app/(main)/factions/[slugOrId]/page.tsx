@@ -19,29 +19,33 @@ export default async function FactionPage({ params }: FactionPageProperties) {
   const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
+  // Fetch faction data - keep redirect outside try/catch to avoid catching redirect errors
+  let faction: Faction | null = null
   try {
     const response = await client.getFaction({ id })
-    const faction: Faction = response.data
-    const canonicalId = buildSluggedId(faction.name, faction.id)
-    if (canonicalId !== slugOrId) {
-      redirect(sluggedPath("factions", faction.name, faction.id))
-    }
-
-    // Detect mobile device on the server
-    const headersState = await headers()
-    const userAgent = headersState.get("user-agent") || ""
-    const initialIsMobile = /mobile/i.test(userAgent)
-
-    return (
-      <>
-        <Breadcrumbs client={client} />
-        <Suspense fallback={<CircularProgress />}>
-          <Show faction={faction} initialIsMobile={initialIsMobile} />
-        </Suspense>
-      </>
-    )
+    faction = response.data
   } catch (error) {
     console.error(error)
     return <NotFound />
   }
+
+  // Redirect to canonical URL if needed (must be outside try/catch)
+  const canonicalId = buildSluggedId(faction.name, faction.id)
+  if (canonicalId !== slugOrId) {
+    redirect(sluggedPath("factions", faction.name, faction.id))
+  }
+
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
+  return (
+    <>
+      <Breadcrumbs client={client} />
+      <Suspense fallback={<CircularProgress />}>
+        <Show faction={faction} initialIsMobile={initialIsMobile} />
+      </Suspense>
+    </>
+  )
 }

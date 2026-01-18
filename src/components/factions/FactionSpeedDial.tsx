@@ -10,6 +10,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import type { Faction } from "@/types"
 import { useClient, useConfirm, useToast } from "@/contexts"
+import { sluggedPath } from "@/lib/slug"
 
 type Action = {
   [key: string]: unknown
@@ -66,7 +67,7 @@ export default function FactionSpeedDial({
     try {
       const response = await client.duplicateFaction(faction)
       const newFaction = response.data
-      router.push(`/factions/${newFaction.id}`)
+      router.push(sluggedPath("factions", newFaction.name, newFaction.id))
     } catch (error_) {
       console.error("Failed to duplicate faction:", error_)
       toastError("Failed to duplicate faction.")

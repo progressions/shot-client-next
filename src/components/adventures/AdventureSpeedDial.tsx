@@ -10,6 +10,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import type { Adventure } from "@/types"
 import { useClient, useConfirm, useToast } from "@/contexts"
+import { sluggedPath } from "@/lib/slug"
 
 type Action = {
   [key: string]: unknown
@@ -65,7 +66,7 @@ export default function AdventureSpeedDial({
     try {
       const response = await client.duplicateAdventure(adventure)
       const newAdventure = response.data
-      router.push(`/adventures/${newAdventure.id}`)
+      router.push(sluggedPath("adventures", newAdventure.name, newAdventure.id))
     } catch (error_) {
       console.error("Failed to duplicate adventure:", error_)
       toastError("Failed to duplicate adventure.")
