@@ -23,9 +23,9 @@ const API_URL =
   process.env.NEXT_PUBLIC_SERVER_URL ||
   "http://localhost:4002"
 
-// UUID pattern for entity ID validation
+// UUID or slug+UUID pattern (allows leading slug text, UUID must be at the end)
 const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  /^[a-z0-9-]*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 // Headers to forward from backend response
 const FORWARD_HEADERS = [
