@@ -16,6 +16,7 @@ import {
   PartyName,
   JunctureName,
 } from "@/components/names"
+import { extractId } from "@/lib/slug"
 
 interface BreadcrumbItem {
   label: string | React.ReactNode
@@ -41,60 +42,61 @@ async function fetchCrumbName(
   }
 
   if (!id || id === pathnames[0]) return null
+  const uuid = extractId(id)
 
   if (pathnames[0] === "weapons") {
-    const response = await client.getWeapon({ id })
+    const response = await client.getWeapon({ id: uuid })
     return <WeaponName weapon={response.data} />
   }
   if (pathnames[0] === "parties") {
-    const response = await client.getParty({ id })
+    const response = await client.getParty({ id: uuid })
     return <PartyName party={response.data} />
   }
   if (pathnames[0] === "junctures") {
-    const response = await client.getJuncture({ id })
+    const response = await client.getJuncture({ id: uuid })
     return <JunctureName juncture={response.data} />
   }
   if (pathnames[0] === "schticks") {
-    const response = await client.getSchtick({ id })
+    const response = await client.getSchtick({ id: uuid })
     return <SchtickName schtick={response.data} />
   }
   if (pathnames[0] === "factions") {
-    const response = await client.getFaction({ id })
+    const response = await client.getFaction({ id: uuid })
     return <FactionName faction={response.data} />
   }
   if (pathnames[0] === "vehicles") {
-    const response = await client.getVehicle({ id })
+    const response = await client.getVehicle({ id: uuid })
     return <VehicleName vehicle={response.data} />
   }
   if (pathnames[0] === "characters") {
     if (id === "import") return "Import"
     if (id === "generate") return "Generate"
     if (id === "create") return "Create"
-    const response = await client.getCharacter({ id })
+    const response = await client.getCharacter({ id: uuid })
     return <CharacterName character={response.data} />
   }
   if (pathnames[0] === "fights") {
-    const response = await client.getFight({ id })
+    const response = await client.getFight({ id: uuid })
     return <FightName fight={response.data} />
   }
   if (pathnames[0] === "encounters") {
-    const response = await client.getFight({ id })
+    const response = await client.getFight({ id: uuid })
     return <FightName fight={response.data} />
   }
   if (pathnames[0] === "sites") {
-    const response = await client.getSite({ id })
+    const response = await client.getSite({ id: uuid })
     return <SiteName site={response.data} />
   }
   if (pathnames[0] === "campaigns") {
-    const response = await client.getCampaign({ id })
+    const response = await client.getCampaign({ id: uuid })
     return <CampaignName campaign={response.data} />
   }
   if (pathnames[0] === "users") {
-    const response = await client.getUser({ id })
+    const response = await client.getUser({ id: uuid })
     return <UserName user={response.data} />
   }
   if (pathnames[0] === "adventures") {
-    const response = await client.getAdventure({ id })
+    const response = await client.getAdventure({ id: uuid })
     return <AdventureName adventure={response.data} />
   }
   return null

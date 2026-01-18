@@ -7,6 +7,7 @@ import { useClient, useToast } from "@/contexts"
 import { MainHeader, Icon, Button } from "@/components/ui"
 import { SpeedDial } from "@/components/characters"
 import { NotionPageAutocomplete } from "@/components/autocomplete"
+import { sluggedPath } from "@/lib/slug"
 
 export default function ImportFromNotionPage() {
   const { client } = useClient()
@@ -29,7 +30,7 @@ export default function ImportFromNotionPage() {
       const newCharacter = response.data
 
       toastSuccess(`Created character: ${newCharacter.name}`)
-      router.push(`/characters/${newCharacter.id}`)
+      router.push(sluggedPath("characters", newCharacter.name, newCharacter.id))
     } catch (error) {
       console.error("Error creating character from Notion:", error)
       toastError("Failed to create character from Notion")

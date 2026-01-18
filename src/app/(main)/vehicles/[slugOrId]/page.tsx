@@ -1,44 +1,46 @@
 import { redirect } from "next/navigation"
 import { CircularProgress } from "@mui/material"
 import { getCurrentUser, getServerClient } from "@/lib"
-import type { Character } from "@/types"
+import type { Vehicle } from "@/types"
 import type { Metadata } from "next"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import { Suspense } from "react"
-import { NotFound, Show } from "@/components/characters"
+import { NotFound, Show } from "@/components/vehicles"
 import { headers } from "next/headers"
+import { extractId, buildSluggedId, sluggedPath } from "@/lib/slug"
 
 // Dynamically generate metadata for the page title
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ slugOrId: string }>
 }): Promise<Metadata> {
   const client = await getServerClient()
   const user = await getCurrentUser()
   if (!client || !user) {
-    return { title: "Character - Chi War" }
+    return { title: "Vehicle - Chi War" }
   }
 
-  const { id } = await params
+  const { slugOrId } = await params
+  const id = extractId(slugOrId)
 
   try {
-    const response = await client.getCharacter({ id })
-    const character: Character = response.data
-    if (!character) {
-      return { title: "Character Not Found - Chi War" }
+    const response = await client.getVehicle({ id })
+    const vehicle: Vehicle = response.data
+    if (!vehicle) {
+      return { title: "Vehicle Not Found - Chi War" }
     }
-    return { title: `${character.name} - Chi War` }
+    return { title: `${vehicle.name} - Chi War` }
   } catch (error) {
-    console.error("Fetch character error for metadata:", error)
-    return { title: "Character Not Found - Chi War" }
+    console.error("Fetch vehicle error for metadata:", error)
+    return { title: "Vehicle Not Found - Chi War" }
   }
 }
 
-export default async function CharacterPage({
+export default async function VehiclePage({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ slugOrId: string }>
 }) {
   const client = await getServerClient()
   const user = await getCurrentUser()
@@ -46,11 +48,16 @@ export default async function CharacterPage({
     redirect("/login")
   }
 
-  const { id } = await params
+  const { slugOrId } = await params
+  const id = extractId(slugOrId)
 
   try {
-    const response = await client.getCharacter({ id })
-    const character = response.data
+    const response = await client.getVehicle({ id })
+    const vehicle = response.data
+    const canonicalId = buildSluggedId(vehicle.name, vehicle.id)
+    if (canonicalId !== slugOrId) {
+      redirect(sluggedPath("vehicles", vehicle.name, vehicle.id))
+    }
 
     // Detect mobile device on the server
     const headersState = await headers()
@@ -61,7 +68,7 @@ export default async function CharacterPage({
       <>
         <Breadcrumbs client={client} />
         <Suspense fallback={<CircularProgress />}>
-          <Show character={character} initialIsMobile={initialIsMobile} />
+          <Show vehicle={vehicle} initialIsMobile={initialIsMobile} />
         </Suspense>
       </>
     )
