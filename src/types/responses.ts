@@ -137,3 +137,28 @@ export interface PaginationMeta {
   total_pages: number
   total_count: number
 }
+
+// Search metadata
+export interface SearchMeta {
+  query: string
+  limit_per_type: number
+  total_count: number
+}
+
+// Search response grouped by entity type
+// Returns full entity data compatible with badge components
+export interface SearchResponse {
+  results: {
+    characters?: Character[]
+    vehicles?: Vehicle[]
+    fights?: Fight[]
+    sites?: Site[]
+    parties?: Party[]
+    factions?: Faction[]
+    schticks?: Schtick[]
+    weapons?: Weapon[]
+    junctures?: Juncture[]
+    adventures?: Adventure[]
+  }
+  meta: SearchMeta
+}
