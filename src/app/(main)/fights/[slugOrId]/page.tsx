@@ -1,3 +1,4 @@
+import { cache } from "react"
 import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
@@ -12,30 +13,37 @@ type FightPageProperties = {
   params: Promise<{ slugOrId: string }>
 }
 
-export async function generateMetadata({ params }: FightPageProperties) {
-  const { slugOrId } = await params
-  const id = extractId(slugOrId)
+/**
+ * Cached fight fetcher - deduplicates API calls within a single request.
+ */
+const getFight = cache(async (id: string): Promise<Fight | null> => {
   const client = await getServerClient()
-
-  if (!client) {
-    return {
-      title: "Fight - Chi War",
-      description: "View fight details",
-    }
-  }
+  if (!client) return null
 
   try {
     const response = await client.getFight({ id })
-    const fight: Fight = response.data
-    return {
-      title: `${fight.name || "Fight"} - Chi War`,
-      description: `Fight details${fight.name ? ` for ${fight.name}` : ""}`,
-    }
-  } catch {
+    return response.data
+  } catch (error) {
+    console.error("Fetch fight error:", error)
+    return null
+  }
+})
+
+export async function generateMetadata({ params }: FightPageProperties) {
+  const { slugOrId } = await params
+  const id = extractId(slugOrId)
+
+  const fight = await getFight(id)
+  if (!fight) {
     return {
       title: "Fight Not Found - Chi War",
       description: "The requested fight could not be found",
     }
+  }
+
+  return {
+    title: `${fight.name || "Fight"} - Chi War`,
+    description: `Fight details${fight.name ? ` for ${fight.name}` : ""}`,
   }
 }
 
@@ -46,12 +54,9 @@ export default async function FightPage({ params }: FightPageProperties) {
   const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
-  let fight: Fight
-  try {
-    const response = await client.getFight({ id })
-    fight = response.data
-  } catch (error) {
-    console.error(error)
+  // Use cached getFight - this reuses the result from generateMetadata
+  const fight = await getFight(id)
+  if (!fight) {
     return <NotFound />
   }
 

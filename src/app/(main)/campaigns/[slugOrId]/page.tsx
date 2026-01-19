@@ -1,3 +1,4 @@
+import { cache } from "react"
 import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
@@ -12,30 +13,37 @@ type CampaignPageProperties = {
   params: Promise<{ slugOrId: string }>
 }
 
-export async function generateMetadata({ params }: CampaignPageProperties) {
-  const { slugOrId } = await params
-  const id = extractId(slugOrId)
+/**
+ * Cached campaign fetcher - deduplicates API calls within a single request.
+ */
+const getCampaign = cache(async (id: string): Promise<Campaign | null> => {
   const client = await getServerClient()
-
-  if (!client) {
-    return {
-      title: "Campaign - Chi War",
-      description: "View campaign details",
-    }
-  }
+  if (!client) return null
 
   try {
     const response = await client.getCampaign({ id })
-    const campaign: Campaign = response.data
-    return {
-      title: `${campaign.name} - Chi War`,
-      description: `Campaign details for ${campaign.name}`,
-    }
-  } catch {
+    return response.data
+  } catch (error) {
+    console.error("Fetch campaign error:", error)
+    return null
+  }
+})
+
+export async function generateMetadata({ params }: CampaignPageProperties) {
+  const { slugOrId } = await params
+  const id = extractId(slugOrId)
+
+  const campaign = await getCampaign(id)
+  if (!campaign) {
     return {
       title: "Campaign Not Found - Chi War",
       description: "The requested campaign could not be found",
     }
+  }
+
+  return {
+    title: `${campaign.name} - Chi War`,
+    description: `Campaign details for ${campaign.name}`,
   }
 }
 
@@ -46,12 +54,9 @@ export default async function CampaignPage({ params }: CampaignPageProperties) {
   const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
-  let campaign: Campaign
-  try {
-    const response = await client.getCampaign({ id })
-    campaign = response.data
-  } catch (error) {
-    console.error(error)
+  // Use cached getCampaign - this reuses the result from generateMetadata
+  const campaign = await getCampaign(id)
+  if (!campaign) {
     return <NotFound />
   }
 

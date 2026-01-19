@@ -1,5 +1,6 @@
 "use server"
 
+import { cache } from "react"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/client"
@@ -10,6 +11,10 @@ import { createClient } from "@/lib/client"
  *
  * Use this in Server Components and Server Actions to make authenticated API calls.
  * Automatically redirects to login on 401/400 auth errors.
+ *
+ * Wrapped with React cache() to deduplicate calls within a single request -
+ * calling getServerClient() multiple times in the same request will reuse
+ * the same client instance.
  *
  * @returns Proxied client that handles auth errors, or null if no JWT token
  *
@@ -25,7 +30,7 @@ import { createClient } from "@/lib/client"
  * }
  * ```
  */
-export async function getServerClient() {
+export const getServerClient = cache(async function getServerClient() {
   const cookieStore = await cookies()
   const token = cookieStore.get("jwtToken")?.value
 
@@ -115,4 +120,4 @@ export async function getServerClient() {
   })
 
   return wrappedClient
-}
+})

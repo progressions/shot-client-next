@@ -1,3 +1,4 @@
+import { cache } from "react"
 import { redirect } from "next/navigation"
 import { CircularProgress } from "@mui/material"
 import { getCurrentUser, getServerClient } from "@/lib"
@@ -9,32 +10,43 @@ import { NotFound, Show } from "@/components/characters"
 import { headers } from "next/headers"
 import { extractId, buildSluggedId, sluggedPath } from "@/lib/slug"
 
+/**
+ * Cached character fetcher - deduplicates API calls within a single request.
+ * Both generateMetadata and the page component can call this without
+ * making duplicate API requests.
+ */
+const getCharacter = cache(async (id: string): Promise<Character | null> => {
+  const client = await getServerClient()
+  if (!client) return null
+
+  try {
+    const response = await client.getCharacter({ id })
+    return response.data
+  } catch (error) {
+    console.error("Fetch character error:", error)
+    return null
+  }
+})
+
 // Dynamically generate metadata for the page title
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slugOrId: string }>
 }): Promise<Metadata> {
-  const client = await getServerClient()
   const user = await getCurrentUser()
-  if (!client || !user) {
+  if (!user) {
     return { title: "Character - Chi War" }
   }
 
   const { slugOrId } = await params
   const id = extractId(slugOrId)
 
-  try {
-    const response = await client.getCharacter({ id })
-    const character: Character = response.data
-    if (!character) {
-      return { title: "Character Not Found - Chi War" }
-    }
-    return { title: `${character.name} - Chi War` }
-  } catch (error) {
-    console.error("Fetch character error for metadata:", error)
+  const character = await getCharacter(id)
+  if (!character) {
     return { title: "Character Not Found - Chi War" }
   }
+  return { title: `${character.name} - Chi War` }
 }
 
 export default async function CharacterPage({
@@ -51,12 +63,9 @@ export default async function CharacterPage({
   const { slugOrId } = await params
   const id = extractId(slugOrId)
 
-  let character: Character
-  try {
-    const response = await client.getCharacter({ id })
-    character = response.data
-  } catch (error) {
-    console.error(error)
+  // Use cached getCharacter - this reuses the result from generateMetadata
+  const character = await getCharacter(id)
+  if (!character) {
     return <NotFound />
   }
 
