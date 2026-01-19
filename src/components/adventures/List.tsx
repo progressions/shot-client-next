@@ -1,6 +1,6 @@
 "use client"
-import { useRouter } from "next/navigation"
-import { useEffect, useCallback, useState } from "react"
+import { useRouter, usePathname } from "next/navigation"
+import { useEffect, useCallback, useState, useRef } from "react"
 import { Box } from "@mui/material"
 import type { Adventure, PaginationMeta } from "@/types"
 import { useCampaign, useClient, useLocalStorage } from "@/contexts"
@@ -32,6 +32,8 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   const { subscribeToEntity } = useCampaign()
   const { saveLocally } = useLocalStorage()
   const router = useRouter()
+  const pathname = usePathname()
+  const isFirstRender = useRef(true)
   const [viewMode, setViewMode] = useState<"table" | "mobile">(
     initialIsMobile ? "mobile" : "table"
   )
@@ -70,12 +72,21 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   }, [subscribeToEntity, fetchAdventures, filters])
 
   useEffect(() => {
-    const url = `/adventures?${queryParams(filters)}`
+    // Skip URL update on first render to avoid navigating away from /new
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      fetchAdventures(filters)
+      return
+    }
+    // Preserve the /new path if we're on it
+    const basePath =
+      pathname === "/adventures/new" ? "/adventures/new" : "/adventures"
+    const url = `${basePath}?${queryParams(filters)}`
     router.push(url, {
       scroll: false,
     })
     fetchAdventures(filters)
-  }, [filters, fetchAdventures, router, viewMode])
+  }, [filters, fetchAdventures, router, viewMode, pathname])
 
   useEffect(() => {
     saveLocally("adventureViewMode", viewMode)
