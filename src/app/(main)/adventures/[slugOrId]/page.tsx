@@ -1,5 +1,6 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getCurrentUser } from "@/lib"
+import type { Adventure } from "@/types"
 import { NotFound, Show } from "@/components/adventures"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
@@ -19,24 +20,27 @@ export default async function AdventurePage({
   const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
+  let adventure: Adventure
   try {
     const response = await client.getAdventure({ id })
-    const adventure = response.data
-    const canonicalId = buildSluggedId(adventure.name, adventure.id)
-    if (canonicalId !== slugOrId) {
-      redirect(sluggedPath("adventures", adventure.name, adventure.id))
-    }
-
-    return (
-      <>
-        <Breadcrumbs client={client} />
-        <Suspense fallback={<CircularProgress />}>
-          <Show adventure={adventure} />
-        </Suspense>
-      </>
-    )
+    adventure = response.data
   } catch (error) {
     console.error(error)
     return <NotFound />
   }
+
+  // Redirect outside try-catch to avoid catching Next.js redirect errors
+  const canonicalId = buildSluggedId(adventure.name, adventure.id)
+  if (canonicalId !== slugOrId) {
+    redirect(sluggedPath("adventures", adventure.name, adventure.id))
+  }
+
+  return (
+    <>
+      <Breadcrumbs client={client} />
+      <Suspense fallback={<CircularProgress />}>
+        <Show adventure={adventure} />
+      </Suspense>
+    </>
+  )
 }

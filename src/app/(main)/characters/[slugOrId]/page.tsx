@@ -51,29 +51,32 @@ export default async function CharacterPage({
   const { slugOrId } = await params
   const id = extractId(slugOrId)
 
+  let character: Character
   try {
     const response = await client.getCharacter({ id })
-    const character = response.data
-    const canonicalId = buildSluggedId(character.name, character.id)
-    if (canonicalId !== slugOrId) {
-      redirect(sluggedPath("characters", character.name, character.id))
-    }
-
-    // Detect mobile device on the server
-    const headersState = await headers()
-    const userAgent = headersState.get("user-agent") || ""
-    const initialIsMobile = /mobile/i.test(userAgent)
-
-    return (
-      <>
-        <Breadcrumbs client={client} />
-        <Suspense fallback={<CircularProgress />}>
-          <Show character={character} initialIsMobile={initialIsMobile} />
-        </Suspense>
-      </>
-    )
+    character = response.data
   } catch (error) {
     console.error(error)
     return <NotFound />
   }
+
+  // Redirect outside try-catch to avoid catching Next.js redirect errors
+  const canonicalId = buildSluggedId(character.name, character.id)
+  if (canonicalId !== slugOrId) {
+    redirect(sluggedPath("characters", character.name, character.id))
+  }
+
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
+  return (
+    <>
+      <Breadcrumbs client={client} />
+      <Suspense fallback={<CircularProgress />}>
+        <Show character={character} initialIsMobile={initialIsMobile} />
+      </Suspense>
+    </>
+  )
 }

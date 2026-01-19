@@ -51,29 +51,32 @@ export default async function VehiclePage({
   const { slugOrId } = await params
   const id = extractId(slugOrId)
 
+  let vehicle: Vehicle
   try {
     const response = await client.getVehicle({ id })
-    const vehicle = response.data
-    const canonicalId = buildSluggedId(vehicle.name, vehicle.id)
-    if (canonicalId !== slugOrId) {
-      redirect(sluggedPath("vehicles", vehicle.name, vehicle.id))
-    }
-
-    // Detect mobile device on the server
-    const headersState = await headers()
-    const userAgent = headersState.get("user-agent") || ""
-    const initialIsMobile = /mobile/i.test(userAgent)
-
-    return (
-      <>
-        <Breadcrumbs client={client} />
-        <Suspense fallback={<CircularProgress />}>
-          <Show vehicle={vehicle} initialIsMobile={initialIsMobile} />
-        </Suspense>
-      </>
-    )
+    vehicle = response.data
   } catch (error) {
     console.error(error)
     return <NotFound />
   }
+
+  // Redirect outside try-catch to avoid catching Next.js redirect errors
+  const canonicalId = buildSluggedId(vehicle.name, vehicle.id)
+  if (canonicalId !== slugOrId) {
+    redirect(sluggedPath("vehicles", vehicle.name, vehicle.id))
+  }
+
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
+  return (
+    <>
+      <Breadcrumbs client={client} />
+      <Suspense fallback={<CircularProgress />}>
+        <Show vehicle={vehicle} initialIsMobile={initialIsMobile} />
+      </Suspense>
+    </>
+  )
 }

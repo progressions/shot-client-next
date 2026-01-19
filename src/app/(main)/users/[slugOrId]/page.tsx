@@ -22,29 +22,32 @@ export default async function UserPage({ params }: UserPageProperties) {
   // Check admin access first before making any API calls
   if (!currentUser.admin) redirect("/")
 
+  let user: User
   try {
     const response = await client.getUser({ id })
-    const user: User = response.data
-    const canonicalId = buildSluggedId(user.name, user.id)
-    if (canonicalId !== slugOrId) {
-      redirect(sluggedPath("users", user.name, user.id))
-    }
-
-    // Detect mobile device on the server
-    const headersState = await headers()
-    const userAgent = headersState.get("user-agent") || ""
-    const initialIsMobile = /mobile/i.test(userAgent)
-
-    return (
-      <>
-        <Breadcrumbs client={client} />
-        <Suspense fallback={<CircularProgress />}>
-          <Show user={user} initialIsMobile={initialIsMobile} />
-        </Suspense>
-      </>
-    )
+    user = response.data
   } catch (error) {
     console.error(error)
     return <NotFound />
   }
+
+  // Redirect outside try-catch to avoid catching Next.js redirect errors
+  const canonicalId = buildSluggedId(user.name, user.id)
+  if (canonicalId !== slugOrId) {
+    redirect(sluggedPath("users", user.name, user.id))
+  }
+
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
+  return (
+    <>
+      <Breadcrumbs client={client} />
+      <Suspense fallback={<CircularProgress />}>
+        <Show user={user} initialIsMobile={initialIsMobile} />
+      </Suspense>
+    </>
+  )
 }

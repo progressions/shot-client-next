@@ -46,29 +46,32 @@ export default async function CampaignPage({ params }: CampaignPageProperties) {
   const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
+  let campaign: Campaign
   try {
     const response = await client.getCampaign({ id })
-    const campaign: Campaign = response.data
-    const canonicalId = buildSluggedId(campaign.name, campaign.id)
-    if (canonicalId !== slugOrId) {
-      redirect(sluggedPath("campaigns", campaign.name, campaign.id))
-    }
-
-    // Detect mobile device on the server
-    const headersState = await headers()
-    const userAgent = headersState.get("user-agent") || ""
-    const initialIsMobile = /mobile/i.test(userAgent)
-
-    return (
-      <>
-        <Breadcrumbs client={client} />
-        <Suspense fallback={<CircularProgress />}>
-          <Show campaign={campaign} initialIsMobile={initialIsMobile} />
-        </Suspense>
-      </>
-    )
+    campaign = response.data
   } catch (error) {
     console.error(error)
     return <NotFound />
   }
+
+  // Redirect outside try-catch to avoid catching Next.js redirect errors
+  const canonicalId = buildSluggedId(campaign.name, campaign.id)
+  if (canonicalId !== slugOrId) {
+    redirect(sluggedPath("campaigns", campaign.name, campaign.id))
+  }
+
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
+  return (
+    <>
+      <Breadcrumbs client={client} />
+      <Suspense fallback={<CircularProgress />}>
+        <Show campaign={campaign} initialIsMobile={initialIsMobile} />
+      </Suspense>
+    </>
+  )
 }
