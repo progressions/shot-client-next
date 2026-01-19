@@ -1,4 +1,5 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios"
+import { etagCache } from "./etagCache"
 
 interface ClientDependencies {
   jwt?: string
@@ -7,6 +8,8 @@ interface ClientDependencies {
 interface CacheOptions {
   cache?: "default" | "no-store" | "force-cache"
   revalidate?: number
+  /** Disable ETag caching for this request */
+  skipEtag?: boolean
 }
 
 type Parameters_ = Record<string, unknown>
@@ -54,14 +57,61 @@ export function createBaseClient({ jwt }: ClientDependencies) {
     } else if (cacheOptions.cache === "force-cache") {
       headers["Cache-Control"] = `max-age=${cacheOptions.revalidate || 3600}`
     }
+
+    // Add If-None-Match header if we have a cached ETag (unless skipEtag is set)
+    const useEtag = !cacheOptions.skipEtag && cacheOptions.cache !== "no-store"
+    if (useEtag) {
+      const cachedEtag = etagCache.getEtag(
+        url,
+        parameters as Record<string, unknown>
+      )
+      if (cachedEtag) {
+        headers["If-None-Match"] = cachedEtag
+      }
+    }
+
     const config: AxiosRequestConfig = {
       url: url,
       method: "GET",
       params: parameters,
       headers: headers,
       proxy: false,
+      // Tell axios not to throw on 304 responses
+      validateStatus: status =>
+        (status >= 200 && status < 300) || status === 304,
     }
-    return await axios(config)
+
+    const response = await axios(config)
+
+    // Handle 304 Not Modified - return cached data
+    if (response.status === 304 && useEtag) {
+      const cachedData = etagCache.getData<T>(
+        url,
+        parameters as Record<string, unknown>
+      )
+      if (cachedData) {
+        return {
+          ...response,
+          status: 200,
+          data: cachedData,
+        } as AxiosResponse<T>
+      }
+    }
+
+    // Store ETag and response data for future conditional requests
+    if (useEtag && response.status === 200) {
+      const etag = response.headers["etag"]
+      if (etag) {
+        etagCache.set(
+          url,
+          etag,
+          response.data,
+          parameters as Record<string, unknown>
+        )
+      }
+    }
+
+    return response
   }
 
   async function getPublic<T>(
@@ -111,7 +161,10 @@ export function createBaseClient({ jwt }: ClientDependencies) {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<T>> {
-    return await request("POST", url, parameters, cacheOptions)
+    const response = await request<T>("POST", url, parameters, cacheOptions)
+    // Invalidate cache for this resource type on create
+    invalidateCacheForUrl(url)
+    return response
   }
 
   async function patch<T>(
@@ -119,14 +172,19 @@ export function createBaseClient({ jwt }: ClientDependencies) {
     parameters: Parameters_ = {},
     cacheOptions: CacheOptions = {}
   ): Promise<AxiosResponse<T>> {
-    return await request("PATCH", url, parameters, cacheOptions)
+    const response = await request<T>("PATCH", url, parameters, cacheOptions)
+    // Invalidate cache for this specific resource on update
+    etagCache.invalidate(url)
+    // Also invalidate the list endpoint
+    invalidateCacheForUrl(url)
+    return response
   }
 
   async function delete_<T>(
     url: string,
     parameters: Parameters_ = {}
   ): Promise<AxiosResponse<T>> {
-    return await axios({
+    const response = await axios({
       url: url,
       method: "DELETE",
       params: parameters,
@@ -137,6 +195,22 @@ export function createBaseClient({ jwt }: ClientDependencies) {
       },
       proxy: false,
     })
+    // Invalidate cache for this resource on delete
+    etagCache.invalidate(url)
+    invalidateCacheForUrl(url)
+    return response
+  }
+
+  /**
+   * Invalidate cache entries for a resource URL pattern
+   * e.g., /api/v2/characters/123 -> invalidates /api/v2/characters*
+   */
+  function invalidateCacheForUrl(url: string): void {
+    // Extract base resource path (e.g., /api/v2/characters)
+    const match = url.match(/^(\/api\/v\d+\/[^/]+)/)
+    if (match) {
+      etagCache.invalidatePattern(match[1])
+    }
   }
 
   async function request<T>(
@@ -200,5 +274,10 @@ export function createBaseClient({ jwt }: ClientDependencies) {
     delete: delete_,
     request,
     requestFormData,
+    /** Access to ETag cache for manual invalidation */
+    cache: etagCache,
   }
 }
+
+// Re-export etagCache for direct access
+export { etagCache }
