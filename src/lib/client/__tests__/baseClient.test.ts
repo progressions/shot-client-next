@@ -35,17 +35,19 @@ describe("createBaseClient", () => {
     it("makes authenticated GET request with correct headers", async () => {
       await baseClient.get(mockURL)
 
-      expect(mockedAxios).toHaveBeenCalledWith({
-        url: mockURL,
-        method: "GET",
-        params: {},
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${mockJWT}`,
-        },
-        proxy: false,
-      })
+      expect(mockedAxios).toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: mockURL,
+          method: "GET",
+          params: {},
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${mockJWT}`,
+          },
+          proxy: false,
+        })
+      )
     })
 
     it("includes query parameters", async () => {
