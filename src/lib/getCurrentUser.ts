@@ -1,5 +1,6 @@
 "use server"
 
+import { cache } from "react"
 import { getServerClient } from "@/lib/getServerClient"
 
 /**
@@ -8,6 +9,10 @@ import { getServerClient } from "@/lib/getServerClient"
  * Used for SSR (Server-Side Rendering) to get user data during page load.
  * Handles authentication errors gracefully by returning null instead of throwing,
  * allowing pages to render in an unauthenticated state.
+ *
+ * Wrapped with React cache() to deduplicate calls within a single request -
+ * calling getCurrentUser() multiple times (e.g., in generateMetadata and page)
+ * will only make one API call.
  *
  * @returns The authenticated User object, or null if:
  *   - No JWT token is present in cookies
@@ -24,8 +29,7 @@ import { getServerClient } from "@/lib/getServerClient"
  * }
  * ```
  */
-export async function getCurrentUser() {
-  "use server"
+export const getCurrentUser = cache(async function getCurrentUser() {
   const client = await getServerClient()
   if (!client) {
     return null
@@ -51,4 +55,4 @@ export async function getCurrentUser() {
     console.error("Unexpected error in getCurrentUser:", error)
     return null
   }
-}
+})

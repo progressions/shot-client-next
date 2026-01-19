@@ -1,3 +1,4 @@
+import { cache } from "react"
 import { redirect } from "next/navigation"
 import { CircularProgress } from "@mui/material"
 import { getCurrentUser, getServerClient } from "@/lib"
@@ -9,32 +10,41 @@ import { NotFound, Show } from "@/components/vehicles"
 import { headers } from "next/headers"
 import { extractId, buildSluggedId, sluggedPath } from "@/lib/slug"
 
+/**
+ * Cached vehicle fetcher - deduplicates API calls within a single request.
+ */
+const getVehicle = cache(async (id: string): Promise<Vehicle | null> => {
+  const client = await getServerClient()
+  if (!client) return null
+
+  try {
+    const response = await client.getVehicle({ id })
+    return response.data
+  } catch (error) {
+    console.error("Fetch vehicle error:", error)
+    return null
+  }
+})
+
 // Dynamically generate metadata for the page title
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slugOrId: string }>
 }): Promise<Metadata> {
-  const client = await getServerClient()
   const user = await getCurrentUser()
-  if (!client || !user) {
+  if (!user) {
     return { title: "Vehicle - Chi War" }
   }
 
   const { slugOrId } = await params
   const id = extractId(slugOrId)
 
-  try {
-    const response = await client.getVehicle({ id })
-    const vehicle: Vehicle = response.data
-    if (!vehicle) {
-      return { title: "Vehicle Not Found - Chi War" }
-    }
-    return { title: `${vehicle.name} - Chi War` }
-  } catch (error) {
-    console.error("Fetch vehicle error for metadata:", error)
+  const vehicle = await getVehicle(id)
+  if (!vehicle) {
     return { title: "Vehicle Not Found - Chi War" }
   }
+  return { title: `${vehicle.name} - Chi War` }
 }
 
 export default async function VehiclePage({
@@ -51,12 +61,9 @@ export default async function VehiclePage({
   const { slugOrId } = await params
   const id = extractId(slugOrId)
 
-  let vehicle: Vehicle
-  try {
-    const response = await client.getVehicle({ id })
-    vehicle = response.data
-  } catch (error) {
-    console.error(error)
+  // Use cached getVehicle - this reuses the result from generateMetadata
+  const vehicle = await getVehicle(id)
+  if (!vehicle) {
     return <NotFound />
   }
 
