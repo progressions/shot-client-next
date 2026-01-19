@@ -1,4 +1,4 @@
-import { redirect, isRedirectError } from "next/navigation"
+import { redirect } from "next/navigation"
 import { CircularProgress } from "@mui/material"
 import { getCurrentUser, getServerClient } from "@/lib"
 import type { Character } from "@/types"
@@ -51,33 +51,32 @@ export default async function CharacterPage({
   const { slugOrId } = await params
   const id = extractId(slugOrId)
 
+  let character: Character
   try {
     const response = await client.getCharacter({ id })
-    const character = response.data
-    const canonicalId = buildSluggedId(character.name, character.id)
-    if (canonicalId !== slugOrId) {
-      redirect(sluggedPath("characters", character.name, character.id))
-    }
-
-    // Detect mobile device on the server
-    const headersState = await headers()
-    const userAgent = headersState.get("user-agent") || ""
-    const initialIsMobile = /mobile/i.test(userAgent)
-
-    return (
-      <>
-        <Breadcrumbs client={client} />
-        <Suspense fallback={<CircularProgress />}>
-          <Show character={character} initialIsMobile={initialIsMobile} />
-        </Suspense>
-      </>
-    )
+    character = response.data
   } catch (error) {
-    // Re-throw redirect errors so Next.js can handle them
-    if (isRedirectError(error)) {
-      throw error
-    }
     console.error(error)
     return <NotFound />
   }
+
+  // Redirect outside try-catch to avoid catching Next.js redirect errors
+  const canonicalId = buildSluggedId(character.name, character.id)
+  if (canonicalId !== slugOrId) {
+    redirect(sluggedPath("characters", character.name, character.id))
+  }
+
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
+  return (
+    <>
+      <Breadcrumbs client={client} />
+      <Suspense fallback={<CircularProgress />}>
+        <Show character={character} initialIsMobile={initialIsMobile} />
+      </Suspense>
+    </>
+  )
 }

@@ -1,6 +1,6 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
-import { redirect, isRedirectError } from "next/navigation"
+import { redirect } from "next/navigation"
 import { getServerClient, getCurrentUser } from "@/lib"
 import type { Campaign } from "@/types"
 import { NotFound, Show } from "@/components/campaigns"
@@ -46,32 +46,32 @@ export default async function CampaignPage({ params }: CampaignPageProperties) {
   const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
+  let campaign: Campaign
   try {
     const response = await client.getCampaign({ id })
-    const campaign: Campaign = response.data
-    const canonicalId = buildSluggedId(campaign.name, campaign.id)
-    if (canonicalId !== slugOrId) {
-      redirect(sluggedPath("campaigns", campaign.name, campaign.id))
-    }
-
-    // Detect mobile device on the server
-    const headersState = await headers()
-    const userAgent = headersState.get("user-agent") || ""
-    const initialIsMobile = /mobile/i.test(userAgent)
-
-    return (
-      <>
-        <Breadcrumbs client={client} />
-        <Suspense fallback={<CircularProgress />}>
-          <Show campaign={campaign} initialIsMobile={initialIsMobile} />
-        </Suspense>
-      </>
-    )
+    campaign = response.data
   } catch (error) {
-    if (isRedirectError(error)) {
-      throw error
-    }
     console.error(error)
     return <NotFound />
   }
+
+  // Redirect outside try-catch to avoid catching Next.js redirect errors
+  const canonicalId = buildSluggedId(campaign.name, campaign.id)
+  if (canonicalId !== slugOrId) {
+    redirect(sluggedPath("campaigns", campaign.name, campaign.id))
+  }
+
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
+  return (
+    <>
+      <Breadcrumbs client={client} />
+      <Suspense fallback={<CircularProgress />}>
+        <Show campaign={campaign} initialIsMobile={initialIsMobile} />
+      </Suspense>
+    </>
+  )
 }

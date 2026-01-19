@@ -1,6 +1,6 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
-import { redirect, isRedirectError } from "next/navigation"
+import { redirect } from "next/navigation"
 import { getServerClient, getCurrentUser } from "@/lib"
 import type { Schtick } from "@/types"
 import { NotFound, Show } from "@/components/schticks"
@@ -19,32 +19,32 @@ export default async function SchtickPage({ params }: SchtickPageProperties) {
   const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
+  let schtick: Schtick
   try {
     const response = await client.getSchtick({ id })
-    const schtick: Schtick = response.data
-    const canonicalId = buildSluggedId(schtick.name, schtick.id)
-    if (canonicalId !== slugOrId) {
-      redirect(sluggedPath("schticks", schtick.name, schtick.id))
-    }
-
-    // Detect mobile device on the server
-    const headersState = await headers()
-    const userAgent = headersState.get("user-agent") || ""
-    const initialIsMobile = /mobile/i.test(userAgent)
-
-    return (
-      <>
-        <Breadcrumbs client={client} />
-        <Suspense fallback={<CircularProgress />}>
-          <Show schtick={schtick} initialIsMobile={initialIsMobile} />
-        </Suspense>
-      </>
-    )
+    schtick = response.data
   } catch (error) {
-    if (isRedirectError(error)) {
-      throw error
-    }
     console.error(error)
     return <NotFound />
   }
+
+  // Redirect outside try-catch to avoid catching Next.js redirect errors
+  const canonicalId = buildSluggedId(schtick.name, schtick.id)
+  if (canonicalId !== slugOrId) {
+    redirect(sluggedPath("schticks", schtick.name, schtick.id))
+  }
+
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
+  return (
+    <>
+      <Breadcrumbs client={client} />
+      <Suspense fallback={<CircularProgress />}>
+        <Show schtick={schtick} initialIsMobile={initialIsMobile} />
+      </Suspense>
+    </>
+  )
 }

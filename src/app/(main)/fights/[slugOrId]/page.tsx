@@ -1,6 +1,6 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
-import { redirect, isRedirectError } from "next/navigation"
+import { redirect } from "next/navigation"
 import { getServerClient, getCurrentUser } from "@/lib"
 import type { Fight } from "@/types"
 import { NotFound, Show } from "@/components/fights"
@@ -46,32 +46,32 @@ export default async function FightPage({ params }: FightPageProperties) {
   const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
+  let fight: Fight
   try {
     const response = await client.getFight({ id })
-    const fight: Fight = response.data
-    const canonicalId = buildSluggedId(fight.name, fight.id)
-    if (canonicalId !== slugOrId) {
-      redirect(sluggedPath("fights", fight.name, fight.id))
-    }
-
-    // Detect mobile device on the server
-    const headersState = await headers()
-    const userAgent = headersState.get("user-agent") || ""
-    const initialIsMobile = /mobile/i.test(userAgent)
-
-    return (
-      <>
-        <Breadcrumbs client={client} />
-        <Suspense fallback={<CircularProgress />}>
-          <Show fight={fight} initialIsMobile={initialIsMobile} />
-        </Suspense>
-      </>
-    )
+    fight = response.data
   } catch (error) {
-    if (isRedirectError(error)) {
-      throw error
-    }
     console.error(error)
     return <NotFound />
   }
+
+  // Redirect outside try-catch to avoid catching Next.js redirect errors
+  const canonicalId = buildSluggedId(fight.name, fight.id)
+  if (canonicalId !== slugOrId) {
+    redirect(sluggedPath("fights", fight.name, fight.id))
+  }
+
+  // Detect mobile device on the server
+  const headersState = await headers()
+  const userAgent = headersState.get("user-agent") || ""
+  const initialIsMobile = /mobile/i.test(userAgent)
+
+  return (
+    <>
+      <Breadcrumbs client={client} />
+      <Suspense fallback={<CircularProgress />}>
+        <Show fight={fight} initialIsMobile={initialIsMobile} />
+      </Suspense>
+    </>
+  )
 }
