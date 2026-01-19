@@ -15,6 +15,13 @@ interface CacheOptions {
 type Parameters_ = Record<string, unknown>
 
 /**
+ * Validate status for requests that support 304 Not Modified responses.
+ * Defined once to avoid creating a new function instance for each request.
+ */
+const validateStatusWith304 = (status: number): boolean =>
+  (status >= 200 && status < 300) || status === 304
+
+/**
  * Factory to create low-level HTTP client with JWT authentication.
  * Provides get, post, patch, delete methods that automatically include auth headers.
  *
@@ -77,8 +84,7 @@ export function createBaseClient({ jwt }: ClientDependencies) {
       headers: headers,
       proxy: false,
       // Tell axios not to throw on 304 responses
-      validateStatus: status =>
-        (status >= 200 && status < 300) || status === 304,
+      validateStatus: validateStatusWith304,
     }
 
     const response = await axios(config)
@@ -90,12 +96,50 @@ export function createBaseClient({ jwt }: ClientDependencies) {
         parameters as Record<string, unknown>
       )
       if (cachedData) {
-        return {
-          ...response,
-          status: 200,
+        // Construct a synthetic 200 response using cached data.
+        // Note: headers are reused from the 304 response and may not fully
+        // match a real 200 response from the server.
+        const syntheticResponse: AxiosResponse<T> = {
           data: cachedData,
-        } as AxiosResponse<T>
+          status: 200,
+          statusText: response.statusText,
+          headers: response.headers,
+          config: response.config,
+          request: response.request,
+        }
+        return syntheticResponse
       }
+
+      // Cache entry was evicted between sending If-None-Match and receiving 304.
+      // Make a fresh request without the If-None-Match header.
+      const freshHeaders = { ...headers }
+      delete freshHeaders["If-None-Match"]
+
+      const freshConfig: AxiosRequestConfig = {
+        url: url,
+        method: "GET",
+        params: parameters,
+        headers: freshHeaders,
+        proxy: false,
+        validateStatus: validateStatusWith304,
+      }
+
+      const freshResponse = await axios(freshConfig)
+
+      // Store ETag and response data for future conditional requests
+      if (freshResponse.status === 200) {
+        const freshEtag = freshResponse.headers["etag"]
+        if (freshEtag) {
+          etagCache.set(
+            url,
+            freshEtag,
+            freshResponse.data,
+            parameters as Record<string, unknown>
+          )
+        }
+      }
+
+      return freshResponse
     }
 
     // Store ETag and response data for future conditional requests
@@ -202,8 +246,16 @@ export function createBaseClient({ jwt }: ClientDependencies) {
   }
 
   /**
-   * Invalidate cache entries for a resource URL pattern
-   * e.g., /api/v2/characters/123 -> invalidates /api/v2/characters*
+   * Invalidate cache entries for a resource URL pattern.
+   *
+   * Extracts the base resource path (e.g., /api/v2/characters) from URLs like:
+   * - /api/v2/characters/123 -> invalidates /api/v2/characters*
+   * - /api/v2/characters -> invalidates /api/v2/characters*
+   *
+   * Note: For nested resources like /api/v2/games/456/characters/123,
+   * this will extract /api/v2/games and invalidate all game-related caches.
+   * This is intentional for our API structure where top-level resources
+   * are the primary cache boundaries.
    */
   function invalidateCacheForUrl(url: string): void {
     // Extract base resource path (e.g., /api/v2/characters)

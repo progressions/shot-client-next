@@ -2,7 +2,7 @@
  * ETag Cache for HTTP Conditional Requests
  *
  * Stores ETags and response data to enable 304 Not Modified responses.
- * Uses in-memory cache with optional size limits to prevent memory bloat.
+ * Uses in-memory cache with timestamp-based LRU eviction to prevent memory bloat.
  *
  * @example
  * ```ts
@@ -49,6 +49,38 @@ class ETagCache {
   }
 
   /**
+   * Check if a cache entry has expired
+   */
+  private isExpired(entry: CacheEntry): boolean {
+    return Date.now() - entry.timestamp > this.maxAgeMs
+  }
+
+  /**
+   * Get a valid (non-expired) cache entry, or null if not found or expired
+   */
+  private getValidEntry(key: string): CacheEntry | null {
+    const entry = this.cache.get(key)
+
+    if (!entry) {
+      return null
+    }
+
+    if (this.isExpired(entry)) {
+      this.cache.delete(key)
+      return null
+    }
+
+    return entry
+  }
+
+  /**
+   * Update timestamp on cache entry access (for LRU tracking)
+   */
+  private touchEntry(entry: CacheEntry): void {
+    entry.timestamp = Date.now()
+  }
+
+  /**
    * Store an ETag and response data for a URL
    */
   set<T>(
@@ -59,10 +91,19 @@ class ETagCache {
   ): void {
     const key = this.getCacheKey(url, params)
 
-    // Enforce max entries limit (LRU-style: remove oldest)
+    // Enforce max entries limit: remove entry with oldest timestamp (true LRU)
     if (this.cache.size >= this.maxEntries) {
-      const oldestKey = this.cache.keys().next().value
-      if (oldestKey) {
+      let oldestKey: string | undefined
+      let oldestTimestamp = Infinity
+
+      for (const [entryKey, entry] of this.cache.entries()) {
+        if (entry.timestamp < oldestTimestamp) {
+          oldestTimestamp = entry.timestamp
+          oldestKey = entryKey
+        }
+      }
+
+      if (oldestKey !== undefined) {
         this.cache.delete(oldestKey)
       }
     }
@@ -76,43 +117,36 @@ class ETagCache {
 
   /**
    * Get the stored ETag for a URL (for If-None-Match header)
+   * Also updates timestamp on access for LRU tracking
    */
   getEtag(url: string, params?: Record<string, unknown>): string | null {
     const key = this.getCacheKey(url, params)
-    const entry = this.cache.get(key)
+    const entry = this.getValidEntry(key)
 
     if (!entry) {
       return null
     }
 
-    // Check if entry has expired
-    if (Date.now() - entry.timestamp > this.maxAgeMs) {
-      this.cache.delete(key)
-      return null
-    }
+    // Update timestamp on access (consistent LRU behavior with getData)
+    this.touchEntry(entry)
 
     return entry.etag
   }
 
   /**
    * Get cached response data for a URL (when 304 received)
+   * Also updates timestamp on access for LRU tracking
    */
   getData<T>(url: string, params?: Record<string, unknown>): T | null {
     const key = this.getCacheKey(url, params)
-    const entry = this.cache.get(key)
+    const entry = this.getValidEntry(key)
 
     if (!entry) {
       return null
     }
 
-    // Check if entry has expired
-    if (Date.now() - entry.timestamp > this.maxAgeMs) {
-      this.cache.delete(key)
-      return null
-    }
-
     // Update timestamp on access (LRU behavior)
-    entry.timestamp = Date.now()
+    this.touchEntry(entry)
 
     return entry.data as T
   }
