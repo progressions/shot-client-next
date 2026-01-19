@@ -1,10 +1,11 @@
 "use client"
 
+import { useRouter, usePathname } from "next/navigation"
 import { GridView, ViewList } from "@mui/icons-material"
 import { CreateAdventureForm } from "@/components/adventures"
 import { SpeedDial, actions as initialActions } from "@/components/ui"
 import AddIcon from "@mui/icons-material/Add"
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 
 interface MenuProps {
   viewMode: "table" | "mobile"
@@ -12,11 +13,13 @@ interface MenuProps {
 }
 
 export default function Menu({ viewMode, setViewMode }: MenuProps) {
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const router = useRouter()
+  const pathname = usePathname()
+  const drawerOpen = pathname === "/adventures/new"
 
   useEffect(() => {
     const handleOpenDrawerEvent = () => {
-      setDrawerOpen(true)
+      router.push("/adventures/new", { scroll: false })
     }
 
     window.addEventListener("openAdventureDrawer", handleOpenDrawerEvent)
@@ -24,7 +27,7 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
     return () => {
       window.removeEventListener("openAdventureDrawer", handleOpenDrawerEvent)
     }
-  }, [])
+  }, [router])
 
   const handleToggleView = () => {
     setViewMode(viewMode === "table" ? "mobile" : "table")
@@ -46,10 +49,10 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
   ]
 
   function handleOpenCreateDrawer() {
-    setDrawerOpen(true)
+    router.push("/adventures/new", { scroll: false })
   }
   function handleCloseCreateDrawer() {
-    setDrawerOpen(false)
+    router.push("/adventures", { scroll: false })
   }
 
   return (
