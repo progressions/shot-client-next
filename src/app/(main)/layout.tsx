@@ -5,6 +5,7 @@ import {
   LocalStorageProvider,
   ToastProvider,
   ConfirmProvider,
+  HotkeysProvider,
 } from "@/contexts"
 import { Navbar, Footer } from "@/components/ui"
 import { OnboardingClientWrapper } from "@/components/onboarding"
@@ -28,21 +29,23 @@ export default async function RootLayout({
             <AppProvider initialUser={user}>
               <ToastProvider>
                 <ConfirmProvider>
-                  <Navbar user={user} />
-                  <OnboardingClientWrapper />
-                  <Container
-                    maxWidth="md"
-                    sx={{ paddingTop: 2, paddingBottom: 2 }}
-                  >
-                    {React.Children.map(children, child =>
-                      React.isValidElement(child)
-                        ? React.cloneElement(child, { user })
-                        : child
-                    )}
-                    <PopupToast />
-                    <GlobalConfirmDialog />
-                    <Footer />
-                  </Container>
+                  <HotkeysProvider>
+                    <Navbar user={user} />
+                    <OnboardingClientWrapper />
+                    <Container
+                      maxWidth="md"
+                      sx={{ paddingTop: 2, paddingBottom: 2 }}
+                    >
+                      {React.Children.map(children, child =>
+                        React.isValidElement(child)
+                          ? React.cloneElement(child, { user })
+                          : child
+                      )}
+                      <PopupToast />
+                      <GlobalConfirmDialog />
+                      <Footer />
+                    </Container>
+                  </HotkeysProvider>
                 </ConfirmProvider>
               </ToastProvider>
             </AppProvider>
