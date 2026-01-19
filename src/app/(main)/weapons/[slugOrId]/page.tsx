@@ -1,6 +1,6 @@
 import { CircularProgress, Typography } from "@mui/material"
 import { headers } from "next/headers"
-import { redirect } from "next/navigation"
+import { redirect, isRedirectError } from "next/navigation"
 import { getServerClient, getCurrentUser } from "@/lib"
 import type { Weapon } from "@/types"
 import { NotFound, Show } from "@/components/weapons"
@@ -41,6 +41,9 @@ export default async function WeaponPage({ params }: WeaponPageProperties) {
       </>
     )
   } catch (error) {
+    if (isRedirectError(error)) {
+      throw error
+    }
     console.error(error)
     return <NotFound />
   }

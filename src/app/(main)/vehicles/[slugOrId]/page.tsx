@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation"
+import { redirect, isRedirectError } from "next/navigation"
 import { CircularProgress } from "@mui/material"
 import { getCurrentUser, getServerClient } from "@/lib"
 import type { Vehicle } from "@/types"
@@ -73,6 +73,9 @@ export default async function VehiclePage({
       </>
     )
   } catch (error) {
+    if (isRedirectError(error)) {
+      throw error
+    }
     console.error(error)
     return <NotFound />
   }

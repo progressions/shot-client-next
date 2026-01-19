@@ -1,5 +1,5 @@
 import { headers } from "next/headers"
-import { redirect } from "next/navigation"
+import { redirect, isRedirectError } from "next/navigation"
 import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getCurrentUser } from "@/lib"
 import { NotFound, Show } from "@/components/parties"
@@ -40,6 +40,9 @@ export default async function PartyPage({ params }: PartyPageProperties) {
       </>
     )
   } catch (error) {
+    if (isRedirectError(error)) {
+      throw error
+    }
     console.error(error)
     return <NotFound />
   }

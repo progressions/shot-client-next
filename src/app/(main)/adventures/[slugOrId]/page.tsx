@@ -3,7 +3,7 @@ import { getServerClient, getCurrentUser } from "@/lib"
 import { NotFound, Show } from "@/components/adventures"
 import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
-import { redirect } from "next/navigation"
+import { redirect, isRedirectError } from "next/navigation"
 import { extractId, buildSluggedId, sluggedPath } from "@/lib/slug"
 
 type AdventurePageProperties = {
@@ -36,6 +36,9 @@ export default async function AdventurePage({
       </>
     )
   } catch (error) {
+    if (isRedirectError(error)) {
+      throw error
+    }
     console.error(error)
     return <NotFound />
   }

@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation"
+import { redirect, isRedirectError } from "next/navigation"
 import { headers } from "next/headers"
 import { CircularProgress, Typography } from "@mui/material"
 import { getServerClient, getCurrentUser } from "@/lib"
@@ -44,6 +44,9 @@ export default async function UserPage({ params }: UserPageProperties) {
       </>
     )
   } catch (error) {
+    if (isRedirectError(error)) {
+      throw error
+    }
     console.error(error)
     return <NotFound />
   }
