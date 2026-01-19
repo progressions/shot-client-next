@@ -15,13 +15,15 @@ jest.mock("@/components/search/SearchModal", () => ({
 describe("SearchButton", () => {
   it("renders the search icon button", () => {
     render(<SearchButton />)
-    expect(screen.getByRole("button", { name: "Search" })).toBeInTheDocument()
+    expect(
+      screen.getByRole("button", { name: "Search (K)" })
+    ).toBeInTheDocument()
   })
 
   it("has correct aria-label", () => {
     render(<SearchButton />)
-    const button = screen.getByRole("button", { name: "Search" })
-    expect(button).toHaveAttribute("aria-label", "Search")
+    const button = screen.getByRole("button", { name: "Search (K)" })
+    expect(button).toHaveAttribute("aria-label", "Search (K)")
   })
 
   it("opens the modal when clicked", () => {
@@ -31,7 +33,7 @@ describe("SearchButton", () => {
     expect(screen.queryByTestId("search-modal")).not.toBeInTheDocument()
 
     // Click the search button
-    fireEvent.click(screen.getByRole("button", { name: "Search" }))
+    fireEvent.click(screen.getByRole("button", { name: "Search (K)" }))
 
     // Modal should now be visible
     expect(screen.getByTestId("search-modal")).toBeInTheDocument()
@@ -41,7 +43,7 @@ describe("SearchButton", () => {
     render(<SearchButton />)
 
     // Open the modal
-    fireEvent.click(screen.getByRole("button", { name: "Search" }))
+    fireEvent.click(screen.getByRole("button", { name: "Search (K)" }))
     expect(screen.getByTestId("search-modal")).toBeInTheDocument()
 
     // Close the modal
