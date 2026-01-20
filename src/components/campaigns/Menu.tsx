@@ -1,10 +1,11 @@
 "use client"
 
+import { useRouter, usePathname } from "next/navigation"
 import { GridView, ViewList } from "@mui/icons-material"
 import { CampaignForm } from "@/components/campaigns"
 import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 
 interface MenuProps {
   viewMode: "table" | "mobile"
@@ -12,12 +13,14 @@ interface MenuProps {
 }
 
 export default function Menu({ viewMode, setViewMode }: MenuProps) {
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const router = useRouter()
+  const pathname = usePathname()
+  const drawerOpen = pathname === "/campaigns/new"
 
   // Listen for onboarding CTA events to open campaign drawer
   useEffect(() => {
     const handleOpenDrawerEvent = () => {
-      setDrawerOpen(true)
+      router.push("/campaigns/new", { scroll: false })
     }
 
     window.addEventListener("openCampaignDrawer", handleOpenDrawerEvent)
@@ -25,7 +28,7 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
     return () => {
       window.removeEventListener("openCampaignDrawer", handleOpenDrawerEvent)
     }
-  }, [])
+  }, [router])
 
   const handleToggleView = () => {
     setViewMode(viewMode === "table" ? "mobile" : "table")
@@ -47,10 +50,10 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
   ]
 
   function handleOpenCreateDrawer() {
-    setDrawerOpen(true)
+    router.push("/campaigns/new", { scroll: false })
   }
   function handleCloseCreateDrawer() {
-    setDrawerOpen(false)
+    router.push("/campaigns", { scroll: false })
   }
 
   function handleCampaignCreated() {

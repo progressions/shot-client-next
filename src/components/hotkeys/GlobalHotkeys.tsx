@@ -167,20 +167,10 @@ export function GlobalHotkeys() {
     )
 
     cleanups.push(
-      registerHotkey(
-        "n+g",
-        () => {
-          router.push("/campaigns")
-          // Dispatch event after a short delay to allow page to load
-          setTimeout(() => {
-            window.dispatchEvent(new CustomEvent("openCampaignDrawer"))
-          }, 100)
-        },
-        {
-          description: "New Campaign",
-          category: "Create New",
-        }
-      )
+      registerHotkey("n+g", () => router.push("/campaigns/new"), {
+        description: "New Campaign",
+        category: "Create New",
+      })
     )
 
     cleanups.push(
