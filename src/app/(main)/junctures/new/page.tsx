@@ -18,6 +18,8 @@ export default async function NewJuncturePage({
     order?: string
     search?: string
     at_a_glance?: string
+    faction_id?: string
+    [key: string]: string | undefined
   }>
 }) {
   // Server-side campaign check - will redirect if no campaign
