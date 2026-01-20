@@ -9,6 +9,7 @@ import {
 } from "@/contexts"
 import { Navbar, Footer } from "@/components/ui"
 import { OnboardingClientWrapper } from "@/components/onboarding"
+import { GlobalHotkeys } from "@/components/hotkeys"
 import { getCurrentUser } from "@/lib"
 import "@/styles/global.scss"
 import { Container } from "@mui/material"
@@ -30,6 +31,7 @@ export default async function RootLayout({
               <ToastProvider>
                 <ConfirmProvider>
                   <HotkeysProvider>
+                    <GlobalHotkeys />
                     <Navbar user={user} />
                     <OnboardingClientWrapper />
                     <Container

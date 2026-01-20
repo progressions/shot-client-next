@@ -1,10 +1,11 @@
 "use client"
 
+import { useRouter, usePathname } from "next/navigation"
 import { GridView, ViewList } from "@mui/icons-material"
 import { CreateVehicleForm } from "@/components/vehicles"
 import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
-import { useState } from "react"
+import { useEffect } from "react"
 
 interface MenuProps {
   viewMode: "table" | "mobile"
@@ -12,7 +13,22 @@ interface MenuProps {
 }
 
 export default function Menu({ viewMode, setViewMode }: MenuProps) {
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const router = useRouter()
+  const pathname = usePathname()
+  const drawerOpen = pathname === "/vehicles/new"
+
+  useEffect(() => {
+    const handleOpenDrawerEvent = () => {
+      router.push("/vehicles/new", { scroll: false })
+    }
+
+    window.addEventListener("openVehicleDrawer", handleOpenDrawerEvent)
+
+    return () => {
+      window.removeEventListener("openVehicleDrawer", handleOpenDrawerEvent)
+    }
+  }, [router])
+
   const handleToggleView = () => {
     setViewMode(viewMode === "table" ? "mobile" : "table")
   }
@@ -33,10 +49,10 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
   ]
 
   function handleOpenCreateDrawer() {
-    setDrawerOpen(true)
+    router.push("/vehicles/new", { scroll: false })
   }
   function handleCloseCreateDrawer() {
-    setDrawerOpen(false)
+    router.push("/vehicles", { scroll: false })
   }
 
   function handleVehicleCreated() {

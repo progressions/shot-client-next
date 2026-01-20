@@ -1,10 +1,11 @@
 "use client"
 
+import { useRouter, usePathname } from "next/navigation"
 import { GridView, ViewList } from "@mui/icons-material"
 import { CreateSchtickForm } from "@/components/schticks"
 import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
-import { useState } from "react"
+import { useEffect } from "react"
 
 interface MenuProps {
   viewMode: "table" | "mobile"
@@ -12,7 +13,22 @@ interface MenuProps {
 }
 
 export default function Menu({ viewMode, setViewMode }: MenuProps) {
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const router = useRouter()
+  const pathname = usePathname()
+  const drawerOpen = pathname === "/schticks/new"
+
+  useEffect(() => {
+    const handleOpenDrawerEvent = () => {
+      router.push("/schticks/new", { scroll: false })
+    }
+
+    window.addEventListener("openSchtickDrawer", handleOpenDrawerEvent)
+
+    return () => {
+      window.removeEventListener("openSchtickDrawer", handleOpenDrawerEvent)
+    }
+  }, [router])
+
   const handleToggleView = () => {
     setViewMode(viewMode === "table" ? "mobile" : "table")
   }
@@ -33,10 +49,10 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
   ]
 
   function handleOpenCreateDrawer() {
-    setDrawerOpen(true)
+    router.push("/schticks/new", { scroll: false })
   }
   function handleCloseCreateDrawer() {
-    setDrawerOpen(false)
+    router.push("/schticks", { scroll: false })
   }
 
   return (
