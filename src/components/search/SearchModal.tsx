@@ -98,19 +98,47 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const selectedItemRef = useRef<HTMLDivElement>(null)
 
-  // Flatten results for keyboard navigation
+  // Check if a result's name matches the search query (case-insensitive)
+  const isTitleMatch = useCallback(
+    (item: SearchableEntity, searchQuery: string): boolean => {
+      if (!searchQuery.trim()) return false
+      const name = item.name?.toLowerCase() || ""
+      return name.includes(searchQuery.toLowerCase())
+    },
+    []
+  )
+
+  // Flatten and sort results: title matches first, then by entity type order
   const flatResults = useMemo(() => {
-    const flat: { type: string; item: SearchableEntity }[] = []
+    const flat: {
+      type: string
+      item: SearchableEntity
+      titleMatch: boolean
+    }[] = []
     for (const type of ENTITY_ORDER) {
       const items = results[type as keyof typeof results]
       if (items && items.length > 0) {
         for (const item of items) {
-          flat.push({ type, item: item as SearchableEntity })
+          flat.push({
+            type,
+            item: item as SearchableEntity,
+            titleMatch: isTitleMatch(item as SearchableEntity, query),
+          })
         }
       }
     }
+    // Sort: title matches first, then by entity type order
+    flat.sort((a, b) => {
+      // Title matches come first
+      if (a.titleMatch && !b.titleMatch) return -1
+      if (!a.titleMatch && b.titleMatch) return 1
+      // Within same relevance tier, maintain entity type order
+      const aTypeIndex = ENTITY_ORDER.indexOf(a.type)
+      const bTypeIndex = ENTITY_ORDER.indexOf(b.type)
+      return aTypeIndex - bTypeIndex
+    })
     return flat
-  }, [results])
+  }, [results, query, isTitleMatch])
 
   // Perform search
   const performSearch = useCallback(
@@ -293,7 +321,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
     }
   }
 
-  // Render results grouped by entity type
+  // Render results sorted by relevance (title matches first)
   const renderResults = () => {
     if (loading) {
       return (
@@ -323,46 +351,104 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
       )
     }
 
+    // Group results by title match status, then by entity type
+    const titleMatches = flatResults.filter(r => r.titleMatch)
+    const otherMatches = flatResults.filter(r => !r.titleMatch)
+
+    // Group items by type within each relevance tier
+    const groupByType = (
+      items: typeof flatResults
+    ): Record<string, typeof flatResults> => {
+      const groups: Record<string, typeof flatResults> = {}
+      for (const item of items) {
+        if (!groups[item.type]) groups[item.type] = []
+        groups[item.type].push(item)
+      }
+      return groups
+    }
+
+    const titleMatchGroups = groupByType(titleMatches)
+    const otherMatchGroups = groupByType(otherMatches)
+
+    // Calculate global indices for keyboard navigation
     let globalIndex = 0
+
+    const renderSection = (
+      groups: Record<string, typeof flatResults>,
+      sectionLabel?: string
+    ) => {
+      const types = ENTITY_ORDER.filter(type => groups[type]?.length > 0)
+      if (types.length === 0) return null
+
+      return (
+        <Box>
+          {sectionLabel && (
+            <Typography
+              variant="overline"
+              sx={{
+                color: "#d4a44a",
+                display: "block",
+                mb: 1,
+                px: 1,
+                fontWeight: "bold",
+              }}
+            >
+              {sectionLabel}
+            </Typography>
+          )}
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {types.map(type => {
+              const items = groups[type]
+              const renderedItems = items.map(({ item }) => {
+                const result = renderResultItem(type, item, globalIndex)
+                globalIndex++
+                return result
+              })
+
+              return (
+                <Box key={type}>
+                  <Typography
+                    variant="overline"
+                    sx={{
+                      color: "#888",
+                      display: "block",
+                      mb: 1,
+                      px: 1,
+                      fontSize: "0.65rem",
+                    }}
+                  >
+                    {ENTITY_LABELS[type]}
+                  </Typography>
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
+                  >
+                    {renderedItems}
+                  </Box>
+                </Box>
+              )
+            })}
+          </Box>
+        </Box>
+      )
+    }
+
+    const hasTitleMatches = titleMatches.length > 0
+    const hasOtherMatches = otherMatches.length > 0
+
     return (
       <Box
         role="listbox"
         aria-label="Search results"
-        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+        sx={{ display: "flex", flexDirection: "column", gap: 3 }}
       >
-        {ENTITY_ORDER.map(type => {
-          const items = results[type as keyof typeof results]
-          if (!items || items.length === 0) return null
-
-          const renderedItems = items.map(item => {
-            const result = renderResultItem(
-              type,
-              item as SearchableEntity,
-              globalIndex
-            )
-            globalIndex++
-            return result
-          })
-
-          return (
-            <Box key={type}>
-              <Typography
-                variant="overline"
-                sx={{
-                  color: "#888",
-                  display: "block",
-                  mb: 1,
-                  px: 1,
-                }}
-              >
-                {ENTITY_LABELS[type]}
-              </Typography>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-                {renderedItems}
-              </Box>
-            </Box>
-          )
-        })}
+        {renderSection(
+          titleMatchGroups,
+          hasTitleMatches && hasOtherMatches ? "Title Matches" : undefined
+        )}
+        {renderSection(
+          otherMatchGroups,
+          hasTitleMatches && hasOtherMatches ? "Other Results" : undefined
+        )}
       </Box>
     )
   }
