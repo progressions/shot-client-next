@@ -183,6 +183,13 @@ export function GlobalHotkeys() {
       )
     )
 
+    cleanups.push(
+      registerHotkey("n+j", () => router.push("/junctures/new"), {
+        description: "New Juncture",
+        category: "Create New",
+      })
+    )
+
     // Register ? for help (description only - handling is in context)
     cleanups.push(
       registerHotkey("?", () => {}, {

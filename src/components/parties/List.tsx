@@ -1,6 +1,6 @@
 "use client"
 import { useRouter } from "next/navigation"
-import { useEffect, useCallback, useState } from "react"
+import { useRef, useEffect, useCallback, useState } from "react"
 import { Box } from "@mui/material"
 import type { Party, Faction, PaginationMeta } from "@/types"
 import { useCampaign, useClient, useLocalStorage } from "@/contexts"
@@ -40,6 +40,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   )
   const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
   const { filters } = formState.data
+  const isInitialRender = useRef(true)
 
   const fetchParties = useCallback(
     async filters => {
@@ -79,6 +80,10 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   }, [subscribeToEntity, fetchParties, filters])
 
   useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false
+      return
+    }
     const url = `/parties?${queryParams(filters)}`
     router.push(url, {
       scroll: false,
