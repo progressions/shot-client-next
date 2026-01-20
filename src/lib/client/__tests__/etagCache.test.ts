@@ -4,7 +4,12 @@ describe("ETagCache", () => {
   let cache: ETagCache
 
   beforeEach(() => {
+    jest.useFakeTimers()
     cache = new ETagCache({ maxEntries: 5, maxAgeMs: 1000 })
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
   })
 
   describe("set and getEtag", () => {
@@ -84,29 +89,29 @@ describe("ETagCache", () => {
   })
 
   describe("expiration", () => {
-    it("returns null for expired entries from getEtag", async () => {
+    it("returns null for expired entries from getEtag", () => {
       cache.set("/api/v2/characters/123", '"abc123"', { id: "123" })
 
-      // Wait for entry to expire (maxAgeMs is 1000ms)
-      await new Promise(resolve => setTimeout(resolve, 1100))
+      // Advance time past expiration (maxAgeMs is 1000ms)
+      jest.advanceTimersByTime(1100)
 
       expect(cache.getEtag("/api/v2/characters/123")).toBeNull()
     })
 
-    it("returns null for expired entries from getData", async () => {
+    it("returns null for expired entries from getData", () => {
       cache.set("/api/v2/characters/123", '"abc123"', { id: "123" })
 
-      // Wait for entry to expire
-      await new Promise(resolve => setTimeout(resolve, 1100))
+      // Advance time past expiration
+      jest.advanceTimersByTime(1100)
 
       expect(cache.getData("/api/v2/characters/123")).toBeNull()
     })
 
-    it("deletes expired entries on access", async () => {
+    it("deletes expired entries on access", () => {
       cache.set("/api/v2/characters/123", '"abc123"', { id: "123" })
 
-      // Wait for entry to expire
-      await new Promise(resolve => setTimeout(resolve, 1100))
+      // Advance time past expiration
+      jest.advanceTimersByTime(1100)
 
       // Access should delete the expired entry
       cache.getEtag("/api/v2/characters/123")
@@ -133,17 +138,17 @@ describe("ETagCache", () => {
       expect(cache.getEtag("/api/v2/characters/6")).toBe('"etag6"')
     })
 
-    it("evicts entry with oldest timestamp (true LRU)", async () => {
+    it("evicts entry with oldest timestamp (true LRU)", () => {
       // Add entries with staggered timestamps
       cache.set("/api/v2/characters/1", '"etag1"', { id: "1" })
-      await new Promise(resolve => setTimeout(resolve, 50))
+      jest.advanceTimersByTime(50)
 
       cache.set("/api/v2/characters/2", '"etag2"', { id: "2" })
-      await new Promise(resolve => setTimeout(resolve, 50))
+      jest.advanceTimersByTime(50)
 
       // Access entry 1 to update its timestamp
       cache.getEtag("/api/v2/characters/1")
-      await new Promise(resolve => setTimeout(resolve, 50))
+      jest.advanceTimersByTime(50)
 
       cache.set("/api/v2/characters/3", '"etag3"', { id: "3" })
       cache.set("/api/v2/characters/4", '"etag4"', { id: "4" })
@@ -158,12 +163,12 @@ describe("ETagCache", () => {
       expect(cache.getEtag("/api/v2/characters/2")).toBeNull()
     })
 
-    it("updates timestamp on getEtag access", async () => {
+    it("updates timestamp on getEtag access", () => {
       cache.set("/api/v2/characters/1", '"etag1"', { id: "1" })
-      await new Promise(resolve => setTimeout(resolve, 50))
+      jest.advanceTimersByTime(50)
 
       cache.set("/api/v2/characters/2", '"etag2"', { id: "2" })
-      await new Promise(resolve => setTimeout(resolve, 50))
+      jest.advanceTimersByTime(50)
 
       // Access entry 1 via getEtag
       cache.getEtag("/api/v2/characters/1")
@@ -179,12 +184,12 @@ describe("ETagCache", () => {
       expect(cache.getEtag("/api/v2/characters/2")).toBeNull()
     })
 
-    it("updates timestamp on getData access", async () => {
+    it("updates timestamp on getData access", () => {
       cache.set("/api/v2/characters/1", '"etag1"', { id: "1" })
-      await new Promise(resolve => setTimeout(resolve, 50))
+      jest.advanceTimersByTime(50)
 
       cache.set("/api/v2/characters/2", '"etag2"', { id: "2" })
-      await new Promise(resolve => setTimeout(resolve, 50))
+      jest.advanceTimersByTime(50)
 
       // Access entry 1 via getData
       cache.getData("/api/v2/characters/1")
@@ -211,10 +216,10 @@ describe("ETagCache", () => {
       expect(cache.has("/api/v2/characters/999")).toBe(false)
     })
 
-    it("returns false for expired entry", async () => {
+    it("returns false for expired entry", () => {
       cache.set("/api/v2/characters/123", '"etag"', { id: "123" })
 
-      await new Promise(resolve => setTimeout(resolve, 1100))
+      jest.advanceTimersByTime(1100)
 
       expect(cache.has("/api/v2/characters/123")).toBe(false)
     })
