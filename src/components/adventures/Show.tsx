@@ -14,6 +14,7 @@ import {
   SectionHeader,
   HeroImage,
   RichDescription,
+  NumberField,
 } from "@/components/ui"
 import { AdventureSpeedDial } from "@/components/adventures"
 import {
@@ -59,6 +60,15 @@ export default function Show({ adventure: initialAdventure }: ShowProperties) {
     },
     [dispatchForm]
   )
+
+  const handleChangeLocal = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    dispatchForm({
+      type: FormActions.UPDATE,
+      name: "entity",
+      value: { ...adventure, [name]: value },
+    })
+  }
 
   useEffect(() => {
     document.title = adventure.name ? `${adventure.name} - Chi War` : "Chi War"
@@ -124,6 +134,26 @@ export default function Show({ adventure: initialAdventure }: ShowProperties) {
           onChange={handleChangeAndSave}
           fallback="No description available."
         />
+      </Box>
+      <Box sx={{ mb: 2 }}>
+        <SectionHeader title="Details" icon={<Icon keyword="Details" />}>
+          Additional details about this adventure.
+        </SectionHeader>
+        <Stack direction="row" spacing={2} sx={{ mt: 2, flexWrap: "wrap" }}>
+          <FormControl margin="normal" error={!!errors.season}>
+            <NumberField
+              label="Season"
+              name="season"
+              value={adventure.season || null}
+              onChange={handleChangeLocal}
+              onBlur={handleChangeAndSave}
+              size="small"
+              width="100px"
+              error={!!errors.season}
+            />
+            {errors.season && <FormHelperText>{errors.season}</FormHelperText>}
+          </FormControl>
+        </Stack>
       </Box>
       {adventure.rich_description && (
         <Box sx={{ mb: 2 }}>
