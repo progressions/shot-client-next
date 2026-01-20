@@ -26,12 +26,14 @@ interface JunctureFormProperties {
   open: boolean
   onClose: () => void
   title: string
+  onJunctureCreated?: () => void
 }
 
 export default function JunctureForm({
   open,
   onClose,
   title,
+  onJunctureCreated,
 }: JunctureFormProperties) {
   const { formState, dispatchForm, initialFormState } = useForm<FormStateData>({
     ...defaultJuncture,
@@ -128,6 +130,7 @@ export default function JunctureForm({
       // Check if we have a temporary image file from PositionableImage upload
       const imageFile = image || data._tempImageFile
       await createEntity(data, imageFile)
+      onJunctureCreated?.()
       handleClose()
     } catch (error) {
       handleFormErrors(error)

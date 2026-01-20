@@ -1,10 +1,11 @@
 "use client"
 
+import { useRouter, usePathname } from "next/navigation"
 import { GridView, ViewList } from "@mui/icons-material"
 import { CreateJunctureForm } from "@/components/junctures"
 import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
-import { useState } from "react"
+import { useEffect } from "react"
 
 interface MenuProps {
   viewMode: "table" | "mobile"
@@ -12,7 +13,22 @@ interface MenuProps {
 }
 
 export default function Menu({ viewMode, setViewMode }: MenuProps) {
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const router = useRouter()
+  const pathname = usePathname()
+  const drawerOpen = pathname === "/junctures/new"
+
+  useEffect(() => {
+    const handleOpenDrawerEvent = () => {
+      router.push("/junctures/new", { scroll: false })
+    }
+
+    window.addEventListener("openJunctureDrawer", handleOpenDrawerEvent)
+
+    return () => {
+      window.removeEventListener("openJunctureDrawer", handleOpenDrawerEvent)
+    }
+  }, [router])
+
   const handleToggleView = () => {
     setViewMode(viewMode === "table" ? "mobile" : "table")
   }
@@ -33,16 +49,25 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
   ]
 
   function handleOpenCreateDrawer() {
-    setDrawerOpen(true)
+    router.push("/junctures/new", { scroll: false })
   }
   function handleCloseCreateDrawer() {
-    setDrawerOpen(false)
+    router.push("/junctures", { scroll: false })
+  }
+
+  function handleJunctureCreated() {
+    // Dispatch custom event to refresh junctures list
+    window.dispatchEvent(new CustomEvent("junctureCreated"))
   }
 
   return (
     <>
       <SpeedDial actions={actions} />
-      <CreateJunctureForm open={drawerOpen} onClose={handleCloseCreateDrawer} />
+      <CreateJunctureForm
+        open={drawerOpen}
+        onClose={handleCloseCreateDrawer}
+        onJunctureCreated={handleJunctureCreated}
+      />
     </>
   )
 }
