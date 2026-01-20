@@ -373,82 +373,53 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
     // Calculate global indices for keyboard navigation
     let globalIndex = 0
 
-    const renderSection = (
-      groups: Record<string, typeof flatResults>,
-      sectionLabel?: string
-    ) => {
+    const renderSection = (groups: Record<string, typeof flatResults>) => {
       const types = ENTITY_ORDER.filter(type => groups[type]?.length > 0)
       if (types.length === 0) return null
 
       return (
-        <Box>
-          {sectionLabel && (
-            <Typography
-              variant="overline"
-              sx={{
-                color: "#d4a44a",
-                display: "block",
-                mb: 1,
-                px: 1,
-                fontWeight: "bold",
-              }}
-            >
-              {sectionLabel}
-            </Typography>
-          )}
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {types.map(type => {
-              const items = groups[type]
-              const renderedItems = items.map(({ item }) => {
-                const result = renderResultItem(type, item, globalIndex)
-                globalIndex++
-                return result
-              })
+        <>
+          {types.map(type => {
+            const items = groups[type]
+            const renderedItems = items.map(({ item }) => {
+              const result = renderResultItem(type, item, globalIndex)
+              globalIndex++
+              return result
+            })
 
-              return (
-                <Box key={type}>
-                  <Typography
-                    variant="overline"
-                    sx={{
-                      color: "#888",
-                      display: "block",
-                      mb: 1,
-                      px: 1,
-                      fontSize: "0.65rem",
-                    }}
-                  >
-                    {ENTITY_LABELS[type]}
-                  </Typography>
-                  <Box
-                    sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
-                  >
-                    {renderedItems}
-                  </Box>
+            return (
+              <Box key={type}>
+                <Typography
+                  variant="overline"
+                  sx={{
+                    color: "#888",
+                    display: "block",
+                    mb: 1,
+                    px: 1,
+                  }}
+                >
+                  {ENTITY_LABELS[type]}
+                </Typography>
+                <Box
+                  sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
+                >
+                  {renderedItems}
                 </Box>
-              )
-            })}
-          </Box>
-        </Box>
+              </Box>
+            )
+          })}
+        </>
       )
     }
-
-    const hasTitleMatches = titleMatches.length > 0
-    const hasOtherMatches = otherMatches.length > 0
 
     return (
       <Box
         role="listbox"
         aria-label="Search results"
-        sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
       >
-        {renderSection(
-          titleMatchGroups,
-          hasTitleMatches && hasOtherMatches ? "Title Matches" : undefined
-        )}
-        {renderSection(
-          otherMatchGroups,
-          hasTitleMatches && hasOtherMatches ? "Other Results" : undefined
-        )}
+        {renderSection(titleMatchGroups)}
+        {renderSection(otherMatchGroups)}
       </Box>
     )
   }
