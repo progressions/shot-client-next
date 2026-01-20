@@ -1,8 +1,8 @@
 "use client"
 import { useRouter } from "next/navigation"
-import { useEffect, useCallback, useState } from "react"
+import { useRef, useEffect, useCallback, useState } from "react"
 import { Box } from "@mui/material"
-import type { Faction, Faction, PaginationMeta } from "@/types"
+import type { Faction, PaginationMeta } from "@/types"
 import { useCampaign, useClient, useLocalStorage } from "@/contexts"
 import { FormActions, useForm } from "@/reducers"
 import { Icon, MainHeader } from "@/components/ui"
@@ -37,6 +37,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   )
   const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
   const { filters } = formState.data
+  const isInitialRender = useRef(true)
 
   const fetchFactions = useCallback(
     async filters => {
@@ -71,6 +72,10 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   }, [subscribeToEntity, fetchFactions, filters])
 
   useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false
+      return
+    }
     const url = `/factions?${queryParams(filters)}`
     router.push(url, {
       scroll: false,

@@ -1,6 +1,6 @@
 "use client"
 import { useRouter } from "next/navigation"
-import { useEffect, useCallback, useState } from "react"
+import { useRef, useEffect, useCallback, useState } from "react"
 import { Box } from "@mui/material"
 import type { Weapon, PaginationMeta } from "@/types"
 import { useCampaign, useClient, useLocalStorage } from "@/contexts"
@@ -41,6 +41,7 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   )
   const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
   const { filters } = formState.data
+  const isInitialRender = useRef(true)
 
   const fetchWeapons = useCallback(
     async filters => {
@@ -85,6 +86,10 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   }, [subscribeToEntity, fetchWeapons, filters])
 
   useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false
+      return
+    }
     const url = `/weapons?${queryParams(filters)}`
     router.push(url, {
       scroll: false,
