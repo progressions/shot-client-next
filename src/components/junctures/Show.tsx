@@ -86,25 +86,25 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
       <SpeedDialMenu onDelete={deleteEntity} />
       <HeroImage entity={juncture} setEntity={setJuncture} />
       <Alert status={status} />
-      <Box sx={{ mb: 1 }}>
-        <Stack
-          direction="row"
-          spacing={2}
-          alignItems="center"
-          sx={{ flexWrap: "wrap" }}
-        >
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        sx={{ my: 1, flexWrap: "wrap" }}
+      >
+        <Box sx={{ flexGrow: 1 }}>
           <NameEditor
             entity={juncture}
             setEntity={setJuncture}
             updateEntity={updateEntity}
           />
-          <EditEntityNotionLink
-            entity={juncture}
-            entityType="juncture"
-            updateEntity={setJuncture}
-          />
-        </Stack>
-      </Box>
+        </Box>
+        <EditEntityNotionLink
+          entity={juncture}
+          entityType="juncture"
+          updateEntity={setJuncture}
+        />
+      </Stack>
       <Box sx={{ mb: 2 }}>
         <SectionHeader title="Faction" icon={<Icon keyword="Factions" />}>
           A <InfoLink href="/junctures" info="Juncture" /> belongs to a{" "}
