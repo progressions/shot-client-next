@@ -95,6 +95,13 @@ export function GlobalHotkeys() {
       })
     )
 
+    cleanups.push(
+      registerHotkey("g+g", () => router.push("/campaigns"), {
+        description: "Go to Campaigns",
+        category: "Navigation",
+      })
+    )
+
     // N (New) commands - navigate to create pages
     cleanups.push(
       registerHotkey("n+a", () => router.push("/adventures/new"), {
@@ -157,6 +164,23 @@ export function GlobalHotkeys() {
         description: "New Faction",
         category: "Create New",
       })
+    )
+
+    cleanups.push(
+      registerHotkey(
+        "n+g",
+        () => {
+          router.push("/campaigns")
+          // Dispatch event after a short delay to allow page to load
+          setTimeout(() => {
+            window.dispatchEvent(new CustomEvent("openCampaignDrawer"))
+          }, 100)
+        },
+        {
+          description: "New Campaign",
+          category: "Create New",
+        }
+      )
     )
 
     // Register ? for help (description only - handling is in context)
