@@ -1,11 +1,12 @@
 "use client"
 
+import { useRouter, usePathname } from "next/navigation"
 import { GridView, ViewList } from "@mui/icons-material"
 import { CreateFightForm } from "@/components/fights"
 import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
 import { defaultFight } from "@/types"
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 
 interface MenuProps {
   viewMode: "table" | "mobile"
@@ -13,12 +14,14 @@ interface MenuProps {
 }
 
 export default function Menu({ viewMode, setViewMode }: MenuProps) {
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const router = useRouter()
+  const pathname = usePathname()
+  const drawerOpen = pathname === "/fights/new"
 
   // Listen for onboarding CTA events to open fight drawer
   useEffect(() => {
     const handleOpenDrawerEvent = () => {
-      setDrawerOpen(true)
+      router.push("/fights/new", { scroll: false })
     }
 
     window.addEventListener("openFightDrawer", handleOpenDrawerEvent)
@@ -26,7 +29,7 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
     return () => {
       window.removeEventListener("openFightDrawer", handleOpenDrawerEvent)
     }
-  }, [])
+  }, [router])
 
   const handleToggleView = () => {
     setViewMode(viewMode === "table" ? "mobile" : "table")
@@ -50,13 +53,13 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
   const defaultEntity = defaultFight
 
   function handleOpenCreateDrawer() {
-    setDrawerOpen(true)
+    router.push("/fights/new", { scroll: false })
   }
   function handleCloseCreateDrawer() {
-    setDrawerOpen(false)
+    router.push("/fights", { scroll: false })
   }
   function handleSave() {
-    setDrawerOpen(false)
+    router.push("/fights", { scroll: false })
   }
 
   return (

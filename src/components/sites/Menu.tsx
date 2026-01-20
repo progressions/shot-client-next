@@ -1,10 +1,11 @@
 "use client"
 
+import { useRouter, usePathname } from "next/navigation"
 import { GridView, ViewList } from "@mui/icons-material"
 import { CreateSiteForm } from "@/components/sites"
 import { SpeedDial, actions as initialActions } from "@/components/ui"
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1"
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 
 interface MenuProps {
   viewMode: "table" | "mobile"
@@ -12,12 +13,14 @@ interface MenuProps {
 }
 
 export default function Menu({ viewMode, setViewMode }: MenuProps) {
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const router = useRouter()
+  const pathname = usePathname()
+  const drawerOpen = pathname === "/sites/new"
 
   // Listen for onboarding CTA events to open site drawer
   useEffect(() => {
     const handleOpenDrawerEvent = () => {
-      setDrawerOpen(true)
+      router.push("/sites/new", { scroll: false })
     }
 
     window.addEventListener("openSiteDrawer", handleOpenDrawerEvent)
@@ -25,7 +28,7 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
     return () => {
       window.removeEventListener("openSiteDrawer", handleOpenDrawerEvent)
     }
-  }, [])
+  }, [router])
 
   const handleToggleView = () => {
     setViewMode(viewMode === "table" ? "mobile" : "table")
@@ -47,10 +50,10 @@ export default function Menu({ viewMode, setViewMode }: MenuProps) {
   ]
 
   function handleOpenCreateDrawer() {
-    setDrawerOpen(true)
+    router.push("/sites/new", { scroll: false })
   }
   function handleCloseCreateDrawer() {
-    setDrawerOpen(false)
+    router.push("/sites", { scroll: false })
   }
 
   return (
