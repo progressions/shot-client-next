@@ -1,6 +1,6 @@
 "use client"
 import { useRouter } from "next/navigation"
-import { useEffect, useCallback, useState } from "react"
+import { useEffect, useCallback, useState, useRef } from "react"
 import { Box } from "@mui/material"
 import type { Campaign, Faction, PaginationMeta } from "@/types"
 import { useCampaign, useClient, useLocalStorage } from "@/contexts"
@@ -41,6 +41,9 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   )
   const { formState, dispatchForm } = useForm<FormStateData>(initialFormData)
   const { filters } = formState.data
+
+  // Track initial render to prevent URL push on mount (which would override /campaigns/new)
+  const isInitialRender = useRef(true)
 
   const fetchCampaigns = useCallback(
     async filters => {
@@ -87,6 +90,11 @@ export default function List({ initialFormData, initialIsMobile }: ListProps) {
   }, [subscribeToEntity, fetchCampaigns, filters])
 
   useEffect(() => {
+    // Skip URL push on initial render to preserve /campaigns/new route
+    if (isInitialRender.current) {
+      isInitialRender.current = false
+      return
+    }
     const url = `/campaigns?${queryParams(filters)}`
     router.push(url, {
       scroll: false,
