@@ -53,10 +53,14 @@ jest.mock("@/lib/client", () => ({
 }))
 
 describe("LoginPage", () => {
+  let user: ReturnType<typeof userEvent.setup>
+
   beforeEach(() => {
     jest.clearAllMocks()
     mockSearchParams.delete("redirect")
     mockSearchParams.delete("error")
+    // Setup userEvent with delay disabled for faster tests
+    user = userEvent.setup({ delay: null })
   })
 
   describe("Tab Navigation", () => {
@@ -97,8 +101,9 @@ describe("LoginPage", () => {
       const emailInput = screen.getByLabelText(/email address/i)
       const passwordInput = screen.getByLabelText(/password/i)
 
-      await userEvent.type(emailInput, "test@example.com")
-      await userEvent.type(passwordInput, "wrongpassword")
+      // Use fireEvent.change for faster input simulation
+      fireEvent.change(emailInput, { target: { value: "test@example.com" } })
+      fireEvent.change(passwordInput, { target: { value: "wrongpassword" } })
 
       const submitButton = screen.getByRole("button", { name: /sign in/i })
       await act(async () => {
@@ -134,7 +139,7 @@ describe("LoginPage", () => {
       })
 
       const emailInput = screen.getByLabelText(/email address/i)
-      await userEvent.type(emailInput, "test@example.com")
+      fireEvent.change(emailInput, { target: { value: "test@example.com" } })
 
       const sendButton = screen.getByRole("button", {
         name: /send login code/i,
@@ -186,8 +191,8 @@ describe("LoginPage", () => {
       const emailInput = screen.getByLabelText(/email address/i)
       const passwordInput = screen.getByLabelText(/password/i)
 
-      await userEvent.type(emailInput, "test@example.com")
-      await userEvent.type(passwordInput, "correctpassword")
+      fireEvent.change(emailInput, { target: { value: "test@example.com" } })
+      fireEvent.change(passwordInput, { target: { value: "correctpassword" } })
 
       const submitButton = screen.getByRole("button", { name: /sign in/i })
       fireEvent.click(submitButton)
@@ -215,8 +220,8 @@ describe("LoginPage", () => {
       const emailInput = screen.getByLabelText(/email address/i)
       const passwordInput = screen.getByLabelText(/password/i)
 
-      await userEvent.type(emailInput, "test@example.com")
-      await userEvent.type(passwordInput, "wrongpassword")
+      fireEvent.change(emailInput, { target: { value: "test@example.com" } })
+      fireEvent.change(passwordInput, { target: { value: "wrongpassword" } })
 
       const submitButton = screen.getByRole("button", { name: /sign in/i })
       await act(async () => {
@@ -245,8 +250,10 @@ describe("LoginPage", () => {
       const emailInput = screen.getByLabelText(/email address/i)
       const passwordInput = screen.getByLabelText(/password/i)
 
-      await userEvent.type(emailInput, "unconfirmed@example.com")
-      await userEvent.type(passwordInput, "password123")
+      fireEvent.change(emailInput, {
+        target: { value: "unconfirmed@example.com" },
+      })
+      fireEvent.change(passwordInput, { target: { value: "password123" } })
 
       const submitButton = screen.getByRole("button", { name: /sign in/i })
       await act(async () => {
@@ -284,8 +291,10 @@ describe("LoginPage", () => {
       const emailInput = screen.getByLabelText(/email address/i)
       const passwordInput = screen.getByLabelText(/password/i)
 
-      await userEvent.type(emailInput, "unconfirmed@example.com")
-      await userEvent.type(passwordInput, "password123")
+      fireEvent.change(emailInput, {
+        target: { value: "unconfirmed@example.com" },
+      })
+      fireEvent.change(passwordInput, { target: { value: "password123" } })
 
       const submitButton = screen.getByRole("button", { name: /sign in/i })
       await act(async () => {
@@ -326,8 +335,8 @@ describe("LoginPage", () => {
       const emailInput = screen.getByLabelText(/email address/i)
       const passwordInput = screen.getByLabelText(/password/i)
 
-      await userEvent.type(emailInput, "test@example.com")
-      await userEvent.type(passwordInput, "password123")
+      fireEvent.change(emailInput, { target: { value: "test@example.com" } })
+      fireEvent.change(passwordInput, { target: { value: "password123" } })
 
       const submitButton = screen.getByRole("button", { name: /sign in/i })
       fireEvent.click(submitButton)
@@ -353,7 +362,7 @@ describe("LoginPage", () => {
       await setupOtpTab()
 
       const emailInput = screen.getByLabelText(/email address/i)
-      await userEvent.type(emailInput, "test@example.com")
+      fireEvent.change(emailInput, { target: { value: "test@example.com" } })
 
       const sendButton = screen.getByRole("button", {
         name: /send login code/i,
@@ -379,7 +388,7 @@ describe("LoginPage", () => {
       await setupOtpTab()
 
       const emailInput = screen.getByLabelText(/email address/i)
-      await userEvent.type(emailInput, "test@example.com")
+      fireEvent.change(emailInput, { target: { value: "test@example.com" } })
 
       const sendButton = screen.getByRole("button", {
         name: /send login code/i,
@@ -401,7 +410,7 @@ describe("LoginPage", () => {
       await setupOtpTab()
 
       const emailInput = screen.getByLabelText(/email address/i)
-      await userEvent.type(emailInput, "test@example.com")
+      fireEvent.change(emailInput, { target: { value: "test@example.com" } })
 
       const sendButton = screen.getByRole("button", {
         name: /send login code/i,
@@ -423,7 +432,7 @@ describe("LoginPage", () => {
       await setupOtpTab()
 
       const emailInput = screen.getByLabelText(/email address/i)
-      await userEvent.type(emailInput, "test@example.com")
+      fireEvent.change(emailInput, { target: { value: "test@example.com" } })
 
       const sendButton = screen.getByRole("button", {
         name: /send login code/i,
@@ -450,7 +459,7 @@ describe("LoginPage", () => {
       })
 
       const emailInput = screen.getByLabelText(/email address/i)
-      await userEvent.type(emailInput, "test@example.com")
+      fireEvent.change(emailInput, { target: { value: "test@example.com" } })
 
       const sendButton = screen.getByRole("button", {
         name: /send login code/i,
@@ -460,19 +469,13 @@ describe("LoginPage", () => {
       })
 
       // Wait for the OTP request to complete and UI to transition
-      await waitFor(
-        () => {
-          expect(
-            screen.getByText(/enter the 6-digit code/i)
-          ).toBeInTheDocument()
-        },
-        { timeout: 3000 }
-      )
+      await waitFor(() => {
+        expect(screen.getByText(/enter the 6-digit code/i)).toBeInTheDocument()
+      })
     }
 
     // Helper function to fill OTP inputs by pasting the code
     const fillOtpInputs = async (code: string) => {
-      const user = userEvent.setup()
       const digit1 = screen.getByLabelText("Digit 1 of 6")
       await user.click(digit1)
       await user.paste(code)
@@ -543,14 +546,11 @@ describe("LoginPage", () => {
         await new Promise(resolve => setTimeout(resolve, 100))
       })
 
-      await waitFor(
-        () => {
-          expect(screen.getByRole("alert")).toHaveTextContent(
-            "Invalid or expired code"
-          )
-        },
-        { timeout: 3000 }
-      )
+      await waitFor(() => {
+        expect(screen.getByRole("alert")).toHaveTextContent(
+          "Invalid or expired code"
+        )
+      })
     })
 
     it("only allows numeric input in OTP field", async () => {
@@ -651,8 +651,8 @@ describe("LoginPage", () => {
       const emailInput = screen.getByLabelText(/email address/i)
       const passwordInput = screen.getByLabelText(/password/i)
 
-      await userEvent.type(emailInput, "test@example.com")
-      await userEvent.type(passwordInput, "correctpassword")
+      fireEvent.change(emailInput, { target: { value: "test@example.com" } })
+      fireEvent.change(passwordInput, { target: { value: "correctpassword" } })
 
       const submitButton = screen.getByRole("button", { name: /sign in/i })
       fireEvent.click(submitButton)
