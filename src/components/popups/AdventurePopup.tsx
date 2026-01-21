@@ -4,13 +4,14 @@ import { defaultAdventure } from "@/types"
 import { useState, useEffect } from "react"
 import { RichTextRenderer } from "@/components/editor"
 import { EntityAvatar } from "@/components/avatars"
-import { useClient } from "@/contexts"
+import { useClient, useCampaign } from "@/contexts"
 import { MembersGroup } from "../ui/MembersGroup"
 import AdventureLink from "../ui/links/AdventureLink"
 import { isPlayerForCampaign } from "@/lib/permissions"
 
 export default function AdventurePopup({ id }: PopupProps) {
   const { user, client } = useClient()
+  const { campaign } = useCampaign()
   const [adventure, setAdventure] = useState<Adventure>(defaultAdventure)
 
   useEffect(() => {
@@ -48,7 +49,7 @@ export default function AdventurePopup({ id }: PopupProps) {
     )
   }
 
-  const isPlayer = isPlayerForCampaign(user)
+  const isPlayer = isPlayerForCampaign(user, campaign)
   const isRestrictedView = adventure.restricted_view === true
 
   // Player view - shows limited information

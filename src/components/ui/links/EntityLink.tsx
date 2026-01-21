@@ -5,7 +5,7 @@ import type { Entity } from "@/types"
 import pluralize from "pluralize"
 import dynamic from "next/dynamic"
 import { sluggedPath } from "@/lib/slug"
-import { useClient } from "@/contexts"
+import { useClient, useCampaign } from "@/contexts"
 import { isPlayerForCampaign } from "@/lib/permissions"
 
 // Dynamically import popup components to avoid loading all upfront
@@ -176,6 +176,7 @@ export default function EntityLink({
   const openTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const { user } = useClient()
+  const { campaign } = useCampaign()
 
   const handleMouseEnterLink = useCallback(
     (event: MouseEvent<HTMLAnchorElement>) => {
@@ -261,7 +262,7 @@ export default function EntityLink({
   // Check if this entity type is popup-only (no dedicated page to navigate to)
   // Adventures are popup-only for players (non-GM users)
   const isAdventureForPlayer =
-    entity.entity_class === "Adventure" && isPlayerForCampaign(user)
+    entity.entity_class === "Adventure" && isPlayerForCampaign(user, campaign)
   const isPopupOnly =
     popupOnlyEntityTypes.has(entity.entity_class) || isAdventureForPlayer
 
