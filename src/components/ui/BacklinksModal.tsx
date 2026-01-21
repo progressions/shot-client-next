@@ -4,7 +4,7 @@ import { useState, useCallback } from "react"
 import { Button, Stack } from "@mui/material"
 import { Icon } from "@/components/ui/Icon"
 import BacklinksPanel from "@/components/ui/BacklinksPanel"
-import DialogBox from "@/components/ui/DialogBox"
+import { DialogBox } from "@/components/ui/DialogBox"
 
 type BacklinksModalProps = {
   entityId: string
@@ -60,6 +60,8 @@ export default function BacklinksModal({
           entityId={entityId}
           entityType={entityType}
           fetchBacklinks={fetchBacklinks}
+          showHeader={false}
+          showCountChip={false}
         />
       </DialogBox>
     </>

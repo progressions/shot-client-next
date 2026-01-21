@@ -9,12 +9,16 @@ type BacklinksPanelProps = {
   entityId: string
   entityType: string
   fetchBacklinks: (entityType: string, id: string) => Promise<Backlink[]>
+  showHeader?: boolean
+  showCountChip?: boolean
 }
 
 export function BacklinksPanel({
   entityId,
   entityType,
   fetchBacklinks,
+  showHeader = true,
+  showCountChip = true,
 }: BacklinksPanelProps) {
   const [backlinks, setBacklinks] = useState<Backlink[]>([])
   const [loading, setLoading] = useState(false)
@@ -50,12 +54,20 @@ export function BacklinksPanel({
         background: theme.palette.background.paper,
       })}
     >
-      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
-        <Typography variant="h6" component="div">
-          Backlinks
-        </Typography>
-        <Chip label={items.length} size="small" />
-      </Stack>
+      {showHeader && (
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
+          <Typography variant="h6" component="div">
+            Backlinks
+          </Typography>
+          {showCountChip && <Chip label={items.length} size="small" />}
+        </Stack>
+      )}
+
+      {!showHeader && showCountChip && (
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+          <Chip label={items.length} size="small" />
+        </Stack>
+      )}
 
       {loading ? (
         <Stack direction="row" spacing={1} alignItems="center">
