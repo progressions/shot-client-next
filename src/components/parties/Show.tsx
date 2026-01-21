@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { FormControl, FormHelperText, Stack, Box } from "@mui/material"
 import type { Party } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
@@ -14,6 +14,7 @@ import {
   SectionHeader,
   HeroImage,
   RichDescription,
+  BacklinksModal,
 } from "@/components/ui"
 import { PartySpeedDial, PartyCompositionBuilder } from "@/components/parties"
 import {
@@ -25,6 +26,7 @@ import { NotionSyncLogList } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import { EditFaction } from "@/components/factions"
+import { createBacklinksFetcher } from "@/lib/backlinks"
 
 interface ShowProperties {
   party: Party
@@ -38,7 +40,7 @@ type FormStateData = {
 
 export default function Show({ party: initialParty }: ShowProperties) {
   const { subscribeToEntity, campaign } = useCampaign()
-  const { user } = useClient()
+  const { user, client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialParty,
   })
@@ -79,6 +81,8 @@ export default function Show({ party: initialParty }: ShowProperties) {
     return unsubscribe
   }, [subscribeToEntity, initialParty.id, dispatchForm])
 
+  const fetchBacklinks = useMemo(() => createBacklinksFetcher(client), [client])
+
   return (
     <Box
       sx={{
@@ -88,6 +92,13 @@ export default function Show({ party: initialParty }: ShowProperties) {
     >
       <PartySpeedDial party={party} onDelete={deleteEntity} />
       <HeroImage entity={party} setEntity={setParty} />
+      <Box sx={{ mb: 1 }}>
+        <BacklinksModal
+          entityId={party.id}
+          entityType="party"
+          fetchBacklinks={fetchBacklinks}
+        />
+      </Box>
       <Alert status={status} />
       <Stack
         direction="row"

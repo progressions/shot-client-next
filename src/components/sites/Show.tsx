@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { FormControl, FormHelperText, Stack, Box } from "@mui/material"
 import type { Site } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
@@ -14,6 +14,7 @@ import {
   SectionHeader,
   HeroImage,
   RichDescription,
+  BacklinksModal,
 } from "@/components/ui"
 import { SiteSpeedDial } from "@/components/sites"
 import {
@@ -25,6 +26,7 @@ import { NotionSyncLogList } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import { EditFaction } from "@/components/factions"
+import { createBacklinksFetcher } from "@/lib/backlinks"
 
 interface ShowProperties {
   site: Site
@@ -38,7 +40,7 @@ type FormStateData = {
 
 export default function Show({ site: initialSite }: ShowProperties) {
   const { subscribeToEntity, campaign } = useCampaign()
-  const { user } = useClient()
+  const { user, client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialSite,
   })
@@ -83,6 +85,8 @@ export default function Show({ site: initialSite }: ShowProperties) {
     return unsubscribe
   }, [subscribeToEntity, initialSite.id, dispatchForm])
 
+  const fetchBacklinks = useMemo(() => createBacklinksFetcher(client), [client])
+
   return (
     <Box
       sx={{
@@ -92,6 +96,13 @@ export default function Show({ site: initialSite }: ShowProperties) {
     >
       <SiteSpeedDial site={site} onDelete={deleteEntity} />
       <HeroImage entity={site} setEntity={setSite} />
+      <Box sx={{ mb: 1 }}>
+        <BacklinksModal
+          entityId={site.id}
+          entityType="site"
+          fetchBacklinks={fetchBacklinks}
+        />
+      </Box>
       <Alert status={status} />
       <Stack
         direction="row"

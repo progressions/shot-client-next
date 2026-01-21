@@ -52,6 +52,10 @@ class ApiV2 {
     return id ? `${this.api()}/vehicles/${id}` : `${this.api()}/vehicles`
   }
 
+  backlinks(entityType: string, id: string): string {
+    return `${this.api()}/backlinks/${entityType}/${id}`
+  }
+
   chaseRelationships(): string {
     return `${this.api()}/chase_relationships`
   }
