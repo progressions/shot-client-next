@@ -350,7 +350,7 @@ export function useWebSocketSubscriptions({
     Object.entries(campaignData).forEach(([key, value]) => {
       console.debug("[WebSocket] Dispatching campaignData entry", key, value)
       const callbacks = entityUpdateCallbacks.current.get(key)
-      console.log(
+      console.debug(
         `🔄 AppContext: Entity '${key}' - value: ${value}, callbacks: ${callbacks?.size || 0}`
       )
 
