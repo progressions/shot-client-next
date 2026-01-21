@@ -20,6 +20,7 @@ import {
   EditableRichText,
   SectionHeader,
   RichDescription,
+  BacklinksModal,
 } from "@/components/ui"
 import {
   EntityActiveToggle,
@@ -42,7 +43,7 @@ type FormStateData = {
 
 export default function Show({ faction: initialFaction }: ShowProperties) {
   const { campaignData, campaign } = useCampaign()
-  const { user } = useClient()
+  const { user, client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialFaction,
   })
@@ -87,6 +88,16 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
     >
       <FactionSpeedDial faction={faction} onDelete={deleteEntity} />
       <HeroImage entity={faction} setEntity={setFaction} />
+      <Box sx={{ mb: 1 }}>
+        <BacklinksModal
+          entityId={faction.id}
+          entityType="faction"
+          fetchBacklinks={async (type, id) => {
+            const response = await client.getBacklinks(type, id)
+            return response.data.backlinks || []
+          }}
+        />
+      </Box>
       <Alert status={status} />
       <Stack
         direction="row"

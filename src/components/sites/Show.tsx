@@ -14,6 +14,7 @@ import {
   SectionHeader,
   HeroImage,
   RichDescription,
+  BacklinksModal,
 } from "@/components/ui"
 import { SiteSpeedDial } from "@/components/sites"
 import {
@@ -38,7 +39,7 @@ type FormStateData = {
 
 export default function Show({ site: initialSite }: ShowProperties) {
   const { subscribeToEntity, campaign } = useCampaign()
-  const { user } = useClient()
+  const { user, client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialSite,
   })
@@ -92,6 +93,16 @@ export default function Show({ site: initialSite }: ShowProperties) {
     >
       <SiteSpeedDial site={site} onDelete={deleteEntity} />
       <HeroImage entity={site} setEntity={setSite} />
+      <Box sx={{ mb: 1 }}>
+        <BacklinksModal
+          entityId={site.id}
+          entityType="site"
+          fetchBacklinks={async (type, id) => {
+            const response = await client.getBacklinks(type, id)
+            return response.data.backlinks || []
+          }}
+        />
+      </Box>
       <Alert status={status} />
       <Stack
         direction="row"

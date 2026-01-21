@@ -15,6 +15,7 @@ import {
   HeroImage,
   RichDescription,
   NumberField,
+  BacklinksModal,
 } from "@/components/ui"
 import { AdventureSpeedDial } from "@/components/adventures"
 import {
@@ -38,7 +39,7 @@ type FormStateData = {
 
 export default function Show({ adventure: initialAdventure }: ShowProperties) {
   const { subscribeToEntity, campaign } = useCampaign()
-  const { user } = useClient()
+  const { user, client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialAdventure,
   })
@@ -97,6 +98,16 @@ export default function Show({ adventure: initialAdventure }: ShowProperties) {
     >
       <AdventureSpeedDial adventure={adventure} onDelete={deleteEntity} />
       <HeroImage entity={adventure} setEntity={setAdventure} />
+      <Box sx={{ mb: 1 }}>
+        <BacklinksModal
+          entityId={adventure.id}
+          entityType="adventure"
+          fetchBacklinks={async (type, id) => {
+            const response = await client.getBacklinks(type, id)
+            return response.data.backlinks || []
+          }}
+        />
+      </Box>
       <Alert status={status} />
       <Stack
         direction="row"

@@ -13,6 +13,7 @@ import {
   SectionHeader,
   PositionableImage,
   RichDescription,
+  BacklinksModal,
 } from "@/components/ui"
 import {
   CharacterSpeedDial,
@@ -142,6 +143,16 @@ export default function Show({
         isMobile={isMobile}
         setEntity={setCharacter}
       />
+      <Box sx={{ mb: 1 }}>
+        <BacklinksModal
+          entityId={memoizedCharacter.id}
+          entityType="character"
+          fetchBacklinks={async (type, id) => {
+            const response = await client.getBacklinks(type, id)
+            return response.data.backlinks || []
+          }}
+        />
+      </Box>
       <NameEditor
         entity={memoizedCharacter}
         setEntity={setCharacter}

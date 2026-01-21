@@ -14,6 +14,7 @@ import {
   SectionHeader,
   HeroImage,
   RichDescription,
+  BacklinksModal,
 } from "@/components/ui"
 import { PartySpeedDial, PartyCompositionBuilder } from "@/components/parties"
 import {
@@ -38,7 +39,7 @@ type FormStateData = {
 
 export default function Show({ party: initialParty }: ShowProperties) {
   const { subscribeToEntity, campaign } = useCampaign()
-  const { user } = useClient()
+  const { user, client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialParty,
   })
@@ -88,6 +89,16 @@ export default function Show({ party: initialParty }: ShowProperties) {
     >
       <PartySpeedDial party={party} onDelete={deleteEntity} />
       <HeroImage entity={party} setEntity={setParty} />
+      <Box sx={{ mb: 1 }}>
+        <BacklinksModal
+          entityId={party.id}
+          entityType="party"
+          fetchBacklinks={async (type, id) => {
+            const response = await client.getBacklinks(type, id)
+            return response.data.backlinks || []
+          }}
+        />
+      </Box>
       <Alert status={status} />
       <Stack
         direction="row"

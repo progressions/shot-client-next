@@ -15,6 +15,7 @@ import {
   InfoLink,
   Icon,
   RichDescription,
+  BacklinksModal,
 } from "@/components/ui"
 import { EntityActiveToggle, EntityAtAGlanceToggle } from "@/components/common"
 import { EditEntityNotionLink } from "@/components/common"
@@ -35,7 +36,7 @@ type FormStateData = {
 
 export default function Show({ juncture: initialJuncture }: ShowProperties) {
   const { subscribeToEntity, campaign } = useCampaign()
-  const { user } = useClient()
+  const { user, client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialJuncture,
   })
@@ -85,6 +86,16 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
     >
       <SpeedDialMenu onDelete={deleteEntity} />
       <HeroImage entity={juncture} setEntity={setJuncture} />
+      <Box sx={{ mb: 1 }}>
+        <BacklinksModal
+          entityId={juncture.id}
+          entityType="juncture"
+          fetchBacklinks={async (type, id) => {
+            const response = await client.getBacklinks(type, id)
+            return response.data.backlinks || []
+          }}
+        />
+      </Box>
       <Alert status={status} />
       <Stack
         direction="row"
