@@ -20,6 +20,11 @@ export default async function AdventurePage({
   const user = await getCurrentUser()
   if (!client || !user) return <Typography>Not logged in</Typography>
 
+  // Adventures pages are GM-only - redirect players to characters page
+  if (!user.gamemaster && !user.admin) {
+    redirect("/characters")
+  }
+
   let adventure: Adventure
   try {
     const response = await client.getAdventure({ id })
