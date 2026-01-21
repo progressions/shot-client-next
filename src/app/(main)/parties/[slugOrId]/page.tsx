@@ -8,6 +8,9 @@ import { Suspense } from "react"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import { extractId, buildSluggedId, sluggedPath } from "@/lib/slug"
 
+// Force dynamic rendering to ensure fresh data on each request
+export const dynamic = "force-dynamic"
+
 type PartyPageProperties = {
   params: Promise<{ slugOrId: string }>
 }
