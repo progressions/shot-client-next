@@ -1,9 +1,6 @@
-import { Box, Stack, Typography } from "@mui/material"
 import { getServerClient } from "@/lib"
-import { AdventureBadge } from "@/components/badges"
-import Link from "next/link"
 import { Icon } from "@/components/ui"
-import { ErrorModule, ModuleHeader } from "@/components/dashboard"
+import { ErrorModule } from "@/components/dashboard"
 import AdventuresModuleClient from "./AdventuresModuleClient"
 import type { Adventure } from "@/types"
 
@@ -42,7 +39,7 @@ export default async function AdventuresModule({
     )
   }
 
-  const sizeMap = {
+  const sizeMap: Record<string, "sm" | "md" | "lg"> = {
     small: "sm",
     medium: "md",
     large: "lg",
@@ -50,37 +47,10 @@ export default async function AdventuresModule({
   const abbrevSize = sizeMap[size] || "md"
 
   return (
-    <AdventuresModuleClient>
-      <Box
-        sx={{
-          width: "100%",
-          p: 2,
-          borderRadius: 2,
-          backgroundColor: "#2d2d2d",
-        }}
-      >
-        <ModuleHeader
-          title="Your Adventures"
-          icon={<Icon keyword="Adventure" />}
-        />
-        <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
-          {adventures.map(adventure => (
-            <AdventureBadge
-              key={adventure.id}
-              adventure={adventure}
-              size={abbrevSize}
-            />
-          ))}
-        </Stack>
-        <Typography variant="body2">
-          <Link
-            href="/adventures"
-            style={{ color: "#fff", textDecoration: "underline" }}
-          >
-            All adventures
-          </Link>
-        </Typography>
-      </Box>
-    </AdventuresModuleClient>
+    <AdventuresModuleClient
+      initialAdventures={adventures}
+      userId={userId}
+      size={abbrevSize}
+    />
   )
 }
