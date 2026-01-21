@@ -218,6 +218,22 @@ export const coreConceptContents: InfoContents = {
       </>
     ),
   },
+  adventure: {
+    title: "Adventure",
+    content: (
+      <>
+        An <InfoLink href="/adventures" info="Adventure" /> is a focused
+        scenario within a <InfoLink href="/campaigns" info="Campaign" />: a
+        clear hook, vivid stakes, and a handful of pivotal scenes that propel a
+        <InfoLink href="/parties" info="Party" /> toward a goal. Each{" "}
+        <InfoLink info="Adventure" /> ties together evocative locations across
+        the <InfoLink href="/junctures" info="Junctures" />, key
+        <InfoLink href="/fights" info="Fights" />, and colorful
+        <InfoLink href="/characters" info="Characters" /> to deliver a complete
+        chapter of the <InfoLink info="Chi War" /> story.
+      </>
+    ),
+  },
   category: {
     title: "Category",
     content: (
