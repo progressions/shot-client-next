@@ -1,7 +1,13 @@
 // app/adventures/page.tsx
 import { List } from "@/components/adventures"
 import ResourcePage from "@/components/ResourcePage"
-import { requireCampaign, applyFilterDefaults, getFilterDefaults } from "@/lib"
+import {
+  requireCampaign,
+  applyFilterDefaults,
+  getFilterDefaults,
+  getCurrentUser,
+} from "@/lib"
+import { redirect } from "next/navigation"
 import type { AdventuresResponse } from "@/types"
 
 export const metadata = {
@@ -23,6 +29,12 @@ export default async function AdventuresPage({
 }) {
   // Server-side campaign check - will redirect if no campaign
   await requireCampaign()
+
+  // Adventures are GM-only - redirect players to characters page
+  const user = await getCurrentUser()
+  if (user && !user.gamemaster && !user.admin) {
+    redirect("/characters")
+  }
 
   // Get default filter values for Adventure entity
   const defaults = getFilterDefaults("Adventure")

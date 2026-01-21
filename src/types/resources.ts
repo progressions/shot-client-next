@@ -410,6 +410,8 @@ export interface Adventure extends BaseEntity {
   entity_class: "Adventure"
   created_at: string
   updated_at: string
+  // Indicates player-restricted view with limited data
+  restricted_view?: boolean
 }
 
 export interface Effect {
