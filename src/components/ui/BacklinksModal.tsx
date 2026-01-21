@@ -1,15 +1,10 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import {
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from "@mui/material"
+import { Button, Stack } from "@mui/material"
 import { Icon } from "@/components/ui/Icon"
 import BacklinksPanel from "@/components/ui/BacklinksPanel"
+import DialogBox from "@/components/ui/DialogBox"
 
 type BacklinksModalProps = {
   entityId: string
@@ -49,19 +44,24 @@ export default function BacklinksModal({
       >
         Backlinks →
       </Button>
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-        <DialogTitle>Backlinks</DialogTitle>
-        <DialogContent dividers>
-          <BacklinksPanel
-            entityId={entityId}
-            entityType={entityType}
-            fetchBacklinks={fetchBacklinks}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Close</Button>
-        </DialogActions>
-      </Dialog>
+      <DialogBox
+        open={open}
+        onClose={handleClose}
+        title="Backlinks"
+        actions={
+          <Stack direction="row" spacing={2}>
+            <Button variant="outlined" onClick={handleClose}>
+              Close
+            </Button>
+          </Stack>
+        }
+      >
+        <BacklinksPanel
+          entityId={entityId}
+          entityType={entityType}
+          fetchBacklinks={fetchBacklinks}
+        />
+      </DialogBox>
     </>
   )
 }
