@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { Stack, Box } from "@mui/material"
 import type { Faction } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
@@ -30,6 +30,7 @@ import {
 import { NotionSyncLogList } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
+import { createBacklinksFetcher } from "@/lib/backlinks"
 
 interface ShowProperties {
   faction: Faction
@@ -79,6 +80,8 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
     }
   }, [campaignData, initialFaction, setFaction])
 
+  const fetchBacklinks = useMemo(() => createBacklinksFetcher(client), [client])
+
   return (
     <Box
       sx={{
@@ -92,10 +95,7 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
         <BacklinksModal
           entityId={faction.id}
           entityType="faction"
-          fetchBacklinks={async (type, id) => {
-            const response = await client.getBacklinks(type, id)
-            return response.data.backlinks || []
-          }}
+          fetchBacklinks={fetchBacklinks}
         />
       </Box>
       <Alert status={status} />

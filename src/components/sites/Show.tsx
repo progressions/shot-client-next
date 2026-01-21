@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { FormControl, FormHelperText, Stack, Box } from "@mui/material"
 import type { Site } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
@@ -26,6 +26,7 @@ import { NotionSyncLogList } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
 import { EditFaction } from "@/components/factions"
+import { createBacklinksFetcher } from "@/lib/backlinks"
 
 interface ShowProperties {
   site: Site
@@ -84,6 +85,8 @@ export default function Show({ site: initialSite }: ShowProperties) {
     return unsubscribe
   }, [subscribeToEntity, initialSite.id, dispatchForm])
 
+  const fetchBacklinks = useMemo(() => createBacklinksFetcher(client), [client])
+
   return (
     <Box
       sx={{
@@ -97,10 +100,7 @@ export default function Show({ site: initialSite }: ShowProperties) {
         <BacklinksModal
           entityId={site.id}
           entityType="site"
-          fetchBacklinks={async (type, id) => {
-            const response = await client.getBacklinks(type, id)
-            return response.data.backlinks || []
-          }}
+          fetchBacklinks={fetchBacklinks}
         />
       </Box>
       <Alert status={status} />

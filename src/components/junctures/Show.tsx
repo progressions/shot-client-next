@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { Stack, Box } from "@mui/material"
 import type { Juncture } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
@@ -23,6 +23,7 @@ import { NotionSyncLogList } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { EditFaction } from "@/components/factions"
 import { FormActions, useForm } from "@/reducers"
+import { createBacklinksFetcher } from "@/lib/backlinks"
 
 interface ShowProperties {
   juncture: Juncture
@@ -77,6 +78,8 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
     return unsubscribe
   }, [subscribeToEntity, initialJuncture.id, dispatchForm])
 
+  const fetchBacklinks = useMemo(() => createBacklinksFetcher(client), [client])
+
   return (
     <Box
       sx={{
@@ -90,10 +93,7 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
         <BacklinksModal
           entityId={juncture.id}
           entityType="juncture"
-          fetchBacklinks={async (type, id) => {
-            const response = await client.getBacklinks(type, id)
-            return response.data.backlinks || []
-          }}
+          fetchBacklinks={fetchBacklinks}
         />
       </Box>
       <Alert status={status} />

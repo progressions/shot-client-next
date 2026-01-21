@@ -5,11 +5,12 @@ import { Button, Stack } from "@mui/material"
 import { Icon } from "@/components/ui/Icon"
 import BacklinksPanel from "@/components/ui/BacklinksPanel"
 import { DialogBox } from "@/components/ui/DialogBox"
+import type { Backlink } from "@/types"
 
 type BacklinksModalProps = {
   entityId: string
   entityType: string
-  fetchBacklinks: (entityType: string, id: string) => Promise<unknown[]>
+  fetchBacklinks: (entityType: string, id: string) => Promise<Backlink[]>
 }
 
 export default function BacklinksModal({
@@ -27,20 +28,20 @@ export default function BacklinksModal({
       <Button
         size="medium"
         variant="text"
-        endIcon={<Icon keyword="Link" size={18} color="#fff" />}
+        endIcon={<Icon keyword="Link" size={18} color="inherit" />}
         onClick={handleOpen}
-        sx={{
+        sx={theme => ({
           px: 0,
-          color: "#fff",
+          color: theme.palette.common.white,
           textTransform: "none",
           fontWeight: 500,
           gap: 0.5,
           minWidth: "auto",
           "&:hover": {
             backgroundColor: "transparent",
-            textDecoration: "underline",
+            color: theme.palette.common.white,
           },
-        }}
+        })}
       >
         Backlinks →
       </Button>

@@ -22,17 +22,22 @@ export function BacklinksPanel({
 }: BacklinksPanelProps) {
   const [backlinks, setBacklinks] = useState<Backlink[]>([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let mounted = true
     async function load() {
       setLoading(true)
+      setError(null)
       try {
         const data = await fetchBacklinks(entityType, entityId)
         if (mounted) setBacklinks(data)
       } catch (err) {
         console.error("Failed to load backlinks", err)
-        if (mounted) setBacklinks([])
+        if (mounted) {
+          setBacklinks([])
+          setError("Unable to load backlinks.")
+        }
       } finally {
         if (mounted) setLoading(false)
       }
@@ -59,13 +64,13 @@ export function BacklinksPanel({
           <Typography variant="h6" component="div">
             Backlinks
           </Typography>
-          {showCountChip && <Chip label={items.length} size="small" />}
+          {showCountChip && <Chip label={backlinks.length} size="small" />}
         </Stack>
       )}
 
       {!showHeader && showCountChip && (
         <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-          <Chip label={items.length} size="small" />
+          <Chip label={backlinks.length} size="small" />
         </Stack>
       )}
 
@@ -74,6 +79,10 @@ export function BacklinksPanel({
           <CircularProgress size={18} />
           <Typography variant="body2">Loading backlinks…</Typography>
         </Stack>
+      ) : error ? (
+        <Typography variant="body2" color="error">
+          {error}
+        </Typography>
       ) : items.length === 0 ? (
         <Typography variant="body2" color="text.secondary">
           No backlinks yet.

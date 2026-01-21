@@ -41,6 +41,7 @@ import {
   EntityAtAGlanceToggle,
   EntityTaskToggle,
 } from "@/components/common"
+import { createBacklinksFetcher } from "@/lib/backlinks"
 
 type ShowProps = {
   character: Character
@@ -125,6 +126,8 @@ export default function Show({
   const hasAdminPermission =
     user?.admin || (campaign && user?.id === campaign.gamemaster_id)
 
+  const fetchBacklinks = useMemo(() => createBacklinksFetcher(client), [client])
+
   return (
     <Box
       sx={{
@@ -147,10 +150,7 @@ export default function Show({
         <BacklinksModal
           entityId={memoizedCharacter.id}
           entityType="character"
-          fetchBacklinks={async (type, id) => {
-            const response = await client.getBacklinks(type, id)
-            return response.data.backlinks || []
-          }}
+          fetchBacklinks={fetchBacklinks}
         />
       </Box>
       <NameEditor
