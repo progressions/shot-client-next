@@ -345,7 +345,7 @@ export default function PartyCompositionBuilder({
             {selectingSlotId && (
               <CharacterFilter
                 addMember={handlePopulateSlot}
-                omit={[]}
+                omit={["search"]}
                 defaultCharacterType={(() => {
                   const slot = slots.find(s => s.id === selectingSlotId)
                   return slot?.role ? roleToCharacterType[slot.role] : null
