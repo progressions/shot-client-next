@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { FormControl, FormHelperText, Stack, Box } from "@mui/material"
 import type { Adventure } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
@@ -15,6 +15,7 @@ import {
   HeroImage,
   RichDescription,
   NumberField,
+  BacklinksModal,
 } from "@/components/ui"
 import { AdventureSpeedDial } from "@/components/adventures"
 import {
@@ -25,6 +26,7 @@ import {
 import { NotionSyncLogList } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
+import { createBacklinksFetcher } from "@/lib/backlinks"
 
 interface ShowProperties {
   adventure: Adventure
@@ -38,7 +40,7 @@ type FormStateData = {
 
 export default function Show({ adventure: initialAdventure }: ShowProperties) {
   const { subscribeToEntity, campaign } = useCampaign()
-  const { user } = useClient()
+  const { user, client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialAdventure,
   })
@@ -88,6 +90,8 @@ export default function Show({ adventure: initialAdventure }: ShowProperties) {
     return unsubscribe
   }, [subscribeToEntity, initialAdventure.id, dispatchForm])
 
+  const fetchBacklinks = useMemo(() => createBacklinksFetcher(client), [client])
+
   return (
     <Box
       sx={{
@@ -97,6 +101,13 @@ export default function Show({ adventure: initialAdventure }: ShowProperties) {
     >
       <AdventureSpeedDial adventure={adventure} onDelete={deleteEntity} />
       <HeroImage entity={adventure} setEntity={setAdventure} />
+      <Box sx={{ mb: 1 }}>
+        <BacklinksModal
+          entityId={adventure.id}
+          entityType="adventure"
+          fetchBacklinks={fetchBacklinks}
+        />
+      </Box>
       <Alert status={status} />
       <Stack
         direction="row"

@@ -36,6 +36,13 @@ export type DescriptionValues = {
   [key in DescriptionKeys]: string
 }
 
+export interface Backlink {
+  id: string
+  name: string
+  entity_class: string
+  updated_at: string
+}
+
 export interface Campaign extends BaseEntity {
   id: string
   name: string

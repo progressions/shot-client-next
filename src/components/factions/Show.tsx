@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { Stack, Box } from "@mui/material"
 import type { Faction } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
@@ -20,6 +20,7 @@ import {
   EditableRichText,
   SectionHeader,
   RichDescription,
+  BacklinksModal,
 } from "@/components/ui"
 import {
   EntityActiveToggle,
@@ -29,6 +30,7 @@ import {
 import { NotionSyncLogList } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { FormActions, useForm } from "@/reducers"
+import { createBacklinksFetcher } from "@/lib/backlinks"
 
 interface ShowProperties {
   faction: Faction
@@ -42,7 +44,7 @@ type FormStateData = {
 
 export default function Show({ faction: initialFaction }: ShowProperties) {
   const { campaignData, campaign } = useCampaign()
-  const { user } = useClient()
+  const { user, client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialFaction,
   })
@@ -78,6 +80,8 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
     }
   }, [campaignData, initialFaction, setFaction])
 
+  const fetchBacklinks = useMemo(() => createBacklinksFetcher(client), [client])
+
   return (
     <Box
       sx={{
@@ -87,6 +91,13 @@ export default function Show({ faction: initialFaction }: ShowProperties) {
     >
       <FactionSpeedDial faction={faction} onDelete={deleteEntity} />
       <HeroImage entity={faction} setEntity={setFaction} />
+      <Box sx={{ mb: 1 }}>
+        <BacklinksModal
+          entityId={faction.id}
+          entityType="faction"
+          fetchBacklinks={fetchBacklinks}
+        />
+      </Box>
       <Alert status={status} />
       <Stack
         direction="row"

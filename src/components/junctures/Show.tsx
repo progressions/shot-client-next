@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { Stack, Box } from "@mui/material"
 import type { Juncture } from "@/types"
 import { useCampaign, useClient } from "@/contexts"
@@ -15,6 +15,7 @@ import {
   InfoLink,
   Icon,
   RichDescription,
+  BacklinksModal,
 } from "@/components/ui"
 import { EntityActiveToggle, EntityAtAGlanceToggle } from "@/components/common"
 import { EditEntityNotionLink } from "@/components/common"
@@ -22,6 +23,7 @@ import { NotionSyncLogList } from "@/components/characters"
 import { useEntity } from "@/hooks"
 import { EditFaction } from "@/components/factions"
 import { FormActions, useForm } from "@/reducers"
+import { createBacklinksFetcher } from "@/lib/backlinks"
 
 interface ShowProperties {
   juncture: Juncture
@@ -35,7 +37,7 @@ type FormStateData = {
 
 export default function Show({ juncture: initialJuncture }: ShowProperties) {
   const { subscribeToEntity, campaign } = useCampaign()
-  const { user } = useClient()
+  const { user, client } = useClient()
   const { formState, dispatchForm } = useForm<FormStateData>({
     entity: initialJuncture,
   })
@@ -76,6 +78,8 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
     return unsubscribe
   }, [subscribeToEntity, initialJuncture.id, dispatchForm])
 
+  const fetchBacklinks = useMemo(() => createBacklinksFetcher(client), [client])
+
   return (
     <Box
       sx={{
@@ -85,6 +89,13 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
     >
       <SpeedDialMenu onDelete={deleteEntity} />
       <HeroImage entity={juncture} setEntity={setJuncture} />
+      <Box sx={{ mb: 1 }}>
+        <BacklinksModal
+          entityId={juncture.id}
+          entityType="juncture"
+          fetchBacklinks={fetchBacklinks}
+        />
+      </Box>
       <Alert status={status} />
       <Stack
         direction="row"

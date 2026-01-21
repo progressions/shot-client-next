@@ -22,6 +22,7 @@ import * as mediaLibrary from "@/lib/client/mediaLibraryClient"
 import * as notification from "@/lib/client/notificationClient"
 import * as notion from "@/lib/client/notionClient"
 import * as search from "@/lib/client/searchClient"
+import * as backlink from "@/lib/client/backlinkClient"
 
 interface ClientParameters {
   jwt?: string
@@ -101,5 +102,6 @@ export default function createClient(parameters: ClientParameters = {}) {
     ...notification.createNotificationClient({ jwt, apiV2, queryParams }),
     ...notion.createNotionClient({ jwt, api, apiV2, queryParams }),
     ...search.createSearchClient({ jwt, apiV2, queryParams }),
+    ...backlink.createBacklinkClient({ jwt, apiV2 }),
   }
 }
