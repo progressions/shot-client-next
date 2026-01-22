@@ -533,6 +533,7 @@ export interface Person extends BaseEntity {
   status?: string[]
   notion_page_id: string | null
   rich_description?: string | null
+  rich_description_gm_only?: string | null
   mentions?: Record<string, string[]>
   driving?: Vehicle
   wealth: string
