@@ -60,6 +60,8 @@ export default function SitesModule({
   }, [fetchSites])
 
   // Subscribe to WebSocket updates
+  // Note: Including fetchSites in deps causes resubscription on client/user change,
+  // which is acceptable as these changes are infrequent
   useEffect(() => {
     const unsubscribe = subscribeToEntity("sites", data => {
       if (data === "reload") {
@@ -115,9 +117,15 @@ export default function SitesModule({
     >
       <ModuleHeader title="Your Sites" icon={<Icon keyword="Site" />} />
       <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
-        {sites.map(site => (
-          <SiteBadge key={site.id} site={site} size={abbrevSize} />
-        ))}
+        {sites.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">
+            No sites yet. Your recently created sites will appear here.
+          </Typography>
+        ) : (
+          sites.map(site => (
+            <SiteBadge key={site.id} site={site} size={abbrevSize} />
+          ))
+        )}
       </Stack>
       <Typography variant="body2">
         <Link

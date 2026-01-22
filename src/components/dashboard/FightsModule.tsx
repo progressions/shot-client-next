@@ -60,6 +60,8 @@ export default function FightsModule({
   }, [fetchFights])
 
   // Subscribe to WebSocket updates
+  // Note: Including fetchFights in deps causes resubscription on client/user change,
+  // which is acceptable as these changes are infrequent
   useEffect(() => {
     const unsubscribe = subscribeToEntity("fights", data => {
       if (data === "reload") {
@@ -115,9 +117,22 @@ export default function FightsModule({
     >
       <ModuleHeader title="Your Fights" icon={<Icon keyword="Fights" />} />
       <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
-        {fights.map(fight => (
-          <FightBadge key={fight.id} fight={fight} size={abbrevSize} />
-        ))}
+        {fights.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">
+            No fights yet.{" "}
+            <Link
+              href="/fights/new"
+              style={{ color: "#fff", textDecoration: "underline" }}
+            >
+              Create your first fight
+            </Link>
+            .
+          </Typography>
+        ) : (
+          fights.map(fight => (
+            <FightBadge key={fight.id} fight={fight} size={abbrevSize} />
+          ))
+        )}
       </Stack>
       <Typography variant="body2">
         <Link

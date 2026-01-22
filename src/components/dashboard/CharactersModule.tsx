@@ -60,6 +60,8 @@ export default function CharactersModule({
   }, [fetchCharacters])
 
   // Subscribe to WebSocket updates
+  // Note: Including fetchCharacters in deps causes resubscription on client/user change,
+  // which is acceptable as these changes are infrequent
   useEffect(() => {
     const unsubscribe = subscribeToEntity("characters", data => {
       if (data === "reload") {
@@ -118,13 +120,26 @@ export default function CharactersModule({
         icon={<Icon keyword="Character" />}
       />
       <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
-        {characters.map(character => (
-          <CharacterBadge
-            key={character.id}
-            character={character}
-            size={abbrevSize}
-          />
-        ))}
+        {characters.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">
+            No characters yet.{" "}
+            <Link
+              href="/characters/new"
+              style={{ color: "#fff", textDecoration: "underline" }}
+            >
+              Create your first character
+            </Link>
+            .
+          </Typography>
+        ) : (
+          characters.map(character => (
+            <CharacterBadge
+              key={character.id}
+              character={character}
+              size={abbrevSize}
+            />
+          ))
+        )}
       </Stack>
       <Typography variant="body2">
         <Link

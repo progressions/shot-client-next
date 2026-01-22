@@ -60,6 +60,8 @@ export default function PartiesModule({
   }, [fetchParties])
 
   // Subscribe to WebSocket updates
+  // Note: Including fetchParties in deps causes resubscription on client/user change,
+  // which is acceptable as these changes are infrequent
   useEffect(() => {
     const unsubscribe = subscribeToEntity("parties", data => {
       if (data === "reload") {
@@ -115,9 +117,15 @@ export default function PartiesModule({
     >
       <ModuleHeader title="Your Parties" icon={<Icon keyword="Party" />} />
       <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
-        {parties.map(party => (
-          <PartyBadge key={party.id} party={party} size={abbrevSize} />
-        ))}
+        {parties.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">
+            No parties yet.
+          </Typography>
+        ) : (
+          parties.map(party => (
+            <PartyBadge key={party.id} party={party} size={abbrevSize} />
+          ))
+        )}
       </Stack>
       <Typography variant="body2">
         <Link

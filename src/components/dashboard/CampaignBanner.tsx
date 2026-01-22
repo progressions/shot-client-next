@@ -12,6 +12,15 @@ type CampaignBannerProps = {
   campaign: Campaign
 }
 
+// Type guard for campaign update messages from WebSocket
+const isCampaignUpdateMessage = (
+  data: unknown
+): data is { id: Campaign["id"] } => {
+  if (!data || typeof data !== "object") return false
+  const maybe = data as { id?: unknown }
+  return typeof maybe.id === "string"
+}
+
 export default function CampaignBanner({
   campaign: initialCampaign,
 }: CampaignBannerProps) {
@@ -37,12 +46,12 @@ export default function CampaignBanner({
   }, [client, initialCampaign.id])
 
   // Subscribe to WebSocket updates
+  // Note: Including fetchCampaign in deps causes resubscription on client/campaign change,
+  // which is acceptable as these changes are infrequent
   useEffect(() => {
     const unsubscribe = subscribeToEntity("campaign", data => {
-      if (data && typeof data === "object" && "id" in data) {
-        if (data.id === initialCampaign.id) {
-          fetchCampaign()
-        }
+      if (isCampaignUpdateMessage(data) && data.id === initialCampaign.id) {
+        fetchCampaign()
       }
     })
     return unsubscribe
