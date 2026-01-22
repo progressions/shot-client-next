@@ -1,25 +1,38 @@
+import { render, screen, waitFor, act } from "@testing-library/react"
 import FightsModule from "./FightsModule"
-import { getServerClient } from "@/lib"
 
-// Mock the dependencies
-jest.mock("@/lib", () => ({
-  getServerClient: jest.fn(),
+// Mock the contexts with stable references
+const mockGetFights = jest.fn()
+const mockSubscribeToEntity = jest.fn()
+const mockUnsubscribe = jest.fn()
+
+// Create stable client object
+const mockClient = {
+  getFights: mockGetFights,
+}
+
+jest.mock("@/contexts", () => ({
+  useClient: () => ({
+    client: mockClient,
+  }),
+  useCampaign: () => ({
+    subscribeToEntity: mockSubscribeToEntity,
+  }),
 }))
 
 jest.mock("@/components/badges", () => ({
-  FightBadge: () => <div>FightBadge</div>,
-}))
-
-jest.mock("./FightsModuleClient", () => ({
-  __esModule: true,
-  default: ({ children }: { children: React.ReactNode }) => (
-    <div>{children}</div>
+  FightBadge: ({ fight }: { fight: { id: string; name: string } }) => (
+    <div data-testid={`fight-${fight.id}`}>{fight.name}</div>
   ),
 }))
 
 jest.mock("@/components/dashboard", () => ({
-  ErrorModule: () => <div>ErrorModule</div>,
-  ModuleHeader: () => <div>ModuleHeader</div>,
+  ErrorModule: ({ message }: { message: string }) => (
+    <div data-testid="error-module">{message}</div>
+  ),
+  ModuleHeader: ({ title }: { title: string }) => (
+    <div data-testid="module-header">{title}</div>
+  ),
 }))
 
 jest.mock("@/components/ui", () => ({
@@ -29,40 +42,120 @@ jest.mock("@/components/ui", () => ({
 describe("FightsModule", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockSubscribeToEntity.mockReturnValue(mockUnsubscribe)
   })
 
   it("calls getFights with at_a_glance: true", async () => {
-    const mockGetFights = jest.fn().mockResolvedValue({
+    mockGetFights.mockResolvedValue({
       data: { fights: [] },
     })
 
-    ;(getServerClient as jest.Mock).mockResolvedValue({
-      getFights: mockGetFights,
+    await act(async () => {
+      render(<FightsModule userId="user-123" />)
     })
 
-    // Call the component as an async function
-    await FightsModule({ userId: "user-123" })
+    await waitFor(() => {
+      expect(mockGetFights).toHaveBeenCalledWith(
+        expect.objectContaining({
+          at_a_glance: true,
+          user_id: "user-123",
+        })
+      )
+    })
 
-    expect(mockGetFights).toHaveBeenCalledWith(
-      expect.objectContaining({
-        at_a_glance: true,
-        user_id: "user-123",
-      })
-    )
     const callArgs = mockGetFights.mock.calls[0]?.[0]
     expect(callArgs).not.toHaveProperty("status")
   })
 
-  it("handles errors gracefully", async () => {
-    const mockGetFights = jest.fn().mockRejectedValue(new Error("API Error"))
-
-    ;(getServerClient as jest.Mock).mockResolvedValue({
-      getFights: mockGetFights,
+  it("displays fights when loaded successfully", async () => {
+    mockGetFights.mockResolvedValue({
+      data: {
+        fights: [
+          { id: "fight-1", name: "Test Fight 1" },
+          { id: "fight-2", name: "Test Fight 2" },
+        ],
+      },
     })
 
-    const result = await FightsModule({ userId: "user-123" })
+    await act(async () => {
+      render(<FightsModule userId="user-123" />)
+    })
 
-    // It should return the ErrorModule
-    expect(result).toBeDefined()
+    // Wait for data to load and component to re-render
+    await waitFor(
+      () => {
+        expect(screen.getByTestId("fight-fight-1")).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
+
+    expect(screen.getByTestId("fight-fight-2")).toBeInTheDocument()
+  })
+
+  it("handles errors gracefully", async () => {
+    mockGetFights.mockRejectedValue(new Error("API Error"))
+
+    await act(async () => {
+      render(<FightsModule userId="user-123" />)
+    })
+
+    // Wait for error state
+    await waitFor(
+      () => {
+        expect(screen.getByTestId("error-module")).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
+  })
+
+  it("subscribes to WebSocket updates", async () => {
+    mockGetFights.mockResolvedValue({
+      data: { fights: [] },
+    })
+
+    await act(async () => {
+      render(<FightsModule userId="user-123" />)
+    })
+
+    await waitFor(() => {
+      expect(mockSubscribeToEntity).toHaveBeenCalledWith(
+        "fights",
+        expect.any(Function)
+      )
+    })
+  })
+
+  it("refetches data when WebSocket sends reload signal", async () => {
+    mockGetFights.mockResolvedValue({
+      data: { fights: [] },
+    })
+
+    // Capture the callback passed to subscribeToEntity
+    let reloadCallback: (data: string) => void = () => {}
+    mockSubscribeToEntity.mockImplementation(
+      (entity: string, callback: (data: string) => void) => {
+        if (entity === "fights") {
+          reloadCallback = callback
+        }
+        return mockUnsubscribe
+      }
+    )
+
+    await act(async () => {
+      render(<FightsModule userId="user-123" />)
+    })
+
+    await waitFor(() => {
+      expect(mockGetFights).toHaveBeenCalledTimes(1)
+    })
+
+    // Simulate WebSocket reload signal
+    await act(async () => {
+      reloadCallback("reload")
+    })
+
+    await waitFor(() => {
+      expect(mockGetFights).toHaveBeenCalledTimes(2)
+    })
   })
 })
