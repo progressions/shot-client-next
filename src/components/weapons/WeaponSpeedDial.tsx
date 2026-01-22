@@ -9,7 +9,7 @@ import type { MouseEvent, SyntheticEvent } from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import type { Weapon } from "@/types"
-import { useClient, useConfirm, useToast } from "@/contexts"
+import { useClient, useToast } from "@/contexts"
 
 type Action = {
   [key: string]: unknown
@@ -31,7 +31,6 @@ export default function WeaponSpeedDial({
   sx = {},
 }: WeaponSpeedDialProps) {
   const { client } = useClient()
-  const { confirm } = useConfirm()
   const { toastError } = useToast()
   const router = useRouter()
   const [speedDialOpen, setSpeedDialOpen] = useState(false)
@@ -46,13 +45,6 @@ export default function WeaponSpeedDial({
 
   const handleDelete = async () => {
     if (!weapon?.id) return
-    const confirmed = await confirm({
-      title: "Delete Weapon",
-      message: `Are you sure you want to delete the weapon: ${weapon.name || "Unnamed"}?`,
-      confirmText: "Delete",
-      destructive: true,
-    })
-    if (!confirmed) return
     try {
       await onDelete()
     } catch (error_) {
