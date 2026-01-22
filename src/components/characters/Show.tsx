@@ -267,6 +267,30 @@ export default function Show({
         </Box>
       )}
 
+      {hasAdminPermission && memoizedCharacter.rich_description_gm_only && (
+        <Box
+          sx={theme => ({
+            mb: 2,
+            p: 2,
+            borderRadius: 1,
+            backgroundColor: theme.palette.warning.dark,
+            border: `1px solid ${theme.palette.warning.main}`,
+          })}
+        >
+          <SectionHeader
+            title="GM Only"
+            icon={<Icon keyword="Administration" />}
+            sx={{ mb: 2, color: "warning.contrastText" }}
+          >
+            This content is only visible to gamemasters.
+          </SectionHeader>
+          <RichDescription
+            markdown={memoizedCharacter.rich_description_gm_only}
+            mentions={memoizedCharacter.mentions}
+          />
+        </Box>
+      )}
+
       {memoizedCharacter.action_values?.Type === "PC" && (
         <AdvancementsManager character={memoizedCharacter} />
       )}
