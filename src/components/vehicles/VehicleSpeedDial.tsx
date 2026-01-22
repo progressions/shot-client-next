@@ -17,7 +17,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import type { Vehicle } from "@/types"
 import { CS } from "@/services"
-import { useClient, useConfirm } from "@/contexts"
+import { useClient } from "@/contexts"
 
 type Action = {
   [key: string]: unknown
@@ -39,7 +39,6 @@ export default function VehicleSpeedDial({
   sx = {},
 }: VehicleSpeedDialProps) {
   const { client } = useClient()
-  const { confirm } = useConfirm()
   const router = useRouter()
   const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null)
   const exportMenuOpen = Boolean(exportAnchorEl)
@@ -56,13 +55,6 @@ export default function VehicleSpeedDial({
 
   const handleDelete = async () => {
     if (!vehicle?.id) return
-    const confirmed = await confirm({
-      title: "Delete Vehicle",
-      message: `Are you sure you want to delete the vehicle: ${vehicle.name || "Unnamed"}?`,
-      confirmText: "Delete",
-      destructive: true,
-    })
-    if (!confirmed) return
     try {
       if (onDelete) {
         await onDelete()

@@ -9,7 +9,7 @@ import type { MouseEvent, SyntheticEvent } from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import type { Schtick } from "@/types"
-import { useClient, useConfirm, useToast } from "@/contexts"
+import { useClient, useToast } from "@/contexts"
 
 type Action = {
   [key: string]: unknown
@@ -31,7 +31,6 @@ export default function SchtickSpeedDial({
   sx = {},
 }: SchtickSpeedDialProps) {
   const { client } = useClient()
-  const { confirm } = useConfirm()
   const { toastError } = useToast()
   const router = useRouter()
   const [speedDialOpen, setSpeedDialOpen] = useState(false)
@@ -46,13 +45,6 @@ export default function SchtickSpeedDial({
 
   const handleDelete = async () => {
     if (!schtick?.id) return
-    const confirmed = await confirm({
-      title: "Delete Schtick",
-      message: `Are you sure you want to delete the schtick: ${schtick.name || "Unnamed"}?`,
-      confirmText: "Delete",
-      destructive: true,
-    })
-    if (!confirmed) return
     try {
       await onDelete()
     } catch (error_) {
