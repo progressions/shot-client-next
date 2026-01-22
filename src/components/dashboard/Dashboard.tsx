@@ -47,24 +47,16 @@ export default async function Dashboard({
             spacing={2}
             sx={{ mb: 2 }}
           >
-            <Suspense fallback={<LoadingModule />}>
-              <FightsModule userId={user.id} />
-            </Suspense>
-            <Suspense fallback={<LoadingModule />}>
-              <CharactersModule userId={user.id} />
-            </Suspense>
+            <FightsModule userId={user.id} />
+            <CharactersModule userId={user.id} />
           </Stack>
           <Stack
             direction={{ xs: "column", sm: "row" }}
             spacing={2}
             sx={{ mb: 2 }}
           >
-            <Suspense fallback={<LoadingModule />}>
-              <PartiesModule userId={user.id} size="small" />
-            </Suspense>
-            <Suspense fallback={<LoadingModule />}>
-              <SitesModule userId={user.id} size="small" />
-            </Suspense>
+            <PartiesModule userId={user.id} size="small" />
+            <SitesModule userId={user.id} size="small" />
           </Stack>
         </>
       )}
@@ -76,9 +68,7 @@ export default async function Dashboard({
           spacing={2}
           sx={{ mb: 2 }}
         >
-          <Suspense fallback={<LoadingModule />}>
-            <CharactersModule userId={user.id} />
-          </Suspense>
+          <CharactersModule userId={user.id} />
         </Stack>
       )}
     </Box>

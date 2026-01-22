@@ -82,7 +82,8 @@ export function useAuthState({
 
     const hasValidUser = state.user.id && state.user.id !== defaultUser.id
 
-    // Only skip fetch if we have both a valid user AND a valid cached campaign
+    // Use cached campaign for immediate display, but ALWAYS verify with API
+    // to avoid stale cache causing WebSocket subscription to wrong campaign
     if (hasValidUser) {
       try {
         const cachedCampaign = localStorage.getItem(
@@ -96,10 +97,10 @@ export function useAuthState({
             normalizedCampaign.id &&
             normalizedCampaign.id !== defaultCampaign.id
           ) {
+            // Set cached campaign for immediate display but keep loading=true
+            // so WebSocket doesn't subscribe until API confirms the campaign
             setCampaign(normalizedCampaign)
-            setLoading(false)
-            hasFetched.current = true
-            return
+            // Don't return early - always verify with API to handle stale cache
           }
         }
       } catch {

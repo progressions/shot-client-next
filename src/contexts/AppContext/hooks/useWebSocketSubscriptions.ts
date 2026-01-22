@@ -31,6 +31,10 @@ interface UseWebSocketSubscriptionsProps {
   campaignId: string | undefined
   client: Client
   setCampaign: React.Dispatch<React.SetStateAction<Campaign | null>>
+  /** When true, WebSocket subscription is deferred until loading completes.
+   * This prevents subscribing with stale cached campaign data before the API
+   * confirms the actual current campaign. */
+  loading?: boolean
 }
 
 /**
@@ -50,6 +54,7 @@ export function useWebSocketSubscriptions({
   campaignId,
   client,
   setCampaign,
+  loading = false,
 }: UseWebSocketSubscriptionsProps): UseWebSocketSubscriptionsResult {
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [campaignData, setCampaignData] = useState<CampaignCableData | null>(
@@ -97,14 +102,25 @@ export function useWebSocketSubscriptions({
       {
         userId,
         campaignId,
+        loading,
         isDefaultCampaign: campaignId === defaultCampaign.id,
         shouldSubscribe: !!(
           userId &&
           campaignId &&
-          campaignId !== defaultCampaign.id
+          campaignId !== defaultCampaign.id &&
+          !loading
         ),
       }
     )
+
+    // Don't subscribe while loading - this prevents using stale cached campaign
+    // data before the API confirms the actual current campaign
+    if (loading) {
+      console.log(
+        "⏳ [AppContext] Deferring WebSocket subscription - still loading campaign data"
+      )
+      return
+    }
 
     if (!userId || !campaignId || campaignId === defaultCampaign.id) {
       console.log(
@@ -267,7 +283,7 @@ export function useWebSocketSubscriptions({
       sub.unsubscribe()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- campaignData and client intentionally omitted to prevent reconnection loops
-  }, [userId, campaignId])
+  }, [userId, campaignId, loading])
 
   // UserChannel subscription for campaign list updates and notifications
   useEffect(() => {
