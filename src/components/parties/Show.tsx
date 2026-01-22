@@ -52,6 +52,10 @@ export default function Show({ party: initialParty }: ShowProperties) {
     dispatchForm
   )
 
+  // Check permissions for administrative controls
+  const hasAdminPermission =
+    user?.admin || (campaign && user?.id === campaign.gamemaster_id)
+
   const setParty = useCallback(
     (party: Party) => {
       dispatchForm({
@@ -166,6 +170,23 @@ export default function Show({ party: initialParty }: ShowProperties) {
           />
         </Box>
       )}
+
+      {hasAdminPermission && party.rich_description_gm_only && (
+        <Box sx={{ mb: 2 }}>
+          <SectionHeader
+            title="GM Only"
+            icon={<Icon keyword="Administration" />}
+            sx={{ mb: 2 }}
+          >
+            This content is only visible to gamemasters.
+          </SectionHeader>
+          <RichDescription
+            markdown={party.rich_description_gm_only}
+            mentions={party.mentions}
+          />
+        </Box>
+      )}
+
       <Box sx={{ mb: 4 }}>
         <SectionHeader
           title="Party Composition"
@@ -197,7 +218,7 @@ export default function Show({ party: initialParty }: ShowProperties) {
           onListUpdate={updateEntity}
         />
       </Stack>
-      {(user?.admin || (campaign && user?.id === campaign.gamemaster_id)) && (
+      {hasAdminPermission && (
         <>
           <SectionHeader
             title="Administrative Controls"

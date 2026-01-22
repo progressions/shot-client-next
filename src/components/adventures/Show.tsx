@@ -52,6 +52,10 @@ export default function Show({ adventure: initialAdventure }: ShowProperties) {
     dispatchForm
   )
 
+  // Check permissions for administrative controls
+  const hasAdminPermission =
+    user?.admin || (campaign && user?.id === campaign.gamemaster_id)
+
   const setAdventure = useCallback(
     (adventure: Adventure) => {
       dispatchForm({
@@ -181,6 +185,23 @@ export default function Show({ adventure: initialAdventure }: ShowProperties) {
           />
         </Box>
       )}
+
+      {hasAdminPermission && adventure.rich_description_gm_only && (
+        <Box sx={{ mb: 2 }}>
+          <SectionHeader
+            title="GM Only"
+            icon={<Icon keyword="Administration" />}
+            sx={{ mb: 2 }}
+          >
+            This content is only visible to gamemasters.
+          </SectionHeader>
+          <RichDescription
+            markdown={adventure.rich_description_gm_only}
+            mentions={adventure.mentions}
+          />
+        </Box>
+      )}
+
       <Stack direction="column" spacing={4}>
         <Manager
           icon={<Icon keyword="Fighters" size="24" />}
@@ -224,7 +245,7 @@ export default function Show({ adventure: initialAdventure }: ShowProperties) {
           onListUpdate={updateEntity}
         />
       </Stack>
-      {(user?.admin || (campaign && user?.id === campaign.gamemaster_id)) && (
+      {hasAdminPermission && (
         <>
           <SectionHeader
             title="Administrative Controls"
