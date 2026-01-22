@@ -75,11 +75,14 @@ export function AppProvider({ children, initialUser }: AppProviderProps) {
   })
 
   // WebSocket subscriptions
+  // Pass loading state to prevent subscribing with stale cached campaign data
+  // before the API confirms the actual current campaign
   const ws = useWebSocketSubscriptions({
     userId: auth.user.id,
     campaignId: campaign?.id,
     client: auth.client,
     setCampaign,
+    loading: auth.loading,
   })
 
   const hasCampaign = Boolean(campaign?.id && campaign.id.trim() !== "")
