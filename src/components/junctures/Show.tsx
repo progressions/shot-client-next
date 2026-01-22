@@ -49,6 +49,10 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
     dispatchForm
   )
 
+  // Check permissions for administrative controls
+  const hasAdminPermission =
+    user?.admin || (campaign && user?.id === campaign.gamemaster_id)
+
   const setJuncture = useCallback(
     (juncture: Juncture) => {
       dispatchForm({
@@ -155,6 +159,22 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
         </Box>
       )}
 
+      {hasAdminPermission && juncture.rich_description_gm_only && (
+        <Box sx={{ mb: 2 }}>
+          <SectionHeader
+            title="GM Only"
+            icon={<Icon keyword="Administration" />}
+            sx={{ mb: 2 }}
+          >
+            This content is only visible to gamemasters.
+          </SectionHeader>
+          <RichDescription
+            markdown={juncture.rich_description_gm_only}
+            mentions={juncture.mentions}
+          />
+        </Box>
+      )}
+
       <Stack direction="column" spacing={2}>
         <Manager
           icon={<Icon keyword="Fighters" />}
@@ -174,7 +194,7 @@ export default function Show({ juncture: initialJuncture }: ShowProperties) {
           onListUpdate={updateEntity}
         />
       </Stack>
-      {(user?.admin || (campaign && user?.id === campaign.gamemaster_id)) && (
+      {hasAdminPermission && (
         <>
           <SectionHeader
             title="Administrative Controls"

@@ -253,6 +253,7 @@ export interface Party extends BaseEntity {
   notion_page_id?: string | null
   last_synced_to_notion_at?: string | null
   rich_description?: string | null
+  rich_description_gm_only?: string | null
   mentions?: Record<string, string[]>
 }
 
@@ -277,6 +278,7 @@ export interface Faction extends BaseEntity {
   notion_page_id?: string | null
   last_synced_to_notion_at?: string | null
   rich_description?: string | null
+  rich_description_gm_only?: string | null
   mentions?: Record<string, string[]>
 }
 
@@ -362,6 +364,7 @@ export interface Site extends BaseEntity {
   notion_page_id?: string | null
   last_synced_to_notion_at?: string | null
   rich_description?: string | null
+  rich_description_gm_only?: string | null
   mentions?: Record<string, string[]>
 }
 
@@ -380,6 +383,7 @@ export interface Juncture extends BaseEntity {
   notion_page_id?: string | null
   last_synced_to_notion_at?: string | null
   rich_description?: string | null
+  rich_description_gm_only?: string | null
   mentions?: Record<string, string[]>
 }
 
@@ -398,6 +402,7 @@ export interface Adventure extends BaseEntity {
   notion_page_id?: string | null
   last_synced_to_notion_at?: string | null
   rich_description?: string | null
+  rich_description_gm_only?: string | null
   mentions?: Record<string, string[]>
   image_url: string | null
   image_positions?: ImagePosition[]
