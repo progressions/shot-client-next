@@ -216,6 +216,7 @@ export default function Show({ party: initialParty }: ShowProperties) {
             </>
           }
           onListUpdate={updateEntity}
+          allowDuplicates={true}
         />
       </Stack>
       {hasAdminPermission && (
