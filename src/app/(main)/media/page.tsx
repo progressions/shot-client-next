@@ -13,7 +13,12 @@ export const metadata = {
 
 // Valid filter values for validation
 const VALID_STATUSES = ["all", "orphan", "attached"] as const
-const VALID_SOURCES = ["all", "upload", "ai_generated"] as const
+const VALID_SOURCES = [
+  "all",
+  "upload",
+  "ai_generated",
+  "notion_import",
+] as const
 const VALID_ENTITY_TYPES = [
   "",
   "Character",
@@ -75,7 +80,7 @@ export default async function MediaLibraryPage({
   const source =
     params.source &&
     VALID_SOURCES.includes(params.source as (typeof VALID_SOURCES)[number])
-      ? (params.source as "all" | "upload" | "ai_generated")
+      ? (params.source as "all" | "upload" | "ai_generated" | "notion_import")
       : undefined
 
   // Validate entity_type parameter
@@ -129,6 +134,7 @@ export default async function MediaLibraryPage({
     attached: 0,
     uploaded: 0,
     ai_generated: 0,
+    notion_imported: 0,
     total_size_bytes: 0,
   }
 
@@ -157,6 +163,7 @@ export default async function MediaLibraryPage({
           attached: stats?.attached ?? 0,
           uploaded: stats?.uploaded ?? 0,
           ai_generated: stats?.ai_generated ?? 0,
+          notion_imported: stats?.notion_imported ?? 0,
           total_size_bytes: stats?.total_size_bytes ?? 0,
         },
       }}

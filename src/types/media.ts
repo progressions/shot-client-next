@@ -4,7 +4,7 @@
 
 export type MediaImageStatus = "orphan" | "attached"
 
-export type MediaImageSource = "upload" | "ai_generated"
+export type MediaImageSource = "upload" | "ai_generated" | "notion_import"
 
 export type MediaImageEntityType =
   | "Adventure"
@@ -59,6 +59,7 @@ export interface MediaLibraryStats {
   attached: number
   uploaded: number
   ai_generated: number
+  notion_imported: number
   total_size_bytes: number
 }
 
