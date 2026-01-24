@@ -170,6 +170,7 @@ export default function Filter({
               <MenuItem value="all">All Sources</MenuItem>
               <MenuItem value="upload">Uploaded</MenuItem>
               <MenuItem value="ai_generated">AI Generated</MenuItem>
+              <MenuItem value="notion_import">Notion Import</MenuItem>
             </Select>
           </FormControl>
 
