@@ -28,7 +28,7 @@ export default function PartyBadge({
       )}
       {party.characters?.length === 0 && "No members yet!"}
       {party.characters?.slice(0, 3).map((character, index) => (
-        <span key={character.id}>
+        <span key={index}>
           {index > 0 && ", "}
           <CharacterLink character={character} />
         </span>
