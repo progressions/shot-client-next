@@ -4,6 +4,7 @@ import tippy from "tippy.js"
 import MentionList from "./MentionList.jsx"
 
 const suggestion = (user, client) => ({
+  allowSpaces: true,
   items: async ({ query }) => {
     if (user?.id) {
       const response = await client.getSuggestions({ query })
