@@ -351,7 +351,16 @@ export const defaultPaginationMeta: PaginationMeta = {
 }
 
 export const defaultLocation: Location = {
+  id: "",
   name: "",
+  description: "",
+  color: "",
+  image_url: "",
+  fight_id: "",
+  site_id: "",
+  copied_from_location_id: "",
+  created_at: "",
+  updated_at: "",
 }
 
 export const defaultSwerve: Swerve = {
