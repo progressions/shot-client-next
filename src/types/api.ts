@@ -13,6 +13,7 @@ import type {
   Schtick,
   CharacterJson,
 } from "@/types/resources"
+import type { Location } from "@/types/ui"
 
 /**
  * API Response Types
@@ -97,6 +98,38 @@ export interface CableData {
 export interface FightChannelMessage {
   fight?: "updated" | Fight
   users?: Viewer[]
+  // Location-related events for real-time sync
+  location_created?: LocationEventPayload
+  location_updated?: LocationEventPayload
+  location_deleted?: LocationDeletedPayload
+  shot_location_changed?: ShotLocationChangedPayload
+}
+
+/**
+ * Payload for location created/updated events
+ */
+export interface LocationEventPayload {
+  location: Location
+  timestamp: string
+}
+
+/**
+ * Payload for location deleted event
+ */
+export interface LocationDeletedPayload {
+  location_id: string
+  timestamp: string
+}
+
+/**
+ * Payload for shot location changed event
+ */
+export interface ShotLocationChangedPayload {
+  shot_id: string
+  location_id: string | null
+  location: string | null
+  location_name: string | null
+  timestamp: string
 }
 
 export interface Viewer {
