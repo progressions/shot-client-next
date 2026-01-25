@@ -358,7 +358,6 @@ export const defaultLocation: Location = {
   image_url: "",
   fight_id: "",
   site_id: "",
-  copied_from_location_id: "",
   created_at: "",
   updated_at: "",
 }

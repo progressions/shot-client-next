@@ -78,6 +78,7 @@ export default function LocationAutocomplete({
         .filter(loc =>
           loc.name.toLowerCase().includes(inputValue.toLowerCase())
         )
+        .filter(loc => !exclude.includes(loc.id || ""))
         .map(loc => ({
           label: loc.name,
           value: loc.id || "",
@@ -100,7 +101,7 @@ export default function LocationAutocomplete({
 
       return filtered
     },
-    [locations, options, allowCreate, exclude]
+    [locations, options, exclude, allowCreate]
   )
 
   const handleChange = useCallback(
