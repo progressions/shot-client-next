@@ -395,12 +395,14 @@ export function createCharacterClient(deps: ClientDependencies) {
   }
 
   async function updateShotLocation(
-    fight: Fight | Encounter,
+    _fight: Fight | Encounter,
     shotId: string,
     location: string
   ): Promise<AxiosResponse<void>> {
-    return patch(`${apiV2.fights(fight)}/shots/${shotId}`, {
-      shot: { location },
+    // Use the new set_location endpoint which creates Location records
+    // Note: _fight param kept for API compatibility but not needed by new endpoint
+    return post(apiV2.setShotLocation(shotId), {
+      location_name: location,
     })
   }
 

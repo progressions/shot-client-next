@@ -17,7 +17,6 @@ import {
   Button,
   Box,
   Typography,
-  TextField,
   Alert,
 } from "@mui/material"
 import {
@@ -44,6 +43,7 @@ import {
 import { VehicleAvatar } from "@/components/avatars"
 import CharacterEffectsDisplay from "./effects/CharacterEffectsDisplay"
 import { VehicleLink } from "@/components/ui/links"
+import { LocationAutocomplete } from "@/components/autocomplete"
 import Link from "next/link"
 import { encounterTransition } from "@/contexts/EncounterContext"
 import { useEncounter, useClient, useToast, useApp } from "@/contexts"
@@ -237,6 +237,11 @@ export default function CharacterDetail({
     try {
       // Update the shot location
       await client.updateShotLocation(encounter, character.shot_id, newLocation)
+      // Update local state immediately for responsive UI
+      setCharacter(prev => ({
+        ...prev,
+        location: newLocation || undefined,
+      }))
       toastSuccess(`Updated location for ${character.name}`)
       setLocationDialogOpen(false)
     } catch (error) {
@@ -598,25 +603,13 @@ export default function CharacterDetail({
             <Typography variant="body2" sx={{ mb: 2 }}>
               Where is {character.name}?
             </Typography>
-            <TextField
-              autoFocus
-              fullWidth
-              label="Location"
+            <LocationAutocomplete
+              fightId={encounter.id}
               value={newLocation}
-              onChange={e => setNewLocation(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === "Enter") {
-                  e.preventDefault()
-                  handleLocationSave()
-                }
-              }}
-              inputProps={{
-                onFocus: e => {
-                  // Small delay to ensure the field is ready
-                  setTimeout(() => e.target.select(), 0)
-                },
-              }}
-              placeholder="e.g., Behind cover, On the roof, In the car"
+              onChange={value => setNewLocation(value || "")}
+              allowCreate={true}
+              allowNone={true}
+              label="Location"
             />
           </Box>
         </DialogContent>
