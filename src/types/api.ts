@@ -124,15 +124,12 @@ export interface LocationDeletedPayload {
 /**
  * Payload for shot location changed event.
  *
- * Contains both the new Location model reference (location_id, location_name)
- * and the legacy location string field for backward compatibility during migration.
+ * Contains the Location model reference (location_id, location_name).
  */
 export interface ShotLocationChangedPayload {
   shot_id: string
   /** ID of the Location model record, or null if unset */
   location_id: string | null
-  /** Legacy location string field (deprecated, use location_name) */
-  location: string | null
   /** Name from the Location model, or null if no location set */
   location_name: string | null
   timestamp: string
