@@ -76,10 +76,52 @@ export interface ImagePosition {
  * Game UI Specific Types
  */
 
+/**
+ * Location represents a named area within a fight or site.
+ * Characters and vehicles can be assigned to locations during combat.
+ */
 export interface Location {
   id?: string
   name: string
-  shot?: Shot
+  description?: string
+  color?: string
+  image_url?: string
+  fight_id?: string
+  site_id?: string
+  copied_from_location_id?: string
+  created_at?: string
+  updated_at?: string
+}
+
+/**
+ * Response from set_location endpoint
+ */
+export interface SetLocationResponse {
+  shot: ShotWithLocation
+  created: boolean
+}
+
+/**
+ * Shot data returned from set_location endpoint
+ */
+export interface ShotWithLocation {
+  id: string
+  shot: number
+  position?: number
+  count?: number
+  color?: string
+  impairments?: number
+  location?: string
+  location_id?: string
+  location_data?: Location
+  was_rammed_or_damaged?: boolean
+  fight_id: string
+  character_id?: string
+  vehicle_id?: string
+  driver_id?: string
+  driving_id?: string
+  character?: { id: string; name: string }
+  vehicle?: { id: string; name: string }
 }
 
 export interface Shot {

@@ -15,3 +15,4 @@ export { default as PrerequisiteSchtickAutocomplete } from "@/components/autocom
 export { default as NotionPageAutocomplete } from "@/components/autocomplete/NotionPageAutocomplete"
 export { default as EntityNotionPageAutocomplete } from "@/components/autocomplete/EntityNotionPageAutocomplete"
 export { default as FightAutocomplete } from "@/components/autocomplete/FightAutocomplete"
+export { default as LocationAutocomplete } from "@/components/autocomplete/LocationAutocomplete"

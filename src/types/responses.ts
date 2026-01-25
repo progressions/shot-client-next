@@ -13,6 +13,7 @@ import type {
   Fight,
   NotionSyncLog,
 } from "./resources"
+import type { Location } from "./ui"
 import type {
   SchtickPath,
   SchtickCategory,
@@ -57,6 +58,11 @@ export interface SitesResponse {
 export interface JuncturesResponse {
   junctures: Juncture[]
   factions: Faction[]
+  meta: PaginationMeta
+}
+
+export interface LocationsResponse {
+  locations: Location[]
   meta: PaginationMeta
 }
 

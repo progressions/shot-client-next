@@ -23,6 +23,7 @@ import * as notification from "@/lib/client/notificationClient"
 import * as notion from "@/lib/client/notionClient"
 import * as search from "@/lib/client/searchClient"
 import * as backlink from "@/lib/client/backlinkClient"
+import * as location from "@/lib/client/locationClient"
 
 interface ClientParameters {
   jwt?: string
@@ -103,5 +104,6 @@ export default function createClient(parameters: ClientParameters = {}) {
     ...notion.createNotionClient({ jwt, api, apiV2, queryParams }),
     ...search.createSearchClient({ jwt, apiV2, queryParams }),
     ...backlink.createBacklinkClient({ jwt, apiV2 }),
+    ...location.createLocationClient({ jwt, api, apiV2, queryParams }),
   }
 }

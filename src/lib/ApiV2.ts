@@ -16,6 +16,7 @@ import {
   AiProvider,
   Notification,
   Adventure,
+  Location,
 } from "@/types"
 import { getEntityId } from "@/lib/entityId"
 
@@ -225,6 +226,32 @@ class ApiV2 {
       throw new Error("fightEvents requires a valid fight ID")
     }
     return `${this.api()}/fights/${fightId}/fight_events`
+  }
+
+  // Location endpoints
+  locations(location?: Location | ID): string {
+    const id = this.id(location)
+    return id ? `${this.api()}/locations/${id}` : `${this.api()}/locations`
+  }
+
+  fightLocations(fight: Fight | ID): string {
+    const fightId = this.id(fight)
+    if (!fightId) {
+      throw new Error("fightLocations requires a valid fight ID")
+    }
+    return `${this.api()}/fights/${fightId}/locations`
+  }
+
+  siteLocations(site: Site | ID): string {
+    const siteId = this.id(site)
+    if (!siteId) {
+      throw new Error("siteLocations requires a valid site ID")
+    }
+    return `${this.api()}/sites/${siteId}/locations`
+  }
+
+  setShotLocation(shotId: string): string {
+    return `${this.api()}/shots/${shotId}/set_location`
   }
 
   currentCampaign() {
