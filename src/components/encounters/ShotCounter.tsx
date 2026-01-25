@@ -16,6 +16,7 @@ import {
   CheeseItPanel,
   SpeedCheckPanel,
 } from "@/components/encounters"
+import { LocationsPanel } from "@/components/encounters/locations"
 import { useEncounter } from "@/contexts"
 import { useLocalStorage } from "@/contexts/LocalStorageContext"
 import { getAllVisibleShots } from "@/components/encounters/attacks/shotSorting"
@@ -34,6 +35,7 @@ export default function ShotCounter() {
   const upCheckPanelRef = useRef<HTMLDivElement>(null)
   const cheeseItPanelRef = useRef<HTMLDivElement>(null)
   const speedCheckPanelRef = useRef<HTMLDivElement>(null)
+  const locationsPanelRef = useRef<HTMLDivElement>(null)
   const actionBarRef = useRef<HTMLDivElement>(null)
 
   // Load the persisted setting on mount
@@ -152,6 +154,8 @@ export default function ShotCounter() {
       <MenuBar
         showHidden={showHidden}
         onShowHiddenChange={handleShowHiddenChange}
+        onViewLocations={() => handleAction("locations")}
+        locationsViewActive={activePanel === "locations"}
       />
 
       {/* Character selector below MenuBar */}
@@ -246,6 +250,12 @@ export default function ShotCounter() {
             onClose={handlePanelClose}
             onComplete={handleActionComplete}
           />
+        </Box>
+      )}
+
+      {activePanel === "locations" && (
+        <Box ref={locationsPanelRef}>
+          <LocationsPanel onClose={handlePanelClose} />
         </Box>
       )}
 

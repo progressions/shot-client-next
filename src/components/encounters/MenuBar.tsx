@@ -21,7 +21,6 @@ import {
   AddCharacter,
   AddVehicle,
   InitiativeDialog,
-  LocationsDialog,
   EndFightDialog,
   ResetFightDialog,
   FightEventsDialog,
@@ -49,11 +48,15 @@ import type { Character, Vehicle } from "@/types"
 interface MenuBarProps {
   showHidden: boolean
   onShowHiddenChange: (show: boolean) => void
+  onViewLocations?: () => void
+  locationsViewActive?: boolean
 }
 
 export default function MenuBar({
   showHidden,
   onShowHiddenChange,
+  onViewLocations,
+  locationsViewActive,
 }: MenuBarProps) {
   const theme = useTheme()
   const { encounter, updateEncounter } = useEncounter()
@@ -63,7 +66,6 @@ export default function MenuBar({
     null
   )
   const [initiativeDialogOpen, setInitiativeDialogOpen] = useState(false)
-  const [locationsDialogOpen, setLocationsDialogOpen] = useState(false)
   const [endFightDialogOpen, setEndFightDialogOpen] = useState(false)
   const [resetFightDialogOpen, setResetFightDialogOpen] = useState(false)
   const [fightEventsDialogOpen, setFightEventsDialogOpen] = useState(false)
@@ -277,16 +279,16 @@ export default function MenuBar({
             }}
           />
           <IconButton
-            onClick={() => setLocationsDialogOpen(true)}
+            onClick={() => onViewLocations?.()}
             sx={{
               color: "white",
               px: { xs: 0.5, sm: 1 },
-              backgroundColor: locationsDialogOpen
+              backgroundColor: locationsViewActive
                 ? "rgba(255, 255, 255, 0.2)"
                 : "transparent",
               borderRadius: 1,
               "&:hover": {
-                backgroundColor: locationsDialogOpen
+                backgroundColor: locationsViewActive
                   ? "rgba(255, 255, 255, 0.3)"
                   : "rgba(255, 255, 255, 0.1)",
               },
@@ -549,10 +551,6 @@ export default function MenuBar({
         characters={getAllCombatants()}
         onApply={handleApplyInitiatives}
         encounter={encounter}
-      />
-      <LocationsDialog
-        open={locationsDialogOpen}
-        onClose={() => setLocationsDialogOpen(false)}
       />
       <EndFightDialog
         open={endFightDialogOpen}

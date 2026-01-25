@@ -77,6 +77,34 @@ export interface ImagePosition {
  */
 
 /**
+ * Shot data nested within a Location response.
+ * Contains minimal character/vehicle info for display in location zones.
+ */
+export interface LocationShot {
+  id: string
+  shot: number | null
+  count?: number
+  color?: string
+  impairments?: number
+  location_id?: string
+  character_id?: string
+  vehicle_id?: string
+  character?: {
+    id: string
+    name: string
+    image_url?: string
+    character_type?: string
+    faction?: string
+    count?: number
+  }
+  vehicle?: {
+    id: string
+    name: string
+    image_url?: string
+  }
+}
+
+/**
  * Location represents a named area within a fight or site.
  * Characters and vehicles can be assigned to locations during combat.
  */
@@ -89,6 +117,16 @@ export interface Location {
   fight_id?: string
   site_id?: string
   copied_from_location_id?: string
+  /** X position for visual layout (pixels) */
+  position_x?: number
+  /** Y position for visual layout (pixels) */
+  position_y?: number
+  /** Width for visual layout (pixels) */
+  width?: number
+  /** Height for visual layout (pixels) */
+  height?: number
+  /** Shots (characters/vehicles) assigned to this location */
+  shots?: LocationShot[]
   created_at?: string
   updated_at?: string
 }
