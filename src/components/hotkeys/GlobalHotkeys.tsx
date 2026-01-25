@@ -102,6 +102,13 @@ export function GlobalHotkeys() {
       })
     )
 
+    cleanups.push(
+      registerHotkey("g+m", () => router.push("/media"), {
+        description: "Go to Media Library",
+        category: "Navigation",
+      })
+    )
+
     // N (New) commands - navigate to create pages
     cleanups.push(
       registerHotkey("n+a", () => router.push("/adventures/new"), {
