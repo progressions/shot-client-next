@@ -80,39 +80,21 @@ export default function LocationAutocomplete({
         )
         .map(loc => ({
           label: loc.name,
-          value: loc.id || "",
+          // Use the name as the value since the API expects a location name
+          // The backend will find-or-create the Location by name
+          value: loc.name,
         }))
-
-      // If allowCreate is true and there's input that doesn't match any existing location,
-      // add an option to create a new one
-      if (
-        allowCreate &&
-        inputValue.trim() &&
-        !filtered.some(
-          opt => opt.label.toLowerCase() === inputValue.toLowerCase()
-        )
-      ) {
-        filtered.push({
-          label: `Create "${inputValue.trim()}"`,
-          value: `__create__:${inputValue.trim()}`,
-        })
-      }
 
       return filtered
     },
-    [locations, options, allowCreate, exclude]
+    [locations, options, exclude]
   )
 
   const handleChange = useCallback(
     (newValue: string | null) => {
-      // Check if this is a "create new" option
-      if (newValue?.startsWith("__create__:")) {
-        const newName = newValue.replace("__create__:", "")
-        // Return the name instead of ID so the parent can handle creation
-        onChange(newName)
-      } else {
-        onChange(newValue)
-      }
+      // Pass through the location name directly
+      // The API will find-or-create the Location by name
+      onChange(newValue)
     },
     [onChange]
   )
@@ -126,6 +108,7 @@ export default function LocationAutocomplete({
       exclude={exclude}
       allowNone={allowNone}
       loading={loading}
+      freeSolo={allowCreate}
     />
   )
 }

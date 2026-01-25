@@ -210,14 +210,14 @@ export function createVehicleClient(deps: ClientDependencies) {
   }
 
   async function updateShotLocation(
-    fight: Fight | import("@/types").Encounter,
+    _fight: Fight | import("@/types").Encounter,
     shotId: string,
     location: string
   ): Promise<AxiosResponse<void>> {
-    return patch(`${apiV2.fights(fight)}/shots/${shotId}`, {
-      shot: {
-        location: location,
-      },
+    // Use the new set_location endpoint which creates Location records
+    // Note: _fight param kept for API compatibility but not needed by new endpoint
+    return post(apiV2.setShotLocation(shotId), {
+      location_name: location,
     })
   }
 

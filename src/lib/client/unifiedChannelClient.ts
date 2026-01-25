@@ -150,6 +150,12 @@ class PhoenixChannelClient implements UnifiedChannelClient {
     channel.on("character_update", options.received)
     channel.on("fight_update", options.received)
 
+    // Location-related events for real-time fight location sync
+    channel.on("location_created", options.received)
+    channel.on("location_updated", options.received)
+    channel.on("location_deleted", options.received)
+    channel.on("shot_location_changed", options.received)
+
     // Handle Phoenix lifecycle events
     channel.on("phx_error", (error: unknown) => {
       console.error(`[Phoenix] Error on channel ${topic}:`, error)
