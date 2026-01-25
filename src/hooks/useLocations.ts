@@ -36,6 +36,7 @@ export function useLocations(fightId: string | undefined): UseLocationsResult {
   const fetchLocations = useCallback(async () => {
     if (!fightId) {
       setLocations([])
+      setError(null)
       setLoading(false)
       return
     }

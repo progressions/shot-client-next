@@ -21,7 +21,6 @@ import {
   AddCharacter,
   AddVehicle,
   InitiativeDialog,
-  LocationsDialog,
   EndFightDialog,
   ResetFightDialog,
   FightEventsDialog,
@@ -67,7 +66,6 @@ export default function MenuBar({
     null
   )
   const [initiativeDialogOpen, setInitiativeDialogOpen] = useState(false)
-  const [locationsDialogOpen, setLocationsDialogOpen] = useState(false)
   const [endFightDialogOpen, setEndFightDialogOpen] = useState(false)
   const [resetFightDialogOpen, setResetFightDialogOpen] = useState(false)
   const [fightEventsDialogOpen, setFightEventsDialogOpen] = useState(false)
@@ -553,10 +551,6 @@ export default function MenuBar({
         characters={getAllCombatants()}
         onApply={handleApplyInitiatives}
         encounter={encounter}
-      />
-      <LocationsDialog
-        open={locationsDialogOpen}
-        onClose={() => setLocationsDialogOpen(false)}
       />
       <EndFightDialog
         open={endFightDialogOpen}

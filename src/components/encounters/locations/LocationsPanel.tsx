@@ -145,15 +145,30 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   }, [allCharacters])
 
   // Enrich locations with full character/vehicle data from encounter
+  // Merge objects to preserve any backend-supplied data while enriching from encounter
   const enrichedLocations = useMemo(() => {
     return locations.map(loc => ({
       ...loc,
       shots: loc.shots?.map(shot => {
         const enrichedData = characterDataMap.get(shot.id)
+        const mergedCharacter =
+          shot.character || enrichedData?.character
+            ? {
+                ...(shot.character || {}),
+                ...(enrichedData?.character || {}),
+              }
+            : undefined
+        const mergedVehicle =
+          shot.vehicle || enrichedData?.vehicle
+            ? {
+                ...(shot.vehicle || {}),
+                ...(enrichedData?.vehicle || {}),
+              }
+            : undefined
         return {
           ...shot,
-          character: enrichedData?.character,
-          vehicle: enrichedData?.vehicle,
+          character: mergedCharacter,
+          vehicle: mergedVehicle,
           shot: shot.shot ?? enrichedData?.shot ?? null,
         }
       }),
@@ -202,7 +217,9 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
 
   const handleCharacterClick = (shot: LocationShot) => {
     // TODO: In future phases, this could open character details or start drag
-    console.log("Character clicked:", shot)
+    if (process.env.NODE_ENV === "development") {
+      console.log("Character clicked:", shot)
+    }
   }
 
   if (loading) {
