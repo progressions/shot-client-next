@@ -7,8 +7,15 @@ import {
   CircularProgress,
   Alert,
   IconButton,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
 } from "@mui/material"
-import { Close as CloseIcon } from "@mui/icons-material"
+import {
+  Close as CloseIcon,
+  GridView as GridIcon,
+  Map as CanvasIcon,
+} from "@mui/icons-material"
 import { FaMapLocationDot } from "react-icons/fa6"
 import {
   DndContext,
@@ -21,9 +28,9 @@ import {
   pointerWithin,
 } from "@dnd-kit/core"
 import { useEncounter, useClient, useToast } from "@/contexts"
-import { useLocations } from "@/hooks"
+import { useLocations, useDebouncedLocationUpdate } from "@/hooks"
 import { FormActions } from "@/reducers"
-import type { LocationShot, Encounter } from "@/types"
+import type { Location, LocationShot, Encounter } from "@/types"
 import BasePanel from "../BasePanel"
 import LocationZone from "./LocationZone"
 import UnassignedZone from "./UnassignedZone"
@@ -33,11 +40,40 @@ interface LocationsPanelProps {
   onClose: () => void
 }
 
+type ViewMode = "grid" | "canvas"
+
+const CANVAS_MIN_WIDTH = 800
+const CANVAS_MIN_HEIGHT = 500
+const DEFAULT_ZONE_WIDTH = 200
+const DEFAULT_ZONE_HEIGHT = 150
+const ZONE_SPACING = 20
+const COLLISION_PADDING = 4 // Minimum gap between zones
+
+interface Rect {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+/**
+ * Check if two rectangles overlap (with optional padding)
+ */
+function rectsOverlap(a: Rect, b: Rect, padding: number = 0): boolean {
+  return !(
+    a.x + a.width + padding <= b.x ||
+    b.x + b.width + padding <= a.x ||
+    a.y + a.height + padding <= b.y ||
+    b.y + b.height + padding <= a.y
+  )
+}
+
 /**
  * LocationsPanel displays all fight locations as visual zones.
  * Characters/vehicles can be dragged between locations.
  *
  * Phase 2: Drag-and-drop support for moving characters between zones.
+ * Phase 3: Canvas mode with draggable/resizable zones.
  */
 export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   const { encounter, dispatchEncounter } = useEncounter()
@@ -45,6 +81,10 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   const { toastSuccess, toastError } = useToast()
   const fightId = encounter?.id
   const { locations, loading, error } = useLocations(fightId)
+  const { queueUpdate, flushUpdate } = useDebouncedLocationUpdate(500)
+
+  // View mode state
+  const [viewMode, setViewMode] = useState<ViewMode>("canvas")
 
   // Track the currently dragged shot for DragOverlay
   const [activeDragShot, setActiveDragShot] = useState<LocationShot | null>(
@@ -55,6 +95,11 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   // This allows instant UI updates while the API call happens in the background
   const [locationOverrides, setLocationOverrides] = useState<
     Map<string, string | null>
+  >(new Map())
+
+  // Track local position/size overrides for optimistic updates during drag/resize
+  const [positionOverrides, setPositionOverrides] = useState<
+    Map<string, { x?: number; y?: number; width?: number; height?: number }>
   >(new Map())
 
   // Configure sensors for drag-and-drop
@@ -178,36 +223,42 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     return map
   }, [allCharacters])
 
-  // Enrich locations with full character/vehicle data from encounter
-  // Merge objects to preserve any backend-supplied data while enriching from encounter
+  // Enrich locations with full character/vehicle data and position overrides
   const enrichedLocations = useMemo(() => {
-    return locations.map(loc => ({
-      ...loc,
-      shots: loc.shots?.map(shot => {
-        const enrichedData = characterDataMap.get(shot.id)
-        const mergedCharacter =
-          shot.character || enrichedData?.character
-            ? {
-                ...(shot.character || {}),
-                ...(enrichedData?.character || {}),
-              }
-            : undefined
-        const mergedVehicle =
-          shot.vehicle || enrichedData?.vehicle
-            ? {
-                ...(shot.vehicle || {}),
-                ...(enrichedData?.vehicle || {}),
-              }
-            : undefined
-        return {
-          ...shot,
-          character: mergedCharacter,
-          vehicle: mergedVehicle,
-          shot: shot.shot ?? enrichedData?.shot ?? null,
-        }
-      }),
-    }))
-  }, [locations, characterDataMap])
+    return locations.map(loc => {
+      const override = positionOverrides.get(loc.id!)
+      return {
+        ...loc,
+        position_x: override?.x ?? loc.position_x ?? 0,
+        position_y: override?.y ?? loc.position_y ?? 0,
+        width: override?.width ?? loc.width ?? DEFAULT_ZONE_WIDTH,
+        height: override?.height ?? loc.height ?? DEFAULT_ZONE_HEIGHT,
+        shots: loc.shots?.map(shot => {
+          const enrichedData = characterDataMap.get(shot.id)
+          const mergedCharacter =
+            shot.character || enrichedData?.character
+              ? {
+                  ...(shot.character || {}),
+                  ...(enrichedData?.character || {}),
+                }
+              : undefined
+          const mergedVehicle =
+            shot.vehicle || enrichedData?.vehicle
+              ? {
+                  ...(shot.vehicle || {}),
+                  ...(enrichedData?.vehicle || {}),
+                }
+              : undefined
+          return {
+            ...shot,
+            character: mergedCharacter,
+            vehicle: mergedVehicle,
+            shot: shot.shot ?? enrichedData?.shot ?? null,
+          }
+        }),
+      }
+    })
+  }, [locations, characterDataMap, positionOverrides])
 
   // Find unassigned characters (those with no location_id)
   const unassignedShots: LocationShot[] = useMemo(() => {
@@ -324,6 +375,25 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     }
   }, [enrichedLocations, unassignedShots, locationOverrides])
 
+  // Calculate canvas dimensions based on zone positions
+  const canvasDimensions = useMemo(() => {
+    let maxX = CANVAS_MIN_WIDTH
+    let maxY = CANVAS_MIN_HEIGHT
+
+    displayData.locations.forEach(loc => {
+      const right =
+        (loc.position_x ?? 0) + (loc.width ?? DEFAULT_ZONE_WIDTH) + ZONE_SPACING
+      const bottom =
+        (loc.position_y ?? 0) +
+        (loc.height ?? DEFAULT_ZONE_HEIGHT) +
+        ZONE_SPACING
+      maxX = Math.max(maxX, right)
+      maxY = Math.max(maxY, bottom)
+    })
+
+    return { width: maxX, height: maxY }
+  }, [displayData.locations])
+
   // Find a shot by its ID from all available shots
   const findShotById = useCallback(
     (shotId: string): LocationShot | null => {
@@ -366,7 +436,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     let currentLocationId: string | null = null
     for (const loc of displayData.locations) {
       if (loc.shots?.some(s => s.id === shotId)) {
-        currentLocationId = loc.id
+        currentLocationId = loc.id!
         break
       }
     }
@@ -442,6 +512,120 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     }
   }
 
+  // Check if a zone would overlap with any other zone
+  const wouldOverlap = useCallback(
+    (movingLocationId: string, newRect: Rect): boolean => {
+      for (const loc of displayData.locations) {
+        if (loc.id === movingLocationId) continue
+
+        const otherRect: Rect = {
+          x: loc.position_x ?? 0,
+          y: loc.position_y ?? 0,
+          width: loc.width ?? DEFAULT_ZONE_WIDTH,
+          height: loc.height ?? DEFAULT_ZONE_HEIGHT,
+        }
+
+        if (rectsOverlap(newRect, otherRect, COLLISION_PADDING)) {
+          return true
+        }
+      }
+      return false
+    },
+    [displayData.locations]
+  )
+
+  // Zone position change handler (optimistic update)
+  const handlePositionChange = useCallback(
+    (location: Location, position: { x: number; y: number }) => {
+      // Check for collision before allowing the move
+      const newRect: Rect = {
+        x: position.x,
+        y: position.y,
+        width: location.width ?? DEFAULT_ZONE_WIDTH,
+        height: location.height ?? DEFAULT_ZONE_HEIGHT,
+      }
+
+      if (wouldOverlap(location.id!, newRect)) {
+        // Don't allow the move - zone would overlap
+        return
+      }
+
+      setPositionOverrides(prev => {
+        const next = new Map(prev)
+        const existing = next.get(location.id!) || {}
+        next.set(location.id!, { ...existing, x: position.x, y: position.y })
+        return next
+      })
+
+      // Queue debounced save
+      queueUpdate(location, {
+        position_x: Math.round(position.x),
+        position_y: Math.round(position.y),
+      })
+    },
+    [queueUpdate, wouldOverlap]
+  )
+
+  // Zone size change handler (optimistic update)
+  const handleSizeChange = useCallback(
+    (location: Location, size: { width: number; height: number }) => {
+      // Get current position (from overrides or location)
+      const currentOverride = positionOverrides.get(location.id!)
+      const currentX = currentOverride?.x ?? location.position_x ?? 0
+      const currentY = currentOverride?.y ?? location.position_y ?? 0
+
+      // Check for collision before allowing the resize
+      const newRect: Rect = {
+        x: currentX,
+        y: currentY,
+        width: size.width,
+        height: size.height,
+      }
+
+      if (wouldOverlap(location.id!, newRect)) {
+        // Don't allow the resize - zone would overlap
+        return
+      }
+
+      setPositionOverrides(prev => {
+        const next = new Map(prev)
+        const existing = next.get(location.id!) || {}
+        next.set(location.id!, {
+          ...existing,
+          width: size.width,
+          height: size.height,
+        })
+        return next
+      })
+
+      // Queue debounced save
+      queueUpdate(location, {
+        width: Math.round(size.width),
+        height: Math.round(size.height),
+      })
+    },
+    [queueUpdate, wouldOverlap, positionOverrides]
+  )
+
+  // On drag/resize end, flush the update immediately
+  const handleZoneDragEnd = useCallback(
+    (location: Location) => {
+      if (location.id) {
+        flushUpdate(location.id)
+      }
+    },
+    [flushUpdate]
+  )
+
+  const handleViewModeChange = (
+    _: React.MouseEvent<HTMLElement>,
+    newMode: ViewMode | null
+  ) => {
+    if (newMode !== null) {
+      setViewMode(newMode)
+    }
+  }
+
   if (loading) {
     return (
       <BasePanel
@@ -482,18 +666,38 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
       borderColor="info.main"
       sx={{ position: "relative" }}
     >
-      {/* Close button */}
-      <IconButton
-        onClick={onClose}
-        size="small"
+      {/* Header controls */}
+      <Box
         sx={{
           position: "absolute",
           top: 8,
           right: 8,
+          display: "flex",
+          gap: 1,
+          alignItems: "center",
         }}
       >
-        <CloseIcon />
-      </IconButton>
+        <ToggleButtonGroup
+          value={viewMode}
+          exclusive
+          onChange={handleViewModeChange}
+          size="small"
+        >
+          <ToggleButton value="grid">
+            <Tooltip title="Grid View">
+              <GridIcon fontSize="small" />
+            </Tooltip>
+          </ToggleButton>
+          <ToggleButton value="canvas">
+            <Tooltip title="Canvas View (drag to reposition)">
+              <CanvasIcon fontSize="small" />
+            </Tooltip>
+          </ToggleButton>
+        </ToggleButtonGroup>
+        <IconButton onClick={onClose} size="small">
+          <CloseIcon />
+        </IconButton>
+      </Box>
 
       {displayData.locations.length === 0 ? (
         <Box sx={{ textAlign: "center", py: 4 }}>
@@ -512,27 +716,57 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          {/* Grid layout for locations - handles variable heights naturally */}
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: 2,
-              backgroundColor: "grey.100",
-              borderRadius: 1,
-              p: 2,
-              border: "1px solid",
-              borderColor: "divider",
-            }}
-          >
-            {displayData.locations.map(location => (
-              <LocationZone
-                key={location.id}
-                location={location}
-                onCharacterClick={handleCharacterClick}
-              />
-            ))}
-          </Box>
+          {viewMode === "grid" ? (
+            // Grid layout (original Phase 2 behavior)
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 2,
+                backgroundColor: "grey.100",
+                borderRadius: 1,
+                p: 2,
+                border: "1px solid",
+                borderColor: "divider",
+              }}
+            >
+              {displayData.locations.map(location => (
+                <LocationZone
+                  key={location.id}
+                  location={location}
+                  onCharacterClick={handleCharacterClick}
+                  isCanvasMode={false}
+                />
+              ))}
+            </Box>
+          ) : (
+            // Canvas layout (Phase 3 - draggable/resizable zones)
+            <Box
+              sx={{
+                position: "relative",
+                minWidth: canvasDimensions.width,
+                minHeight: canvasDimensions.height,
+                backgroundColor: "grey.100",
+                borderRadius: 1,
+                border: "1px solid",
+                borderColor: "divider",
+                overflow: "auto",
+              }}
+            >
+              {displayData.locations.map(location => (
+                <LocationZone
+                  key={location.id}
+                  location={location}
+                  onCharacterClick={handleCharacterClick}
+                  onPositionChange={handlePositionChange}
+                  onSizeChange={handleSizeChange}
+                  onDragEnd={handleZoneDragEnd}
+                  onResizeEnd={handleZoneDragEnd}
+                  isCanvasMode={true}
+                />
+              ))}
+            </Box>
+          )}
 
           {/* Unassigned zone below the canvas */}
           <UnassignedZone
