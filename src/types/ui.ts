@@ -132,6 +132,23 @@ export interface Location {
 }
 
 /**
+ * LocationConnection represents a visual connection between two locations.
+ * Used to show paths/relationships between zones in canvas mode.
+ */
+export interface LocationConnection {
+  id?: string
+  fight_id?: string
+  from_location_id: string
+  to_location_id: string
+  /** If true, the connection goes both ways */
+  bidirectional?: boolean
+  /** Optional label to display on the connection line */
+  label?: string
+  created_at?: string
+  updated_at?: string
+}
+
+/**
  * Response from set_location endpoint
  */
 export interface SetLocationResponse {

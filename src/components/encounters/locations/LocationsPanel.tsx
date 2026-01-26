@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState, useCallback } from "react"
+import { useMemo, useState, useCallback, useRef } from "react"
 import {
   Box,
   Typography,
@@ -17,6 +17,7 @@ import {
   GridView as GridIcon,
   Map as CanvasIcon,
   Add as AddIcon,
+  Timeline as ConnectIcon,
 } from "@mui/icons-material"
 import { FaMapLocationDot } from "react-icons/fa6"
 import {
@@ -30,14 +31,26 @@ import {
   pointerWithin,
 } from "@dnd-kit/core"
 import { useEncounter, useClient, useToast } from "@/contexts"
-import { useLocations, useDebouncedLocationUpdate } from "@/hooks"
+import {
+  useLocations,
+  useDebouncedLocationUpdate,
+  useLocationConnections,
+} from "@/hooks"
 import { FormActions } from "@/reducers"
-import type { Location, LocationShot, Encounter } from "@/types"
+import type {
+  Location,
+  LocationShot,
+  Encounter,
+  LocationConnection,
+} from "@/types"
 import BasePanel from "../BasePanel"
 import LocationZone from "./LocationZone"
 import UnassignedZone from "./UnassignedZone"
 import LocationCharacterAvatar from "./LocationCharacterAvatar"
 import LocationFormDialog from "./LocationFormDialog"
+import ConnectionsLayer from "./ConnectionsLayer"
+import ConnectionHandle from "./ConnectionHandle"
+import ConnectionPopover from "./ConnectionPopover"
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog"
 import {
   CANVAS_MIN_WIDTH,
@@ -86,10 +99,26 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   const { toastSuccess, toastError } = useToast()
   const fightId = encounter?.id
   const { locations, loading, error } = useLocations(fightId)
+  const { connections } = useLocationConnections(fightId)
   const { queueUpdate, flushUpdate } = useDebouncedLocationUpdate(500)
 
-  // View mode state - default to "grid" for backward compatibility
-  const [viewMode, setViewMode] = useState<ViewMode>("grid")
+  // View mode state - default to "canvas" for visual layout
+  const [viewMode, setViewMode] = useState<ViewMode>("canvas")
+
+  // Connection mode state
+  const [connectionMode, setConnectionMode] = useState(false)
+  const [pendingConnection, setPendingConnection] = useState<string | null>(
+    null
+  ) // from_location_id
+  const [selectedConnection, setSelectedConnection] =
+    useState<LocationConnection | null>(null)
+  const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null)
+  const [isNewConnection, setIsNewConnection] = useState(false)
+  const [previewLine, setPreviewLine] = useState<{
+    fromLocationId: string
+    toPoint: { x: number; y: number }
+  } | null>(null)
+  const canvasRef = useRef<HTMLDivElement>(null)
 
   // Track the currently dragged shot for DragOverlay
   const [activeDragShot, setActiveDragShot] = useState<LocationShot | null>(
@@ -640,8 +669,143 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   ) => {
     if (newMode !== null) {
       setViewMode(newMode)
+      // Exit connection mode when switching to grid view
+      if (newMode === "grid") {
+        setConnectionMode(false)
+        setPendingConnection(null)
+        setPreviewLine(null)
+      }
     }
   }
+
+  // Connection mode handlers
+  const toggleConnectionMode = useCallback(() => {
+    setConnectionMode(prev => {
+      if (prev) {
+        // Exiting connection mode - clear state
+        setPendingConnection(null)
+        setPreviewLine(null)
+        setSelectedConnection(null)
+      }
+      return !prev
+    })
+  }, [])
+
+  const handleConnectionHandleClick = useCallback(
+    (locationId: string, event: React.MouseEvent) => {
+      if (!connectionMode) return
+
+      if (!pendingConnection) {
+        // Start connection from this location
+        setPendingConnection(locationId)
+      } else if (pendingConnection === locationId) {
+        // Clicked same location - cancel
+        setPendingConnection(null)
+        setPreviewLine(null)
+      } else {
+        // Complete connection to this location
+        setIsNewConnection(true)
+        setSelectedConnection({
+          from_location_id: pendingConnection,
+          to_location_id: locationId,
+        })
+        setPopoverAnchor(event.currentTarget as HTMLElement)
+      }
+    },
+    [connectionMode, pendingConnection]
+  )
+
+  const handleCanvasMouseMove = useCallback(
+    (event: React.MouseEvent) => {
+      if (!connectionMode || !pendingConnection || !canvasRef.current) return
+
+      const rect = canvasRef.current.getBoundingClientRect()
+      const x = event.clientX - rect.left
+      const y = event.clientY - rect.top
+
+      setPreviewLine({
+        fromLocationId: pendingConnection,
+        toPoint: { x, y },
+      })
+    },
+    [connectionMode, pendingConnection]
+  )
+
+  const handleConnectionClick = useCallback(
+    (connection: LocationConnection) => {
+      setSelectedConnection(connection)
+      setIsNewConnection(false)
+      // Create a temporary anchor element at the click position
+      const tempAnchor = document.createElement("div")
+      tempAnchor.style.position = "fixed"
+      tempAnchor.style.left = `${window.innerWidth / 2}px`
+      tempAnchor.style.top = `${window.innerHeight / 2}px`
+      document.body.appendChild(tempAnchor)
+      setPopoverAnchor(tempAnchor)
+      // Clean up the temporary anchor when popover closes
+      setTimeout(() => {
+        if (tempAnchor.parentNode) {
+          tempAnchor.parentNode.removeChild(tempAnchor)
+        }
+      }, 100)
+    },
+    []
+  )
+
+  const handleConnectionPopoverClose = useCallback(() => {
+    setPopoverAnchor(null)
+    setSelectedConnection(null)
+    setIsNewConnection(false)
+    setPendingConnection(null)
+    setPreviewLine(null)
+  }, [])
+
+  const handleConnectionSave = useCallback(
+    async (data: { label?: string; bidirectional?: boolean }) => {
+      if (!fightId || !selectedConnection) return
+
+      try {
+        await client.createFightLocationConnection(fightId, {
+          from_location_id: selectedConnection.from_location_id,
+          to_location_id: selectedConnection.to_location_id,
+          label: data.label,
+          bidirectional: data.bidirectional,
+        })
+        toastSuccess("Connection created")
+        handleConnectionPopoverClose()
+      } catch (err) {
+        console.error("Failed to create connection:", err)
+        toastError("Failed to create connection")
+      }
+    },
+    [
+      fightId,
+      selectedConnection,
+      client,
+      toastSuccess,
+      toastError,
+      handleConnectionPopoverClose,
+    ]
+  )
+
+  const handleConnectionDelete = useCallback(async () => {
+    if (!selectedConnection?.id) return
+
+    try {
+      await client.deleteLocationConnection(selectedConnection.id)
+      toastSuccess("Connection deleted")
+      handleConnectionPopoverClose()
+    } catch (err) {
+      console.error("Failed to delete connection:", err)
+      toastError("Failed to delete connection")
+    }
+  }, [
+    selectedConnection,
+    client,
+    toastSuccess,
+    toastError,
+    handleConnectionPopoverClose,
+  ])
 
   // CRUD handlers for locations
   const handleAddLocation = () => {
@@ -804,6 +968,29 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
         >
           Add Location
         </Button>
+        {viewMode === "canvas" && (
+          <Tooltip
+            title={
+              connectionMode ? "Exit connection mode" : "Connect locations"
+            }
+          >
+            <ToggleButton
+              value="connect"
+              selected={connectionMode}
+              onChange={toggleConnectionMode}
+              size="small"
+              sx={{
+                borderColor: connectionMode ? "primary.main" : undefined,
+                backgroundColor: connectionMode ? "primary.light" : undefined,
+                "&:hover": {
+                  backgroundColor: connectionMode ? "primary.light" : undefined,
+                },
+              }}
+            >
+              <ConnectIcon fontSize="small" />
+            </ToggleButton>
+          </Tooltip>
+        )}
         <ToggleButtonGroup
           value={viewMode}
           exclusive
@@ -871,6 +1058,15 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
           ) : (
             // Canvas layout (Phase 3 - draggable/resizable zones)
             <Box
+              ref={canvasRef}
+              onMouseMove={handleCanvasMouseMove}
+              onClick={() => {
+                // Cancel pending connection when clicking on empty canvas
+                if (connectionMode && pendingConnection) {
+                  setPendingConnection(null)
+                  setPreviewLine(null)
+                }
+              }}
               sx={{
                 position: "relative",
                 minWidth: canvasDimensions.width,
@@ -878,10 +1074,23 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
                 backgroundColor: "grey.100",
                 borderRadius: 1,
                 border: "1px solid",
-                borderColor: "divider",
+                borderColor: connectionMode ? "primary.main" : "divider",
+                borderWidth: connectionMode ? 2 : 1,
                 overflow: "auto",
+                cursor: connectionMode ? "crosshair" : "default",
               }}
             >
+              {/* Connection lines layer */}
+              <ConnectionsLayer
+                connections={connections}
+                locations={displayData.locations}
+                selectedConnection={selectedConnection}
+                onConnectionClick={handleConnectionClick}
+                previewLine={previewLine}
+                width={canvasDimensions.width}
+                height={canvasDimensions.height}
+              />
+
               {displayData.locations.map(location => (
                 <LocationZone
                   key={location.id}
@@ -896,6 +1105,31 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
                   isCanvasMode={true}
                 />
               ))}
+
+              {/* Connection handles (visible only in connection mode) */}
+              {connectionMode &&
+                displayData.locations.map(location => {
+                  if (!location.id) return null
+                  const centerX =
+                    (location.position_x ?? 0) +
+                    (location.width ?? DEFAULT_ZONE_WIDTH) / 2
+                  const centerY =
+                    (location.position_y ?? 0) +
+                    (location.height ?? DEFAULT_ZONE_HEIGHT) / 2
+                  return (
+                    <ConnectionHandle
+                      key={`handle-${location.id}`}
+                      x={centerX}
+                      y={centerY}
+                      isActive={pendingConnection === location.id}
+                      onClick={() =>
+                        handleConnectionHandleClick(location.id!, {
+                          currentTarget: canvasRef.current,
+                        } as React.MouseEvent)
+                      }
+                    />
+                  )
+                })}
             </Box>
           )}
 
@@ -936,6 +1170,17 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
         title="Delete Location"
         message={`Are you sure you want to delete "${deletingLocation?.name}"? Characters in this location will be moved to Unassigned.`}
         destructive
+      />
+
+      {/* Connection popover for creating/editing connections */}
+      <ConnectionPopover
+        open={Boolean(popoverAnchor)}
+        anchorEl={popoverAnchor}
+        onClose={handleConnectionPopoverClose}
+        onSave={handleConnectionSave}
+        onDelete={!isNewConnection ? handleConnectionDelete : undefined}
+        connection={selectedConnection}
+        isNew={isNewConnection}
       />
     </BasePanel>
   )
