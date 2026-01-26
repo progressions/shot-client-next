@@ -7,8 +7,17 @@ import {
   CircularProgress,
   Alert,
   IconButton,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
+  Button,
 } from "@mui/material"
-import { Close as CloseIcon } from "@mui/icons-material"
+import {
+  Close as CloseIcon,
+  GridView as GridIcon,
+  Map as CanvasIcon,
+  Add as AddIcon,
+} from "@mui/icons-material"
 import { FaMapLocationDot } from "react-icons/fa6"
 import {
   DndContext,
@@ -21,16 +30,47 @@ import {
   pointerWithin,
 } from "@dnd-kit/core"
 import { useEncounter, useClient, useToast } from "@/contexts"
-import { useLocations } from "@/hooks"
+import { useLocations, useDebouncedLocationUpdate } from "@/hooks"
 import { FormActions } from "@/reducers"
-import type { LocationShot, Encounter } from "@/types"
+import type { Location, LocationShot, Encounter } from "@/types"
 import BasePanel from "../BasePanel"
 import LocationZone from "./LocationZone"
 import UnassignedZone from "./UnassignedZone"
 import LocationCharacterAvatar from "./LocationCharacterAvatar"
+import LocationFormDialog from "./LocationFormDialog"
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog"
+import {
+  CANVAS_MIN_WIDTH,
+  CANVAS_MIN_HEIGHT,
+  DEFAULT_ZONE_WIDTH,
+  DEFAULT_ZONE_HEIGHT,
+  ZONE_SPACING,
+  COLLISION_PADDING,
+} from "./constants"
 
 interface LocationsPanelProps {
   onClose: () => void
+}
+
+type ViewMode = "grid" | "canvas"
+
+interface Rect {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+/**
+ * Check if two rectangles overlap (with optional padding)
+ */
+function rectsOverlap(a: Rect, b: Rect, padding: number = 0): boolean {
+  return !(
+    a.x + a.width + padding <= b.x ||
+    b.x + b.width + padding <= a.x ||
+    a.y + a.height + padding <= b.y ||
+    b.y + b.height + padding <= a.y
+  )
 }
 
 /**
@@ -38,6 +78,7 @@ interface LocationsPanelProps {
  * Characters/vehicles can be dragged between locations.
  *
  * Phase 2: Drag-and-drop support for moving characters between zones.
+ * Phase 3: Canvas mode with draggable/resizable zones.
  */
 export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   const { encounter, dispatchEncounter } = useEncounter()
@@ -45,6 +86,10 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   const { toastSuccess, toastError } = useToast()
   const fightId = encounter?.id
   const { locations, loading, error } = useLocations(fightId)
+  const { queueUpdate, flushUpdate } = useDebouncedLocationUpdate(500)
+
+  // View mode state - default to "grid" for backward compatibility
+  const [viewMode, setViewMode] = useState<ViewMode>("grid")
 
   // Track the currently dragged shot for DragOverlay
   const [activeDragShot, setActiveDragShot] = useState<LocationShot | null>(
@@ -56,6 +101,19 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   const [locationOverrides, setLocationOverrides] = useState<
     Map<string, string | null>
   >(new Map())
+
+  // Track local position/size overrides for optimistic updates during drag/resize
+  const [positionOverrides, setPositionOverrides] = useState<
+    Map<string, { x?: number; y?: number; width?: number; height?: number }>
+  >(new Map())
+
+  // Dialog state for add/edit/delete
+  const [formDialogOpen, setFormDialogOpen] = useState(false)
+  const [editingLocation, setEditingLocation] = useState<Location | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [deletingLocation, setDeletingLocation] = useState<Location | null>(
+    null
+  )
 
   // Configure sensors for drag-and-drop
   const sensors = useSensors(
@@ -178,36 +236,42 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     return map
   }, [allCharacters])
 
-  // Enrich locations with full character/vehicle data from encounter
-  // Merge objects to preserve any backend-supplied data while enriching from encounter
+  // Enrich locations with full character/vehicle data and position overrides
   const enrichedLocations = useMemo(() => {
-    return locations.map(loc => ({
-      ...loc,
-      shots: loc.shots?.map(shot => {
-        const enrichedData = characterDataMap.get(shot.id)
-        const mergedCharacter =
-          shot.character || enrichedData?.character
-            ? {
-                ...(shot.character || {}),
-                ...(enrichedData?.character || {}),
-              }
-            : undefined
-        const mergedVehicle =
-          shot.vehicle || enrichedData?.vehicle
-            ? {
-                ...(shot.vehicle || {}),
-                ...(enrichedData?.vehicle || {}),
-              }
-            : undefined
-        return {
-          ...shot,
-          character: mergedCharacter,
-          vehicle: mergedVehicle,
-          shot: shot.shot ?? enrichedData?.shot ?? null,
-        }
-      }),
-    }))
-  }, [locations, characterDataMap])
+    return locations.map(loc => {
+      const override = loc.id ? positionOverrides.get(loc.id) : undefined
+      return {
+        ...loc,
+        position_x: override?.x ?? loc.position_x ?? 0,
+        position_y: override?.y ?? loc.position_y ?? 0,
+        width: override?.width ?? loc.width ?? DEFAULT_ZONE_WIDTH,
+        height: override?.height ?? loc.height ?? DEFAULT_ZONE_HEIGHT,
+        shots: loc.shots?.map(shot => {
+          const enrichedData = characterDataMap.get(shot.id)
+          const mergedCharacter =
+            shot.character || enrichedData?.character
+              ? {
+                  ...(shot.character || {}),
+                  ...(enrichedData?.character || {}),
+                }
+              : undefined
+          const mergedVehicle =
+            shot.vehicle || enrichedData?.vehicle
+              ? {
+                  ...(shot.vehicle || {}),
+                  ...(enrichedData?.vehicle || {}),
+                }
+              : undefined
+          return {
+            ...shot,
+            character: mergedCharacter,
+            vehicle: mergedVehicle,
+            shot: shot.shot ?? enrichedData?.shot ?? null,
+          }
+        }),
+      }
+    })
+  }, [locations, characterDataMap, positionOverrides])
 
   // Find unassigned characters (those with no location_id)
   const unassignedShots: LocationShot[] = useMemo(() => {
@@ -324,6 +388,25 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     }
   }, [enrichedLocations, unassignedShots, locationOverrides])
 
+  // Calculate canvas dimensions based on zone positions
+  const canvasDimensions = useMemo(() => {
+    let maxX = CANVAS_MIN_WIDTH
+    let maxY = CANVAS_MIN_HEIGHT
+
+    displayData.locations.forEach(loc => {
+      const right =
+        (loc.position_x ?? 0) + (loc.width ?? DEFAULT_ZONE_WIDTH) + ZONE_SPACING
+      const bottom =
+        (loc.position_y ?? 0) +
+        (loc.height ?? DEFAULT_ZONE_HEIGHT) +
+        ZONE_SPACING
+      maxX = Math.max(maxX, right)
+      maxY = Math.max(maxY, bottom)
+    })
+
+    return { width: maxX, height: maxY }
+  }, [displayData.locations])
+
   // Find a shot by its ID from all available shots
   const findShotById = useCallback(
     (shotId: string): LocationShot | null => {
@@ -366,7 +449,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     let currentLocationId: string | null = null
     for (const loc of displayData.locations) {
       if (loc.shots?.some(s => s.id === shotId)) {
-        currentLocationId = loc.id
+        currentLocationId = loc.id!
         break
       }
     }
@@ -442,6 +525,226 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     }
   }
 
+  // Check if a zone would overlap with any other zone
+  const wouldOverlap = useCallback(
+    (movingLocationId: string, newRect: Rect): boolean => {
+      for (const loc of displayData.locations) {
+        if (loc.id === movingLocationId) continue
+
+        const otherRect: Rect = {
+          x: loc.position_x ?? 0,
+          y: loc.position_y ?? 0,
+          width: loc.width ?? DEFAULT_ZONE_WIDTH,
+          height: loc.height ?? DEFAULT_ZONE_HEIGHT,
+        }
+
+        if (rectsOverlap(newRect, otherRect, COLLISION_PADDING)) {
+          return true
+        }
+      }
+      return false
+    },
+    [displayData.locations]
+  )
+
+  // Zone position change handler (optimistic update)
+  const handlePositionChange = useCallback(
+    (location: Location, position: { x: number; y: number }) => {
+      if (!location.id) return
+
+      // Check for collision before allowing the move
+      const newRect: Rect = {
+        x: position.x,
+        y: position.y,
+        width: location.width ?? DEFAULT_ZONE_WIDTH,
+        height: location.height ?? DEFAULT_ZONE_HEIGHT,
+      }
+
+      if (wouldOverlap(location.id!, newRect)) {
+        // Don't allow the move - zone would overlap
+        return
+      }
+
+      setPositionOverrides(prev => {
+        const next = new Map(prev)
+        const existing = next.get(location.id!) || {}
+        next.set(location.id!, { ...existing, x: position.x, y: position.y })
+        return next
+      })
+
+      // Queue debounced save
+      queueUpdate(location, {
+        position_x: Math.round(position.x),
+        position_y: Math.round(position.y),
+      })
+    },
+    [queueUpdate, wouldOverlap]
+  )
+
+  // Zone size change handler (optimistic update)
+  const handleSizeChange = useCallback(
+    (location: Location, size: { width: number; height: number }) => {
+      if (!location.id) return
+
+      // Get current position (from overrides or location)
+      const currentOverride = positionOverrides.get(location.id)
+      const currentX = currentOverride?.x ?? location.position_x ?? 0
+      const currentY = currentOverride?.y ?? location.position_y ?? 0
+
+      // Check for collision before allowing the resize
+      const newRect: Rect = {
+        x: currentX,
+        y: currentY,
+        width: size.width,
+        height: size.height,
+      }
+
+      if (wouldOverlap(location.id!, newRect)) {
+        // Don't allow the resize - zone would overlap
+        return
+      }
+
+      setPositionOverrides(prev => {
+        const next = new Map(prev)
+        const existing = next.get(location.id!) || {}
+        next.set(location.id!, {
+          ...existing,
+          width: size.width,
+          height: size.height,
+        })
+        return next
+      })
+
+      // Queue debounced save
+      queueUpdate(location, {
+        width: Math.round(size.width),
+        height: Math.round(size.height),
+      })
+    },
+    [queueUpdate, wouldOverlap, positionOverrides]
+  )
+
+  // On drag/resize end, flush the update immediately
+  const handleZoneDragEnd = useCallback(
+    (location: Location) => {
+      if (location.id) {
+        flushUpdate(location.id)
+      }
+    },
+    [flushUpdate]
+  )
+
+  const handleViewModeChange = (
+    _: React.MouseEvent<HTMLElement>,
+    newMode: ViewMode | null
+  ) => {
+    if (newMode !== null) {
+      setViewMode(newMode)
+    }
+  }
+
+  // CRUD handlers for locations
+  const handleAddLocation = () => {
+    setEditingLocation(null)
+    setFormDialogOpen(true)
+  }
+
+  const handleEditLocation = (location: Location) => {
+    setEditingLocation(location)
+    setFormDialogOpen(true)
+  }
+
+  const handleDeleteLocation = (location: Location) => {
+    setDeletingLocation(location)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleSaveLocation = async (locationData: Partial<Location>) => {
+    if (!fightId) return
+
+    try {
+      if (editingLocation?.id) {
+        // Update existing location
+        await client.updateLocation(editingLocation.id, locationData)
+        toastSuccess(`Location "${locationData.name}" updated`)
+      } else {
+        // Create new location - calculate position to avoid overlap
+        const newPosition = calculateNewLocationPosition()
+        const newLocation = {
+          ...locationData,
+          position_x: newPosition.x,
+          position_y: newPosition.y,
+          width: DEFAULT_ZONE_WIDTH,
+          height: DEFAULT_ZONE_HEIGHT,
+        }
+        await client.createFightLocation(fightId, newLocation)
+        toastSuccess(`Location "${locationData.name}" created`)
+      }
+      // WebSocket will broadcast the update automatically
+    } catch (err) {
+      console.error("Failed to save location:", err)
+      toastError("Failed to save location")
+      throw err // Re-throw so dialog knows it failed
+    }
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!deletingLocation?.id) return
+
+    try {
+      await client.deleteLocation(deletingLocation.id)
+      toastSuccess(`Location "${deletingLocation.name}" deleted`)
+      setDeleteDialogOpen(false)
+      setDeletingLocation(null)
+      // WebSocket will broadcast the update automatically
+    } catch (err) {
+      console.error("Failed to delete location:", err)
+      toastError("Failed to delete location")
+    }
+  }
+
+  // Calculate position for new location to avoid overlap
+  const calculateNewLocationPosition = (): { x: number; y: number } => {
+    const padding = ZONE_SPACING
+    const x = padding
+    const y = padding
+
+    // Find a position that doesn't overlap with existing locations
+    const existingRects = displayData.locations.map(loc => ({
+      x: loc.position_x ?? 0,
+      y: loc.position_y ?? 0,
+      width: loc.width ?? DEFAULT_ZONE_WIDTH,
+      height: loc.height ?? DEFAULT_ZONE_HEIGHT,
+    }))
+
+    // Try positions in a grid pattern
+    const gridStep = DEFAULT_ZONE_WIDTH + padding
+    for (let row = 0; row < 10; row++) {
+      for (let col = 0; col < 5; col++) {
+        const testX = col * gridStep + padding
+        const testY = row * (DEFAULT_ZONE_HEIGHT + padding) + padding
+        const testRect = {
+          x: testX,
+          y: testY,
+          width: DEFAULT_ZONE_WIDTH,
+          height: DEFAULT_ZONE_HEIGHT,
+        }
+
+        const hasOverlap = existingRects.some(rect =>
+          rectsOverlap(testRect, rect, COLLISION_PADDING)
+        )
+
+        if (!hasOverlap) {
+          return { x: testX, y: testY }
+        }
+      }
+    }
+
+    // Fallback: place at bottom
+    const maxY = Math.max(0, ...existingRects.map(r => r.y + r.height))
+    return { x: padding, y: maxY + padding }
+  }
+
   if (loading) {
     return (
       <BasePanel
@@ -482,18 +785,46 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
       borderColor="info.main"
       sx={{ position: "relative" }}
     >
-      {/* Close button */}
-      <IconButton
-        onClick={onClose}
-        size="small"
+      {/* Header controls */}
+      <Box
         sx={{
           position: "absolute",
           top: 8,
           right: 8,
+          display: "flex",
+          gap: 1,
+          alignItems: "center",
         }}
       >
-        <CloseIcon />
-      </IconButton>
+        <Button
+          variant="contained"
+          size="small"
+          startIcon={<AddIcon />}
+          onClick={handleAddLocation}
+        >
+          Add Location
+        </Button>
+        <ToggleButtonGroup
+          value={viewMode}
+          exclusive
+          onChange={handleViewModeChange}
+          size="small"
+        >
+          <ToggleButton value="grid">
+            <Tooltip title="Grid View">
+              <GridIcon fontSize="small" />
+            </Tooltip>
+          </ToggleButton>
+          <ToggleButton value="canvas">
+            <Tooltip title="Canvas View (drag to reposition)">
+              <CanvasIcon fontSize="small" />
+            </Tooltip>
+          </ToggleButton>
+        </ToggleButtonGroup>
+        <IconButton onClick={onClose} size="small">
+          <CloseIcon />
+        </IconButton>
+      </Box>
 
       {displayData.locations.length === 0 ? (
         <Box sx={{ textAlign: "center", py: 4 }}>
@@ -512,27 +843,61 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          {/* Grid layout for locations - handles variable heights naturally */}
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: 2,
-              backgroundColor: "grey.100",
-              borderRadius: 1,
-              p: 2,
-              border: "1px solid",
-              borderColor: "divider",
-            }}
-          >
-            {displayData.locations.map(location => (
-              <LocationZone
-                key={location.id}
-                location={location}
-                onCharacterClick={handleCharacterClick}
-              />
-            ))}
-          </Box>
+          {viewMode === "grid" ? (
+            // Grid layout (original Phase 2 behavior)
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 2,
+                backgroundColor: "grey.100",
+                borderRadius: 1,
+                p: 2,
+                border: "1px solid",
+                borderColor: "divider",
+              }}
+            >
+              {displayData.locations.map(location => (
+                <LocationZone
+                  key={location.id}
+                  location={location}
+                  onCharacterClick={handleCharacterClick}
+                  onEdit={handleEditLocation}
+                  onDelete={handleDeleteLocation}
+                  isCanvasMode={false}
+                />
+              ))}
+            </Box>
+          ) : (
+            // Canvas layout (Phase 3 - draggable/resizable zones)
+            <Box
+              sx={{
+                position: "relative",
+                minWidth: canvasDimensions.width,
+                minHeight: canvasDimensions.height,
+                backgroundColor: "grey.100",
+                borderRadius: 1,
+                border: "1px solid",
+                borderColor: "divider",
+                overflow: "auto",
+              }}
+            >
+              {displayData.locations.map(location => (
+                <LocationZone
+                  key={location.id}
+                  location={location}
+                  onCharacterClick={handleCharacterClick}
+                  onPositionChange={handlePositionChange}
+                  onSizeChange={handleSizeChange}
+                  onDragEnd={handleZoneDragEnd}
+                  onResizeEnd={handleZoneDragEnd}
+                  onEdit={handleEditLocation}
+                  onDelete={handleDeleteLocation}
+                  isCanvasMode={true}
+                />
+              ))}
+            </Box>
+          )}
 
           {/* Unassigned zone below the canvas */}
           <UnassignedZone
@@ -548,6 +913,30 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
           </DragOverlay>
         </DndContext>
       )}
+
+      {/* Location form dialog for add/edit */}
+      <LocationFormDialog
+        open={formDialogOpen}
+        onClose={() => {
+          setFormDialogOpen(false)
+          setEditingLocation(null)
+        }}
+        onSave={handleSaveLocation}
+        location={editingLocation}
+      />
+
+      {/* Delete confirmation dialog */}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onClose={() => {
+          setDeleteDialogOpen(false)
+          setDeletingLocation(null)
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete Location"
+        message={`Are you sure you want to delete "${deletingLocation?.name}"? Characters in this location will be moved to Unassigned.`}
+        destructive
+      />
     </BasePanel>
   )
 }
