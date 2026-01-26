@@ -39,16 +39,22 @@ interface LocationsPanelProps {
  * Phase 2: Drag-and-drop support for moving characters between zones.
  */
 export default function LocationsPanel({ onClose }: LocationsPanelProps) {
-  const { encounter, refreshEncounter } = useEncounter()
+  const { encounter } = useEncounter()
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
   const fightId = encounter?.id
-  const { locations, loading, error, refetch } = useLocations(fightId)
+  const { locations, loading, error } = useLocations(fightId)
 
   // Track the currently dragged shot for DragOverlay
   const [activeDragShot, setActiveDragShot] = useState<LocationShot | null>(
     null
   )
+
+  // Track optimistic location overrides: shotId -> locationId (null = unassigned)
+  // This allows instant UI updates while the API call happens in the background
+  const [locationOverrides, setLocationOverrides] = useState<
+    Map<string, string | null>
+  >(new Map())
 
   // Configure sensors for drag-and-drop
   const sensors = useSensors(
@@ -242,20 +248,95 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
       }))
   }, [allCharacters, enrichedLocations])
 
+  // Apply optimistic overrides to create display data
+  // This allows instant UI updates while the API call happens in the background
+  const displayData = useMemo(() => {
+    if (locationOverrides.size === 0) {
+      // No overrides, use data as-is
+      return {
+        locations: enrichedLocations,
+        unassignedShots: unassignedShots,
+      }
+    }
+
+    // Collect all shots from all sources for easy lookup
+    const allShots = new Map<string, LocationShot>()
+    enrichedLocations.forEach(loc => {
+      loc.shots?.forEach(shot => allShots.set(shot.id, shot))
+    })
+    unassignedShots.forEach(shot => allShots.set(shot.id, shot))
+
+    // Build new locations with overrides applied
+    const newLocations = enrichedLocations.map(loc => {
+      // Start with shots that belong here and haven't been moved away
+      const remainingShots =
+        loc.shots?.filter(shot => {
+          if (locationOverrides.has(shot.id)) {
+            // Shot has override - only keep if override points to this location
+            return locationOverrides.get(shot.id) === loc.id
+          }
+          return true // No override, keep in original location
+        }) || []
+
+      // Add shots that have been moved TO this location
+      const incomingShots: LocationShot[] = []
+      locationOverrides.forEach((targetLocId, shotId) => {
+        if (targetLocId === loc.id) {
+          // This shot was moved to this location
+          const shot = allShots.get(shotId)
+          // Only add if not already in remainingShots
+          if (shot && !remainingShots.some(s => s.id === shotId)) {
+            incomingShots.push(shot)
+          }
+        }
+      })
+
+      return {
+        ...loc,
+        shots: [...remainingShots, ...incomingShots],
+      }
+    })
+
+    // Build new unassigned list with overrides applied
+    const newUnassigned = unassignedShots.filter(shot => {
+      if (locationOverrides.has(shot.id)) {
+        // Shot has override - only keep if override is null (unassigned)
+        return locationOverrides.get(shot.id) === null
+      }
+      return true // No override, keep in unassigned
+    })
+
+    // Add shots that have been moved TO unassigned
+    locationOverrides.forEach((targetLocId, shotId) => {
+      if (targetLocId === null) {
+        const shot = allShots.get(shotId)
+        // Only add if not already in newUnassigned
+        if (shot && !newUnassigned.some(s => s.id === shotId)) {
+          newUnassigned.push(shot)
+        }
+      }
+    })
+
+    return {
+      locations: newLocations,
+      unassignedShots: newUnassigned,
+    }
+  }, [enrichedLocations, unassignedShots, locationOverrides])
+
   // Find a shot by its ID from all available shots
   const findShotById = useCallback(
     (shotId: string): LocationShot | null => {
       // Check assigned locations
-      for (const loc of enrichedLocations) {
+      for (const loc of displayData.locations) {
         const shot = loc.shots?.find(s => s.id === shotId)
         if (shot) return shot
       }
       // Check unassigned
-      const unassigned = unassignedShots.find(s => s.id === shotId)
+      const unassigned = displayData.unassignedShots.find(s => s.id === shotId)
       if (unassigned) return unassigned
       return null
     },
-    [enrichedLocations, unassignedShots]
+    [displayData]
   )
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -265,9 +346,11 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   }
 
   const handleDragEnd = async (event: DragEndEvent) => {
-    setActiveDragShot(null)
-
     const { active, over } = event
+
+    // Get entity name before clearing drag state
+    const draggedShot = activeDragShot
+    setActiveDragShot(null)
 
     if (!over || !fightId) return
 
@@ -280,7 +363,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
 
     // Find the current location of the shot to avoid unnecessary updates
     let currentLocationId: string | null = null
-    for (const loc of enrichedLocations) {
+    for (const loc of displayData.locations) {
       if (loc.shots?.some(s => s.id === shotId)) {
         currentLocationId = loc.id
         break
@@ -291,26 +374,39 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     // Don't update if dropping in the same location
     if (newLocationId === currentLocationId) return
 
+    // Get names for toast message before the move
+    const entityName =
+      draggedShot?.character?.name || draggedShot?.vehicle?.name || "Character"
+    const locationName =
+      newLocationId === null
+        ? "Unassigned"
+        : displayData.locations.find(l => l.id === newLocationId)?.name ||
+          "location"
+
+    // Apply optimistic update immediately
+    setLocationOverrides(prev => {
+      const next = new Map(prev)
+      next.set(shotId, newLocationId)
+      return next
+    })
+
     try {
-      // Optimistic update: refetch will happen after API call
+      // Make API call in the background
       await client.updateShotLocationById(fightId, shotId, newLocationId)
 
-      // Refetch locations and encounter to get updated data
-      await Promise.all([refetch(), refreshEncounter()])
-
-      const entityName =
-        findShotById(shotId)?.character?.name ||
-        findShotById(shotId)?.vehicle?.name ||
-        "Character"
-      const locationName =
-        newLocationId === null
-          ? "Unassigned"
-          : enrichedLocations.find(l => l.id === newLocationId)?.name ||
-            "location"
-
+      // Don't clear override or refetch - the optimistic state is correct
+      // and clearing/refetching causes a visual flicker
       toastSuccess(`${entityName} moved to ${locationName}`)
     } catch (err) {
       console.error("Failed to update location:", err)
+
+      // Revert the optimistic update
+      setLocationOverrides(prev => {
+        const next = new Map(prev)
+        next.delete(shotId)
+        return next
+      })
+
       toastError("Failed to move character")
     }
   }
@@ -375,7 +471,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
         <CloseIcon />
       </IconButton>
 
-      {enrichedLocations.length === 0 ? (
+      {displayData.locations.length === 0 ? (
         <Box sx={{ textAlign: "center", py: 4 }}>
           <Typography variant="body1" color="text.secondary">
             No locations have been created for this fight yet.
@@ -405,7 +501,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
               borderColor: "divider",
             }}
           >
-            {enrichedLocations.map(location => (
+            {displayData.locations.map(location => (
               <LocationZone
                 key={location.id}
                 location={location}
@@ -416,7 +512,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
 
           {/* Unassigned zone below the canvas */}
           <UnassignedZone
-            shots={unassignedShots}
+            shots={displayData.unassignedShots}
             onCharacterClick={handleCharacterClick}
           />
 
