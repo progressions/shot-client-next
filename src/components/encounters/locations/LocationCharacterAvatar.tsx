@@ -7,6 +7,8 @@ import type { LocationShot } from "@/types"
 interface LocationCharacterAvatarProps {
   shot: LocationShot
   onClick?: (shot: LocationShot) => void
+  onSelect?: (shotId: string, addToSelection: boolean) => void
+  isSelected?: boolean
   isDragOverlay?: boolean
 }
 
@@ -18,6 +20,8 @@ interface LocationCharacterAvatarProps {
 export default function LocationCharacterAvatar({
   shot,
   onClick,
+  onSelect,
+  isSelected = false,
   isDragOverlay = false,
 }: LocationCharacterAvatarProps) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
@@ -33,19 +37,14 @@ export default function LocationCharacterAvatar({
   const isMook = character?.character_type === "mook"
   const count = character?.count || shot.count || 1
 
-  // Faction-based color (simplified for now)
-  const getFactionColor = () => {
-    const faction = character?.faction?.toLowerCase()
-    if (!faction) return "#666"
-    if (faction.includes("dragon")) return "#2196f3"
-    if (faction.includes("ascended")) return "#4caf50"
-    if (faction.includes("lotus")) return "#9c27b0"
-    if (faction.includes("architect")) return "#f44336"
-    if (faction.includes("jammer")) return "#ff9800"
-    return "#666"
-  }
+  // Use character's own color for border (or vehicle color, or fallback)
+  const borderColor = character?.color || vehicle?.color || "#666"
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    // Handle selection with shift+click
+    if (onSelect) {
+      onSelect(shot.id, e.shiftKey)
+    }
     if (onClick) {
       onClick(shot)
     }
@@ -62,7 +61,7 @@ export default function LocationCharacterAvatar({
         p: 0.5,
         borderRadius: 1,
         cursor: isDragOverlay ? "grabbing" : "grab",
-        transition: "background-color 0.2s, opacity 0.2s",
+        transition: "background-color 0.2s, opacity 0.2s, outline 0.15s",
         "&:hover": {
           backgroundColor: "action.hover",
         },
@@ -70,6 +69,10 @@ export default function LocationCharacterAvatar({
         maxWidth: 80,
         opacity: isDragging && !isDragOverlay ? 0.5 : 1,
         userSelect: "none",
+        // Selection indicator
+        outline: isSelected ? "3px solid" : "none",
+        outlineColor: isSelected ? "primary.main" : "transparent",
+        outlineOffset: 2,
       }}
     >
       <Badge
@@ -85,7 +88,7 @@ export default function LocationCharacterAvatar({
             width: 40,
             height: 40,
             border: 2,
-            borderColor: getFactionColor(),
+            borderColor: borderColor,
             backgroundColor: "background.default",
           }}
         >

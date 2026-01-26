@@ -8,6 +8,8 @@ import LocationCharacterAvatar from "./LocationCharacterAvatar"
 interface UnassignedZoneProps {
   shots: LocationShot[]
   onCharacterClick?: (shot: LocationShot) => void
+  onCharacterSelect?: (shotId: string, addToSelection: boolean) => void
+  selectedShotIds?: Set<string>
 }
 
 /**
@@ -18,6 +20,8 @@ interface UnassignedZoneProps {
 export default function UnassignedZone({
   shots,
   onCharacterClick,
+  onCharacterSelect,
+  selectedShotIds,
 }: UnassignedZoneProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: "unassigned",
@@ -77,6 +81,8 @@ export default function UnassignedZone({
               key={shot.id}
               shot={shot}
               onClick={onCharacterClick}
+              onSelect={onCharacterSelect}
+              isSelected={selectedShotIds?.has(shot.id) ?? false}
             />
           ))
         ) : (

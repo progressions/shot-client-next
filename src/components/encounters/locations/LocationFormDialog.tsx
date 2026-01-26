@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { TextField, Box, CircularProgress, Stack } from "@mui/material"
 import { Button, DialogBox } from "@/components/ui"
+import { ColorPickerField } from "@/components/ui/ColorPickerField"
 import type { Location } from "@/types"
 
 interface LocationFormDialogProps {
@@ -12,18 +13,6 @@ interface LocationFormDialogProps {
   location?: Location | null
   title?: string
 }
-
-const COLOR_PRESETS = [
-  { name: "Default", value: "" },
-  { name: "Red", value: "#ffebee" },
-  { name: "Blue", value: "#e3f2fd" },
-  { name: "Green", value: "#e8f5e9" },
-  { name: "Yellow", value: "#fffde7" },
-  { name: "Purple", value: "#f3e5f5" },
-  { name: "Orange", value: "#fff3e0" },
-  { name: "Cyan", value: "#e0f7fa" },
-  { name: "Grey", value: "#f5f5f5" },
-]
 
 /**
  * Dialog for creating or editing a location.
@@ -150,34 +139,11 @@ export default function LocationFormDialog({
           }}
         />
 
-        <Box>
-          <Box sx={{ mb: 1, fontSize: "0.875rem", color: "grey.400" }}>
-            Background Color
-          </Box>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-            {COLOR_PRESETS.map(preset => (
-              <Box
-                key={preset.name}
-                onClick={() => setColor(preset.value)}
-                sx={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 1,
-                  backgroundColor: preset.value || "grey.700",
-                  border: "2px solid",
-                  borderColor:
-                    color === preset.value ? "primary.main" : "grey.600",
-                  cursor: "pointer",
-                  transition: "border-color 0.2s",
-                  "&:hover": {
-                    borderColor: "primary.light",
-                  },
-                }}
-                title={preset.name}
-              />
-            ))}
-          </Box>
-        </Box>
+        <ColorPickerField
+          label="Background Color"
+          value={color || null}
+          onChange={newColor => setColor(newColor || "")}
+        />
 
         {error && name.trim() && (
           <Box sx={{ color: "error.main", fontSize: "0.875rem" }}>{error}</Box>
