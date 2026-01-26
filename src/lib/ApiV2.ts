@@ -17,6 +17,7 @@ import {
   Notification,
   Adventure,
   Location,
+  LocationConnection,
 } from "@/types"
 import { getEntityId } from "@/lib/entityId"
 
@@ -252,6 +253,22 @@ class ApiV2 {
 
   setShotLocation(shotId: string): string {
     return `${this.api()}/shots/${shotId}/set_location`
+  }
+
+  // Location Connection endpoints
+  fightLocationConnections(fight: Fight | ID): string {
+    const fightId = this.id(fight)
+    if (!fightId) {
+      throw new Error("fightLocationConnections requires a valid fight ID")
+    }
+    return `${this.api()}/fights/${fightId}/location_connections`
+  }
+
+  locationConnections(connection?: LocationConnection | ID): string {
+    const id = this.id(connection)
+    return id
+      ? `${this.api()}/location_connections/${id}`
+      : `${this.api()}/location_connections`
   }
 
   currentCampaign() {
