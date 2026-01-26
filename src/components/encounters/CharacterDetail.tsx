@@ -77,6 +77,13 @@ export default function CharacterDetail({
     initialCharacter.driving || null
   )
 
+  // Sync local state when initialCharacter prop changes (e.g., from encounter context update)
+  useEffect(() => {
+    setCharacter(initialCharacter)
+    setNewLocation(initialCharacter.location || "")
+    setDrivingVehicle(initialCharacter.driving || null)
+  }, [initialCharacter])
+
   // Subscribe to character updates via WebSocket
   useEffect(() => {
     const unsubscribe = subscribeToEntity("character", updatedCharacter => {

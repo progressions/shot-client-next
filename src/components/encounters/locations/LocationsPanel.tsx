@@ -22,7 +22,8 @@ import {
 } from "@dnd-kit/core"
 import { useEncounter, useClient, useToast } from "@/contexts"
 import { useLocations } from "@/hooks"
-import type { LocationShot } from "@/types"
+import { FormActions } from "@/reducers"
+import type { LocationShot, Encounter } from "@/types"
 import BasePanel from "../BasePanel"
 import LocationZone from "./LocationZone"
 import UnassignedZone from "./UnassignedZone"
@@ -39,7 +40,7 @@ interface LocationsPanelProps {
  * Phase 2: Drag-and-drop support for moving characters between zones.
  */
 export default function LocationsPanel({ onClose }: LocationsPanelProps) {
-  const { encounter } = useEncounter()
+  const { encounter, dispatchEncounter } = useEncounter()
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
   const fightId = encounter?.id
@@ -399,8 +400,19 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
       // Make API call in the background
       await client.updateShotLocationById(fightId, shotId, newLocationId)
 
-      // Don't clear override or refetch - the optimistic state is correct
-      // and clearing/refetching causes a visual flicker
+      // Update the encounter context so other components get the new location data
+      // We keep the optimistic override in place so LocationsPanel doesn't flicker
+      // Note: We use dispatchEncounter directly with name: "encounter" because
+      // the context's updateEntity dispatches to name: "entity" which is wrong
+      const encounterResponse = await client.getEncounter(encounter)
+      if (encounterResponse.data) {
+        dispatchEncounter({
+          type: FormActions.UPDATE,
+          name: "encounter",
+          value: encounterResponse.data as Encounter,
+        })
+      }
+
       toastSuccess(`${entityName} moved to ${locationName}`)
     } catch (err) {
       console.error("Failed to update location:", err)

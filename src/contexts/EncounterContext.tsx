@@ -144,18 +144,10 @@ export function EncounterProvider({
 
   useEffect(() => {
     if (campaignData?.encounter && campaignData.encounter.id === encounter.id) {
-      console.log("[EncounterContext] WebSocket update received:", {
-        encounterUpdate: campaignData.encounter,
-        localAction,
-        actionId: campaignData.encounter.action_id,
-        firstShot: campaignData.encounter.shots?.[0],
-      })
       if (localAction && campaignData.encounter.action_id === localAction) {
-        console.log("[EncounterContext] Skipping update - local action match")
         setLocalAction(null)
         return
       }
-      console.log("[EncounterContext] Applying WebSocket encounter update")
       dispatchEncounter({
         type: FormActions.UPDATE,
         name: "encounter",
