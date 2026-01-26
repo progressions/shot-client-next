@@ -894,7 +894,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     }
   }, [])
 
-  // Pan handlers (middle mouse button or space+drag)
+  // Pan handler (middle mouse button only)
   const handleCanvasMouseDown = useCallback(
     (e: React.MouseEvent) => {
       // Start pan on middle mouse button (button 1)
