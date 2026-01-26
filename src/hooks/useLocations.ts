@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useClient, useCampaign } from "@/contexts/AppContext"
-import type { Location, CampaignCableData } from "@/types"
+import type { Location } from "@/types"
 
 interface UseLocationsResult {
   locations: Location[]
@@ -35,6 +35,9 @@ export function useLocations(fightId: string | undefined): UseLocationsResult {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Track the latest fight_id from WebSocket to filter location updates
+  const latestWsFightId = useRef<string | null>(null)
+
   const fetchLocations = useCallback(async () => {
     if (!fightId) {
       setLocations([])
@@ -63,38 +66,46 @@ export function useLocations(fightId: string | undefined): UseLocationsResult {
     fetchLocations()
   }, [fetchLocations])
 
-  // Subscribe to WebSocket updates for locations
+  // Subscribe to fight_id updates to track which fight locations belong to
   useEffect(() => {
     if (!fightId) return
 
-    const unsubscribe = subscribeToEntity(
-      "locations",
-      (data: CampaignCableData["locations"]) => {
-        // Check if this update is for our fight
-        // The WebSocket data includes fight_id to identify which fight the locations belong to
-        if (data && typeof data === "object" && "locations" in data) {
-          console.log(
-            "📍 [useLocations] WebSocket locations update received:",
-            data
-          )
-          // Update locations without setting loading=true to avoid flicker
-          setLocations(data.locations || [])
-        }
+    const unsubscribe = subscribeToEntity("fight_id", (wsFightId: unknown) => {
+      if (typeof wsFightId === "string") {
+        latestWsFightId.current = wsFightId
+        console.log("📍 [useLocations] WebSocket fight_id received:", wsFightId)
       }
-    )
+    })
 
     return unsubscribe
   }, [fightId, subscribeToEntity])
 
-  // Also subscribe to fight_id to know which fight the locations are for
+  // Subscribe to WebSocket updates for locations
   useEffect(() => {
     if (!fightId) return
 
-    // We need to track the fight_id from WebSocket to match with our fightId
-    // This is handled by checking campaignData.fight_id in the locations callback
-    const unsubscribe = subscribeToEntity("fight_id", (wsightId: unknown) => {
-      // When we receive a fight_id, the next locations update will be for that fight
-      console.log("📍 [useLocations] WebSocket fight_id received:", wsightId)
+    const unsubscribe = subscribeToEntity("locations", (data: unknown) => {
+      // Only update if the locations are for this fight
+      // The fight_id is broadcast alongside locations and stored in latestWsFightId
+      if (latestWsFightId.current && latestWsFightId.current !== fightId) {
+        console.log(
+          "📍 [useLocations] Ignoring locations update for different fight:",
+          latestWsFightId.current,
+          "!==",
+          fightId
+        )
+        return
+      }
+
+      // Data is now an array of Location objects (not nested)
+      if (Array.isArray(data)) {
+        console.log(
+          "📍 [useLocations] WebSocket locations update received for fight:",
+          fightId
+        )
+        // Update locations without setting loading=true to avoid flicker
+        setLocations(data as Location[])
+      }
     })
 
     return unsubscribe
