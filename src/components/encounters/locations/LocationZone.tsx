@@ -1,11 +1,12 @@
 "use client"
 
-import { useRef, useState, useCallback } from "react"
+import { useRef, useState, useCallback, useEffect } from "react"
 import { Paper, Box, Typography, IconButton } from "@mui/material"
 import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material"
 import { useDroppable } from "@dnd-kit/core"
 import type { Location, LocationShot } from "@/types"
 import LocationCharacterAvatar from "./LocationCharacterAvatar"
+import { MIN_ZONE_WIDTH, MIN_ZONE_HEIGHT } from "./constants"
 
 interface LocationZoneProps {
   location: Location
@@ -24,9 +25,6 @@ interface LocationZoneProps {
   onDelete?: (location: Location) => void
   isCanvasMode?: boolean
 }
-
-const MIN_WIDTH = 150
-const MIN_HEIGHT = 100
 
 /**
  * Visual zone representing a location in the fight.
@@ -68,6 +66,18 @@ export default function LocationZone({
     handle: string
   } | null>(null)
 
+  // Store cleanup functions for event listeners
+  const cleanupRef = useRef<(() => void) | null>(null)
+
+  // Cleanup event listeners on unmount
+  useEffect(() => {
+    return () => {
+      if (cleanupRef.current) {
+        cleanupRef.current()
+      }
+    }
+  }, [])
+
   const shots = location.shots || []
   const hasCharacters = shots.length > 0
 
@@ -99,7 +109,14 @@ export default function LocationZone({
         dragStartPos.current = null
         document.removeEventListener("mousemove", handleMouseMove)
         document.removeEventListener("mouseup", handleMouseUp)
+        cleanupRef.current = null
         onDragEnd?.(location)
+      }
+
+      // Store cleanup function for unmount
+      cleanupRef.current = () => {
+        document.removeEventListener("mousemove", handleMouseMove)
+        document.removeEventListener("mouseup", handleMouseUp)
       }
 
       document.addEventListener("mousemove", handleMouseMove)
@@ -144,18 +161,18 @@ export default function LocationZone({
 
         // Handle resize based on which handle is being dragged
         if (h.includes("e")) {
-          newWidth = Math.max(MIN_WIDTH, startW + deltaX)
+          newWidth = Math.max(MIN_ZONE_WIDTH, startW + deltaX)
         }
         if (h.includes("w")) {
-          const widthDelta = Math.min(deltaX, startW - MIN_WIDTH)
+          const widthDelta = Math.min(deltaX, startW - MIN_ZONE_WIDTH)
           newWidth = startW - widthDelta
           newX = locX + widthDelta
         }
         if (h.includes("s")) {
-          newHeight = Math.max(MIN_HEIGHT, startH + deltaY)
+          newHeight = Math.max(MIN_ZONE_HEIGHT, startH + deltaY)
         }
         if (h.includes("n")) {
-          const heightDelta = Math.min(deltaY, startH - MIN_HEIGHT)
+          const heightDelta = Math.min(deltaY, startH - MIN_ZONE_HEIGHT)
           newHeight = startH - heightDelta
           newY = locY + heightDelta
         }
@@ -171,7 +188,14 @@ export default function LocationZone({
         resizeStartPos.current = null
         document.removeEventListener("mousemove", handleMouseMove)
         document.removeEventListener("mouseup", handleMouseUp)
+        cleanupRef.current = null
         onResizeEnd?.(location)
+      }
+
+      // Store cleanup function for unmount
+      cleanupRef.current = () => {
+        document.removeEventListener("mousemove", handleMouseMove)
+        document.removeEventListener("mouseup", handleMouseUp)
       }
 
       document.addEventListener("mousemove", handleMouseMove)

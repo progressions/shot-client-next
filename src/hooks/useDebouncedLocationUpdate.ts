@@ -1,4 +1,4 @@
-import { useRef, useCallback } from "react"
+import { useRef, useCallback, useEffect } from "react"
 import { useClient, useToast } from "@/contexts"
 import type { Location } from "@/types"
 
@@ -70,6 +70,15 @@ export function useDebouncedLocationUpdate(debounceMs: number = 300) {
     },
     [saveUpdate]
   )
+
+  // Cleanup all pending timeouts on unmount
+  useEffect(() => {
+    const timeouts = timeoutRefs.current
+    return () => {
+      timeouts.forEach(timeout => clearTimeout(timeout))
+      timeouts.clear()
+    }
+  }, [])
 
   return { queueUpdate, flushUpdate }
 }

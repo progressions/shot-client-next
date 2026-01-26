@@ -39,19 +39,20 @@ import UnassignedZone from "./UnassignedZone"
 import LocationCharacterAvatar from "./LocationCharacterAvatar"
 import LocationFormDialog from "./LocationFormDialog"
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog"
+import {
+  CANVAS_MIN_WIDTH,
+  CANVAS_MIN_HEIGHT,
+  DEFAULT_ZONE_WIDTH,
+  DEFAULT_ZONE_HEIGHT,
+  ZONE_SPACING,
+  COLLISION_PADDING,
+} from "./constants"
 
 interface LocationsPanelProps {
   onClose: () => void
 }
 
 type ViewMode = "grid" | "canvas"
-
-const CANVAS_MIN_WIDTH = 800
-const CANVAS_MIN_HEIGHT = 500
-const DEFAULT_ZONE_WIDTH = 200
-const DEFAULT_ZONE_HEIGHT = 150
-const ZONE_SPACING = 20
-const COLLISION_PADDING = 4 // Minimum gap between zones
 
 interface Rect {
   x: number
@@ -87,8 +88,8 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   const { locations, loading, error } = useLocations(fightId)
   const { queueUpdate, flushUpdate } = useDebouncedLocationUpdate(500)
 
-  // View mode state
-  const [viewMode, setViewMode] = useState<ViewMode>("canvas")
+  // View mode state - default to "grid" for backward compatibility
+  const [viewMode, setViewMode] = useState<ViewMode>("grid")
 
   // Track the currently dragged shot for DragOverlay
   const [activeDragShot, setActiveDragShot] = useState<LocationShot | null>(
@@ -238,7 +239,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   // Enrich locations with full character/vehicle data and position overrides
   const enrichedLocations = useMemo(() => {
     return locations.map(loc => {
-      const override = positionOverrides.get(loc.id!)
+      const override = loc.id ? positionOverrides.get(loc.id) : undefined
       return {
         ...loc,
         position_x: override?.x ?? loc.position_x ?? 0,
@@ -549,6 +550,8 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   // Zone position change handler (optimistic update)
   const handlePositionChange = useCallback(
     (location: Location, position: { x: number; y: number }) => {
+      if (!location.id) return
+
       // Check for collision before allowing the move
       const newRect: Rect = {
         x: position.x,
@@ -581,8 +584,10 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   // Zone size change handler (optimistic update)
   const handleSizeChange = useCallback(
     (location: Location, size: { width: number; height: number }) => {
+      if (!location.id) return
+
       // Get current position (from overrides or location)
-      const currentOverride = positionOverrides.get(location.id!)
+      const currentOverride = positionOverrides.get(location.id)
       const currentX = currentOverride?.x ?? location.position_x ?? 0
       const currentY = currentOverride?.y ?? location.position_y ?? 0
 
