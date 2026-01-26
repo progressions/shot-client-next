@@ -81,6 +81,10 @@ export interface CampaignCableData {
   // Notion sync log reload signal
   notion_sync_logs?: string | null
   character_id?: string
+  // Locations update from WebSocket (array of Location objects)
+  locations?: Location[] | null
+  // Fight ID for locations update (to match with correct fight)
+  fight_id?: string
   // Seeding status fields for real-time updates
   seeding_status?: string | null
   campaign_id?: string
