@@ -15,7 +15,7 @@ export interface LocationConnectionsResponse {
 
 export function createLocationConnectionClient(deps: ClientDependencies) {
   const { apiV2 } = deps
-  const { get, post, delete: delete_ } = createBaseClient(deps)
+  const { get, post, patch, delete: delete_ } = createBaseClient(deps)
 
   /**
    * Get all location connections for a fight
@@ -46,6 +46,21 @@ export function createLocationConnectionClient(deps: ClientDependencies) {
   }
 
   /**
+   * Update a location connection
+   */
+  async function updateLocationConnection(
+    connection: LocationConnection | string,
+    updates: {
+      bidirectional?: boolean
+      label?: string
+    }
+  ): Promise<AxiosResponse<LocationConnection>> {
+    return patch(apiV2.locationConnections(connection), {
+      location_connection: updates,
+    })
+  }
+
+  /**
    * Delete a location connection
    */
   async function deleteLocationConnection(
@@ -57,6 +72,7 @@ export function createLocationConnectionClient(deps: ClientDependencies) {
   return {
     getFightLocationConnections,
     createFightLocationConnection,
+    updateLocationConnection,
     deleteLocationConnection,
   }
 }

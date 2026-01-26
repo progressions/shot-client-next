@@ -765,22 +765,33 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
       if (!fightId || !selectedConnection) return
 
       try {
-        await client.createFightLocationConnection(fightId, {
-          from_location_id: selectedConnection.from_location_id,
-          to_location_id: selectedConnection.to_location_id,
-          label: data.label,
-          bidirectional: data.bidirectional,
-        })
-        toastSuccess("Connection created")
+        if (isNewConnection) {
+          // Creating a new connection
+          await client.createFightLocationConnection(fightId, {
+            from_location_id: selectedConnection.from_location_id,
+            to_location_id: selectedConnection.to_location_id,
+            label: data.label,
+            bidirectional: data.bidirectional,
+          })
+          toastSuccess("Connection created")
+        } else if (selectedConnection.id) {
+          // Updating an existing connection
+          await client.updateLocationConnection(selectedConnection.id, {
+            label: data.label,
+            bidirectional: data.bidirectional,
+          })
+          toastSuccess("Connection updated")
+        }
         handleConnectionPopoverClose()
       } catch (err) {
-        console.error("Failed to create connection:", err)
-        toastError("Failed to create connection")
+        console.error("Failed to save connection:", err)
+        toastError("Failed to save connection")
       }
     },
     [
       fightId,
       selectedConnection,
+      isNewConnection,
       client,
       toastSuccess,
       toastError,

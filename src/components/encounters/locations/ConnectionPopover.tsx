@@ -94,7 +94,7 @@ export default function ConnectionPopover({
           onKeyDown={handleKeyDown}
           size="small"
           fullWidth
-          autoFocus
+          autoFocus={isNew}
           placeholder="e.g., Stairs, Door, etc."
         />
 
