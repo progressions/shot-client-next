@@ -51,6 +51,7 @@ import LocationFormDialog from "./LocationFormDialog"
 import ConnectionsLayer from "./ConnectionsLayer"
 import ConnectionHandle from "./ConnectionHandle"
 import ConnectionPopover from "./ConnectionPopover"
+import CanvasControls from "./CanvasControls"
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog"
 import {
   CANVAS_MIN_WIDTH,
@@ -133,6 +134,15 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   const lastMouseMoveTime = useRef<number>(0)
   const tempAnchorRef = useRef<HTMLDivElement | null>(null)
 
+  // Zoom and pan state for canvas mode
+  const [zoom, setZoom] = useState(1.0)
+  const [pan, setPan] = useState({ x: 0, y: 0 })
+  const [isPanning, setIsPanning] = useState(false)
+  const panStart = useRef({ x: 0, y: 0, panX: 0, panY: 0 })
+
+  // Bulk selection state for characters
+  const [selectedShotIds, setSelectedShotIds] = useState<Set<string>>(new Set())
+
   // Track the currently dragged shot for DragOverlay
   const [activeDragShot, setActiveDragShot] = useState<LocationShot | null>(
     null
@@ -179,12 +189,14 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
         image_url?: string | null
         character_type?: string
         count?: number
+        color?: string
       }
       vehicle?: {
         id: string
         name: string
         shot_id?: string
         image_url?: string | null
+        color?: string
       }
       shot: number | null
     }> = []
@@ -203,6 +215,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
               image_url: char.image_url as string | null | undefined,
               character_type: char.character_type as string | undefined,
               count: char.count as number | undefined,
+              color: char.color as string | undefined,
             },
             shot: shotNumber,
           })
@@ -218,6 +231,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
               name: veh.name as string,
               shot_id: veh.shot_id as string | undefined,
               image_url: veh.image_url as string | null | undefined,
+              color: veh.color as string | undefined,
             },
             shot: shotNumber,
           })
@@ -239,11 +253,13 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
           image_url?: string
           character_type?: string
           count?: number
+          color?: string
         }
         vehicle?: {
           id: string
           name: string
           image_url?: string
+          color?: string
         }
         shot: number | null
       }
@@ -259,6 +275,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
             image_url: item.character.image_url || undefined,
             character_type: item.character.character_type,
             count: item.character.count,
+            color: item.character.color,
           },
           shot: item.shot,
         })
@@ -269,6 +286,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
             id: item.vehicle.id,
             name: item.vehicle.name,
             image_url: item.vehicle.image_url || undefined,
+            color: item.vehicle.color,
           },
           shot: item.shot,
         })
@@ -343,6 +361,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
               image_url: item.character.image_url || undefined,
               character_type: item.character.character_type,
               count: item.character.count,
+              color: item.character.color,
             }
           : undefined,
         vehicle: item.vehicle
@@ -350,6 +369,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
               id: item.vehicle.id,
               name: item.vehicle.name,
               image_url: item.vehicle.image_url || undefined,
+              color: item.vehicle.color,
             }
           : undefined,
       }))
@@ -579,6 +599,164 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     }
   }
 
+  // Handle character selection (shift+click for multi-select)
+  const handleCharacterSelect = useCallback(
+    (shotId: string, addToSelection: boolean) => {
+      if (addToSelection) {
+        // Shift+click: toggle in selection
+        setSelectedShotIds(prev => {
+          const next = new Set(prev)
+          if (next.has(shotId)) {
+            next.delete(shotId)
+          } else {
+            next.add(shotId)
+          }
+          return next
+        })
+      } else {
+        // Regular click: select only this one (or deselect if already selected alone)
+        setSelectedShotIds(prev => {
+          if (prev.size === 1 && prev.has(shotId)) {
+            return new Set()
+          }
+          return new Set([shotId])
+        })
+      }
+    },
+    []
+  )
+
+  // Clear selection
+  const clearSelection = useCallback(() => {
+    setSelectedShotIds(new Set())
+  }, [])
+
+  // Move selected shots to unassigned
+  const moveSelectedToUnassigned = useCallback(async () => {
+    if (selectedShotIds.size === 0 || !fightId) return
+
+    const shotIds = Array.from(selectedShotIds)
+
+    // Apply optimistic updates for all selected shots
+    setLocationOverrides(prev => {
+      const next = new Map(prev)
+      shotIds.forEach(shotId => next.set(shotId, null))
+      return next
+    })
+
+    // Clear selection
+    setSelectedShotIds(new Set())
+
+    // Make API calls for each shot
+    try {
+      await Promise.all(
+        shotIds.map(shotId =>
+          client.updateShotLocationById(fightId, shotId, null)
+        )
+      )
+      toastSuccess(
+        `${shotIds.length} ${shotIds.length === 1 ? "character" : "characters"} moved to Unassigned`
+      )
+
+      // Refresh encounter data
+      const encounterResponse = await client.getEncounter(encounter)
+      if (encounterResponse.data) {
+        dispatchEncounter({
+          type: FormActions.UPDATE,
+          name: "encounter",
+          value: encounterResponse.data as Encounter,
+        })
+      }
+    } catch (err) {
+      console.error("Failed to move characters:", err)
+      // Revert optimistic updates
+      setLocationOverrides(prev => {
+        const next = new Map(prev)
+        shotIds.forEach(shotId => next.delete(shotId))
+        return next
+      })
+      toastError("Failed to move characters")
+    }
+  }, [
+    selectedShotIds,
+    fightId,
+    client,
+    encounter,
+    dispatchEncounter,
+    toastSuccess,
+    toastError,
+  ])
+
+  // Keyboard shortcuts for canvas operations
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle when in canvas mode
+      if (viewMode !== "canvas") return
+
+      // Don't handle if focus is on an input element
+      const target = e.target as HTMLElement
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      ) {
+        return
+      }
+
+      switch (e.key) {
+        case "Escape":
+          // Clear selection and exit connection mode
+          clearSelection()
+          if (connectionMode) {
+            setConnectionMode(false)
+            setPendingConnection(null)
+            setPreviewLine(null)
+          }
+          break
+
+        case "Delete":
+        case "Backspace":
+          // Move selected characters to unassigned
+          if (selectedShotIds.size > 0) {
+            e.preventDefault()
+            moveSelectedToUnassigned()
+          }
+          break
+
+        case "+":
+        case "=":
+          // Zoom in
+          e.preventDefault()
+          handleZoomIn()
+          break
+
+        case "-":
+          // Zoom out
+          e.preventDefault()
+          handleZoomOut()
+          break
+
+        case "0":
+          // Reset zoom and pan
+          e.preventDefault()
+          handleZoomReset()
+          break
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [
+    viewMode,
+    connectionMode,
+    selectedShotIds,
+    clearSelection,
+    moveSelectedToUnassigned,
+    handleZoomIn,
+    handleZoomOut,
+    handleZoomReset,
+  ])
+
   // Check if a zone would overlap with any other zone
   const wouldOverlap = useCallback(
     (movingLocationId: string, newRect: Rect): boolean => {
@@ -686,6 +864,66 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
       }
     },
     [flushUpdate]
+  )
+
+  // Zoom handlers
+  const MIN_ZOOM = 0.5
+  const MAX_ZOOM = 2.0
+  const ZOOM_STEP = 0.1
+
+  const handleZoomIn = useCallback(() => {
+    setZoom(z => Math.min(MAX_ZOOM, z + ZOOM_STEP))
+  }, [])
+
+  const handleZoomOut = useCallback(() => {
+    setZoom(z => Math.max(MIN_ZOOM, z - ZOOM_STEP))
+  }, [])
+
+  const handleZoomReset = useCallback(() => {
+    setZoom(1.0)
+    setPan({ x: 0, y: 0 })
+  }, [])
+
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    // Only zoom if Ctrl/Cmd is held
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault()
+      const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP
+      setZoom(z => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z + delta)))
+    }
+  }, [])
+
+  // Pan handlers (middle mouse button or space+drag)
+  const handleCanvasMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      // Start pan on middle mouse button (button 1)
+      if (e.button === 1) {
+        e.preventDefault()
+        setIsPanning(true)
+        panStart.current = {
+          x: e.clientX,
+          y: e.clientY,
+          panX: pan.x,
+          panY: pan.y,
+        }
+      }
+    },
+    [pan]
+  )
+
+  const handleCanvasMouseUp = useCallback(() => {
+    setIsPanning(false)
+  }, [])
+
+  const handlePanMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (isPanning) {
+        const dx = e.clientX - panStart.current.x
+        const dy = e.clientY - panStart.current.y
+        setPan({ x: panStart.current.panX + dx, y: panStart.current.panY + dy })
+      }
+    },
+    [isPanning]
   )
 
   const handleViewModeChange = (
@@ -1121,6 +1359,8 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
                   key={location.id}
                   location={location}
                   onCharacterClick={handleCharacterClick}
+                  onCharacterSelect={handleCharacterSelect}
+                  selectedShotIds={selectedShotIds}
                   onEdit={handleEditLocation}
                   onDelete={handleDeleteLocation}
                   isCanvasMode={false}
@@ -1130,65 +1370,96 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
           ) : (
             // Canvas layout (Phase 3 - draggable/resizable zones)
             <Box
-              ref={canvasRef}
-              onMouseMove={handleCanvasMouseMove}
-              onClick={() => {
-                // Cancel pending connection when clicking on empty canvas
-                if (connectionMode && pendingConnection) {
-                  setPendingConnection(null)
-                  setPreviewLine(null)
-                }
-              }}
               sx={{
                 position: "relative",
-                minWidth: canvasDimensions.width,
-                minHeight: canvasDimensions.height,
                 backgroundColor: "grey.100",
                 borderRadius: 1,
                 border: "1px solid",
                 borderColor: connectionMode ? "primary.main" : "divider",
                 borderWidth: connectionMode ? 2 : 1,
                 overflow: "auto",
-                cursor: connectionMode ? "crosshair" : "default",
+                cursor: isPanning
+                  ? "grabbing"
+                  : connectionMode
+                    ? "crosshair"
+                    : "default",
               }}
+              onWheel={handleWheel}
+              onMouseDown={handleCanvasMouseDown}
+              onMouseUp={handleCanvasMouseUp}
+              onMouseLeave={handleCanvasMouseUp}
             >
-              {/* Connection lines layer */}
-              <ConnectionsLayer
-                connections={connections}
-                locations={displayData.locations}
-                selectedConnection={selectedConnection}
-                onConnectionClick={handleConnectionClick}
-                previewLine={previewLine}
-                width={canvasDimensions.width}
-                height={canvasDimensions.height}
+              {/* Zoom controls */}
+              <CanvasControls
+                zoom={zoom}
+                onZoomIn={handleZoomIn}
+                onZoomOut={handleZoomOut}
+                onReset={handleZoomReset}
+                minZoom={MIN_ZOOM}
+                maxZoom={MAX_ZOOM}
               />
-
-              {displayData.locations.map(location => (
-                <LocationZone
-                  key={location.id}
-                  location={location}
-                  onCharacterClick={handleCharacterClick}
-                  onPositionChange={handlePositionChange}
-                  onSizeChange={handleSizeChange}
-                  onDragEnd={handleZoneDragEnd}
-                  onResizeEnd={handleZoneDragEnd}
-                  onEdit={handleEditLocation}
-                  onDelete={handleDeleteLocation}
-                  isCanvasMode={true}
+              {/* Transform container for zoom/pan */}
+              <Box
+                ref={canvasRef}
+                onMouseMove={e => {
+                  handleCanvasMouseMove(e)
+                  handlePanMouseMove(e)
+                }}
+                onClick={() => {
+                  // Cancel pending connection when clicking on empty canvas
+                  if (connectionMode && pendingConnection) {
+                    setPendingConnection(null)
+                    setPreviewLine(null)
+                  }
+                }}
+                sx={{
+                  position: "relative",
+                  minWidth: canvasDimensions.width * zoom,
+                  minHeight: canvasDimensions.height * zoom,
+                  transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+                  transformOrigin: "top left",
+                }}
+              >
+                {/* Connection lines layer */}
+                <ConnectionsLayer
+                  connections={connections}
+                  locations={displayData.locations}
+                  selectedConnection={selectedConnection}
+                  onConnectionClick={handleConnectionClick}
+                  previewLine={previewLine}
+                  width={canvasDimensions.width}
+                  height={canvasDimensions.height}
                 />
-              ))}
 
-              {/* Connection handles (visible only in connection mode) */}
-              {connectionMode &&
-                handlePositions.map(({ locationId, centerX, centerY }) => (
-                  <ConnectionHandle
-                    key={`handle-${locationId}`}
-                    x={centerX}
-                    y={centerY}
-                    isActive={pendingConnection === locationId}
-                    onClick={() => handleConnectionHandleClick(locationId)}
+                {displayData.locations.map(location => (
+                  <LocationZone
+                    key={location.id}
+                    location={location}
+                    onCharacterClick={handleCharacterClick}
+                    onCharacterSelect={handleCharacterSelect}
+                    selectedShotIds={selectedShotIds}
+                    onPositionChange={handlePositionChange}
+                    onSizeChange={handleSizeChange}
+                    onDragEnd={handleZoneDragEnd}
+                    onResizeEnd={handleZoneDragEnd}
+                    onEdit={handleEditLocation}
+                    onDelete={handleDeleteLocation}
+                    isCanvasMode={true}
                   />
                 ))}
+
+                {/* Connection handles (visible only in connection mode) */}
+                {connectionMode &&
+                  handlePositions.map(({ locationId, centerX, centerY }) => (
+                    <ConnectionHandle
+                      key={`handle-${locationId}`}
+                      x={centerX}
+                      y={centerY}
+                      isActive={pendingConnection === locationId}
+                      onClick={() => handleConnectionHandleClick(locationId)}
+                    />
+                  ))}
+              </Box>
             </Box>
           )}
 
@@ -1196,6 +1467,8 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
           <UnassignedZone
             shots={displayData.unassignedShots}
             onCharacterClick={handleCharacterClick}
+            onCharacterSelect={handleCharacterSelect}
+            selectedShotIds={selectedShotIds}
           />
 
           {/* Drag overlay - shows the dragged item */}

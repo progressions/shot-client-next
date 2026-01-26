@@ -11,6 +11,8 @@ import { MIN_ZONE_WIDTH, MIN_ZONE_HEIGHT } from "./constants"
 interface LocationZoneProps {
   location: Location
   onCharacterClick?: (shot: LocationShot) => void
+  onCharacterSelect?: (shotId: string, addToSelection: boolean) => void
+  selectedShotIds?: Set<string>
   onPositionChange?: (
     location: Location,
     position: { x: number; y: number }
@@ -35,6 +37,8 @@ interface LocationZoneProps {
 export default function LocationZone({
   location,
   onCharacterClick,
+  onCharacterSelect,
+  selectedShotIds,
   onPositionChange,
   onSizeChange,
   onDragEnd,
@@ -394,6 +398,8 @@ export default function LocationZone({
               key={shot.id}
               shot={shot}
               onClick={onCharacterClick}
+              onSelect={onCharacterSelect}
+              isSelected={selectedShotIds?.has(shot.id) ?? false}
             />
           ))
         ) : (

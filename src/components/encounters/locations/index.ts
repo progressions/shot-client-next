@@ -1,3 +1,4 @@
+export { default as CanvasControls } from "./CanvasControls"
 export { default as LocationCharacterAvatar } from "./LocationCharacterAvatar"
 export { default as LocationZone } from "./LocationZone"
 export { default as UnassignedZone } from "./UnassignedZone"

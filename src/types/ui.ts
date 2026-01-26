@@ -96,11 +96,13 @@ export interface LocationShot {
     character_type?: string
     faction?: string
     count?: number
+    color?: string
   }
   vehicle?: {
     id: string
     name: string
     image_url?: string
+    color?: string
   }
 }
 
