@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState, useCallback, useRef } from "react"
+import { useMemo, useState, useCallback, useRef, useEffect } from "react"
 import {
   Box,
   Typography,
@@ -102,8 +102,19 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   const { connections } = useLocationConnections(fightId)
   const { queueUpdate, flushUpdate } = useDebouncedLocationUpdate(500)
 
-  // View mode state - default to "canvas" for visual layout
-  const [viewMode, setViewMode] = useState<ViewMode>("canvas")
+  // View mode state - persist in localStorage, default to "canvas" for visual layout
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("locationsPanel.viewMode")
+      if (saved === "grid" || saved === "canvas") return saved
+    }
+    return "canvas"
+  })
+
+  // Persist view mode to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem("locationsPanel.viewMode", viewMode)
+  }, [viewMode])
 
   // Connection mode state
   const [connectionMode, setConnectionMode] = useState(false)
@@ -119,6 +130,8 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     toPoint: { x: number; y: number }
   } | null>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
+  const lastMouseMoveTime = useRef<number>(0)
+  const tempAnchorRef = useRef<HTMLDivElement | null>(null)
 
   // Track the currently dragged shot for DragOverlay
   const [activeDragShot, setActiveDragShot] = useState<LocationShot | null>(
@@ -417,6 +430,18 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     }
   }, [enrichedLocations, unassignedShots, locationOverrides])
 
+  // Memoize handle positions to avoid recalculating on every render
+  const handlePositions = useMemo(() => {
+    return displayData.locations
+      .filter(loc => loc.id)
+      .map(loc => ({
+        locationId: loc.id!,
+        centerX: (loc.position_x ?? 0) + (loc.width ?? DEFAULT_ZONE_WIDTH) / 2,
+        centerY:
+          (loc.position_y ?? 0) + (loc.height ?? DEFAULT_ZONE_HEIGHT) / 2,
+      }))
+  }, [displayData.locations])
+
   // Calculate canvas dimensions based on zone positions
   const canvasDimensions = useMemo(() => {
     let maxX = CANVAS_MIN_WIDTH
@@ -692,7 +717,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   }, [])
 
   const handleConnectionHandleClick = useCallback(
-    (locationId: string, event: React.MouseEvent) => {
+    (locationId: string) => {
       if (!connectionMode) return
 
       if (!pendingConnection) {
@@ -709,7 +734,17 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
           from_location_id: pendingConnection,
           to_location_id: locationId,
         })
-        setPopoverAnchor(event.currentTarget as HTMLElement)
+        // Create a temporary anchor element for the popover
+        const tempAnchor = document.createElement("div")
+        tempAnchor.style.position = "fixed"
+        tempAnchor.style.left = `${window.innerWidth / 2}px`
+        tempAnchor.style.top = `${window.innerHeight / 2}px`
+        tempAnchor.style.width = "0px"
+        tempAnchor.style.height = "0px"
+        tempAnchor.style.pointerEvents = "none"
+        document.body.appendChild(tempAnchor)
+        tempAnchorRef.current = tempAnchor
+        setPopoverAnchor(tempAnchor)
       }
     },
     [connectionMode, pendingConnection]
@@ -718,6 +753,11 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   const handleCanvasMouseMove = useCallback(
     (event: React.MouseEvent) => {
       if (!connectionMode || !pendingConnection || !canvasRef.current) return
+
+      // Throttle mouse move updates to 60fps (16ms) to avoid excessive re-renders
+      const now = Date.now()
+      if (now - lastMouseMoveTime.current < 16) return
+      lastMouseMoveTime.current = now
 
       const rect = canvasRef.current.getBoundingClientRect()
       const x = event.clientX - rect.left
@@ -735,24 +775,28 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     (connection: LocationConnection) => {
       setSelectedConnection(connection)
       setIsNewConnection(false)
-      // Create a temporary anchor element at the click position
+      // Create a temporary anchor element at the center of the screen
       const tempAnchor = document.createElement("div")
       tempAnchor.style.position = "fixed"
       tempAnchor.style.left = `${window.innerWidth / 2}px`
       tempAnchor.style.top = `${window.innerHeight / 2}px`
+      tempAnchor.style.width = "0px"
+      tempAnchor.style.height = "0px"
+      tempAnchor.style.pointerEvents = "none"
       document.body.appendChild(tempAnchor)
+      // Store in ref for cleanup when popover closes
+      tempAnchorRef.current = tempAnchor
       setPopoverAnchor(tempAnchor)
-      // Clean up the temporary anchor when popover closes
-      setTimeout(() => {
-        if (tempAnchor.parentNode) {
-          tempAnchor.parentNode.removeChild(tempAnchor)
-        }
-      }, 100)
     },
     []
   )
 
   const handleConnectionPopoverClose = useCallback(() => {
+    // Clean up temporary anchor element if it exists
+    if (tempAnchorRef.current?.parentNode) {
+      tempAnchorRef.current.parentNode.removeChild(tempAnchorRef.current)
+      tempAnchorRef.current = null
+    }
     setPopoverAnchor(null)
     setSelectedConnection(null)
     setIsNewConnection(false)
@@ -766,6 +810,22 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
 
       try {
         if (isNewConnection) {
+          // Check for duplicate connections before creating
+          const fromId = selectedConnection.from_location_id
+          const toId = selectedConnection.to_location_id
+          const existingConnection = connections.find(
+            conn =>
+              (conn.from_location_id === fromId &&
+                conn.to_location_id === toId) ||
+              (conn.bidirectional &&
+                conn.from_location_id === toId &&
+                conn.to_location_id === fromId)
+          )
+          if (existingConnection) {
+            toastError("A connection between these locations already exists")
+            return
+          }
+
           // Creating a new connection
           await client.createFightLocationConnection(fightId, {
             from_location_id: selectedConnection.from_location_id,
@@ -792,6 +852,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
       fightId,
       selectedConnection,
       isNewConnection,
+      connections,
       client,
       toastSuccess,
       toastError,
@@ -1119,28 +1180,15 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
 
               {/* Connection handles (visible only in connection mode) */}
               {connectionMode &&
-                displayData.locations.map(location => {
-                  if (!location.id) return null
-                  const centerX =
-                    (location.position_x ?? 0) +
-                    (location.width ?? DEFAULT_ZONE_WIDTH) / 2
-                  const centerY =
-                    (location.position_y ?? 0) +
-                    (location.height ?? DEFAULT_ZONE_HEIGHT) / 2
-                  return (
-                    <ConnectionHandle
-                      key={`handle-${location.id}`}
-                      x={centerX}
-                      y={centerY}
-                      isActive={pendingConnection === location.id}
-                      onClick={() =>
-                        handleConnectionHandleClick(location.id!, {
-                          currentTarget: canvasRef.current,
-                        } as React.MouseEvent)
-                      }
-                    />
-                  )
-                })}
+                handlePositions.map(({ locationId, centerX, centerY }) => (
+                  <ConnectionHandle
+                    key={`handle-${locationId}`}
+                    x={centerX}
+                    y={centerY}
+                    isActive={pendingConnection === locationId}
+                    onClick={() => handleConnectionHandleClick(locationId)}
+                  />
+                ))}
             </Box>
           )}
 
@@ -1191,7 +1239,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
         onSave={handleConnectionSave}
         onDelete={!isNewConnection ? handleConnectionDelete : undefined}
         connection={selectedConnection}
-        isNew={isNewConnection}
+        isNewConnection={isNewConnection}
       />
     </BasePanel>
   )

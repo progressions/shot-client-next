@@ -29,6 +29,7 @@ export function createLocationConnectionClient(deps: ClientDependencies) {
 
   /**
    * Create a new location connection for a fight
+   * @throws Error if attempting to create a self-connection
    */
   async function createFightLocationConnection(
     fight: Fight | string,
@@ -39,6 +40,11 @@ export function createLocationConnectionClient(deps: ClientDependencies) {
       label?: string
     }
   ): Promise<AxiosResponse<LocationConnection>> {
+    // Validate: cannot create a connection from a location to itself
+    if (connection.from_location_id === connection.to_location_id) {
+      throw new Error("Cannot create a connection from a location to itself")
+    }
+
     const fightId = typeof fight === "string" ? fight : fight.id
     return post(apiV2.fightLocationConnections({ id: fightId }), {
       location_connection: connection,

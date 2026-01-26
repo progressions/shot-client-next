@@ -38,7 +38,13 @@ export function useLocationConnections(
   const [error, setError] = useState<string | null>(null)
 
   // Track the latest fight_id from WebSocket to filter connection updates
-  const latestWsFightId = useRef<string | null>(null)
+  // Initialize with the prop fightId to avoid race conditions on initial load
+  const latestWsFightId = useRef<string | undefined>(fightId)
+
+  // Keep the ref in sync with the prop when it changes
+  useEffect(() => {
+    latestWsFightId.current = fightId
+  }, [fightId])
 
   const fetchConnections = useCallback(async () => {
     if (!fightId) {
@@ -93,10 +99,12 @@ export function useLocationConnections(
       "location_connections",
       (data: unknown) => {
         // Only update if the connections are for this fight
-        if (latestWsFightId.current && latestWsFightId.current !== fightId) {
+        // Use the ref to compare against the latest WebSocket fight_id
+        const currentFightId = latestWsFightId.current
+        if (currentFightId && currentFightId !== fightId) {
           console.log(
             "[useLocationConnections] Ignoring connections update for different fight:",
-            latestWsFightId.current,
+            currentFightId,
             "!==",
             fightId
           )

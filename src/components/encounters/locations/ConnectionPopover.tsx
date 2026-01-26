@@ -23,7 +23,7 @@ interface ConnectionPopoverProps {
   /** Initial values when editing an existing connection */
   connection?: LocationConnection | null
   /** Whether this is for creating a new connection */
-  isNew?: boolean
+  isNewConnection?: boolean
 }
 
 /**
@@ -37,7 +37,7 @@ export default function ConnectionPopover({
   onSave,
   onDelete,
   connection,
-  isNew = false,
+  isNewConnection = false,
 }: ConnectionPopoverProps) {
   const [label, setLabel] = useState("")
   const [bidirectional, setBidirectional] = useState(true)
@@ -84,7 +84,7 @@ export default function ConnectionPopover({
     >
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <Typography variant="subtitle2" color="text.secondary">
-          {isNew ? "New Connection" : "Edit Connection"}
+          {isNewConnection ? "New Connection" : "Edit Connection"}
         </Typography>
 
         <TextField
@@ -94,7 +94,7 @@ export default function ConnectionPopover({
           onKeyDown={handleKeyDown}
           size="small"
           fullWidth
-          autoFocus={isNew}
+          autoFocus={isNewConnection}
           placeholder="e.g., Stairs, Door, etc."
         />
 
@@ -110,7 +110,7 @@ export default function ConnectionPopover({
         />
 
         <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1 }}>
-          {!isNew && onDelete && (
+          {!isNewConnection && onDelete && (
             <IconButton
               onClick={onDelete}
               color="error"
@@ -125,7 +125,7 @@ export default function ConnectionPopover({
             Cancel
           </Button>
           <Button onClick={handleSave} variant="contained" size="small">
-            {isNew ? "Create" : "Save"}
+            {isNewConnection ? "Create" : "Save"}
           </Button>
         </Box>
       </Box>

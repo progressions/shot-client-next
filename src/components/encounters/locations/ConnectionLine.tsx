@@ -177,11 +177,11 @@ export default function ConnectionLine({
       {/* Label at midpoint */}
       {connection.label && (
         <g transform={`translate(${midPoint.x}, ${midPoint.y})`}>
-          {/* Background for readability */}
+          {/* Background for readability - uses generous padding for variable-width fonts */}
           <rect
-            x={-connection.label.length * 4 - 4}
+            x={-connection.label.length * 4 - 8}
             y={-10}
-            width={connection.label.length * 8 + 8}
+            width={connection.label.length * 8 + 16}
             height={20}
             fill="white"
             fillOpacity={0.9}
