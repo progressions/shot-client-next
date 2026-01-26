@@ -1,7 +1,8 @@
 "use client"
 
 import { useRef, useState, useCallback } from "react"
-import { Paper, Box, Typography } from "@mui/material"
+import { Paper, Box, Typography, IconButton } from "@mui/material"
+import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material"
 import { useDroppable } from "@dnd-kit/core"
 import type { Location, LocationShot } from "@/types"
 import LocationCharacterAvatar from "./LocationCharacterAvatar"
@@ -19,6 +20,8 @@ interface LocationZoneProps {
   ) => void
   onDragEnd?: (location: Location) => void
   onResizeEnd?: (location: Location) => void
+  onEdit?: (location: Location) => void
+  onDelete?: (location: Location) => void
   isCanvasMode?: boolean
 }
 
@@ -38,6 +41,8 @@ export default function LocationZone({
   onSizeChange,
   onDragEnd,
   onResizeEnd,
+  onEdit,
+  onDelete,
   isCanvasMode = false,
 }: LocationZoneProps) {
   const { setNodeRef, isOver } = useDroppable({
@@ -46,6 +51,7 @@ export default function LocationZone({
 
   const [isDragging, setIsDragging] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
+  const [isHovering, setIsHovering] = useState(false)
   const dragStartPos = useRef<{
     x: number
     y: number
@@ -250,6 +256,8 @@ export default function LocationZone({
     <Paper
       ref={setNodeRef}
       elevation={isOver ? 6 : isDragging || isResizing ? 8 : 3}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
       sx={{
         ...zoneStyles,
         minHeight: isCanvasMode ? undefined : 120,
@@ -271,19 +279,24 @@ export default function LocationZone({
         userSelect: isDragging || isResizing ? "none" : "auto",
       }}
     >
-      {/* Header - draggable in canvas mode */}
+      {/* Header - draggable in canvas mode, double-click to edit */}
       <Box
         onMouseDown={handleHeaderMouseDown}
+        onDoubleClick={() => onEdit?.(location)}
         sx={{
           backgroundColor: "primary.main",
           color: "primary.contrastText",
           px: 1.5,
-          py: 0.75,
+          py: 0.5,
           borderBottom: "1px solid",
           borderColor: "divider",
           cursor: isCanvasMode ? "move" : "default",
           borderTopLeftRadius: 6,
           borderTopRightRadius: 6,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          minHeight: 32,
         }}
       >
         <Typography
@@ -293,10 +306,49 @@ export default function LocationZone({
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
+            flex: 1,
           }}
         >
           {location.name}
         </Typography>
+
+        {/* Action buttons - show on hover */}
+        {isHovering && (onEdit || onDelete) && (
+          <Box sx={{ display: "flex", ml: 0.5 }}>
+            {onEdit && (
+              <IconButton
+                size="small"
+                onClick={e => {
+                  e.stopPropagation()
+                  onEdit(location)
+                }}
+                sx={{
+                  color: "primary.contrastText",
+                  p: 0.25,
+                  "&:hover": { backgroundColor: "rgba(255,255,255,0.2)" },
+                }}
+              >
+                <EditIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+            )}
+            {onDelete && (
+              <IconButton
+                size="small"
+                onClick={e => {
+                  e.stopPropagation()
+                  onDelete(location)
+                }}
+                sx={{
+                  color: "primary.contrastText",
+                  p: 0.25,
+                  "&:hover": { backgroundColor: "rgba(255,255,255,0.2)" },
+                }}
+              >
+                <DeleteIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+            )}
+          </Box>
+        )}
       </Box>
 
       {/* Characters */}

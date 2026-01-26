@@ -10,11 +10,13 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
+  Button,
 } from "@mui/material"
 import {
   Close as CloseIcon,
   GridView as GridIcon,
   Map as CanvasIcon,
+  Add as AddIcon,
 } from "@mui/icons-material"
 import { FaMapLocationDot } from "react-icons/fa6"
 import {
@@ -35,6 +37,8 @@ import BasePanel from "../BasePanel"
 import LocationZone from "./LocationZone"
 import UnassignedZone from "./UnassignedZone"
 import LocationCharacterAvatar from "./LocationCharacterAvatar"
+import LocationFormDialog from "./LocationFormDialog"
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog"
 
 interface LocationsPanelProps {
   onClose: () => void
@@ -101,6 +105,14 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
   const [positionOverrides, setPositionOverrides] = useState<
     Map<string, { x?: number; y?: number; width?: number; height?: number }>
   >(new Map())
+
+  // Dialog state for add/edit/delete
+  const [formDialogOpen, setFormDialogOpen] = useState(false)
+  const [editingLocation, setEditingLocation] = useState<Location | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [deletingLocation, setDeletingLocation] = useState<Location | null>(
+    null
+  )
 
   // Configure sensors for drag-and-drop
   const sensors = useSensors(
@@ -626,6 +638,108 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     }
   }
 
+  // CRUD handlers for locations
+  const handleAddLocation = () => {
+    setEditingLocation(null)
+    setFormDialogOpen(true)
+  }
+
+  const handleEditLocation = (location: Location) => {
+    setEditingLocation(location)
+    setFormDialogOpen(true)
+  }
+
+  const handleDeleteLocation = (location: Location) => {
+    setDeletingLocation(location)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleSaveLocation = async (locationData: Partial<Location>) => {
+    if (!fightId) return
+
+    try {
+      if (editingLocation?.id) {
+        // Update existing location
+        await client.updateLocation(editingLocation.id, locationData)
+        toastSuccess(`Location "${locationData.name}" updated`)
+      } else {
+        // Create new location - calculate position to avoid overlap
+        const newPosition = calculateNewLocationPosition()
+        const newLocation = {
+          ...locationData,
+          position_x: newPosition.x,
+          position_y: newPosition.y,
+          width: DEFAULT_ZONE_WIDTH,
+          height: DEFAULT_ZONE_HEIGHT,
+        }
+        await client.createFightLocation(fightId, newLocation)
+        toastSuccess(`Location "${locationData.name}" created`)
+      }
+      // WebSocket will broadcast the update automatically
+    } catch (err) {
+      console.error("Failed to save location:", err)
+      toastError("Failed to save location")
+      throw err // Re-throw so dialog knows it failed
+    }
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!deletingLocation?.id) return
+
+    try {
+      await client.deleteLocation(deletingLocation.id)
+      toastSuccess(`Location "${deletingLocation.name}" deleted`)
+      setDeleteDialogOpen(false)
+      setDeletingLocation(null)
+      // WebSocket will broadcast the update automatically
+    } catch (err) {
+      console.error("Failed to delete location:", err)
+      toastError("Failed to delete location")
+    }
+  }
+
+  // Calculate position for new location to avoid overlap
+  const calculateNewLocationPosition = (): { x: number; y: number } => {
+    const padding = ZONE_SPACING
+    const x = padding
+    const y = padding
+
+    // Find a position that doesn't overlap with existing locations
+    const existingRects = displayData.locations.map(loc => ({
+      x: loc.position_x ?? 0,
+      y: loc.position_y ?? 0,
+      width: loc.width ?? DEFAULT_ZONE_WIDTH,
+      height: loc.height ?? DEFAULT_ZONE_HEIGHT,
+    }))
+
+    // Try positions in a grid pattern
+    const gridStep = DEFAULT_ZONE_WIDTH + padding
+    for (let row = 0; row < 10; row++) {
+      for (let col = 0; col < 5; col++) {
+        const testX = col * gridStep + padding
+        const testY = row * (DEFAULT_ZONE_HEIGHT + padding) + padding
+        const testRect = {
+          x: testX,
+          y: testY,
+          width: DEFAULT_ZONE_WIDTH,
+          height: DEFAULT_ZONE_HEIGHT,
+        }
+
+        const hasOverlap = existingRects.some(rect =>
+          rectsOverlap(testRect, rect, COLLISION_PADDING)
+        )
+
+        if (!hasOverlap) {
+          return { x: testX, y: testY }
+        }
+      }
+    }
+
+    // Fallback: place at bottom
+    const maxY = Math.max(0, ...existingRects.map(r => r.y + r.height))
+    return { x: padding, y: maxY + padding }
+  }
+
   if (loading) {
     return (
       <BasePanel
@@ -677,6 +791,14 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
           alignItems: "center",
         }}
       >
+        <Button
+          variant="contained"
+          size="small"
+          startIcon={<AddIcon />}
+          onClick={handleAddLocation}
+        >
+          Add Location
+        </Button>
         <ToggleButtonGroup
           value={viewMode}
           exclusive
@@ -735,6 +857,8 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
                   key={location.id}
                   location={location}
                   onCharacterClick={handleCharacterClick}
+                  onEdit={handleEditLocation}
+                  onDelete={handleDeleteLocation}
                   isCanvasMode={false}
                 />
               ))}
@@ -762,6 +886,8 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
                   onSizeChange={handleSizeChange}
                   onDragEnd={handleZoneDragEnd}
                   onResizeEnd={handleZoneDragEnd}
+                  onEdit={handleEditLocation}
+                  onDelete={handleDeleteLocation}
                   isCanvasMode={true}
                 />
               ))}
@@ -782,6 +908,30 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
           </DragOverlay>
         </DndContext>
       )}
+
+      {/* Location form dialog for add/edit */}
+      <LocationFormDialog
+        open={formDialogOpen}
+        onClose={() => {
+          setFormDialogOpen(false)
+          setEditingLocation(null)
+        }}
+        onSave={handleSaveLocation}
+        location={editingLocation}
+      />
+
+      {/* Delete confirmation dialog */}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onClose={() => {
+          setDeleteDialogOpen(false)
+          setDeletingLocation(null)
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete Location"
+        message={`Are you sure you want to delete "${deletingLocation?.name}"? Characters in this location will be moved to Unassigned.`}
+        destructive
+      />
     </BasePanel>
   )
 }
