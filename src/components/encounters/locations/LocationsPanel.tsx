@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState, useCallback } from "react"
 import {
   Box,
   Typography,
@@ -10,12 +10,24 @@ import {
 } from "@mui/material"
 import { Close as CloseIcon } from "@mui/icons-material"
 import { FaMapLocationDot } from "react-icons/fa6"
-import { useEncounter } from "@/contexts"
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  pointerWithin,
+} from "@dnd-kit/core"
+import { useEncounter, useClient, useToast } from "@/contexts"
 import { useLocations } from "@/hooks"
-import type { LocationShot } from "@/types"
+import { FormActions } from "@/reducers"
+import type { LocationShot, Encounter } from "@/types"
 import BasePanel from "../BasePanel"
 import LocationZone from "./LocationZone"
 import UnassignedZone from "./UnassignedZone"
+import LocationCharacterAvatar from "./LocationCharacterAvatar"
 
 interface LocationsPanelProps {
   onClose: () => void
@@ -23,14 +35,36 @@ interface LocationsPanelProps {
 
 /**
  * LocationsPanel displays all fight locations as visual zones.
- * Characters/vehicles can be seen in their assigned locations.
+ * Characters/vehicles can be dragged between locations.
  *
- * Phase 1: Read-only visualization with auto-layout for zones without positions.
+ * Phase 2: Drag-and-drop support for moving characters between zones.
  */
 export default function LocationsPanel({ onClose }: LocationsPanelProps) {
-  const { encounter } = useEncounter()
+  const { encounter, dispatchEncounter } = useEncounter()
+  const { client } = useClient()
+  const { toastSuccess, toastError } = useToast()
   const fightId = encounter?.id
   const { locations, loading, error } = useLocations(fightId)
+
+  // Track the currently dragged shot for DragOverlay
+  const [activeDragShot, setActiveDragShot] = useState<LocationShot | null>(
+    null
+  )
+
+  // Track optimistic location overrides: shotId -> locationId (null = unassigned)
+  // This allows instant UI updates while the API call happens in the background
+  const [locationOverrides, setLocationOverrides] = useState<
+    Map<string, string | null>
+  >(new Map())
+
+  // Configure sensors for drag-and-drop
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5, // 5px movement required to start drag
+      },
+    })
+  )
 
   // Get all characters from the encounter (including hidden ones)
   // We need ALL characters to map location shots to their names
@@ -215,8 +249,194 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
       }))
   }, [allCharacters, enrichedLocations])
 
+  // Apply optimistic overrides to create display data
+  // This allows instant UI updates while the API call happens in the background
+  const displayData = useMemo(() => {
+    if (locationOverrides.size === 0) {
+      // No overrides, use data as-is
+      return {
+        locations: enrichedLocations,
+        unassignedShots: unassignedShots,
+      }
+    }
+
+    // Collect all shots from all sources for easy lookup
+    const allShots = new Map<string, LocationShot>()
+    enrichedLocations.forEach(loc => {
+      loc.shots?.forEach(shot => allShots.set(shot.id, shot))
+    })
+    unassignedShots.forEach(shot => allShots.set(shot.id, shot))
+
+    // Build new locations with overrides applied
+    const newLocations = enrichedLocations.map(loc => {
+      // Start with shots that belong here and haven't been moved away
+      const remainingShots =
+        loc.shots?.filter(shot => {
+          if (locationOverrides.has(shot.id)) {
+            // Shot has override - only keep if override points to this location
+            return locationOverrides.get(shot.id) === loc.id
+          }
+          return true // No override, keep in original location
+        }) || []
+
+      // Add shots that have been moved TO this location
+      const incomingShots: LocationShot[] = []
+      locationOverrides.forEach((targetLocId, shotId) => {
+        if (targetLocId === loc.id) {
+          // This shot was moved to this location
+          const shot = allShots.get(shotId)
+          // Only add if not already in remainingShots
+          if (shot && !remainingShots.some(s => s.id === shotId)) {
+            incomingShots.push(shot)
+          }
+        }
+      })
+
+      return {
+        ...loc,
+        shots: [...remainingShots, ...incomingShots],
+      }
+    })
+
+    // Build new unassigned list with overrides applied
+    const newUnassigned = unassignedShots.filter(shot => {
+      if (locationOverrides.has(shot.id)) {
+        // Shot has override - only keep if override is null (unassigned)
+        return locationOverrides.get(shot.id) === null
+      }
+      return true // No override, keep in unassigned
+    })
+
+    // Add shots that have been moved TO unassigned
+    locationOverrides.forEach((targetLocId, shotId) => {
+      if (targetLocId === null) {
+        const shot = allShots.get(shotId)
+        // Only add if not already in newUnassigned
+        if (shot && !newUnassigned.some(s => s.id === shotId)) {
+          newUnassigned.push(shot)
+        }
+      }
+    })
+
+    return {
+      locations: newLocations,
+      unassignedShots: newUnassigned,
+    }
+  }, [enrichedLocations, unassignedShots, locationOverrides])
+
+  // Find a shot by its ID from all available shots
+  const findShotById = useCallback(
+    (shotId: string): LocationShot | null => {
+      // Check assigned locations
+      for (const loc of displayData.locations) {
+        const shot = loc.shots?.find(s => s.id === shotId)
+        if (shot) return shot
+      }
+      // Check unassigned
+      const unassigned = displayData.unassignedShots.find(s => s.id === shotId)
+      if (unassigned) return unassigned
+      return null
+    },
+    [displayData]
+  )
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const shotId = event.active.id as string
+    const shot = findShotById(shotId)
+    setActiveDragShot(shot)
+  }
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+
+    // Get entity name before clearing drag state
+    const draggedShot = activeDragShot
+    setActiveDragShot(null)
+
+    if (!over || !fightId) return
+
+    const shotId = active.id as string
+    const targetId = over.id as string
+
+    // Determine the new location_id
+    // "unassigned" means set to null, otherwise it's a location ID
+    const newLocationId = targetId === "unassigned" ? null : targetId
+
+    // Find the current location of the shot to avoid unnecessary updates
+    let currentLocationId: string | null = null
+    for (const loc of displayData.locations) {
+      if (loc.shots?.some(s => s.id === shotId)) {
+        currentLocationId = loc.id
+        break
+      }
+    }
+    // If shot is in unassigned, currentLocationId stays null
+
+    // Don't update if dropping in the same location
+    if (newLocationId === currentLocationId) return
+
+    // Get names for toast message before the move
+    const entityName =
+      draggedShot?.character?.name || draggedShot?.vehicle?.name || "Character"
+    const locationName =
+      newLocationId === null
+        ? "Unassigned"
+        : displayData.locations.find(l => l.id === newLocationId)?.name ||
+          "location"
+
+    // Capture the previous override value (if any) to restore on failure
+    // This handles the case where a previous successful move set an override
+    const previousOverride = locationOverrides.get(shotId)
+    const hasPreviousOverride = locationOverrides.has(shotId)
+
+    // Apply optimistic update immediately
+    setLocationOverrides(prev => {
+      const next = new Map(prev)
+      next.set(shotId, newLocationId)
+      return next
+    })
+
+    try {
+      // Make API call in the background
+      await client.updateShotLocationById(fightId, shotId, newLocationId)
+
+      // Update the encounter context so other components get the new location data
+      // We keep the optimistic override in place so LocationsPanel doesn't flicker
+      // Note: We use dispatchEncounter directly with name: "encounter" because
+      // the context's updateEntity dispatches to name: "entity" which is wrong
+      const encounterResponse = await client.getEncounter(encounter)
+      if (encounterResponse.data) {
+        dispatchEncounter({
+          type: FormActions.UPDATE,
+          name: "encounter",
+          value: encounterResponse.data as Encounter,
+        })
+      }
+
+      toastSuccess(`${entityName} moved to ${locationName}`)
+    } catch (err) {
+      console.error("Failed to update location:", err)
+
+      // Revert to the previous override state, not just delete
+      // This preserves the last successful location if there was one
+      setLocationOverrides(prev => {
+        const next = new Map(prev)
+        if (hasPreviousOverride) {
+          // Restore the previous override (last successful location)
+          next.set(shotId, previousOverride as string | null)
+        } else {
+          // No previous override, remove entirely to show original server state
+          next.delete(shotId)
+        }
+        return next
+      })
+
+      toastError("Failed to move character")
+    }
+  }
+
   const handleCharacterClick = (shot: LocationShot) => {
-    // TODO: In future phases, this could open character details or start drag
+    // TODO: In future phases, this could open character details
     if (process.env.NODE_ENV === "development") {
       console.log("Character clicked:", shot)
     }
@@ -275,7 +495,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
         <CloseIcon />
       </IconButton>
 
-      {enrichedLocations.length === 0 ? (
+      {displayData.locations.length === 0 ? (
         <Box sx={{ textAlign: "center", py: 4 }}>
           <Typography variant="body1" color="text.secondary">
             No locations have been created for this fight yet.
@@ -286,7 +506,12 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
           </Typography>
         </Box>
       ) : (
-        <>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={pointerWithin}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
           {/* Grid layout for locations - handles variable heights naturally */}
           <Box
             sx={{
@@ -300,7 +525,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
               borderColor: "divider",
             }}
           >
-            {enrichedLocations.map(location => (
+            {displayData.locations.map(location => (
               <LocationZone
                 key={location.id}
                 location={location}
@@ -311,10 +536,17 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
 
           {/* Unassigned zone below the canvas */}
           <UnassignedZone
-            shots={unassignedShots}
+            shots={displayData.unassignedShots}
             onCharacterClick={handleCharacterClick}
           />
-        </>
+
+          {/* Drag overlay - shows the dragged item */}
+          <DragOverlay>
+            {activeDragShot ? (
+              <LocationCharacterAvatar shot={activeDragShot} isDragOverlay />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       )}
     </BasePanel>
   )

@@ -281,6 +281,21 @@ export function createFightClient(deps: ClientDependencies) {
     return get(apiV2.playerTokens(encounterId))
   }
 
+  /**
+   * Update a shot's location by location ID.
+   * Used for drag-and-drop in the Locations panel.
+   * Pass null as locationId to remove the shot from any location.
+   */
+  async function updateShotLocationById(
+    fightId: string,
+    shotId: string,
+    locationId: string | null
+  ): Promise<AxiosResponse<{ success: boolean }>> {
+    return patch(`${apiV2.fights({ id: fightId })}/shots/${shotId}`, {
+      shot: { location_id: locationId },
+    })
+  }
+
   function normalizeFightResponse(
     response: AxiosResponse<{ fight?: Fight }>
   ): AxiosResponse<Fight> {
@@ -310,5 +325,6 @@ export function createFightClient(deps: ClientDependencies) {
     resetFight,
     generatePlayerViewToken,
     listPlayerViewTokens,
+    updateShotLocationById,
   }
 }
