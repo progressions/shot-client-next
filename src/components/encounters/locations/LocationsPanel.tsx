@@ -62,6 +62,11 @@ import {
   COLLISION_PADDING,
 } from "./constants"
 
+// Zoom constants
+const MIN_ZOOM = 0.5
+const MAX_ZOOM = 2.0
+const ZOOM_STEP = 0.1
+
 interface LocationsPanelProps {
   onClose: () => void
 }
@@ -687,6 +692,20 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     toastError,
   ])
 
+  // Zoom handlers
+  const handleZoomIn = useCallback(() => {
+    setZoom(z => Math.min(MAX_ZOOM, z + ZOOM_STEP))
+  }, [])
+
+  const handleZoomOut = useCallback(() => {
+    setZoom(z => Math.max(MIN_ZOOM, z - ZOOM_STEP))
+  }, [])
+
+  const handleZoomReset = useCallback(() => {
+    setZoom(1.0)
+    setPan({ x: 0, y: 0 })
+  }, [])
+
   // Keyboard shortcuts for canvas operations
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -865,24 +884,6 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     },
     [flushUpdate]
   )
-
-  // Zoom handlers
-  const MIN_ZOOM = 0.5
-  const MAX_ZOOM = 2.0
-  const ZOOM_STEP = 0.1
-
-  const handleZoomIn = useCallback(() => {
-    setZoom(z => Math.min(MAX_ZOOM, z + ZOOM_STEP))
-  }, [])
-
-  const handleZoomOut = useCallback(() => {
-    setZoom(z => Math.max(MIN_ZOOM, z - ZOOM_STEP))
-  }, [])
-
-  const handleZoomReset = useCallback(() => {
-    setZoom(1.0)
-    setPan({ x: 0, y: 0 })
-  }, [])
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
     // Only zoom if Ctrl/Cmd is held
