@@ -383,6 +383,11 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
         : displayData.locations.find(l => l.id === newLocationId)?.name ||
           "location"
 
+    // Capture the previous override value (if any) to restore on failure
+    // This handles the case where a previous successful move set an override
+    const previousOverride = locationOverrides.get(shotId)
+    const hasPreviousOverride = locationOverrides.has(shotId)
+
     // Apply optimistic update immediately
     setLocationOverrides(prev => {
       const next = new Map(prev)
@@ -400,10 +405,17 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     } catch (err) {
       console.error("Failed to update location:", err)
 
-      // Revert the optimistic update
+      // Revert to the previous override state, not just delete
+      // This preserves the last successful location if there was one
       setLocationOverrides(prev => {
         const next = new Map(prev)
-        next.delete(shotId)
+        if (hasPreviousOverride) {
+          // Restore the previous override (last successful location)
+          next.set(shotId, previousOverride as string | null)
+        } else {
+          // No previous override, remove entirely to show original server state
+          next.delete(shotId)
+        }
         return next
       })
 
