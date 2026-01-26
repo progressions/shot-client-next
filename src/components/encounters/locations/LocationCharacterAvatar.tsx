@@ -1,21 +1,30 @@
 "use client"
 
 import { Box, Avatar, Typography, Badge, Tooltip } from "@mui/material"
+import { useDraggable } from "@dnd-kit/core"
 import type { LocationShot } from "@/types"
 
 interface LocationCharacterAvatarProps {
   shot: LocationShot
   onClick?: (shot: LocationShot) => void
+  isDragOverlay?: boolean
 }
 
 /**
  * Compact avatar display for characters/vehicles in location zones.
  * Shows image, name, faction color, and mook count badge.
+ * Draggable using @dnd-kit for moving between locations.
  */
 export default function LocationCharacterAvatar({
   shot,
   onClick,
+  isDragOverlay = false,
 }: LocationCharacterAvatarProps) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: shot.id,
+    disabled: isDragOverlay,
+  })
+
   const character = shot.character
   const vehicle = shot.vehicle
 
@@ -52,15 +61,15 @@ export default function LocationCharacterAvatar({
         gap: 0.5,
         p: 0.5,
         borderRadius: 1,
-        cursor: onClick ? "pointer" : "default",
-        transition: "background-color 0.2s",
-        "&:hover": onClick
-          ? {
-              backgroundColor: "action.hover",
-            }
-          : {},
+        cursor: isDragOverlay ? "grabbing" : "grab",
+        transition: "background-color 0.2s, opacity 0.2s",
+        "&:hover": {
+          backgroundColor: "action.hover",
+        },
         minWidth: 60,
         maxWidth: 80,
+        opacity: isDragging && !isDragOverlay ? 0.5 : 1,
+        userSelect: "none",
       }}
     >
       <Badge
@@ -93,6 +102,7 @@ export default function LocationCharacterAvatar({
           maxWidth: "100%",
           fontSize: "0.65rem",
           lineHeight: 1.2,
+          userSelect: "none",
         }}
       >
         {name}
@@ -100,9 +110,26 @@ export default function LocationCharacterAvatar({
     </Box>
   )
 
+  // For drag overlay, don't add drag handlers
+  if (isDragOverlay) {
+    return (
+      <Tooltip title={name} placement="top" arrow>
+        {avatarContent}
+      </Tooltip>
+    )
+  }
+
+  // Wrap with draggable div - ref and listeners must be on outermost element
   return (
-    <Tooltip title={name} placement="top" arrow>
-      {avatarContent}
-    </Tooltip>
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      style={{ touchAction: "none" }}
+    >
+      <Tooltip title={name} placement="top" arrow>
+        {avatarContent}
+      </Tooltip>
+    </div>
   )
 }

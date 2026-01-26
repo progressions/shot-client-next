@@ -1,6 +1,7 @@
 "use client"
 
 import { Paper, Box, Typography } from "@mui/material"
+import { useDroppable } from "@dnd-kit/core"
 import type { Location, LocationShot } from "@/types"
 import LocationCharacterAvatar from "./LocationCharacterAvatar"
 
@@ -12,29 +13,33 @@ interface LocationZoneProps {
 /**
  * Visual zone representing a location in the fight.
  * Displays location name and contains character avatars.
- *
- * For Phase 1, this is read-only (no drag/resize).
- * Uses CSS Grid layout from parent for positioning.
+ * Droppable zone for drag-and-drop character movement.
  */
 export default function LocationZone({
   location,
   onCharacterClick,
 }: LocationZoneProps) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: location.id,
+  })
+
   const shots = location.shots || []
   const hasCharacters = shots.length > 0
 
   return (
     <Paper
-      elevation={3}
+      ref={setNodeRef}
+      elevation={isOver ? 6 : 3}
       sx={{
         minHeight: 120,
         backgroundColor: location.color || "background.paper",
         border: "2px solid",
-        borderColor: "divider",
+        borderColor: isOver ? "primary.main" : "divider",
         borderRadius: 2,
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
+        transition: "border-color 0.2s, box-shadow 0.2s",
       }}
     >
       {/* Header */}

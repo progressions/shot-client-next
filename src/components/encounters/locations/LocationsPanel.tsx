@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState, useCallback } from "react"
 import {
   Box,
   Typography,
@@ -10,12 +10,23 @@ import {
 } from "@mui/material"
 import { Close as CloseIcon } from "@mui/icons-material"
 import { FaMapLocationDot } from "react-icons/fa6"
-import { useEncounter } from "@/contexts"
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  pointerWithin,
+} from "@dnd-kit/core"
+import { useEncounter, useClient, useToast } from "@/contexts"
 import { useLocations } from "@/hooks"
 import type { LocationShot } from "@/types"
 import BasePanel from "../BasePanel"
 import LocationZone from "./LocationZone"
 import UnassignedZone from "./UnassignedZone"
+import LocationCharacterAvatar from "./LocationCharacterAvatar"
 
 interface LocationsPanelProps {
   onClose: () => void
@@ -23,14 +34,30 @@ interface LocationsPanelProps {
 
 /**
  * LocationsPanel displays all fight locations as visual zones.
- * Characters/vehicles can be seen in their assigned locations.
+ * Characters/vehicles can be dragged between locations.
  *
- * Phase 1: Read-only visualization with auto-layout for zones without positions.
+ * Phase 2: Drag-and-drop support for moving characters between zones.
  */
 export default function LocationsPanel({ onClose }: LocationsPanelProps) {
-  const { encounter } = useEncounter()
+  const { encounter, refreshEncounter } = useEncounter()
+  const { client } = useClient()
+  const { toastSuccess, toastError } = useToast()
   const fightId = encounter?.id
-  const { locations, loading, error } = useLocations(fightId)
+  const { locations, loading, error, refetch } = useLocations(fightId)
+
+  // Track the currently dragged shot for DragOverlay
+  const [activeDragShot, setActiveDragShot] = useState<LocationShot | null>(
+    null
+  )
+
+  // Configure sensors for drag-and-drop
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5, // 5px movement required to start drag
+      },
+    })
+  )
 
   // Get all characters from the encounter (including hidden ones)
   // We need ALL characters to map location shots to their names
@@ -215,8 +242,81 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
       }))
   }, [allCharacters, enrichedLocations])
 
+  // Find a shot by its ID from all available shots
+  const findShotById = useCallback(
+    (shotId: string): LocationShot | null => {
+      // Check assigned locations
+      for (const loc of enrichedLocations) {
+        const shot = loc.shots?.find(s => s.id === shotId)
+        if (shot) return shot
+      }
+      // Check unassigned
+      const unassigned = unassignedShots.find(s => s.id === shotId)
+      if (unassigned) return unassigned
+      return null
+    },
+    [enrichedLocations, unassignedShots]
+  )
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const shotId = event.active.id as string
+    const shot = findShotById(shotId)
+    setActiveDragShot(shot)
+  }
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    setActiveDragShot(null)
+
+    const { active, over } = event
+
+    if (!over || !fightId) return
+
+    const shotId = active.id as string
+    const targetId = over.id as string
+
+    // Determine the new location_id
+    // "unassigned" means set to null, otherwise it's a location ID
+    const newLocationId = targetId === "unassigned" ? null : targetId
+
+    // Find the current location of the shot to avoid unnecessary updates
+    let currentLocationId: string | null = null
+    for (const loc of enrichedLocations) {
+      if (loc.shots?.some(s => s.id === shotId)) {
+        currentLocationId = loc.id
+        break
+      }
+    }
+    // If shot is in unassigned, currentLocationId stays null
+
+    // Don't update if dropping in the same location
+    if (newLocationId === currentLocationId) return
+
+    try {
+      // Optimistic update: refetch will happen after API call
+      await client.updateShotLocationById(fightId, shotId, newLocationId)
+
+      // Refetch locations and encounter to get updated data
+      await Promise.all([refetch(), refreshEncounter()])
+
+      const entityName =
+        findShotById(shotId)?.character?.name ||
+        findShotById(shotId)?.vehicle?.name ||
+        "Character"
+      const locationName =
+        newLocationId === null
+          ? "Unassigned"
+          : enrichedLocations.find(l => l.id === newLocationId)?.name ||
+            "location"
+
+      toastSuccess(`${entityName} moved to ${locationName}`)
+    } catch (err) {
+      console.error("Failed to update location:", err)
+      toastError("Failed to move character")
+    }
+  }
+
   const handleCharacterClick = (shot: LocationShot) => {
-    // TODO: In future phases, this could open character details or start drag
+    // TODO: In future phases, this could open character details
     if (process.env.NODE_ENV === "development") {
       console.log("Character clicked:", shot)
     }
@@ -286,7 +386,12 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
           </Typography>
         </Box>
       ) : (
-        <>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={pointerWithin}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
           {/* Grid layout for locations - handles variable heights naturally */}
           <Box
             sx={{
@@ -314,7 +419,14 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
             shots={unassignedShots}
             onCharacterClick={handleCharacterClick}
           />
-        </>
+
+          {/* Drag overlay - shows the dragged item */}
+          <DragOverlay>
+            {activeDragShot ? (
+              <LocationCharacterAvatar shot={activeDragShot} isDragOverlay />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       )}
     </BasePanel>
   )
