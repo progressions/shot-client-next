@@ -1340,6 +1340,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
           collisionDetection={pointerWithin}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
+          autoScroll={false}
         >
           {viewMode === "grid" ? (
             // Grid layout (original Phase 2 behavior)
