@@ -33,12 +33,6 @@ const severityOptions: { value: Severity; label: string }[] = [
   { value: "success", label: "Success (Green)" },
 ]
 
-// Generate shot options (18 down to 0)
-const shotOptions = Array.from({ length: 19 }, (_, i) => 18 - i)
-
-// Generate sequence options (1 to 10)
-const sequenceOptions = Array.from({ length: 10 }, (_, i) => i + 1)
-
 export default function AddEffectModal({
   open,
   onClose,
@@ -243,47 +237,25 @@ export default function AddEffectModal({
             </Typography>
             <Stack direction="row" spacing={2}>
               <TextField
-                select
+                type="number"
                 label="Expires on Sequence"
                 name="end_sequence"
                 value={effect.end_sequence ?? ""}
-                onChange={e => {
-                  const val = e.target.value
-                  setEffect(prev => ({
-                    ...prev,
-                    end_sequence: val === "" ? null : Number(val),
-                  }))
-                }}
+                onChange={handleChange("end_sequence")}
                 fullWidth
-              >
-                <MenuItem value="">None</MenuItem>
-                {sequenceOptions.map(seq => (
-                  <MenuItem key={seq} value={seq}>
-                    Sequence {seq}
-                  </MenuItem>
-                ))}
-              </TextField>
+                inputProps={{ min: 1 }}
+                helperText="Sequence number (1, 2, 3...)"
+              />
               <TextField
-                select
+                type="number"
                 label="Expires on Shot"
                 name="end_shot"
                 value={effect.end_shot ?? ""}
-                onChange={e => {
-                  const val = e.target.value
-                  setEffect(prev => ({
-                    ...prev,
-                    end_shot: val === "" ? null : Number(val),
-                  }))
-                }}
+                onChange={handleChange("end_shot")}
                 fullWidth
-              >
-                <MenuItem value="">None</MenuItem>
-                {shotOptions.map(shot => (
-                  <MenuItem key={shot} value={shot}>
-                    Shot {shot}
-                  </MenuItem>
-                ))}
-              </TextField>
+                inputProps={{ min: 0, max: 30 }}
+                helperText="Shot value (0-30)"
+              />
             </Stack>
           </Box>
         </Stack>
