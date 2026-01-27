@@ -11,6 +11,7 @@ import {
   Stack,
   Box,
   IconButton,
+  Typography,
 } from "@mui/material"
 import CircleIcon from "@mui/icons-material/Circle"
 import { useState } from "react"
@@ -49,6 +50,8 @@ export default function AddEffectModal({
     change: "",
     character_id: character.id,
     shot_id: character.shot_id,
+    end_sequence: null,
+    end_shot: null,
   })
 
   // Define available action values based on character type
@@ -72,10 +75,19 @@ export default function AddEffectModal({
   const handleChange =
     (field: keyof CharacterEffect) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setEffect(prev => ({
-        ...prev,
-        [field]: event.target.value,
-      }))
+      const value = event.target.value
+      // Handle numeric fields that can be null
+      if (field === "end_sequence" || field === "end_shot") {
+        setEffect(prev => ({
+          ...prev,
+          [field]: value === "" ? null : Number(value),
+        }))
+      } else {
+        setEffect(prev => ({
+          ...prev,
+          [field]: value,
+        }))
+      }
     }
 
   const handleSubmit = async () => {
@@ -113,6 +125,8 @@ export default function AddEffectModal({
       change: "",
       character_id: character.id,
       shot_id: character.shot_id,
+      end_sequence: null,
+      end_shot: null,
     })
     onClose()
   }
@@ -209,6 +223,38 @@ export default function AddEffectModal({
                 fullWidth
                 placeholder="+2, -1, or 18"
                 helperText="Use +/- for modifiers or number for absolute"
+              />
+            </Stack>
+          </Box>
+
+          <Box>
+            <Box sx={{ mb: 1 }}>
+              <strong>Expiry (Optional)</strong>
+            </Box>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              Leave empty for permanent effect. Effect expires when the shot
+              counter passes the specified shot.
+            </Typography>
+            <Stack direction="row" spacing={2}>
+              <TextField
+                type="number"
+                label="Expires on Sequence"
+                name="end_sequence"
+                value={effect.end_sequence ?? ""}
+                onChange={handleChange("end_sequence")}
+                fullWidth
+                inputProps={{ min: 1 }}
+                helperText="Sequence number (1, 2, 3...)"
+              />
+              <TextField
+                type="number"
+                label="Expires on Shot"
+                name="end_shot"
+                value={effect.end_shot ?? ""}
+                onChange={handleChange("end_shot")}
+                fullWidth
+                inputProps={{ min: 0, max: 30 }}
+                helperText="Shot value (0-30)"
               />
             </Stack>
           </Box>

@@ -145,6 +145,21 @@ export default function CharacterEffectsDisplay({
     return `${actionValueLabel(effect)} = ${effect.change}`
   }
 
+  const formatExpiry = (effect: CharacterEffect) => {
+    if (effect.end_sequence == null && effect.end_shot == null) {
+      return null
+    }
+
+    const parts: string[] = []
+    if (effect.end_sequence != null) {
+      parts.push(`Seq ${effect.end_sequence}`)
+    }
+    if (effect.end_shot != null) {
+      parts.push(`Shot ${effect.end_shot}`)
+    }
+    return `Expires: ${parts.join(", ")}`
+  }
+
   const severityOrder: Severity[] = ["error", "warning", "info", "success"]
 
   // Cleanup timeouts on unmount
@@ -219,50 +234,62 @@ export default function CharacterEffectsDisplay({
             onMouseEnter={handlePopoverMouseEnter}
             onMouseLeave={handlePopoverClose}
           >
-            {groupedEffects[openSeverity].map((effect, index) => (
-              <Stack
-                key={effect.id || index}
-                direction="row"
-                alignItems="center"
-                spacing={1}
-                sx={{
-                  py: 0.5,
-                  borderBottom:
-                    index < groupedEffects[openSeverity].length - 1
-                      ? "1px solid"
-                      : "none",
-                  borderColor: "divider",
-                }}
-              >
-                <InfoOutlinedIcon
-                  fontSize="small"
-                  color={severityColors[openSeverity]}
-                />
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="body2">
-                    {effect.name}
-                    {effect.action_value && effect.change && (
+            {groupedEffects[openSeverity].map((effect, index) => {
+              const expiry = formatExpiry(effect)
+              return (
+                <Stack
+                  key={effect.id || index}
+                  direction="row"
+                  alignItems="center"
+                  spacing={1}
+                  sx={{
+                    py: 0.5,
+                    borderBottom:
+                      index < groupedEffects[openSeverity].length - 1
+                        ? "1px solid"
+                        : "none",
+                    borderColor: "divider",
+                  }}
+                >
+                  <InfoOutlinedIcon
+                    fontSize="small"
+                    color={severityColors[openSeverity]}
+                  />
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="body2">
+                      {effect.name}
+                      {effect.action_value && effect.change && (
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          sx={{ ml: 1, fontWeight: "bold" }}
+                        >
+                          ({formatChange(effect)})
+                        </Typography>
+                      )}
+                    </Typography>
+                    {expiry && (
                       <Typography
-                        component="span"
-                        variant="body2"
-                        sx={{ ml: 1, fontWeight: "bold" }}
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: "block" }}
                       >
-                        ({formatChange(effect)})
+                        {expiry}
                       </Typography>
                     )}
-                  </Typography>
-                </Box>
-                {isGamemaster && (
-                  <IconButton
-                    size="small"
-                    onClick={() => handleDeleteEffect(effect)}
-                    sx={{ padding: 0.25 }}
-                  >
-                    <DeleteIcon sx={{ fontSize: 16 }} />
-                  </IconButton>
-                )}
-              </Stack>
-            ))}
+                  </Box>
+                  {isGamemaster && (
+                    <IconButton
+                      size="small"
+                      onClick={() => handleDeleteEffect(effect)}
+                      sx={{ padding: 0.25 }}
+                    >
+                      <DeleteIcon sx={{ fontSize: 16 }} />
+                    </IconButton>
+                  )}
+                </Stack>
+              )
+            })}
           </Box>
         )}
       </Popover>

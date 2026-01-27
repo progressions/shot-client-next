@@ -443,6 +443,8 @@ export interface CharacterEffect {
   change?: string
   action_value?: string
   shot_id: string
+  end_sequence?: number | null
+  end_shot?: number | null
 }
 
 export interface CharacterEffects {
