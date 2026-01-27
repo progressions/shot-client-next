@@ -40,3 +40,4 @@ export { default as SpendShotsPanel } from "@/components/encounters/SpendShotsPa
 export { default as FortunePanel } from "@/components/encounters/FortunePanel"
 export { default as BasePanel } from "@/components/encounters/BasePanel"
 export { default as InvitePlayersModal } from "@/components/encounters/InvitePlayersModal"
+export { FightEffectsDisplay } from "@/components/encounters/effects"

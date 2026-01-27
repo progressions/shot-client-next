@@ -422,12 +422,15 @@ export interface Adventure extends BaseEntity {
 export interface Effect {
   id: string
   name: string
-  description: string
+  description: string | null
   severity: Severity
-  start_sequence: number
-  end_sequence: number
-  start_shot: number
-  end_shot: number
+  start_sequence: number | null
+  end_sequence: number | null
+  start_shot: number | null
+  end_shot: number | null
+  fight_id: string
+  user_id: string
+  created_at: string
 }
 
 export interface CharacterEffect {

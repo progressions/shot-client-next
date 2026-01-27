@@ -25,6 +25,7 @@ import {
   ResetFightDialog,
   FightEventsDialog,
   InvitePlayersModal,
+  FightEffectsDisplay,
 } from "@/components/encounters"
 import {
   FaPlay,
@@ -230,6 +231,12 @@ export default function MenuBar({
               Sequence {encounter.sequence ?? 0}
             </Typography>
           </Box>
+
+          {/* Fight Effects */}
+          <FightEffectsDisplay
+            encounter={encounter}
+            effects={encounter.effects}
+          />
 
           <Box sx={{ flexGrow: 1 }} />
 
