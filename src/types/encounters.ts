@@ -1,6 +1,6 @@
 import type { BaseEntity } from "./ui"
 import type { Character } from "./character"
-import type { Vehicle } from "./resources"
+import type { Vehicle, Effect } from "./resources"
 
 export type EncounterVehicle = Vehicle & {
   shot_id: string
@@ -16,6 +16,7 @@ export type Encounter = BaseEntity & {
   sequence: number
   description: string | null
   shots: Shot[]
+  effects?: Effect[]
   character_ids?: string[]
   vehicle_ids?: string[]
   started_at: string | null

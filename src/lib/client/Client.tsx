@@ -17,6 +17,7 @@ import * as adventure from "@/lib/client/adventureClient"
 import * as ai from "@/lib/client/aiClient"
 import * as editor from "@/lib/client/editorClient"
 import * as characterEffect from "@/lib/client/characterEffectClient"
+import * as effect from "@/lib/client/effectClient"
 import * as chaseRelationship from "@/lib/client/chaseRelationshipClient"
 import * as mediaLibrary from "@/lib/client/mediaLibraryClient"
 import * as notification from "@/lib/client/notificationClient"
@@ -89,6 +90,12 @@ export default function createClient(parameters: ClientParameters = {}) {
     ...ai.createAiClient({ jwt, api, apiV2 }),
     ...editor.createEditorClient({ jwt, api, apiV2, queryParams }),
     ...characterEffect.createCharacterEffectClient({
+      jwt,
+      api,
+      apiV2,
+      queryParams,
+    }),
+    ...effect.createEffectClient({
       jwt,
       api,
       apiV2,
