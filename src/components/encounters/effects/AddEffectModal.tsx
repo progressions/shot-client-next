@@ -16,6 +16,7 @@ import {
 import CircleIcon from "@mui/icons-material/Circle"
 import { useState } from "react"
 import { useEncounter, useToast, useClient } from "@/contexts"
+import { NumberField } from "@/components/ui"
 import type { Character, CharacterEffect } from "@/types"
 
 interface AddEffectModalProps {
@@ -236,26 +237,54 @@ export default function AddEffectModal({
               counter passes the specified shot.
             </Typography>
             <Stack direction="row" spacing={2}>
-              <TextField
-                type="number"
-                label="Expires on Sequence"
-                name="end_sequence"
-                value={effect.end_sequence ?? ""}
-                onChange={handleChange("end_sequence")}
-                fullWidth
-                inputProps={{ min: 1 }}
-                helperText="Sequence number (1, 2, 3...)"
-              />
-              <TextField
-                type="number"
-                label="Expires on Shot"
-                name="end_shot"
-                value={effect.end_shot ?? ""}
-                onChange={handleChange("end_shot")}
-                fullWidth
-                inputProps={{ min: 0, max: 30 }}
-                helperText="Shot value (0-30)"
-              />
+              <Stack>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ mb: 0.5 }}
+                >
+                  End Sequence
+                </Typography>
+                <NumberField
+                  name="end_sequence"
+                  value={effect.end_sequence ?? ""}
+                  size="small"
+                  width="100px"
+                  error={false}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const val = e.target.value
+                    setEffect(prev => ({
+                      ...prev,
+                      end_sequence: val === "" ? null : Number(val),
+                    }))
+                  }}
+                  onBlur={() => {}}
+                />
+              </Stack>
+              <Stack>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ mb: 0.5 }}
+                >
+                  End Shot
+                </Typography>
+                <NumberField
+                  name="end_shot"
+                  value={effect.end_shot ?? ""}
+                  size="small"
+                  width="100px"
+                  error={false}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const val = e.target.value
+                    setEffect(prev => ({
+                      ...prev,
+                      end_shot: val === "" ? null : Number(val),
+                    }))
+                  }}
+                  onBlur={() => {}}
+                />
+              </Stack>
             </Stack>
           </Box>
         </Stack>
