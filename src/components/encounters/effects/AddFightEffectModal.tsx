@@ -12,8 +12,8 @@ import {
   Typography,
 } from "@mui/material"
 import CircleIcon from "@mui/icons-material/Circle"
-import { useState } from "react"
-import { useToast, useClient } from "@/contexts"
+import { useState, useMemo } from "react"
+import { useToast, useClient, useEncounter } from "@/contexts"
 import { NumberField } from "@/components/ui"
 import type { Effect, Encounter } from "@/types"
 
@@ -39,19 +39,22 @@ export default function AddFightEffectModal({
 }: AddFightEffectModalProps) {
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
+  const { currentShot } = useEncounter()
 
-  // Get the highest shot number from the encounter's shots
-  const highestShot = encounter.shots?.length
-    ? Math.max(...encounter.shots.map(s => s.shot))
-    : 0
+  // Calculate default values - memoized to stay current with encounter changes
+  const defaultEndSequence = useMemo(
+    () => (encounter.sequence ?? 0) + 1,
+    [encounter.sequence]
+  )
+  const defaultEndShot = useMemo(() => currentShot ?? 0, [currentShot])
 
   const [saving, setSaving] = useState(false)
   const [effect, setEffect] = useState<Partial<Effect>>({
     name: "",
     description: "",
     severity: "info" as Severity,
-    end_sequence: (encounter.sequence ?? 0) + 1,
-    end_shot: highestShot,
+    end_sequence: defaultEndSequence,
+    end_shot: defaultEndShot,
   })
 
   const handleChange =
@@ -78,7 +81,7 @@ export default function AddFightEffectModal({
         description: effect.description || undefined,
       }
 
-      await client.createEffect(encounter, effectToSend as Effect)
+      await client.createEffect(encounter, effectToSend)
       toastSuccess(
         effect.name ? `Added effect: ${effect.name}` : "Added fight effect"
       )
@@ -100,8 +103,8 @@ export default function AddFightEffectModal({
       name: "",
       description: "",
       severity: "info" as Severity,
-      end_sequence: (encounter.sequence ?? 0) + 1,
-      end_shot: highestShot,
+      end_sequence: defaultEndSequence,
+      end_shot: defaultEndShot,
     })
     onClose()
   }
