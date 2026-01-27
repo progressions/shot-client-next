@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState, useCallback, useRef, useEffect } from "react"
+import { AxiosError } from "axios"
 import {
   Box,
   Typography,
@@ -1158,7 +1159,16 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
       // WebSocket will broadcast the update automatically
     } catch (err) {
       console.error("Failed to save location:", err)
-      toastError("Failed to save location")
+      // Extract meaningful error message from API response
+      if (err instanceof AxiosError && err.response?.data?.errors) {
+        const errors = err.response.data.errors as Record<string, string[]>
+        const errorMessages = Object.entries(errors)
+          .map(([field, messages]) => `${field}: ${messages.join(", ")}`)
+          .join("; ")
+        toastError(errorMessages || "Failed to save location")
+      } else {
+        toastError("Failed to save location")
+      }
       throw err // Re-throw so dialog knows it failed
     }
   }
