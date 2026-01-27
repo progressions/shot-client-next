@@ -38,6 +38,11 @@ export function useLocations(fightId: string | undefined): UseLocationsResult {
   // Track the latest fight_id from WebSocket to filter location updates
   const latestWsFightId = useRef<string | null>(null)
 
+  // Reset latestWsFightId when fightId changes to prevent stale filtering
+  useEffect(() => {
+    latestWsFightId.current = null
+  }, [fightId])
+
   const fetchLocations = useCallback(async () => {
     if (!fightId) {
       setLocations([])
