@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useClient, useCampaign } from "@/contexts/AppContext"
 import type { Location } from "@/types"
 
@@ -35,14 +35,6 @@ export function useLocations(fightId: string | undefined): UseLocationsResult {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Track the latest fight_id from WebSocket to filter location updates
-  const latestWsFightId = useRef<string | null>(null)
-
-  // Reset latestWsFightId when fightId changes to prevent stale filtering
-  useEffect(() => {
-    latestWsFightId.current = null
-  }, [fightId])
-
   const fetchLocations = useCallback(async () => {
     if (!fightId) {
       setLocations([])
@@ -71,45 +63,40 @@ export function useLocations(fightId: string | undefined): UseLocationsResult {
     fetchLocations()
   }, [fetchLocations])
 
-  // Subscribe to fight_id updates to track which fight locations belong to
-  useEffect(() => {
-    if (!fightId) return
-
-    const unsubscribe = subscribeToEntity("fight_id", (wsFightId: unknown) => {
-      if (typeof wsFightId === "string") {
-        latestWsFightId.current = wsFightId
-        console.log("📍 [useLocations] WebSocket fight_id received:", wsFightId)
-      }
-    })
-
-    return unsubscribe
-  }, [fightId, subscribeToEntity])
-
   // Subscribe to WebSocket updates for locations
+  // The locations array contains location objects with fight_id, so we can filter directly
   useEffect(() => {
     if (!fightId) return
 
     const unsubscribe = subscribeToEntity("locations", (data: unknown) => {
-      // Only update if the locations are for this fight
-      // The fight_id is broadcast alongside locations and stored in latestWsFightId
-      if (latestWsFightId.current && latestWsFightId.current !== fightId) {
-        console.log(
-          "📍 [useLocations] Ignoring locations update for different fight:",
-          latestWsFightId.current,
-          "!==",
-          fightId
-        )
-        return
-      }
-
-      // Data is now an array of Location objects (not nested)
+      // Data is an array of Location objects
       if (Array.isArray(data)) {
+        // Filter to only include locations for this fight
+        // Each location has a fight_id property we can use for verification
+        const locationsData = data as Location[]
+
+        // If locations array is empty, it might be for any fight - accept it
+        // If locations have fight_id, verify they're for this fight
+        const isForThisFight =
+          locationsData.length === 0 ||
+          locationsData.some(loc => loc.fight_id === fightId)
+
+        if (!isForThisFight) {
+          console.log(
+            "📍 [useLocations] Ignoring locations update for different fight"
+          )
+          return
+        }
+
         console.log(
           "📍 [useLocations] WebSocket locations update received for fight:",
-          fightId
+          fightId,
+          "with",
+          locationsData.length,
+          "locations"
         )
         // Update locations without setting loading=true to avoid flicker
-        setLocations(data as Location[])
+        setLocations(locationsData)
       }
     })
 
