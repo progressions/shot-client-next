@@ -392,6 +392,22 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
       }
     }
 
+    // Build a set of valid location IDs for checking stale overrides
+    const validLocationIds = new Set(
+      enrichedLocations.map(loc => loc.id).filter(Boolean)
+    )
+
+    // Helper to check if an override points to a valid location
+    // Overrides pointing to deleted locations should be treated as unassigned
+    const getEffectiveTargetLocation = (
+      targetLocId: string | null
+    ): string | null => {
+      if (targetLocId === null) return null
+      if (validLocationIds.has(targetLocId)) return targetLocId
+      // Override points to a deleted location - treat as unassigned
+      return null
+    }
+
     // Collect all shots from all sources for easy lookup
     const allShots = new Map<string, LocationShot>()
     enrichedLocations.forEach(loc => {
@@ -405,8 +421,11 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
       const remainingShots =
         loc.shots?.filter(shot => {
           if (locationOverrides.has(shot.id)) {
-            // Shot has override - only keep if override points to this location
-            return locationOverrides.get(shot.id) === loc.id
+            // Shot has override - only keep if effective target is this location
+            const effectiveTarget = getEffectiveTargetLocation(
+              locationOverrides.get(shot.id)!
+            )
+            return effectiveTarget === loc.id
           }
           return true // No override, keep in original location
         }) || []
@@ -414,7 +433,8 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
       // Add shots that have been moved TO this location
       const incomingShots: LocationShot[] = []
       locationOverrides.forEach((targetLocId, shotId) => {
-        if (targetLocId === loc.id) {
+        const effectiveTarget = getEffectiveTargetLocation(targetLocId)
+        if (effectiveTarget === loc.id) {
           // This shot was moved to this location
           const shot = allShots.get(shotId)
           // Only add if not already in remainingShots
@@ -433,15 +453,19 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     // Build new unassigned list with overrides applied
     const newUnassigned = unassignedShots.filter(shot => {
       if (locationOverrides.has(shot.id)) {
-        // Shot has override - only keep if override is null (unassigned)
-        return locationOverrides.get(shot.id) === null
+        // Shot has override - only keep if effective target is null (unassigned)
+        const effectiveTarget = getEffectiveTargetLocation(
+          locationOverrides.get(shot.id)!
+        )
+        return effectiveTarget === null
       }
       return true // No override, keep in unassigned
     })
 
-    // Add shots that have been moved TO unassigned
+    // Add shots that have been moved TO unassigned (including those with stale overrides)
     locationOverrides.forEach((targetLocId, shotId) => {
-      if (targetLocId === null) {
+      const effectiveTarget = getEffectiveTargetLocation(targetLocId)
+      if (effectiveTarget === null) {
         const shot = allShots.get(shotId)
         // Only add if not already in newUnassigned
         if (shot && !newUnassigned.some(s => s.id === shotId)) {
