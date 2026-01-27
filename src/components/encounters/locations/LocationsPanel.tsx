@@ -1181,7 +1181,8 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
       toastSuccess(`Location "${deletingLocation.name}" deleted`)
       setDeleteDialogOpen(false)
       setDeletingLocation(null)
-      // WebSocket will broadcast the update automatically
+      // WebSocket will broadcast the locations update, which triggers
+      // re-computation of unassignedShots to include the deleted location's characters
     } catch (err) {
       console.error("Failed to delete location:", err)
       toastError("Failed to delete location")
