@@ -77,12 +77,30 @@ export default function AddEffectModal({
     (field: keyof CharacterEffect) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value
-      // Handle numeric fields that can be null
-      if (field === "end_sequence" || field === "end_shot") {
-        setEffect(prev => ({
-          ...prev,
-          [field]: value === "" ? null : Number(value),
-        }))
+      // Handle numeric fields that can be null with validation
+      if (field === "end_sequence") {
+        if (value === "") {
+          setEffect(prev => ({ ...prev, [field]: null }))
+        } else {
+          const num = Number(value)
+          if (!Number.isNaN(num)) {
+            // Clamp to minimum of 1
+            setEffect(prev => ({ ...prev, [field]: Math.max(1, num) }))
+          }
+        }
+      } else if (field === "end_shot") {
+        if (value === "") {
+          setEffect(prev => ({ ...prev, [field]: null }))
+        } else {
+          const num = Number(value)
+          if (!Number.isNaN(num)) {
+            // Clamp to 0-30 range
+            setEffect(prev => ({
+              ...prev,
+              [field]: Math.max(0, Math.min(30, num)),
+            }))
+          }
+        }
       } else {
         setEffect(prev => ({
           ...prev,
@@ -237,54 +255,26 @@ export default function AddEffectModal({
               counter passes the specified shot.
             </Typography>
             <Stack direction="row" spacing={2}>
-              <Stack>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mb: 0.5 }}
-                >
-                  End Sequence
-                </Typography>
-                <NumberField
-                  name="end_sequence"
-                  value={effect.end_sequence ?? ""}
-                  size="small"
-                  width="100px"
-                  error={false}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    const val = e.target.value
-                    setEffect(prev => ({
-                      ...prev,
-                      end_sequence: val === "" ? null : Number(val),
-                    }))
-                  }}
-                  onBlur={() => {}}
-                />
-              </Stack>
-              <Stack>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mb: 0.5 }}
-                >
-                  End Shot
-                </Typography>
-                <NumberField
-                  name="end_shot"
-                  value={effect.end_shot ?? ""}
-                  size="small"
-                  width="100px"
-                  error={false}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    const val = e.target.value
-                    setEffect(prev => ({
-                      ...prev,
-                      end_shot: val === "" ? null : Number(val),
-                    }))
-                  }}
-                  onBlur={() => {}}
-                />
-              </Stack>
+              <NumberField
+                name="end_sequence"
+                value={effect.end_sequence ?? ""}
+                size="small"
+                width="100px"
+                error={false}
+                label="End Sequence"
+                onChange={handleChange("end_sequence")}
+                onBlur={() => {}}
+              />
+              <NumberField
+                name="end_shot"
+                value={effect.end_shot ?? ""}
+                size="small"
+                width="100px"
+                error={false}
+                label="End Shot"
+                onChange={handleChange("end_shot")}
+                onBlur={() => {}}
+              />
             </Stack>
           </Box>
         </Stack>
