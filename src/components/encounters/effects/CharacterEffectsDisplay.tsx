@@ -145,6 +145,21 @@ export default function CharacterEffectsDisplay({
     return `${actionValueLabel(effect)} = ${effect.change}`
   }
 
+  const formatExpiry = (effect: CharacterEffect) => {
+    if (effect.end_sequence == null && effect.end_shot == null) {
+      return null
+    }
+
+    const parts: string[] = []
+    if (effect.end_sequence != null) {
+      parts.push(`Seq ${effect.end_sequence}`)
+    }
+    if (effect.end_shot != null) {
+      parts.push(`Shot ${effect.end_shot}`)
+    }
+    return `Expires: ${parts.join(", ")}`
+  }
+
   const severityOrder: Severity[] = ["error", "warning", "info", "success"]
 
   // Cleanup timeouts on unmount
@@ -251,6 +266,15 @@ export default function CharacterEffectsDisplay({
                       </Typography>
                     )}
                   </Typography>
+                  {formatExpiry(effect) && (
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ display: "block" }}
+                    >
+                      {formatExpiry(effect)}
+                    </Typography>
+                  )}
                 </Box>
                 {isGamemaster && (
                   <IconButton
