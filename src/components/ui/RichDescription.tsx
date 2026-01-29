@@ -14,6 +14,8 @@ type RichDescriptionProps = {
   mentions?: Record<string, string[]>
 }
 
+const IMAGEKIT_TRANSFORM = "tr:w-1200,c-at_max,fo-auto"
+
 // Regex to match mention syntax: [[@entity_type:uuid|Display Name]]
 const MENTION_REGEX = /\[\[@(\w+):([a-f0-9-]+)\|([^\]]+)\]\]/g
 
@@ -33,6 +35,17 @@ const VALID_ENTITY_TYPES = new Set([
  */
 function capitalizeEntityType(entityType: string): string {
   return entityType.charAt(0).toUpperCase() + entityType.slice(1)
+}
+
+function addImagekitTransform(src: string): string {
+  if (!src.includes("ik.imagekit.io")) return src
+  if (src.includes("/tr:") || /[?&]tr=/.test(src)) return src
+
+  const match = src.match(/^(https?:\/\/ik\.imagekit\.io\/[^/]+\/)(.+)$/)
+  if (!match) return src
+
+  const [, base, path] = match
+  return `${base}${IMAGEKIT_TRANSFORM}/${path}`
 }
 
 /**
@@ -229,6 +242,17 @@ export function RichDescription({
           {children}
         </MuiLink>
       ),
+      img: ({ src, alt }) => {
+        if (!src) return null
+        return (
+          <Box
+            component="img"
+            src={addImagekitTransform(src)}
+            alt={alt || ""}
+            sx={{ maxWidth: "100%", height: "auto" }}
+          />
+        )
+      },
     }),
     []
   )
