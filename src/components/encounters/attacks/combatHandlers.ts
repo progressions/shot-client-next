@@ -157,7 +157,7 @@ export function createWoundUpdate(
 
   const description =
     isMook && context.isMookTakedown
-      ? `${attacker.name} took out ${wounds} ${wounds === 1 ? "mook" : "mooks"}${defenseDesc}`
+      ? `${attacker.name} took out ${wounds} ${targetChar.name}${defenseDesc}`
       : `${attacker.name} attacked ${targetChar.name}${defenseDesc} for ${wounds} wounds`
 
   console.log(`[createWoundUpdate] Creating update for ${targetChar.name}:`, {

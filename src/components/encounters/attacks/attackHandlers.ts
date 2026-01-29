@@ -219,7 +219,7 @@ export async function handleNonMookMultipleTargets(
 
     const isMook = CS.isMook(targetChar)
     const toastMessage = isMook
-      ? `Took out ${effectiveWounds} ${effectiveWounds === 1 ? "mook" : "mooks"}`
+      ? `${attacker.name} took out ${effectiveWounds} ${targetChar.name}`
       : `Applied ${effectiveWounds} wound${effectiveWounds !== 1 ? "s" : ""} to ${targetChar.name}`
     toastSuccess(toastMessage)
   }
