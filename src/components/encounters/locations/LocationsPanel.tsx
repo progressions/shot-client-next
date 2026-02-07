@@ -19,6 +19,7 @@ import {
   Map as CanvasIcon,
   Add as AddIcon,
   Timeline as ConnectIcon,
+  OpenInNew as OpenInNewIcon,
 } from "@mui/icons-material"
 import { FaMapLocationDot } from "react-icons/fa6"
 import {
@@ -70,6 +71,8 @@ const ZOOM_STEP = 0.1
 
 interface LocationsPanelProps {
   onClose: () => void
+  poppedOut?: boolean
+  onPopOut?: () => void
 }
 
 type ViewMode = "grid" | "canvas"
@@ -100,7 +103,11 @@ function rectsOverlap(a: Rect, b: Rect, padding: number = 0): boolean {
  * Phase 2: Drag-and-drop support for moving characters between zones.
  * Phase 3: Canvas mode with draggable/resizable zones.
  */
-export default function LocationsPanel({ onClose }: LocationsPanelProps) {
+export default function LocationsPanel({
+  onClose,
+  poppedOut,
+  onPopOut,
+}: LocationsPanelProps) {
   const { encounter, dispatchEncounter } = useEncounter()
   const { client } = useClient()
   const { toastSuccess, toastError } = useToast()
@@ -1255,12 +1262,22 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
     return { x: padding, y: maxY + padding }
   }
 
+  const panelSx = poppedOut
+    ? {
+        position: "relative" as const,
+        height: "100vh",
+        overflow: "auto",
+        borderRadius: 0,
+      }
+    : { position: "relative" as const }
+
   if (loading) {
     return (
       <BasePanel
         title="Locations"
         icon={<FaMapLocationDot />}
         borderColor="info.main"
+        sx={panelSx}
       >
         <Box
           sx={{
@@ -1282,6 +1299,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
         title="Locations"
         icon={<FaMapLocationDot />}
         borderColor="error.main"
+        sx={panelSx}
       >
         <Alert severity="error">{error}</Alert>
       </BasePanel>
@@ -1293,7 +1311,7 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
       title="Locations"
       icon={<FaMapLocationDot />}
       borderColor="info.main"
-      sx={{ position: "relative" }}
+      sx={panelSx}
     >
       {/* Header controls */}
       <Box
@@ -1354,9 +1372,18 @@ export default function LocationsPanel({ onClose }: LocationsPanelProps) {
             </Tooltip>
           </ToggleButton>
         </ToggleButtonGroup>
-        <IconButton onClick={onClose} size="small">
-          <CloseIcon />
-        </IconButton>
+        {!poppedOut && onPopOut && (
+          <Tooltip title="Pop out to separate window">
+            <IconButton onClick={onPopOut} size="small">
+              <OpenInNewIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        )}
+        {!poppedOut && (
+          <IconButton onClick={onClose} size="small">
+            <CloseIcon />
+          </IconButton>
+        )}
       </Box>
 
       {displayData.locations.length === 0 ? (
