@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 
 interface UsePopOutWindowReturn {
-  popOut: () => Window | null | undefined
+  popOut: () => Window | null
   popIn: () => void
   isPoppedOut: boolean
   containerEl: HTMLElement | null
@@ -29,10 +29,10 @@ export function usePopOutWindow(title: string): UsePopOutWindowReturn {
   }, [])
 
   const popOut = useCallback(() => {
-    // If already open, just focus
+    // If already open, just focus and return the existing window
     if (windowRef.current && !windowRef.current.closed) {
       windowRef.current.focus()
-      return
+      return windowRef.current
     }
 
     const newWindow = window.open(
@@ -64,12 +64,19 @@ export function usePopOutWindow(title: string): UsePopOutWindowReturn {
     setContainerEl(container)
     setIsPoppedOut(true)
 
-    // Poll for window close
+    // Detect window close via lifecycle events
+    const handleUnload = () => {
+      cleanup()
+    }
+    newWindow.addEventListener("beforeunload", handleUnload)
+    newWindow.addEventListener("unload", handleUnload)
+
+    // Fallback poll in case events are missed
     pollRef.current = setInterval(() => {
       if (newWindow.closed) {
         cleanup()
       }
-    }, 500)
+    }, 2000)
 
     return newWindow
   }, [title, cleanup])

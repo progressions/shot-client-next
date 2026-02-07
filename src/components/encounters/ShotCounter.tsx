@@ -138,7 +138,11 @@ export default function ShotCounter() {
   const handleAction = (action: string) => {
     // If locations are popped out and user clicks locations, focus the window
     if (action === "locations" && isPoppedOut) {
-      popOut() // This will focus the existing window
+      const result = popOut()
+      if (result === null) {
+        toastError("Pop-up blocked. Please allow pop-ups for this site.")
+        setActivePanel("locations")
+      }
       return
     }
 
