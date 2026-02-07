@@ -17,15 +17,24 @@ import {
   SpeedCheckPanel,
 } from "@/components/encounters"
 import { LocationsPanel } from "@/components/encounters/locations"
+import PopOutWindow from "@/components/ui/PopOutWindow"
 import { useEncounter } from "@/contexts"
+import { useToast } from "@/contexts"
 import { useLocalStorage } from "@/contexts/LocalStorageContext"
+import { usePopOutWindow } from "@/hooks"
 import { getAllVisibleShots } from "@/components/encounters/attacks/shotSorting"
 
 export default function ShotCounter() {
   const { encounter, selectedActorId, setSelectedActor } = useEncounter()
   const { getLocally, saveLocally } = useLocalStorage()
+  const { toastError } = useToast()
   const [showHidden, setShowHidden] = useState(true)
   const [activePanel, setActivePanel] = useState<string | null>(null)
+
+  const fightName = encounter?.name || "Fight"
+  const { popOut, popIn, isPoppedOut, containerEl } = usePopOutWindow(
+    `Locations - ${fightName}`
+  )
 
   // Refs for each panel
   const attackPanelRef = useRef<HTMLDivElement>(null)
@@ -109,8 +118,34 @@ export default function ShotCounter() {
     return shot?.character || null
   }, [selectedActorId, allVisibleShots])
 
+  const handlePopOutLocations = () => {
+    if (isPoppedOut) {
+      popIn()
+    } else {
+      const result = popOut()
+      if (result === null) {
+        toastError("Pop-up blocked. Please allow pop-ups for this site.")
+        return
+      }
+      // Close the inline panel if it's open
+      if (activePanel === "locations") {
+        setActivePanel(null)
+      }
+    }
+  }
+
   // Handle action from EncounterActionBar
   const handleAction = (action: string) => {
+    // If locations are popped out and user clicks locations, focus the window
+    if (action === "locations" && isPoppedOut) {
+      const result = popOut()
+      if (result === null) {
+        toastError("Pop-up blocked. Please allow pop-ups for this site.")
+        setActivePanel("locations")
+      }
+      return
+    }
+
     // Toggle panel - if clicking same action, close it
     if (activePanel === action) {
       setActivePanel(null)
@@ -156,6 +191,7 @@ export default function ShotCounter() {
         onShowHiddenChange={handleShowHiddenChange}
         onViewLocations={() => handleAction("locations")}
         locationsViewActive={activePanel === "locations"}
+        locationsPoppedOut={isPoppedOut}
       />
 
       {/* Character selector below MenuBar */}
@@ -253,11 +289,19 @@ export default function ShotCounter() {
         </Box>
       )}
 
-      {activePanel === "locations" && (
+      {activePanel === "locations" && !isPoppedOut && (
         <Box ref={locationsPanelRef}>
-          <LocationsPanel onClose={handlePanelClose} />
+          <LocationsPanel
+            onClose={handlePanelClose}
+            onPopOut={handlePopOutLocations}
+          />
         </Box>
       )}
+
+      {/* Pop-out window for locations */}
+      <PopOutWindow isPoppedOut={isPoppedOut} containerEl={containerEl}>
+        <LocationsPanel onClose={popIn} poppedOut />
+      </PopOutWindow>
 
       {/* Shot List */}
       <List>

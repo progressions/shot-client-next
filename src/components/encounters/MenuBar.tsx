@@ -51,6 +51,7 @@ interface MenuBarProps {
   onShowHiddenChange: (show: boolean) => void
   onViewLocations?: () => void
   locationsViewActive?: boolean
+  locationsPoppedOut?: boolean
 }
 
 export default function MenuBar({
@@ -58,6 +59,7 @@ export default function MenuBar({
   onShowHiddenChange,
   onViewLocations,
   locationsViewActive,
+  locationsPoppedOut,
 }: MenuBarProps) {
   const theme = useTheme()
   const { encounter, updateEncounter } = useEncounter()
@@ -288,19 +290,23 @@ export default function MenuBar({
           <IconButton
             onClick={() => onViewLocations?.()}
             sx={{
-              color: "white",
+              color: locationsPoppedOut ? "warning.main" : "white",
               px: { xs: 0.5, sm: 1 },
-              backgroundColor: locationsViewActive
-                ? "rgba(255, 255, 255, 0.2)"
-                : "transparent",
+              backgroundColor:
+                locationsViewActive || locationsPoppedOut
+                  ? "rgba(255, 255, 255, 0.2)"
+                  : "transparent",
               borderRadius: 1,
               "&:hover": {
-                backgroundColor: locationsViewActive
-                  ? "rgba(255, 255, 255, 0.3)"
-                  : "rgba(255, 255, 255, 0.1)",
+                backgroundColor:
+                  locationsViewActive || locationsPoppedOut
+                    ? "rgba(255, 255, 255, 0.3)"
+                    : "rgba(255, 255, 255, 0.1)",
               },
             }}
-            title="View Locations"
+            title={
+              locationsPoppedOut ? "Locations (popped out)" : "View Locations"
+            }
           >
             <FaMapMarkerAlt size={18} />
           </IconButton>
