@@ -36,8 +36,6 @@ export function useLocations(fightId: string | undefined): UseLocationsResult {
   const [error, setError] = useState<string | null>(null)
   // Track fight_id from websocket payloads to reliably filter cross-fight updates.
   const latestWsFightId = useRef<string | undefined>(fightId)
-  // Tracks shot->location assignments from encounter updates to detect location changes.
-  const lastLocationSignature = useRef<string>("")
 
   useEffect(() => {
     latestWsFightId.current = fightId
@@ -127,33 +125,6 @@ export function useLocations(fightId: string | undefined): UseLocationsResult {
 
     return unsubscribe
   }, [fightId, subscribeToEntity])
-
-  // Fallback: when encounter updates change shot->location mapping, refetch locations.
-  useEffect(() => {
-    if (!fightId) return
-
-    const unsubscribe = subscribeToEntity("encounter", (data: unknown) => {
-      if (!data || typeof data !== "object") return
-
-      const encounter = data as {
-        id?: string
-        shots?: Array<{ id?: string; location_id?: string | null }>
-      }
-      if (encounter.id !== fightId || !Array.isArray(encounter.shots)) return
-
-      const signature = encounter.shots
-        .map(shot => `${shot.id || ""}:${shot.location_id || ""}`)
-        .sort()
-        .join("|")
-
-      if (signature === lastLocationSignature.current) return
-
-      lastLocationSignature.current = signature
-      fetchLocations(false)
-    })
-
-    return unsubscribe
-  }, [fightId, fetchLocations, subscribeToEntity])
 
   return {
     locations,
