@@ -89,8 +89,8 @@ export function useLocations(fightId: string | undefined): UseLocationsResult {
     return unsubscribe
   }, [fightId, subscribeToEntity])
 
-  // Subscribe to WebSocket updates for locations
-  // Accept both direct arrays and wrapped payload shapes.
+  // Subscribe to WebSocket updates for locations.
+  // Contract: "locations" payload is always Location[].
   useEffect(() => {
     if (!fightId) return
 
@@ -100,16 +100,12 @@ export function useLocations(fightId: string | undefined): UseLocationsResult {
         return
       }
 
-      const locationsData = Array.isArray(data)
-        ? (data as Location[])
-        : data &&
-            typeof data === "object" &&
-            "locations" in (data as Record<string, unknown>) &&
-            Array.isArray((data as { locations: unknown }).locations)
-          ? ((data as { locations: Location[] }).locations ?? [])
-          : null
+      if (!Array.isArray(data)) {
+        console.warn("[useLocations] Ignoring invalid locations payload", data)
+        return
+      }
 
-      if (!locationsData) return
+      const locationsData = data as Location[]
 
       const hasFightIds = locationsData.some(loc => !!loc.fight_id)
       const isForThisFight =
