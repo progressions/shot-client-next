@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useClient, useCampaign } from "@/contexts/AppContext"
 import type { Location } from "@/types"
 
@@ -34,74 +34,126 @@ export function useLocations(fightId: string | undefined): UseLocationsResult {
   const [locations, setLocations] = useState<Location[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  // Track fight_id from websocket payloads to reliably filter cross-fight updates.
+  const latestWsFightId = useRef<string | undefined>(fightId)
+  // Tracks shot->location assignments from encounter updates to detect location changes.
+  const lastLocationSignature = useRef<string>("")
 
-  const fetchLocations = useCallback(async () => {
-    if (!fightId) {
-      setLocations([])
+  useEffect(() => {
+    latestWsFightId.current = fightId
+  }, [fightId])
+
+  const fetchLocations = useCallback(
+    async (showLoading: boolean = true) => {
+      if (!fightId) {
+        setLocations([])
+        setError(null)
+        setLoading(false)
+        return
+      }
+
+      if (showLoading) {
+        setLoading(true)
+      }
       setError(null)
-      setLoading(false)
-      return
-    }
 
-    setLoading(true)
-    setError(null)
-
-    try {
-      const response = await client.getFightLocations(fightId)
-      setLocations(response.data.locations || [])
-    } catch (err) {
-      console.error("Error fetching locations:", err)
-      setError("Failed to load locations")
-      setLocations([])
-    } finally {
-      setLoading(false)
-    }
-  }, [fightId, client])
+      try {
+        const response = await client.getFightLocations(fightId)
+        setLocations(response.data.locations || [])
+      } catch (err) {
+        console.error("Error fetching locations:", err)
+        setError("Failed to load locations")
+        setLocations([])
+      } finally {
+        if (showLoading) {
+          setLoading(false)
+        }
+      }
+    },
+    [fightId, client]
+  )
 
   // Initial fetch
   useEffect(() => {
     fetchLocations()
   }, [fetchLocations])
 
-  // Subscribe to WebSocket updates for locations
-  // The locations array contains location objects with fight_id, so we can filter directly
+  // Subscribe to fight_id updates for precise fight scoping.
   useEffect(() => {
     if (!fightId) return
 
-    const unsubscribe = subscribeToEntity("locations", (data: unknown) => {
-      // Data is an array of Location objects
-      if (Array.isArray(data)) {
-        // Filter to only include locations for this fight
-        // Each location has a fight_id property we can use for verification
-        const locationsData = data as Location[]
-
-        // If locations array is empty, it might be for any fight - accept it
-        // If locations have fight_id, verify they're for this fight
-        const isForThisFight =
-          locationsData.length === 0 ||
-          locationsData.some(loc => loc.fight_id === fightId)
-
-        if (!isForThisFight) {
-          console.log(
-            "📍 [useLocations] Ignoring locations update for different fight"
-          )
-          return
-        }
-
-        console.log(
-          "📍 [useLocations] WebSocket locations update received for fight:",
-          fightId,
-          "with",
-          locationsData.length,
-          "locations"
-        )
-        // Update locations without setting loading=true to avoid flicker
-        setLocations(locationsData)
+    const unsubscribe = subscribeToEntity("fight_id", (wsFightId: unknown) => {
+      if (typeof wsFightId === "string") {
+        latestWsFightId.current = wsFightId
       }
     })
 
     return unsubscribe
   }, [fightId, subscribeToEntity])
+
+  // Subscribe to WebSocket updates for locations
+  // Accept both direct arrays and wrapped payload shapes.
+  useEffect(() => {
+    if (!fightId) return
+
+    const unsubscribe = subscribeToEntity("locations", (data: unknown) => {
+      const currentFightId = latestWsFightId.current
+      if (currentFightId && currentFightId !== fightId) {
+        return
+      }
+
+      const locationsData = Array.isArray(data)
+        ? (data as Location[])
+        : data &&
+            typeof data === "object" &&
+            "locations" in (data as Record<string, unknown>) &&
+            Array.isArray((data as { locations: unknown }).locations)
+          ? ((data as { locations: Location[] }).locations ?? [])
+          : null
+
+      if (!locationsData) return
+
+      const hasFightIds = locationsData.some(loc => !!loc.fight_id)
+      const isForThisFight =
+        locationsData.length === 0 ||
+        !hasFightIds ||
+        locationsData.some(loc => loc.fight_id === fightId)
+
+      if (!isForThisFight) return
+
+      // Update locations without loading state changes to avoid UI flicker.
+      setLocations(locationsData)
+    })
+
+    return unsubscribe
+  }, [fightId, subscribeToEntity])
+
+  // Fallback: when encounter updates change shot->location mapping, refetch locations.
+  useEffect(() => {
+    if (!fightId) return
+
+    const unsubscribe = subscribeToEntity("encounter", (data: unknown) => {
+      if (!data || typeof data !== "object") return
+
+      const encounter = data as {
+        id?: string
+        shots?: Array<{ id?: string; location_id?: string | null }>
+      }
+      if (encounter.id !== fightId || !Array.isArray(encounter.shots)) return
+
+      const signature = encounter.shots
+        .map(shot => `${shot.id || ""}:${shot.location_id || ""}`)
+        .sort()
+        .join("|")
+
+      if (signature === lastLocationSignature.current) return
+
+      lastLocationSignature.current = signature
+      fetchLocations(false)
+    })
+
+    return unsubscribe
+  }, [fightId, fetchLocations, subscribeToEntity])
 
   return {
     locations,
