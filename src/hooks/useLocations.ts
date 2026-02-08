@@ -95,11 +95,6 @@ export function useLocations(fightId: string | undefined): UseLocationsResult {
     if (!fightId) return
 
     const unsubscribe = subscribeToEntity("locations", (data: unknown) => {
-      const currentFightId = latestWsFightId.current
-      if (currentFightId && currentFightId !== fightId) {
-        return
-      }
-
       if (!Array.isArray(data)) {
         console.warn("[useLocations] Ignoring invalid locations payload", data)
         return
@@ -108,10 +103,11 @@ export function useLocations(fightId: string | undefined): UseLocationsResult {
       const locationsData = data as Location[]
 
       const hasFightIds = locationsData.some(loc => !!loc.fight_id)
-      const isForThisFight =
-        locationsData.length === 0 ||
-        !hasFightIds ||
-        locationsData.some(loc => loc.fight_id === fightId)
+      const isForThisFight = hasFightIds
+        ? locationsData.some(loc => loc.fight_id === fightId)
+        : locationsData.length === 0
+          ? !latestWsFightId.current || latestWsFightId.current === fightId
+          : true
 
       if (!isForThisFight) return
 
