@@ -74,7 +74,7 @@ export default function SchtickDetail({
   }
 
   const handleEdit = () => {
-    router.push(`/schticks/${schtick.id}`, { target: "_blank" })
+    router.push(`/schticks/${schtick.id}`)
   }
 
   // Format created_at timestamp for display

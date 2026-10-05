@@ -229,8 +229,6 @@ export function RichDescription({
       a: ({ href, children }) => (
         <MuiLink
           href={href}
-          target="_blank"
-          rel="noopener noreferrer"
           sx={{
             color: "primary.main",
             textDecoration: "none",

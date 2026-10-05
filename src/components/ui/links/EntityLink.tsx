@@ -141,7 +141,7 @@ type EntityLinkProperties = {
  * Features:
  * - Auto-generates href from entity_class (pluralized, lowercase)
  * - Auto-selects popup component based on entity_class
- * - Opens in new tab by default
+ * - Opens in the same tab
  * - Hover popup with 500ms delay (cancelable)
  * - Popup stays open when hovering over it
  * - Data attributes for mention parsing
@@ -300,7 +300,6 @@ export default function EntityLink({
       <Link
         component="a"
         href={linkHref}
-        target={isPopupOnly ? undefined : "_blank"}
         role={isPopupOnly ? "button" : undefined}
         tabIndex={isPopupOnly ? 0 : undefined}
         data-mention-id={entity.id}

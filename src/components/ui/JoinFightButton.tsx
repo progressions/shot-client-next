@@ -70,7 +70,7 @@ export const JoinFightButton = ({ fight }: JoinFightButtonProps) => {
 
   const handleClick = () => {
     setIsShimmering(false)
-    router.push(`/encounters/${fight.id}`, { target: "_blank" })
+    router.push(`/encounters/${fight.id}`)
   }
 
   if (!fight.started_at || fight.ended_at) return null

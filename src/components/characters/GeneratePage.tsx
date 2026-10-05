@@ -246,7 +246,7 @@ export default function GeneratePage() {
               <Typography variant="h5" sx={{ mt: 2 }}>
                 Character saved successfully!
                 <br />
-                <Link href={`/characters/${character.id}`} target="_blank">
+                <Link href={`/characters/${character.id}`}>
                   {character.name}
                 </Link>
               </Typography>

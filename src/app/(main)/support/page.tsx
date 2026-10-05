@@ -82,8 +82,6 @@ export default function SupportPage() {
                 variant="contained"
                 startIcon={<GitHubIcon />}
                 href="https://github.com/progressions/shot-counter/issues/new?labels=bug&template=bug_report.md"
-                target="_blank"
-                rel="noopener noreferrer"
                 fullWidth
               >
                 Report Bug on GitHub
@@ -118,8 +116,6 @@ export default function SupportPage() {
                 variant="contained"
                 startIcon={<LightbulbIcon />}
                 href="https://github.com/progressions/shot-counter/issues/new?labels=enhancement&template=feature_request.md"
-                target="_blank"
-                rel="noopener noreferrer"
                 fullWidth
               >
                 Request Feature on GitHub
@@ -178,8 +174,6 @@ export default function SupportPage() {
                 <strong>GitHub Repository:</strong>{" "}
                 <Link
                   href="https://github.com/progressions/shot-counter"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   color="primary"
                 >
                   github.com/progressions/shot-counter

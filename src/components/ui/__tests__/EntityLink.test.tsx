@@ -94,11 +94,11 @@ describe("EntityLink", () => {
           expect(link).toHaveAttribute("href", expectedPath)
         })
 
-        it("has target='_blank' to open in new tab", () => {
+        it("does not have a target attribute (opens in same tab)", () => {
           render(<EntityLink entity={entity} />)
 
           const link = screen.getByRole("link")
-          expect(link).toHaveAttribute("target", "_blank")
+          expect(link).not.toHaveAttribute("target")
         })
 
         it("does not have role='button'", () => {

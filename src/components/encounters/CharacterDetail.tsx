@@ -551,7 +551,6 @@ export default function CharacterDetail({
                   aria-label="player view"
                   component={Link}
                   href={`/encounters/${encounter.id}/play/${character.id}`}
-                  target="_blank"
                   size="small"
                   sx={{
                     p: { xs: 0.5, sm: 1 },

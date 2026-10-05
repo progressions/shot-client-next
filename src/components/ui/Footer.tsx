@@ -3,8 +3,6 @@ import { Container, Grid, Link, Typography } from "@mui/material"
 interface FooterLink {
   label: string
   href: string
-  target?: string
-  rel?: string
 }
 
 interface FooterColumn {
@@ -29,20 +27,14 @@ const footerColumns: FooterColumn[] = [
       {
         label: "Blog",
         href: "https://isaacpriestley.com/blog",
-        target: "_blank",
-        rel: "noopener noreferrer",
       },
       {
         label: "GitHub",
         href: "https://github.com/progressions/shot-counter",
-        target: "_blank",
-        rel: "noopener noreferrer",
       },
       {
         label: "Report Issues",
         href: "https://github.com/progressions/shot-counter/issues",
-        target: "_blank",
-        rel: "noopener noreferrer",
       },
     ],
   },
@@ -52,14 +44,10 @@ const footerColumns: FooterColumn[] = [
       {
         label: "Feng Shui 2 Official",
         href: "https://atlas-games.com/fengshui/",
-        target: "_blank",
-        rel: "noopener noreferrer",
       },
       {
         label: "Atlas Games",
         href: "https://atlas-games.com/",
-        target: "_blank",
-        rel: "noopener noreferrer",
       },
       {
         label: "Contact",
