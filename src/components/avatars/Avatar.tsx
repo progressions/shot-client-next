@@ -175,7 +175,6 @@ const Avatar = ({
       <CharacterLink
         character={entity}
         href={href}
-        target="_blank"
         data-mention-id={entity.id}
         data-mention-class-name={entity.entity_class}
         sx={{ padding: 0, ml: -0.5 }}

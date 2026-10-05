@@ -329,8 +329,6 @@ export default function DocumentationPage() {
           for additional resources, or check out the{" "}
           <Link
             href="https://github.com/progressions/shot-counter"
-            target="_blank"
-            rel="noopener noreferrer"
             color="primary"
           >
             GitHub repository

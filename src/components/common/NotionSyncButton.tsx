@@ -103,13 +103,7 @@ export function NotionSyncButton({
 
       {notionLink && (
         <Tooltip title="Open in Notion">
-          <IconButton
-            href={notionLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            size="small"
-            color="primary"
-          >
+          <IconButton href={notionLink} size="small" color="primary">
             <LaunchIcon fontSize="small" />
           </IconButton>
         </Tooltip>

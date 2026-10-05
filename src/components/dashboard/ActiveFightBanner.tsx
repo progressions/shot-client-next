@@ -235,7 +235,6 @@ export default function ActiveFightBanner({
                   {currentFight && (
                     <Link
                       href={`/encounters/${currentFight.id}`}
-                      target="_blank"
                       style={{ textDecoration: "none" }}
                     >
                       <Stack

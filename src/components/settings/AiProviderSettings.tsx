@@ -370,8 +370,6 @@ export function AiProviderSettings() {
               href={
                 selectedProvider ? AI_PROVIDERS[selectedProvider].helpUrl : "#"
               }
-              target="_blank"
-              rel="noopener noreferrer"
               underline="hover"
             >
               {selectedProvider && AI_PROVIDERS[selectedProvider].helpUrl}

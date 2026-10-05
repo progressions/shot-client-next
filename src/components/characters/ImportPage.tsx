@@ -313,7 +313,6 @@ export default function UploadForm() {
                             p.character.name,
                             p.character.id
                           )}
-                          target="_blank"
                           sx={{
                             ml: 1,
                             fontFamily: theme.typography.fontFamily,
